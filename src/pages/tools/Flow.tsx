@@ -1,47 +1,192 @@
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Plus, Play, History, Settings, Workflow, Mail, Globe, FileText, Sparkles, ArrowRight, ChevronDown } from "lucide-react";
-import { useState } from "react";
-
-const blocks = [
-  { type: "trigger", name: "Email Received", icon: Mail, color: "from-blue-500 to-cyan-400" },
-  { type: "trigger", name: "Webhook", icon: Globe, color: "from-green-500 to-emerald-400" },
-  { type: "trigger", name: "File Upload", icon: FileText, color: "from-purple-500 to-pink-400" },
-  { type: "action", name: "AI Summary", icon: Sparkles, color: "from-indigo-500 to-blue-400" },
-  { type: "action", name: "Extract Data", icon: FileText, color: "from-yellow-500 to-orange-400" },
-  { type: "action", name: "Send Email", icon: Mail, color: "from-rose-500 to-red-400" },
-];
-
-const workflows = [
-  { id: 1, name: "Invoice Processing", status: "active", runs: 234, lastRun: "2 min ago" },
-  { id: 2, name: "Email Triage", status: "active", runs: 1289, lastRun: "5 min ago" },
-  { id: 3, name: "Document Analysis", status: "paused", runs: 89, lastRun: "1 hour ago" },
-];
+import { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useWorkflows, useWorkflowRuns } from '@/hooks/useWorkflows';
+import { Workflow, WorkflowBlock, BlockType, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { BlockPalette } from '@/components/flow/BlockPalette';
+import { WorkflowCanvas } from '@/components/flow/WorkflowCanvas';
+import { BlockProperties } from '@/components/flow/BlockProperties';
+import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
+import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
+import { 
+  Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
+  Settings, Loader2, MoreVertical 
+} from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function Flow() {
-  const [selectedWorkflow, setSelectedWorkflow] = useState<number | null>(null);
+  const { workflows, loading, createWorkflow, updateWorkflow, deleteWorkflow, duplicateWorkflow } = useWorkflows();
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newWorkflowName, setNewWorkflowName] = useState('');
+  const [newWorkflowDesc, setNewWorkflowDesc] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
+  const [localBlocks, setLocalBlocks] = useState<WorkflowBlock[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
+  const { runs, loading: runsLoading, createRun, updateRun } = useWorkflowRuns(selectedWorkflowId || undefined);
+
+  // Sync local blocks with selected workflow
+  useEffect(() => {
+    if (selectedWorkflow) {
+      setLocalBlocks(selectedWorkflow.blocks || []);
+      setHasUnsavedChanges(false);
+    } else {
+      setLocalBlocks([]);
+    }
+    setSelectedBlockId(null);
+  }, [selectedWorkflowId, selectedWorkflow?.id]);
+
+  const handleCreateWorkflow = async () => {
+    if (!newWorkflowName.trim()) {
+      toast.error('Please enter a workflow name');
+      return;
+    }
+
+    const workflow = await createWorkflow(newWorkflowName, newWorkflowDesc);
+    if (workflow) {
+      setSelectedWorkflowId(workflow.id);
+      setIsCreateDialogOpen(false);
+      setNewWorkflowName('');
+      setNewWorkflowDesc('');
+    }
+  };
+
+  const handleAddBlock = (type: BlockType) => {
+    if (!selectedWorkflowId) return;
+
+    const def = BLOCK_DEFINITIONS[type];
+    const newBlock: WorkflowBlock = {
+      id: crypto.randomUUID(),
+      type,
+      name: def.name,
+      config: {},
+      position: { x: 0, y: localBlocks.length * 120 }
+    };
+
+    setLocalBlocks(prev => [...prev, newBlock]);
+    setHasUnsavedChanges(true);
+    setSelectedBlockId(newBlock.id);
+  };
+
+  const handleUpdateBlock = (blockId: string, updates: Partial<WorkflowBlock>) => {
+    setLocalBlocks(prev => prev.map(b => 
+      b.id === blockId ? { ...b, ...updates } : b
+    ));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleDeleteBlock = (blockId: string) => {
+    setLocalBlocks(prev => prev.filter(b => b.id !== blockId));
+    if (selectedBlockId === blockId) setSelectedBlockId(null);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleMoveBlock = (blockId: string, direction: 'up' | 'down') => {
+    setLocalBlocks(prev => {
+      const sorted = [...prev].sort((a, b) => a.position.y - b.position.y);
+      const index = sorted.findIndex(b => b.id === blockId);
+      if (index === -1) return prev;
+      
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= sorted.length) return prev;
+
+      // Swap positions
+      const temp = sorted[index].position.y;
+      sorted[index].position.y = sorted[newIndex].position.y;
+      sorted[newIndex].position.y = temp;
+
+      return sorted;
+    });
+    setHasUnsavedChanges(true);
+  };
+
+  const handleSaveWorkflow = async () => {
+    if (!selectedWorkflowId) return;
+
+    const success = await updateWorkflow(selectedWorkflowId, { blocks: localBlocks });
+    if (success) {
+      setHasUnsavedChanges(false);
+      toast.success('Workflow saved');
+    }
+  };
+
+  const handleDeleteWorkflow = async () => {
+    if (!workflowToDelete) return;
+
+    const success = await deleteWorkflow(workflowToDelete);
+    if (success && selectedWorkflowId === workflowToDelete) {
+      setSelectedWorkflowId(null);
+    }
+    setDeleteDialogOpen(false);
+    setWorkflowToDelete(null);
+  };
+
+  const handleDuplicateWorkflow = async (workflow: Workflow) => {
+    const newWorkflow = await duplicateWorkflow(workflow);
+    if (newWorkflow) {
+      // Copy blocks to new workflow
+      await updateWorkflow(newWorkflow.id, { blocks: workflow.blocks });
+    }
+  };
+
+  const handleRunCompleted = async (workflowId: string, logs: any[], output: any) => {
+    const run = await createRun(workflowId, localBlocks.length > 0 ? 'User input' : null);
+    if (run) {
+      await updateRun(run.id, {
+        status: output ? 'success' : 'error',
+        output_data: output,
+        completed_at: new Date().toISOString()
+      });
+    }
+  };
+
+  const selectedBlock = localBlocks.find(b => b.id === selectedBlockId);
 
   return (
     <DashboardLayout>
       <div className="h-full flex flex-col">
         {/* Header */}
-        <header className="px-8 py-6 border-b border-border">
+        <header className="px-8 py-6 border-b border-border bg-card/50">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-                  <Workflow className="w-5 h-5 text-white" />
+                  <WorkflowIcon className="w-5 h-5 text-white" />
                 </div>
                 AETHER Flow
               </h1>
-              <p className="text-muted-foreground mt-1">Visual workflow automation with drag & drop</p>
+              <p className="text-muted-foreground mt-1">Visual workflow automation with AI-powered blocks</p>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm">
-                <History className="w-4 h-4 mr-2" />
-                History
-              </Button>
-              <Button variant="hero" size="sm">
+              <WorkflowHistory 
+                runs={runs} 
+                loading={runsLoading}
+                workflowName={selectedWorkflow?.name}
+              />
+              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 New Workflow
               </Button>
@@ -50,86 +195,144 @@ export default function Flow() {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex overflow-hidden">
           {/* Sidebar - Workflows List */}
-          <aside className="w-72 border-r border-border p-4 space-y-2">
+          <aside className="w-72 border-r border-border bg-card/30 p-4 overflow-y-auto">
             <h3 className="text-sm font-medium text-muted-foreground px-2 mb-4">Your Workflows</h3>
-            {workflows.map((workflow) => (
-              <button
-                key={workflow.id}
-                onClick={() => setSelectedWorkflow(workflow.id)}
-                className={`w-full p-3 rounded-lg text-left transition-all ${
-                  selectedWorkflow === workflow.id
-                    ? "bg-primary/10 border border-primary/30"
-                    : "hover:bg-secondary border border-transparent"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-foreground text-sm">{workflow.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    workflow.status === "active" 
-                      ? "bg-success/20 text-success" 
-                      : "bg-muted text-muted-foreground"
-                  }`}>
-                    {workflow.status}
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {workflow.runs} runs · Last: {workflow.lastRun}
-                </div>
-              </button>
-            ))}
+            
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : workflows.length === 0 ? (
+              <div className="text-center py-8">
+                <WorkflowIcon className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No workflows yet</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {workflows.map((workflow) => {
+                  const workflowRuns = runs.filter(r => r.workflow_id === workflow.id);
+                  const lastRun = workflowRuns[0];
+                  
+                  return (
+                    <div
+                      key={workflow.id}
+                      onClick={() => setSelectedWorkflowId(workflow.id)}
+                      className={`
+                        p-3 rounded-lg cursor-pointer transition-all
+                        ${selectedWorkflowId === workflow.id
+                          ? 'bg-primary/10 border border-primary/30'
+                          : 'hover:bg-secondary border border-transparent'
+                        }
+                      `}
+                    >
+                      <div className="flex items-start justify-between mb-1">
+                        <span className="font-medium text-foreground text-sm truncate flex-1">
+                          {workflow.name}
+                        </span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleDuplicateWorkflow(workflow)}>
+                              <Copy className="w-4 h-4 mr-2" />
+                              Duplicate
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              onClick={() => {
+                                setWorkflowToDelete(workflow.id);
+                                setDeleteDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          workflow.is_active 
+                            ? 'bg-success/20 text-success' 
+                            : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {workflow.is_active ? 'active' : 'paused'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {workflow.blocks?.length || 0} blocks
+                        </span>
+                      </div>
+                      {lastRun && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Last run: {lastRun.status}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </aside>
 
           {/* Canvas Area */}
-          <div className="flex-1 p-8 bg-background/50">
+          <div className="flex-1 flex flex-col bg-background/50">
             {selectedWorkflow ? (
-              <div className="h-full flex flex-col">
+              <>
                 {/* Workflow Controls */}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    {workflows.find(w => w.id === selectedWorkflow)?.name}
-                  </h2>
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/30">
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">
+                      {selectedWorkflow.name}
+                    </h2>
+                    {selectedWorkflow.description && (
+                      <p className="text-sm text-muted-foreground">{selectedWorkflow.description}</p>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                      <Settings className="w-4 h-4" />
+                    {hasUnsavedChanges && (
+                      <span className="text-xs text-amber-500 mr-2">Unsaved changes</span>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleSaveWorkflow}
+                      disabled={!hasUnsavedChanges}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Save
                     </Button>
-                    <Button variant="hero" size="sm">
-                      <Play className="w-4 h-4 mr-2" />
-                      Run Workflow
-                    </Button>
+                    <WorkflowExecutor
+                      blocks={localBlocks}
+                      workflowId={selectedWorkflow.id}
+                      workflowName={selectedWorkflow.name}
+                      onRunCreated={handleRunCompleted}
+                    />
                   </div>
                 </div>
 
-                {/* Visual Canvas */}
-                <div className="flex-1 rounded-2xl border-2 border-dashed border-border bg-card/30 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-4 mb-6">
-                      {[0, 1, 2].map((i) => {
-                        const Icon = blocks[i].icon;
-                        return (
-                          <div key={i} className="flex items-center">
-                            <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${blocks[i].color} flex items-center justify-center shadow-lg`}>
-                              <Icon className="w-7 h-7 text-white" />
-                            </div>
-                            {i < 2 && <ArrowRight className="w-5 h-5 text-muted-foreground mx-2" />}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <p className="text-muted-foreground text-sm">
-                      Drag blocks from the panel to build your workflow
-                    </p>
-                  </div>
-                </div>
-              </div>
+                {/* Canvas */}
+                <WorkflowCanvas
+                  blocks={localBlocks}
+                  selectedBlockId={selectedBlockId}
+                  onSelectBlock={setSelectedBlockId}
+                  onDeleteBlock={handleDeleteBlock}
+                  onMoveBlock={handleMoveBlock}
+                />
+              </>
             ) : (
-              <div className="h-full flex items-center justify-center text-center">
-                <div>
-                  <Workflow className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <WorkflowIcon className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-foreground mb-2">Select a workflow</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Choose a workflow from the list or create a new one</p>
-                  <Button variant="hero">
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Choose a workflow from the list or create a new one
+                  </p>
+                  <Button variant="hero" onClick={() => setIsCreateDialogOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Create Workflow
                   </Button>
@@ -138,52 +341,80 @@ export default function Flow() {
             )}
           </div>
 
-          {/* Blocks Panel */}
-          <aside className="w-64 border-l border-border p-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-4">Available Blocks</h3>
-            
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Triggers</h4>
-                <div className="space-y-2">
-                  {blocks.filter(b => b.type === "trigger").map((block) => (
-                    <div
-                      key={block.name}
-                      className="p-3 rounded-lg bg-card border border-border hover:border-primary/50 cursor-grab transition-all group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${block.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <block.icon className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{block.name}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">AI Actions</h4>
-                <div className="space-y-2">
-                  {blocks.filter(b => b.type === "action").map((block) => (
-                    <div
-                      key={block.name}
-                      className="p-3 rounded-lg bg-card border border-border hover:border-primary/50 cursor-grab transition-all group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${block.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <block.icon className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{block.name}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </aside>
+          {/* Properties Panel or Block Palette */}
+          {selectedWorkflow && (
+            selectedBlock ? (
+              <BlockProperties
+                block={selectedBlock}
+                onUpdate={(updates) => handleUpdateBlock(selectedBlock.id, updates)}
+                onClose={() => setSelectedBlockId(null)}
+              />
+            ) : (
+              <BlockPalette onAddBlock={handleAddBlock} />
+            )
+          )}
         </div>
       </div>
+
+      {/* Create Workflow Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Workflow</DialogTitle>
+            <DialogDescription>
+              Give your workflow a name and optional description
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Name</label>
+              <Input
+                value={newWorkflowName}
+                onChange={(e) => setNewWorkflowName(e.target.value)}
+                placeholder="e.g., Invoice Processing"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Description (optional)</label>
+              <Textarea
+                value={newWorkflowDesc}
+                onChange={(e) => setNewWorkflowDesc(e.target.value)}
+                placeholder="Describe what this workflow does..."
+                rows={3}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="hero" onClick={handleCreateWorkflow}>
+              Create
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Workflow?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the workflow and all its execution history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteWorkflow}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
