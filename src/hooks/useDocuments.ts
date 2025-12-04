@@ -193,46 +193,89 @@ export function useDocuments() {
     try {
       const prompt = `Tu es un expert en rédaction de documents professionnels.
 Génère un document complet de type "${params.type}" sur le sujet "${params.subject}".
-Public cible: ${params.target}
+Public cible: ${params.target || 'général'}
 Ton: ${params.tone}
 Niveau de détail: ${params.detailLevel}
 
-Retourne le document au format JSON avec la structure suivante:
+IMPORTANT: Retourne UNIQUEMENT un objet JSON valide (sans markdown, sans backticks) avec cette structure exacte:
 {
   "blocks": [
-    {"type": "heading", "content": "Titre", "level": 1},
-    {"type": "paragraph", "content": "texte..."},
-    {"type": "list", "items": ["item1", "item2"]},
-    {"type": "callout", "content": "note importante", "style": "info"}
+    {"type": "heading", "content": "Titre principal", "level": 1},
+    {"type": "paragraph", "content": "Introduction..."},
+    {"type": "heading", "content": "Section 1", "level": 2},
+    {"type": "paragraph", "content": "Contenu..."},
+    {"type": "list", "items": ["Point 1", "Point 2"]},
+    {"type": "callout", "content": "Note importante", "style": "info"}
   ]
 }
 
-Génère un document professionnel, structuré et complet.`;
+Types de blocs disponibles: heading (avec level 1-3), paragraph, list (avec items array), callout (avec style: info/warning/success/error), quote.
+Génère un document professionnel, structuré et complet avec au moins 5-10 blocs.`;
 
+      console.log('Generating document with params:', params);
+      
       const response = await callAI({
         messages: [{ role: 'user', content: prompt }],
         type: 'generate'
       });
+
+      console.log('AI response received:', response.content?.substring(0, 200));
 
       if (response.error) {
         toast({ title: 'Erreur IA', description: response.error, variant: 'destructive' });
         return null;
       }
 
-      // Parse JSON response
+      if (!response.content) {
+        toast({ title: 'Erreur', description: 'Réponse vide de l\'IA', variant: 'destructive' });
+        return null;
+      }
+
+      // Parse JSON response - try multiple approaches
       try {
-        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+        // First, try to find JSON in the response (might be wrapped in markdown code blocks)
+        let jsonStr = response.content;
+        
+        // Remove markdown code blocks if present
+        const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (codeBlockMatch) {
+          jsonStr = codeBlockMatch[1];
+        }
+        
+        // Try to find JSON object
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
-          return parsed.blocks || [];
+          const blocks = parsed.blocks || [];
+          
+          if (blocks.length === 0) {
+            throw new Error('No blocks in response');
+          }
+          
+          // Add IDs to blocks
+          return blocks.map((block: any) => ({
+            id: crypto.randomUUID(),
+            type: block.type || 'paragraph',
+            content: block.content || '',
+            level: block.level,
+            items: block.items,
+            style: block.style,
+          }));
         }
-      } catch {
-        // Fallback: create blocks from text
+        
+        throw new Error('No JSON found in response');
+      } catch (parseError) {
+        console.error('JSON parsing error:', parseError);
+        // Fallback: create blocks from raw text
+        toast({ title: 'Info', description: 'Document généré en mode texte simple' });
         return [
+          { id: crypto.randomUUID(), type: 'heading', content: params.subject, level: 1 },
           { id: crypto.randomUUID(), type: 'paragraph', content: response.content }
         ];
       }
-
+    } catch (error) {
+      console.error('Generate document error:', error);
+      toast({ title: 'Erreur', description: 'Erreur lors de la génération', variant: 'destructive' });
       return null;
     } finally {
       setProcessing(false);
