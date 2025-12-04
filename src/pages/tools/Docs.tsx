@@ -100,7 +100,9 @@ export default function Docs() {
 
   // Use template
   const handleUseTemplate = async (template: Template) => {
-    const newDoc = await createDocument(`${template.title} - ${new Date().toLocaleDateString()}`, template.content, template.type, template.id);
+    // Don't pass template_id for default templates (they have non-UUID ids like "default-1")
+    const templateId = template.is_default ? undefined : template.id;
+    const newDoc = await createDocument(`${template.title} - ${new Date().toLocaleDateString()}`, template.content, template.type, templateId);
     if (newDoc) {
       openDocument(newDoc);
     }
