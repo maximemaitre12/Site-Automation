@@ -1,0 +1,112 @@
+import { useState } from "react";
+import { NavLink } from "@/components/NavLink";
+import { useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import {
+  Workflow,
+  FileText,
+  TrendingUp,
+  DollarSign,
+  Users,
+  HeadphonesIcon,
+  BarChart3,
+  Brain,
+  Shield,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  Sparkles,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const tools = [
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "AETHER Flow", path: "/flow", icon: Workflow, description: "Workflow Orchestrator" },
+  { name: "AETHER Docs", path: "/docs", icon: FileText, description: "Document Engine" },
+  { name: "Sales Copilot", path: "/sales", icon: TrendingUp, description: "Sales Assistant" },
+  { name: "Finance", path: "/finance", icon: DollarSign, description: "Financial Automation" },
+  { name: "HR Copilot", path: "/hr", icon: Users, description: "HR Assistant" },
+  { name: "Support Copilot", path: "/support", icon: HeadphonesIcon, description: "Support AI" },
+  { name: "Insights", path: "/insights", icon: BarChart3, description: "BI & Analytics" },
+  { name: "Brain", path: "/brain", icon: Brain, description: "Internal Assistant" },
+  { name: "Compliance", path: "/compliance", icon: Shield, description: "Audit & Compliance" },
+];
+
+export function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
+
+  return (
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-40 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col",
+        collapsed ? "w-16" : "w-64"
+      )}
+    >
+      {/* Logo */}
+      <div className="flex items-center h-16 px-4 border-b border-sidebar-border">
+        <NavLink to="/" className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-primary-foreground" />
+          </div>
+          {!collapsed && (
+            <span className="font-bold text-lg text-foreground">AETHER</span>
+          )}
+        </NavLink>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-4 px-2">
+        <div className="space-y-1">
+          {tools.map((tool) => {
+            const isActive = location.pathname === tool.path;
+            return (
+              <NavLink
+                key={tool.path}
+                to={tool.path}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+                )}
+              >
+                <tool.icon className={cn(
+                  "w-5 h-5 flex-shrink-0 transition-colors",
+                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                )} />
+                {!collapsed && (
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium truncate">{tool.name}</span>
+                    {tool.description && (
+                      <span className="text-xs text-muted-foreground truncate">{tool.description}</span>
+                    )}
+                  </div>
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* Collapse button */}
+      <div className="p-2 border-t border-sidebar-border">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setCollapsed(!collapsed)}
+          className="w-full justify-center"
+        >
+          {collapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <>
+              <ChevronLeft className="w-4 h-4" />
+              <span>Collapse</span>
+            </>
+          )}
+        </Button>
+      </div>
+    </aside>
+  );
+}
