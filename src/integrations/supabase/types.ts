@@ -282,6 +282,7 @@ export type Database = {
       documents: {
         Row: {
           analysis: Json | null
+          content: Json | null
           created_at: string
           file_type: string | null
           file_url: string | null
@@ -291,12 +292,16 @@ export type Database = {
           raw_text: string | null
           status: string | null
           summary: string | null
+          tags: Json | null
+          template_id: string | null
           title: string
+          type: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           analysis?: Json | null
+          content?: Json | null
           created_at?: string
           file_type?: string | null
           file_url?: string | null
@@ -306,12 +311,16 @@ export type Database = {
           raw_text?: string | null
           status?: string | null
           summary?: string | null
+          tags?: Json | null
+          template_id?: string | null
           title: string
+          type?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           analysis?: Json | null
+          content?: Json | null
           created_at?: string
           file_type?: string | null
           file_url?: string | null
@@ -321,11 +330,22 @@ export type Database = {
           raw_text?: string | null
           status?: string | null
           summary?: string | null
+          tags?: Json | null
+          template_id?: string | null
           title?: string
+          type?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "documents_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       internal_docs: {
         Row: {
@@ -614,6 +634,45 @@ export type Database = {
           status?: string | null
           subject?: string
           ticket_number?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      templates: {
+        Row: {
+          content: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          is_default: boolean | null
+          tags: Json | null
+          title: string
+          type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          tags?: Json | null
+          title: string
+          type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          tags?: Json | null
+          title?: string
+          type?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
