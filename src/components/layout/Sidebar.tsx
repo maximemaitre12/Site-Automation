@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   Workflow,
@@ -16,25 +16,36 @@ import {
   ChevronRight,
   LayoutDashboard,
   Sparkles,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "AETHER Flow", path: "/flow", icon: Workflow, description: "Workflow Orchestrator" },
-  { name: "AETHER Docs", path: "/docs", icon: FileText, description: "Document Engine" },
-  { name: "Sales Copilot", path: "/sales", icon: TrendingUp, description: "Sales Assistant" },
-  { name: "Finance", path: "/finance", icon: DollarSign, description: "Financial Automation" },
-  { name: "HR Copilot", path: "/hr", icon: Users, description: "HR Assistant" },
-  { name: "Support Copilot", path: "/support", icon: HeadphonesIcon, description: "Support AI" },
-  { name: "Insights", path: "/insights", icon: BarChart3, description: "BI & Analytics" },
-  { name: "Brain", path: "/brain", icon: Brain, description: "Internal Assistant" },
-  { name: "Compliance", path: "/compliance", icon: Shield, description: "Audit & Compliance" },
+  { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
+  { name: "AETHER Docs", path: "/tools/docs", icon: FileText, description: "Document Engine" },
+  { name: "Sales Copilot", path: "/tools/sales", icon: TrendingUp, description: "Sales Assistant" },
+  { name: "Finance", path: "/tools/finance", icon: DollarSign, description: "Financial Automation" },
+  { name: "HR Copilot", path: "/tools/hr", icon: Users, description: "HR Assistant" },
+  { name: "Support Copilot", path: "/tools/support", icon: HeadphonesIcon, description: "Support AI" },
+  { name: "Insights", path: "/tools/insights", icon: BarChart3, description: "BI & Analytics" },
+  { name: "Brain", path: "/tools/brain", icon: Brain, description: "Internal Assistant" },
+  { name: "Compliance", path: "/tools/compliance", icon: Shield, description: "Audit & Compliance" },
 ];
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out successfully");
+    navigate("/");
+  };
 
   return (
     <aside
@@ -89,8 +100,22 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Collapse button */}
-      <div className="p-2 border-t border-sidebar-border">
+      {/* User & Collapse */}
+      <div className="p-2 border-t border-sidebar-border space-y-2">
+        {user && !collapsed && (
+          <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+            {user.email}
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleSignOut}
+          className="w-full justify-start text-muted-foreground hover:text-destructive"
+        >
+          <LogOut className="w-4 h-4" />
+          {!collapsed && <span className="ml-2">Sign out</span>}
+        </Button>
         <Button
           variant="ghost"
           size="sm"

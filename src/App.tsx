@@ -2,11 +2,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, RequireAuth } from "@/hooks/useAuth";
+
+// Pages
 import Landing from "./pages/Landing";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import NotFound from "./pages/NotFound";
+
+// Tools
 import Flow from "./pages/tools/Flow";
 import Docs from "./pages/tools/Docs";
 import Sales from "./pages/tools/Sales";
@@ -16,7 +21,6 @@ import Support from "./pages/tools/Support";
 import Insights from "./pages/tools/Insights";
 import BrainPage from "./pages/tools/Brain";
 import Compliance from "./pages/tools/Compliance";
-import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -26,23 +30,30 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/flow" element={<Flow />} />
-          <Route path="/docs" element={<Docs />} />
-          <Route path="/sales" element={<Sales />} />
-          <Route path="/finance" element={<Finance />} />
-          <Route path="/hr" element={<HR />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/brain" element={<BrainPage />} />
-          <Route path="/compliance" element={<Compliance />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
+            <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
+            
+            {/* Protected routes */}
+            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/tools/flow" element={<RequireAuth><Flow /></RequireAuth>} />
+            <Route path="/tools/docs" element={<RequireAuth><Docs /></RequireAuth>} />
+            <Route path="/tools/sales" element={<RequireAuth><Sales /></RequireAuth>} />
+            <Route path="/tools/finance" element={<RequireAuth><Finance /></RequireAuth>} />
+            <Route path="/tools/hr" element={<RequireAuth><HR /></RequireAuth>} />
+            <Route path="/tools/support" element={<RequireAuth><Support /></RequireAuth>} />
+            <Route path="/tools/insights" element={<RequireAuth><Insights /></RequireAuth>} />
+            <Route path="/tools/brain" element={<RequireAuth><BrainPage /></RequireAuth>} />
+            <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
+            
+            {/* Catch-all */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
