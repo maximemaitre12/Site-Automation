@@ -1,0 +1,384 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
+import { callAI } from '@/lib/ai';
+
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: Message[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InternalDoc {
+  id: string;
+  title: string;
+  content: string | null;
+  doc_type: string | null;
+  file_url: string | null;
+  tags: string[] | null;
+  created_at: string;
+}
+
+export function useBrain() {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [documents, setDocuments] = useState<InternalDoc[]>([]);
+  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const fetchConversations = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+
+    if (!error && data) {
+      const parsed = data.map(conv => ({
+        ...conv,
+        messages: (conv.messages as any[]) || []
+      }));
+      setConversations(parsed);
+    }
+    setLoading(false);
+  };
+
+  const fetchDocuments = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('internal_docs')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (!error) {
+      setDocuments(data?.map(doc => ({
+        ...doc,
+        tags: doc.tags as string[] | null
+      })) || []);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+      fetchDocuments();
+    }
+  }, [user]);
+
+  const createConversation = async (initialMessage?: string): Promise<Conversation | null> => {
+    if (!user) return null;
+
+    const newConv: Partial<Conversation> = {
+      title: initialMessage?.slice(0, 50) || 'Nouvelle conversation',
+      messages: [],
+    };
+
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert({
+        user_id: user.id,
+        title: newConv.title,
+        messages: []
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast({ title: 'Erreur', description: 'Impossible de créer la conversation', variant: 'destructive' });
+      return null;
+    }
+
+    const conversation = { ...data, messages: [] };
+    setConversations(prev => [conversation, ...prev]);
+    setCurrentConversation(conversation);
+    return conversation;
+  };
+
+  const sendMessage = async (content: string, conversationId?: string): Promise<Message | null> => {
+    if (!user || !content.trim()) return null;
+
+    setSendingMessage(true);
+    
+    try {
+      let conv = currentConversation;
+      
+      // Create new conversation if needed
+      if (!conv || (conversationId && conv.id !== conversationId)) {
+        if (conversationId) {
+          conv = conversations.find(c => c.id === conversationId) || null;
+        }
+        if (!conv) {
+          conv = await createConversation(content);
+        }
+      }
+      
+      if (!conv) throw new Error('No conversation');
+
+      const userMessage: Message = {
+        id: crypto.randomUUID(),
+        role: 'user',
+        content,
+        timestamp: new Date()
+      };
+
+      // Update local state immediately
+      const updatedMessages = [...conv.messages, userMessage];
+      setCurrentConversation({ ...conv, messages: updatedMessages });
+
+      // Build context from documents for RAG-like behavior
+      const docContext = documents.length > 0 
+        ? `\n\nDocuments disponibles dans la base de connaissances:\n${documents.map(d => `- ${d.title}: ${d.content?.slice(0, 500) || 'Pas de contenu'}`).join('\n')}`
+        : '';
+
+      // Get AI response
+      const response = await callAI({
+        messages: [
+          ...updatedMessages.slice(-10).map(m => ({ 
+            role: m.role as 'user' | 'assistant', 
+            content: m.content 
+          }))
+        ],
+        systemPrompt: `Tu es AETHER Brain, l'assistant IA interne d'une entreprise. Tu aides les utilisateurs à:
+- Répondre à leurs questions en utilisant la base de connaissances
+- Rédiger des procédures et de la documentation
+- Améliorer et reformuler des textes
+- Analyser et synthétiser des informations
+- Prendre des notes intelligentes
+
+Réponds toujours en français de manière professionnelle, claire et utile.${docContext}`,
+        type: 'chat'
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      const assistantMessage: Message = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: response.content,
+        timestamp: new Date()
+      };
+
+      const finalMessages = [...updatedMessages, assistantMessage];
+      
+      // Update title if first message
+      const newTitle = conv.messages.length === 0 ? content.slice(0, 50) : conv.title;
+
+      // Convert messages to JSON-serializable format
+      const messagesForDb = finalMessages.map(m => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp
+      }));
+
+      // Save to database
+      await supabase
+        .from('conversations')
+        .update({ 
+          messages: messagesForDb,
+          title: newTitle,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', conv.id);
+
+      // Update local state
+      const updatedConv = { ...conv, messages: finalMessages, title: newTitle };
+      setCurrentConversation(updatedConv);
+      setConversations(prev => 
+        prev.map(c => c.id === conv!.id ? updatedConv : c)
+      );
+
+      return assistantMessage;
+    } catch (err) {
+      toast({ 
+        title: 'Erreur', 
+        description: err instanceof Error ? err.message : 'Erreur lors de l\'envoi', 
+        variant: 'destructive' 
+      });
+      return null;
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const deleteConversation = async (id: string): Promise<boolean> => {
+    const { error } = await supabase.from('conversations').delete().eq('id', id);
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    setConversations(prev => prev.filter(c => c.id !== id));
+    if (currentConversation?.id === id) {
+      setCurrentConversation(null);
+    }
+    return true;
+  };
+
+  const selectConversation = (id: string) => {
+    const conv = conversations.find(c => c.id === id);
+    if (conv) setCurrentConversation(conv);
+  };
+
+  // Document management
+  const uploadDocument = async (title: string, content: string, docType: string = 'text', tags: string[] = []): Promise<InternalDoc | null> => {
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from('internal_docs')
+      .insert({
+        user_id: user.id,
+        title,
+        content,
+        doc_type: docType,
+        tags
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast({ title: 'Erreur', description: 'Impossible d\'ajouter le document', variant: 'destructive' });
+      return null;
+    }
+
+    const doc = { ...data, tags: data.tags as string[] | null };
+    setDocuments(prev => [doc, ...prev]);
+    toast({ title: 'Succès', description: 'Document ajouté à la base de connaissances' });
+    return doc;
+  };
+
+  const deleteDocument = async (id: string): Promise<boolean> => {
+    const { error } = await supabase.from('internal_docs').delete().eq('id', id);
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    setDocuments(prev => prev.filter(d => d.id !== id));
+    toast({ title: 'Succès', description: 'Document supprimé' });
+    return true;
+  };
+
+  const searchDocuments = async (query: string): Promise<InternalDoc[]> => {
+    if (!user || !query.trim()) return documents;
+
+    const { data, error } = await supabase
+      .from('internal_docs')
+      .select('*')
+      .eq('user_id', user.id)
+      .or(`title.ilike.%${query}%,content.ilike.%${query}%`);
+
+    if (error) return [];
+    return data?.map(doc => ({
+      ...doc,
+      tags: doc.tags as string[] | null
+    })) || [];
+  };
+
+  // AI-powered features
+  const generateProcedure = async (topic: string): Promise<string | null> => {
+    const response = await callAI({
+      messages: [{ 
+        role: 'user', 
+        content: `Génère une procédure détaillée et professionnelle pour: ${topic}
+        
+La procédure doit inclure:
+- Un titre clair
+- L'objectif
+- Les prérequis
+- Les étapes numérotées avec détails
+- Les points d'attention
+- Les critères de validation` 
+      }],
+      type: 'generate'
+    });
+
+    if (response.error) {
+      toast({ title: 'Erreur', description: response.error, variant: 'destructive' });
+      return null;
+    }
+    return response.content;
+  };
+
+  const improveText = async (text: string, style: 'formal' | 'casual' | 'concise' | 'detailed' = 'formal'): Promise<string | null> => {
+    const styleInstructions = {
+      formal: 'un style formel et professionnel',
+      casual: 'un style décontracté mais professionnel',
+      concise: 'un style concis et direct',
+      detailed: 'un style détaillé et explicatif'
+    };
+
+    const response = await callAI({
+      messages: [{ 
+        role: 'user', 
+        content: `Améliore ce texte avec ${styleInstructions[style]}. Conserve le sens original mais améliore la clarté, la grammaire et le style:\n\n${text}` 
+      }],
+      type: 'generate'
+    });
+
+    if (response.error) {
+      toast({ title: 'Erreur', description: response.error, variant: 'destructive' });
+      return null;
+    }
+    return response.content;
+  };
+
+  const summarizeDocument = async (docId: string): Promise<string | null> => {
+    const doc = documents.find(d => d.id === docId);
+    if (!doc || !doc.content) {
+      toast({ title: 'Erreur', description: 'Document non trouvé ou vide', variant: 'destructive' });
+      return null;
+    }
+
+    const response = await callAI({
+      messages: [{ 
+        role: 'user', 
+        content: `Résume ce document de manière structurée avec les points clés:\n\n${doc.content}` 
+      }],
+      type: 'summarize'
+    });
+
+    if (response.error) {
+      toast({ title: 'Erreur', description: response.error, variant: 'destructive' });
+      return null;
+    }
+    return response.content;
+  };
+
+  return {
+    conversations,
+    documents,
+    currentConversation,
+    loading,
+    sendingMessage,
+    createConversation,
+    sendMessage,
+    deleteConversation,
+    selectConversation,
+    uploadDocument,
+    deleteDocument,
+    searchDocuments,
+    generateProcedure,
+    improveText,
+    summarizeDocument,
+    refreshConversations: fetchConversations,
+    refreshDocuments: fetchDocuments,
+    setCurrentConversation
+  };
+}
