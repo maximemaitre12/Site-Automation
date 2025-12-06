@@ -175,6 +175,7 @@ export async function executeWorkflow(
     const log: WorkflowRunLog = {
       blockId: block.id,
       blockName: block.name || blockDef?.name || block.type,
+      blockType: block.type,
       input: currentInput,
       output: null,
       status: 'pending',

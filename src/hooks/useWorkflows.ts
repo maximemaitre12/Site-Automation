@@ -29,7 +29,8 @@ export function useWorkflows() {
       
       setWorkflows((data || []).map(w => ({
         ...w,
-        blocks: (w.blocks as unknown as WorkflowBlock[]) || []
+        blocks: (w.blocks as unknown as WorkflowBlock[]) || [],
+        connections: []
       })));
     } catch (error) {
       console.error('Error fetching workflows:', error);

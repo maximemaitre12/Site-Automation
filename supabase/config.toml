@@ -1,4 +1,10 @@
 project_id = "gydrpmetswrkrjcbkgqd"
 
+[functions.workflow-execute]
+verify_jwt = false
+
+[functions.workflow-generate]
+verify_jwt = false
+
 [functions.ai-chat]
 verify_jwt = false
