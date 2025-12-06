@@ -1,18 +1,69 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, AlertTriangle, CheckCircle, Download, Sparkles, FileText } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Shield, AlertTriangle, CheckCircle, TrendingUp, FileText, Loader2, Sparkles, BarChart3 } from "lucide-react";
 import { useState } from "react";
+import { useCompliance, Audit } from "@/hooks/useCompliance";
+import { AuditResult } from "@/components/compliance/AuditResult";
+import { ReportDialog } from "@/components/compliance/ReportDialog";
 
-const audits = [
-  { id: 1, name: "Privacy Policy Review", score: 85, risks: 2, date: "Dec 1, 2024" },
-  { id: 2, name: "Data Processing Audit", score: 72, risks: 5, date: "Nov 28, 2024" },
-  { id: 3, name: "Cookie Consent Check", score: 95, risks: 1, date: "Nov 25, 2024" },
+const auditTypes = [
+  { value: 'gdpr', label: 'Conformité RGPD', description: 'Audit complet RGPD' },
+  { value: 'privacy', label: 'Politique de confidentialité', description: 'Analyse de politique' },
+  { value: 'data_processing', label: 'Traitement des données', description: 'Audit des processus' },
+  { value: 'cookies', label: 'Cookies & Traceurs', description: 'Conformité cookies' },
 ];
 
 export default function Compliance() {
-  const [text, setText] = useState("");
+  const { audits, loading, analyzing, runAudit, deleteAudit, generateReport, getStats } = useCompliance();
+  
+  const [auditType, setAuditType] = useState('gdpr');
+  const [inputText, setInputText] = useState('');
+  const [title, setTitle] = useState('');
+  const [selectedAudit, setSelectedAudit] = useState<Audit | null>(null);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [report, setReport] = useState<string | null>(null);
+  const [generatingReport, setGeneratingReport] = useState(false);
+
+  const stats = getStats();
+
+  const handleRunAudit = async () => {
+    if (!inputText.trim()) return;
+    const result = await runAudit(auditType, inputText, title || undefined);
+    if (result) {
+      setSelectedAudit(result);
+      setInputText('');
+      setTitle('');
+    }
+  };
+
+  const handleGenerateReport = async (auditId: string) => {
+    const audit = audits.find(a => a.id === auditId);
+    if (!audit) return;
+    
+    setSelectedAudit(audit);
+    setReportDialogOpen(true);
+    setGeneratingReport(true);
+    
+    const reportContent = await generateReport(auditId);
+    setReport(reportContent);
+    setGeneratingReport(false);
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="h-full flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -27,102 +78,183 @@ export default function Compliance() {
                 </div>
                 AETHER Compliance
               </h1>
-              <p className="text-muted-foreground mt-1">Automated GDPR audit and compliance risk detection</p>
+              <p className="text-muted-foreground mt-1">Audit automatisé RGPD et détection des risques de conformité</p>
             </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-4 gap-4 mt-6">
+            <Card>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.total}</p>
+                  <p className="text-xs text-muted-foreground">Audits réalisés</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.avgScore}%</p>
+                  <p className="text-xs text-muted-foreground">Score moyen</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.highRiskCount}</p>
+                  <p className="text-xs text-muted-foreground">Risques élevés</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{stats.completedCount}</p>
+                  <p className="text-xs text-muted-foreground">Audits terminés</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex overflow-hidden">
           {/* Audit Form */}
-          <div className="flex-1 p-8">
+          <div className="flex-1 p-8 overflow-y-auto">
             <div className="max-w-2xl">
-              <h2 className="text-lg font-semibold text-foreground mb-4">New Compliance Audit</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-4">Nouvel audit de conformité</h2>
               
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label>Audit Type</Label>
-                  <select className="w-full h-10 rounded-lg bg-secondary border border-border px-3 text-foreground">
-                    <option>GDPR Compliance</option>
-                    <option>Privacy Policy Review</option>
-                    <option>Data Processing Analysis</option>
-                    <option>Cookie Consent Audit</option>
-                  </select>
+                  <Label htmlFor="title">Titre de l'audit (optionnel)</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Ex: Audit politique vie privée site web"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="content">Text or Process to Analyze</Label>
+                  <Label>Type d'audit</Label>
+                  <Select value={auditType} onValueChange={setAuditType}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {auditTypes.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          <div className="flex flex-col">
+                            <span>{type.label}</span>
+                            <span className="text-xs text-muted-foreground">{type.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="content">Texte, politique ou processus à analyser</Label>
                   <Textarea
                     id="content"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Paste the text, policy, or describe the process you want to audit for compliance..."
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Collez ici le texte de votre politique de confidentialité, conditions d'utilisation, ou décrivez le processus de traitement des données à auditer..."
                     className="min-h-[250px]"
                   />
                 </div>
 
-                <Button variant="hero" className="w-full">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Run Compliance Audit
+                <Button 
+                  onClick={handleRunAudit} 
+                  disabled={analyzing || !inputText.trim()}
+                  className="w-full"
+                  size="lg"
+                >
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Lancer l'audit de conformité
+                    </>
+                  )}
                 </Button>
+
+                {/* Quick Tips */}
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-5 h-5 text-primary" />
+                    <h4 className="font-medium text-foreground">Conseils pour un audit efficace</h4>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Incluez le texte complet de votre politique</li>
+                    <li>• Décrivez les flux de données en détail</li>
+                    <li>• Mentionnez les tiers et sous-traitants</li>
+                    <li>• Précisez les durées de conservation</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Recent Audits */}
-          <aside className="w-96 border-l border-border p-6 bg-card/30">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-foreground">Recent Audits</h3>
-              <Button variant="ghost" size="sm">View All</Button>
+          {/* Results Panel */}
+          <aside className="w-[450px] border-l border-border bg-card/30 overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-border">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Audits récents
+              </h3>
             </div>
-
-            <div className="space-y-3">
-              {audits.map((audit) => (
-                <div key={audit.id} className="p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all cursor-pointer">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-foreground">{audit.name}</h4>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                      audit.score >= 90 ? "bg-success/20 text-success" :
-                      audit.score >= 70 ? "bg-warning/20 text-warning" :
-                      "bg-destructive/20 text-destructive"
-                    }`}>
-                      {audit.score}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />
-                      {audit.risks} risks
-                    </span>
-                    <span>{audit.date}</span>
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <Button variant="subtle" size="sm" className="flex-1">
-                      <FileText className="w-3 h-3 mr-1" />
-                      View Report
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Download className="w-3 h-3" />
-                    </Button>
-                  </div>
+            
+            <ScrollArea className="flex-1 p-4">
+              {audits.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Shield className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Aucun audit réalisé</p>
+                  <p className="text-sm">Lancez votre premier audit de conformité</p>
                 </div>
-              ))}
-            </div>
-
-            {/* Compliance Tips */}
-            <div className="mt-6 p-4 rounded-xl bg-primary/5 border border-primary/20">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <h4 className="font-medium text-foreground">Quick Tips</h4>
-              </div>
-              <ul className="text-sm text-muted-foreground space-y-2">
-                <li>• Include clear data retention policies</li>
-                <li>• Document all third-party processors</li>
-                <li>• Ensure consent mechanisms are explicit</li>
-              </ul>
-            </div>
+              ) : (
+                <div className="space-y-4">
+                  {audits.map(audit => (
+                    <AuditResult
+                      key={audit.id}
+                      audit={audit}
+                      onDelete={deleteAudit}
+                      onGenerateReport={handleGenerateReport}
+                    />
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
           </aside>
         </div>
+
+        {/* Report Dialog */}
+        <ReportDialog
+          open={reportDialogOpen}
+          onOpenChange={setReportDialogOpen}
+          report={report}
+          loading={generatingReport}
+          auditTitle={selectedAudit?.title || 'Audit'}
+        />
       </div>
     </DashboardLayout>
   );
