@@ -8,9 +8,7 @@ import {
   ChevronRight, Plus
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
@@ -108,42 +106,30 @@ export function EnhancedBlockPalette({ onAddBlock }: EnhancedBlockPaletteProps) 
 
                 {isExpanded && (
                   <div className="space-y-1.5 mt-2">
-                    <TooltipProvider delayDuration={300}>
-                      {blocks.map(([type, def]) => {
-                        const Icon = iconMap[def.icon] || Sparkles;
-                        return (
-                          <Tooltip key={type}>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={() => onAddBlock(type)}
-                                className="w-full p-2.5 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group text-left flex items-center gap-3"
-                              >
-                                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${def.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
-                                  <Icon className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <span className="text-sm font-medium text-foreground block truncate">
-                                    {def.name}
-                                  </span>
-                                </div>
-                                <Plus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="max-w-xs">
-                              <p className="font-medium">{def.name}</p>
-                              <p className="text-xs text-muted-foreground mt-1">{def.description}</p>
-                              {def.configFields.length > 0 && (
-                                <div className="mt-2 text-xs">
-                                  <span className="text-muted-foreground">Config: </span>
-                                  {def.configFields.map(f => f.label).slice(0, 3).join(', ')}
-                                  {def.configFields.length > 3 && '...'}
-                                </div>
-                              )}
-                            </TooltipContent>
-                          </Tooltip>
-                        );
-                      })}
-                    </TooltipProvider>
+                    {blocks.map(([type, def]) => {
+                      const Icon = iconMap[def.icon] || Sparkles;
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => onAddBlock(type)}
+                          className="w-full p-2.5 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group text-left flex items-center gap-3"
+                          title={def.description}
+                        >
+                          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${def.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
+                            <Icon className="w-4 h-4 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm font-medium text-foreground block truncate">
+                              {def.name}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate block">
+                              {def.description}
+                            </span>
+                          </div>
+                          <Plus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
