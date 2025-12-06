@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -19,9 +18,12 @@ import {
   LogOut,
   Building2,
   Settings,
+  Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useSidebarState } from "@/hooks/useSidebar";
 import { toast } from "sonner";
 
 const tools = [
@@ -42,7 +44,7 @@ const settingsLinks = [
 ];
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, toggle } = useSidebarState();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -57,11 +59,15 @@ export function Sidebar() {
     <aside
       className={cn(
         "fixed left-0 top-0 z-40 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col",
-        collapsed ? "w-16" : "w-64"
+        // Desktop: normal behavior
+        "lg:translate-x-0",
+        collapsed ? "lg:w-16 w-64" : "lg:w-64 w-64",
+        // Mobile: slide in/out
+        collapsed ? "-translate-x-full lg:translate-x-0" : "translate-x-0"
       )}
     >
-      {/* Logo */}
-      <div className="flex items-center h-16 px-4 border-b border-sidebar-border">
+      {/* Header */}
+      <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
         <NavLink to="/" className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-primary-foreground" />
@@ -70,6 +76,15 @@ export function Sidebar() {
             <span className="font-bold text-lg text-foreground">AETHER</span>
           )}
         </NavLink>
+        {/* Close button on mobile */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggle}
+          className="lg:hidden"
+        >
+          <X className="w-5 h-5" />
+        </Button>
       </div>
 
       {/* Navigation */}
@@ -157,14 +172,14 @@ export function Sidebar() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full justify-center"
+          onClick={toggle}
+          className="w-full justify-center hover:bg-primary/10 hidden lg:flex"
         >
           {collapsed ? (
             <ChevronRight className="w-4 h-4" />
           ) : (
             <>
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 mr-2" />
               <span>Collapse</span>
             </>
           )}
