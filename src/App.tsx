@@ -15,7 +15,6 @@ import CompanySettings from "./pages/settings/CompanySettings";
 
 // Tools
 import Flow from "./pages/tools/Flow";
-import Docs from "./pages/tools/Docs";
 import Sales from "./pages/tools/Sales";
 import Finance from "./pages/tools/Finance";
 import HR from "./pages/tools/HR";
@@ -43,7 +42,6 @@ const App = () => (
             {/* Protected routes */}
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/tools/flow" element={<RequireAuth><Flow /></RequireAuth>} />
-            <Route path="/tools/docs" element={<RequireAuth><Docs /></RequireAuth>} />
             <Route path="/tools/sales" element={<RequireAuth><Sales /></RequireAuth>} />
             <Route path="/tools/finance" element={<RequireAuth><Finance /></RequireAuth>} />
             <Route path="/tools/hr" element={<RequireAuth><HR /></RequireAuth>} />
