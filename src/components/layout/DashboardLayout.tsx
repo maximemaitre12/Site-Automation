@@ -3,7 +3,8 @@ import { Sidebar } from "./Sidebar";
 import { SidebarProvider, useSidebarState } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -16,23 +17,39 @@ function DashboardContent({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-background">
       <Sidebar />
       
-      {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      {/* Top Header Bar */}
+      <header
+        className={cn(
+          "fixed top-0 right-0 z-30 h-14 bg-card/80 backdrop-blur-md border-b border-border transition-all duration-300 flex items-center px-4 gap-4",
+          collapsed ? "left-0 lg:left-16" : "left-0 lg:left-64"
+        )}
+      >
+        {/* Menu toggle button */}
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={toggle}
-          className="bg-card border-border"
+          className="hover:bg-primary/10"
         >
           <Menu className="w-5 h-5" />
         </Button>
-      </div>
+
+        {/* Mobile logo (visible when sidebar is hidden) */}
+        <Link to="/dashboard" className={cn("flex items-center gap-2", collapsed ? "flex" : "flex lg:hidden")}>
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <span className="font-bold text-foreground">AETHER</span>
+        </Link>
+
+        <div className="flex-1" />
+      </header>
 
       <main
         className={cn(
-          "transition-all duration-300 min-h-screen",
+          "transition-all duration-300 min-h-screen pt-14",
           collapsed ? "lg:pl-16" : "lg:pl-64",
-          "pl-0" // Mobile: no padding, sidebar overlays
+          "pl-0"
         )}
       >
         <div className="min-h-screen">
