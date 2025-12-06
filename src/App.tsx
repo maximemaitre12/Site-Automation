@@ -16,10 +16,8 @@ import CompanySettings from "./pages/settings/CompanySettings";
 // Tools
 import Flow from "./pages/tools/Flow";
 import Sales from "./pages/tools/Sales";
-import Finance from "./pages/tools/Finance";
 import HR from "./pages/tools/HR";
 import Support from "./pages/tools/Support";
-import Insights from "./pages/tools/Insights";
 import BrainPage from "./pages/tools/Brain";
 import Compliance from "./pages/tools/Compliance";
 
@@ -43,10 +41,8 @@ const App = () => (
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/tools/flow" element={<RequireAuth><Flow /></RequireAuth>} />
             <Route path="/tools/sales" element={<RequireAuth><Sales /></RequireAuth>} />
-            <Route path="/tools/finance" element={<RequireAuth><Finance /></RequireAuth>} />
             <Route path="/tools/hr" element={<RequireAuth><HR /></RequireAuth>} />
             <Route path="/tools/support" element={<RequireAuth><Support /></RequireAuth>} />
-            <Route path="/tools/insights" element={<RequireAuth><Insights /></RequireAuth>} />
             <Route path="/tools/brain" element={<RequireAuth><BrainPage /></RequireAuth>} />
             <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
             <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
