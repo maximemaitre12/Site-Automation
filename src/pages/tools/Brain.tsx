@@ -17,6 +17,7 @@ export default function BrainPage() {
     conversations,
     documents,
     currentConversation,
+    streamingContent,
     loading,
     sendingMessage,
     createConversation,
@@ -43,7 +44,7 @@ export default function BrainPage() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentConversation?.messages]);
+  }, [currentConversation?.messages, streamingContent]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -270,7 +271,16 @@ export default function BrainPage() {
                 ))
               )}
               
-              {sendingMessage && (
+              {/* Streaming response */}
+              {sendingMessage && streamingContent && (
+                <ChatMessage 
+                  role="assistant" 
+                  content={streamingContent}
+                />
+              )}
+              
+              {/* Loading indicator when no content yet */}
+              {sendingMessage && !streamingContent && (
                 <div className="flex gap-4">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center flex-shrink-0">
                     <Brain className="w-4 h-4 text-white" />
@@ -278,7 +288,7 @@ export default function BrainPage() {
                   <div className="flex-1 p-4 rounded-xl bg-card border border-border">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>AETHER Brain réfléchit...</span>
+                      <span>Connexion...</span>
                     </div>
                   </div>
                 </div>
