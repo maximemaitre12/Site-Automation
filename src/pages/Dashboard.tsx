@@ -60,14 +60,6 @@ const tools = [
     stats: { active: 8, runs: "456" },
   },
   {
-    name: "Finance",
-    description: "Financial automation",
-    icon: DollarSign,
-    color: "from-yellow-500 to-orange-400",
-    path: "/tools/finance",
-    stats: { active: 23, runs: "2.1k" },
-  },
-  {
     name: "HR Copilot",
     description: "HR assistant",
     icon: Users,
@@ -82,14 +74,6 @@ const tools = [
     color: "from-rose-500 to-red-400",
     path: "/tools/support",
     stats: { active: 67, runs: "4.5k" },
-  },
-  {
-    name: "Insights",
-    description: "BI & Analytics",
-    icon: BarChart3,
-    color: "from-teal-500 to-cyan-400",
-    path: "/tools/insights",
-    stats: { active: 9, runs: "567" },
   },
   {
     name: "Brain",

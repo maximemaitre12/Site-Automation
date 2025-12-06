@@ -30,10 +30,8 @@ const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
   { name: "Sales Copilot", path: "/tools/sales", icon: TrendingUp, description: "Sales Assistant" },
-  { name: "Finance", path: "/tools/finance", icon: DollarSign, description: "Financial Automation" },
   { name: "HR Copilot", path: "/tools/hr", icon: Users, description: "HR Assistant" },
   { name: "Support Copilot", path: "/tools/support", icon: HeadphonesIcon, description: "Support AI" },
-  { name: "Insights", path: "/tools/insights", icon: BarChart3, description: "BI & Analytics" },
   { name: "Brain", path: "/tools/brain", icon: Brain, description: "Internal Assistant" },
   { name: "Compliance", path: "/tools/compliance", icon: Shield, description: "Audit & Compliance" },
 ];

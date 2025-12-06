@@ -27,13 +27,6 @@ const tools = [
     path: "/sales",
   },
   {
-    name: "Finance",
-    description: "Automated invoice processing and financial analysis",
-    icon: DollarSign,
-    color: "from-yellow-500 to-orange-400",
-    path: "/finance",
-  },
-  {
     name: "HR Copilot",
     description: "Resume analysis, candidate matching and HR automation",
     icon: Users,
@@ -46,13 +39,6 @@ const tools = [
     icon: HeadphonesIcon,
     color: "from-rose-500 to-red-400",
     path: "/support",
-  },
-  {
-    name: "Insights",
-    description: "AI-powered business intelligence and predictive analytics",
-    icon: BarChart3,
-    color: "from-teal-500 to-cyan-400",
-    path: "/insights",
   },
   {
     name: "Brain",
