@@ -153,7 +153,7 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* User & Collapse */}
+      {/* User section */}
       <div className="p-2 border-t border-sidebar-border space-y-2">
         {user && !collapsed && (
           <div className="px-3 py-2 text-xs text-muted-foreground truncate">
@@ -168,21 +168,6 @@ export function Sidebar() {
         >
           <LogOut className="w-4 h-4" />
           {!collapsed && <span className="ml-2">Sign out</span>}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggle}
-          className="w-full justify-center hover:bg-primary/10 hidden lg:flex"
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <>
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              <span>Collapse</span>
-            </>
-          )}
         </Button>
       </div>
     </aside>
