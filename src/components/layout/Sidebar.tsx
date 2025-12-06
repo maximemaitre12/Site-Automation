@@ -17,6 +17,8 @@ import {
   LayoutDashboard,
   Sparkles,
   LogOut,
+  Building2,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,6 +35,10 @@ const tools = [
   { name: "Insights", path: "/tools/insights", icon: BarChart3, description: "BI & Analytics" },
   { name: "Brain", path: "/tools/brain", icon: Brain, description: "Internal Assistant" },
   { name: "Compliance", path: "/tools/compliance", icon: Shield, description: "Audit & Compliance" },
+];
+
+const settingsLinks = [
+  { name: "Company Settings", path: "/settings/company", icon: Building2 },
 ];
 
 export function Sidebar() {
@@ -97,6 +103,38 @@ export function Sidebar() {
               </NavLink>
             );
           })}
+        </div>
+
+        {/* Settings Section */}
+        <div className="mt-6 pt-4 border-t border-sidebar-border">
+          {!collapsed && (
+            <span className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Settings</span>
+          )}
+          <div className="mt-2 space-y-1">
+            {settingsLinks.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+                  )}
+                >
+                  <item.icon className={cn(
+                    "w-5 h-5 flex-shrink-0 transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                  )} />
+                  {!collapsed && (
+                    <span className="text-sm font-medium truncate">{item.name}</span>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
         </div>
       </nav>
 
