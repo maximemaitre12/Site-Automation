@@ -29,7 +29,6 @@ import { toast } from "sonner";
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
-  { name: "AETHER Docs", path: "/tools/docs", icon: FileText, description: "Document Engine" },
   { name: "Sales Copilot", path: "/tools/sales", icon: TrendingUp, description: "Sales Assistant" },
   { name: "Finance", path: "/tools/finance", icon: DollarSign, description: "Financial Automation" },
   { name: "HR Copilot", path: "/tools/hr", icon: Users, description: "HR Assistant" },

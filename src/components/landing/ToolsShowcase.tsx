@@ -20,13 +20,6 @@ const tools = [
     path: "/flow",
   },
   {
-    name: "AETHER Docs",
-    description: "Intelligent document processing with OCR and AI analysis",
-    icon: FileText,
-    color: "from-purple-500 to-pink-400",
-    path: "/docs",
-  },
-  {
     name: "Sales Copilot",
     description: "AI-powered sales proposals and prospect scoring",
     icon: TrendingUp,

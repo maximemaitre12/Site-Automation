@@ -52,14 +52,6 @@ const tools = [
     stats: { active: 12, runs: "1.2k" },
   },
   {
-    name: "AETHER Docs",
-    description: "Document AI processing",
-    icon: FileText,
-    color: "from-purple-500 to-pink-400",
-    path: "/tools/docs",
-    stats: { active: 48, runs: "890" },
-  },
-  {
     name: "Sales Copilot",
     description: "AI sales assistant",
     icon: TrendingUp,
@@ -129,11 +121,10 @@ const activityData = [
 ];
 
 const usageByToolData = [
-  { name: "Flow", value: 35, color: "#3b82f6" },
-  { name: "Docs", value: 25, color: "#a855f7" },
-  { name: "Support", value: 20, color: "#f43f5e" },
-  { name: "Brain", value: 12, color: "#8b5cf6" },
-  { name: "Others", value: 8, color: "#64748b" },
+  { name: "Flow", value: 40, color: "#3b82f6" },
+  { name: "Support", value: 25, color: "#f43f5e" },
+  { name: "Brain", value: 20, color: "#8b5cf6" },
+  { name: "Others", value: 15, color: "#64748b" },
 ];
 
 const recentActivity = [
