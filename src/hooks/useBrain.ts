@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
+import { streamAIChat } from '@/lib/ai-stream';
 
 export interface Message {
   id: string;
@@ -35,6 +36,7 @@ export function useBrain() {
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [streamingContent, setStreamingContent] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -110,10 +112,11 @@ export function useBrain() {
     return conversation;
   };
 
-  const sendMessage = async (content: string, conversationId?: string): Promise<Message | null> => {
+  const sendMessage = useCallback(async (content: string, conversationId?: string): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
 
     setSendingMessage(true);
+    setStreamingContent('');
     
     try {
       let conv = currentConversation;
@@ -137,51 +140,48 @@ export function useBrain() {
         timestamp: new Date()
       };
 
-      // Update local state immediately
+      // Update local state immediately with user message
       const updatedMessages = [...conv.messages, userMessage];
       setCurrentConversation({ ...conv, messages: updatedMessages });
 
-      // Build context from documents for RAG-like behavior
+      // Build context from documents
       const docContext = documents.length > 0 
-        ? `\n\nDocuments disponibles dans la base de connaissances:\n${documents.map(d => `- ${d.title}: ${d.content?.slice(0, 500) || 'Pas de contenu'}`).join('\n')}`
+        ? `\n\nDocuments disponibles:\n${documents.slice(0, 5).map(d => `- ${d.title}: ${d.content?.slice(0, 300) || ''}`).join('\n')}`
         : '';
 
-      // Get AI response
-      const response = await callAI({
-        messages: [
-          ...updatedMessages.slice(-10).map(m => ({ 
-            role: m.role as 'user' | 'assistant', 
-            content: m.content 
-          }))
-        ],
-        systemPrompt: `Tu es AETHER Brain, l'assistant IA interne d'une entreprise. Tu aides les utilisateurs à:
-- Répondre à leurs questions en utilisant la base de connaissances
-- Rédiger des procédures et de la documentation
-- Améliorer et reformuler des textes
-- Analyser et synthétiser des informations
-- Prendre des notes intelligentes
+      const systemPrompt = `Tu es AETHER Brain, l'assistant IA interne. Réponds en français de manière concise et utile.${docContext}`;
 
-Réponds toujours en français de manière professionnelle, claire et utile.${docContext}`,
-        type: 'chat'
+      // Use streaming for faster perceived response
+      let fullContent = '';
+      const assistantMessageId = crypto.randomUUID();
+
+      await new Promise<void>((resolve, reject) => {
+        streamAIChat({
+          messages: updatedMessages.slice(-10).map(m => ({ 
+            role: m.role, 
+            content: m.content 
+          })),
+          systemPrompt,
+          onDelta: (delta) => {
+            fullContent += delta;
+            setStreamingContent(fullContent);
+          },
+          onDone: () => resolve(),
+          onError: (err) => reject(err),
+        });
       });
 
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
       const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+        id: assistantMessageId,
         role: 'assistant',
-        content: response.content,
+        content: fullContent,
         timestamp: new Date()
       };
 
       const finalMessages = [...updatedMessages, assistantMessage];
-      
-      // Update title if first message
       const newTitle = conv.messages.length === 0 ? content.slice(0, 50) : conv.title;
 
-      // Convert messages to JSON-serializable format
+      // Save to database
       const messagesForDb = finalMessages.map(m => ({
         id: m.id,
         role: m.role,
@@ -189,7 +189,6 @@ Réponds toujours en français de manière professionnelle, claire et utile.${do
         timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp
       }));
 
-      // Save to database
       await supabase
         .from('conversations')
         .update({ 
@@ -206,8 +205,10 @@ Réponds toujours en français de manière professionnelle, claire et utile.${do
         prev.map(c => c.id === conv!.id ? updatedConv : c)
       );
 
+      setStreamingContent('');
       return assistantMessage;
     } catch (err) {
+      setStreamingContent('');
       toast({ 
         title: 'Erreur', 
         description: err instanceof Error ? err.message : 'Erreur lors de l\'envoi', 
@@ -217,7 +218,7 @@ Réponds toujours en français de manière professionnelle, claire et utile.${do
     } finally {
       setSendingMessage(false);
     }
-  };
+  }, [user, currentConversation, conversations, documents, toast]);
 
   const deleteConversation = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('conversations').delete().eq('id', id);
@@ -260,7 +261,7 @@ Réponds toujours en français de manière professionnelle, claire et utile.${do
 
     const doc = { ...data, tags: data.tags as string[] | null };
     setDocuments(prev => [doc, ...prev]);
-    toast({ title: 'Succès', description: 'Document ajouté à la base de connaissances' });
+    toast({ title: 'Succès', description: 'Document ajouté' });
     return doc;
   };
 
@@ -296,15 +297,7 @@ Réponds toujours en français de manière professionnelle, claire et utile.${do
     const response = await callAI({
       messages: [{ 
         role: 'user', 
-        content: `Génère une procédure détaillée et professionnelle pour: ${topic}
-        
-La procédure doit inclure:
-- Un titre clair
-- L'objectif
-- Les prérequis
-- Les étapes numérotées avec détails
-- Les points d'attention
-- Les critères de validation` 
+        content: `Génère une procédure concise pour: ${topic}. Inclus: objectif, étapes numérotées, points d'attention.` 
       }],
       type: 'generate'
     });
@@ -317,17 +310,17 @@ La procédure doit inclure:
   };
 
   const improveText = async (text: string, style: 'formal' | 'casual' | 'concise' | 'detailed' = 'formal'): Promise<string | null> => {
-    const styleInstructions = {
-      formal: 'un style formel et professionnel',
-      casual: 'un style décontracté mais professionnel',
-      concise: 'un style concis et direct',
-      detailed: 'un style détaillé et explicatif'
+    const styleMap = {
+      formal: 'formel et professionnel',
+      casual: 'décontracté',
+      concise: 'concis et direct',
+      detailed: 'détaillé'
     };
 
     const response = await callAI({
       messages: [{ 
         role: 'user', 
-        content: `Améliore ce texte avec ${styleInstructions[style]}. Conserve le sens original mais améliore la clarté, la grammaire et le style:\n\n${text}` 
+        content: `Améliore ce texte (style ${styleMap[style]}):\n\n${text}` 
       }],
       type: 'generate'
     });
@@ -341,16 +334,13 @@ La procédure doit inclure:
 
   const summarizeDocument = async (docId: string): Promise<string | null> => {
     const doc = documents.find(d => d.id === docId);
-    if (!doc || !doc.content) {
+    if (!doc?.content) {
       toast({ title: 'Erreur', description: 'Document non trouvé ou vide', variant: 'destructive' });
       return null;
     }
 
     const response = await callAI({
-      messages: [{ 
-        role: 'user', 
-        content: `Résume ce document de manière structurée avec les points clés:\n\n${doc.content}` 
-      }],
+      messages: [{ role: 'user', content: `Résume ce document:\n\n${doc.content}` }],
       type: 'summarize'
     });
 
@@ -367,6 +357,7 @@ La procédure doit inclure:
     currentConversation,
     loading,
     sendingMessage,
+    streamingContent,
     createConversation,
     sendMessage,
     deleteConversation,
