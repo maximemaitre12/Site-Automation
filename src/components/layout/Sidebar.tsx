@@ -31,7 +31,6 @@ const tools = [
   { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
   { name: "Sales Copilot", path: "/tools/sales", icon: TrendingUp, description: "Sales Assistant" },
   { name: "HR Copilot", path: "/tools/hr", icon: Users, description: "HR Assistant" },
-  { name: "Support Copilot", path: "/tools/support", icon: HeadphonesIcon, description: "Support AI" },
   { name: "Brain", path: "/tools/brain", icon: Brain, description: "Internal Assistant" },
   { name: "Compliance", path: "/tools/compliance", icon: Shield, description: "Audit & Compliance" },
 ];
