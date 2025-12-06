@@ -10,6 +10,8 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
+import CompanySettings from "./pages/settings/CompanySettings";
 
 // Tools
 import Flow from "./pages/tools/Flow";
@@ -49,6 +51,8 @@ const App = () => (
             <Route path="/tools/insights" element={<RequireAuth><Insights /></RequireAuth>} />
             <Route path="/tools/brain" element={<RequireAuth><BrainPage /></RequireAuth>} />
             <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
+            <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+            <Route path="/settings/company" element={<RequireAuth><CompanySettings /></RequireAuth>} />
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
