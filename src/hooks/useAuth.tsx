@@ -106,12 +106,10 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     }
   }, [user, loading, navigate]);
 
+  // Render children immediately while checking auth in background
+  // This prevents the loading flash
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+    return <>{children}</>;
   }
 
   return user ? <>{children}</> : null;

@@ -32,15 +32,36 @@ export interface Audit {
   created_at: string;
 }
 
+// Cache audits in memory
+let cachedAudits: Audit[] = [];
+let lastAuditUserId: string | null = null;
+let auditsLoaded = false;
+
 export function useCompliance() {
-  const [audits, setAudits] = useState<Audit[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [analyzing, setAnalyzing] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  // Initialize with cached data
+  const [audits, setAudits] = useState<Audit[]>(() => 
+    user?.id === lastAuditUserId ? cachedAudits : []
+  );
+  const [loading, setLoading] = useState(() => 
+    !(user?.id === lastAuditUserId && auditsLoaded)
+  );
+  const [analyzing, setAnalyzing] = useState(false);
 
   const fetchAudits = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    // Use cached data if available
+    if (user.id === lastAuditUserId && auditsLoaded) {
+      setAudits(cachedAudits);
+      setLoading(false);
+      return;
+    }
     
     const { data, error } = await supabase
       .from('audits')
@@ -49,11 +70,15 @@ export function useCompliance() {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setAudits(data.map(audit => ({
+      const mappedAudits = data.map(audit => ({
         ...audit,
         risks: (audit.risks as unknown) as Risk[] | null,
         recommendations: (audit.recommendations as unknown) as Recommendation[] | null
-      })));
+      }));
+      setAudits(mappedAudits);
+      cachedAudits = mappedAudits;
+      lastAuditUserId = user.id;
+      auditsLoaded = true;
     }
     setLoading(false);
   };
@@ -210,7 +235,9 @@ ${inputText.slice(0, 8000)}`
         recommendations: (updatedAudit.recommendations as unknown) as Recommendation[] | null
       };
 
-      setAudits(prev => [finalAudit, ...prev.filter(a => a.id !== finalAudit.id)]);
+      const newAudits = [finalAudit, ...audits.filter(a => a.id !== finalAudit.id)];
+      setAudits(newAudits);
+      cachedAudits = newAudits;
       toast({ title: 'Succès', description: 'Audit de conformité terminé' });
       return finalAudit;
     } catch (err) {
@@ -232,7 +259,9 @@ ${inputText.slice(0, 8000)}`
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    setAudits(prev => prev.filter(a => a.id !== id));
+    const newAudits = audits.filter(a => a.id !== id);
+    setAudits(newAudits);
+    cachedAudits = newAudits;
     toast({ title: 'Succès', description: 'Audit supprimé' });
     return true;
   };

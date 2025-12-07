@@ -30,18 +30,36 @@ export interface InternalDoc {
   created_at: string;
 }
 
+// Cache data in memory
+let cachedConversations: Conversation[] = [];
+let cachedDocs: InternalDoc[] = [];
+let lastBrainUserId: string | null = null;
+let brainDataLoaded = false;
+
 export function useBrain() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [documents, setDocuments] = useState<InternalDoc[]>([]);
-  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [sendingMessage, setSendingMessage] = useState(false);
-  const [streamingContent, setStreamingContent] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const [conversations, setConversations] = useState<Conversation[]>(() => 
+    user?.id === lastBrainUserId ? cachedConversations : []
+  );
+  const [documents, setDocuments] = useState<InternalDoc[]>(() => 
+    user?.id === lastBrainUserId ? cachedDocs : []
+  );
+  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
+  const [loading, setLoading] = useState(() => 
+    !(user?.id === lastBrainUserId && brainDataLoaded)
+  );
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [streamingContent, setStreamingContent] = useState('');
 
   const fetchConversations = async () => {
     if (!user) return;
+    
+    if (user.id === lastBrainUserId && brainDataLoaded) {
+      setConversations(cachedConversations);
+      return;
+    }
     
     const { data, error } = await supabase
       .from('conversations')
@@ -55,12 +73,17 @@ export function useBrain() {
         messages: (conv.messages as any[]) || []
       }));
       setConversations(parsed);
+      cachedConversations = parsed;
     }
-    setLoading(false);
   };
 
   const fetchDocuments = async () => {
     if (!user) return;
+    
+    if (user.id === lastBrainUserId && brainDataLoaded) {
+      setDocuments(cachedDocs);
+      return;
+    }
     
     const { data, error } = await supabase
       .from('internal_docs')
@@ -69,17 +92,24 @@ export function useBrain() {
       .order('created_at', { ascending: false });
 
     if (!error) {
-      setDocuments(data?.map(doc => ({
+      const docs = data?.map(doc => ({
         ...doc,
         tags: doc.tags as string[] | null
-      })) || []);
+      })) || [];
+      setDocuments(docs);
+      cachedDocs = docs;
     }
   };
 
   useEffect(() => {
     if (user) {
-      fetchConversations();
-      fetchDocuments();
+      Promise.all([fetchConversations(), fetchDocuments()]).then(() => {
+        lastBrainUserId = user.id;
+        brainDataLoaded = true;
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
     }
   }, [user]);
 

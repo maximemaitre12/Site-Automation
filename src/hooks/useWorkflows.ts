@@ -4,10 +4,20 @@ import { useAuth } from './useAuth';
 import { Workflow, WorkflowBlock, WorkflowRun } from '@/types/workflow';
 import { toast } from 'sonner';
 
+// Cache workflows in memory
+let cachedWorkflows: Workflow[] = [];
+let lastWorkflowUserId: string | null = null;
+let workflowDataLoaded = false;
+
 export function useWorkflows() {
   const { user } = useAuth();
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  const [workflows, setWorkflows] = useState<Workflow[]>(() => 
+    user?.id === lastWorkflowUserId ? cachedWorkflows : []
+  );
+  const [loading, setLoading] = useState(() => 
+    !(user?.id === lastWorkflowUserId && workflowDataLoaded)
+  );
 
   useEffect(() => {
     if (user) {
@@ -16,7 +26,17 @@ export function useWorkflows() {
   }, [user]);
 
   const fetchWorkflows = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    // Use cache if available
+    if (user.id === lastWorkflowUserId && workflowDataLoaded) {
+      setWorkflows(cachedWorkflows);
+      setLoading(false);
+      return;
+    }
     
     try {
       const { data, error } = await supabase
@@ -27,11 +47,16 @@ export function useWorkflows() {
 
       if (error) throw error;
       
-      setWorkflows((data || []).map(w => ({
+      const parsed = (data || []).map(w => ({
         ...w,
         blocks: (w.blocks as unknown as WorkflowBlock[]) || [],
         connections: []
-      })));
+      }));
+      
+      setWorkflows(parsed);
+      cachedWorkflows = parsed;
+      lastWorkflowUserId = user.id;
+      workflowDataLoaded = true;
     } catch (error) {
       console.error('Error fetching workflows:', error);
       toast.error('Failed to load workflows');
