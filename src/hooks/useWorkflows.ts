@@ -14,7 +14,7 @@ export function useWorkflows() {
     fetchWorkflows();
   }, [user]);
 
-  const fetchWorkflows = async () => {
+  const fetchWorkflows = async (retryCount = 0) => {
     if (!user) {
       setWorkflows([]);
       setLoading(false);
@@ -37,9 +37,14 @@ export function useWorkflows() {
       }));
       
       setWorkflows(parsed);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching workflows:', error);
-      toast.error('Failed to load workflows');
+      // Retry up to 3 times for network errors
+      if (retryCount < 3 && (error.message?.includes('Load failed') || error.message?.includes('network'))) {
+        setTimeout(() => fetchWorkflows(retryCount + 1), 1000 * (retryCount + 1));
+        return;
+      }
+      toast.error('Échec du chargement des workflows');
     } finally {
       setLoading(false);
     }
