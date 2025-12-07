@@ -325,11 +325,7 @@ export default function Flow() {
 
   const selectedBlock = localBlocks.find(b => b.id === selectedBlockId);
 
-  const headerActions = (
-    <>
-      <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
-    </>
-  );
+  const headerActions = null;
 
   return (
     <DashboardLayout headerActions={headerActions}>
@@ -399,9 +395,10 @@ export default function Flow() {
           {/* Workflow Builder */}
           {selectedWorkflow ? (
             <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-              <div className="flex items-center justify-end gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Undo/Redo buttons */}
+              <div className="flex items-center justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
+                {/* Left side: History, Undo/Redo, Save */}
+                <div className="flex items-center gap-2">
+                  <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
                   <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -420,13 +417,15 @@ export default function Flow() {
                       <TooltipContent>Rétablir (Ctrl+Y)</TooltipContent>
                     </Tooltip>
                   </div>
-                  {/* View mode toggle removed - canvas only */}
-                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
-                    <Sparkles className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">IA</span>
-                  </Button>
                   {hasUnsavedChanges && <span className="text-[10px] md:text-xs text-amber-500">Non sauvegardé</span>}
                   <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges}>
                     <Save className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">Sauvegarder</span>
+                  </Button>
+                </div>
+                {/* Right side: AI, Execute */}
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
+                    <Sparkles className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">IA</span>
                   </Button>
                   <WorkflowExecutor blocks={localBlocks} connections={localConnections} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
                 </div>
