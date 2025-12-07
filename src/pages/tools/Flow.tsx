@@ -316,7 +316,7 @@ export default function Flow() {
     const run = await createRun(workflowId, localBlocks.length > 0 ? 'User input' : null);
     if (run) {
       await updateRun(run.id, {
-        status: output ? 'success' : 'error',
+        status: output ? 'completed' : 'failed',
         output_data: output,
         completed_at: new Date().toISOString()
       });
