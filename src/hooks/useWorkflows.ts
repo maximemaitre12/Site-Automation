@@ -46,7 +46,17 @@ export function useWorkflows() {
   };
 
   const createWorkflow = async (name: string, description?: string): Promise<Workflow | null> => {
-    if (!user) return null;
+    if (!user) {
+      toast.error('Vous devez être connecté pour créer un workflow');
+      return null;
+    }
+
+    // Verify session is still valid
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error('Session expirée, veuillez vous reconnecter');
+      return null;
+    }
 
     try {
       const { data, error } = await supabase
@@ -61,7 +71,15 @@ export function useWorkflows() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') {
+          toast.error('Session expirée, veuillez vous reconnecter');
+          // Force refresh auth state
+          await supabase.auth.refreshSession();
+          return null;
+        }
+        throw error;
+      }
       
       const newWorkflow = {
         ...data,
@@ -69,11 +87,11 @@ export function useWorkflows() {
       } as Workflow;
       
       setWorkflows(prev => [newWorkflow, ...prev]);
-      toast.success('Workflow created');
+      toast.success('Workflow créé');
       return newWorkflow;
     } catch (error) {
       console.error('Error creating workflow:', error);
-      toast.error('Failed to create workflow');
+      toast.error('Échec de la création du workflow');
       return null;
     }
   };
