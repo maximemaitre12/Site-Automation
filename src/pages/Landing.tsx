@@ -1,9 +1,17 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/landing/Navbar";
-import { Hero } from "@/components/landing/Hero";
-import { ToolsShowcase } from "@/components/landing/ToolsShowcase";
 import { useAuth } from "@/hooks/useAuth";
+
+// Landing page components
+import { LandingHeader } from "@/components/landing/LandingHeader";
+import { LandingFooter } from "@/components/landing/LandingFooter";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { MetricsSection } from "@/components/landing/MetricsSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { BenefitsSection } from "@/components/landing/BenefitsSection";
+import { UseCasesSection } from "@/components/landing/UseCasesSection";
+import { SocialProofSection } from "@/components/landing/SocialProofSection";
+import { CTASection } from "@/components/landing/CTASection";
 
 export default function Landing() {
   const { user, loading } = useAuth();
@@ -31,19 +39,20 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <Hero />
-      <ToolsShowcase />
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <LandingHeader />
       
-      {/* Footer */}
-      <footer className="border-t border-border py-12">
-        <div className="container mx-auto px-6 text-center">
-          <p className="text-muted-foreground text-sm">
-            © 2024 AETHER AI Suite. Automate Everything. Empower Everyone.
-          </p>
-        </div>
-      </footer>
+      <main>
+        <HeroSection />
+        <MetricsSection />
+        <FeaturesSection />
+        <BenefitsSection />
+        <UseCasesSection />
+        <SocialProofSection />
+        <CTASection />
+      </main>
+      
+      <LandingFooter />
     </div>
   );
 }
