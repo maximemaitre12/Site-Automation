@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WorkflowBlock, BlockType, BLOCK_DEFINITIONS, BlockCategory, CATEGORY_INFO, ConfigField } from '@/types/workflow';
+import { WorkflowBlock, BlockType, BLOCK_DEFINITIONS, BlockCategory, ConfigField } from '@/types/workflow';
 import { 
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch, 
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
