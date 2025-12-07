@@ -1,15 +1,28 @@
-import { WorkflowBlock, WorkflowRunLog, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { WorkflowBlock, WorkflowRunLog, BLOCK_DEFINITIONS, BlockConnection } from '@/types/workflow';
 import { callAI, summarizeText, extractData, classifyText, generateContent } from './ai';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ExecutionContext {
   input: any;
   previousOutputs: Record<string, any>;
+  branchId?: string;
+  parentWorkflowId?: string;
+}
+
+export interface BranchResult {
+  branchId: string;
+  branchName: string;
+  output: any;
+  success: boolean;
+  logs: WorkflowRunLog[];
 }
 
 export async function executeBlock(
   block: WorkflowBlock,
-  context: ExecutionContext
-): Promise<{ output: any; error?: string }> {
+  context: ExecutionContext,
+  allBlocks?: WorkflowBlock[],
+  connections?: BlockConnection[]
+): Promise<{ output: any; error?: string; branches?: BranchResult[] }> {
   const startTime = Date.now();
   
   try {
@@ -23,6 +36,8 @@ export async function executeBlock(
       case 'trigger_file':
       case 'trigger_webhook':
       case 'trigger_form':
+      case 'trigger_schedule':
+      case 'trigger_email':
         output = context.input;
         break;
 
@@ -112,6 +127,174 @@ export async function executeBlock(
         break;
       }
 
+      case 'ai_sentiment': {
+        const response = await callAI({
+          messages: [{
+            role: 'user',
+            content: `Analyze the sentiment of this text:\n\n${inputText}\n\nRespond with JSON: {"sentiment": "positive/negative/neutral", "score": -1.0 to 1.0, "emotions": ["list of detected emotions"]}`
+          }],
+          type: 'analyze'
+        });
+        if (response.error) throw new Error(response.error);
+        try {
+          const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+          output = jsonMatch ? JSON.parse(jsonMatch[0]) : { sentiment: 'neutral', score: 0 };
+        } catch {
+          output = { sentiment: 'neutral', score: 0, raw: response.content };
+        }
+        break;
+      }
+
+      case 'ai_translate': {
+        const targetLanguage = block.config?.targetLanguage || 'English';
+        const response = await callAI({
+          messages: [{
+            role: 'user',
+            content: `Translate the following text to ${targetLanguage}:\n\n${inputText}`
+          }],
+          type: 'generate'
+        });
+        if (response.error) throw new Error(response.error);
+        output = { translated: response.content, targetLanguage };
+        break;
+      }
+
+      // Control flow blocks
+      case 'control_condition': {
+        const condition = block.config?.condition || 'true';
+        // Simple condition evaluation
+        let result = false;
+        try {
+          // Safe evaluation with context
+          const evalContext = { input: context.input, ...context.previousOutputs };
+          result = new Function('ctx', `with(ctx) { return ${condition}; }`)(evalContext);
+        } catch {
+          result = false;
+        }
+        output = { 
+          condition, 
+          result, 
+          branch: result ? 'true' : 'false',
+          input: context.input 
+        };
+        break;
+      }
+
+      case 'control_delay': {
+        const duration = (block.config?.duration || 5) * 1000;
+        await new Promise(resolve => setTimeout(resolve, Math.min(duration, 30000)));
+        output = { delayed: true, duration, input: context.input };
+        break;
+      }
+
+      case 'control_loop': {
+        const arrayField = block.config?.arrayField || 'items';
+        const inputData = context.input;
+        const items = inputData?.[arrayField] || (Array.isArray(inputData) ? inputData : [inputData]);
+        output = { 
+          loopItems: items, 
+          count: items.length,
+          currentIndex: 0 
+        };
+        break;
+      }
+
+      case 'control_branch': {
+        const branchCount = block.config?.branchCount || 2;
+        const branchNames = (block.config?.branchNames || 'Branch A, Branch B')
+          .split(',')
+          .map((n: string) => n.trim());
+        output = {
+          branched: true,
+          branchCount,
+          branches: branchNames.slice(0, branchCount).map((name: string, index: number) => ({
+            id: `${block.id}-branch-${index}`,
+            name,
+            input: context.input
+          }))
+        };
+        break;
+      }
+
+      case 'control_parallel': {
+        output = {
+          parallel: true,
+          input: context.input,
+          branches: [
+            { id: `${block.id}-parallel-0`, input: context.input },
+            { id: `${block.id}-parallel-1`, input: context.input }
+          ]
+        };
+        break;
+      }
+
+      case 'control_merge': {
+        const mergeStrategy = block.config?.mergeStrategy || 'combine_results';
+        const branchOutputs = context.previousOutputs;
+        let mergedOutput: any;
+        
+        switch (mergeStrategy) {
+          case 'wait_all':
+            mergedOutput = { mergedResults: Object.values(branchOutputs) };
+            break;
+          case 'first_complete':
+            mergedOutput = Object.values(branchOutputs)[0];
+            break;
+          case 'combine_results':
+          default:
+            mergedOutput = { ...context.input, branches: branchOutputs };
+        }
+        output = mergedOutput;
+        break;
+      }
+
+      // Sub-workflow call
+      case 'workflow_call': {
+        const workflowId = block.config?.workflowId;
+        const passInput = block.config?.passInput !== false;
+        const customInput = block.config?.customInput;
+        const waitForCompletion = block.config?.waitForCompletion !== false;
+
+        if (!workflowId) {
+          throw new Error('No workflow ID specified');
+        }
+
+        // Fetch the sub-workflow
+        const { data: workflow, error: fetchError } = await supabase
+          .from('workflows')
+          .select('*')
+          .eq('id', workflowId)
+          .single();
+
+        if (fetchError || !workflow) {
+          throw new Error(`Failed to load sub-workflow: ${fetchError?.message || 'Not found'}`);
+        }
+
+        const subWorkflowInput = customInput || (passInput ? context.input : {});
+        const subBlocks = (workflow.blocks as unknown as WorkflowBlock[]) || [];
+
+        if (waitForCompletion) {
+          // Execute sub-workflow synchronously
+          const result = await executeWorkflow(subBlocks, subWorkflowInput);
+          output = {
+            subWorkflowId: workflowId,
+            subWorkflowName: workflow.name,
+            success: result.success,
+            output: result.output,
+            logsCount: result.logs.length
+          };
+        } else {
+          // Just trigger and continue
+          output = {
+            subWorkflowId: workflowId,
+            subWorkflowName: workflow.name,
+            triggered: true,
+            async: true
+          };
+        }
+        break;
+      }
+
       case 'system_email':
         output = { 
           sent: true, 
@@ -123,6 +306,7 @@ export async function executeBlock(
         break;
 
       case 'system_webhook':
+      case 'http_webhook':
         output = { 
           posted: true, 
           url: block.config?.url || 'https://webhook.example.com',
@@ -131,11 +315,51 @@ export async function executeBlock(
         };
         break;
 
+      case 'http_request': {
+        const url = block.config?.url;
+        const method = block.config?.method || 'GET';
+        if (url) {
+          try {
+            const response = await fetch(url, {
+              method,
+              headers: block.config?.headers || {},
+              body: method !== 'GET' ? JSON.stringify(block.config?.body || context.input) : undefined
+            });
+            const data = await response.json().catch(() => response.text());
+            output = { success: response.ok, status: response.status, data };
+          } catch (err) {
+            output = { success: false, error: err instanceof Error ? err.message : 'Request failed' };
+          }
+        } else {
+          output = { success: false, error: 'No URL specified' };
+        }
+        break;
+      }
+
       case 'system_save':
         output = { 
           saved: true, 
           table: block.config?.table || 'results',
           data: context.input,
+          timestamp: new Date().toISOString()
+        };
+        break;
+
+      case 'system_notify':
+        output = {
+          notified: true,
+          channel: block.config?.channel || 'slack',
+          message: block.config?.message || inputText,
+          timestamp: new Date().toISOString()
+        };
+        break;
+
+      case 'system_log':
+        console.log(`[Workflow Log - ${block.config?.level || 'info'}]`, block.config?.message || inputText);
+        output = {
+          logged: true,
+          level: block.config?.level || 'info',
+          message: block.config?.message || inputText,
           timestamp: new Date().toISOString()
         };
         break;
