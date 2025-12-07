@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Workflow,
   FileText,
   TrendingUp,
-  DollarSign,
   Users,
   HeadphonesIcon,
-  BarChart3,
   Brain,
   Shield,
   ArrowRight,
@@ -15,11 +13,11 @@ import {
   Zap,
   Clock,
   ArrowUpRight,
-  ArrowDownRight,
   Sparkles,
   Settings,
   Bell,
   Search,
+  MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,6 +25,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompany } from "@/hooks/useCompany";
+import { useWorkflows, useWorkflowRuns } from "@/hooks/useWorkflows";
+import { useCompliance } from "@/hooks/useCompliance";
+import { useHR } from "@/hooks/useHR";
+import { useSupport } from "@/hooks/useSupport";
+import { useBrain } from "@/hooks/useBrain";
+import { useSalesProposals } from "@/hooks/useSalesProposals";
 import {
   AreaChart,
   Area,
@@ -35,126 +39,25 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
 } from "recharts";
-
-const tools = [
-  {
-    name: "AETHER Flow",
-    description: "Visual workflow automation",
-    icon: Workflow,
-    color: "from-blue-500 to-cyan-400",
-    path: "/tools/flow",
-    stats: { active: 12, runs: "1.2k" },
-  },
-  {
-    name: "Sales Copilot",
-    description: "AI sales assistant",
-    icon: TrendingUp,
-    color: "from-green-500 to-emerald-400",
-    path: "/tools/sales",
-    stats: { active: 8, runs: "456" },
-  },
-  {
-    name: "HR Copilot",
-    description: "HR assistant",
-    icon: Users,
-    color: "from-indigo-500 to-blue-400",
-    path: "/tools/hr",
-    stats: { active: 15, runs: "324" },
-  },
-  {
-    name: "Support Copilot",
-    description: "Support AI",
-    icon: HeadphonesIcon,
-    color: "from-rose-500 to-red-400",
-    path: "/tools/support",
-    stats: { active: 67, runs: "4.5k" },
-  },
-  {
-    name: "Brain",
-    description: "Internal assistant",
-    icon: Brain,
-    color: "from-violet-500 to-purple-400",
-    path: "/tools/brain",
-    stats: { active: 1, runs: "12k" },
-  },
-  {
-    name: "Compliance",
-    description: "Audit & compliance",
-    icon: Shield,
-    color: "from-slate-500 to-gray-400",
-    path: "/tools/compliance",
-    stats: { active: 4, runs: "89" },
-  },
-];
-
-// Mock data for charts
-const activityData = [
-  { name: "Mon", workflows: 45, documents: 32, ai: 120 },
-  { name: "Tue", workflows: 52, documents: 41, ai: 145 },
-  { name: "Wed", workflows: 61, documents: 38, ai: 180 },
-  { name: "Thu", workflows: 48, documents: 55, ai: 156 },
-  { name: "Fri", workflows: 72, documents: 48, ai: 210 },
-  { name: "Sat", workflows: 35, documents: 22, ai: 95 },
-  { name: "Sun", workflows: 28, documents: 18, ai: 78 },
-];
-
-const usageByToolData = [
-  { name: "Flow", value: 40, color: "#3b82f6" },
-  { name: "Support", value: 25, color: "#f43f5e" },
-  { name: "Brain", value: 20, color: "#8b5cf6" },
-  { name: "Others", value: 15, color: "#64748b" },
-];
-
-const recentActivity = [
-  { type: "workflow", name: "Invoice Processing", status: "completed", time: "2 min ago" },
-  { type: "document", name: "Q4 Report.pdf", status: "analyzed", time: "5 min ago" },
-  { type: "ai", name: "Sales Analysis", status: "running", time: "8 min ago" },
-  { type: "ticket", name: "Support #1234", status: "resolved", time: "12 min ago" },
-  { type: "workflow", name: "Data Sync", status: "completed", time: "15 min ago" },
-];
+import { format, subDays, isToday, isThisWeek } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { company, loading: companyLoading } = useCompany();
+  const { workflows } = useWorkflows();
+  const { runs: workflowRuns } = useWorkflowRuns();
+  const { audits } = useCompliance();
+  const { candidates, jobs } = useHR();
+  const { tickets } = useSupport();
+  const { conversations, documents: brainDocs } = useBrain();
+  const { proposals, callAnalyses } = useSalesProposals();
+  
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [animatedStats, setAnimatedStats] = useState({
-    workflows: 0,
-    aiCalls: 0,
-    documents: 0,
-    response: 0,
-  });
-
-  // Animate stats on mount
-  useEffect(() => {
-    const targetStats = { workflows: 187, aiCalls: 24500, documents: 1420, response: 1.2 };
-    const duration = 1500;
-    const steps = 60;
-    const stepDuration = duration / steps;
-
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
-
-      setAnimatedStats({
-        workflows: Math.round(targetStats.workflows * eased),
-        aiCalls: Math.round(targetStats.aiCalls * eased),
-        documents: Math.round(targetStats.documents * eased),
-        response: parseFloat((targetStats.response * eased).toFixed(1)),
-      });
-
-      if (step >= steps) clearInterval(interval);
-    }, stepDuration);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Update time every minute
   useEffect(() => {
@@ -162,14 +65,215 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  const greeting = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+  // Calculate real stats
+  const stats = useMemo(() => {
+    const activeWorkflows = workflows?.filter(w => w.is_active)?.length || 0;
+    const totalWorkflowRuns = workflowRuns?.length || 0;
+    const totalDocuments = (brainDocs?.length || 0) + (audits?.length || 0);
+    const totalConversations = conversations?.length || 0;
+    const totalTickets = tickets?.length || 0;
+    const resolvedTickets = tickets?.filter(t => t.status === 'resolved')?.length || 0;
+    const totalCandidates = candidates?.length || 0;
+    const totalProposals = proposals?.length || 0;
+    const totalCallAnalyses = callAnalyses?.length || 0;
+    
+    return {
+      activeWorkflows,
+      totalWorkflowRuns,
+      totalDocuments,
+      totalConversations,
+      totalTickets,
+      resolvedTickets,
+      totalCandidates,
+      totalProposals,
+      totalCallAnalyses,
+      aiCalls: totalConversations + totalWorkflowRuns + (audits?.length || 0) + totalCallAnalyses,
+    };
+  }, [workflows, workflowRuns, brainDocs, audits, conversations, tickets, candidates, proposals, callAnalyses]);
+
+  // Calculate usage by tool
+  const usageByToolData = useMemo(() => {
+    const flowUsage = (workflowRuns?.length || 0);
+    const supportUsage = (tickets?.length || 0);
+    const brainUsage = (conversations?.length || 0) + (brainDocs?.length || 0);
+    const hrUsage = (candidates?.length || 0) + (jobs?.length || 0);
+    const salesUsage = (proposals?.length || 0) + (callAnalyses?.length || 0);
+    const complianceUsage = (audits?.length || 0);
+    
+    const total = flowUsage + supportUsage + brainUsage + hrUsage + salesUsage + complianceUsage;
+    
+    if (total === 0) {
+      return [
+        { name: "Flow", value: 0, color: "#3b82f6" },
+        { name: "Support", value: 0, color: "#f43f5e" },
+        { name: "Brain", value: 0, color: "#8b5cf6" },
+        { name: "Autres", value: 0, color: "#64748b" },
+      ];
+    }
+    
+    return [
+      { name: "Flow", value: Math.round((flowUsage / total) * 100), color: "#3b82f6" },
+      { name: "Support", value: Math.round((supportUsage / total) * 100), color: "#f43f5e" },
+      { name: "Brain", value: Math.round((brainUsage / total) * 100), color: "#8b5cf6" },
+      { name: "Autres", value: Math.round(((hrUsage + salesUsage + complianceUsage) / total) * 100), color: "#64748b" },
+    ];
+  }, [workflowRuns, tickets, conversations, brainDocs, candidates, jobs, proposals, callAnalyses, audits]);
+
+  // Build recent activity from real data
+  const recentActivity = useMemo(() => {
+    const activities: Array<{ type: string; name: string; status: string; time: Date; timeLabel: string }> = [];
+    
+    // Add workflow runs
+    workflowRuns?.slice(0, 3).forEach(run => {
+      const workflow = workflows?.find(w => w.id === run.workflow_id);
+      activities.push({
+        type: "workflow",
+        name: workflow?.name || "Workflow",
+        status: run.status || "completed",
+        time: new Date(run.created_at),
+        timeLabel: formatTimeAgo(new Date(run.created_at)),
+      });
+    });
+    
+    // Add tickets
+    tickets?.slice(0, 2).forEach(ticket => {
+      activities.push({
+        type: "ticket",
+        name: `Ticket ${ticket.ticket_number}`,
+        status: ticket.status || "open",
+        time: new Date(ticket.created_at),
+        timeLabel: formatTimeAgo(new Date(ticket.created_at)),
+      });
+    });
+    
+    // Add audits
+    audits?.slice(0, 2).forEach(audit => {
+      activities.push({
+        type: "audit",
+        name: audit.title,
+        status: audit.status || "completed",
+        time: new Date(audit.created_at),
+        timeLabel: formatTimeAgo(new Date(audit.created_at)),
+      });
+    });
+    
+    // Add conversations
+    conversations?.slice(0, 2).forEach(conv => {
+      activities.push({
+        type: "ai",
+        name: conv.title,
+        status: "completed",
+        time: new Date(conv.created_at),
+        timeLabel: formatTimeAgo(new Date(conv.created_at)),
+      });
+    });
+    
+    // Sort by time and take top 5
+    return activities
+      .sort((a, b) => b.time.getTime() - a.time.getTime())
+      .slice(0, 5);
+  }, [workflowRuns, workflows, tickets, audits, conversations]);
+
+  // Build weekly activity data
+  const activityData = useMemo(() => {
+    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const today = new Date();
+    
+    return days.map((name, index) => {
+      const date = subDays(today, 6 - index);
+      const dayStart = new Date(date.setHours(0, 0, 0, 0));
+      const dayEnd = new Date(date.setHours(23, 59, 59, 999));
+      
+      const workflowCount = workflowRuns?.filter(run => {
+        const runDate = new Date(run.created_at);
+        return runDate >= dayStart && runDate <= dayEnd;
+      }).length || 0;
+      
+      const aiCount = (conversations?.filter(conv => {
+        const convDate = new Date(conv.created_at);
+        return convDate >= dayStart && convDate <= dayEnd;
+      }).length || 0) + workflowCount;
+      
+      return {
+        name,
+        workflows: workflowCount,
+        ai: aiCount,
+      };
+    });
+  }, [workflowRuns, conversations]);
+
+  const formatTimeAgo = (date: Date): string => {
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return "À l'instant";
+    if (minutes < 60) return `Il y a ${minutes} min`;
+    if (hours < 24) return `Il y a ${hours}h`;
+    return `Il y a ${days}j`;
   };
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "there";
+  const greeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Bonjour";
+    if (hour < 18) return "Bon après-midi";
+    return "Bonsoir";
+  };
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "là";
+
+  const tools = [
+    {
+      name: "AETHER Flow",
+      description: "Automatisation visuelle",
+      icon: Workflow,
+      color: "from-blue-500 to-cyan-400",
+      path: "/tools/flow",
+      stats: { active: stats.activeWorkflows, runs: stats.totalWorkflowRuns },
+    },
+    {
+      name: "Sales Copilot",
+      description: "Assistant commercial IA",
+      icon: TrendingUp,
+      color: "from-green-500 to-emerald-400",
+      path: "/tools/sales",
+      stats: { active: stats.totalProposals, runs: stats.totalCallAnalyses },
+    },
+    {
+      name: "HR Copilot",
+      description: "Assistant RH",
+      icon: Users,
+      color: "from-indigo-500 to-blue-400",
+      path: "/tools/hr",
+      stats: { active: jobs?.length || 0, runs: stats.totalCandidates },
+    },
+    {
+      name: "Support Copilot",
+      description: "Support IA",
+      icon: HeadphonesIcon,
+      color: "from-rose-500 to-red-400",
+      path: "/tools/support",
+      stats: { active: stats.totalTickets - stats.resolvedTickets, runs: stats.totalTickets },
+    },
+    {
+      name: "Brain",
+      description: "Assistant interne",
+      icon: Brain,
+      color: "from-violet-500 to-purple-400",
+      path: "/tools/brain",
+      stats: { active: brainDocs?.length || 0, runs: stats.totalConversations },
+    },
+    {
+      name: "Compliance",
+      description: "Audit & conformité",
+      icon: Shield,
+      color: "from-slate-500 to-gray-400",
+      path: "/tools/compliance",
+      stats: { active: audits?.length || 0, runs: audits?.length || 0 },
+    },
+  ];
 
   return (
     <DashboardLayout>
@@ -181,11 +285,7 @@ export default function Dashboard() {
               {greeting()}, <span className="text-gradient">{userName}</span>
             </h1>
             <p className="text-muted-foreground">
-              {currentTime.toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}
+              {format(currentTime, "EEEE d MMMM", { locale: fr })}
               {company && (
                 <span className="ml-2 text-primary">• {company.name}</span>
               )}
@@ -196,13 +296,15 @@ export default function Dashboard() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search anything..."
+                placeholder="Rechercher..."
                 className="w-64 pl-9 bg-secondary/50 border-border"
               />
             </div>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+              {recentActivity.length > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
+              )}
             </Button>
             <Link to="/settings/company">
               <Button variant="ghost" size="icon">
@@ -216,35 +318,27 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
-              label: "Active Workflows",
-              value: animatedStats.workflows,
+              label: "Workflows actifs",
+              value: stats.activeWorkflows,
               icon: Activity,
-              trend: "+12%",
-              positive: true,
               color: "from-blue-500/20 to-cyan-500/20",
             },
             {
-              label: "AI Calls Today",
-              value: animatedStats.aiCalls.toLocaleString(),
+              label: "Appels IA",
+              value: stats.aiCalls,
               icon: Zap,
-              trend: "+8%",
-              positive: true,
               color: "from-purple-500/20 to-pink-500/20",
             },
             {
-              label: "Documents Processed",
-              value: animatedStats.documents.toLocaleString(),
+              label: "Documents traités",
+              value: stats.totalDocuments,
               icon: FileText,
-              trend: "+23%",
-              positive: true,
               color: "from-green-500/20 to-emerald-500/20",
             },
             {
-              label: "Avg. Response",
-              value: `${animatedStats.response}s`,
-              icon: Clock,
-              trend: "-15%",
-              positive: true,
+              label: "Tickets support",
+              value: stats.totalTickets,
+              icon: MessageSquare,
               color: "from-orange-500/20 to-yellow-500/20",
             },
           ].map((stat, i) => (
@@ -254,7 +348,6 @@ export default function Dashboard() {
               style={{ animationDelay: `${(i + 1) * 0.1}s` }}
             >
               <CardContent className="p-5 relative">
-                {/* Gradient background */}
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
@@ -263,18 +356,6 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <stat.icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div
-                      className={`flex items-center gap-1 text-sm font-medium ${
-                        stat.positive ? "text-success" : "text-destructive"
-                      }`}
-                    >
-                      {stat.positive ? (
-                        <ArrowUpRight className="w-4 h-4" />
-                      ) : (
-                        <ArrowDownRight className="w-4 h-4" />
-                      )}
-                      {stat.trend}
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-foreground mb-1 tabular-nums">
@@ -294,7 +375,7 @@ export default function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Activity className="w-5 h-5 text-primary" />
-                Weekly Activity
+                Activité de la semaine
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -357,7 +438,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ background: "hsl(260 100% 65%)" }} />
-                  <span className="text-sm text-muted-foreground">AI Calls</span>
+                  <span className="text-sm text-muted-foreground">Appels IA</span>
                 </div>
               </div>
             </CardContent>
@@ -367,8 +448,8 @@ export default function Dashboard() {
           <Card className="border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-primary" />
-                Usage by Tool
+                <Zap className="w-5 h-5 text-primary" />
+                Utilisation par outil
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -419,100 +500,78 @@ export default function Dashboard() {
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-primary" />
-                Recent Activity
+                Activité récente
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {recentActivity.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
-                  >
+              {recentActivity.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Activity className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">Aucune activité récente</p>
+                  <p className="text-xs mt-1">Commencez à utiliser les outils AETHER</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {recentActivity.map((item, i) => (
                     <div
-                      className={`w-2 h-2 rounded-full ${
-                        item.status === "completed" || item.status === "resolved"
-                          ? "bg-success"
-                          : item.status === "running"
-                          ? "bg-warning animate-pulse"
-                          : "bg-primary"
-                      }`}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{item.status}</p>
+                      key={i}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          item.status === "completed" || item.status === "resolved"
+                            ? "bg-success"
+                            : item.status === "running" || item.status === "pending"
+                            ? "bg-warning animate-pulse"
+                            : "bg-primary"
+                        }`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{item.status}</p>
+                      </div>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">{item.timeLabel}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">{item.time}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Tools Grid */}
           <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: "0.6s" }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Your Tools</h2>
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
-                View all
-              </Button>
+              <h2 className="text-lg font-semibold text-foreground">Vos outils</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {tools.slice(0, 6).map((tool, index) => (
+              {tools.map((tool, index) => (
                 <Link
                   key={tool.name}
                   to={tool.path}
-                  className="group relative p-4 rounded-xl bg-card/50 border border-border hover:border-primary/50 hover:bg-card transition-all duration-300"
+                  className="group p-4 rounded-xl bg-card/50 border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg"
                 >
-                  <div className="flex items-start gap-3">
-                    {/* Icon */}
-                    <div
-                      className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
-                    >
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                       <tool.icon className="w-5 h-5 text-white" />
                     </div>
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-foreground mb-0.5 group-hover:text-primary transition-colors">
-                        {tool.name}
-                      </h3>
-                      <p className="text-xs text-muted-foreground truncate">{tool.description}</p>
+                      <h3 className="text-sm font-semibold text-foreground truncate">{tool.name}</h3>
+                      <p className="text-xs text-muted-foreground">{tool.description}</p>
                     </div>
-
-                    {/* Arrow */}
-                    <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      {tool.stats.active} actif{tool.stats.active > 1 ? 's' : ''}
+                    </span>
+                    <span className="text-primary font-medium">
+                      {tool.stats.runs} exécution{typeof tool.stats.runs === 'number' && tool.stats.runs > 1 ? 's' : ''}
+                    </span>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
         </div>
-
-        {/* CTA Banner */}
-        {!company && !companyLoading && (
-          <Card className="border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent animate-fade-in overflow-hidden relative" style={{ animationDelay: "0.7s" }}>
-            <div className="absolute inset-0 bg-hero-pattern opacity-50" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    Complete Your Setup
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Create your company workspace to unlock team collaboration and enterprise features.
-                  </p>
-                </div>
-                <Link to="/onboarding">
-                  <Button className="glow">
-                    Create Workspace
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </DashboardLayout>
   );
