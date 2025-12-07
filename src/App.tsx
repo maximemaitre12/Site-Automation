@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import CompanySettings from "./pages/settings/CompanySettings";
+import ApiKeys from "./pages/settings/ApiKeys";
 
 // Tools
 import Flow from "./pages/tools/Flow";
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
             <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
             <Route path="/settings/company" element={<RequireAuth><CompanySettings /></RequireAuth>} />
+            <Route path="/settings/api-keys" element={<RequireAuth><ApiKeys /></RequireAuth>} />
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
