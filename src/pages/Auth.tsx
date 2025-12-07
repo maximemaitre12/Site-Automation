@@ -60,6 +60,7 @@ export default function Auth() {
       if (mode === 'login') {
         const { error } = await signIn(email, password);
         if (error) {
+          setLoading(false);
           if (error.message.includes('Invalid login credentials')) {
             toast.error('Invalid email or password');
           } else {
@@ -67,11 +68,12 @@ export default function Auth() {
           }
         } else {
           toast.success('Welcome back!');
-          navigate('/dashboard');
+          // Navigation is handled by useEffect when user state updates
         }
       } else if (mode === 'signup') {
         const { error } = await signUp(email, password, name);
         if (error) {
+          setLoading(false);
           if (error.message.includes('already registered')) {
             toast.error('This email is already registered. Please sign in.');
           } else {
@@ -79,10 +81,11 @@ export default function Auth() {
           }
         } else {
           toast.success('Account created successfully!');
-          navigate('/dashboard');
+          // Navigation is handled by useEffect when user state updates
         }
       } else if (mode === 'reset') {
         const { error } = await resetPassword(email);
+        setLoading(false);
         if (error) {
           toast.error(error.message);
         } else {
@@ -90,8 +93,9 @@ export default function Auth() {
           toast.success('Password reset email sent!');
         }
       }
-    } finally {
+    } catch (err) {
       setLoading(false);
+      toast.error('An unexpected error occurred');
     }
   };
 
