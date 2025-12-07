@@ -390,8 +390,8 @@ export default function Flow() {
                   </div>
                 ))}
                 {/* New Workflow Button */}
-                <div className="flex justify-center pt-2 md:pt-3">
-                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-8 w-8 p-0 rounded-full">
+                <div className="flex justify-center pt-2 md:pt-3 flex-shrink-0">
+                  <Button variant="hero" size="sm" onClick={(e) => { e.stopPropagation(); setIsCreateDialogOpen(true); }} className="h-8 px-3">
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
