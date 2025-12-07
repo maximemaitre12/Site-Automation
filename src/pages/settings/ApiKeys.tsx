@@ -23,14 +23,72 @@ const API_SERVICES = [
     label: 'Resend (Email)',
     description: 'Clé API pour l\'envoi d\'emails via Resend',
     placeholder: 're_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://resend.com/api-keys'
+    helpUrl: 'https://resend.com/api-keys',
+    icon: '📧'
+  },
+  {
+    name: 'telegram',
+    label: 'Telegram Bot',
+    description: 'Token de bot Telegram pour envoyer des messages',
+    placeholder: '1234567890:ABCdefGHIjklMNOpqrsTUVwxyz',
+    helpUrl: 'https://core.telegram.org/bots#creating-a-new-bot',
+    icon: '✈️'
+  },
+  {
+    name: 'slack',
+    label: 'Slack',
+    description: 'Token OAuth pour poster des messages Slack',
+    placeholder: 'xoxb-xxxxxxxxxxxxxxxxxxxxxxxx',
+    helpUrl: 'https://api.slack.com/tutorials/tracks/getting-a-token',
+    icon: '💬'
+  },
+  {
+    name: 'discord',
+    label: 'Discord Webhook',
+    description: 'URL de webhook Discord pour poster des messages',
+    placeholder: 'https://discord.com/api/webhooks/...',
+    helpUrl: 'https://support.discord.com/hc/en-us/articles/228383668',
+    icon: '🎮'
+  },
+  {
+    name: 'twilio',
+    label: 'Twilio (SMS)',
+    description: 'Clés Twilio pour envoyer des SMS (format: SID:AuthToken)',
+    placeholder: 'ACxxxxxxxx:xxxxxxxx',
+    helpUrl: 'https://console.twilio.com/',
+    icon: '📱'
+  },
+  {
+    name: 'sendgrid',
+    label: 'SendGrid (Email)',
+    description: 'Clé API SendGrid pour l\'envoi d\'emails',
+    placeholder: 'SG.xxxxxxxxxxxxxxxxxxxxxxxx',
+    helpUrl: 'https://app.sendgrid.com/settings/api_keys',
+    icon: '📬'
   },
   {
     name: 'openai',
     label: 'OpenAI',
-    description: 'Clé API pour les fonctionnalités IA avancées',
+    description: 'Clé API pour les fonctionnalités IA personnalisées',
     placeholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://platform.openai.com/api-keys'
+    helpUrl: 'https://platform.openai.com/api-keys',
+    icon: '🤖'
+  },
+  {
+    name: 'notion',
+    label: 'Notion',
+    description: 'Token d\'intégration Notion pour accéder aux bases de données',
+    placeholder: 'secret_xxxxxxxxxxxxxxxxxxxxxxxx',
+    helpUrl: 'https://www.notion.so/my-integrations',
+    icon: '📝'
+  },
+  {
+    name: 'airtable',
+    label: 'Airtable',
+    description: 'Token API Airtable pour accéder aux bases',
+    placeholder: 'patxxxxxxxxxxxxxxxx',
+    helpUrl: 'https://airtable.com/create/tokens',
+    icon: '📊'
   }
 ];
 
@@ -190,7 +248,13 @@ export default function ApiKeys() {
           {API_SERVICES.map(service => (
             <Card key={service.name}>
               <CardHeader>
-                <CardTitle className="text-lg">{service.label}</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span>{service.icon}</span>
+                  {service.label}
+                  {savedKeys[service.name] && (
+                    <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full">Configuré</span>
+                  )}
+                </CardTitle>
                 <CardDescription>
                   {service.description}
                   {service.helpUrl && (

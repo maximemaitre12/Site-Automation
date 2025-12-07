@@ -36,6 +36,13 @@ export type BlockType =
   // Integrations
   | 'http_request'
   | 'http_webhook'
+  | 'integration_telegram'
+  | 'integration_slack'
+  | 'integration_discord'
+  | 'integration_twilio_sms'
+  | 'integration_sendgrid'
+  | 'integration_notion'
+  | 'integration_airtable'
   // System Actions
   | 'system_email'
   | 'system_webhook'
@@ -468,6 +475,87 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
       { key: 'url', label: 'Webhook URL', type: 'text', placeholder: 'https://hooks.example.com/webhook' },
       { key: 'payload', label: 'Payload Template', type: 'json' },
       { key: 'retry', label: 'Retry on Failure', type: 'boolean', defaultValue: true }
+    ]
+  },
+  integration_telegram: {
+    name: 'Telegram',
+    category: 'integration',
+    color: 'from-sky-500 to-blue-400',
+    icon: 'Send',
+    description: 'Send a message via Telegram bot',
+    configFields: [
+      { key: 'chatId', label: 'Chat ID', type: 'text', placeholder: '123456789 or @channel_name', required: true },
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Hello from AETHER Flow!' }
+    ]
+  },
+  integration_slack: {
+    name: 'Slack',
+    category: 'integration',
+    color: 'from-purple-500 to-violet-400',
+    icon: 'MessageSquare',
+    description: 'Post a message to Slack',
+    configFields: [
+      { key: 'channel', label: 'Channel', type: 'text', placeholder: '#general or @user', required: true },
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Workflow notification' }
+    ]
+  },
+  integration_discord: {
+    name: 'Discord',
+    category: 'integration',
+    color: 'from-indigo-500 to-purple-400',
+    icon: 'MessageCircle',
+    description: 'Send a message to Discord',
+    configFields: [
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Discord notification', required: true },
+      { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Flow' }
+    ]
+  },
+  integration_twilio_sms: {
+    name: 'Twilio SMS',
+    category: 'integration',
+    color: 'from-red-500 to-pink-400',
+    icon: 'Phone',
+    description: 'Send an SMS via Twilio',
+    configFields: [
+      { key: 'to', label: 'To Phone Number', type: 'text', placeholder: '+33612345678', required: true },
+      { key: 'from', label: 'From Phone Number', type: 'text', placeholder: '+15558675309', required: true },
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'SMS content' }
+    ]
+  },
+  integration_sendgrid: {
+    name: 'SendGrid Email',
+    category: 'integration',
+    color: 'from-blue-500 to-cyan-400',
+    icon: 'Mail',
+    description: 'Send an email via SendGrid',
+    configFields: [
+      { key: 'to', label: 'To Email', type: 'text', placeholder: 'recipient@example.com', required: true },
+      { key: 'from', label: 'From Email', type: 'text', placeholder: 'sender@yourdomain.com', required: true },
+      { key: 'subject', label: 'Subject', type: 'text', placeholder: 'Email subject' },
+      { key: 'message', label: 'Body', type: 'textarea', placeholder: 'Email content' }
+    ]
+  },
+  integration_notion: {
+    name: 'Notion',
+    category: 'integration',
+    color: 'from-gray-600 to-gray-400',
+    icon: 'FileText',
+    description: 'Create a page in Notion database',
+    configFields: [
+      { key: 'databaseId', label: 'Database ID', type: 'text', placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', required: true },
+      { key: 'properties', label: 'Properties (JSON)', type: 'json', placeholder: '{"Name": {"title": [{"text": {"content": "My Page"}}]}}' }
+    ]
+  },
+  integration_airtable: {
+    name: 'Airtable',
+    category: 'integration',
+    color: 'from-green-500 to-teal-400',
+    icon: 'Table',
+    description: 'Create a record in Airtable',
+    configFields: [
+      { key: 'baseId', label: 'Base ID', type: 'text', placeholder: 'appXXXXXXXXXXXXXX', required: true },
+      { key: 'tableId', label: 'Table Name or ID', type: 'text', placeholder: 'Table 1', required: true },
+      { key: 'fields', label: 'Fields (JSON)', type: 'json', placeholder: '{"Name": "New Record", "Status": "Active"}' }
     ]
   },
 

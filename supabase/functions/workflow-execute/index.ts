@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -6,6 +7,22 @@ const corsHeaders = {
 };
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Helper to get user API key
+async function getUserApiKey(userId: string, serviceName: string): Promise<string | null> {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const { data, error } = await supabase
+    .from('user_api_keys')
+    .select('api_key')
+    .eq('user_id', userId)
+    .eq('service_name', serviceName)
+    .maybeSingle();
+  
+  if (error || !data) return null;
+  return data.api_key;
+}
 
 interface WorkflowBlock {
   id: string;
@@ -488,6 +505,269 @@ Only output JSON, no other text.`;
         break;
       }
 
+      // ===== INTEGRATIONS WITH USER API KEYS =====
+      case 'integration_telegram': {
+        const chatId = block.config?.chatId;
+        const message = block.config?.message || inputText;
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { sent: false, error: 'User ID required for API key lookup' };
+          break;
+        }
+        
+        const botToken = await getUserApiKey(userId, 'telegram');
+        if (!botToken) {
+          output = { sent: false, error: 'Telegram bot token not configured. Add it in Settings > API Keys' };
+          break;
+        }
+        
+        if (!chatId) {
+          output = { sent: false, error: 'Chat ID is required' };
+          break;
+        }
+        
+        try {
+          const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' })
+          });
+          const data = await response.json();
+          output = { sent: data.ok, messageId: data.result?.message_id, chatId };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Telegram error' };
+        }
+        break;
+      }
+
+      case 'integration_slack': {
+        const channel = block.config?.channel || '#general';
+        const message = block.config?.message || inputText;
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { sent: false, error: 'User ID required' };
+          break;
+        }
+        
+        const slackToken = await getUserApiKey(userId, 'slack');
+        if (!slackToken) {
+          output = { sent: false, error: 'Slack token not configured. Add it in Settings > API Keys' };
+          break;
+        }
+        
+        try {
+          const response = await fetch('https://slack.com/api/chat.postMessage', {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${slackToken}`,
+              'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ channel, text: message })
+          });
+          const data = await response.json();
+          output = { sent: data.ok, ts: data.ts, channel: data.channel, error: data.error };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Slack error' };
+        }
+        break;
+      }
+
+      case 'integration_discord': {
+        const message = block.config?.message || inputText;
+        const username = block.config?.username || 'AETHER Flow';
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { sent: false, error: 'User ID required' };
+          break;
+        }
+        
+        const webhookUrl = await getUserApiKey(userId, 'discord');
+        if (!webhookUrl) {
+          output = { sent: false, error: 'Discord webhook not configured. Add it in Settings > API Keys' };
+          break;
+        }
+        
+        try {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: message, username })
+          });
+          output = { sent: response.ok, status: response.status };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Discord error' };
+        }
+        break;
+      }
+
+      case 'integration_twilio_sms': {
+        const to = block.config?.to;
+        const from = block.config?.from;
+        const message = block.config?.message || inputText;
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { sent: false, error: 'User ID required' };
+          break;
+        }
+        
+        const twilioCredentials = await getUserApiKey(userId, 'twilio');
+        if (!twilioCredentials) {
+          output = { sent: false, error: 'Twilio credentials not configured. Add SID:AuthToken in Settings > API Keys' };
+          break;
+        }
+        
+        const [accountSid, authToken] = twilioCredentials.split(':');
+        if (!accountSid || !authToken || !to || !from) {
+          output = { sent: false, error: 'Invalid Twilio configuration or missing phone numbers' };
+          break;
+        }
+        
+        try {
+          const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ To: to, From: from, Body: message })
+          });
+          const data = await response.json();
+          output = { sent: response.ok, sid: data.sid, error: data.message };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Twilio error' };
+        }
+        break;
+      }
+
+      case 'integration_sendgrid': {
+        const to = block.config?.to;
+        const from = block.config?.from;
+        const subject = block.config?.subject || 'Notification';
+        const content = block.config?.message || inputText;
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { sent: false, error: 'User ID required' };
+          break;
+        }
+        
+        const apiKey = await getUserApiKey(userId, 'sendgrid');
+        if (!apiKey) {
+          output = { sent: false, error: 'SendGrid API key not configured. Add it in Settings > API Keys' };
+          break;
+        }
+        
+        if (!to || !from) {
+          output = { sent: false, error: 'To and From email addresses are required' };
+          break;
+        }
+        
+        try {
+          const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              personalizations: [{ to: [{ email: to }] }],
+              from: { email: from },
+              subject,
+              content: [{ type: 'text/plain', value: content }]
+            })
+          });
+          output = { sent: response.ok, status: response.status };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'SendGrid error' };
+        }
+        break;
+      }
+
+      case 'integration_notion': {
+        const databaseId = block.config?.databaseId;
+        const properties = block.config?.properties || {};
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { created: false, error: 'User ID required' };
+          break;
+        }
+        
+        const notionToken = await getUserApiKey(userId, 'notion');
+        if (!notionToken) {
+          output = { created: false, error: 'Notion token not configured. Add it in Settings > API Keys' };
+          break;
+        }
+        
+        if (!databaseId) {
+          output = { created: false, error: 'Database ID is required' };
+          break;
+        }
+        
+        try {
+          const response = await fetch('https://api.notion.com/v1/pages', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${notionToken}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify({
+              parent: { database_id: databaseId },
+              properties
+            })
+          });
+          const data = await response.json();
+          output = { created: response.ok, pageId: data.id, error: data.message };
+        } catch (e) {
+          output = { created: false, error: e instanceof Error ? e.message : 'Notion error' };
+        }
+        break;
+      }
+
+      case 'integration_airtable': {
+        const baseId = block.config?.baseId;
+        const tableId = block.config?.tableId;
+        const fields = block.config?.fields || {};
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { created: false, error: 'User ID required' };
+          break;
+        }
+        
+        const airtableToken = await getUserApiKey(userId, 'airtable');
+        if (!airtableToken) {
+          output = { created: false, error: 'Airtable token not configured. Add it in Settings > API Keys' };
+          break;
+        }
+        
+        if (!baseId || !tableId) {
+          output = { created: false, error: 'Base ID and Table ID are required' };
+          break;
+        }
+        
+        try {
+          const response = await fetch(`https://api.airtable.com/v0/${baseId}/${tableId}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${airtableToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fields })
+          });
+          const data = await response.json();
+          output = { created: response.ok, recordId: data.id, error: data.error?.message };
+        } catch (e) {
+          output = { created: false, error: e instanceof Error ? e.message : 'Airtable error' };
+        }
+        break;
+      }
+
       default:
         output = context.input;
     }
@@ -611,6 +891,21 @@ serve(async (req) => {
   }
 
   try {
+    // Extract user ID from JWT token
+    const authHeader = req.headers.get('authorization');
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const { data: { user } } = await supabase.auth.getUser(token);
+        userId = user?.id || null;
+      } catch (e) {
+        console.warn('Could not extract user from token:', e);
+      }
+    }
+
     const { blocks, input, variables, workflowId } = await req.json();
 
     if (!blocks || !Array.isArray(blocks)) {
@@ -620,9 +915,11 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Executing workflow ${workflowId || 'unnamed'} with ${blocks.length} blocks`);
+    console.log(`Executing workflow ${workflowId || 'unnamed'} with ${blocks.length} blocks for user ${userId}`);
 
-    const result = await executeWorkflow(blocks, input || '', variables || {});
+    // Pass userId in variables so blocks can access user's API keys
+    const enrichedVariables = { ...variables, _userId: userId };
+    const result = await executeWorkflow(blocks, input || '', enrichedVariables);
 
     return new Response(
       JSON.stringify(result),
