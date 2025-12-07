@@ -339,8 +339,11 @@ export default function Flow() {
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Workflows List */}
           <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
-            <div className="px-2 mb-3 md:mb-4">
+            <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
               <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
+              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 px-2">
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-6 md:py-8">
@@ -350,16 +353,10 @@ export default function Flow() {
               <div className="text-center py-6 md:py-8">
                 <Zap className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
                 <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">No workflows yet</p>
-                <div className="flex flex-col gap-2 items-center">
-                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Workflow
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate with AI
-                  </Button>
-                </div>
+                <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate with AI
+                </Button>
               </div>
             ) : (
               <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
@@ -395,14 +392,6 @@ export default function Flow() {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
-            {/* New Workflow Button - always visible */}
-            {!loading && workflows.length > 0 && (
-              <div className="flex justify-center pt-3 md:pt-4 flex-shrink-0">
-                <Button variant="hero" size="sm" onClick={(e) => { e.stopPropagation(); setIsCreateDialogOpen(true); }} className="h-8 px-3">
-                  <Plus className="w-4 h-4" />
-                </Button>
               </div>
             )}
           </aside>
