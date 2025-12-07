@@ -425,6 +425,9 @@ export default function Flow() {
                     </Tooltip>
                   </div>
                   {/* View mode toggle removed - canvas only */}
+                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
+                    <Sparkles className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">IA</span>
+                  </Button>
                   {hasUnsavedChanges && <span className="text-[10px] md:text-xs text-amber-500">Non sauvegardé</span>}
                   <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges}>
                     <Save className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">Sauvegarder</span>
