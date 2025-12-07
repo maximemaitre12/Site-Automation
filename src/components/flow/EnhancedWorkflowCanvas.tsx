@@ -232,9 +232,10 @@ export function EnhancedWorkflowCanvas({
     <div 
       ref={containerRef}
       className={cn(
-        "relative flex-1 overflow-hidden bg-muted/20",
+        "relative w-full h-full min-h-[500px] overflow-hidden bg-muted/20",
         isPanning ? "cursor-grabbing" : "cursor-grab"
       )}
+      style={{ flex: '1 1 0%' }}
       onMouseDown={startPanning}
     >
       {/* Toolbar */}
