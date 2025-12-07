@@ -46,12 +46,12 @@ export function HeroSection() {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
-          <Link to="#features">
+          <a href="#features">
             <Button variant="outline" size="xl" className="min-w-[220px] bg-background/50 backdrop-blur-sm border-border/50 hover:bg-secondary/50">
               <Play className="w-4 h-4 mr-2" />
               Voir les automatisations
             </Button>
-          </Link>
+          </a>
         </div>
         
         {/* Hero Visual - Stylized Interface */}
