@@ -296,22 +296,41 @@ export async function executeBlock(
       }
 
       case 'system_email': {
-        // Real email sending would require an edge function with Resend
-        // For now, we log a warning that email config is needed
+        // Email requires Resend integration - return info without failing
         const to = block.config?.to;
         const subject = block.config?.subject || 'Workflow Notification';
         if (!to) {
-          output = { sent: false, error: 'No recipient email configured' };
+          output = { sent: false, warning: 'No recipient email configured', requiresSetup: true };
         } else {
-          // Call edge function to send email
+          // Check if email edge function exists by trying to call it
           try {
             const { data, error } = await supabase.functions.invoke('send-workflow-email', {
               body: { to, subject, body: inputText }
             });
-            if (error) throw error;
-            output = { sent: true, to, subject, timestamp: new Date().toISOString() };
+            if (error) {
+              // Function doesn't exist or failed - don't block workflow
+              output = { 
+                sent: false, 
+                warning: 'Email integration not configured. Configure Resend to enable real email sending.',
+                to, 
+                subject,
+                body: inputText,
+                requiresSetup: true,
+                timestamp: new Date().toISOString()
+              };
+            } else {
+              output = { sent: true, to, subject, timestamp: new Date().toISOString() };
+            }
           } catch (err) {
-            output = { sent: false, error: err instanceof Error ? err.message : 'Email sending not configured', to, subject };
+            // Don't fail workflow - just indicate email not configured
+            output = { 
+              sent: false, 
+              warning: 'Email integration not configured',
+              to, 
+              subject,
+              requiresSetup: true,
+              timestamp: new Date().toISOString()
+            };
           }
         }
         break;
@@ -322,7 +341,14 @@ export async function executeBlock(
         // Real webhook POST
         const webhookUrl = block.config?.url;
         if (!webhookUrl || webhookUrl === 'https://webhook.example.com' || webhookUrl.includes('YOUR_')) {
-          output = { posted: false, error: 'No valid webhook URL configured' };
+          // Don't fail workflow - just indicate webhook not configured
+          output = { 
+            posted: false, 
+            warning: 'No valid webhook URL configured',
+            requiresSetup: true,
+            payload: context.input,
+            timestamp: new Date().toISOString()
+          };
         } else {
           try {
             const controller = new AbortController();
@@ -352,10 +378,11 @@ export async function executeBlock(
               timestamp: new Date().toISOString()
             };
           } catch (err) {
+            // Don't fail workflow - return error info but continue
             output = { 
               posted: false, 
               url: webhookUrl,
-              error: err instanceof Error ? err.message : 'Webhook request failed',
+              warning: err instanceof Error ? err.message : 'Webhook request failed',
               timestamp: new Date().toISOString()
             };
           }
