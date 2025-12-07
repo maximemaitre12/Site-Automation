@@ -1,155 +1,172 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, Zap, Bot, FileText } from "lucide-react";
+import { ArrowRight, Play, CheckCircle2, Zap, Clock, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/90" />
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-primary/8 rounded-full blur-[150px] animate-pulse-slow" />
-      <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-[hsl(260_100%_65%/0.1)] rounded-full blur-[100px]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-primary/5" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] bg-primary/5 rounded-full blur-[200px]" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(220_30%_25%/0.1)_1px,transparent_1px),linear-gradient(to_bottom,hsl(220_30%_25%/0.1)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      {/* Grid pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(220_30%_25%/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(220_30%_25%/0.05)_1px,transparent_1px)] bg-[size:80px_80px]" />
       
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 py-20 text-center max-w-6xl">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8 animate-fade-in">
-          <Zap className="w-4 h-4 text-primary" />
-          <span className="text-sm font-medium text-primary">Plateforme d'automatisation IA Enterprise</span>
-        </div>
-        
-        {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <span className="text-foreground">Automatisez </span>
-          <span className="text-gradient">90% de vos processus.</span>
-          <br className="hidden sm:block" />
-          <span className="text-foreground">Déployez des </span>
-          <span className="text-gradient">agents IA</span>
-          <span className="text-foreground"> en quelques minutes.</span>
-        </h1>
-        
-        {/* Subheadline */}
-        <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto mb-12 animate-fade-in leading-relaxed" style={{ animationDelay: "0.2s" }}>
-          AETHER transforme vos opérations, réduit drastiquement vos coûts, 
-          et libère votre équipe des tâches manuelles répétitives.
-        </p>
-        
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-          <Link to="/demo">
-            <Button variant="hero" size="xl" className="min-w-[220px]">
-              Demander une démo
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-          <a href="#features">
-            <Button variant="outline" size="xl" className="min-w-[220px] bg-background/50 backdrop-blur-sm border-border/50 hover:bg-secondary/50">
-              <Play className="w-4 h-4 mr-2" />
-              Voir les automatisations
-            </Button>
-          </a>
-        </div>
-        
-        {/* Hero Visual - Stylized Interface */}
-        <div className="relative max-w-5xl mx-auto animate-fade-in" style={{ animationDelay: "0.4s" }}>
-          <div className="relative rounded-xl border border-border/50 bg-card/80 backdrop-blur-xl overflow-hidden shadow-2xl">
-            {/* Window Header */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-secondary/30">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                <div className="w-3 h-3 rounded-full bg-warning/60" />
-                <div className="w-3 h-3 rounded-full bg-success/60" />
-              </div>
-              <span className="text-xs text-muted-foreground ml-2">AETHER Flow — Workflow Builder</span>
+      <div className="relative z-10 container mx-auto px-6 py-16">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left - Text Content */}
+          <div className="max-w-2xl">
+            {/* Problem Statement Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 border border-destructive/20 mb-6 animate-fade-in">
+              <Clock className="w-4 h-4 text-destructive" />
+              <span className="text-sm font-medium text-destructive">Vos équipes perdent 40% de leur temps sur des tâches répétitives</span>
             </div>
             
-            {/* Interface Preview */}
-            <div className="p-6 md:p-8">
-              <div className="flex flex-col md:flex-row gap-6">
-                {/* Workflow Canvas */}
-                <div className="flex-1 space-y-4">
-                  <div className="flex items-center gap-3 p-4 rounded-lg bg-primary/10 border border-primary/30">
-                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-medium text-foreground">Trigger: Email reçu</p>
-                      <p className="text-xs text-muted-foreground">Automatiquement détecté</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-center">
-                    <div className="w-px h-6 bg-gradient-to-b from-primary/50 to-primary/20" />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-4 rounded-lg bg-secondary/50 border border-border/50">
-                    <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
-                      <Bot className="w-5 h-5 text-accent" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-medium text-foreground">Agent IA: Classification</p>
-                      <p className="text-xs text-muted-foreground">Analyse et catégorisation</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-center">
-                    <div className="w-px h-6 bg-gradient-to-b from-border/50 to-border/20" />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-4 rounded-lg bg-secondary/50 border border-border/50">
-                    <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-success" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-medium text-foreground">Action: Mise à jour CRM</p>
-                      <p className="text-xs text-muted-foreground">Synchronisation automatique</p>
-                    </div>
-                  </div>
+            {/* Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-[1.1] animate-fade-in" style={{ animationDelay: "0.1s" }}>
+              <span className="text-foreground">Libérez vos équipes.</span>
+              <br />
+              <span className="text-gradient">L'IA travaille pour vous.</span>
+            </h1>
+            
+            {/* Solution Statement */}
+            <p className="text-lg lg:text-xl text-muted-foreground mb-8 leading-relaxed animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              AETHER automatise vos processus métier en quelques clics. 
+              Factures, emails, support client, RH — tout est géré par des agents IA intelligents.
+            </p>
+            
+            {/* Quick Benefits */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 animate-fade-in" style={{ animationDelay: "0.25s" }}>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 text-success" />
                 </div>
-                
-                {/* Stats Panel */}
-                <div className="md:w-64 space-y-4 p-4 rounded-lg bg-secondary/30 border border-border/30">
-                  <h4 className="text-sm font-semibold text-foreground">Performance temps réel</h4>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground">Exécutions/jour</span>
-                        <span className="text-success font-medium">1,247</span>
-                      </div>
-                      <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                        <div className="h-full w-3/4 bg-gradient-to-r from-primary to-[hsl(260_100%_65%)] rounded-full" />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground">Temps économisé</span>
-                        <span className="text-success font-medium">127h</span>
-                      </div>
-                      <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                        <div className="h-full w-[85%] bg-gradient-to-r from-success to-[hsl(160_76%_55%)] rounded-full" />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground">Taux de succès</span>
-                        <span className="text-success font-medium">99.7%</span>
-                      </div>
-                      <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                        <div className="h-full w-[99%] bg-gradient-to-r from-primary to-success rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <span className="text-sm font-medium text-foreground">–70% de tâches manuelles</span>
               </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm font-medium text-foreground">120h/mois économisées</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-warning" />
+                </div>
+                <span className="text-sm font-medium text-foreground">ROI en 30 jours</span>
+              </div>
+            </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+              <Link to="/demo">
+                <Button variant="hero" size="xl" className="w-full sm:w-auto">
+                  Demander une démo gratuite
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <a href="#tools">
+                <Button variant="outline" size="xl" className="w-full sm:w-auto bg-background/50 backdrop-blur-sm">
+                  <Play className="w-4 h-4 mr-2" />
+                  Voir comment ça marche
+                </Button>
+              </a>
             </div>
           </div>
           
-          {/* Glow effect behind the card */}
-          <div className="absolute -inset-4 -z-10 bg-gradient-to-r from-primary/20 via-[hsl(260_100%_65%/0.2)] to-primary/20 blur-3xl opacity-50" />
+          {/* Right - Visual Demo */}
+          <div className="relative animate-fade-in lg:animate-slide-in-left" style={{ animationDelay: "0.4s" }}>
+            {/* Main Interface Card */}
+            <div className="relative rounded-2xl border border-border/50 bg-card/90 backdrop-blur-xl overflow-hidden shadow-2xl">
+              {/* Window Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-secondary/30">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                    <div className="w-3 h-3 rounded-full bg-warning/60" />
+                    <div className="w-3 h-3 rounded-full bg-success/60" />
+                  </div>
+                  <span className="text-xs text-muted-foreground ml-2">AETHER — Automatisation en cours</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 border border-success/20">
+                  <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                  <span className="text-xs text-success font-medium">Live</span>
+                </div>
+              </div>
+              
+              {/* Workflow Animation */}
+              <div className="p-6 space-y-4">
+                {/* Step 1 - Completed */}
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-success/5 border border-success/20">
+                  <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-success" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Facture #2847 reçue</p>
+                    <p className="text-xs text-muted-foreground">Extraction automatique des données</p>
+                  </div>
+                  <span className="text-xs text-success font-medium">Terminé</span>
+                </div>
+                
+                {/* Step 2 - Completed */}
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-success/5 border border-success/20">
+                  <div className="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-success" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Validation comptable</p>
+                    <p className="text-xs text-muted-foreground">Montant: 2,450€ — Fournisseur: Acme Corp</p>
+                  </div>
+                  <span className="text-xs text-success font-medium">Terminé</span>
+                </div>
+                
+                {/* Step 3 - In Progress */}
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/30 animate-pulse">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Intégration ERP</p>
+                    <p className="text-xs text-muted-foreground">Synchronisation avec votre comptabilité...</p>
+                  </div>
+                  <span className="text-xs text-primary font-medium">En cours</span>
+                </div>
+                
+                {/* Stats Bar */}
+                <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border/30">
+                  <div className="text-center p-3 rounded-lg bg-secondary/30">
+                    <div className="text-2xl font-bold text-gradient">847</div>
+                    <div className="text-xs text-muted-foreground">Tâches/jour</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-secondary/30">
+                    <div className="text-2xl font-bold text-success">99.7%</div>
+                    <div className="text-xs text-muted-foreground">Précision</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-secondary/30">
+                    <div className="text-2xl font-bold text-primary">24/7</div>
+                    <div className="text-xs text-muted-foreground">Disponible</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Floating notification */}
+            <div className="absolute -bottom-4 -left-4 p-4 rounded-xl bg-card border border-border/50 shadow-xl animate-float">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 text-success" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">+127 heures économisées</p>
+                  <p className="text-xs text-muted-foreground">Ce mois-ci</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Glow effect */}
+            <div className="absolute -inset-4 -z-10 bg-gradient-to-r from-primary/20 via-[hsl(260_100%_65%/0.15)] to-primary/20 blur-3xl opacity-60" />
+          </div>
         </div>
       </div>
     </section>
