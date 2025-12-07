@@ -39,7 +39,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
-  Repeat, Timer, GitFork, Bell, FileText
+  Repeat, Timer, GitFork, Bell, FileText, Play
 };
 
 interface WorkflowBuilderProps {
@@ -454,8 +454,27 @@ function BlockCard({
           {def?.category === 'system' && 'Action'}
         </div>
 
+        {/* Branch/Sub-workflow indicators */}
+        {(block.type === 'control_condition' || block.type === 'control_branch' || block.type === 'control_parallel' || block.type === 'ai_decision') && (
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1">
+            <div className="flex items-center gap-0.5 bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px] font-medium shadow-md">
+              <GitBranch className="w-3 h-3" />
+              Branches
+            </div>
+          </div>
+        )}
+
+        {block.type === 'workflow_call' && (
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1">
+            <div className="flex items-center gap-0.5 bg-purple-500 text-white px-2 py-0.5 rounded-full text-[10px] font-medium shadow-md">
+              <Play className="w-3 h-3" />
+              Sous-workflow
+            </div>
+          </div>
+        )}
+
         {/* Click to configure hint */}
-        {isSelected && (
+        {isSelected && block.type !== 'control_condition' && block.type !== 'control_branch' && block.type !== 'workflow_call' && block.type !== 'control_parallel' && block.type !== 'ai_decision' && (
           <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
             <Badge className="bg-primary text-primary-foreground shadow-lg text-xs">
               <Settings className="w-3 h-3 mr-1" />
@@ -465,8 +484,43 @@ function BlockCard({
         )}
       </div>
 
-      {/* Connector to next block */}
-      {!isLast && (
+      {/* Branch visualization for control blocks */}
+      {(block.type === 'control_condition' || block.type === 'ai_decision') && !isLast && (
+        <div className="flex justify-center py-2">
+          <div className="flex items-start gap-8">
+            <div className="flex flex-col items-center">
+              <div className="w-px h-4 bg-emerald-500" />
+              <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+                Oui
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-px h-4 bg-red-500" />
+              <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/20 text-red-500 border border-red-500/30">
+                Non
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {(block.type === 'control_branch' || block.type === 'control_parallel') && !isLast && (
+        <div className="flex justify-center py-2">
+          <div className="flex items-start gap-6">
+            {[...Array(Math.min(block.config?.branchCount || 2, 4))].map((_, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="w-px h-4 bg-amber-500" />
+                <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                  {block.config?.branchNames?.split(',')[i]?.trim() || `Branche ${i + 1}`}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Standard connector to next block */}
+      {!isLast && block.type !== 'control_condition' && block.type !== 'control_branch' && block.type !== 'control_parallel' && block.type !== 'ai_decision' && (
         <div className="flex justify-center py-1">
           <div className="relative">
             <div className="w-0.5 h-6 bg-border" />

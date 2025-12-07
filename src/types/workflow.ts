@@ -29,6 +29,10 @@ export type BlockType =
   | 'control_loop'
   | 'control_delay'
   | 'control_parallel'
+  | 'control_branch'
+  | 'control_merge'
+  // Workflow
+  | 'workflow_call'
   // Integrations
   | 'http_request'
   | 'http_webhook'
@@ -392,6 +396,50 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     configFields: [
       { key: 'waitAll', label: 'Wait for All', type: 'boolean', defaultValue: true },
       { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000 }
+    ],
+    outputs: 2,
+    allowMultipleOutputs: true
+  },
+  control_branch: {
+    name: 'Branch',
+    category: 'control',
+    color: 'from-orange-500 to-yellow-400',
+    icon: 'GitBranch',
+    description: 'Create multiple workflow branches',
+    configFields: [
+      { key: 'branchCount', label: 'Number of Branches', type: 'number', defaultValue: 2 },
+      { key: 'branchNames', label: 'Branch Names (comma-separated)', type: 'text', placeholder: 'Branch A, Branch B' }
+    ],
+    outputs: 4,
+    allowMultipleOutputs: true
+  },
+  control_merge: {
+    name: 'Merge',
+    category: 'control',
+    color: 'from-teal-500 to-green-400',
+    icon: 'Combine',
+    description: 'Merge multiple branches into one',
+    configFields: [
+      { key: 'mergeStrategy', label: 'Merge Strategy', type: 'select', options: ['wait_all', 'first_complete', 'combine_results'] },
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 60000 }
+    ],
+    inputs: 4
+  },
+
+  // ===== WORKFLOW =====
+  workflow_call: {
+    name: 'Call Workflow',
+    category: 'control',
+    color: 'from-purple-600 to-violet-400',
+    icon: 'Play',
+    description: 'Execute another workflow as a sub-workflow',
+    configFields: [
+      { key: 'workflowId', label: 'Workflow ID', type: 'text', placeholder: 'Select a workflow', required: true },
+      { key: 'workflowName', label: 'Workflow Name', type: 'text', placeholder: 'Workflow name (display only)' },
+      { key: 'passInput', label: 'Pass Current Input', type: 'boolean', defaultValue: true },
+      { key: 'customInput', label: 'Custom Input (JSON)', type: 'json', placeholder: '{}' },
+      { key: 'waitForCompletion', label: 'Wait for Completion', type: 'boolean', defaultValue: true },
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 300000 }
     ]
   },
 
