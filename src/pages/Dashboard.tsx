@@ -279,14 +279,14 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8 space-y-8">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 md:space-y-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="animate-fade-in">
-            <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 md:mb-2">
               {greeting()}, <span className="text-gradient">{userName}</span>
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               {format(currentTime, "EEEE d MMMM", { locale: fr })}
               {company && (
                 <span className="ml-2 text-primary">• {company.name}</span>
@@ -294,30 +294,30 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <div className="relative">
+          <div className="flex items-center gap-2 md:gap-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher..."
-                className="w-64 pl-9 bg-secondary/50 border-border"
+                className="w-40 md:w-64 pl-9 bg-secondary/50 border-border"
               />
             </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10">
+              <Bell className="w-4 h-4 md:w-5 md:h-5" />
               {recentActivity.length > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
               )}
             </Button>
             <Link to="/settings/company">
-              <Button variant="ghost" size="icon">
-                <Settings className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="h-9 w-9 md:h-10 md:w-10">
+                <Settings className="w-4 h-4 md:w-5 md:h-5" />
               </Button>
             </Link>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[
             {
               label: "Workflows actifs",
@@ -349,21 +349,21 @@ export default function Dashboard() {
               className="border-border bg-card/50 backdrop-blur-sm overflow-hidden group hover:border-primary/30 transition-all duration-300 animate-fade-in"
               style={{ animationDelay: `${(i + 1) * 0.1}s` }}
             >
-              <CardContent className="p-5 relative">
+              <CardContent className="p-3 md:p-5 relative">
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <stat.icon className="w-5 h-5 text-primary" />
+                  <div className="flex items-center justify-between mb-2 md:mb-4">
+                    <div className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <stat.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-foreground mb-1 tabular-nums">
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-0.5 md:mb-1 tabular-nums">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               </CardContent>
             </Card>
@@ -371,17 +371,17 @@ export default function Dashboard() {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Activity Chart */}
           <Card className="lg:col-span-2 border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary" />
+            <CardHeader className="pb-2 px-4 md:px-6">
+              <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
+                <Activity className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 Activité de la semaine
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-[280px]">
+            <CardContent className="px-2 md:px-6">
+              <div className="h-[200px] md:h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={activityData}>
                     <defs>
@@ -398,15 +398,16 @@ export default function Dashboard() {
                     <XAxis
                       dataKey="name"
                       stroke="hsl(220 14% 65%)"
-                      fontSize={12}
+                      fontSize={10}
                       tickLine={false}
                       axisLine={false}
                     />
                     <YAxis
                       stroke="hsl(220 14% 65%)"
-                      fontSize={12}
+                      fontSize={10}
                       tickLine={false}
                       axisLine={false}
+                      hide={true}
                     />
                     <Tooltip
                       contentStyle={{
@@ -414,6 +415,7 @@ export default function Dashboard() {
                         border: "1px solid hsl(220 30% 25%)",
                         borderRadius: "8px",
                         color: "hsl(220 14% 91%)",
+                        fontSize: "12px",
                       }}
                     />
                     <Area
@@ -433,14 +435,14 @@ export default function Dashboard() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex items-center justify-center gap-6 mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-primary" />
-                  <span className="text-sm text-muted-foreground">Workflows</span>
+              <div className="flex items-center justify-center gap-4 md:gap-6 mt-3 md:mt-4">
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary" />
+                  <span className="text-xs md:text-sm text-muted-foreground">Workflows</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ background: "hsl(260 100% 65%)" }} />
-                  <span className="text-sm text-muted-foreground">Appels IA</span>
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <div className="w-2 h-2 md:w-3 md:h-3 rounded-full" style={{ background: "hsl(260 100% 65%)" }} />
+                  <span className="text-xs md:text-sm text-muted-foreground">Appels IA</span>
                 </div>
               </div>
             </CardContent>
@@ -448,22 +450,22 @@ export default function Dashboard() {
 
           {/* Usage by Tool */}
           <Card className="border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Zap className="w-5 h-5 text-primary" />
+            <CardHeader className="pb-2 px-4 md:px-6">
+              <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
+                <Zap className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 Utilisation par outil
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-[200px]">
+            <CardContent className="px-4 md:px-6">
+              <div className="h-[150px] md:h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={usageByToolData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
+                      innerRadius={35}
+                      outerRadius={60}
                       paddingAngle={2}
                       dataKey="value"
                     >
@@ -477,17 +479,18 @@ export default function Dashboard() {
                         border: "1px solid hsl(220 30% 25%)",
                         borderRadius: "8px",
                         color: "hsl(220 14% 91%)",
+                        fontSize: "12px",
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="grid grid-cols-2 gap-1.5 md:gap-2 mt-3 md:mt-4">
                 {usageByToolData.map((item) => (
-                  <div key={item.name} className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
-                    <span className="text-xs text-muted-foreground">{item.name}</span>
-                    <span className="text-xs font-medium text-foreground ml-auto">{item.value}%</span>
+                  <div key={item.name} className="flex items-center gap-1.5 md:gap-2">
+                    <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full flex-shrink-0" style={{ background: item.color }} />
+                    <span className="text-[10px] md:text-xs text-muted-foreground truncate">{item.name}</span>
+                    <span className="text-[10px] md:text-xs font-medium text-foreground ml-auto">{item.value}%</span>
                   </div>
                 ))}
               </div>
@@ -496,31 +499,31 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Activity & Tools */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Recent Activity */}
           <Card className="border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.5s" }}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
+            <CardHeader className="pb-2 px-4 md:px-6">
+              <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 Activité récente
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 md:px-6">
               {recentActivity.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Activity className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Aucune activité récente</p>
-                  <p className="text-xs mt-1">Commencez à utiliser les outils AETHER</p>
+                <div className="text-center py-6 md:py-8 text-muted-foreground">
+                  <Activity className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 opacity-50" />
+                  <p className="text-xs md:text-sm">Aucune activité récente</p>
+                  <p className="text-[10px] md:text-xs mt-1">Commencez à utiliser les outils AETHER</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {recentActivity.map((item, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
+                      className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${
+                        className={`w-2 h-2 rounded-full flex-shrink-0 ${
                           item.status === "completed" || item.status === "resolved"
                             ? "bg-success"
                             : item.status === "running" || item.status === "pending"
@@ -529,10 +532,10 @@ export default function Dashboard() {
                         }`}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{item.status}</p>
+                        <p className="text-xs md:text-sm font-medium text-foreground truncate">{item.name}</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground capitalize">{item.status}</p>
                       </div>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">{item.timeLabel}</span>
+                      <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">{item.timeLabel}</span>
                     </div>
                   ))}
                 </div>
@@ -542,31 +545,31 @@ export default function Dashboard() {
 
           {/* Tools Grid */}
           <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: "0.6s" }}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Vos outils</h2>
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <h2 className="text-base md:text-lg font-semibold text-foreground">Vos outils</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
               {tools.map((tool, index) => (
                 <Link
                   key={tool.name}
                   to={tool.path}
-                  className="group p-4 rounded-xl bg-card/50 border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg"
+                  className="group p-3 md:p-4 rounded-lg md:rounded-xl bg-card/50 border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <tool.icon className="w-5 h-5 text-white" />
+                  <div className="flex items-start gap-2 md:gap-3 mb-2 md:mb-3">
+                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0`}>
+                      <tool.icon className="w-4 h-4 md:w-5 md:h-5 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-foreground truncate">{tool.name}</h3>
-                      <p className="text-xs text-muted-foreground">{tool.description}</p>
+                      <h3 className="text-xs md:text-sm font-semibold text-foreground truncate">{tool.name}</h3>
+                      <p className="text-[10px] md:text-xs text-muted-foreground hidden sm:block">{tool.description}</p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-[10px] md:text-xs">
                     <span className="text-muted-foreground">
                       {tool.stats.active} actif{tool.stats.active > 1 ? 's' : ''}
                     </span>
                     <span className="text-primary font-medium">
-                      {tool.stats.runs} exécution{typeof tool.stats.runs === 'number' && tool.stats.runs > 1 ? 's' : ''}
+                      {tool.stats.runs} exec.
                     </span>
                   </div>
                 </Link>
