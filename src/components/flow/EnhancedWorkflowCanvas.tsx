@@ -57,6 +57,10 @@ export function EnhancedWorkflowCanvas({
   const [connectionEnd, setConnectionEnd] = useState({ x: 0, y: 0 });
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const [hoveredConnectionId, setHoveredConnectionId] = useState<string | null>(null);
+  
+  // Track if we're actually dragging (moved enough to count as drag)
+  const [hasMoved, setHasMoved] = useState(false);
+  const DRAG_THRESHOLD = 3;
 
   const BLOCK_WIDTH = 240;
   const BLOCK_HEIGHT = 90;
@@ -76,15 +80,23 @@ export function EnhancedWorkflowCanvas({
       const coords = getEventCoords(e);
       
       if (isDraggingBlock) {
-        e.preventDefault();
         const dx = (coords.clientX - dragStart.x) / zoom;
         const dy = (coords.clientY - dragStart.y) / zoom;
-        onUpdateBlock(isDraggingBlock, {
-          position: { 
-            x: Math.max(0, blockStartPos.x + dx), 
-            y: Math.max(0, blockStartPos.y + dy) 
-          }
-        });
+        
+        // Check if we've moved enough to count as a real drag
+        if (!hasMoved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
+          setHasMoved(true);
+        }
+        
+        if (hasMoved || Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+          e.preventDefault();
+          onUpdateBlock(isDraggingBlock, {
+            position: { 
+              x: Math.max(0, Math.round(blockStartPos.x + dx)), 
+              y: Math.max(0, Math.round(blockStartPos.y + dy)) 
+            }
+          });
+        }
         return;
       }
 
@@ -137,6 +149,7 @@ export function EnhancedWorkflowCanvas({
       setConnectionSource(null);
       setIsPanning(false);
       setHoveredBlockId(null);
+      setHasMoved(false);
     };
 
     const handleWheel = (e: WheelEvent) => {
@@ -169,7 +182,7 @@ export function EnhancedWorkflowCanvas({
       container.removeEventListener('touchcancel', handleEnd);
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [isDraggingBlock, dragStart, blockStartPos, zoom, connectionSource, hoveredBlockId, isPanning, panStart, connections, onUpdateBlock, onAddConnection, blocks, offset]);
+  }, [isDraggingBlock, dragStart, blockStartPos, zoom, connectionSource, hoveredBlockId, isPanning, panStart, connections, onUpdateBlock, onAddConnection, blocks, offset, hasMoved]);
 
   const startBlockDrag = (e: React.MouseEvent, blockId: string) => {
     e.stopPropagation();
