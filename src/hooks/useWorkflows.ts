@@ -97,17 +97,39 @@ export function useWorkflows() {
   };
 
   const updateWorkflow = async (id: string, updates: Partial<Workflow>): Promise<boolean> => {
+    if (!user) {
+      toast.error('Vous devez être connecté pour modifier un workflow');
+      return false;
+    }
+
+    // Verify session is still valid
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error('Session expirée, veuillez vous reconnecter');
+      await supabase.auth.refreshSession();
+      return false;
+    }
+
     try {
       const { error } = await supabase
         .from('workflows')
         .update({
           ...updates,
           blocks: updates.blocks as unknown as any,
+          connections: updates.connections as unknown as any,
           updated_at: new Date().toISOString()
         })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') {
+          toast.error('Session expirée, veuillez vous reconnecter');
+          await supabase.auth.refreshSession();
+          return false;
+        }
+        throw error;
+      }
       
       setWorkflows(prev => prev.map(w => 
         w.id === id ? { ...w, ...updates } : w
@@ -115,7 +137,7 @@ export function useWorkflows() {
       return true;
     } catch (error) {
       console.error('Error updating workflow:', error);
-      toast.error('Failed to save workflow');
+      toast.error('Échec de la sauvegarde du workflow');
       return false;
     }
   };
