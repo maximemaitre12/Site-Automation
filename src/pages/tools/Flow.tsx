@@ -80,14 +80,22 @@ export default function Flow() {
     }
   };
 
-  const handleAIGenerate = async (blocks: WorkflowBlock[], name: string, description: string) => {
+  const handleAIGenerate = async (blocks: WorkflowBlock[], name: string, description: string, connections?: BlockConnection[]) => {
     const workflow = await createWorkflow(name, description);
     if (workflow) {
-      await updateWorkflow(workflow.id, { blocks });
+      await updateWorkflow(workflow.id, { blocks, connections: connections || [] });
       setSelectedWorkflowId(workflow.id);
       setLocalBlocks(blocks);
+      setLocalConnections(connections || []);
       toast.success('AI workflow created successfully!');
     }
+  };
+
+  const handleAIModify = (blocks: WorkflowBlock[], connections: BlockConnection[]) => {
+    setLocalBlocks(blocks);
+    setLocalConnections(connections);
+    setHasUnsavedChanges(true);
+    toast.success('Workflow modified by AI - save to apply changes');
   };
 
   const handleTemplateSelect = async (blocks: WorkflowBlock[], name: string, description: string) => {
@@ -310,6 +318,9 @@ export default function Flow() {
                     <Button variant={viewMode === 'canvas' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('canvas')} className="h-7 text-xs">Canvas</Button>
                     <Button variant={viewMode === 'builder' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('builder')} className="h-7 text-xs">Liste</Button>
                   </div>
+                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
+                    <Sparkles className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">IA</span>
+                  </Button>
                   {hasUnsavedChanges && <span className="text-[10px] md:text-xs text-amber-500">Non sauvegardé</span>}
                   <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges}>
                     <Save className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">Sauvegarder</span>
@@ -386,7 +397,18 @@ export default function Flow() {
         </DialogContent>
       </Dialog>
 
-      <AIWorkflowGenerator isOpen={isAIGeneratorOpen} onClose={() => setIsAIGeneratorOpen(false)} onGenerate={handleAIGenerate} />
+      <AIWorkflowGenerator 
+        isOpen={isAIGeneratorOpen} 
+        onClose={() => setIsAIGeneratorOpen(false)} 
+        onGenerate={handleAIGenerate}
+        existingWorkflow={selectedWorkflow ? {
+          id: selectedWorkflow.id,
+          name: selectedWorkflow.name,
+          blocks: localBlocks,
+          connections: localConnections
+        } : undefined}
+        onModify={handleAIModify}
+      />
       <TemplateGallery isOpen={isTemplateGalleryOpen} onClose={() => setIsTemplateGalleryOpen(false)} onSelect={handleTemplateSelect} />
 
       {/* Block Picker Dialog for Canvas mode */}

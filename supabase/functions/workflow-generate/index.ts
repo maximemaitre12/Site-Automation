@@ -15,10 +15,16 @@ const WORKFLOW_SCHEMA = `
       "type": "block_type (see allowed types below)",
       "name": "Human readable name",
       "config": { /* block-specific configuration */ },
-      "position": { "x": 0, "y": 0 }
+      "position": { "x": number, "y": number }
     }
   ],
-  "connections": [],
+  "connections": [
+    {
+      "id": "unique-uuid",
+      "sourceBlockId": "block-id",
+      "targetBlockId": "block-id"
+    }
+  ],
   "description": "Workflow description"
 }
 
@@ -47,11 +53,21 @@ serve(async (req) => {
   }
 
   try {
-    const { objective, context, constraints } = await req.json();
+    const { objective, context, constraints, existingWorkflow, modificationRequest } = await req.json();
 
-    if (!objective) {
+    // Mode: modification d'un workflow existant
+    const isModification = existingWorkflow && modificationRequest;
+
+    if (!isModification && !objective) {
       return new Response(
         JSON.stringify({ error: 'objective is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (isModification && !modificationRequest) {
+      return new Response(
+        JSON.stringify({ error: 'modificationRequest is required for modifications' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -63,7 +79,37 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows.
+    let systemPrompt: string;
+    let userPrompt: string;
+
+    if (isModification) {
+      // Mode modification
+      systemPrompt = `You are "AETHER Flow Designer", an expert AI that modifies automation workflows.
+You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
+
+WORKFLOW SCHEMA:
+${WORKFLOW_SCHEMA}
+
+RULES FOR MODIFICATIONS:
+1. Preserve block IDs when possible to maintain references
+2. Keep existing connections unless explicitly asked to change them
+3. When adding blocks, position them logically (increment y by 120, spread x for parallel blocks)
+4. When removing blocks, also remove their connections
+5. Update configurations as needed while preserving unrelated settings
+6. For parallel branches, spread blocks horizontally (x: 0, 250, 500, etc.)
+7. Maintain the overall workflow logic unless asked to change it
+8. Return the COMPLETE modified workflow, not just the changes`;
+
+      userPrompt = `Here is the CURRENT workflow:
+${JSON.stringify(existingWorkflow, null, 2)}
+
+MODIFICATION REQUEST: ${modificationRequest}
+
+Apply the modification and output the COMPLETE modified workflow as JSON. Preserve what should stay, modify what needs to change.`;
+
+    } else {
+      // Mode création
+      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
 WORKFLOW SCHEMA:
@@ -72,21 +118,24 @@ ${WORKFLOW_SCHEMA}
 RULES:
 1. Always start with a trigger block
 2. Use logical flow from trigger -> processing -> output
-3. Position blocks vertically (y increases by 120 for each step)
-4. Generate unique IDs using simple patterns like "block-1", "block-2"
-5. Choose appropriate block types for the task
-6. Configure blocks with realistic, useful settings
-7. Keep workflows focused and efficient (3-8 blocks typically)
-8. For AI blocks, write clear, specific prompts in the config`;
+3. Position blocks for a visual canvas: spread them out (x: 0-500, y: 0-600+)
+4. For parallel workflows, spread blocks horizontally (x: 0, 250, 500)
+5. Generate unique IDs using patterns like "block-1", "block-2"
+6. Create connections between blocks to show the flow
+7. Choose appropriate block types for the task
+8. Configure blocks with realistic, useful settings
+9. Keep workflows focused and efficient (3-8 blocks typically)
+10. For AI blocks, write clear, specific prompts in the config`;
 
-    const userPrompt = `Create a workflow for this objective: ${objective}
+      userPrompt = `Create a workflow for this objective: ${objective}
 
 ${context ? `Additional context: ${context}` : ''}
 ${constraints ? `Constraints: ${constraints}` : ''}
 
-Output ONLY the JSON workflow object. No explanations.`;
+Output ONLY the JSON workflow object with blocks AND connections. No explanations.`;
+    }
 
-    console.log('Generating workflow for:', objective);
+    console.log(isModification ? 'Modifying workflow:' : 'Generating workflow for:', isModification ? modificationRequest : objective);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -114,6 +163,12 @@ Output ONLY the JSON workflow object. No explanations.`;
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Payment required. Please add credits to continue.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       
       return new Response(
         JSON.stringify({ error: 'Failed to generate workflow' }),
@@ -137,6 +192,14 @@ Output ONLY the JSON workflow object. No explanations.`;
       console.error('JSON parse error:', parseError);
       console.error('Content was:', content);
       
+      if (isModification) {
+        // En cas d'erreur de parsing en mode modification, retourner le workflow original
+        return new Response(
+          JSON.stringify({ error: 'Failed to parse AI response. Please try rephrasing your request.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       // Fallback: create a simple workflow
       workflow = {
         blocks: [
@@ -145,7 +208,7 @@ Output ONLY the JSON workflow object. No explanations.`;
             type: 'trigger_text',
             name: 'Input',
             config: { placeholder: 'Enter data...' },
-            position: { x: 0, y: 0 }
+            position: { x: 100, y: 50 }
           },
           {
             id: 'process-1',
@@ -155,10 +218,16 @@ Output ONLY the JSON workflow object. No explanations.`;
               prompt: objective,
               tone: 'professional'
             },
-            position: { x: 0, y: 120 }
+            position: { x: 100, y: 200 }
           }
         ],
-        connections: [],
+        connections: [
+          {
+            id: 'conn-1',
+            sourceBlockId: 'trigger-1',
+            targetBlockId: 'process-1'
+          }
+        ],
         description: objective
       };
     }
@@ -168,24 +237,35 @@ Output ONLY the JSON workflow object. No explanations.`;
       workflow.blocks = [];
     }
 
-    if (!workflow.connections) {
+    if (!workflow.connections || !Array.isArray(workflow.connections)) {
       workflow.connections = [];
     }
 
-    // Ensure positions are set correctly
+    // Ensure positions are set correctly and spread out for canvas view
     workflow.blocks = workflow.blocks.map((block: any, index: number) => ({
       ...block,
       id: block.id || `block-${index + 1}`,
-      position: block.position || { x: 0, y: index * 120 }
+      position: block.position || { x: 100, y: 50 + index * 150 }
     }));
 
-    console.log('Generated workflow with', workflow.blocks.length, 'blocks');
+    // If no connections were generated but we have multiple blocks, create linear connections
+    if (workflow.connections.length === 0 && workflow.blocks.length > 1) {
+      workflow.connections = workflow.blocks.slice(0, -1).map((block: any, index: number) => ({
+        id: `conn-${index + 1}`,
+        sourceBlockId: block.id,
+        targetBlockId: workflow.blocks[index + 1].id
+      }));
+    }
+
+    console.log('Generated workflow with', workflow.blocks.length, 'blocks and', workflow.connections.length, 'connections');
 
     return new Response(
       JSON.stringify({ 
         success: true,
         workflow,
-        message: `Generated workflow with ${workflow.blocks.length} blocks`
+        message: isModification 
+          ? `Modified workflow: ${workflow.blocks.length} blocks, ${workflow.connections.length} connections`
+          : `Generated workflow with ${workflow.blocks.length} blocks`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
