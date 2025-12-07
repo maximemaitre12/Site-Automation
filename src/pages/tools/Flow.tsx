@@ -389,12 +389,14 @@ export default function Flow() {
                     </div>
                   </div>
                 ))}
-                {/* New Workflow Button */}
-                <div className="flex justify-center pt-2 md:pt-3 flex-shrink-0">
-                  <Button variant="hero" size="sm" onClick={(e) => { e.stopPropagation(); setIsCreateDialogOpen(true); }} className="h-8 px-3">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
+              </div>
+            )}
+            {/* New Workflow Button - always visible */}
+            {!loading && workflows.length > 0 && (
+              <div className="flex justify-center pt-3 md:pt-4 flex-shrink-0">
+                <Button variant="hero" size="sm" onClick={(e) => { e.stopPropagation(); setIsCreateDialogOpen(true); }} className="h-8 px-3">
+                  <Plus className="w-4 h-4" />
+                </Button>
               </div>
             )}
           </aside>
