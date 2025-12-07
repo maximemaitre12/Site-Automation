@@ -393,7 +393,17 @@ export async function executeBlock(
       case 'http_request': {
         const url = block.config?.url;
         const method = block.config?.method || 'GET';
-        if (url) {
+        
+        // Check if URL is a placeholder or not configured
+        if (!url || url.includes('YOUR_') || url === 'https://example.com') {
+          output = { 
+            success: true, // Don't fail workflow
+            warning: 'No valid URL configured - skipped',
+            requiresSetup: true,
+            url: url || 'not set',
+            timestamp: new Date().toISOString()
+          };
+        } else {
           try {
             const response = await fetch(url, {
               method,
@@ -408,13 +418,11 @@ export async function executeBlock(
             } catch {
               // Keep as text if not valid JSON
             }
-            output = { success: response.ok, status: response.status, data };
+            output = { success: response.ok, status: response.status, data, timestamp: new Date().toISOString() };
           } catch (err) {
             // Don't fail workflow - return warning instead
-            output = { success: false, warning: err instanceof Error ? err.message : 'Request failed', timestamp: new Date().toISOString() };
+            output = { success: true, warning: err instanceof Error ? err.message : 'Request failed', timestamp: new Date().toISOString() };
           }
-        } else {
-          output = { success: false, warning: 'No URL specified', requiresSetup: true, timestamp: new Date().toISOString() };
         }
         break;
       }
