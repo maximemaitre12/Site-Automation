@@ -862,6 +862,7 @@ export type Database = {
       workflows: {
         Row: {
           blocks: Json | null
+          connections: Json | null
           created_at: string
           description: string | null
           id: string
@@ -872,6 +873,7 @@ export type Database = {
         }
         Insert: {
           blocks?: Json | null
+          connections?: Json | null
           created_at?: string
           description?: string | null
           id?: string
@@ -882,6 +884,7 @@ export type Database = {
         }
         Update: {
           blocks?: Json | null
+          connections?: Json | null
           created_at?: string
           description?: string | null
           id?: string
