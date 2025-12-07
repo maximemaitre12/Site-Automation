@@ -328,14 +328,6 @@ export default function Flow() {
   const headerActions = (
     <>
       <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
-      <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
-        <Sparkles className="w-4 h-4 md:mr-2" />
-        <span className="hidden md:inline">AI Generate</span>
-      </Button>
-      <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
-        <Plus className="w-4 h-4 md:mr-2" />
-        <span className="hidden md:inline">New Workflow</span>
-      </Button>
     </>
   );
 
@@ -347,7 +339,12 @@ export default function Flow() {
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Workflows List */}
           <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
-            <h3 className="text-xs md:text-sm font-medium text-muted-foreground px-2 mb-3 md:mb-4">Your Workflows</h3>
+            <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
+              <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
+              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 w-7 p-0">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
             {loading ? (
               <div className="flex items-center justify-center py-6 md:py-8">
                 <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-primary" />
