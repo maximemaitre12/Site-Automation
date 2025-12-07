@@ -398,7 +398,24 @@ export default function Flow() {
               <div className="flex items-center justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
                 {/* Left side: History, Undo/Redo, Save */}
                 <div className="flex items-center gap-2">
-                  <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
+                  <WorkflowHistory 
+                    runs={runs} 
+                    loading={runsLoading} 
+                    workflowName={selectedWorkflow?.name}
+                    versions={history.map((state, index) => ({
+                      id: `version-${index}`,
+                      blocks: state.blocks,
+                      connections: state.connections,
+                      timestamp: new Date(Date.now() - (history.length - index - 1) * 60000).toISOString(),
+                      label: index === history.length - 1 ? 'Version actuelle' : undefined
+                    })).reverse()}
+                    onRestoreVersion={(blocks, connections) => {
+                      isUndoRedoAction.current = true;
+                      setLocalBlocks(JSON.parse(JSON.stringify(blocks)));
+                      setLocalConnections(JSON.parse(JSON.stringify(connections)));
+                      setHasUnsavedChanges(true);
+                    }}
+                  />
                   <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
                     <Tooltip>
                       <TooltipTrigger asChild>
