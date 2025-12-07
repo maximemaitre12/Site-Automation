@@ -148,8 +148,15 @@ ${transcript}`
 
       let parsed: any = {};
       try {
-        parsed = JSON.parse(response.content);
-      } catch {
+        // Handle markdown-wrapped JSON responses
+        let jsonContent = response.content;
+        const jsonMatch = jsonContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonMatch) {
+          jsonContent = jsonMatch[1].trim();
+        }
+        parsed = JSON.parse(jsonContent);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
         parsed = { summary: response.content };
       }
 
