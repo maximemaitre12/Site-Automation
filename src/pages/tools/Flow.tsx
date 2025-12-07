@@ -329,10 +329,10 @@ export default function Flow() {
 
   return (
     <DashboardLayout headerActions={headerActions}>
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
           {/* Sidebar - Workflows List */}
           <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
             <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
