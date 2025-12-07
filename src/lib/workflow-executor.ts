@@ -410,10 +410,11 @@ export async function executeBlock(
             }
             output = { success: response.ok, status: response.status, data };
           } catch (err) {
-            output = { success: false, error: err instanceof Error ? err.message : 'Request failed' };
+            // Don't fail workflow - return warning instead
+            output = { success: false, warning: err instanceof Error ? err.message : 'Request failed', timestamp: new Date().toISOString() };
           }
         } else {
-          output = { success: false, error: 'No URL specified' };
+          output = { success: false, warning: 'No URL specified', requiresSetup: true, timestamp: new Date().toISOString() };
         }
         break;
       }
@@ -422,7 +423,7 @@ export async function executeBlock(
         // Real save to Supabase
         const tableName = block.config?.table;
         if (!tableName) {
-          output = { saved: false, error: 'No table name configured' };
+          output = { saved: false, warning: 'No table name configured', requiresSetup: true, timestamp: new Date().toISOString() };
         } else {
           try {
             const { data, error } = await supabase
@@ -438,10 +439,11 @@ export async function executeBlock(
               timestamp: new Date().toISOString()
             };
           } catch (err) {
+            // Don't fail workflow - return warning instead
             output = { 
               saved: false, 
               table: tableName,
-              error: err instanceof Error ? err.message : 'Save failed',
+              warning: err instanceof Error ? err.message : 'Save failed',
               timestamp: new Date().toISOString()
             };
           }
@@ -456,7 +458,7 @@ export async function executeBlock(
         const message = block.config?.message || inputText;
         
         if (!webhookUrl) {
-          output = { notified: false, channel, error: 'No webhook URL configured for notifications' };
+          output = { notified: false, channel, warning: 'No webhook URL configured for notifications', requiresSetup: true, timestamp: new Date().toISOString() };
         } else {
           try {
             const controller = new AbortController();
@@ -481,10 +483,11 @@ export async function executeBlock(
               timestamp: new Date().toISOString()
             };
           } catch (err) {
+            // Don't fail workflow - return warning instead
             output = {
               notified: false,
               channel,
-              error: err instanceof Error ? err.message : 'Notification failed',
+              warning: err instanceof Error ? err.message : 'Notification failed',
               timestamp: new Date().toISOString()
             };
           }
