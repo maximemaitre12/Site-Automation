@@ -325,7 +325,14 @@ export async function executeBlock(
               headers: block.config?.headers || {},
               body: method !== 'GET' ? JSON.stringify(block.config?.body || context.input) : undefined
             });
-            const data = await response.json().catch(() => response.text());
+            // Read body as text first, then try to parse as JSON
+            const textData = await response.text();
+            let data: any = textData;
+            try {
+              data = JSON.parse(textData);
+            } catch {
+              // Keep as text if not valid JSON
+            }
             output = { success: response.ok, status: response.status, data };
           } catch (err) {
             output = { success: false, error: err instanceof Error ? err.message : 'Request failed' };
