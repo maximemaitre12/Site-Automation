@@ -138,7 +138,12 @@ export function useWorkflows() {
       }
       
       setWorkflows(prev => prev.map(w => 
-        w.id === id ? { ...w, ...updates } : w
+        w.id === id ? { 
+          ...w, 
+          ...updates,
+          blocks: updates.blocks || w.blocks,
+          connections: updates.connections || w.connections
+        } : w
       ));
       return true;
     } catch (error) {
