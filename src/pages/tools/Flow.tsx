@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
 import { TemplateGallery } from '@/components/flow/TemplateGallery';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
-  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap
+  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -33,6 +33,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+interface HistoryState {
+  blocks: WorkflowBlock[];
+  connections: BlockConnection[];
+}
 
 export default function Flow() {
   const { workflows, loading, createWorkflow, updateWorkflow, deleteWorkflow, duplicateWorkflow } = useWorkflows();
@@ -50,21 +56,87 @@ export default function Flow() {
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [viewMode, setViewMode] = useState<'canvas' | 'builder'>('canvas');
+  
+  // Undo/Redo history
+  const [history, setHistory] = useState<HistoryState[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const isUndoRedoAction = useRef(false);
+
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
 
   const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
   const { runs, loading: runsLoading, createRun, updateRun } = useWorkflowRuns(selectedWorkflowId || undefined);
 
+  // Initialize history when workflow changes
   useEffect(() => {
     if (selectedWorkflow) {
-      setLocalBlocks(selectedWorkflow.blocks || []);
-      setLocalConnections(selectedWorkflow.connections || []);
+      const blocks = selectedWorkflow.blocks || [];
+      const connections = selectedWorkflow.connections || [];
+      setLocalBlocks(blocks);
+      setLocalConnections(connections);
       setHasUnsavedChanges(false);
+      // Reset history with initial state
+      setHistory([{ blocks: JSON.parse(JSON.stringify(blocks)), connections: JSON.parse(JSON.stringify(connections)) }]);
+      setHistoryIndex(0);
     } else {
       setLocalBlocks([]);
       setLocalConnections([]);
+      setHistory([]);
+      setHistoryIndex(-1);
     }
     setSelectedBlockId(null);
   }, [selectedWorkflowId, selectedWorkflow?.id]);
+
+  // Push to history when blocks/connections change (except during undo/redo)
+  useEffect(() => {
+    if (isUndoRedoAction.current) {
+      isUndoRedoAction.current = false;
+      return;
+    }
+    if (!selectedWorkflowId || (localBlocks.length === 0 && localConnections.length === 0)) return;
+    
+    // Don't push if state matches current history entry
+    const currentEntry = history[historyIndex];
+    if (currentEntry && 
+        JSON.stringify(currentEntry.blocks) === JSON.stringify(localBlocks) &&
+        JSON.stringify(currentEntry.connections) === JSON.stringify(localConnections)) {
+      return;
+    }
+
+    // Push new state, truncating any redo history
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push({ 
+      blocks: JSON.parse(JSON.stringify(localBlocks)), 
+      connections: JSON.parse(JSON.stringify(localConnections)) 
+    });
+    // Keep max 30 entries
+    if (newHistory.length > 30) newHistory.shift();
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  }, [localBlocks, localConnections]);
+
+  const handleUndo = () => {
+    if (!canUndo) return;
+    isUndoRedoAction.current = true;
+    const prevState = history[historyIndex - 1];
+    setLocalBlocks(JSON.parse(JSON.stringify(prevState.blocks)));
+    setLocalConnections(JSON.parse(JSON.stringify(prevState.connections)));
+    setHistoryIndex(historyIndex - 1);
+    setHasUnsavedChanges(true);
+    toast.info('Action annulée');
+  };
+
+  const handleRedo = () => {
+    if (!canRedo) return;
+    isUndoRedoAction.current = true;
+    const nextState = history[historyIndex + 1];
+    setLocalBlocks(JSON.parse(JSON.stringify(nextState.blocks)));
+    setLocalConnections(JSON.parse(JSON.stringify(nextState.connections)));
+    setHistoryIndex(historyIndex + 1);
+    setHasUnsavedChanges(true);
+    toast.info('Action rétablie');
+  };
 
   const handleCreateWorkflow = async () => {
     if (!newWorkflowName.trim()) {
@@ -314,6 +386,25 @@ export default function Flow() {
                   {selectedWorkflow.description && <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{selectedWorkflow.description}</p>}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Undo/Redo buttons */}
+                  <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" onClick={handleUndo} disabled={!canUndo} className="h-7 w-7 p-0">
+                          <Undo2 className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Annuler (Ctrl+Z)</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="sm" onClick={handleRedo} disabled={!canRedo} className="h-7 w-7 p-0">
+                          <Redo2 className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Rétablir (Ctrl+Y)</TooltipContent>
+                    </Tooltip>
+                  </div>
                   <div className="flex items-center bg-muted rounded-lg p-0.5">
                     <Button variant={viewMode === 'canvas' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('canvas')} className="h-7 text-xs">Canvas</Button>
                     <Button variant={viewMode === 'builder' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('builder')} className="h-7 text-xs">Liste</Button>
