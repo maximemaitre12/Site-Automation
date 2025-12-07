@@ -7,6 +7,7 @@ import { AuthProvider, RequireAuth } from "@/hooks/useAuth";
 
 // Pages
 import Landing from "./pages/Landing";
+import Demo from "./pages/Demo";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -43,6 +44,7 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
             <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
