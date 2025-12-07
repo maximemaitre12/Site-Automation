@@ -101,7 +101,7 @@ export interface WorkflowRun {
   id: string;
   workflow_id: string;
   user_id: string;
-  status: 'pending' | 'running' | 'success' | 'error' | 'cancelled';
+  status: 'pending' | 'running' | 'completed' | 'failed';
   input_data: any;
   output_data: any;
   error_message: string | null;
