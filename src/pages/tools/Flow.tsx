@@ -332,12 +332,9 @@ export default function Flow() {
         <header className="px-4 md:px-6 lg:px-8 py-4 md:py-6 border-b border-border bg-card/50">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2 md:gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-                  <WorkflowIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                </div>
-                AETHER Flow
-              </h1>
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
+                <WorkflowIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
+              </div>
               <p className="text-sm text-muted-foreground mt-1 hidden sm:block">Visual workflow automation with AI-powered blocks</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
