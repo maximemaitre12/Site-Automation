@@ -22,31 +22,16 @@ export interface SupportTicket {
   created_at: string;
 }
 
-// Cache tickets in memory
-let cachedTickets: SupportTicket[] = [];
-let lastSupportUserId: string | null = null;
-let supportDataLoaded = false;
-
 export function useSupport() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  const [tickets, setTickets] = useState<SupportTicket[]>(() => 
-    user?.id === lastSupportUserId ? cachedTickets : []
-  );
-  const [loading, setLoading] = useState(() => 
-    !(user?.id === lastSupportUserId && supportDataLoaded)
-  );
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchTickets = async () => {
     if (!user) {
-      setLoading(false);
-      return;
-    }
-    
-    // Use cache if available
-    if (user.id === lastSupportUserId && supportDataLoaded) {
-      setTickets(cachedTickets);
+      setTickets([]);
       setLoading(false);
       return;
     }
@@ -59,9 +44,6 @@ export function useSupport() {
 
     if (!error) {
       setTickets(data || []);
-      cachedTickets = data || [];
-      lastSupportUserId = user.id;
-      supportDataLoaded = true;
     }
     setLoading(false);
   };

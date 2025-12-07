@@ -30,34 +30,20 @@ export interface InternalDoc {
   created_at: string;
 }
 
-// Cache data in memory
-let cachedConversations: Conversation[] = [];
-let cachedDocs: InternalDoc[] = [];
-let lastBrainUserId: string | null = null;
-let brainDataLoaded = false;
-
 export function useBrain() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  const [conversations, setConversations] = useState<Conversation[]>(() => 
-    user?.id === lastBrainUserId ? cachedConversations : []
-  );
-  const [documents, setDocuments] = useState<InternalDoc[]>(() => 
-    user?.id === lastBrainUserId ? cachedDocs : []
-  );
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [documents, setDocuments] = useState<InternalDoc[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
-  const [loading, setLoading] = useState(() => 
-    !(user?.id === lastBrainUserId && brainDataLoaded)
-  );
+  const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
 
   const fetchConversations = async () => {
-    if (!user) return;
-    
-    if (user.id === lastBrainUserId && brainDataLoaded) {
-      setConversations(cachedConversations);
+    if (!user) {
+      setConversations([]);
       return;
     }
     
@@ -73,15 +59,12 @@ export function useBrain() {
         messages: (conv.messages as any[]) || []
       }));
       setConversations(parsed);
-      cachedConversations = parsed;
     }
   };
 
   const fetchDocuments = async () => {
-    if (!user) return;
-    
-    if (user.id === lastBrainUserId && brainDataLoaded) {
-      setDocuments(cachedDocs);
+    if (!user) {
+      setDocuments([]);
       return;
     }
     
@@ -97,20 +80,13 @@ export function useBrain() {
         tags: doc.tags as string[] | null
       })) || [];
       setDocuments(docs);
-      cachedDocs = docs;
     }
   };
 
   useEffect(() => {
-    if (user) {
-      Promise.all([fetchConversations(), fetchDocuments()]).then(() => {
-        lastBrainUserId = user.id;
-        brainDataLoaded = true;
-        setLoading(false);
-      });
-    } else {
+    Promise.all([fetchConversations(), fetchDocuments()]).finally(() => {
       setLoading(false);
-    }
+    });
   }, [user]);
 
   const createConversation = async (initialMessage?: string): Promise<Conversation | null> => {
