@@ -430,10 +430,7 @@ export default function Flow() {
                       <TooltipContent>Rétablir (Ctrl+Y)</TooltipContent>
                     </Tooltip>
                   </div>
-                  <div className="flex items-center bg-muted rounded-lg p-0.5">
-                    <Button variant={viewMode === 'canvas' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('canvas')} className="h-7 text-xs">Canvas</Button>
-                    <Button variant={viewMode === 'builder' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('builder')} className="h-7 text-xs">Liste</Button>
-                  </div>
+                  {/* View mode toggle removed - canvas only */}
                   <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
                     <Sparkles className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">IA</span>
                   </Button>
@@ -444,34 +441,18 @@ export default function Flow() {
                   <WorkflowExecutor blocks={localBlocks} connections={localConnections} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
                 </div>
               </div>
-              {viewMode === 'canvas' ? (
-                <EnhancedWorkflowCanvas
-                  blocks={localBlocks}
-                  connections={localConnections}
-                  selectedBlockId={selectedBlockId}
-                  onSelectBlock={setSelectedBlockId}
-                  onUpdateBlock={handleUpdateBlock}
-                  onDeleteBlock={handleDeleteBlock}
-                  onDuplicateBlock={handleDuplicateBlock}
-                  onAddConnection={handleAddConnection}
-                  onRemoveConnection={handleRemoveConnection}
-                  onAddBlock={() => setIsBlockPickerOpen(true)}
-                />
-              ) : (
-                <WorkflowBuilder
-                  blocks={localBlocks}
-                  connections={localConnections}
-                  selectedBlockId={selectedBlockId}
-                  onSelectBlock={setSelectedBlockId}
-                  onAddBlock={handleAddBlock}
-                  onUpdateBlock={handleUpdateBlock}
-                  onDeleteBlock={handleDeleteBlock}
-                  onMoveBlock={handleMoveBlock}
-                  onDuplicateBlock={handleDuplicateBlock}
-                  onAddConnection={handleAddConnection}
-                  onRemoveConnection={handleRemoveConnection}
-                />
-              )}
+              <EnhancedWorkflowCanvas
+                blocks={localBlocks}
+                connections={localConnections}
+                selectedBlockId={selectedBlockId}
+                onSelectBlock={setSelectedBlockId}
+                onUpdateBlock={handleUpdateBlock}
+                onDeleteBlock={handleDeleteBlock}
+                onDuplicateBlock={handleDuplicateBlock}
+                onAddConnection={handleAddConnection}
+                onRemoveConnection={handleRemoveConnection}
+                onAddBlock={() => setIsBlockPickerOpen(true)}
+              />
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center p-4">
