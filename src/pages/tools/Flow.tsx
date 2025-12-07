@@ -341,8 +341,8 @@ export default function Flow() {
           <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
             <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
               <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
-              <Button variant="hero" size="icon" onClick={() => setIsCreateDialogOpen(true)} className="h-6 w-6">
-                <Plus className="w-3.5 h-3.5" />
+              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 w-7 p-0">
+                <Plus className="w-4 h-4" />
               </Button>
             </div>
             {loading ? (
