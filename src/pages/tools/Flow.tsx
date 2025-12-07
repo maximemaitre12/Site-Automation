@@ -399,11 +399,7 @@ export default function Flow() {
           {/* Workflow Builder */}
           {selectedWorkflow ? (
             <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
-                <div className="min-w-0">
-                  <h2 className="text-base md:text-lg font-semibold text-foreground truncate">{selectedWorkflow.name}</h2>
-                  {selectedWorkflow.description && <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{selectedWorkflow.description}</p>}
-                </div>
+              <div className="flex items-center justify-end gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {/* Undo/Redo buttons */}
                   <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
