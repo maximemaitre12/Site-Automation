@@ -336,7 +336,7 @@ export default function Flow() {
                 <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
                   <WorkflowIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
-                Flow
+                AETHER Flow
               </h1>
               <p className="text-sm text-muted-foreground mt-1 hidden sm:block">Visual workflow automation with AI-powered blocks</p>
             </div>

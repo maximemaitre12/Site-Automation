@@ -203,7 +203,7 @@ export default function BrainPage() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center">
                 <Brain className="w-4 h-4 text-white" />
               </div>
-              Brain
+              AETHER Brain
             </h1>
             
             <Sheet open={showTools} onOpenChange={setShowTools}>
@@ -239,7 +239,7 @@ export default function BrainPage() {
                   </div>
                   <div className="flex-1 p-4 rounded-xl bg-card border border-border">
                     <p className="text-foreground">
-                      Bonjour ! Je suis Brain, votre assistant IA interne. Je peux vous aider avec :
+                      Bonjour ! Je suis AETHER Brain, votre assistant IA interne. Je peux vous aider avec :
                     </p>
                     <ul className="mt-3 space-y-2 text-muted-foreground">
                       <li className="flex items-center gap-2">

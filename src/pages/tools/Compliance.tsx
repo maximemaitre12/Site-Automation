@@ -117,7 +117,7 @@ export default function Compliance() {
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Compliance</h1>
+              <h1 className="text-xl font-bold text-foreground">AETHER Compliance</h1>
               <p className="text-sm text-muted-foreground">Audit RGPD automatisé</p>
             </div>
           </div>

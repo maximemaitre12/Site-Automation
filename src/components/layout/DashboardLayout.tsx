@@ -3,34 +3,15 @@ import { Sidebar } from "./Sidebar";
 import { SidebarProvider, useSidebarState } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu, Sparkles, Workflow, Brain, HeadphonesIcon, Users, Shield, TrendingUp, LayoutDashboard } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Menu, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-const toolNames: Record<string, { name: string; icon: React.ElementType }> = {
-  '/tools/flow': { name: 'AETHER Flow', icon: Workflow },
-  '/tools/brain': { name: 'AETHER Brain', icon: Brain },
-  '/tools/support': { name: 'AETHER Support', icon: HeadphonesIcon },
-  '/tools/hr': { name: 'AETHER HR', icon: Users },
-  '/tools/compliance': { name: 'AETHER Compliance', icon: Shield },
-  '/tools/sales': { name: 'AETHER Sales', icon: TrendingUp },
-  '/dashboard': { name: 'Dashboard', icon: LayoutDashboard },
-  '/settings': { name: 'Paramètres', icon: Sparkles },
-};
-
 function DashboardContent({ children }: DashboardLayoutProps) {
   const { collapsed, toggle } = useSidebarState();
-  const location = useLocation();
-  
-  // Get current tool info based on route
-  const currentTool = Object.entries(toolNames).find(([path]) => 
-    location.pathname.startsWith(path)
-  );
-  const toolInfo = currentTool?.[1] || { name: 'AETHER', icon: Sparkles };
-  const ToolIcon = toolInfo.icon;
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,6 +34,15 @@ function DashboardContent({ children }: DashboardLayoutProps) {
           <Menu className="w-5 h-5" />
         </Button>
 
+        {/* Mobile logo (visible when sidebar is hidden) */}
+        <Link to="/dashboard" className={cn("flex items-center gap-2", collapsed ? "flex" : "flex lg:hidden")}>
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <span className="font-bold text-foreground">AETHER</span>
+        </Link>
+
+        <div className="flex-1" />
       </header>
 
       <main
