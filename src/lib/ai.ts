@@ -20,23 +20,42 @@ interface AIResponse {
 
 export async function callAI(options: AIRequestOptions): Promise<AIResponse> {
   try {
-    const { data, error } = await supabase.functions.invoke('ai-chat', {
+    const response = await supabase.functions.invoke('ai-chat', {
       body: options,
     });
 
-    if (error) {
-      console.error('AI function error:', error);
-      return { content: '', error: error.message };
+    // Handle case where response itself has an error
+    if (response.error) {
+      console.error('AI function error:', response.error);
+      // Check if it's a body reading error and provide a cleaner message
+      const errorMessage = response.error.message || 'AI service error';
+      if (errorMessage.includes('body is disturbed') || errorMessage.includes('body is locked')) {
+        return { content: '', error: 'AI service temporarily unavailable. Please try again.' };
+      }
+      return { content: '', error: errorMessage };
     }
 
-    if (data.error) {
-      return { content: '', error: data.error };
+    // Handle case where data is null or undefined
+    if (!response.data) {
+      console.error('AI function returned no data');
+      return { content: '', error: 'No response from AI service' };
     }
 
-    return { content: data.content };
+    // Handle case where data contains an error property
+    if (response.data.error) {
+      return { content: '', error: response.data.error };
+    }
+
+    // Return successful content
+    return { content: response.data.content || '' };
   } catch (err) {
     console.error('AI call error:', err);
-    return { content: '', error: err instanceof Error ? err.message : 'Unknown error' };
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    // Provide user-friendly error message for body reading issues
+    if (errorMessage.includes('body is disturbed') || errorMessage.includes('body is locked')) {
+      return { content: '', error: 'AI service temporarily unavailable. Please try again.' };
+    }
+    return { content: '', error: errorMessage };
   }
 }
 
