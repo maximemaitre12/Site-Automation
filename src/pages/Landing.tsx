@@ -6,12 +6,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { MetricsSection } from "@/components/landing/MetricsSection";
-import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { BenefitsSection } from "@/components/landing/BenefitsSection";
-import { UseCasesSection } from "@/components/landing/UseCasesSection";
-import { SocialProofSection } from "@/components/landing/SocialProofSection";
-import { CTASection } from "@/components/landing/CTASection";
+import { PainPointsSection } from "@/components/landing/PainPointsSection";
+import { ToolsShowcaseSection } from "@/components/landing/ToolsShowcaseSection";
+import { ResultsSection } from "@/components/landing/ResultsSection";
+import { FinalCTASection } from "@/components/landing/FinalCTASection";
 
 export default function Landing() {
   const { user, loading } = useAuth();
@@ -44,12 +42,10 @@ export default function Landing() {
       
       <main>
         <HeroSection />
-        <MetricsSection />
-        <FeaturesSection />
-        <BenefitsSection />
-        <UseCasesSection />
-        <SocialProofSection />
-        <CTASection />
+        <PainPointsSection />
+        <ToolsShowcaseSection />
+        <ResultsSection />
+        <FinalCTASection />
       </main>
       
       <LandingFooter />
