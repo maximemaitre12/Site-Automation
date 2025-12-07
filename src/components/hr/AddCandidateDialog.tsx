@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Upload, User, Mail, Phone, FileText, Loader2 } from 'lucide-react';
+import { Upload, User, Mail, Phone, FileText, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { callAI } from '@/lib/ai';
 
 interface AddCandidateDialogProps {
   onAdd: (data: { name: string; email?: string; phone?: string; cvText?: string }) => Promise<any>;
@@ -15,6 +16,7 @@ interface AddCandidateDialogProps {
 export function AddCandidateDialog({ onAdd, children }: AddCandidateDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -24,14 +26,68 @@ export function AddCandidateDialog({ onAdd, children }: AddCandidateDialogProps)
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Extract CV info when cvText changes
+  const extractCVInfo = async (text: string) => {
+    if (!text || text.length < 50) return;
+    
+    setIsExtracting(true);
+    try {
+      const response = await callAI({
+        messages: [{
+          role: 'user',
+          content: `Analyse ce CV et extrais les informations suivantes en JSON:
+{
+  "name": "nom complet du candidat",
+  "email": "adresse email si présente",
+  "phone": "numéro de téléphone si présent"
+}
+
+CV:
+${text}
+
+Réponds UNIQUEMENT avec le JSON, sans markdown ni explication.`
+        }],
+        type: 'extract'
+      });
+
+      if (response.content && !response.error) {
+        try {
+          // Handle potential markdown wrapping
+          let jsonStr = response.content.trim();
+          if (jsonStr.startsWith('```')) {
+            jsonStr = jsonStr.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+          }
+          
+          const extracted = JSON.parse(jsonStr);
+          
+          setForm(f => ({
+            ...f,
+            name: extracted.name || f.name,
+            email: extracted.email || f.email,
+            phone: extracted.phone || f.phone
+          }));
+          
+          toast({
+            title: 'Informations extraites',
+            description: 'Les données du CV ont été détectées automatiquement.'
+          });
+        } catch (parseError) {
+          console.error('Parse error:', parseError);
+        }
+      }
+    } catch (error) {
+      console.error('CV extraction error:', error);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Check file type
     if (!file.type.includes('text') && !file.name.endsWith('.txt') && !file.name.endsWith('.md')) {
-      // For PDFs and other formats, we'll just note that they uploaded something
-      // In a real app, you'd use a PDF parser
       toast({
         title: 'Format détecté',
         description: 'Pour les fichiers PDF, veuillez coller le contenu du CV dans la zone de texte.',
@@ -42,9 +98,24 @@ export function AddCandidateDialog({ onAdd, children }: AddCandidateDialogProps)
     try {
       const text = await file.text();
       setForm(f => ({ ...f, cvText: text }));
-      toast({ title: 'CV chargé', description: 'Le contenu du CV a été extrait.' });
+      toast({ title: 'CV chargé', description: 'Extraction des informations en cours...' });
+      
+      // Auto-extract info from uploaded CV
+      await extractCVInfo(text);
     } catch (error) {
       toast({ title: 'Erreur', description: 'Impossible de lire le fichier', variant: 'destructive' });
+    }
+  };
+
+  const handleCvTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setForm(f => ({ ...f, cvText: text }));
+  };
+
+  // Trigger extraction when user pastes or finishes typing CV
+  const handleCvBlur = () => {
+    if (form.cvText && form.cvText.length > 50 && !form.name) {
+      extractCVInfo(form.cvText);
     }
   };
 
@@ -157,15 +228,34 @@ export function AddCandidateDialog({ onAdd, children }: AddCandidateDialogProps)
             <Label htmlFor="cvText" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               Contenu du CV
-              {form.cvText && <span className="text-xs text-muted-foreground">({form.cvText.length} caractères)</span>}
+              {isExtracting && (
+                <span className="flex items-center gap-1 text-xs text-primary">
+                  <Sparkles className="w-3 h-3 animate-pulse" />
+                  Extraction IA...
+                </span>
+              )}
+              {form.cvText && !isExtracting && <span className="text-xs text-muted-foreground">({form.cvText.length} caractères)</span>}
             </Label>
             <Textarea 
               id="cvText"
-              placeholder="Collez le contenu du CV ici pour l'analyse IA..."
+              placeholder="Collez le contenu du CV ici pour l'analyse IA automatique..."
               value={form.cvText}
-              onChange={(e) => setForm(f => ({ ...f, cvText: e.target.value }))}
+              onChange={handleCvTextChange}
+              onBlur={handleCvBlur}
               className="min-h-[150px] font-mono text-sm"
             />
+            {form.cvText && form.cvText.length > 50 && !form.name && !isExtracting && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                onClick={() => extractCVInfo(form.cvText)}
+                className="w-full"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Extraire les informations du CV
+              </Button>
+            )}
           </div>
 
           {/* Submit */}
