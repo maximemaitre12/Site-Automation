@@ -391,7 +391,7 @@ export function EnhancedWorkflowCanvas({
                 className="cursor-pointer"
                 onMouseEnter={() => setHoveredConnectionId(conn.id)}
                 onMouseLeave={() => setHoveredConnectionId(null)}
-                onClick={(e) => { e.stopPropagation(); onRemoveConnection(conn.id); }}
+                onClick={(e) => { e.stopPropagation(); setHoveredConnectionId(null); onRemoveConnection(conn.id); }}
               />
               <path
                 d={path}
@@ -404,7 +404,7 @@ export function EnhancedWorkflowCanvas({
               {isHovered && (
                 <g 
                   className="cursor-pointer"
-                  onClick={(e) => { e.stopPropagation(); onRemoveConnection(conn.id); }}
+                  onClick={(e) => { e.stopPropagation(); setHoveredConnectionId(null); onRemoveConnection(conn.id); }}
                 >
                   <circle cx={midX} cy={midY} r={14} fill="hsl(var(--destructive))" />
                   <text x={midX} y={midY} textAnchor="middle" dominantBaseline="central" fill="white" fontSize="16" fontWeight="bold">×</text>
