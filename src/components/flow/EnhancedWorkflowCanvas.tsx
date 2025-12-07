@@ -1,24 +1,15 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { WorkflowBlock, BlockConnection, BLOCK_DEFINITIONS, BlockType } from '@/types/workflow';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch, 
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
   Repeat, Timer, GitFork, Bell, FileText, Play, Plus, Trash2,
-  Move, Zap, X, Settings, Link2, Grab, Copy, MoreVertical,
-  ChevronRight, ArrowDown, GripVertical
+  Move, Zap, X, Link2, Grab, Copy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
@@ -52,28 +43,249 @@ export function EnhancedWorkflowCanvas({
   onRemoveConnection,
   onAddBlock
 }: EnhancedWorkflowCanvasProps) {
-  // Sort blocks by Y position to maintain consistent order
-  const sortedBlocks = [...blocks].sort((a, b) => a.position.y - b.position.y);
-  const selectedBlock = blocks.find(b => b.id === selectedBlockId);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 100, y: 100 });
+  const [isDraggingBlock, setIsDraggingBlock] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [blockStartPos, setBlockStartPos] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [connectionSource, setConnectionSource] = useState<string | null>(null);
+  const [connectionEnd, setConnectionEnd] = useState({ x: 0, y: 0 });
+  const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
+  const [hoveredConnectionId, setHoveredConnectionId] = useState<string | null>(null);
 
-  // Move block up or down
-  const handleMoveBlock = (blockId: string, direction: 'up' | 'down') => {
-    const sorted = [...blocks].sort((a, b) => a.position.y - b.position.y);
-    const index = sorted.findIndex(b => b.id === blockId);
-    if (index === -1) return;
+  const BLOCK_WIDTH = 240;
+  const BLOCK_HEIGHT = 90;
+
+  const getEventCoords = (e: MouseEvent | TouchEvent): { clientX: number; clientY: number } => {
+    if ('touches' in e) {
+      return { clientX: e.touches[0]?.clientX || 0, clientY: e.touches[0]?.clientY || 0 };
+    }
+    return { clientX: e.clientX, clientY: e.clientY };
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      const coords = getEventCoords(e);
+      
+      if (isDraggingBlock) {
+        e.preventDefault();
+        const dx = (coords.clientX - dragStart.x) / zoom;
+        const dy = (coords.clientY - dragStart.y) / zoom;
+        onUpdateBlock(isDraggingBlock, {
+          position: { 
+            x: Math.max(0, blockStartPos.x + dx), 
+            y: Math.max(0, blockStartPos.y + dy) 
+          }
+        });
+        return;
+      }
+
+      if (connectionSource) {
+        e.preventDefault();
+        const rect = container.getBoundingClientRect();
+        setConnectionEnd({
+          x: coords.clientX - rect.left,
+          y: coords.clientY - rect.top
+        });
+        
+        const touchedBlock = blocks.find(block => {
+          const blockLeft = block.position.x * zoom + offset.x;
+          const blockTop = block.position.y * zoom + offset.y;
+          const blockWidth = BLOCK_WIDTH * zoom;
+          const blockHeight = BLOCK_HEIGHT * zoom;
+          const relX = coords.clientX - rect.left;
+          const relY = coords.clientY - rect.top;
+          return relX >= blockLeft && relX <= blockLeft + blockWidth && 
+                 relY >= blockTop && relY <= blockTop + blockHeight;
+        });
+        setHoveredBlockId(touchedBlock?.id || null);
+        return;
+      }
+
+      if (isPanning) {
+        e.preventDefault();
+        const dx = coords.clientX - panStart.x;
+        const dy = coords.clientY - panStart.y;
+        setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+        setPanStart({ x: coords.clientX, y: coords.clientY });
+      }
+    };
+
+    const handleEnd = () => {
+      if (connectionSource && hoveredBlockId && connectionSource !== hoveredBlockId) {
+        const exists = connections.some(
+          c => c.sourceBlockId === connectionSource && c.targetBlockId === hoveredBlockId
+        );
+        if (!exists) {
+          onAddConnection({
+            id: crypto.randomUUID(),
+            sourceBlockId: connectionSource,
+            targetBlockId: hoveredBlockId
+          });
+        }
+      }
+
+      setIsDraggingBlock(null);
+      setConnectionSource(null);
+      setIsPanning(false);
+      setHoveredBlockId(null);
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const factor = e.deltaY > 0 ? 0.9 : 1.1;
+        setZoom(prev => Math.min(2, Math.max(0.3, prev * factor)));
+      } else {
+        setOffset(prev => ({
+          x: prev.x - e.deltaX,
+          y: prev.y - e.deltaY
+        }));
+      }
+    };
+
+    container.addEventListener('mousemove', handleMove);
+    container.addEventListener('mouseup', handleEnd);
+    container.addEventListener('mouseleave', handleEnd);
+    container.addEventListener('touchmove', handleMove, { passive: false });
+    container.addEventListener('touchend', handleEnd);
+    container.addEventListener('touchcancel', handleEnd);
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('mousemove', handleMove);
+      container.removeEventListener('mouseup', handleEnd);
+      container.removeEventListener('mouseleave', handleEnd);
+      container.removeEventListener('touchmove', handleMove);
+      container.removeEventListener('touchend', handleEnd);
+      container.removeEventListener('touchcancel', handleEnd);
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [isDraggingBlock, dragStart, blockStartPos, zoom, connectionSource, hoveredBlockId, isPanning, panStart, connections, onUpdateBlock, onAddConnection, blocks, offset]);
+
+  const startBlockDrag = (e: React.MouseEvent, blockId: string) => {
+    e.stopPropagation();
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
     
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= sorted.length) return;
+    setIsDraggingBlock(blockId);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setBlockStartPos({ x: block.position.x, y: block.position.y });
+    onSelectBlock(blockId);
+  };
+
+  const startBlockDragTouch = (e: React.TouchEvent, blockId: string) => {
+    e.stopPropagation();
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
     
-    // Swap positions
-    const tempY = sorted[index].position.y;
-    onUpdateBlock(sorted[index].id, { position: { ...sorted[index].position, y: sorted[newIndex].position.y } });
-    onUpdateBlock(sorted[newIndex].id, { position: { ...sorted[newIndex].position, y: tempY } });
+    const touch = e.touches[0];
+    setIsDraggingBlock(blockId);
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setBlockStartPos({ x: block.position.x, y: block.position.y });
+    onSelectBlock(blockId);
+  };
+
+  const startConnection = (e: React.MouseEvent, blockId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const block = blocks.find(b => b.id === blockId);
+    if (!block || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    setConnectionSource(blockId);
+    setConnectionEnd({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const startConnectionTouch = (e: React.TouchEvent, blockId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const block = blocks.find(b => b.id === blockId);
+    if (!block || !containerRef.current) return;
+
+    const touch = e.touches[0];
+    const rect = containerRef.current.getBoundingClientRect();
+    setConnectionSource(blockId);
+    setConnectionEnd({
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    });
+  };
+
+  const startPanning = (e: React.MouseEvent) => {
+    if (e.target === containerRef.current || e.target === canvasRef.current) {
+      onSelectBlock(null);
+      setIsPanning(true);
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const startPanningTouch = (e: React.TouchEvent) => {
+    if (e.target === containerRef.current || e.target === canvasRef.current) {
+      onSelectBlock(null);
+      const touch = e.touches[0];
+      setIsPanning(true);
+      setPanStart({ x: touch.clientX, y: touch.clientY });
+    }
+  };
+
+  const getConnectionPoint = (blockId: string, side: 'top' | 'bottom') => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return { x: 0, y: 0 };
+    
+    const x = block.position.x * zoom + offset.x + (BLOCK_WIDTH * zoom) / 2;
+    const y = side === 'bottom' 
+      ? block.position.y * zoom + offset.y + BLOCK_HEIGHT * zoom
+      : block.position.y * zoom + offset.y;
+    
+    return { x, y };
+  };
+
+  const renderConnectionPath = (sourceId: string, targetId: string) => {
+    const source = getConnectionPoint(sourceId, 'bottom');
+    const target = getConnectionPoint(targetId, 'top');
+    
+    const dy = Math.abs(target.y - source.y);
+    const controlY = Math.min(dy / 2, 60);
+    
+    return `M ${source.x} ${source.y} C ${source.x} ${source.y + controlY}, ${target.x} ${target.y - controlY}, ${target.x} ${target.y}`;
+  };
+
+  const renderDraggingConnection = () => {
+    if (!connectionSource) return null;
+    
+    const source = getConnectionPoint(connectionSource, 'bottom');
+    const dy = Math.abs(connectionEnd.y - source.y);
+    const controlY = Math.min(dy / 2, 60);
+    
+    return (
+      <path
+        d={`M ${source.x} ${source.y} C ${source.x} ${source.y + controlY}, ${connectionEnd.x} ${connectionEnd.y - controlY}, ${connectionEnd.x} ${connectionEnd.y}`}
+        stroke="hsl(var(--primary))"
+        strokeWidth={3}
+        strokeDasharray="8 4"
+        fill="none"
+        className="animate-pulse"
+      />
+    );
   };
 
   if (blocks.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-8 bg-muted/20">
         <div className="max-w-lg text-center px-4">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-6">
             <Zap className="w-10 h-10 text-primary/60" />
@@ -83,12 +295,12 @@ export function EnhancedWorkflowCanvas({
             Créez votre workflow
           </h2>
           <p className="text-muted-foreground mb-8">
-            Un workflow est une séquence d'étapes automatisées. Commencez par ajouter votre première étape.
+            Ajoutez des blocs et connectez-les pour créer votre automatisation.
           </p>
 
           <Button variant="hero" size="lg" onClick={onAddBlock} className="gap-2">
             <Plus className="w-5 h-5" />
-            Ajouter une étape
+            Ajouter un bloc
           </Button>
         </div>
       </div>
@@ -96,172 +308,201 @@ export function EnhancedWorkflowCanvas({
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <ScrollArea className="flex-1">
-        <div className="p-4 md:p-6 lg:p-8">
-          <div className="max-w-3xl mx-auto space-y-3">
-            {sortedBlocks.map((block, index) => {
-              const def = BLOCK_DEFINITIONS[block.type as BlockType];
-              const Icon = iconMap[def?.icon] || Sparkles;
-              const isSelected = selectedBlockId === block.id;
-              const isFirst = index === 0;
-              const isLast = index === sortedBlocks.length - 1;
-              const hasConfig = Object.keys(block.config || {}).length > 0;
-              
-              // Check if configuration is complete
-              const requiredFields = def?.configFields?.filter(f => f.required) || [];
-              const isConfigComplete = requiredFields.every(f => block.config?.[f.key]);
+    <div 
+      ref={containerRef}
+      className={cn(
+        "relative w-full h-full min-h-[500px] overflow-hidden bg-muted/20 touch-none",
+        isPanning ? "cursor-grabbing" : "cursor-grab"
+      )}
+      style={{ flex: '1 1 0%' }}
+      onMouseDown={startPanning}
+      onTouchStart={startPanningTouch}
+    >
+      {/* Toolbar */}
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-2 shadow-lg">
+        <Button variant="default" size="sm" onClick={onAddBlock} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Ajouter
+        </Button>
+        <div className="h-6 w-px bg-border" />
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0" onClick={() => setZoom(z => Math.min(2, z + 0.1))}>+</Button>
+        <span className="text-xs text-muted-foreground min-w-[45px] text-center font-mono">{Math.round(zoom * 100)}%</span>
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0" onClick={() => setZoom(z => Math.max(0.3, z - 0.1))}>-</Button>
+        <Button variant="ghost" size="sm" onClick={() => { setZoom(1); setOffset({ x: 100, y: 100 }); }}>Reset</Button>
+      </div>
 
-              return (
-                <div key={block.id}>
-                  {/* Connector from previous block */}
-                  {!isFirst && (
-                    <div className="flex justify-center py-1">
-                      <div className="w-0.5 h-8 bg-gradient-to-b from-primary/50 to-primary/20" />
-                    </div>
-                  )}
-
-                  {/* Block card */}
-                  <div
-                    onClick={() => onSelectBlock(block.id)}
-                    className={cn(
-                      "relative rounded-2xl border-2 transition-all cursor-pointer group",
-                      isSelected 
-                        ? "border-primary bg-primary/5 shadow-xl ring-4 ring-primary/10" 
-                        : "border-border bg-card hover:border-primary/40 hover:shadow-lg"
-                    )}
-                  >
-                    {/* Step number badge */}
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2">
-                      <div className={cn(
-                        "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md",
-                        isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                      )}>
-                        {index + 1}
-                      </div>
-                    </div>
-
-                    <div className="p-4 md:p-5">
-                      <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div className={cn(
-                          "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform flex-shrink-0",
-                          def?.color || 'from-gray-500 to-gray-400',
-                          isSelected && "scale-110"
-                        )}>
-                          <Icon className="w-6 h-6 text-white" />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <h4 className="font-semibold text-foreground truncate flex items-center gap-2">
-                                {block.name || def?.name}
-                                {!isConfigComplete && requiredFields.length > 0 && (
-                                  <Badge variant="outline" className="text-amber-500 border-amber-500/50 text-[10px]">
-                                    Config requise
-                                  </Badge>
-                                )}
-                              </h4>
-                              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
-                                {block.description || def?.description}
-                              </p>
-                            </div>
-
-                            {/* Actions */}
-                            <div className={cn(
-                              "flex items-center gap-1 transition-opacity flex-shrink-0",
-                              isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                            )}>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <MoreVertical className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="bg-popover">
-                                  {!isFirst && (
-                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleMoveBlock(block.id, 'up'); }}>
-                                      <ArrowDown className="w-4 h-4 mr-2 rotate-180" />
-                                      Monter
-                                    </DropdownMenuItem>
-                                  )}
-                                  {!isLast && (
-                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleMoveBlock(block.id, 'down'); }}>
-                                      <ArrowDown className="w-4 h-4 mr-2" />
-                                      Descendre
-                                    </DropdownMenuItem>
-                                  )}
-                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicateBlock(block.id); }}>
-                                    <Copy className="w-4 h-4 mr-2" />
-                                    Dupliquer
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem 
-                                    className="text-destructive"
-                                    onClick={(e) => { e.stopPropagation(); onDeleteBlock(block.id); }}
-                                  >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Supprimer
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-
-                          {/* Config preview */}
-                          {hasConfig && (
-                            <div className="mt-3 p-3 rounded-xl bg-muted/50 border border-border/50">
-                              <div className="flex flex-wrap gap-2">
-                                {Object.entries(block.config).slice(0, 3).map(([key, value]) => (
-                                  <div key={key} className="flex items-center gap-1 text-xs bg-background px-2 py-1 rounded-md">
-                                    <span className="text-muted-foreground">{key}:</span>
-                                    <span className="text-foreground font-medium truncate max-w-[100px]">
-                                      {typeof value === 'string' ? value.slice(0, 20) : String(value)}
-                                    </span>
-                                  </div>
-                                ))}
-                                {Object.keys(block.config).length > 3 && (
-                                  <span className="text-xs text-muted-foreground">
-                                    +{Object.keys(block.config).length - 3}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Click to configure hint */}
-                    {isSelected && (
-                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-                        <Badge className="bg-primary text-primary-foreground text-[10px] shadow-lg">
-                          Cliquez à droite pour configurer
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Add more steps button */}
-            <div className="flex justify-center pt-6">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={onAddBlock}
-                className="gap-2 border-dashed border-2 hover:border-primary hover:bg-primary/5"
-              >
-                <Plus className="w-5 h-5" />
-                Ajouter une étape
-              </Button>
-            </div>
-          </div>
+      {/* Instructions */}
+      <div className="absolute top-4 right-4 z-20 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-3 shadow-lg max-w-[220px]">
+        <div className="text-xs text-muted-foreground space-y-1.5">
+          <div className="flex items-center gap-2"><Grab className="w-3 h-3" /> Glissez les blocs</div>
+          <div className="flex items-center gap-2"><Link2 className="w-3 h-3 text-primary" /> Cercle bleu → connecter</div>
+          <div className="flex items-center gap-2"><Move className="w-3 h-3" /> Fond = défilement</div>
+          <div className="flex items-center gap-2"><X className="w-3 h-3 text-destructive" /> Clic sur ligne = supprimer</div>
         </div>
-      </ScrollArea>
+      </div>
+
+      {/* Grid background */}
+      <div 
+        ref={canvasRef}
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px)`,
+          backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
+          backgroundPosition: `${offset.x % (24 * zoom)}px ${offset.y % (24 * zoom)}px`
+        }}
+      />
+
+      {/* Connections SVG */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--primary))" />
+          </marker>
+        </defs>
+
+        {connections.map(conn => {
+          const isHovered = hoveredConnectionId === conn.id;
+          const path = renderConnectionPath(conn.sourceBlockId, conn.targetBlockId);
+          const source = getConnectionPoint(conn.sourceBlockId, 'bottom');
+          const target = getConnectionPoint(conn.targetBlockId, 'top');
+          const midX = (source.x + target.x) / 2;
+          const midY = (source.y + target.y) / 2;
+
+          return (
+            <g key={conn.id} className="pointer-events-auto">
+              <path
+                d={path}
+                stroke="transparent"
+                strokeWidth={20}
+                fill="none"
+                className="cursor-pointer"
+                onMouseEnter={() => setHoveredConnectionId(conn.id)}
+                onMouseLeave={() => setHoveredConnectionId(null)}
+                onClick={(e) => { e.stopPropagation(); onRemoveConnection(conn.id); }}
+              />
+              <path
+                d={path}
+                stroke="hsl(var(--primary))"
+                strokeWidth={isHovered ? 4 : 2.5}
+                fill="none"
+                markerEnd="url(#arrow)"
+                className="transition-all"
+              />
+              {isHovered && (
+                <g 
+                  className="cursor-pointer"
+                  onClick={(e) => { e.stopPropagation(); onRemoveConnection(conn.id); }}
+                >
+                  <circle cx={midX} cy={midY} r={14} fill="hsl(var(--destructive))" />
+                  <text x={midX} y={midY} textAnchor="middle" dominantBaseline="central" fill="white" fontSize="16" fontWeight="bold">×</text>
+                </g>
+              )}
+            </g>
+          );
+        })}
+
+        {renderDraggingConnection()}
+      </svg>
+
+      {/* Blocks */}
+      {blocks.map(block => {
+        const def = BLOCK_DEFINITIONS[block.type as BlockType];
+        const Icon = iconMap[def?.icon] || Sparkles;
+        const isSelected = selectedBlockId === block.id;
+        const isDragging = isDraggingBlock === block.id;
+        const isHovered = hoveredBlockId === block.id;
+        const isConnectionTarget = connectionSource && connectionSource !== block.id && isHovered;
+        const hasConfig = Object.keys(block.config || {}).length > 0;
+
+        const left = block.position.x * zoom + offset.x;
+        const top = block.position.y * zoom + offset.y;
+        const width = BLOCK_WIDTH * zoom;
+        const height = BLOCK_HEIGHT * zoom;
+
+        return (
+          <div
+            key={block.id}
+            className={cn(
+              "absolute rounded-2xl border-2 bg-card shadow-lg select-none transition-shadow touch-none",
+              isSelected && "border-primary ring-4 ring-primary/20 shadow-xl",
+              !isSelected && "border-border hover:border-primary/50",
+              isDragging && "shadow-2xl cursor-grabbing",
+              !isDragging && "cursor-grab",
+              isConnectionTarget && "border-primary ring-4 ring-primary/30 bg-primary/5"
+            )}
+            style={{ left, top, width, height, zIndex: isDragging ? 100 : isSelected ? 50 : 10 }}
+            onMouseDown={(e) => startBlockDrag(e, block.id)}
+            onTouchStart={(e) => startBlockDragTouch(e, block.id)}
+            onMouseEnter={() => setHoveredBlockId(block.id)}
+            onMouseLeave={() => setHoveredBlockId(null)}
+          >
+            {/* Block content */}
+            <div className="p-3 h-full flex items-center gap-3 overflow-hidden">
+              <div 
+                className={cn("rounded-xl bg-gradient-to-br flex items-center justify-center shadow-md flex-shrink-0", def?.color || 'from-gray-500 to-gray-400')}
+                style={{ width: 44 * zoom, height: 44 * zoom }}
+              >
+                <Icon className="text-white" style={{ width: 22 * zoom, height: 22 * zoom }} />
+              </div>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <div className="font-semibold text-foreground truncate" style={{ fontSize: 14 * zoom }}>
+                  {block.name || def?.name}
+                </div>
+                <div className="text-muted-foreground truncate" style={{ fontSize: 11 * zoom }}>
+                  {def?.category}
+                </div>
+                {hasConfig && (
+                  <Badge variant="secondary" className="mt-1" style={{ fontSize: 9 * zoom }}>
+                    Configuré
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Input connection point (top) */}
+            <div 
+              className={cn(
+                "absolute left-1/2 -translate-x-1/2 rounded-full border-2 transition-all",
+                isConnectionTarget ? "bg-primary border-primary scale-150" : "bg-card border-primary/50"
+              )}
+              style={{ top: -6 * zoom, width: 12 * zoom, height: 12 * zoom }}
+            />
+
+            {/* Output connection point (bottom) - draggable */}
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 rounded-full bg-primary border-2 border-primary cursor-crosshair hover:scale-125 transition-transform"
+              style={{ bottom: -6 * zoom, width: 12 * zoom, height: 12 * zoom }}
+              onMouseDown={(e) => startConnection(e, block.id)}
+              onTouchStart={(e) => startConnectionTouch(e, block.id)}
+            />
+
+            {/* Action buttons on selected block */}
+            {isSelected && (
+              <div 
+                className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-card rounded-lg border border-border shadow-lg p-1"
+                style={{ zIndex: 200 }}
+              >
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0"
+                  onClick={(e) => { e.stopPropagation(); onDuplicateBlock(block.id); }}
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                  onClick={(e) => { e.stopPropagation(); onDeleteBlock(block.id); }}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
