@@ -5,7 +5,7 @@ import {
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
   Repeat, Timer, GitFork, Bell, FileText, Search, ChevronDown,
-  ChevronRight, Plus
+  ChevronRight, Plus, MessageSquare, MessageCircle, Phone, Table
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,7 +14,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
-  Repeat, Timer, GitFork, Bell, FileText
+  Repeat, Timer, GitFork, Bell, FileText, MessageSquare, MessageCircle, Phone, Table
 };
 
 interface EnhancedBlockPaletteProps {
