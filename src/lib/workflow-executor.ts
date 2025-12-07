@@ -295,25 +295,73 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_email':
-        output = { 
-          sent: true, 
-          to: block.config?.to || 'recipient@example.com',
-          subject: block.config?.subject || 'Workflow Notification',
-          body: inputText,
-          timestamp: new Date().toISOString()
-        };
+      case 'system_email': {
+        // Real email sending would require an edge function with Resend
+        // For now, we log a warning that email config is needed
+        const to = block.config?.to;
+        const subject = block.config?.subject || 'Workflow Notification';
+        if (!to) {
+          output = { sent: false, error: 'No recipient email configured' };
+        } else {
+          // Call edge function to send email
+          try {
+            const { data, error } = await supabase.functions.invoke('send-workflow-email', {
+              body: { to, subject, body: inputText }
+            });
+            if (error) throw error;
+            output = { sent: true, to, subject, timestamp: new Date().toISOString() };
+          } catch (err) {
+            output = { sent: false, error: err instanceof Error ? err.message : 'Email sending not configured', to, subject };
+          }
+        }
         break;
+      }
 
       case 'system_webhook':
-      case 'http_webhook':
-        output = { 
-          posted: true, 
-          url: block.config?.url || 'https://webhook.example.com',
-          payload: context.input,
-          timestamp: new Date().toISOString()
-        };
+      case 'http_webhook': {
+        // Real webhook POST
+        const webhookUrl = block.config?.url;
+        if (!webhookUrl || webhookUrl === 'https://webhook.example.com' || webhookUrl.includes('YOUR_')) {
+          output = { posted: false, error: 'No valid webhook URL configured' };
+        } else {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+            
+            const response = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(block.config?.payload || context.input),
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            
+            const textData = await response.text();
+            let responseData: any = textData;
+            try {
+              responseData = JSON.parse(textData);
+            } catch {
+              // Keep as text
+            }
+            
+            output = { 
+              posted: response.ok, 
+              status: response.status,
+              url: webhookUrl,
+              response: responseData,
+              timestamp: new Date().toISOString()
+            };
+          } catch (err) {
+            output = { 
+              posted: false, 
+              url: webhookUrl,
+              error: err instanceof Error ? err.message : 'Webhook request failed',
+              timestamp: new Date().toISOString()
+            };
+          }
+        }
         break;
+      }
 
       case 'http_request': {
         const url = block.config?.url;
@@ -343,23 +391,79 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_save':
-        output = { 
-          saved: true, 
-          table: block.config?.table || 'results',
-          data: context.input,
-          timestamp: new Date().toISOString()
-        };
+      case 'system_save': {
+        // Real save to Supabase
+        const tableName = block.config?.table;
+        if (!tableName) {
+          output = { saved: false, error: 'No table name configured' };
+        } else {
+          try {
+            const { data, error } = await supabase
+              .from(tableName)
+              .insert(typeof context.input === 'object' ? context.input : { data: context.input })
+              .select();
+            
+            if (error) throw error;
+            output = { 
+              saved: true, 
+              table: tableName,
+              insertedData: data,
+              timestamp: new Date().toISOString()
+            };
+          } catch (err) {
+            output = { 
+              saved: false, 
+              table: tableName,
+              error: err instanceof Error ? err.message : 'Save failed',
+              timestamp: new Date().toISOString()
+            };
+          }
+        }
         break;
+      }
 
-      case 'system_notify':
-        output = {
-          notified: true,
-          channel: block.config?.channel || 'slack',
-          message: block.config?.message || inputText,
-          timestamp: new Date().toISOString()
-        };
+      case 'system_notify': {
+        // Real notification via Slack webhook or similar
+        const channel = block.config?.channel || 'slack';
+        const webhookUrl = block.config?.webhookUrl;
+        const message = block.config?.message || inputText;
+        
+        if (!webhookUrl) {
+          output = { notified: false, channel, error: 'No webhook URL configured for notifications' };
+        } else {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            const payload = channel === 'slack' 
+              ? { text: message }
+              : { content: message }; // Discord format
+            
+            const response = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            
+            output = {
+              notified: response.ok,
+              channel,
+              status: response.status,
+              timestamp: new Date().toISOString()
+            };
+          } catch (err) {
+            output = {
+              notified: false,
+              channel,
+              error: err instanceof Error ? err.message : 'Notification failed',
+              timestamp: new Date().toISOString()
+            };
+          }
+        }
         break;
+      }
 
       case 'system_log':
         console.log(`[Workflow Log - ${block.config?.level || 'info'}]`, block.config?.message || inputText);
