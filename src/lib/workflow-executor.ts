@@ -380,71 +380,182 @@ export async function executeBlock(
 export async function executeWorkflow(
   blocks: WorkflowBlock[],
   initialInput: any,
-  onProgress?: (log: WorkflowRunLog) => void
+  onProgress?: (log: WorkflowRunLog) => void,
+  connections?: BlockConnection[]
 ): Promise<{ success: boolean; output: any; logs: WorkflowRunLog[] }> {
   const logs: WorkflowRunLog[] = [];
-  let currentInput = initialInput;
   const outputs: Record<string, any> = {};
+  const executedBlocks = new Set<string>();
 
-  // Sort blocks by position (top to bottom, left to right)
-  const sortedBlocks = [...blocks].sort((a, b) => {
-    if (a.position.y !== b.position.y) return a.position.y - b.position.y;
-    return a.position.x - b.position.x;
-  });
+  // Build connection map for efficient lookup
+  const connectionMap = new Map<string, BlockConnection[]>();
+  if (connections) {
+    for (const conn of connections) {
+      const existing = connectionMap.get(conn.sourceBlockId) || [];
+      existing.push(conn);
+      connectionMap.set(conn.sourceBlockId, existing);
+    }
+  }
 
-  for (const block of sortedBlocks) {
+  // Find entry points (blocks with no incoming connections, or first by position if no connections defined)
+  const hasIncoming = new Set<string>();
+  connections?.forEach(c => hasIncoming.add(c.targetBlockId));
+  
+  let entryBlocks = blocks.filter(b => !hasIncoming.has(b.id));
+  if (entryBlocks.length === 0) {
+    // Fallback: sort by position and start with first
+    entryBlocks = [...blocks].sort((a, b) => a.position.y - b.position.y).slice(0, 1);
+  }
+
+  // Execute a block and its connected blocks recursively
+  async function executeFromBlock(
+    block: WorkflowBlock, 
+    input: any,
+    branchLabel?: string
+  ): Promise<{ success: boolean; output: any }> {
+    // Skip if already executed in this run
+    if (executedBlocks.has(block.id)) {
+      return { success: true, output: outputs[block.id] };
+    }
+    executedBlocks.add(block.id);
+
     const startTime = Date.now();
     const blockDef = BLOCK_DEFINITIONS[block.type];
     
     const log: WorkflowRunLog = {
       blockId: block.id,
-      blockName: block.name || blockDef?.name || block.type,
+      blockName: branchLabel ? `[${branchLabel}] ${block.name || blockDef?.name || block.type}` : (block.name || blockDef?.name || block.type),
       blockType: block.type,
-      input: currentInput,
+      input,
       output: null,
-      status: 'pending',
+      status: 'running',
       duration: 0,
       timestamp: new Date().toISOString()
     };
+    
+    logs.push(log);
+    onProgress?.(log);
 
     try {
       const result = await executeBlock(block, {
-        input: currentInput,
+        input,
         previousOutputs: outputs
-      });
+      }, blocks, connections);
 
       log.duration = Date.now() - startTime;
       
       if (result.error) {
         log.status = 'error';
         log.output = { error: result.error };
-        logs.push(log);
+        log.error = result.error;
         onProgress?.(log);
-        return { success: false, output: null, logs };
+        return { success: false, output: null };
       }
 
       log.status = 'success';
       log.output = result.output;
       outputs[block.id] = result.output;
+      onProgress?.(log);
+
+      // Find outgoing connections
+      const outgoing = connectionMap.get(block.id) || [];
       
-      // Pass output to next block
-      currentInput = result.output;
+      if (outgoing.length === 0) {
+        // No connections - this is an end block
+        return { success: true, output: result.output };
+      }
+
+      // Handle conditional branching (ai_decision, control_condition)
+      if (block.type === 'ai_decision' || block.type === 'control_condition') {
+        const decision = result.output?.decision || result.output?.result;
+        const isTrue = decision === 'yes' || decision === true || decision === 'true';
+        const targetHandle = isTrue ? 'true' : 'false';
+        
+        // Find matching connection
+        const matchingConn = outgoing.find(c => c.sourceHandle === targetHandle);
+        if (matchingConn) {
+          const nextBlock = blocks.find(b => b.id === matchingConn.targetBlockId);
+          if (nextBlock) {
+            return executeFromBlock(nextBlock, result.output, targetHandle === 'true' ? 'Oui' : 'Non');
+          }
+        }
+        return { success: true, output: result.output };
+      }
+
+      // Execute all connected blocks in PARALLEL
+      if (outgoing.length > 1) {
+        const parallelResults = await Promise.all(
+          outgoing.map(async (conn, index) => {
+            const nextBlock = blocks.find(b => b.id === conn.targetBlockId);
+            if (!nextBlock) return { success: true, output: null };
+            
+            const branchName = conn.sourceHandle || `Branche ${index + 1}`;
+            return executeFromBlock(nextBlock, result.output, branchName);
+          })
+        );
+
+        // Combine results from parallel branches
+        const allSuccess = parallelResults.every(r => r.success);
+        const combinedOutput = {
+          parallelExecution: true,
+          branches: parallelResults.map((r, i) => ({
+            branch: outgoing[i].sourceHandle || `branch_${i}`,
+            output: r.output,
+            success: r.success
+          }))
+        };
+
+        return { success: allSuccess, output: combinedOutput };
+      }
+
+      // Single connection - sequential execution
+      const nextBlock = blocks.find(b => b.id === outgoing[0].targetBlockId);
+      if (nextBlock) {
+        return executeFromBlock(nextBlock, result.output);
+      }
+
+      return { success: true, output: result.output };
     } catch (error) {
       log.duration = Date.now() - startTime;
       log.status = 'error';
-      log.output = { error: error instanceof Error ? error.message : 'Unknown error' };
-      logs.push(log);
+      log.error = error instanceof Error ? error.message : 'Unknown error';
+      log.output = { error: log.error };
       onProgress?.(log);
-      return { success: false, output: null, logs };
+      return { success: false, output: null };
     }
-
-    logs.push(log);
-    onProgress?.(log);
   }
 
+  // If no connections, execute linearly (fallback for old workflows)
+  if (!connections || connections.length === 0) {
+    const sortedBlocks = [...blocks].sort((a, b) => {
+      if (a.position.y !== b.position.y) return a.position.y - b.position.y;
+      return a.position.x - b.position.x;
+    });
+
+    let currentInput = initialInput;
+    for (const block of sortedBlocks) {
+      const result = await executeFromBlock(block, currentInput);
+      if (!result.success) {
+        return { success: false, output: null, logs };
+      }
+      currentInput = result.output;
+    }
+    return { success: true, output: currentInput, logs };
+  }
+
+  // Execute from all entry points in parallel
+  const results = await Promise.all(
+    entryBlocks.map(block => executeFromBlock(block, initialInput))
+  );
+
+  const allSuccess = results.every(r => r.success);
+  const finalOutput = results.length === 1 
+    ? results[0].output 
+    : { parallelWorkflows: results.map(r => r.output) };
+
   return { 
-    success: true, 
-    output: currentInput, 
+    success: allSuccess, 
+    output: finalOutput, 
     logs 
   };
 }

@@ -75,16 +75,29 @@ export function ConnectionManager({
 
   return (
     <div className="space-y-3">
-      {/* Current connections summary */}
+      {/* Header with parallel execution info */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-medium text-foreground">
           <Link2 className="w-4 h-4" />
-          Connexions sortantes
+          Étapes suivantes
         </div>
         <Badge variant="outline" className="text-xs">
           {outgoingConnections.length} connexion{outgoingConnections.length !== 1 ? 's' : ''}
         </Badge>
       </div>
+
+      {/* Parallel execution info */}
+      {outgoingConnections.length > 1 && (
+        <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+          <div className="flex items-center gap-2 text-xs text-amber-600">
+            <GitBranch className="w-4 h-4" />
+            <span className="font-medium">Exécution parallèle activée</span>
+          </div>
+          <p className="text-[11px] text-amber-600/80 mt-1">
+            Ces {outgoingConnections.length} branches s'exécuteront simultanément
+          </p>
+        </div>
+      )}
 
       {/* List of current connections */}
       {outgoingConnections.length > 0 ? (
