@@ -61,6 +61,7 @@ export default function Flow() {
   const [history, setHistory] = useState<HistoryState[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const isUndoRedoAction = useRef(false);
+  const lastSavedState = useRef<string>('');
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -77,13 +78,16 @@ export default function Flow() {
       setLocalConnections(connections);
       setHasUnsavedChanges(false);
       // Reset history with initial state
-      setHistory([{ blocks: JSON.parse(JSON.stringify(blocks)), connections: JSON.parse(JSON.stringify(connections)) }]);
+      const initialState = { blocks: JSON.parse(JSON.stringify(blocks)), connections: JSON.parse(JSON.stringify(connections)) };
+      setHistory([initialState]);
       setHistoryIndex(0);
+      lastSavedState.current = JSON.stringify(initialState);
     } else {
       setLocalBlocks([]);
       setLocalConnections([]);
       setHistory([]);
       setHistoryIndex(-1);
+      lastSavedState.current = '';
     }
     setSelectedBlockId(null);
   }, [selectedWorkflowId, selectedWorkflow?.id]);
@@ -94,48 +98,56 @@ export default function Flow() {
       isUndoRedoAction.current = false;
       return;
     }
-    if (!selectedWorkflowId || (localBlocks.length === 0 && localConnections.length === 0)) return;
+    if (!selectedWorkflowId) return;
     
-    // Don't push if state matches current history entry
-    const currentEntry = history[historyIndex];
-    if (currentEntry && 
-        JSON.stringify(currentEntry.blocks) === JSON.stringify(localBlocks) &&
-        JSON.stringify(currentEntry.connections) === JSON.stringify(localConnections)) {
-      return;
-    }
+    const currentState = JSON.stringify({ blocks: localBlocks, connections: localConnections });
+    
+    // Don't push if state matches last saved state
+    if (currentState === lastSavedState.current) return;
+    
+    lastSavedState.current = currentState;
 
-    // Push new state, truncating any redo history
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push({ 
-      blocks: JSON.parse(JSON.stringify(localBlocks)), 
-      connections: JSON.parse(JSON.stringify(localConnections)) 
+    // Push new state
+    setHistory(prev => {
+      const truncated = prev.slice(0, historyIndex + 1);
+      const newEntry = { 
+        blocks: JSON.parse(JSON.stringify(localBlocks)), 
+        connections: JSON.parse(JSON.stringify(localConnections)) 
+      };
+      const newHistory = [...truncated, newEntry];
+      // Keep max 30 entries
+      if (newHistory.length > 30) return newHistory.slice(-30);
+      return newHistory;
     });
-    // Keep max 30 entries
-    if (newHistory.length > 30) newHistory.shift();
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  }, [localBlocks, localConnections]);
+    setHistoryIndex(prev => Math.min(prev + 1, 29));
+  }, [localBlocks, localConnections, selectedWorkflowId, historyIndex]);
 
   const handleUndo = () => {
     if (!canUndo) return;
     isUndoRedoAction.current = true;
     const prevState = history[historyIndex - 1];
-    setLocalBlocks(JSON.parse(JSON.stringify(prevState.blocks)));
-    setLocalConnections(JSON.parse(JSON.stringify(prevState.connections)));
-    setHistoryIndex(historyIndex - 1);
-    setHasUnsavedChanges(true);
-    toast.info('Action annulée');
+    if (prevState) {
+      setLocalBlocks(JSON.parse(JSON.stringify(prevState.blocks)));
+      setLocalConnections(JSON.parse(JSON.stringify(prevState.connections)));
+      lastSavedState.current = JSON.stringify(prevState);
+      setHistoryIndex(historyIndex - 1);
+      setHasUnsavedChanges(true);
+      toast.info('Action annulée');
+    }
   };
 
   const handleRedo = () => {
     if (!canRedo) return;
     isUndoRedoAction.current = true;
     const nextState = history[historyIndex + 1];
-    setLocalBlocks(JSON.parse(JSON.stringify(nextState.blocks)));
-    setLocalConnections(JSON.parse(JSON.stringify(nextState.connections)));
-    setHistoryIndex(historyIndex + 1);
-    setHasUnsavedChanges(true);
-    toast.info('Action rétablie');
+    if (nextState) {
+      setLocalBlocks(JSON.parse(JSON.stringify(nextState.blocks)));
+      setLocalConnections(JSON.parse(JSON.stringify(nextState.connections)));
+      lastSavedState.current = JSON.stringify(nextState);
+      setHistoryIndex(historyIndex + 1);
+      setHasUnsavedChanges(true);
+      toast.info('Action rétablie');
+    }
   };
 
   const handleCreateWorkflow = async () => {
