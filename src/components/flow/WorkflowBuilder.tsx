@@ -334,242 +334,151 @@ function BlockCard({
   const requiredFields = def?.configFields?.filter(f => f.required) || [];
   const isConfigComplete = requiredFields.every(f => block.config?.[f.key]);
 
-  // Get outgoing connections for this block
-  const outgoingConnections = connections.filter(c => c.sourceBlockId === block.id);
-
   return (
     <div>
       {/* Connector from previous block */}
       {!isFirst && (
         <div className="flex justify-center py-1">
-          <div className="w-0.5 h-6 bg-border" />
+          <div className="w-0.5 h-8 bg-gradient-to-b from-primary/50 to-primary/20" />
         </div>
       )}
 
-      <div className="flex items-stretch gap-3">
-        {/* Main block card */}
-        <div
-          onClick={onSelect}
-          className={cn(
-            "relative rounded-2xl border-2 transition-all cursor-pointer group flex-1",
-            isSelected 
-              ? "border-primary bg-primary/5 shadow-xl ring-4 ring-primary/10" 
-              : "border-border bg-card hover:border-primary/40 hover:shadow-lg"
-          )}
-        >
-          {/* Step number badge */}
-          <div className="absolute -left-3 top-1/2 -translate-y-1/2">
-            <div className={cn(
-              "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md",
-              isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-            )}>
-              {index + 1}
-            </div>
-          </div>
-
-          <div className="p-4 md:p-5">
-            <div className="flex items-start gap-4">
-              {/* Icon */}
-              <div className={cn(
-                "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform",
-                def?.color || 'from-gray-500 to-gray-400',
-                isSelected && "scale-110"
-              )}>
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <h4 className="font-semibold text-foreground truncate flex items-center gap-2">
-                      {block.name || def?.name}
-                      {!isConfigComplete && requiredFields.length > 0 && (
-                        <Badge variant="outline" className="text-amber-500 border-amber-500/50 text-[10px]">
-                          Config requise
-                        </Badge>
-                      )}
-                    </h4>
-                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
-                      {block.description || def?.description}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className={cn(
-                    "flex items-center gap-1 transition-opacity",
-                    isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                  )}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-popover">
-                        {!isFirst && (
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveUp(); }}>
-                            <ArrowDown className="w-4 h-4 mr-2 rotate-180" />
-                            Monter
-                          </DropdownMenuItem>
-                        )}
-                        {!isLast && (
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveDown(); }}>
-                            <ArrowDown className="w-4 h-4 mr-2" />
-                            Descendre
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(); }}>
-                          <Copy className="w-4 h-4 mr-2" />
-                          Dupliquer
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-destructive"
-                          onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Supprimer
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-
-                {/* Config preview */}
-                {hasConfig && (
-                  <div className="mt-3 p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(block.config).slice(0, 3).map(([key, value]) => (
-                        <div key={key} className="flex items-center gap-1 text-xs bg-background px-2 py-1 rounded-md">
-                          <span className="text-muted-foreground">{key}:</span>
-                          <span className="text-foreground font-medium truncate max-w-[100px]">
-                            {typeof value === 'boolean' ? (value ? 'Oui' : 'Non') : String(value).slice(0, 20)}
-                          </span>
-                        </div>
-                      ))}
-                      {Object.keys(block.config).length > 3 && (
-                        <span className="text-xs text-muted-foreground">+{Object.keys(block.config).length - 3}</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Category badge */}
+      {/* Main block card - full width, no side panels */}
+      <div
+        onClick={onSelect}
+        className={cn(
+          "relative rounded-2xl border-2 transition-all cursor-pointer group",
+          isSelected 
+            ? "border-primary bg-primary/5 shadow-xl ring-4 ring-primary/10" 
+            : "border-border bg-card hover:border-primary/40 hover:shadow-lg"
+        )}
+      >
+        {/* Step number badge */}
+        <div className="absolute -left-3 top-1/2 -translate-y-1/2">
           <div className={cn(
-            "absolute -top-2 right-4 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm",
-            def?.category === 'trigger' && 'bg-blue-500 text-white',
-            def?.category === 'ai' && 'bg-violet-500 text-white',
-            def?.category === 'transform' && 'bg-emerald-500 text-white',
-            def?.category === 'control' && 'bg-amber-500 text-white',
-            def?.category === 'integration' && 'bg-blue-600 text-white',
-            def?.category === 'system' && 'bg-slate-500 text-white'
+            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md",
+            isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
           )}>
-            {def?.category === 'trigger' && 'Déclencheur'}
-            {def?.category === 'ai' && 'IA'}
-            {def?.category === 'transform' && 'Transform'}
-            {def?.category === 'control' && 'Contrôle'}
-            {def?.category === 'integration' && 'API'}
-            {def?.category === 'system' && 'Action'}
+            {index + 1}
           </div>
-
-          {/* Branch/Sub-workflow indicators */}
-          {(block.type === 'control_condition' || block.type === 'control_branch' || block.type === 'control_parallel' || block.type === 'ai_decision') && (
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1">
-              <div className="flex items-center gap-0.5 bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px] font-medium shadow-md">
-                <GitBranch className="w-3 h-3" />
-                Branches
-              </div>
-            </div>
-          )}
-
-          {block.type === 'workflow_call' && (
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1">
-              <div className="flex items-center gap-0.5 bg-purple-500 text-white px-2 py-0.5 rounded-full text-[10px] font-medium shadow-md">
-                <Play className="w-3 h-3" />
-                Sous-workflow
-              </div>
-            </div>
-          )}
-
-          {/* Click to configure hint */}
-          {isSelected && outgoingConnections.length === 0 && (
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-              <Badge className="bg-primary text-primary-foreground shadow-lg text-xs">
-                <Settings className="w-3 h-3 mr-1" />
-                Configurer →
-              </Badge>
-            </div>
-          )}
         </div>
 
-        {/* Connections panel - displayed on the right */}
-        {outgoingConnections.length > 0 && (
-          <div className="flex flex-col justify-center gap-2 min-w-[140px] max-w-[180px]">
-            {outgoingConnections.map((conn) => {
-              const targetBlock = allBlocks.find(b => b.id === conn.targetBlockId);
-              if (!targetBlock) return null;
-              const targetDef = BLOCK_DEFINITIONS[targetBlock.type as BlockType];
-              const TargetIcon = iconMap[targetDef?.icon] || Sparkles;
-              
-              return (
-                <div 
-                  key={conn.id} 
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-xl border shadow-sm transition-all hover:shadow-md",
-                    conn.sourceHandle === 'true' 
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600' 
-                      : conn.sourceHandle === 'false' 
-                      ? 'bg-red-500/10 border-red-500/30 text-red-600' 
-                      : 'bg-primary/10 border-primary/30 text-primary'
-                  )}
-                >
-                  {/* Connection line indicator */}
-                  <div className={cn(
-                    "w-1 h-8 rounded-full flex-shrink-0",
-                    conn.sourceHandle === 'true' ? 'bg-emerald-500' : 
-                    conn.sourceHandle === 'false' ? 'bg-red-500' : 
-                    'bg-primary'
-                  )} />
-                  
-                  <div className="flex-1 min-w-0">
-                    {conn.sourceHandle && (
-                      <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">
-                        {conn.sourceHandle === 'true' ? 'Si Oui' : conn.sourceHandle === 'false' ? 'Si Non' : conn.sourceHandle}
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1.5">
-                      <div className={cn(
-                        "w-5 h-5 rounded-md bg-gradient-to-br flex items-center justify-center flex-shrink-0",
-                        targetDef?.color || 'from-gray-500 to-gray-400'
-                      )}>
-                        <TargetIcon className="w-3 h-3 text-white" />
-                      </div>
-                      <span className="text-xs font-medium truncate text-foreground">
-                        {targetBlock.name}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <ChevronRight className="w-4 h-4 flex-shrink-0 opacity-50" />
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Empty connection indicator */}
-        {outgoingConnections.length === 0 && !isLast && (
-          <div className="flex items-center justify-center w-[60px]">
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <div className="w-6 h-[2px] bg-border border-dashed" />
-              <div className="w-6 h-6 rounded-full bg-muted/50 border-2 border-dashed border-border flex items-center justify-center">
-                <Link2 className="w-3 h-3" />
-              </div>
+        <div className="p-4 md:p-5">
+          <div className="flex items-start gap-4">
+            {/* Icon */}
+            <div className={cn(
+              "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform flex-shrink-0",
+              def?.color || 'from-gray-500 to-gray-400',
+              isSelected && "scale-110"
+            )}>
+              <Icon className="w-6 h-6 text-white" />
             </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-foreground truncate flex items-center gap-2">
+                    {block.name || def?.name}
+                    {!isConfigComplete && requiredFields.length > 0 && (
+                      <Badge variant="outline" className="text-amber-500 border-amber-500/50 text-[10px]">
+                        Config requise
+                      </Badge>
+                    )}
+                  </h4>
+                  <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
+                    {block.description || def?.description}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className={cn(
+                  "flex items-center gap-1 transition-opacity flex-shrink-0",
+                  isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                )}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-popover">
+                      {!isFirst && (
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveUp(); }}>
+                          <ArrowDown className="w-4 h-4 mr-2 rotate-180" />
+                          Monter
+                        </DropdownMenuItem>
+                      )}
+                      {!isLast && (
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onMoveDown(); }}>
+                          <ArrowDown className="w-4 h-4 mr-2" />
+                          Descendre
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDuplicate(); }}>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Dupliquer
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-destructive"
+                        onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+
+              {/* Config preview */}
+              {hasConfig && (
+                <div className="mt-3 p-3 rounded-xl bg-muted/50 border border-border/50">
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(block.config).slice(0, 3).map(([key, value]) => (
+                      <div key={key} className="flex items-center gap-1 text-xs bg-background px-2 py-1 rounded-md">
+                        <span className="text-muted-foreground">{key}:</span>
+                        <span className="text-foreground font-medium truncate max-w-[100px]">
+                          {typeof value === 'boolean' ? (value ? 'Oui' : 'Non') : String(value).slice(0, 20)}
+                        </span>
+                      </div>
+                    ))}
+                    {Object.keys(block.config).length > 3 && (
+                      <span className="text-xs text-muted-foreground">+{Object.keys(block.config).length - 3}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Category badge */}
+        <div className={cn(
+          "absolute -top-2 right-4 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm",
+          def?.category === 'trigger' && 'bg-blue-500 text-white',
+          def?.category === 'ai' && 'bg-violet-500 text-white',
+          def?.category === 'transform' && 'bg-emerald-500 text-white',
+          def?.category === 'control' && 'bg-amber-500 text-white',
+          def?.category === 'integration' && 'bg-blue-600 text-white',
+          def?.category === 'system' && 'bg-slate-500 text-white'
+        )}>
+          {def?.category === 'trigger' && 'Déclencheur'}
+          {def?.category === 'ai' && 'IA'}
+          {def?.category === 'transform' && 'Transform'}
+          {def?.category === 'control' && 'Contrôle'}
+          {def?.category === 'integration' && 'API'}
+          {def?.category === 'system' && 'Action'}
+        </div>
+
+        {/* Click to configure hint */}
+        {isSelected && (
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+            <Badge className="bg-primary text-primary-foreground shadow-lg text-xs">
+              <Settings className="w-3 h-3 mr-1" />
+              Configurer →
+            </Badge>
           </div>
         )}
       </div>
