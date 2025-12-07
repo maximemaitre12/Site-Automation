@@ -487,7 +487,106 @@ interface BlockConfigPanelProps {
 
 function BlockConfigPanel({ block, onUpdate, onClose }: BlockConfigPanelProps) {
   const def = BLOCK_DEFINITIONS[block.type as BlockType];
-  const Icon = iconMap[def?.icon] || Sparkles;
+  const Icon = def?.icon ? (iconMap[def.icon] || Sparkles) : Sparkles;
+
+  // Handle unknown block types gracefully
+  if (!def) {
+    return (
+      <>
+        <div className="p-4 border-b border-border bg-muted/30">
+          <div className="flex items-center justify-between mb-3">
+            <Button variant="ghost" size="sm" onClick={onClose} className="gap-1 lg:hidden">
+              <ArrowLeft className="w-4 h-4" />
+              Retour
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose} className="hidden lg:flex h-8 w-8 p-0">
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-500 to-gray-400 flex items-center justify-center shadow-lg">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">{block.name || block.type}</h3>
+              <Badge variant="outline" className="mt-1 text-xs">
+                {block.type}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Info className="w-4 h-4" />
+                Informations de base
+              </div>
+              
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="block-name">Nom du bloc</Label>
+                  <Input
+                    id="block-name"
+                    value={block.name || ''}
+                    onChange={(e) => onUpdate({ name: e.target.value })}
+                    placeholder="Nom du bloc"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="block-desc">Description (optionnelle)</Label>
+                  <Textarea
+                    id="block-desc"
+                    value={block.description || ''}
+                    onChange={(e) => onUpdate({ description: e.target.value })}
+                    placeholder="Décrivez ce que fait ce bloc..."
+                    rows={2}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Raw config editor for unknown types */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Settings className="w-4 h-4" />
+                Configuration (JSON)
+              </div>
+              <Textarea
+                value={JSON.stringify(block.config || {}, null, 2)}
+                onChange={(e) => {
+                  try {
+                    const parsed = JSON.parse(e.target.value);
+                    onUpdate({ config: parsed });
+                  } catch {
+                    // Invalid JSON, ignore
+                  }
+                }}
+                rows={8}
+                className="font-mono text-sm"
+                placeholder="{}"
+              />
+            </div>
+
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+              <div className="flex items-start gap-3">
+                <HelpCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-medium text-foreground mb-1">Type de bloc non standard</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Ce bloc utilise le type "{block.type}" qui n'a pas de définition standard. 
+                    Vous pouvez éditer la configuration manuellement en JSON.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </>
+    );
+  }
 
   const updateConfig = (key: string, value: any) => {
     onUpdate({
