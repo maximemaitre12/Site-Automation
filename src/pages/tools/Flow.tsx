@@ -193,67 +193,67 @@ export default function Flow() {
     <DashboardLayout>
       <div className="h-full flex flex-col">
         {/* Header */}
-        <header className="px-8 py-6 border-b border-border bg-card/50">
-          <div className="flex items-center justify-between">
+        <header className="px-4 md:px-6 lg:px-8 py-4 md:py-6 border-b border-border bg-card/50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-                  <WorkflowIcon className="w-5 h-5 text-white" />
+              <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
+                  <WorkflowIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 AETHER Flow
               </h1>
-              <p className="text-muted-foreground mt-1">Visual workflow automation with AI-powered blocks</p>
+              <p className="text-sm text-muted-foreground mt-1 hidden sm:block">Visual workflow automation with AI-powered blocks</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-wrap">
               <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
-              <Button variant="outline" size="sm" onClick={() => setIsTemplateGalleryOpen(true)}>
+              <Button variant="outline" size="sm" onClick={() => setIsTemplateGalleryOpen(true)} className="hidden md:flex">
                 <LayoutTemplate className="w-4 h-4 mr-2" />
                 Templates
               </Button>
               <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
-                <Sparkles className="w-4 h-4 mr-2" />
-                AI Generate
+                <Sparkles className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">AI Generate</span>
               </Button>
               <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                New Workflow
+                <Plus className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:inline">New Workflow</span>
               </Button>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Workflows List */}
-          <aside className="w-72 border-r border-border bg-card/30 p-4 overflow-y-auto">
-            <h3 className="text-sm font-medium text-muted-foreground px-2 mb-4">Your Workflows</h3>
+          <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
+            <h3 className="text-xs md:text-sm font-medium text-muted-foreground px-2 mb-3 md:mb-4">Your Workflows</h3>
             {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <div className="flex items-center justify-center py-6 md:py-8">
+                <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-primary" />
               </div>
             ) : workflows.length === 0 ? (
-              <div className="text-center py-8">
-                <Zap className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground mb-4">No workflows yet</p>
+              <div className="text-center py-6 md:py-8">
+                <Zap className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">No workflows yet</p>
                 <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
                   <Sparkles className="w-4 h-4 mr-2" />
                   Generate with AI
                 </Button>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
                 {workflows.map((workflow) => (
                   <div
                     key={workflow.id}
                     onClick={() => setSelectedWorkflowId(workflow.id)}
-                    className={`p-3 rounded-lg cursor-pointer transition-all ${selectedWorkflowId === workflow.id ? 'bg-primary/10 border border-primary/30' : 'hover:bg-secondary border border-transparent'}`}
+                    className={`p-2.5 md:p-3 rounded-lg cursor-pointer transition-all flex-shrink-0 min-w-[160px] md:min-w-0 ${selectedWorkflowId === workflow.id ? 'bg-primary/10 border border-primary/30' : 'hover:bg-secondary border border-transparent'}`}
                   >
                     <div className="flex items-start justify-between mb-1">
-                      <span className="font-medium text-foreground text-sm truncate flex-1">{workflow.name}</span>
+                      <span className="font-medium text-foreground text-xs md:text-sm truncate flex-1">{workflow.name}</span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                            <MoreVertical className="w-4 h-4" />
+                          <Button variant="ghost" size="sm" className="h-5 w-5 md:h-6 md:w-6 p-0">
+                            <MoreVertical className="w-3 h-3 md:w-4 md:h-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -267,10 +267,10 @@ export default function Flow() {
                       </DropdownMenu>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${workflow.is_active ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
+                      <span className={`text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 rounded-full ${workflow.is_active ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
                         {workflow.is_active ? 'active' : 'paused'}
                       </span>
-                      <span className="text-xs text-muted-foreground">{workflow.blocks?.length || 0} blocks</span>
+                      <span className="text-[10px] md:text-xs text-muted-foreground">{workflow.blocks?.length || 0} blocks</span>
                     </div>
                   </div>
                 ))}
@@ -279,18 +279,19 @@ export default function Flow() {
           </aside>
 
           {/* Canvas Area */}
-          <div className="flex-1 flex flex-col bg-background/50">
+          <div className="flex-1 flex flex-col bg-background/50 min-h-[300px]">
             {selectedWorkflow ? (
               <>
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/30">
-                  <div>
-                    <h2 className="text-lg font-semibold text-foreground">{selectedWorkflow.name}</h2>
-                    {selectedWorkflow.description && <p className="text-sm text-muted-foreground">{selectedWorkflow.description}</p>}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
+                  <div className="min-w-0">
+                    <h2 className="text-base md:text-lg font-semibold text-foreground truncate">{selectedWorkflow.name}</h2>
+                    {selectedWorkflow.description && <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{selectedWorkflow.description}</p>}
                   </div>
-                  <div className="flex items-center gap-2">
-                    {hasUnsavedChanges && <span className="text-xs text-amber-500 mr-2">Unsaved changes</span>}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {hasUnsavedChanges && <span className="text-[10px] md:text-xs text-amber-500">Unsaved</span>}
                     <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges}>
-                      <Save className="w-4 h-4 mr-2" />Save
+                      <Save className="w-4 h-4 md:mr-2" />
+                      <span className="hidden md:inline">Save</span>
                     </Button>
                     <WorkflowExecutor blocks={localBlocks} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
                   </div>
@@ -298,16 +299,16 @@ export default function Flow() {
                 <EnhancedWorkflowCanvas blocks={localBlocks} selectedBlockId={selectedBlockId} onSelectBlock={setSelectedBlockId} onDeleteBlock={handleDeleteBlock} onMoveBlock={handleMoveBlock} onDuplicateBlock={handleDuplicateBlock} />
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-center justify-center p-4">
                 <div className="text-center">
-                  <WorkflowIcon className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-2">Select a workflow</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Choose a workflow or create a new one</p>
-                  <div className="flex gap-3 justify-center">
-                    <Button variant="outline" onClick={() => setIsAIGeneratorOpen(true)}>
+                  <WorkflowIcon className="w-12 h-12 md:w-16 md:h-16 text-muted-foreground/30 mx-auto mb-3 md:mb-4" />
+                  <h3 className="text-base md:text-lg font-medium text-foreground mb-2">Select a workflow</h3>
+                  <p className="text-muted-foreground text-xs md:text-sm mb-4">Choose a workflow or create a new one</p>
+                  <div className="flex gap-2 md:gap-3 justify-center flex-wrap">
+                    <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
                       <Sparkles className="w-4 h-4 mr-2" />Generate with AI
                     </Button>
-                    <Button variant="hero" onClick={() => setIsCreateDialogOpen(true)}>
+                    <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
                       <Plus className="w-4 h-4 mr-2" />Create Workflow
                     </Button>
                   </div>
@@ -316,15 +317,37 @@ export default function Flow() {
             )}
           </div>
 
-          {/* Properties Panel or Block Palette */}
+          {/* Properties Panel or Block Palette - Hidden on mobile, shown as overlay or sidebar */}
           {selectedWorkflow && (
-            selectedBlock ? (
-              <EnhancedBlockProperties block={selectedBlock} onUpdate={(updates) => handleUpdateBlock(selectedBlock.id, updates)} onClose={() => setSelectedBlockId(null)} />
-            ) : (
-              <EnhancedBlockPalette onAddBlock={handleAddBlock} />
-            )
+            <div className="hidden lg:block">
+              {selectedBlock ? (
+                <EnhancedBlockProperties block={selectedBlock} onUpdate={(updates) => handleUpdateBlock(selectedBlock.id, updates)} onClose={() => setSelectedBlockId(null)} />
+              ) : (
+                <EnhancedBlockPalette onAddBlock={handleAddBlock} />
+              )}
+            </div>
           )}
         </div>
+
+        {/* Mobile Block Palette */}
+        {selectedWorkflow && !selectedBlock && (
+          <div className="lg:hidden border-t border-border bg-card/50 p-3 overflow-x-auto">
+            <div className="flex gap-2">
+              {Object.entries(BLOCK_DEFINITIONS).slice(0, 6).map(([type, def]) => (
+                <Button
+                  key={type}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleAddBlock(type as BlockType)}
+                  className="flex-shrink-0"
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  {def.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Dialogs */}
