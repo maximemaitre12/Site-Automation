@@ -325,32 +325,23 @@ export default function Flow() {
 
   const selectedBlock = localBlocks.find(b => b.id === selectedBlockId);
 
+  const headerActions = (
+    <>
+      <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
+      <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
+        <Sparkles className="w-4 h-4 md:mr-2" />
+        <span className="hidden md:inline">AI Generate</span>
+      </Button>
+      <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
+        <Plus className="w-4 h-4 md:mr-2" />
+        <span className="hidden md:inline">New Workflow</span>
+      </Button>
+    </>
+  );
+
   return (
-    <DashboardLayout>
+    <DashboardLayout headerActions={headerActions}>
       <div className="h-full flex flex-col">
-        {/* Header */}
-        <header className="px-4 md:px-6 lg:px-8 py-4 md:py-6 border-b border-border bg-card/50">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground hidden sm:block">Visual workflow automation with AI-powered blocks</p>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <WorkflowHistory runs={runs} loading={runsLoading} workflowName={selectedWorkflow?.name} />
-              <Button variant="outline" size="sm" onClick={() => setIsTemplateGalleryOpen(true)} className="hidden md:flex">
-                <LayoutTemplate className="w-4 h-4 mr-2" />
-                Templates
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
-                <Sparkles className="w-4 h-4 md:mr-2" />
-                <span className="hidden md:inline">AI Generate</span>
-              </Button>
-              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="w-4 h-4 md:mr-2" />
-                <span className="hidden md:inline">New Workflow</span>
-              </Button>
-            </div>
-          </div>
-        </header>
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">

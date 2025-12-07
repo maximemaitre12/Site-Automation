@@ -8,9 +8,10 @@ import { Link } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  headerActions?: ReactNode;
 }
 
-function DashboardContent({ children }: DashboardLayoutProps) {
+function DashboardContent({ children, headerActions }: DashboardLayoutProps) {
   const { collapsed, toggle } = useSidebarState();
 
   return (
@@ -43,6 +44,13 @@ function DashboardContent({ children }: DashboardLayoutProps) {
         </Link>
 
         <div className="flex-1" />
+
+        {/* Header Actions */}
+        {headerActions && (
+          <div className="flex items-center gap-2">
+            {headerActions}
+          </div>
+        )}
       </header>
 
       <main
@@ -68,10 +76,10 @@ function DashboardContent({ children }: DashboardLayoutProps) {
   );
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, headerActions }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
-      <DashboardContent>{children}</DashboardContent>
+      <DashboardContent headerActions={headerActions}>{children}</DashboardContent>
     </SidebarProvider>
   );
 }
