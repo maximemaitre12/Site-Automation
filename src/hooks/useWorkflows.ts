@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { Workflow, WorkflowBlock, WorkflowRun } from '@/types/workflow';
+import { Workflow, WorkflowBlock, WorkflowRun, BlockConnection } from '@/types/workflow';
 import { toast } from 'sonner';
 
 export function useWorkflows() {
@@ -33,7 +33,7 @@ export function useWorkflows() {
       const parsed = (data || []).map(w => ({
         ...w,
         blocks: (w.blocks as unknown as WorkflowBlock[]) || [],
-        connections: []
+        connections: (w.connections as unknown as BlockConnection[]) || []
       }));
       
       setWorkflows(parsed);
@@ -83,7 +83,8 @@ export function useWorkflows() {
       
       const newWorkflow = {
         ...data,
-        blocks: []
+        blocks: (data.blocks as unknown as WorkflowBlock[]) || [],
+        connections: (data.connections as unknown as BlockConnection[]) || []
       } as Workflow;
       
       setWorkflows(prev => [newWorkflow, ...prev]);
