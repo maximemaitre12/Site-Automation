@@ -39,10 +39,19 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
     setLogs([]);
     setResult(null);
 
+    // Create a timeout promise (60 seconds max)
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Workflow execution timeout (60s)')), 60000);
+    });
+
     try {
-      const execution = await executeWorkflow(blocks, input, (log) => {
-        setLogs(prev => [...prev.filter(l => l.blockId !== log.blockId), log]);
-      }, connections);
+      // Race between execution and timeout
+      const execution = await Promise.race([
+        executeWorkflow(blocks, input, (log) => {
+          setLogs(prev => [...prev.filter(l => l.blockId !== log.blockId), log]);
+        }, connections),
+        timeoutPromise
+      ]);
 
       setResult(execution);
       
@@ -54,8 +63,10 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
       onRunCreated?.(workflowId, execution.logs, execution.output);
     } catch (error) {
-      toast.error('Execution error');
-      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : 'Execution error';
+      toast.error(errorMessage);
+      console.error('Workflow execution error:', error);
+      setResult({ success: false, output: null, logs: [] });
     } finally {
       setIsRunning(false);
     }
