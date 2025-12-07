@@ -1,22 +1,24 @@
 import { useState } from 'react';
-import { WorkflowBlock, WorkflowRunLog, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { WorkflowBlock, WorkflowRunLog, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { executeWorkflow } from '@/lib/workflow-executor';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Play, Loader2, CheckCircle, XCircle, Clock, ChevronDown, ChevronRight } from 'lucide-react';
+import { Play, Loader2, CheckCircle, XCircle, Clock, ChevronDown, ChevronRight, GitBranch } from 'lucide-react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 interface WorkflowExecutorProps {
   blocks: WorkflowBlock[];
+  connections?: BlockConnection[];
   workflowId: string;
   workflowName: string;
   onRunCreated?: (runId: string, logs: WorkflowRunLog[], output: any) => void;
 }
 
-export function WorkflowExecutor({ blocks, workflowId, workflowName, onRunCreated }: WorkflowExecutorProps) {
+export function WorkflowExecutor({ blocks, connections = [], workflowId, workflowName, onRunCreated }: WorkflowExecutorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [input, setInput] = useState('');
@@ -40,7 +42,7 @@ export function WorkflowExecutor({ blocks, workflowId, workflowName, onRunCreate
     try {
       const execution = await executeWorkflow(blocks, input, (log) => {
         setLogs(prev => [...prev.filter(l => l.blockId !== log.blockId), log]);
-      });
+      }, connections);
 
       setResult(execution);
       
@@ -115,9 +117,10 @@ export function WorkflowExecutor({ blocks, workflowId, workflowName, onRunCreate
                 <div className="space-y-2">
                   {logs.map((log, index) => {
                     const isExpanded = expandedLogs.has(log.blockId);
+                    const isBranch = log.blockName.startsWith('[');
                     return (
                       <div
-                        key={log.blockId}
+                        key={`${log.blockId}-${index}`}
                         className="border border-border rounded-lg overflow-hidden"
                       >
                         <button
@@ -125,12 +128,20 @@ export function WorkflowExecutor({ blocks, workflowId, workflowName, onRunCreate
                           className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
                         >
                           {log.status === 'pending' && <Loader2 className="w-4 h-4 text-primary animate-spin" />}
+                          {log.status === 'running' && <Loader2 className="w-4 h-4 text-primary animate-spin" />}
                           {log.status === 'success' && <CheckCircle className="w-4 h-4 text-success" />}
                           {log.status === 'error' && <XCircle className="w-4 h-4 text-destructive" />}
                           
-                          <span className="flex-1 font-medium text-sm">
-                            Step {index + 1}: {log.blockName}
+                          <span className="flex-1 font-medium text-sm flex items-center gap-2">
+                            {isBranch && <GitBranch className="w-3 h-3 text-amber-500" />}
+                            {log.blockName}
                           </span>
+                          
+                          {isBranch && (
+                            <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30">
+                              Parallèle
+                            </Badge>
+                          )}
                           
                           <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Clock className="w-3 h-3" />

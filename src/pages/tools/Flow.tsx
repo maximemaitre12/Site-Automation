@@ -308,7 +308,7 @@ export default function Flow() {
                     <Save className="w-4 h-4 md:mr-2" />
                     <span className="hidden md:inline">Sauvegarder</span>
                   </Button>
-                  <WorkflowExecutor blocks={localBlocks} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
+                  <WorkflowExecutor blocks={localBlocks} connections={localConnections} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
                 </div>
               </div>
               <WorkflowBuilder
