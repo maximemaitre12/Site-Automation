@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useWorkflows, useWorkflowRuns } from '@/hooks/useWorkflows';
-import { Workflow, WorkflowBlock, BlockType, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { Workflow, WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { WorkflowBuilder } from '@/components/flow/WorkflowBuilder';
 import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
 import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
@@ -45,6 +45,7 @@ export default function Flow() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
   const [localBlocks, setLocalBlocks] = useState<WorkflowBlock[]>([]);
+  const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
@@ -53,9 +54,11 @@ export default function Flow() {
   useEffect(() => {
     if (selectedWorkflow) {
       setLocalBlocks(selectedWorkflow.blocks || []);
+      setLocalConnections(selectedWorkflow.connections || []);
       setHasUnsavedChanges(false);
     } else {
       setLocalBlocks([]);
+      setLocalConnections([]);
     }
     setSelectedBlockId(null);
   }, [selectedWorkflowId, selectedWorkflow?.id]);
@@ -116,7 +119,19 @@ export default function Flow() {
 
   const handleDeleteBlock = (blockId: string) => {
     setLocalBlocks(prev => prev.filter(b => b.id !== blockId));
+    // Also remove any connections involving this block
+    setLocalConnections(prev => prev.filter(c => c.sourceBlockId !== blockId && c.targetBlockId !== blockId));
     if (selectedBlockId === blockId) setSelectedBlockId(null);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleAddConnection = (connection: BlockConnection) => {
+    setLocalConnections(prev => [...prev, connection]);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleRemoveConnection = (connectionId: string) => {
+    setLocalConnections(prev => prev.filter(c => c.id !== connectionId));
     setHasUnsavedChanges(true);
   };
 
@@ -150,7 +165,10 @@ export default function Flow() {
 
   const handleSaveWorkflow = async () => {
     if (!selectedWorkflowId) return;
-    const success = await updateWorkflow(selectedWorkflowId, { blocks: localBlocks });
+    const success = await updateWorkflow(selectedWorkflowId, { 
+      blocks: localBlocks,
+      connections: localConnections 
+    });
     if (success) {
       setHasUnsavedChanges(false);
       toast.success('Workflow saved');
@@ -295,6 +313,7 @@ export default function Flow() {
               </div>
               <WorkflowBuilder
                 blocks={localBlocks}
+                connections={localConnections}
                 selectedBlockId={selectedBlockId}
                 onSelectBlock={setSelectedBlockId}
                 onAddBlock={handleAddBlock}
@@ -302,6 +321,8 @@ export default function Flow() {
                 onDeleteBlock={handleDeleteBlock}
                 onMoveBlock={handleMoveBlock}
                 onDuplicateBlock={handleDuplicateBlock}
+                onAddConnection={handleAddConnection}
+                onRemoveConnection={handleRemoveConnection}
               />
             </>
           ) : (

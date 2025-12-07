@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { WorkflowBlock, BlockType, BLOCK_DEFINITIONS, BlockCategory, ConfigField } from '@/types/workflow';
+import { WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS, BlockCategory, ConfigField } from '@/types/workflow';
 import { 
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch, 
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
@@ -7,7 +7,7 @@ import {
   Repeat, Timer, GitFork, Bell, FileText, Search, Plus, X,
   ChevronRight, Check, ArrowLeft, ArrowDown, MoreVertical,
   Copy, Trash2, Settings, Zap, Play, GripVertical, Info,
-  HelpCircle, Lightbulb
+  HelpCircle, Lightbulb, Link2
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,6 +34,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { ConnectionManager } from './ConnectionManager';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
@@ -44,6 +45,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 interface WorkflowBuilderProps {
   blocks: WorkflowBlock[];
+  connections: BlockConnection[];
   selectedBlockId: string | null;
   onSelectBlock: (id: string | null) => void;
   onAddBlock: (type: BlockType) => void;
@@ -51,17 +53,22 @@ interface WorkflowBuilderProps {
   onDeleteBlock: (id: string) => void;
   onMoveBlock: (id: string, direction: 'up' | 'down') => void;
   onDuplicateBlock: (id: string) => void;
+  onAddConnection: (connection: BlockConnection) => void;
+  onRemoveConnection: (connectionId: string) => void;
 }
 
 export function WorkflowBuilder({ 
   blocks, 
+  connections,
   selectedBlockId, 
   onSelectBlock,
   onAddBlock,
   onUpdateBlock,
   onDeleteBlock,
   onMoveBlock,
-  onDuplicateBlock
+  onDuplicateBlock,
+  onAddConnection,
+  onRemoveConnection
 }: WorkflowBuilderProps) {
   const [isBlockPickerOpen, setIsBlockPickerOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -152,6 +159,8 @@ export function WorkflowBuilder({
                 <BlockCard
                   key={block.id}
                   block={block}
+                  allBlocks={blocks}
+                  connections={connections}
                   index={index}
                   isSelected={selectedBlockId === block.id}
                   isFirst={index === 0}
@@ -193,7 +202,11 @@ export function WorkflowBuilder({
         {selectedBlock ? (
           <BlockConfigPanel
             block={selectedBlock}
+            allBlocks={blocks}
+            connections={connections}
             onUpdate={(updates) => onUpdateBlock(selectedBlock.id, updates)}
+            onAddConnection={onAddConnection}
+            onRemoveConnection={onRemoveConnection}
             onClose={() => {
               onSelectBlock(null);
               setActiveTab('canvas');
@@ -286,6 +299,8 @@ function EmptyState({ onAddBlock }: { onAddBlock: () => void }) {
 // Block card in canvas
 interface BlockCardProps {
   block: WorkflowBlock;
+  allBlocks: WorkflowBlock[];
+  connections: BlockConnection[];
   index: number;
   isSelected: boolean;
   isFirst: boolean;
@@ -299,6 +314,8 @@ interface BlockCardProps {
 
 function BlockCard({ 
   block, 
+  allBlocks,
+  connections,
   index, 
   isSelected, 
   isFirst, 
@@ -484,50 +501,61 @@ function BlockCard({
         )}
       </div>
 
-      {/* Branch visualization for control blocks */}
-      {(block.type === 'control_condition' || block.type === 'ai_decision') && !isLast && (
-        <div className="flex justify-center py-2">
-          <div className="flex items-start gap-8">
-            <div className="flex flex-col items-center">
-              <div className="w-px h-4 bg-emerald-500" />
-              <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
-                Oui
-              </div>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-px h-4 bg-red-500" />
-              <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/20 text-red-500 border border-red-500/30">
-                Non
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {(block.type === 'control_branch' || block.type === 'control_parallel') && !isLast && (
-        <div className="flex justify-center py-2">
-          <div className="flex items-start gap-6">
-            {[...Array(Math.min(block.config?.branchCount || 2, 4))].map((_, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <div className="w-px h-4 bg-amber-500" />
-                <div className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/20 text-amber-500 border border-amber-500/30">
-                  {block.config?.branchNames?.split(',')[i]?.trim() || `Branche ${i + 1}`}
+      {/* Connections visualization */}
+      {(() => {
+        const outgoingConnections = connections.filter(c => c.sourceBlockId === block.id);
+        if (outgoingConnections.length === 0) {
+          // No connections - show default linear connector (unless it's the last block)
+          if (!isLast) {
+            return (
+              <div className="flex justify-center py-1">
+                <div className="relative">
+                  <div className="w-0.5 h-6 bg-border border-dashed" />
+                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
+                    <div className="w-5 h-5 rounded-full bg-muted border-2 border-dashed border-border flex items-center justify-center">
+                      <Link2 className="w-3 h-3 text-muted-foreground" />
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            );
+          }
+          return null;
+        }
 
-      {/* Standard connector to next block */}
-      {!isLast && block.type !== 'control_condition' && block.type !== 'control_branch' && block.type !== 'control_parallel' && block.type !== 'ai_decision' && (
-        <div className="flex justify-center py-1">
-          <div className="relative">
-            <div className="w-0.5 h-6 bg-border" />
-            <ArrowDown className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 text-muted-foreground" />
+        // Has connections - show them
+        return (
+          <div className="flex justify-center py-2">
+            <div className="flex items-start gap-4">
+              {outgoingConnections.map((conn) => {
+                const targetBlock = allBlocks.find(b => b.id === conn.targetBlockId);
+                if (!targetBlock) return null;
+                const targetDef = BLOCK_DEFINITIONS[targetBlock.type as BlockType];
+                
+                return (
+                  <div key={conn.id} className="flex flex-col items-center">
+                    <div className={cn(
+                      "w-px h-4",
+                      conn.sourceHandle === 'true' ? 'bg-emerald-500' : 
+                      conn.sourceHandle === 'false' ? 'bg-red-500' : 
+                      'bg-primary'
+                    )} />
+                    <div className={cn(
+                      "px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-1 shadow-sm max-w-[120px]",
+                      conn.sourceHandle === 'true' ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30' : 
+                      conn.sourceHandle === 'false' ? 'bg-red-500/20 text-red-500 border border-red-500/30' : 
+                      'bg-primary/20 text-primary border border-primary/30'
+                    )}>
+                      <ArrowDown className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">{targetBlock.name}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
@@ -535,11 +563,15 @@ function BlockCard({
 // Block configuration panel
 interface BlockConfigPanelProps {
   block: WorkflowBlock;
+  allBlocks: WorkflowBlock[];
+  connections: BlockConnection[];
   onUpdate: (updates: Partial<WorkflowBlock>) => void;
+  onAddConnection: (connection: BlockConnection) => void;
+  onRemoveConnection: (connectionId: string) => void;
   onClose: () => void;
 }
 
-function BlockConfigPanel({ block, onUpdate, onClose }: BlockConfigPanelProps) {
+function BlockConfigPanel({ block, allBlocks, connections, onUpdate, onAddConnection, onRemoveConnection, onClose }: BlockConfigPanelProps) {
   const def = BLOCK_DEFINITIONS[block.type as BlockType];
   const Icon = def?.icon ? (iconMap[def.icon] || Sparkles) : Sparkles;
 
@@ -733,6 +765,17 @@ function BlockConfigPanel({ block, onUpdate, onClose }: BlockConfigPanelProps) {
               </div>
             </div>
           )}
+
+          {/* Connections section */}
+          <div className="space-y-4 border-t border-border pt-4">
+            <ConnectionManager
+              block={block}
+              allBlocks={allBlocks}
+              connections={connections}
+              onAddConnection={onAddConnection}
+              onRemoveConnection={onRemoveConnection}
+            />
+          </div>
 
           {/* Help section */}
           <div className="p-4 rounded-xl bg-muted/50 border border-border">
