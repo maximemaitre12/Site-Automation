@@ -339,11 +339,8 @@ export default function Flow() {
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Sidebar - Workflows List */}
           <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
-            <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
+            <div className="px-2 mb-3 md:mb-4">
               <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
-              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 w-7 p-0">
-                <Plus className="w-4 h-4" />
-              </Button>
             </div>
             {loading ? (
               <div className="flex items-center justify-center py-6 md:py-8">
@@ -392,6 +389,12 @@ export default function Flow() {
                     </div>
                   </div>
                 ))}
+                {/* New Workflow Button */}
+                <div className="flex justify-center pt-2 md:pt-3">
+                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-8 w-8 p-0 rounded-full">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             )}
           </aside>
