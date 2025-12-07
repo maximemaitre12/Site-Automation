@@ -350,10 +350,16 @@ export default function Flow() {
               <div className="text-center py-6 md:py-8">
                 <Zap className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
                 <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">No workflows yet</p>
-                <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Generate with AI
-                </Button>
+                <div className="flex flex-col gap-2 items-center">
+                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Workflow
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate with AI
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
