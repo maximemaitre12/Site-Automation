@@ -84,10 +84,54 @@ export function useBrain() {
   };
 
   useEffect(() => {
-    Promise.all([fetchConversations(), fetchDocuments()]).finally(() => {
-      setLoading(false);
-    });
-  }, [user]);
+    let mounted = true;
+    
+    const loadData = async () => {
+      if (!user) {
+        setConversations([]);
+        setDocuments([]);
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const [convResult, docsResult] = await Promise.all([
+          supabase
+            .from('conversations')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('updated_at', { ascending: false }),
+          supabase
+            .from('internal_docs')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+        ]);
+
+        if (mounted) {
+          if (!convResult.error && convResult.data) {
+            setConversations(convResult.data.map(conv => ({
+              ...conv,
+              messages: (conv.messages as any[]) || []
+            })));
+          }
+          
+          if (!docsResult.error && docsResult.data) {
+            setDocuments(docsResult.data.map(doc => ({
+              ...doc,
+              tags: doc.tags as string[] | null
+            })));
+          }
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    loadData();
+    
+    return () => { mounted = false; };
+  }, [user?.id]);
 
   const createConversation = async (initialMessage?: string): Promise<Conversation | null> => {
     if (!user) return null;
