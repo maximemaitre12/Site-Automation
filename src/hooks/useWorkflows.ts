@@ -11,8 +11,13 @@ export function useWorkflows() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchWorkflows();
-  }, [user]);
+    if (user?.id) {
+      fetchWorkflows();
+    } else {
+      setWorkflows([]);
+      setLoading(false);
+    }
+  }, [user?.id]);
 
   const fetchWorkflows = async (retryCount = 0) => {
     if (!user) {
@@ -193,10 +198,13 @@ export function useWorkflowRuns(workflowId?: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchRuns();
+    } else {
+      setRuns([]);
+      setLoading(false);
     }
-  }, [user, workflowId]);
+  }, [user?.id, workflowId]);
 
   const fetchRuns = async () => {
     if (!user) return;
