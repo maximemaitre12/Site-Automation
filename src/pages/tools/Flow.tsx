@@ -183,14 +183,39 @@ export default function Flow() {
   const handleAddBlock = (type: BlockType) => {
     if (!selectedWorkflowId) return;
     const def = BLOCK_DEFINITIONS[type];
+    
+    // Find the last block in the chain or the selected block to connect from
+    const sourceBlock = selectedBlockId 
+      ? localBlocks.find(b => b.id === selectedBlockId)
+      : localBlocks.length > 0 
+        ? localBlocks.reduce((last, b) => b.position.y > last.position.y ? b : last, localBlocks[0])
+        : null;
+    
+    // Position new block below the source block
+    const newPosition = sourceBlock 
+      ? { x: sourceBlock.position.x, y: sourceBlock.position.y + 140 }
+      : { x: 100, y: localBlocks.length * 140 };
+    
     const newBlock: WorkflowBlock = {
       id: crypto.randomUUID(),
       type,
       name: def.name,
       config: {},
-      position: { x: 0, y: localBlocks.length * 120 }
+      position: newPosition
     };
+    
     setLocalBlocks(prev => [...prev, newBlock]);
+    
+    // Auto-connect from source block if exists
+    if (sourceBlock) {
+      const newConnection: BlockConnection = {
+        id: crypto.randomUUID(),
+        sourceBlockId: sourceBlock.id,
+        targetBlockId: newBlock.id
+      };
+      setLocalConnections(prev => [...prev, newConnection]);
+    }
+    
     setHasUnsavedChanges(true);
     setSelectedBlockId(newBlock.id);
   };
