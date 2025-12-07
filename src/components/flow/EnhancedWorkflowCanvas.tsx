@@ -1,289 +1,544 @@
-import { useState, useRef } from 'react';
-import { WorkflowBlock, BLOCK_DEFINITIONS, BlockType } from '@/types/workflow';
-import { 
-  Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch, 
-  Tags, Wand2, GitBranch, Mail, Send, Database, X, ArrowDown,
-  Clock, Eye, Heart, Languages, Braces, Filter, ArrowRightLeft,
-  Combine, Repeat, Timer, GitFork, Bell, FileText, GripVertical,
-  Play, Copy, Settings, MoreVertical, Zap
-} from 'lucide-react';
+import { useState, useRef, useCallback, useEffect, MouseEvent as ReactMouseEvent } from 'react';
+import { WorkflowBlock, BlockConnection, BLOCK_DEFINITIONS, BlockType } from '@/types/workflow';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { 
+  Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch, 
+  Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
+  Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
+  Repeat, Timer, GitFork, Bell, FileText, Play, Plus, Trash2,
+  Move, Zap, X, Settings, Link2
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from '@/components/ui/context-menu';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
-  Repeat, Timer, GitFork, Bell, FileText
+  Repeat, Timer, GitFork, Bell, FileText, Play
 };
 
 interface EnhancedWorkflowCanvasProps {
   blocks: WorkflowBlock[];
+  connections: BlockConnection[];
   selectedBlockId: string | null;
   onSelectBlock: (id: string | null) => void;
+  onUpdateBlock: (blockId: string, updates: Partial<WorkflowBlock>) => void;
   onDeleteBlock: (id: string) => void;
-  onMoveBlock: (id: string, direction: 'up' | 'down') => void;
   onDuplicateBlock: (id: string) => void;
-  onAddBlock?: (type: BlockType) => void;
+  onAddConnection: (connection: BlockConnection) => void;
+  onRemoveConnection: (connectionId: string) => void;
+  onAddBlock: () => void;
 }
 
-export function EnhancedWorkflowCanvas({ 
-  blocks, 
-  selectedBlockId, 
-  onSelectBlock, 
+interface DragState {
+  blockId: string | null;
+  startX: number;
+  startY: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+interface ConnectionDragState {
+  sourceBlockId: string | null;
+  startX: number;
+  startY: number;
+  currentX: number;
+  currentY: number;
+}
+
+export function EnhancedWorkflowCanvas({
+  blocks,
+  connections,
+  selectedBlockId,
+  onSelectBlock,
+  onUpdateBlock,
   onDeleteBlock,
-  onMoveBlock,
   onDuplicateBlock,
+  onAddConnection,
+  onRemoveConnection,
   onAddBlock
 }: EnhancedWorkflowCanvasProps) {
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [dragState, setDragState] = useState<DragState>({ blockId: null, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
+  const [connectionDrag, setConnectionDrag] = useState<ConnectionDragState>({ sourceBlockId: null, startX: 0, startY: 0, currentX: 0, currentY: 0 });
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
-  const sortedBlocks = [...blocks].sort((a, b) => a.position.y - b.position.y);
+  const [canvasOffset, setCanvasOffset] = useState({ x: 50, y: 50 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
 
-  if (blocks.length === 0) {
+  // Block dimensions
+  const BLOCK_WIDTH = 220;
+  const BLOCK_HEIGHT = 80;
+
+  // Handle block drag start
+  const handleBlockDragStart = (e: ReactMouseEvent, blockId: string) => {
+    e.stopPropagation();
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    setDragState({
+      blockId,
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: block.position.x,
+      offsetY: block.position.y
+    });
+    onSelectBlock(blockId);
+  };
+
+  // Handle connection drag start
+  const handleConnectionDragStart = (e: ReactMouseEvent, blockId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const block = blocks.find(b => b.id === blockId);
+    if (!block || !canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const startX = (block.position.x + BLOCK_WIDTH) * zoom + canvasOffset.x;
+    const startY = (block.position.y + BLOCK_HEIGHT / 2) * zoom + canvasOffset.y;
+
+    setConnectionDrag({
+      sourceBlockId: blockId,
+      startX,
+      startY,
+      currentX: e.clientX - rect.left,
+      currentY: e.clientY - rect.top
+    });
+  };
+
+  // Handle mouse move
+  const handleMouseMove = useCallback((e: ReactMouseEvent) => {
+    // Block dragging
+    if (dragState.blockId) {
+      const deltaX = (e.clientX - dragState.startX) / zoom;
+      const deltaY = (e.clientY - dragState.startY) / zoom;
+      
+      const newX = Math.max(0, dragState.offsetX + deltaX);
+      const newY = Math.max(0, dragState.offsetY + deltaY);
+
+      onUpdateBlock(dragState.blockId, {
+        position: { x: newX, y: newY }
+      });
+    }
+
+    // Connection dragging
+    if (connectionDrag.sourceBlockId && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      setConnectionDrag(prev => ({
+        ...prev,
+        currentX: e.clientX - rect.left,
+        currentY: e.clientY - rect.top
+      }));
+    }
+
+    // Panning
+    if (isPanning) {
+      const deltaX = e.clientX - panStart.x;
+      const deltaY = e.clientY - panStart.y;
+      setCanvasOffset(prev => ({
+        x: prev.x + deltaX,
+        y: prev.y + deltaY
+      }));
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  }, [dragState, connectionDrag, isPanning, panStart, zoom, onUpdateBlock]);
+
+  // Handle mouse up
+  const handleMouseUp = useCallback(() => {
+    // Complete connection if hovering over a block
+    if (connectionDrag.sourceBlockId && hoveredBlockId && connectionDrag.sourceBlockId !== hoveredBlockId) {
+      // Check if connection already exists
+      const existingConnection = connections.find(
+        c => c.sourceBlockId === connectionDrag.sourceBlockId && c.targetBlockId === hoveredBlockId
+      );
+      
+      if (!existingConnection) {
+        onAddConnection({
+          id: crypto.randomUUID(),
+          sourceBlockId: connectionDrag.sourceBlockId,
+          targetBlockId: hoveredBlockId
+        });
+      }
+    }
+
+    setDragState({ blockId: null, startX: 0, startY: 0, offsetX: 0, offsetY: 0 });
+    setConnectionDrag({ sourceBlockId: null, startX: 0, startY: 0, currentX: 0, currentY: 0 });
+    setIsPanning(false);
+  }, [connectionDrag, hoveredBlockId, connections, onAddConnection]);
+
+  // Handle canvas pan start
+  const handleCanvasMouseDown = (e: ReactMouseEvent) => {
+    if (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-background')) {
+      onSelectBlock(null);
+      setIsPanning(true);
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  // Handle wheel for zoom
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      setZoom(prev => Math.min(2, Math.max(0.25, prev * delta)));
+    }
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.addEventListener('wheel', handleWheel, { passive: false });
+      return () => canvas.removeEventListener('wheel', handleWheel);
+    }
+  }, [handleWheel]);
+
+  // Get block position for connection line
+  const getBlockCenter = (blockId: string, side: 'left' | 'right') => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return { x: 0, y: 0 };
+    
+    return {
+      x: (side === 'right' ? block.position.x + BLOCK_WIDTH : block.position.x) * zoom + canvasOffset.x,
+      y: (block.position.y + BLOCK_HEIGHT / 2) * zoom + canvasOffset.y
+    };
+  };
+
+  // Render connection line
+  const renderConnection = (connection: BlockConnection) => {
+    const source = getBlockCenter(connection.sourceBlockId, 'right');
+    const target = getBlockCenter(connection.targetBlockId, 'left');
+    
+    // Calculate control points for bezier curve
+    const dx = target.x - source.x;
+    const controlOffset = Math.min(Math.abs(dx) / 2, 100);
+    const path = `M ${source.x} ${source.y} C ${source.x + controlOffset} ${source.y}, ${target.x - controlOffset} ${target.y}, ${target.x} ${target.y}`;
+
+    const midX = (source.x + target.x) / 2;
+    const midY = (source.y + target.y) / 2;
+
     return (
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-background to-muted/30 p-4">
-        <div className="text-center max-w-lg">
-          <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-4 md:mb-6">
-            <Zap className="w-8 h-8 md:w-12 md:h-12 text-primary/50" />
-          </div>
-          <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2 md:mb-3">
-            Commencez votre workflow
-          </h3>
-          <p className="text-sm text-muted-foreground mb-6">
-            Ajoutez votre première étape en cliquant sur un bloc ci-dessous
-          </p>
-          
-          {/* Quick add buttons */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
-            {[
-              { type: 'trigger_text' as BlockType, label: 'Texte', icon: Type, color: 'from-slate-500 to-slate-400' },
-              { type: 'trigger_file' as BlockType, label: 'Fichier', icon: FileUp, color: 'from-blue-500 to-blue-400' },
-              { type: 'ai_summary' as BlockType, label: 'Résumer IA', icon: Sparkles, color: 'from-violet-500 to-violet-400' },
-              { type: 'ai_extract' as BlockType, label: 'Extraire IA', icon: FileSearch, color: 'from-purple-500 to-purple-400' },
-              { type: 'ai_classify' as BlockType, label: 'Classifier IA', icon: Tags, color: 'from-pink-500 to-pink-400' },
-              { type: 'system_email' as BlockType, label: 'Email', icon: Mail, color: 'from-orange-500 to-orange-400' },
-            ].map((item) => (
-              <button
-                key={item.type}
-                onClick={() => onAddBlock?.(item.type)}
-                className="flex items-center gap-2 p-3 rounded-xl bg-card border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
-              >
-                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  <item.icon className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-sm font-medium text-foreground">{item.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2 justify-center text-xs text-muted-foreground">
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-              Triggers
-            </span>
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
-              IA
-            </span>
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Actions
-            </span>
-          </div>
-        </div>
-      </div>
+      <g key={connection.id} className="group cursor-pointer">
+        {/* Invisible wider path for easier clicking */}
+        <path
+          d={path}
+          stroke="transparent"
+          strokeWidth={20}
+          fill="none"
+        />
+        {/* Visible path */}
+        <path
+          d={path}
+          stroke="hsl(var(--primary))"
+          strokeWidth={2.5}
+          fill="none"
+          className="transition-all group-hover:stroke-[4px]"
+          markerEnd="url(#arrowhead)"
+        />
+        {/* Delete button on hover */}
+        <g 
+          className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemoveConnection(connection.id);
+          }}
+        >
+          <circle
+            cx={midX}
+            cy={midY}
+            r={14}
+            fill="hsl(var(--destructive))"
+          />
+          <line x1={midX - 5} y1={midY - 5} x2={midX + 5} y2={midY + 5} stroke="white" strokeWidth={2} />
+          <line x1={midX + 5} y1={midY - 5} x2={midX - 5} y2={midY + 5} stroke="white" strokeWidth={2} />
+        </g>
+      </g>
     );
-  }
+  };
 
   return (
-    <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-gradient-to-br from-background to-muted/20">
-      {/* Helper tip */}
-      <div className="max-w-3xl mx-auto mb-4">
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs md:text-sm text-primary">
-          <Sparkles className="w-4 h-4 flex-shrink-0" />
-          <span>Cliquez sur un bloc pour le configurer • Utilisez les flèches pour réorganiser • Plus de blocs dans le panneau à droite</span>
+    <div className="relative flex-1 overflow-hidden bg-muted/30">
+      {/* Toolbar */}
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-2 shadow-lg">
+        <Button variant="outline" size="sm" onClick={onAddBlock} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Ajouter bloc
+        </Button>
+        <div className="h-6 w-px bg-border" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="w-8 h-8 p-0"
+          onClick={() => setZoom(prev => Math.min(2, prev + 0.1))}
+        >
+          +
+        </Button>
+        <span className="text-xs text-muted-foreground min-w-[40px] text-center font-mono">
+          {Math.round(zoom * 100)}%
+        </span>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="w-8 h-8 p-0"
+          onClick={() => setZoom(prev => Math.max(0.25, prev - 0.1))}
+        >
+          -
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => { setZoom(1); setCanvasOffset({ x: 50, y: 50 }); }}
+        >
+          Reset
+        </Button>
+      </div>
+
+      {/* Instructions */}
+      <div className="absolute top-4 right-4 z-10 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-3 shadow-lg">
+        <div className="text-xs text-muted-foreground space-y-1">
+          <div className="flex items-center gap-2"><Move className="w-3 h-3" /> Glissez les blocs librement</div>
+          <div className="flex items-center gap-2"><Link2 className="w-3 h-3" /> Point bleu → créer connexion</div>
+          <div className="flex items-center gap-2"><X className="w-3 h-3 text-destructive" /> Survolez ligne → supprimer</div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto space-y-1">
-        {sortedBlocks.map((block, index) => {
+      {/* Canvas */}
+      <div
+        ref={canvasRef}
+        className={cn(
+          "w-full h-full min-h-[600px] relative",
+          isPanning && "cursor-grabbing",
+          !isPanning && !dragState.blockId && "cursor-grab"
+        )}
+        onMouseDown={handleCanvasMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        {/* Grid pattern background */}
+        <div 
+          className="canvas-background absolute inset-0 pointer-events-auto"
+          style={{
+            backgroundImage: `radial-gradient(circle, hsl(var(--border)) 1.5px, transparent 1.5px)`,
+            backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
+            backgroundPosition: `${canvasOffset.x % (24 * zoom)}px ${canvasOffset.y % (24 * zoom)}px`
+          }}
+        />
+
+        {/* SVG for connections */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
+          <defs>
+            <marker
+              id="arrowhead"
+              markerWidth="10"
+              markerHeight="7"
+              refX="9"
+              refY="3.5"
+              orient="auto"
+            >
+              <polygon
+                points="0 0, 10 3.5, 0 7"
+                fill="hsl(var(--primary))"
+              />
+            </marker>
+          </defs>
+          
+          {/* Existing connections */}
+          <g className="pointer-events-auto">
+            {connections.map(renderConnection)}
+          </g>
+
+          {/* Connection being dragged */}
+          {connectionDrag.sourceBlockId && (
+            <path
+              d={`M ${connectionDrag.startX} ${connectionDrag.startY} 
+                  C ${(connectionDrag.startX + connectionDrag.currentX) / 2} ${connectionDrag.startY}, 
+                    ${(connectionDrag.startX + connectionDrag.currentX) / 2} ${connectionDrag.currentY}, 
+                    ${connectionDrag.currentX} ${connectionDrag.currentY}`}
+              stroke="hsl(var(--primary))"
+              strokeWidth={2.5}
+              strokeDasharray="8,4"
+              fill="none"
+              className="animate-pulse"
+            />
+          )}
+        </svg>
+
+        {/* Blocks */}
+        {blocks.map(block => {
           const def = BLOCK_DEFINITIONS[block.type as BlockType];
           const Icon = iconMap[def?.icon] || Sparkles;
           const isSelected = selectedBlockId === block.id;
+          const isDragging = dragState.blockId === block.id;
           const isHovered = hoveredBlockId === block.id;
+          const outgoingCount = connections.filter(c => c.sourceBlockId === block.id).length;
+          const incomingCount = connections.filter(c => c.targetBlockId === block.id).length;
+          const isConnectionTarget = connectionDrag.sourceBlockId && connectionDrag.sourceBlockId !== block.id && isHovered;
 
           return (
-            <div key={block.id}>
-              {/* Block */}
-              <div
-                onClick={() => onSelectBlock(isSelected ? null : block.id)}
-                onMouseEnter={() => setHoveredBlockId(block.id)}
-                onMouseLeave={() => setHoveredBlockId(null)}
-                className={cn(
-                  "relative p-3 md:p-5 rounded-xl md:rounded-2xl border-2 transition-all cursor-pointer group",
-                  isSelected 
-                    ? "border-primary bg-primary/5 shadow-xl shadow-primary/10 scale-[1.01] md:scale-[1.02]" 
-                    : "border-border bg-card hover:border-primary/40 hover:shadow-lg"
-                )}
-              >
-                <div className="flex items-start gap-3 md:gap-5">
-                  {/* Step indicator and icon */}
-                  <div className="flex flex-col items-center gap-1 md:gap-2">
-                    <div className={cn(
-                      "w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-lg transition-transform",
-                      def?.color || 'from-gray-500 to-gray-400',
-                      (isSelected || isHovered) && "scale-110"
-                    )}>
-                      <Icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
+            <ContextMenu key={block.id}>
+              <ContextMenuTrigger>
+                <div
+                  className={cn(
+                    "absolute rounded-2xl border-2 bg-card shadow-lg transition-all cursor-move select-none",
+                    isSelected && "border-primary ring-4 ring-primary/20 shadow-xl",
+                    !isSelected && "border-border hover:border-primary/50 hover:shadow-xl",
+                    isDragging && "shadow-2xl scale-105",
+                    isConnectionTarget && "border-primary ring-4 ring-primary/40 bg-primary/5"
+                  )}
+                  style={{
+                    left: block.position.x * zoom + canvasOffset.x,
+                    top: block.position.y * zoom + canvasOffset.y,
+                    width: BLOCK_WIDTH * zoom,
+                    height: BLOCK_HEIGHT * zoom,
+                    zIndex: isDragging ? 100 : isSelected ? 50 : 10
+                  }}
+                  onMouseDown={(e) => handleBlockDragStart(e, block.id)}
+                  onMouseEnter={() => setHoveredBlockId(block.id)}
+                  onMouseLeave={() => setHoveredBlockId(null)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectBlock(block.id);
+                  }}
+                >
+                  <div className="p-3 h-full flex items-center gap-3">
+                    {/* Icon */}
+                    <div 
+                      className={cn(
+                        "rounded-xl bg-gradient-to-br flex items-center justify-center shadow-md flex-shrink-0",
+                        def?.color || 'from-gray-500 to-gray-400'
+                      )}
+                      style={{ width: 40 * zoom, height: 40 * zoom }}
+                    >
+                      <Icon className="text-white" style={{ width: 20 * zoom, height: 20 * zoom }} />
                     </div>
-                    <Badge variant="outline" className="text-[9px] md:text-[10px] font-mono px-1.5">
-                      #{index + 1}
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <p 
+                        className="font-semibold text-foreground truncate"
+                        style={{ fontSize: 14 * zoom }}
+                      >
+                        {block.name}
+                      </p>
+                      <p 
+                        className="text-muted-foreground truncate"
+                        style={{ fontSize: 11 * zoom }}
+                      >
+                        {def?.name}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Connection point - Left (input) */}
+                  <div
+                    className={cn(
+                      "absolute bg-card border-2 rounded-full transition-all",
+                      incomingCount > 0 ? "bg-primary border-primary" : "border-muted-foreground/40"
+                    )}
+                    style={{ 
+                      width: 14 * zoom, 
+                      height: 14 * zoom, 
+                      left: -7 * zoom, 
+                      top: '50%', 
+                      transform: 'translateY(-50%)' 
+                    }}
+                  />
+
+                  {/* Connection point - Right (output) */}
+                  <div
+                    className={cn(
+                      "absolute bg-primary border-2 border-primary rounded-full cursor-crosshair transition-all hover:scale-125",
+                      outgoingCount > 0 ? "bg-primary" : "bg-card"
+                    )}
+                    style={{ 
+                      width: 14 * zoom, 
+                      height: 14 * zoom, 
+                      right: -7 * zoom, 
+                      top: '50%', 
+                      transform: 'translateY(-50%)' 
+                    }}
+                    onMouseDown={(e) => handleConnectionDragStart(e, block.id)}
+                  />
+
+                  {/* Badge for multiple connections */}
+                  {outgoingCount > 1 && (
+                    <Badge 
+                      className="absolute -top-2 -right-2 text-[10px] px-1.5 bg-amber-500 text-white border-0"
+                    >
+                      <GitBranch className="w-3 h-3 mr-0.5" />
+                      {outgoingCount}
                     </Badge>
-                  </div>
+                  )}
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-1 md:mb-2">
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-sm md:text-lg text-foreground truncate">
-                          {block.name || def?.name}
-                        </h4>
-                        <p className="text-xs md:text-sm text-muted-foreground mt-0.5 hidden sm:block">
-                          {def?.description}
-                        </p>
-                      </div>
-
-                      {/* Actions - Always visible on touch devices */}
-                      <div className={cn(
-                        "flex items-center gap-0.5 md:gap-1 transition-opacity ml-2",
-                        (isSelected || isHovered) ? "opacity-100" : "opacity-0 sm:opacity-0"
-                      )}>
-                        {index > 0 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 md:h-8 md:w-8 p-0"
-                            onClick={(e) => { e.stopPropagation(); onMoveBlock(block.id, 'up'); }}
-                          >
-                            <ArrowDown className="w-3 h-3 md:w-4 md:h-4 rotate-180" />
-                          </Button>
-                        )}
-                        {index < blocks.length - 1 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 md:h-8 md:w-8 p-0"
-                            onClick={(e) => { e.stopPropagation(); onMoveBlock(block.id, 'down'); }}
-                          >
-                            <ArrowDown className="w-3 h-3 md:w-4 md:h-4" />
-                          </Button>
-                        )}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="sm" className="h-7 w-7 md:h-8 md:w-8 p-0">
-                              <MoreVertical className="w-3 h-3 md:w-4 md:h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => onSelectBlock(block.id)}>
-                              <Settings className="w-4 h-4 mr-2" />
-                              Configurer
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDuplicateBlock(block.id)}>
-                              <Copy className="w-4 h-4 mr-2" />
-                              Dupliquer
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={() => onDeleteBlock(block.id)}
-                            >
-                              <X className="w-4 h-4 mr-2" />
-                              Supprimer
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                    
-                    {/* Config preview */}
-                    {Object.keys(block.config || {}).length > 0 && (
-                      <div className="mt-2 md:mt-3 p-2 md:p-3 rounded-lg md:rounded-xl bg-muted/50 border border-border/50">
-                        <div className="grid grid-cols-2 gap-1 md:gap-2">
-                          {Object.entries(block.config).slice(0, 4).map(([key, value]) => (
-                            <div key={key} className="text-[10px] md:text-xs">
-                              <span className="text-muted-foreground">{key}: </span>
-                              <span className="text-foreground font-medium truncate block">
-                                {String(value).slice(0, 30)}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                  {/* Category badge */}
+                  <div 
+                    className={cn(
+                      "absolute -top-2 left-3 px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wide",
+                      def?.category === 'trigger' && 'bg-blue-500 text-white',
+                      def?.category === 'ai' && 'bg-violet-500 text-white',
+                      def?.category === 'transform' && 'bg-emerald-500 text-white',
+                      def?.category === 'control' && 'bg-amber-500 text-white',
+                      def?.category === 'integration' && 'bg-blue-600 text-white',
+                      def?.category === 'system' && 'bg-slate-500 text-white'
                     )}
-
-                    {/* Retry config indicator */}
-                    {block.retryConfig?.enabled && (
-                      <div className="mt-2 flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
-                        <Repeat className="w-3 h-3" />
-                        Retries: {block.retryConfig.maxRetries}x
-                      </div>
-                    )}
+                    style={{ fontSize: 9 * zoom }}
+                  >
+                    {def?.category}
                   </div>
                 </div>
-
-                {/* Category badge */}
-                <div className={cn(
-                  "absolute -top-1.5 md:-top-2 -right-1.5 md:-right-2 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-semibold uppercase tracking-wide shadow-sm",
-                  def?.category === 'trigger' && 'bg-blue-500 text-white',
-                  def?.category === 'ai' && 'bg-violet-500 text-white',
-                  def?.category === 'transform' && 'bg-emerald-500 text-white',
-                  def?.category === 'control' && 'bg-amber-500 text-white',
-                  def?.category === 'integration' && 'bg-blue-600 text-white',
-                  def?.category === 'system' && 'bg-slate-500 text-white'
-                )}>
-                  {def?.category}
-                </div>
-
-                {/* Selection indicator */}
-                {isSelected && (
-                  <div className="absolute inset-0 rounded-xl md:rounded-2xl border-2 border-primary pointer-events-none" />
-                )}
-              </div>
-
-              {/* Connector line */}
-              {index < sortedBlocks.length - 1 && (
-                <div className="flex justify-center py-0.5 md:py-1">
-                  <div className="relative">
-                    <div className="w-0.5 md:w-1 h-6 md:h-10 bg-gradient-to-b from-border via-primary/30 to-border rounded-full" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary/20 border-2 border-primary/40" />
-                  </div>
-                </div>
-              )}
-            </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => onSelectBlock(block.id)}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configurer
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => onDuplicateBlock(block.id)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Dupliquer
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem 
+                  className="text-destructive"
+                  onClick={() => onDeleteBlock(block.id)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Supprimer
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           );
         })}
 
-        {/* Add block button at the end */}
-        <div className="flex justify-center pt-4">
-          <div className="text-center">
-            <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-muted/50 border border-border text-[10px] md:text-xs text-muted-foreground flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              Fin du workflow
+        {/* Empty state */}
+        {blocks.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 1 }}>
+            <div className="text-center p-8 pointer-events-auto">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-10 h-10 text-primary/60" />
+              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-3">
+                Canvas libre
+              </h2>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                Ajoutez des blocs et positionnez-les librement. Créez des connexions en glissant depuis les points bleus.
+              </p>
+              <Button onClick={onAddBlock} size="lg" className="gap-2">
+                <Plus className="w-5 h-5" />
+                Ajouter un bloc
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Ajoutez d'autres blocs depuis le panneau à droite
-            </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
