@@ -261,41 +261,41 @@ export function EnhancedWorkflowCanvas({
     }
   };
 
-  // Get screen position for a block's connection point
-  const getConnectionPoint = (blockId: string, side: 'left' | 'right') => {
+  // Get screen position for a block's connection point (top = input, bottom = output)
+  const getConnectionPoint = (blockId: string, side: 'top' | 'bottom') => {
     const block = blocks.find(b => b.id === blockId);
     if (!block) return { x: 0, y: 0 };
     
-    const x = side === 'right' 
-      ? block.position.x * zoom + offset.x + BLOCK_WIDTH * zoom
-      : block.position.x * zoom + offset.x;
-    const y = block.position.y * zoom + offset.y + (BLOCK_HEIGHT * zoom) / 2;
+    const x = block.position.x * zoom + offset.x + (BLOCK_WIDTH * zoom) / 2;
+    const y = side === 'bottom' 
+      ? block.position.y * zoom + offset.y + BLOCK_HEIGHT * zoom
+      : block.position.y * zoom + offset.y;
     
     return { x, y };
   };
 
-  // Render a connection path
+  // Render a connection path (vertical flow: top to bottom)
   const renderConnectionPath = (sourceId: string, targetId: string) => {
-    const source = getConnectionPoint(sourceId, 'right');
-    const target = getConnectionPoint(targetId, 'left');
+    const source = getConnectionPoint(sourceId, 'bottom');
+    const target = getConnectionPoint(targetId, 'top');
     
-    const dx = Math.abs(target.x - source.x);
-    const controlX = Math.min(dx / 2, 80);
+    const dy = Math.abs(target.y - source.y);
+    const controlY = Math.min(dy / 2, 60);
     
-    return `M ${source.x} ${source.y} C ${source.x + controlX} ${source.y}, ${target.x - controlX} ${target.y}, ${target.x} ${target.y}`;
+    return `M ${source.x} ${source.y} C ${source.x} ${source.y + controlY}, ${target.x} ${target.y - controlY}, ${target.x} ${target.y}`;
   };
 
-  // Render dragging connection
+  // Render dragging connection (vertical)
   const renderDraggingConnection = () => {
     if (!connectionSource) return null;
     
-    const source = getConnectionPoint(connectionSource, 'right');
-    const dx = Math.abs(connectionEnd.x - source.x);
-    const controlX = Math.min(dx / 2, 80);
+    const source = getConnectionPoint(connectionSource, 'bottom');
+    const dy = Math.abs(connectionEnd.y - source.y);
+    const controlY = Math.min(dy / 2, 60);
     
     return (
       <path
-        d={`M ${source.x} ${source.y} C ${source.x + controlX} ${source.y}, ${connectionEnd.x - controlX} ${connectionEnd.y}, ${connectionEnd.x} ${connectionEnd.y}`}
+        d={`M ${source.x} ${source.y} C ${source.x} ${source.y + controlY}, ${connectionEnd.x} ${connectionEnd.y - controlY}, ${connectionEnd.x} ${connectionEnd.y}`}
         stroke="hsl(var(--primary))"
         strokeWidth={3}
         strokeDasharray="8 4"
@@ -353,7 +353,7 @@ export function EnhancedWorkflowCanvas({
       {/* SVG layer for connections */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
         <defs>
-          <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="5" refY="3.5" orient="auto">
             <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--primary))" />
           </marker>
         </defs>
@@ -362,8 +362,8 @@ export function EnhancedWorkflowCanvas({
         {connections.map(conn => {
           const isHovered = hoveredConnectionId === conn.id;
           const path = renderConnectionPath(conn.sourceBlockId, conn.targetBlockId);
-          const source = getConnectionPoint(conn.sourceBlockId, 'right');
-          const target = getConnectionPoint(conn.targetBlockId, 'left');
+          const source = getConnectionPoint(conn.sourceBlockId, 'bottom');
+          const target = getConnectionPoint(conn.targetBlockId, 'top');
           const midX = (source.x + target.x) / 2;
           const midY = (source.y + target.y) / 2;
 
@@ -454,7 +454,7 @@ export function EnhancedWorkflowCanvas({
               </div>
             </div>
 
-            {/* Input connection point (left) */}
+            {/* Input connection point (top) */}
             <div
               className={cn(
                 "absolute rounded-full border-2 transition-all",
@@ -462,12 +462,12 @@ export function EnhancedWorkflowCanvas({
               )}
               style={{ 
                 width: 14 * zoom, height: 14 * zoom, 
-                left: -7 * zoom, top: '50%', 
-                transform: 'translateY(-50%)' 
+                left: '50%', top: -7 * zoom, 
+                transform: 'translateX(-50%)' 
               }}
             />
 
-            {/* Output connection point (right) - draggable */}
+            {/* Output connection point (bottom) - draggable */}
             <div
               className={cn(
                 "absolute rounded-full border-2 border-primary transition-all hover:scale-125 touch-none",
@@ -476,8 +476,8 @@ export function EnhancedWorkflowCanvas({
               )}
               style={{ 
                 width: 20 * zoom, height: 20 * zoom, 
-                right: -10 * zoom, top: '50%', 
-                transform: 'translateY(-50%)',
+                left: '50%', bottom: -10 * zoom, 
+                transform: 'translateX(-50%)',
                 zIndex: 15
               }}
               onMouseDown={(e) => startConnection(e, block.id)}
