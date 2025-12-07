@@ -74,7 +74,13 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
     setIsGenerating(true);
     setGeneratedPreview(null);
 
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
     try {
+      console.log('Calling workflow-generate with:', { objective, context });
+      
       const { data, error } = await supabase.functions.invoke('workflow-generate', {
         body: { 
           objective,
@@ -83,28 +89,41 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
         }
       });
 
+      clearTimeout(timeoutId);
+
+      console.log('Response:', { data, error });
+
       if (error) {
         console.error('Generation error:', error);
         toast.error(error.message || 'Failed to generate workflow');
+        setIsGenerating(false);
         return;
       }
 
-      if (data?.workflow?.blocks) {
+      if (data?.workflow?.blocks && Array.isArray(data.workflow.blocks)) {
         setGeneratedPreview(data.workflow.blocks);
-        // Generate a name from the objective
         const name = objective.length > 50 
           ? objective.substring(0, 50) + '...'
           : objective;
         setGeneratedName(name);
         setStep('preview');
         toast.success(`Generated workflow with ${data.workflow.blocks.length} blocks`);
+      } else if (data?.error) {
+        console.error('API returned error:', data.error);
+        toast.error(data.error);
       } else {
-        toast.error('Invalid workflow generated');
+        console.error('Invalid response structure:', data);
+        toast.error('Invalid workflow generated - please try again');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Generation error:', err);
-      toast.error('Failed to generate workflow');
+      if (err.name === 'AbortError') {
+        toast.error('Generation timeout - please try a simpler workflow');
+      } else {
+        toast.error(err.message || 'Failed to generate workflow');
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsGenerating(false);
     }
   };
