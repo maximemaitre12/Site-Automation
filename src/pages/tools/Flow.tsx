@@ -296,7 +296,7 @@ export default function Flow() {
                     <WorkflowExecutor blocks={localBlocks} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
                   </div>
                 </div>
-                <EnhancedWorkflowCanvas blocks={localBlocks} selectedBlockId={selectedBlockId} onSelectBlock={setSelectedBlockId} onDeleteBlock={handleDeleteBlock} onMoveBlock={handleMoveBlock} onDuplicateBlock={handleDuplicateBlock} />
+                <EnhancedWorkflowCanvas blocks={localBlocks} selectedBlockId={selectedBlockId} onSelectBlock={setSelectedBlockId} onDeleteBlock={handleDeleteBlock} onMoveBlock={handleMoveBlock} onDuplicateBlock={handleDuplicateBlock} onAddBlock={handleAddBlock} />
               </>
             ) : (
               <div className="flex-1 flex items-center justify-center p-4">
