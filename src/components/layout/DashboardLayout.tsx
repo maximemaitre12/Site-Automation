@@ -53,15 +53,6 @@ function DashboardContent({ children }: DashboardLayoutProps) {
           <Menu className="w-5 h-5" />
         </Button>
 
-        {/* Dynamic tool name display */}
-        <div className={cn("flex items-center gap-2", collapsed ? "flex" : "flex lg:hidden")}>
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
-            <ToolIcon className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-foreground">{toolInfo.name}</span>
-        </div>
-
-        <div className="flex-1" />
       </header>
 
       <main
