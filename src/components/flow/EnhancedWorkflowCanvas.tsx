@@ -62,16 +62,27 @@ export function EnhancedWorkflowCanvas({
   const BLOCK_WIDTH = 220;
   const BLOCK_HEIGHT = 80;
 
-  // Mouse handlers using native events for better control
+  // Get coordinates from mouse or touch event
+  const getEventCoords = (e: MouseEvent | TouchEvent): { clientX: number; clientY: number } => {
+    if ('touches' in e) {
+      return { clientX: e.touches[0]?.clientX || 0, clientY: e.touches[0]?.clientY || 0 };
+    }
+    return { clientX: e.clientX, clientY: e.clientY };
+  };
+
+  // Unified handlers for mouse and touch
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMove = (e: MouseEvent | TouchEvent) => {
+      const coords = getEventCoords(e);
+      
       // Block dragging
       if (isDraggingBlock) {
-        const dx = (e.clientX - dragStart.x) / zoom;
-        const dy = (e.clientY - dragStart.y) / zoom;
+        e.preventDefault();
+        const dx = (coords.clientX - dragStart.x) / zoom;
+        const dy = (coords.clientY - dragStart.y) / zoom;
         onUpdateBlock(isDraggingBlock, {
           position: { 
             x: Math.max(0, blockStartPos.x + dx), 
@@ -83,24 +94,39 @@ export function EnhancedWorkflowCanvas({
 
       // Connection dragging
       if (connectionSource) {
+        e.preventDefault();
         const rect = container.getBoundingClientRect();
         setConnectionEnd({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
+          x: coords.clientX - rect.left,
+          y: coords.clientY - rect.top
         });
+        
+        // Find block under touch point for connection target
+        const touchedBlock = blocks.find(block => {
+          const blockLeft = block.position.x * zoom + offset.x;
+          const blockTop = block.position.y * zoom + offset.y;
+          const blockWidth = BLOCK_WIDTH * zoom;
+          const blockHeight = BLOCK_HEIGHT * zoom;
+          const relX = coords.clientX - rect.left;
+          const relY = coords.clientY - rect.top;
+          return relX >= blockLeft && relX <= blockLeft + blockWidth && 
+                 relY >= blockTop && relY <= blockTop + blockHeight;
+        });
+        setHoveredBlockId(touchedBlock?.id || null);
         return;
       }
 
       // Panning
       if (isPanning) {
-        const dx = e.clientX - panStart.x;
-        const dy = e.clientY - panStart.y;
+        e.preventDefault();
+        const dx = coords.clientX - panStart.x;
+        const dy = coords.clientY - panStart.y;
         setOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
-        setPanStart({ x: e.clientX, y: e.clientY });
+        setPanStart({ x: coords.clientX, y: coords.clientY });
       }
     };
 
-    const handleMouseUp = () => {
+    const handleEnd = () => {
       // Complete connection
       if (connectionSource && hoveredBlockId && connectionSource !== hoveredBlockId) {
         const exists = connections.some(
@@ -118,6 +144,7 @@ export function EnhancedWorkflowCanvas({
       setIsDraggingBlock(null);
       setConnectionSource(null);
       setIsPanning(false);
+      setHoveredBlockId(null);
     };
 
     const handleWheel = (e: WheelEvent) => {
@@ -126,7 +153,6 @@ export function EnhancedWorkflowCanvas({
         const factor = e.deltaY > 0 ? 0.9 : 1.1;
         setZoom(prev => Math.min(2, Math.max(0.3, prev * factor)));
       } else {
-        // Scroll to pan
         setOffset(prev => ({
           x: prev.x - e.deltaX,
           y: prev.y - e.deltaY
@@ -134,20 +160,31 @@ export function EnhancedWorkflowCanvas({
       }
     };
 
-    container.addEventListener('mousemove', handleMouseMove);
-    container.addEventListener('mouseup', handleMouseUp);
-    container.addEventListener('mouseleave', handleMouseUp);
+    // Mouse events
+    container.addEventListener('mousemove', handleMove);
+    container.addEventListener('mouseup', handleEnd);
+    container.addEventListener('mouseleave', handleEnd);
+    
+    // Touch events
+    container.addEventListener('touchmove', handleMove, { passive: false });
+    container.addEventListener('touchend', handleEnd);
+    container.addEventListener('touchcancel', handleEnd);
+    
+    // Wheel
     container.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove);
-      container.removeEventListener('mouseup', handleMouseUp);
-      container.removeEventListener('mouseleave', handleMouseUp);
+      container.removeEventListener('mousemove', handleMove);
+      container.removeEventListener('mouseup', handleEnd);
+      container.removeEventListener('mouseleave', handleEnd);
+      container.removeEventListener('touchmove', handleMove);
+      container.removeEventListener('touchend', handleEnd);
+      container.removeEventListener('touchcancel', handleEnd);
       container.removeEventListener('wheel', handleWheel);
     };
-  }, [isDraggingBlock, dragStart, blockStartPos, zoom, connectionSource, hoveredBlockId, isPanning, panStart, connections, onUpdateBlock, onAddConnection]);
+  }, [isDraggingBlock, dragStart, blockStartPos, zoom, connectionSource, hoveredBlockId, isPanning, panStart, connections, onUpdateBlock, onAddConnection, blocks, offset]);
 
-  // Start dragging a block
+  // Start dragging a block (mouse)
   const startBlockDrag = (e: React.MouseEvent, blockId: string) => {
     e.stopPropagation();
     const block = blocks.find(b => b.id === blockId);
@@ -159,7 +196,20 @@ export function EnhancedWorkflowCanvas({
     onSelectBlock(blockId);
   };
 
-  // Start creating a connection
+  // Start dragging a block (touch)
+  const startBlockDragTouch = (e: React.TouchEvent, blockId: string) => {
+    e.stopPropagation();
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+    
+    const touch = e.touches[0];
+    setIsDraggingBlock(blockId);
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+    setBlockStartPos({ x: block.position.x, y: block.position.y });
+    onSelectBlock(blockId);
+  };
+
+  // Start creating a connection (mouse)
   const startConnection = (e: React.MouseEvent, blockId: string) => {
     e.stopPropagation();
     e.preventDefault();
@@ -175,12 +225,39 @@ export function EnhancedWorkflowCanvas({
     });
   };
 
-  // Start panning
+  // Start creating a connection (touch)
+  const startConnectionTouch = (e: React.TouchEvent, blockId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const block = blocks.find(b => b.id === blockId);
+    if (!block || !containerRef.current) return;
+
+    const touch = e.touches[0];
+    const rect = containerRef.current.getBoundingClientRect();
+    setConnectionSource(blockId);
+    setConnectionEnd({
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    });
+  };
+
+  // Start panning (mouse)
   const startPanning = (e: React.MouseEvent) => {
     if (e.target === containerRef.current || e.target === canvasRef.current) {
       onSelectBlock(null);
       setIsPanning(true);
       setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  // Start panning (touch)
+  const startPanningTouch = (e: React.TouchEvent) => {
+    if (e.target === containerRef.current || e.target === canvasRef.current) {
+      onSelectBlock(null);
+      const touch = e.touches[0];
+      setIsPanning(true);
+      setPanStart({ x: touch.clientX, y: touch.clientY });
     }
   };
 
@@ -232,11 +309,12 @@ export function EnhancedWorkflowCanvas({
     <div 
       ref={containerRef}
       className={cn(
-        "relative w-full h-full min-h-[500px] overflow-hidden bg-muted/20",
+        "relative w-full h-full min-h-[500px] overflow-hidden bg-muted/20 touch-none",
         isPanning ? "cursor-grabbing" : "cursor-grab"
       )}
       style={{ flex: '1 1 0%' }}
       onMouseDown={startPanning}
+      onTouchStart={startPanningTouch}
     >
       {/* Toolbar */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-2 shadow-lg">
@@ -349,7 +427,7 @@ export function EnhancedWorkflowCanvas({
           <div
             key={block.id}
             className={cn(
-              "absolute rounded-2xl border-2 bg-card shadow-lg select-none transition-shadow",
+              "absolute rounded-2xl border-2 bg-card shadow-lg select-none transition-shadow touch-none",
               isSelected && "border-primary ring-4 ring-primary/20 shadow-xl",
               !isSelected && "border-border hover:border-primary/50",
               isDragging && "shadow-2xl cursor-grabbing",
@@ -358,6 +436,7 @@ export function EnhancedWorkflowCanvas({
             )}
             style={{ left, top, width, height, zIndex: isDragging ? 100 : isSelected ? 50 : 10 }}
             onMouseDown={(e) => startBlockDrag(e, block.id)}
+            onTouchStart={(e) => startBlockDragTouch(e, block.id)}
             onMouseEnter={() => setHoveredBlockId(block.id)}
             onMouseLeave={() => setHoveredBlockId(null)}
           >
@@ -391,17 +470,18 @@ export function EnhancedWorkflowCanvas({
             {/* Output connection point (right) - draggable */}
             <div
               className={cn(
-                "absolute rounded-full border-2 border-primary transition-all hover:scale-125",
+                "absolute rounded-full border-2 border-primary transition-all hover:scale-125 touch-none",
                 outgoingCount > 0 ? "bg-primary" : "bg-card hover:bg-primary/50",
                 "cursor-crosshair"
               )}
               style={{ 
-                width: 16 * zoom, height: 16 * zoom, 
-                right: -8 * zoom, top: '50%', 
+                width: 20 * zoom, height: 20 * zoom, 
+                right: -10 * zoom, top: '50%', 
                 transform: 'translateY(-50%)',
                 zIndex: 15
               }}
               onMouseDown={(e) => startConnection(e, block.id)}
+              onTouchStart={(e) => startConnectionTouch(e, block.id)}
             />
 
             {/* Parallel execution badge */}
@@ -427,14 +507,14 @@ export function EnhancedWorkflowCanvas({
               {def?.category}
             </div>
 
-            {/* Action buttons on selection */}
+            {/* Action buttons on selection - larger touch targets */}
             {isSelected && (
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1 bg-card rounded-lg border border-border shadow-lg p-1" style={{ zIndex: 20 }}>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={(e) => { e.stopPropagation(); onDuplicateBlock(block.id); }}>
-                  <Copy className="w-3.5 h-3.5" />
+              <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex gap-2 bg-card rounded-xl border border-border shadow-lg p-1.5" style={{ zIndex: 20 }}>
+                <Button variant="ghost" size="sm" className="h-10 w-10 p-0" onClick={(e) => { e.stopPropagation(); onDuplicateBlock(block.id); }}>
+                  <Copy className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); onDeleteBlock(block.id); }}>
-                  <Trash2 className="w-3.5 h-3.5" />
+                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); onDeleteBlock(block.id); }}>
+                  <Trash2 className="w-5 h-5" />
                 </Button>
               </div>
             )}
