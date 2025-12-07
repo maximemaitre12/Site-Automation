@@ -35,36 +35,18 @@ export interface JobDescription {
   created_at: string;
 }
 
-// Cache data in memory
-let cachedCandidates: Candidate[] = [];
-let cachedJobs: JobDescription[] = [];
-let lastHRUserId: string | null = null;
-let hrDataLoaded = false;
-
 export function useHR() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  const [candidates, setCandidates] = useState<Candidate[]>(() => 
-    user?.id === lastHRUserId ? cachedCandidates : []
-  );
-  const [jobs, setJobs] = useState<JobDescription[]>(() => 
-    user?.id === lastHRUserId ? cachedJobs : []
-  );
-  const [loading, setLoading] = useState(() => 
-    !(user?.id === lastHRUserId && hrDataLoaded)
-  );
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [jobs, setJobs] = useState<JobDescription[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     if (!user) {
-      setLoading(false);
-      return;
-    }
-    
-    // Use cache if available
-    if (user.id === lastHRUserId && hrDataLoaded) {
-      setCandidates(cachedCandidates);
-      setJobs(cachedJobs);
+      setCandidates([]);
+      setJobs([]);
       setLoading(false);
       return;
     }
@@ -76,15 +58,11 @@ export function useHR() {
 
     if (!candidatesRes.error) {
       setCandidates(candidatesRes.data || []);
-      cachedCandidates = candidatesRes.data || [];
     }
     if (!jobsRes.error) {
       setJobs(jobsRes.data || []);
-      cachedJobs = jobsRes.data || [];
     }
     
-    lastHRUserId = user.id;
-    hrDataLoaded = true;
     setLoading(false);
   };
 

@@ -4,36 +4,19 @@ import { useAuth } from './useAuth';
 import { Workflow, WorkflowBlock, WorkflowRun } from '@/types/workflow';
 import { toast } from 'sonner';
 
-// Cache workflows in memory
-let cachedWorkflows: Workflow[] = [];
-let lastWorkflowUserId: string | null = null;
-let workflowDataLoaded = false;
-
 export function useWorkflows() {
   const { user } = useAuth();
   
-  const [workflows, setWorkflows] = useState<Workflow[]>(() => 
-    user?.id === lastWorkflowUserId ? cachedWorkflows : []
-  );
-  const [loading, setLoading] = useState(() => 
-    !(user?.id === lastWorkflowUserId && workflowDataLoaded)
-  );
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      fetchWorkflows();
-    }
+    fetchWorkflows();
   }, [user]);
 
   const fetchWorkflows = async () => {
     if (!user) {
-      setLoading(false);
-      return;
-    }
-    
-    // Use cache if available
-    if (user.id === lastWorkflowUserId && workflowDataLoaded) {
-      setWorkflows(cachedWorkflows);
+      setWorkflows([]);
       setLoading(false);
       return;
     }
@@ -54,9 +37,6 @@ export function useWorkflows() {
       }));
       
       setWorkflows(parsed);
-      cachedWorkflows = parsed;
-      lastWorkflowUserId = user.id;
-      workflowDataLoaded = true;
     } catch (error) {
       console.error('Error fetching workflows:', error);
       toast.error('Failed to load workflows');

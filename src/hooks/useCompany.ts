@@ -46,44 +46,24 @@ const ROLE_LEVELS: Record<AppRole, number> = {
   viewer: 1,
 };
 
-// Cache company data in memory to prevent re-fetching
-let cachedCompany: Company | null = null;
-let cachedUserRole: UserRole | null = null;
-let lastUserId: string | null = null;
-
 export function useCompany() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  // Initialize with cached data for instant loading
-  const [company, setCompany] = useState<Company | null>(() => 
-    user?.id === lastUserId ? cachedCompany : null
-  );
-  const [userRole, setUserRole] = useState<UserRole | null>(() => 
-    user?.id === lastUserId ? cachedUserRole : null
-  );
+  const [company, setCompany] = useState<Company | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(() => 
-    !(user?.id === lastUserId && cachedCompany)
-  );
+  const [loading, setLoading] = useState(true);
 
-  // Fetch user's company and role
   const fetchCompanyData = useCallback(async () => {
     if (!user) {
       setLoading(false);
-      return;
-    }
-
-    // If we have cached data for this user, use it immediately
-    if (user.id === lastUserId && cachedCompany) {
-      setCompany(cachedCompany);
-      setUserRole(cachedUserRole);
-      setLoading(false);
+      setCompany(null);
+      setUserRole(null);
       return;
     }
 
     try {
-      // Get user's role (will also give us company_id)
       const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('*')
@@ -102,9 +82,7 @@ export function useCompany() {
       }
 
       setUserRole(roleData as UserRole);
-      cachedUserRole = roleData as UserRole;
 
-      // Get company details
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
@@ -119,8 +97,6 @@ export function useCompany() {
 
       if (companyData) {
         setCompany(companyData as Company);
-        cachedCompany = companyData as Company;
-        lastUserId = user.id;
       }
     } catch (error) {
       console.error('Error in fetchCompanyData:', error);
@@ -133,7 +109,6 @@ export function useCompany() {
     fetchCompanyData();
   }, [fetchCompanyData]);
 
-  // Fetch team members
   const fetchTeamMembers = useCallback(async () => {
     if (!company) return;
 
@@ -154,7 +129,6 @@ export function useCompany() {
         return;
       }
 
-      // Transform data
       const members: TeamMember[] = (data || []).map((member: any) => ({
         id: member.id,
         user_id: member.user_id,
@@ -176,18 +150,15 @@ export function useCompany() {
     }
   }, [company, fetchTeamMembers]);
 
-  // Check if user has minimum role
   const hasMinRole = useCallback((minRole: AppRole): boolean => {
     if (!userRole) return false;
     return ROLE_LEVELS[userRole.role] >= ROLE_LEVELS[minRole];
   }, [userRole]);
 
-  // Create a new company (for onboarding)
   const createCompany = async (name: string, slug: string): Promise<Company | null> => {
     if (!user) return null;
 
     try {
-      // Create company
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({ name, slug })
@@ -199,7 +170,6 @@ export function useCompany() {
         return null;
       }
 
-      // Create owner role for the user
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({
@@ -213,7 +183,6 @@ export function useCompany() {
         return null;
       }
 
-      // Update profile with company_id
       await supabase
         .from('profiles')
         .update({ company_id: companyData.id })
@@ -222,7 +191,6 @@ export function useCompany() {
       setCompany(companyData as Company);
       toast({ title: 'Success', description: 'Company created successfully' });
       
-      // Refresh data
       await fetchCompanyData();
       
       return companyData as Company;
@@ -233,7 +201,6 @@ export function useCompany() {
     }
   };
 
-  // Update company settings
   const updateCompany = async (updates: Partial<Pick<Company, 'name' | 'slug' | 'logo_url' | 'primary_color'>>): Promise<boolean> => {
     if (!company || !hasMinRole('admin')) {
       toast({ title: 'Error', description: 'Insufficient permissions', variant: 'destructive' });
@@ -260,19 +227,16 @@ export function useCompany() {
     }
   };
 
-  // Invite a new team member
   const inviteTeamMember = async (email: string, role: AppRole): Promise<boolean> => {
     if (!company || !hasMinRole('admin')) {
       toast({ title: 'Error', description: 'Insufficient permissions', variant: 'destructive' });
       return false;
     }
 
-    // TODO: Implement invitation system with email
     toast({ title: 'Info', description: 'Invitation system coming soon' });
     return false;
   };
 
-  // Update team member role
   const updateMemberRole = async (memberId: string, newRole: AppRole): Promise<boolean> => {
     if (!hasMinRole('admin')) {
       toast({ title: 'Error', description: 'Insufficient permissions', variant: 'destructive' });
@@ -299,7 +263,6 @@ export function useCompany() {
     }
   };
 
-  // Remove team member
   const removeTeamMember = async (memberId: string): Promise<boolean> => {
     if (!hasMinRole('admin')) {
       toast({ title: 'Error', description: 'Insufficient permissions', variant: 'destructive' });

@@ -32,34 +32,18 @@ export interface Audit {
   created_at: string;
 }
 
-// Cache audits in memory
-let cachedAudits: Audit[] = [];
-let lastAuditUserId: string | null = null;
-let auditsLoaded = false;
-
 export function useCompliance() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  // Initialize with cached data
-  const [audits, setAudits] = useState<Audit[]>(() => 
-    user?.id === lastAuditUserId ? cachedAudits : []
-  );
-  const [loading, setLoading] = useState(() => 
-    !(user?.id === lastAuditUserId && auditsLoaded)
-  );
+  const [audits, setAudits] = useState<Audit[]>([]);
+  const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
 
   const fetchAudits = async () => {
     if (!user) {
       setLoading(false);
-      return;
-    }
-    
-    // Use cached data if available
-    if (user.id === lastAuditUserId && auditsLoaded) {
-      setAudits(cachedAudits);
-      setLoading(false);
+      setAudits([]);
       return;
     }
     
@@ -76,15 +60,12 @@ export function useCompliance() {
         recommendations: (audit.recommendations as unknown) as Recommendation[] | null
       }));
       setAudits(mappedAudits);
-      cachedAudits = mappedAudits;
-      lastAuditUserId = user.id;
-      auditsLoaded = true;
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    if (user) fetchAudits();
+    fetchAudits();
   }, [user]);
 
   const runAudit = async (auditType: string, inputText: string, title?: string): Promise<Audit | null> => {
@@ -93,7 +74,6 @@ export function useCompliance() {
     setAnalyzing(true);
     
     try {
-      // Create audit record first
       const auditTitle = title || `Audit ${auditType} - ${new Date().toLocaleDateString('fr-FR')}`;
       
       const { data: newAudit, error: createError } = await supabase
@@ -110,7 +90,6 @@ export function useCompliance() {
 
       if (createError) throw createError;
 
-      // Run AI analysis
       const auditPrompts: Record<string, string> = {
         'gdpr': `Analyse ce texte pour la conformité RGPD. Évalue:
 1. Consentement et base légale du traitement
@@ -183,10 +162,8 @@ ${inputText.slice(0, 8000)}`
 
       if (response.error) throw new Error(response.error);
 
-      // Parse AI response
       let analysis: any = {};
       try {
-        // Clean response - remove markdown code blocks if present
         let cleanContent = response.content.trim();
         if (cleanContent.startsWith('```')) {
           cleanContent = cleanContent.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
@@ -194,7 +171,6 @@ ${inputText.slice(0, 8000)}`
         analysis = JSON.parse(cleanContent);
       } catch (parseErr) {
         console.error('Failed to parse AI response:', parseErr);
-        // Create fallback analysis
         analysis = {
           score: 50,
           summary: response.content.slice(0, 500),
@@ -213,7 +189,6 @@ ${inputText.slice(0, 8000)}`
         };
       }
 
-      // Update audit with results
       const { data: updatedAudit, error: updateError } = await supabase
         .from('audits')
         .update({
@@ -235,9 +210,7 @@ ${inputText.slice(0, 8000)}`
         recommendations: (updatedAudit.recommendations as unknown) as Recommendation[] | null
       };
 
-      const newAudits = [finalAudit, ...audits.filter(a => a.id !== finalAudit.id)];
-      setAudits(newAudits);
-      cachedAudits = newAudits;
+      setAudits(prev => [finalAudit, ...prev.filter(a => a.id !== finalAudit.id)]);
       toast({ title: 'Succès', description: 'Audit de conformité terminé' });
       return finalAudit;
     } catch (err) {
@@ -259,9 +232,7 @@ ${inputText.slice(0, 8000)}`
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    const newAudits = audits.filter(a => a.id !== id);
-    setAudits(newAudits);
-    cachedAudits = newAudits;
+    setAudits(prev => prev.filter(a => a.id !== id));
     toast({ title: 'Succès', description: 'Audit supprimé' });
     return true;
   };
