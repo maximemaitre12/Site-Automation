@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useWorkflows, useWorkflowRuns } from '@/hooks/useWorkflows';
 import { Workflow, WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { WorkflowBuilder } from '@/components/flow/WorkflowBuilder';
+import { EnhancedWorkflowCanvas } from '@/components/flow/EnhancedWorkflowCanvas';
 import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
 import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
 import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
@@ -40,6 +41,7 @@ export default function Flow() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
+  const [isBlockPickerOpen, setIsBlockPickerOpen] = useState(false);
   const [newWorkflowName, setNewWorkflowName] = useState('');
   const [newWorkflowDesc, setNewWorkflowDesc] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -47,6 +49,7 @@ export default function Flow() {
   const [localBlocks, setLocalBlocks] = useState<WorkflowBlock[]>([]);
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [viewMode, setViewMode] = useState<'canvas' | 'builder'>('canvas');
 
   const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
   const { runs, loading: runsLoading, createRun, updateRun } = useWorkflowRuns(selectedWorkflowId || undefined);
@@ -294,37 +297,55 @@ export default function Flow() {
             )}
           </aside>
 
-          {/* Workflow Builder - New unified component */}
+          {/* Workflow Builder */}
           {selectedWorkflow ? (
-            <>
+            <div className="flex-1 flex flex-col overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30">
                 <div className="min-w-0">
                   <h2 className="text-base md:text-lg font-semibold text-foreground truncate">{selectedWorkflow.name}</h2>
                   {selectedWorkflow.description && <p className="text-xs md:text-sm text-muted-foreground truncate hidden sm:block">{selectedWorkflow.description}</p>}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center bg-muted rounded-lg p-0.5">
+                    <Button variant={viewMode === 'canvas' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('canvas')} className="h-7 text-xs">Canvas</Button>
+                    <Button variant={viewMode === 'builder' ? 'secondary' : 'ghost'} size="sm" onClick={() => setViewMode('builder')} className="h-7 text-xs">Liste</Button>
+                  </div>
                   {hasUnsavedChanges && <span className="text-[10px] md:text-xs text-amber-500">Non sauvegardé</span>}
                   <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges}>
-                    <Save className="w-4 h-4 md:mr-2" />
-                    <span className="hidden md:inline">Sauvegarder</span>
+                    <Save className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">Sauvegarder</span>
                   </Button>
                   <WorkflowExecutor blocks={localBlocks} connections={localConnections} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
                 </div>
               </div>
-              <WorkflowBuilder
-                blocks={localBlocks}
-                connections={localConnections}
-                selectedBlockId={selectedBlockId}
-                onSelectBlock={setSelectedBlockId}
-                onAddBlock={handleAddBlock}
-                onUpdateBlock={handleUpdateBlock}
-                onDeleteBlock={handleDeleteBlock}
-                onMoveBlock={handleMoveBlock}
-                onDuplicateBlock={handleDuplicateBlock}
-                onAddConnection={handleAddConnection}
-                onRemoveConnection={handleRemoveConnection}
-              />
-            </>
+              {viewMode === 'canvas' ? (
+                <EnhancedWorkflowCanvas
+                  blocks={localBlocks}
+                  connections={localConnections}
+                  selectedBlockId={selectedBlockId}
+                  onSelectBlock={setSelectedBlockId}
+                  onUpdateBlock={handleUpdateBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                  onDuplicateBlock={handleDuplicateBlock}
+                  onAddConnection={handleAddConnection}
+                  onRemoveConnection={handleRemoveConnection}
+                  onAddBlock={() => setIsBlockPickerOpen(true)}
+                />
+              ) : (
+                <WorkflowBuilder
+                  blocks={localBlocks}
+                  connections={localConnections}
+                  selectedBlockId={selectedBlockId}
+                  onSelectBlock={setSelectedBlockId}
+                  onAddBlock={handleAddBlock}
+                  onUpdateBlock={handleUpdateBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                  onMoveBlock={handleMoveBlock}
+                  onDuplicateBlock={handleDuplicateBlock}
+                  onAddConnection={handleAddConnection}
+                  onRemoveConnection={handleRemoveConnection}
+                />
+              )}
+            </div>
           ) : (
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center">
@@ -332,12 +353,8 @@ export default function Flow() {
                 <h3 className="text-base md:text-lg font-medium text-foreground mb-2">Sélectionnez un workflow</h3>
                 <p className="text-muted-foreground text-xs md:text-sm mb-4">Choisissez un workflow existant ou créez-en un nouveau</p>
                 <div className="flex gap-2 md:gap-3 justify-center flex-wrap">
-                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
-                    <Sparkles className="w-4 h-4 mr-2" />Générer avec l'IA
-                  </Button>
-                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />Créer un workflow
-                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}><Sparkles className="w-4 h-4 mr-2" />Générer avec l'IA</Button>
+                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}><Plus className="w-4 h-4 mr-2" />Créer un workflow</Button>
                 </div>
               </div>
             </div>
@@ -371,6 +388,30 @@ export default function Flow() {
 
       <AIWorkflowGenerator isOpen={isAIGeneratorOpen} onClose={() => setIsAIGeneratorOpen(false)} onGenerate={handleAIGenerate} />
       <TemplateGallery isOpen={isTemplateGalleryOpen} onClose={() => setIsTemplateGalleryOpen(false)} onSelect={handleTemplateSelect} />
+
+      {/* Block Picker Dialog for Canvas mode */}
+      <Dialog open={isBlockPickerOpen} onOpenChange={setIsBlockPickerOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Ajouter un bloc</DialogTitle>
+            <DialogDescription>Choisissez le type de bloc à ajouter</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 py-4">
+            {Object.entries(BLOCK_DEFINITIONS).map(([type, def]) => (
+              <button
+                key={type}
+                onClick={() => { handleAddBlock(type as BlockType); setIsBlockPickerOpen(false); }}
+                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-center"
+              >
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${def.color} flex items-center justify-center`}>
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium">{def.name}</span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
