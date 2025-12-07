@@ -59,8 +59,8 @@ export default function Auth() {
     try {
       if (mode === 'login') {
         const { error } = await signIn(email, password);
+        setLoading(false);
         if (error) {
-          setLoading(false);
           if (error.message.includes('Invalid login credentials')) {
             toast.error('Invalid email or password');
           } else {
@@ -72,8 +72,8 @@ export default function Auth() {
         }
       } else if (mode === 'signup') {
         const { error } = await signUp(email, password, name);
+        setLoading(false);
         if (error) {
-          setLoading(false);
           if (error.message.includes('already registered')) {
             toast.error('This email is already registered. Please sign in.');
           } else {
