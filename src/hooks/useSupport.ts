@@ -22,14 +22,34 @@ export interface SupportTicket {
   created_at: string;
 }
 
+// Cache tickets in memory
+let cachedTickets: SupportTicket[] = [];
+let lastSupportUserId: string | null = null;
+let supportDataLoaded = false;
+
 export function useSupport() {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const [tickets, setTickets] = useState<SupportTicket[]>(() => 
+    user?.id === lastSupportUserId ? cachedTickets : []
+  );
+  const [loading, setLoading] = useState(() => 
+    !(user?.id === lastSupportUserId && supportDataLoaded)
+  );
 
   const fetchTickets = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    // Use cache if available
+    if (user.id === lastSupportUserId && supportDataLoaded) {
+      setTickets(cachedTickets);
+      setLoading(false);
+      return;
+    }
     
     const { data, error } = await supabase
       .from('support_tickets')
@@ -37,7 +57,12 @@ export function useSupport() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (!error) setTickets(data || []);
+    if (!error) {
+      setTickets(data || []);
+      cachedTickets = data || [];
+      lastSupportUserId = user.id;
+      supportDataLoaded = true;
+    }
     setLoading(false);
   };
 

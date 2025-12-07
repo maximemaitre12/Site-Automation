@@ -46,17 +46,38 @@ const ROLE_LEVELS: Record<AppRole, number> = {
   viewer: 1,
 };
 
+// Cache company data in memory to prevent re-fetching
+let cachedCompany: Company | null = null;
+let cachedUserRole: UserRole | null = null;
+let lastUserId: string | null = null;
+
 export function useCompany() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [company, setCompany] = useState<Company | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  
+  // Initialize with cached data for instant loading
+  const [company, setCompany] = useState<Company | null>(() => 
+    user?.id === lastUserId ? cachedCompany : null
+  );
+  const [userRole, setUserRole] = useState<UserRole | null>(() => 
+    user?.id === lastUserId ? cachedUserRole : null
+  );
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => 
+    !(user?.id === lastUserId && cachedCompany)
+  );
 
   // Fetch user's company and role
   const fetchCompanyData = useCallback(async () => {
     if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    // If we have cached data for this user, use it immediately
+    if (user.id === lastUserId && cachedCompany) {
+      setCompany(cachedCompany);
+      setUserRole(cachedUserRole);
       setLoading(false);
       return;
     }
@@ -67,25 +88,28 @@ export function useCompany() {
         .from('user_roles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (roleError) {
-        // User might not have a company yet
-        if (roleError.code !== 'PGRST116') {
-          console.error('Error fetching role:', roleError);
-        }
+        console.error('Error fetching role:', roleError);
+        setLoading(false);
+        return;
+      }
+
+      if (!roleData) {
         setLoading(false);
         return;
       }
 
       setUserRole(roleData as UserRole);
+      cachedUserRole = roleData as UserRole;
 
       // Get company details
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
         .eq('id', roleData.company_id)
-        .single();
+        .maybeSingle();
 
       if (companyError) {
         console.error('Error fetching company:', companyError);
@@ -93,7 +117,11 @@ export function useCompany() {
         return;
       }
 
-      setCompany(companyData as Company);
+      if (companyData) {
+        setCompany(companyData as Company);
+        cachedCompany = companyData as Company;
+        lastUserId = user.id;
+      }
     } catch (error) {
       console.error('Error in fetchCompanyData:', error);
     } finally {

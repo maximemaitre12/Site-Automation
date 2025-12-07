@@ -35,23 +35,56 @@ export interface JobDescription {
   created_at: string;
 }
 
+// Cache data in memory
+let cachedCandidates: Candidate[] = [];
+let cachedJobs: JobDescription[] = [];
+let lastHRUserId: string | null = null;
+let hrDataLoaded = false;
+
 export function useHR() {
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [jobs, setJobs] = useState<JobDescription[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  const [candidates, setCandidates] = useState<Candidate[]>(() => 
+    user?.id === lastHRUserId ? cachedCandidates : []
+  );
+  const [jobs, setJobs] = useState<JobDescription[]>(() => 
+    user?.id === lastHRUserId ? cachedJobs : []
+  );
+  const [loading, setLoading] = useState(() => 
+    !(user?.id === lastHRUserId && hrDataLoaded)
+  );
 
   const fetchData = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    // Use cache if available
+    if (user.id === lastHRUserId && hrDataLoaded) {
+      setCandidates(cachedCandidates);
+      setJobs(cachedJobs);
+      setLoading(false);
+      return;
+    }
     
     const [candidatesRes, jobsRes] = await Promise.all([
       supabase.from('candidates').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('job_descriptions').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
     ]);
 
-    if (!candidatesRes.error) setCandidates(candidatesRes.data || []);
-    if (!jobsRes.error) setJobs(jobsRes.data || []);
+    if (!candidatesRes.error) {
+      setCandidates(candidatesRes.data || []);
+      cachedCandidates = candidatesRes.data || [];
+    }
+    if (!jobsRes.error) {
+      setJobs(jobsRes.data || []);
+      cachedJobs = jobsRes.data || [];
+    }
+    
+    lastHRUserId = user.id;
+    hrDataLoaded = true;
     setLoading(false);
   };
 
