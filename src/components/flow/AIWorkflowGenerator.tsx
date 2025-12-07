@@ -1,21 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { WorkflowBlock, BlockType, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Sparkles, Wand2, Loader2, CheckCircle, AlertCircle, 
   Lightbulb, Zap, FileText, Users, ShoppingCart, Headphones,
-  Mail, Database, Brain, TrendingUp, Shield
+  Mail, Database, Brain, TrendingUp, Shield, Edit3, Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 interface AIWorkflowGeneratorProps {
   isOpen: boolean;
   onClose: () => void;
-  onGenerate: (blocks: WorkflowBlock[], name: string, description: string) => void;
+  onGenerate: (blocks: WorkflowBlock[], name: string, description: string, connections?: BlockConnection[]) => void;
+  // Mode modification
+  existingWorkflow?: {
+    id: string;
+    name: string;
+    blocks: WorkflowBlock[];
+    connections: BlockConnection[];
+  };
+  onModify?: (blocks: WorkflowBlock[], connections: BlockConnection[]) => void;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -57,37 +66,68 @@ const EXAMPLE_PROMPTS = [
   }
 ];
 
-export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowGeneratorProps) {
+const MODIFICATION_EXAMPLES = [
+  'Ajouter une branche parallèle qui envoie un email de notification',
+  'Insérer une étape de validation humaine avant la sauvegarde',
+  'Remplacer le bloc de classification par un bloc de sentiment analysis',
+  'Ajouter un délai de 5 minutes entre les étapes',
+  'Créer une condition qui route vers différentes actions selon le score',
+  'Dupliquer la branche principale pour traiter les cas urgents différemment'
+];
+
+export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkflow, onModify }: AIWorkflowGeneratorProps) {
   const [objective, setObjective] = useState('');
   const [context, setContext] = useState('');
+  const [modificationRequest, setModificationRequest] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedPreview, setGeneratedPreview] = useState<WorkflowBlock[] | null>(null);
+  const [generatedPreview, setGeneratedPreview] = useState<{ blocks: WorkflowBlock[], connections: BlockConnection[] } | null>(null);
   const [generatedName, setGeneratedName] = useState('');
   const [step, setStep] = useState<'input' | 'preview' | 'success'>('input');
+  const [mode, setMode] = useState<'create' | 'modify'>('create');
+
+  // Set mode based on whether we have an existing workflow
+  useEffect(() => {
+    if (existingWorkflow) {
+      setMode('modify');
+    } else {
+      setMode('create');
+    }
+  }, [existingWorkflow]);
 
   const handleGenerate = async () => {
-    if (!objective.trim()) {
+    if (mode === 'create' && !objective.trim()) {
       toast.error('Please describe your workflow objective');
+      return;
+    }
+    if (mode === 'modify' && !modificationRequest.trim()) {
+      toast.error('Please describe what you want to modify');
       return;
     }
 
     setIsGenerating(true);
     setGeneratedPreview(null);
 
-    // Create abort controller for timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
 
     try {
-      console.log('Calling workflow-generate with:', { objective, context });
+      const body = mode === 'modify' && existingWorkflow
+        ? {
+            existingWorkflow: {
+              blocks: existingWorkflow.blocks,
+              connections: existingWorkflow.connections
+            },
+            modificationRequest
+          }
+        : {
+            objective,
+            context,
+            constraints: 'Keep the workflow focused and efficient. Use appropriate AI blocks for intelligent processing. Create connections between blocks.'
+          };
+
+      console.log('Calling workflow-generate with:', body);
       
-      const { data, error } = await supabase.functions.invoke('workflow-generate', {
-        body: { 
-          objective,
-          context,
-          constraints: 'Keep the workflow focused and efficient. Use appropriate AI blocks for intelligent processing.'
-        }
-      });
+      const { data, error } = await supabase.functions.invoke('workflow-generate', { body });
 
       clearTimeout(timeoutId);
 
@@ -101,13 +141,22 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
       }
 
       if (data?.workflow?.blocks && Array.isArray(data.workflow.blocks)) {
-        setGeneratedPreview(data.workflow.blocks);
-        const name = objective.length > 50 
-          ? objective.substring(0, 50) + '...'
-          : objective;
-        setGeneratedName(name);
+        setGeneratedPreview({
+          blocks: data.workflow.blocks,
+          connections: data.workflow.connections || []
+        });
+        
+        if (mode === 'create') {
+          const name = objective.length > 50 
+            ? objective.substring(0, 50) + '...'
+            : objective;
+          setGeneratedName(name);
+        } else {
+          setGeneratedName(existingWorkflow?.name || 'Modified Workflow');
+        }
+        
         setStep('preview');
-        toast.success(`Generated workflow with ${data.workflow.blocks.length} blocks`);
+        toast.success(`${mode === 'modify' ? 'Modified' : 'Generated'} workflow with ${data.workflow.blocks.length} blocks`);
       } else if (data?.error) {
         console.error('API returned error:', data.error);
         toast.error(data.error);
@@ -118,7 +167,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
     } catch (err: any) {
       console.error('Generation error:', err);
       if (err.name === 'AbortError') {
-        toast.error('Generation timeout - please try a simpler workflow');
+        toast.error('Generation timeout - please try a simpler request');
       } else {
         toast.error(err.message || 'Failed to generate workflow');
       }
@@ -130,7 +179,11 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
 
   const handleConfirm = () => {
     if (generatedPreview) {
-      onGenerate(generatedPreview, generatedName, objective);
+      if (mode === 'modify' && onModify) {
+        onModify(generatedPreview.blocks, generatedPreview.connections);
+      } else {
+        onGenerate(generatedPreview.blocks, generatedName, objective, generatedPreview.connections);
+      }
       setStep('success');
       setTimeout(() => {
         handleReset();
@@ -142,13 +195,18 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
   const handleReset = () => {
     setObjective('');
     setContext('');
+    setModificationRequest('');
     setGeneratedPreview(null);
     setGeneratedName('');
     setStep('input');
   };
 
   const useExample = (prompt: string) => {
-    setObjective(prompt);
+    if (mode === 'modify') {
+      setModificationRequest(prompt);
+    } else {
+      setObjective(prompt);
+    }
   };
 
   return (
@@ -156,103 +214,193 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${mode === 'modify' ? 'from-amber-500 to-orange-600' : 'from-violet-500 to-purple-600'} flex items-center justify-center`}>
+              {mode === 'modify' ? <Edit3 className="w-5 h-5 text-white" /> : <Sparkles className="w-5 h-5 text-white" />}
             </div>
-            AI Workflow Generator
+            {mode === 'modify' ? 'Modifier le Workflow avec l\'IA' : 'AI Workflow Generator'}
           </DialogTitle>
           <DialogDescription>
-            Describe what you want to automate in natural language and AI will design the perfect workflow for you
+            {mode === 'modify' 
+              ? `Décrivez comment vous voulez modifier "${existingWorkflow?.name}"`
+              : 'Describe what you want to automate in natural language and AI will design the perfect workflow for you'
+            }
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
           {step === 'input' && (
             <div className="space-y-6">
-              {/* Main input */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-amber-500" />
-                  What do you want to automate?
-                </label>
-                <Textarea
-                  value={objective}
-                  onChange={(e) => setObjective(e.target.value)}
-                  placeholder="Describe your workflow goal in detail. For example: 'Process customer support emails, classify by urgency, extract key information, generate response drafts, and escalate high-priority issues to the right team.'"
-                  rows={4}
-                  className="text-base"
-                />
-              </div>
+              {/* Mode tabs if we have an existing workflow */}
+              {existingWorkflow && (
+                <Tabs value={mode} onValueChange={(v) => setMode(v as 'create' | 'modify')} className="w-full">
+                  <TabsList className="grid grid-cols-2 w-full">
+                    <TabsTrigger value="modify" className="gap-2">
+                      <Edit3 className="w-4 h-4" />
+                      Modifier ce workflow
+                    </TabsTrigger>
+                    <TabsTrigger value="create" className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Créer un nouveau
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
 
-              {/* Context input */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">
-                  Additional context (optional)
-                </label>
-                <Input
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="Any specific requirements, tools to integrate, output format preferences..."
-                />
-              </div>
-
-              {/* Example prompts */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  Try an example
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {EXAMPLE_PROMPTS.map((example) => {
-                    const Icon = example.icon;
-                    return (
-                      <button
-                        key={example.title}
-                        onClick={() => useExample(example.prompt)}
-                        className="p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
-                      >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Icon className="w-4 h-4 text-primary" />
-                          </div>
-                          <span className="font-medium text-sm text-foreground">{example.title}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground line-clamp-2">{example.prompt}</span>
-                        <span className="text-[10px] mt-2 px-2 py-0.5 rounded-full bg-muted text-muted-foreground inline-block">
-                          {example.category}
+              {mode === 'modify' && existingWorkflow ? (
+                <>
+                  {/* Current workflow summary */}
+                  <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                    <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      Workflow actuel: {existingWorkflow.name}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {existingWorkflow.blocks.slice(0, 6).map((block) => {
+                        const def = BLOCK_DEFINITIONS[block.type as BlockType];
+                        return (
+                          <span 
+                            key={block.id}
+                            className={`text-xs px-2 py-1 rounded-full ${
+                              def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
+                              def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
+                              'bg-muted text-muted-foreground'
+                            }`}
+                          >
+                            {block.name}
+                          </span>
+                        );
+                      })}
+                      {existingWorkflow.blocks.length > 6 && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                          +{existingWorkflow.blocks.length - 6} autres
                         </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Modification input */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Edit3 className="w-4 h-4 text-amber-500" />
+                      Que voulez-vous modifier ?
+                    </label>
+                    <Textarea
+                      value={modificationRequest}
+                      onChange={(e) => setModificationRequest(e.target.value)}
+                      placeholder="Ex: Ajouter une branche parallèle pour envoyer une notification, insérer une étape de validation, créer des connexions entre les blocs..."
+                      rows={4}
+                      className="text-base"
+                    />
+                  </div>
+
+                  {/* Modification examples */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-muted-foreground">Exemples de modifications</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {MODIFICATION_EXAMPLES.map((example) => (
+                        <button
+                          key={example}
+                          onClick={() => useExample(example)}
+                          className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-primary/5 transition-all"
+                        >
+                          {example}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Main input for new workflow */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Lightbulb className="w-4 h-4 text-amber-500" />
+                      What do you want to automate?
+                    </label>
+                    <Textarea
+                      value={objective}
+                      onChange={(e) => setObjective(e.target.value)}
+                      placeholder="Describe your workflow goal in detail. For example: 'Process customer support emails, classify by urgency, extract key information, generate response drafts, and escalate high-priority issues to the right team.'"
+                      rows={4}
+                      className="text-base"
+                    />
+                  </div>
+
+                  {/* Context input */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Additional context (optional)
+                    </label>
+                    <Input
+                      value={context}
+                      onChange={(e) => setContext(e.target.value)}
+                      placeholder="Any specific requirements, tools to integrate, output format preferences..."
+                    />
+                  </div>
+
+                  {/* Example prompts */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Zap className="w-4 h-4" />
+                      Try an example
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {EXAMPLE_PROMPTS.map((example) => {
+                        const Icon = example.icon;
+                        return (
+                          <button
+                            key={example.title}
+                            onClick={() => useExample(example.prompt)}
+                            className="p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
+                          >
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Icon className="w-4 h-4 text-primary" />
+                              </div>
+                              <span className="font-medium text-sm text-foreground">{example.title}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground line-clamp-2">{example.prompt}</span>
+                            <span className="text-[10px] mt-2 px-2 py-0.5 rounded-full bg-muted text-muted-foreground inline-block">
+                              {example.category}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
           {step === 'preview' && generatedPreview && (
             <div className="space-y-6">
               {/* Workflow name */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Workflow Name</label>
-                <Input
-                  value={generatedName}
-                  onChange={(e) => setGeneratedName(e.target.value)}
-                  placeholder="Name your workflow"
-                />
-              </div>
+              {mode === 'create' && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Workflow Name</label>
+                  <Input
+                    value={generatedName}
+                    onChange={(e) => setGeneratedName(e.target.value)}
+                    placeholder="Name your workflow"
+                  />
+                </div>
+              )}
 
               {/* Generated blocks preview */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-medium flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-success" />
-                    Generated Workflow ({generatedPreview.length} blocks)
+                    {mode === 'modify' ? 'Workflow modifié' : 'Generated Workflow'} ({generatedPreview.blocks.length} blocs, {generatedPreview.connections.length} connexions)
                   </h4>
                 </div>
 
                 <div className="space-y-3 max-h-96 overflow-y-auto p-4 bg-muted/30 rounded-xl">
-                  {generatedPreview.map((block, index) => {
+                  {generatedPreview.blocks.map((block, index) => {
                     const def = BLOCK_DEFINITIONS[block.type as BlockType];
+                    const outgoingConnections = generatedPreview.connections.filter(c => c.sourceBlockId === block.id);
+                    
                     return (
                       <div key={block.id} className="flex items-start gap-4">
                         {/* Step number and connector */}
@@ -260,7 +408,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${def?.color || 'from-gray-500 to-gray-400'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
                             {index + 1}
                           </div>
-                          {index < generatedPreview.length - 1 && (
+                          {outgoingConnections.length > 0 && (
                             <div className="w-0.5 h-6 bg-border mt-1" />
                           )}
                         </div>
@@ -278,6 +426,11 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
                             }`}>
                               {def?.category}
                             </span>
+                            {outgoingConnections.length > 1 && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                                {outgoingConnections.length} branches
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm text-muted-foreground">{def?.description}</p>
                           {Object.keys(block.config || {}).length > 0 && (
@@ -301,10 +454,14 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
                 <div className="flex items-start gap-3">
                   <Brain className="w-5 h-5 text-primary mt-0.5" />
                   <div>
-                    <h5 className="font-medium text-sm text-foreground mb-1">AI Recommendation</h5>
+                    <h5 className="font-medium text-sm text-foreground mb-1">
+                      {mode === 'modify' ? 'Modifications appliquées' : 'AI Recommendation'}
+                    </h5>
                     <p className="text-sm text-muted-foreground">
-                      This workflow is optimized for your use case. After creation, you can customize each block's configuration, 
-                      add more blocks, or adjust the flow to match your exact requirements.
+                      {mode === 'modify' 
+                        ? 'Vérifiez les changements ci-dessus. Après confirmation, vous pourrez ajuster les blocs et les connexions sur le canvas.'
+                        : 'This workflow is optimized for your use case. After creation, you can customize each block\'s configuration, add more blocks, or adjust the flow to match your exact requirements.'
+                      }
                     </p>
                   </div>
                 </div>
@@ -317,9 +474,14 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
               <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mb-6 animate-bounce">
                 <CheckCircle className="w-10 h-10 text-success" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Workflow Created!</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                {mode === 'modify' ? 'Workflow modifié !' : 'Workflow Created!'}
+              </h3>
               <p className="text-muted-foreground text-center">
-                Your AI-generated workflow is ready. You can now customize and run it.
+                {mode === 'modify' 
+                  ? 'Les modifications ont été appliquées. Vous pouvez maintenant ajuster sur le canvas.'
+                  : 'Your AI-generated workflow is ready. You can now customize and run it.'
+                }
               </p>
             </div>
           )}
@@ -331,30 +493,30 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
             <div>
               {step === 'preview' && (
                 <Button variant="ghost" onClick={handleReset}>
-                  Start Over
+                  Recommencer
                 </Button>
               )}
             </div>
             <div className="flex gap-3">
               <Button variant="outline" onClick={onClose}>
-                Cancel
+                Annuler
               </Button>
               {step === 'input' && (
                 <Button
                   variant="hero"
                   onClick={handleGenerate}
-                  disabled={isGenerating || !objective.trim()}
+                  disabled={isGenerating || (mode === 'create' ? !objective.trim() : !modificationRequest.trim())}
                   className="min-w-32"
                 >
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Generating...
+                      {mode === 'modify' ? 'Modification...' : 'Generating...'}
                     </>
                   ) : (
                     <>
                       <Wand2 className="w-4 h-4 mr-2" />
-                      Generate Workflow
+                      {mode === 'modify' ? 'Modifier' : 'Generate Workflow'}
                     </>
                   )}
                 </Button>
@@ -362,7 +524,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate }: AIWorkflowG
               {step === 'preview' && (
                 <Button variant="hero" onClick={handleConfirm}>
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  Create Workflow
+                  {mode === 'modify' ? 'Appliquer' : 'Create Workflow'}
                 </Button>
               )}
             </div>
