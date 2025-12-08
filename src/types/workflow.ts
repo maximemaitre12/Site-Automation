@@ -33,16 +33,93 @@ export type BlockType =
   | 'control_merge'
   // Workflow
   | 'workflow_call'
-  // Integrations
+  // HTTP & Webhooks
   | 'http_request'
   | 'http_webhook'
+  // Communication (Messaging & Social)
   | 'integration_telegram'
   | 'integration_slack'
   | 'integration_discord'
-  | 'integration_twilio_sms'
+  | 'integration_whatsapp'
+  | 'integration_teams'
+  | 'integration_intercom'
+  | 'integration_zendesk'
+  | 'integration_freshdesk'
+  | 'integration_crisp'
+  // Email Services
   | 'integration_sendgrid'
+  | 'integration_mailchimp'
+  | 'integration_brevo'
+  | 'integration_mailgun'
+  | 'integration_resend'
+  | 'integration_convertkit'
+  // SMS & Phone
+  | 'integration_twilio_sms'
+  | 'integration_twilio_voice'
+  // AI & ML Providers
+  | 'integration_openai'
+  | 'integration_anthropic'
+  | 'integration_google_ai'
+  | 'integration_mistral'
+  | 'integration_huggingface'
+  | 'integration_replicate'
+  | 'integration_stability'
+  | 'integration_elevenlabs'
+  | 'integration_deepgram'
+  | 'integration_assemblyai'
+  // CRM & Sales
+  | 'integration_hubspot'
+  | 'integration_salesforce'
+  | 'integration_pipedrive'
+  | 'integration_zoho'
+  // Productivity & Databases
   | 'integration_notion'
   | 'integration_airtable'
+  | 'integration_google_sheets'
+  | 'integration_google_calendar'
+  | 'integration_trello'
+  | 'integration_asana'
+  | 'integration_monday'
+  | 'integration_clickup'
+  | 'integration_jira'
+  | 'integration_linear'
+  | 'integration_calendly'
+  // Storage & Files
+  | 'integration_google_drive'
+  | 'integration_dropbox'
+  | 'integration_onedrive'
+  | 'integration_box'
+  | 'integration_aws_s3'
+  // Payments & Finance
+  | 'integration_stripe'
+  | 'integration_paypal'
+  | 'integration_shopify'
+  | 'integration_quickbooks'
+  // Social Media
+  | 'integration_twitter'
+  | 'integration_linkedin'
+  | 'integration_facebook'
+  | 'integration_instagram'
+  | 'integration_youtube'
+  | 'integration_tiktok'
+  // Development & DevOps
+  | 'integration_github'
+  | 'integration_gitlab'
+  | 'integration_vercel'
+  | 'integration_supabase'
+  | 'integration_firebase'
+  // Analytics
+  | 'integration_google_analytics'
+  | 'integration_mixpanel'
+  | 'integration_segment'
+  | 'integration_amplitude'
+  // Automation & No-Code
+  | 'integration_zapier'
+  | 'integration_make'
+  | 'integration_n8n'
+  // Video & Meetings
+  | 'integration_zoom'
+  | 'integration_loom'
   // System Actions
   | 'system_email'
   | 'system_webhook'
@@ -51,6 +128,22 @@ export type BlockType =
   | 'system_log';
 
 export type BlockCategory = 'trigger' | 'ai' | 'transform' | 'control' | 'integration' | 'system';
+
+// Sub-categories for better organization in UI
+export type IntegrationSubCategory = 
+  | 'communication' 
+  | 'email' 
+  | 'ai_providers' 
+  | 'crm' 
+  | 'productivity' 
+  | 'storage' 
+  | 'payments' 
+  | 'social' 
+  | 'dev' 
+  | 'analytics' 
+  | 'automation' 
+  | 'video'
+  | 'sms';
 
 export interface BlockConnection {
   id: string;
@@ -477,6 +570,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
       { key: 'retry', label: 'Retry on Failure', type: 'boolean', defaultValue: true }
     ]
   },
+
+  // ===== COMMUNICATION (Messaging & Chat) =====
   integration_telegram: {
     name: 'Telegram',
     category: 'integration',
@@ -510,52 +605,879 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
       { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Flow' }
     ]
   },
+  integration_whatsapp: {
+    name: 'WhatsApp Business',
+    category: 'integration',
+    color: 'from-green-500 to-emerald-400',
+    icon: 'MessageCircle',
+    description: 'Send WhatsApp message via Business API',
+    configFields: [
+      { key: 'to', label: 'Phone Number', type: 'text', placeholder: '+33612345678', required: true },
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'WhatsApp message' }
+    ]
+  },
+  integration_teams: {
+    name: 'Microsoft Teams',
+    category: 'integration',
+    color: 'from-violet-600 to-purple-500',
+    icon: 'MessageSquare',
+    description: 'Post message to Teams channel',
+    configFields: [
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', placeholder: 'https://outlook.office.com/webhook/...', required: true },
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Teams notification' }
+    ]
+  },
+  integration_intercom: {
+    name: 'Intercom',
+    category: 'integration',
+    color: 'from-blue-500 to-blue-400',
+    icon: 'MessageSquare',
+    description: 'Send message or create conversation in Intercom',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['send_message', 'create_contact', 'create_conversation'] },
+      { key: 'userId', label: 'User ID', type: 'text', placeholder: 'user_id or email' },
+      { key: 'message', label: 'Message', type: 'textarea' }
+    ]
+  },
+  integration_zendesk: {
+    name: 'Zendesk',
+    category: 'integration',
+    color: 'from-green-600 to-teal-500',
+    icon: 'Headphones',
+    description: 'Create or update Zendesk tickets',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_ticket', 'update_ticket', 'add_comment'] },
+      { key: 'subject', label: 'Subject', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'priority', label: 'Priority', type: 'select', options: ['low', 'normal', 'high', 'urgent'] }
+    ]
+  },
+  integration_freshdesk: {
+    name: 'Freshdesk',
+    category: 'integration',
+    color: 'from-green-500 to-lime-400',
+    icon: 'Headphones',
+    description: 'Create Freshdesk tickets',
+    configFields: [
+      { key: 'subject', label: 'Subject', type: 'text', required: true },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'email', label: 'Requester Email', type: 'text' },
+      { key: 'priority', label: 'Priority', type: 'select', options: ['1', '2', '3', '4'] }
+    ]
+  },
+  integration_crisp: {
+    name: 'Crisp',
+    category: 'integration',
+    color: 'from-purple-600 to-pink-500',
+    icon: 'MessageCircle',
+    description: 'Send messages via Crisp chat',
+    configFields: [
+      { key: 'websiteId', label: 'Website ID', type: 'text', required: true },
+      { key: 'sessionId', label: 'Session ID', type: 'text' },
+      { key: 'message', label: 'Message', type: 'textarea' }
+    ]
+  },
+
+  // ===== EMAIL MARKETING =====
+  integration_sendgrid: {
+    name: 'SendGrid',
+    category: 'integration',
+    color: 'from-blue-500 to-cyan-400',
+    icon: 'Mail',
+    description: 'Send transactional emails via SendGrid',
+    configFields: [
+      { key: 'to', label: 'To Email', type: 'text', placeholder: 'recipient@example.com', required: true },
+      { key: 'from', label: 'From Email', type: 'text', placeholder: 'sender@yourdomain.com', required: true },
+      { key: 'subject', label: 'Subject', type: 'text' },
+      { key: 'message', label: 'Body', type: 'textarea' }
+    ]
+  },
+  integration_mailchimp: {
+    name: 'Mailchimp',
+    category: 'integration',
+    color: 'from-yellow-500 to-amber-400',
+    icon: 'Mail',
+    description: 'Add subscribers or send campaigns',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['add_subscriber', 'update_subscriber', 'send_campaign'] },
+      { key: 'listId', label: 'List/Audience ID', type: 'text', required: true },
+      { key: 'email', label: 'Email Address', type: 'text' },
+      { key: 'mergeFields', label: 'Merge Fields (JSON)', type: 'json' }
+    ]
+  },
+  integration_brevo: {
+    name: 'Brevo (Sendinblue)',
+    category: 'integration',
+    color: 'from-blue-600 to-indigo-500',
+    icon: 'Mail',
+    description: 'Email marketing and transactional emails',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['send_email', 'create_contact', 'send_campaign'] },
+      { key: 'to', label: 'To Email', type: 'text' },
+      { key: 'subject', label: 'Subject', type: 'text' },
+      { key: 'htmlContent', label: 'HTML Content', type: 'textarea' }
+    ]
+  },
+  integration_mailgun: {
+    name: 'Mailgun',
+    category: 'integration',
+    color: 'from-red-600 to-red-400',
+    icon: 'Mail',
+    description: 'Send emails via Mailgun API',
+    configFields: [
+      { key: 'to', label: 'To', type: 'text', required: true },
+      { key: 'from', label: 'From', type: 'text', required: true },
+      { key: 'subject', label: 'Subject', type: 'text' },
+      { key: 'text', label: 'Text Body', type: 'textarea' },
+      { key: 'html', label: 'HTML Body', type: 'textarea' }
+    ]
+  },
+  integration_resend: {
+    name: 'Resend',
+    category: 'integration',
+    color: 'from-gray-800 to-gray-600',
+    icon: 'Mail',
+    description: 'Modern email API for developers',
+    configFields: [
+      { key: 'to', label: 'To', type: 'text', required: true },
+      { key: 'from', label: 'From', type: 'text', required: true },
+      { key: 'subject', label: 'Subject', type: 'text' },
+      { key: 'html', label: 'HTML Content', type: 'textarea' }
+    ]
+  },
+  integration_convertkit: {
+    name: 'ConvertKit',
+    category: 'integration',
+    color: 'from-rose-500 to-pink-400',
+    icon: 'Mail',
+    description: 'Email marketing for creators',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['add_subscriber', 'add_tag', 'remove_tag'] },
+      { key: 'email', label: 'Subscriber Email', type: 'text', required: true },
+      { key: 'formId', label: 'Form ID', type: 'text' },
+      { key: 'tagId', label: 'Tag ID', type: 'text' }
+    ]
+  },
+
+  // ===== SMS & PHONE =====
   integration_twilio_sms: {
     name: 'Twilio SMS',
     category: 'integration',
     color: 'from-red-500 to-pink-400',
     icon: 'Phone',
-    description: 'Send an SMS via Twilio',
+    description: 'Send SMS via Twilio',
     configFields: [
       { key: 'to', label: 'To Phone Number', type: 'text', placeholder: '+33612345678', required: true },
       { key: 'from', label: 'From Phone Number', type: 'text', placeholder: '+15558675309', required: true },
-      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'SMS content' }
+      { key: 'message', label: 'Message', type: 'textarea' }
     ]
   },
-  integration_sendgrid: {
-    name: 'SendGrid Email',
+  integration_twilio_voice: {
+    name: 'Twilio Voice',
     category: 'integration',
-    color: 'from-blue-500 to-cyan-400',
-    icon: 'Mail',
-    description: 'Send an email via SendGrid',
+    color: 'from-red-600 to-rose-500',
+    icon: 'Phone',
+    description: 'Make phone calls via Twilio',
     configFields: [
-      { key: 'to', label: 'To Email', type: 'text', placeholder: 'recipient@example.com', required: true },
-      { key: 'from', label: 'From Email', type: 'text', placeholder: 'sender@yourdomain.com', required: true },
-      { key: 'subject', label: 'Subject', type: 'text', placeholder: 'Email subject' },
-      { key: 'message', label: 'Body', type: 'textarea', placeholder: 'Email content' }
+      { key: 'to', label: 'To Phone Number', type: 'text', required: true },
+      { key: 'from', label: 'From Phone Number', type: 'text', required: true },
+      { key: 'twiml', label: 'TwiML or URL', type: 'textarea', placeholder: '<Response><Say>Hello!</Say></Response>' }
     ]
   },
+
+  // ===== AI & ML PROVIDERS =====
+  integration_openai: {
+    name: 'OpenAI',
+    category: 'integration',
+    color: 'from-emerald-600 to-teal-500',
+    icon: 'Brain',
+    description: 'Use GPT-4, DALL-E, Whisper APIs',
+    configFields: [
+      { key: 'model', label: 'Model', type: 'select', options: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo', 'dall-e-3', 'whisper-1'] },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 },
+      { key: 'temperature', label: 'Temperature', type: 'number', defaultValue: 0.7 }
+    ]
+  },
+  integration_anthropic: {
+    name: 'Anthropic Claude',
+    category: 'integration',
+    color: 'from-orange-500 to-amber-400',
+    icon: 'Brain',
+    description: 'Use Claude AI models',
+    configFields: [
+      { key: 'model', label: 'Model', type: 'select', options: ['claude-3-opus', 'claude-3-sonnet', 'claude-3-haiku'] },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
+    ]
+  },
+  integration_google_ai: {
+    name: 'Google AI (Gemini)',
+    category: 'integration',
+    color: 'from-blue-500 to-sky-400',
+    icon: 'Brain',
+    description: 'Use Gemini Pro and other Google AI models',
+    configFields: [
+      { key: 'model', label: 'Model', type: 'select', options: ['gemini-pro', 'gemini-pro-vision', 'gemini-ultra'] },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'temperature', label: 'Temperature', type: 'number', defaultValue: 0.7 }
+    ]
+  },
+  integration_mistral: {
+    name: 'Mistral AI',
+    category: 'integration',
+    color: 'from-orange-600 to-red-500',
+    icon: 'Brain',
+    description: 'Use Mistral language models',
+    configFields: [
+      { key: 'model', label: 'Model', type: 'select', options: ['mistral-large', 'mistral-medium', 'mistral-small'] },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
+    ]
+  },
+  integration_huggingface: {
+    name: 'Hugging Face',
+    category: 'integration',
+    color: 'from-yellow-500 to-orange-400',
+    icon: 'Brain',
+    description: 'Run inference on HF models',
+    configFields: [
+      { key: 'modelId', label: 'Model ID', type: 'text', placeholder: 'facebook/bart-large-cnn', required: true },
+      { key: 'inputs', label: 'Inputs', type: 'textarea' },
+      { key: 'parameters', label: 'Parameters (JSON)', type: 'json' }
+    ]
+  },
+  integration_replicate: {
+    name: 'Replicate',
+    category: 'integration',
+    color: 'from-gray-700 to-gray-500',
+    icon: 'Brain',
+    description: 'Run ML models in the cloud',
+    configFields: [
+      { key: 'model', label: 'Model Version', type: 'text', placeholder: 'owner/model:version', required: true },
+      { key: 'input', label: 'Input (JSON)', type: 'json', required: true }
+    ]
+  },
+  integration_stability: {
+    name: 'Stability AI',
+    category: 'integration',
+    color: 'from-purple-600 to-indigo-500',
+    icon: 'Image',
+    description: 'Generate images with Stable Diffusion',
+    configFields: [
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'negativePrompt', label: 'Negative Prompt', type: 'textarea' },
+      { key: 'width', label: 'Width', type: 'number', defaultValue: 1024 },
+      { key: 'height', label: 'Height', type: 'number', defaultValue: 1024 }
+    ]
+  },
+  integration_elevenlabs: {
+    name: 'ElevenLabs',
+    category: 'integration',
+    color: 'from-gray-800 to-gray-600',
+    icon: 'Volume2',
+    description: 'Text-to-speech synthesis',
+    configFields: [
+      { key: 'text', label: 'Text', type: 'textarea', required: true },
+      { key: 'voiceId', label: 'Voice ID', type: 'text', placeholder: 'rachel, adam, etc.' },
+      { key: 'modelId', label: 'Model', type: 'select', options: ['eleven_monolingual_v1', 'eleven_multilingual_v2'] }
+    ]
+  },
+  integration_deepgram: {
+    name: 'Deepgram',
+    category: 'integration',
+    color: 'from-green-600 to-emerald-500',
+    icon: 'Mic',
+    description: 'Speech-to-text transcription',
+    configFields: [
+      { key: 'audioUrl', label: 'Audio URL', type: 'text', required: true },
+      { key: 'language', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de', 'it', 'pt'] },
+      { key: 'model', label: 'Model', type: 'select', options: ['nova-2', 'enhanced', 'base'] }
+    ]
+  },
+  integration_assemblyai: {
+    name: 'AssemblyAI',
+    category: 'integration',
+    color: 'from-blue-700 to-blue-500',
+    icon: 'Mic',
+    description: 'Advanced speech recognition',
+    configFields: [
+      { key: 'audioUrl', label: 'Audio URL', type: 'text', required: true },
+      { key: 'languageCode', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de'] },
+      { key: 'speakerLabels', label: 'Speaker Detection', type: 'boolean', defaultValue: false }
+    ]
+  },
+
+  // ===== CRM & SALES =====
+  integration_hubspot: {
+    name: 'HubSpot',
+    category: 'integration',
+    color: 'from-orange-500 to-red-400',
+    icon: 'Users',
+    description: 'CRM operations with HubSpot',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_contact', 'update_contact', 'create_deal', 'create_task'] },
+      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
+    ]
+  },
+  integration_salesforce: {
+    name: 'Salesforce',
+    category: 'integration',
+    color: 'from-blue-600 to-sky-500',
+    icon: 'Cloud',
+    description: 'CRM operations with Salesforce',
+    configFields: [
+      { key: 'object', label: 'Object', type: 'select', options: ['Lead', 'Contact', 'Account', 'Opportunity', 'Case'] },
+      { key: 'action', label: 'Action', type: 'select', options: ['create', 'update', 'query', 'delete'] },
+      { key: 'data', label: 'Record Data (JSON)', type: 'json' }
+    ]
+  },
+  integration_pipedrive: {
+    name: 'Pipedrive',
+    category: 'integration',
+    color: 'from-green-600 to-emerald-500',
+    icon: 'TrendingUp',
+    description: 'Sales CRM operations',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_deal', 'create_person', 'create_organization', 'update_deal'] },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+  integration_zoho: {
+    name: 'Zoho CRM',
+    category: 'integration',
+    color: 'from-red-600 to-yellow-500',
+    icon: 'Users',
+    description: 'Zoho CRM operations',
+    configFields: [
+      { key: 'module', label: 'Module', type: 'select', options: ['Leads', 'Contacts', 'Accounts', 'Deals', 'Tasks'] },
+      { key: 'action', label: 'Action', type: 'select', options: ['create', 'update', 'search', 'delete'] },
+      { key: 'data', label: 'Record Data (JSON)', type: 'json' }
+    ]
+  },
+
+  // ===== PRODUCTIVITY & DATABASES =====
   integration_notion: {
     name: 'Notion',
     category: 'integration',
-    color: 'from-gray-600 to-gray-400',
+    color: 'from-gray-800 to-gray-600',
     icon: 'FileText',
-    description: 'Create a page in Notion database',
+    description: 'Create pages and database entries',
     configFields: [
-      { key: 'databaseId', label: 'Database ID', type: 'text', placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', required: true },
-      { key: 'properties', label: 'Properties (JSON)', type: 'json', placeholder: '{"Name": {"title": [{"text": {"content": "My Page"}}]}}' }
+      { key: 'action', label: 'Action', type: 'select', options: ['create_page', 'update_page', 'query_database'] },
+      { key: 'databaseId', label: 'Database ID', type: 'text' },
+      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
     ]
   },
   integration_airtable: {
     name: 'Airtable',
     category: 'integration',
-    color: 'from-green-500 to-teal-400',
+    color: 'from-yellow-500 to-green-400',
     icon: 'Table',
-    description: 'Create a record in Airtable',
+    description: 'Database operations with Airtable',
     configFields: [
-      { key: 'baseId', label: 'Base ID', type: 'text', placeholder: 'appXXXXXXXXXXXXXX', required: true },
-      { key: 'tableId', label: 'Table Name or ID', type: 'text', placeholder: 'Table 1', required: true },
-      { key: 'fields', label: 'Fields (JSON)', type: 'json', placeholder: '{"Name": "New Record", "Status": "Active"}' }
+      { key: 'action', label: 'Action', type: 'select', options: ['create_record', 'update_record', 'list_records', 'delete_record'] },
+      { key: 'baseId', label: 'Base ID', type: 'text', required: true },
+      { key: 'tableId', label: 'Table Name', type: 'text', required: true },
+      { key: 'fields', label: 'Fields (JSON)', type: 'json' }
+    ]
+  },
+  integration_google_sheets: {
+    name: 'Google Sheets',
+    category: 'integration',
+    color: 'from-green-500 to-emerald-400',
+    icon: 'Table',
+    description: 'Read/write Google Sheets data',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['read', 'append', 'update', 'clear'] },
+      { key: 'spreadsheetId', label: 'Spreadsheet ID', type: 'text', required: true },
+      { key: 'range', label: 'Range', type: 'text', placeholder: 'Sheet1!A1:D10' },
+      { key: 'values', label: 'Values (JSON)', type: 'json' }
+    ]
+  },
+  integration_google_calendar: {
+    name: 'Google Calendar',
+    category: 'integration',
+    color: 'from-blue-500 to-indigo-400',
+    icon: 'Calendar',
+    description: 'Create and manage calendar events',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_event', 'update_event', 'list_events', 'delete_event'] },
+      { key: 'calendarId', label: 'Calendar ID', type: 'text', defaultValue: 'primary' },
+      { key: 'summary', label: 'Event Title', type: 'text' },
+      { key: 'startTime', label: 'Start Time', type: 'text', placeholder: '2024-01-15T09:00:00Z' },
+      { key: 'endTime', label: 'End Time', type: 'text', placeholder: '2024-01-15T10:00:00Z' }
+    ]
+  },
+  integration_trello: {
+    name: 'Trello',
+    category: 'integration',
+    color: 'from-blue-500 to-sky-400',
+    icon: 'Columns',
+    description: 'Manage Trello boards and cards',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_card', 'update_card', 'move_card', 'add_comment'] },
+      { key: 'boardId', label: 'Board ID', type: 'text' },
+      { key: 'listId', label: 'List ID', type: 'text' },
+      { key: 'name', label: 'Card Name', type: 'text' },
+      { key: 'desc', label: 'Description', type: 'textarea' }
+    ]
+  },
+  integration_asana: {
+    name: 'Asana',
+    category: 'integration',
+    color: 'from-rose-500 to-pink-400',
+    icon: 'CheckSquare',
+    description: 'Project management with Asana',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_task', 'update_task', 'complete_task', 'add_comment'] },
+      { key: 'projectId', label: 'Project ID', type: 'text' },
+      { key: 'name', label: 'Task Name', type: 'text' },
+      { key: 'notes', label: 'Notes', type: 'textarea' },
+      { key: 'dueOn', label: 'Due Date', type: 'text', placeholder: 'YYYY-MM-DD' }
+    ]
+  },
+  integration_monday: {
+    name: 'Monday.com',
+    category: 'integration',
+    color: 'from-red-500 to-orange-400',
+    icon: 'Columns',
+    description: 'Work management with Monday',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_item', 'update_item', 'change_column'] },
+      { key: 'boardId', label: 'Board ID', type: 'text', required: true },
+      { key: 'groupId', label: 'Group ID', type: 'text' },
+      { key: 'itemName', label: 'Item Name', type: 'text' },
+      { key: 'columnValues', label: 'Column Values (JSON)', type: 'json' }
+    ]
+  },
+  integration_clickup: {
+    name: 'ClickUp',
+    category: 'integration',
+    color: 'from-purple-600 to-violet-500',
+    icon: 'CheckSquare',
+    description: 'Task management with ClickUp',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_task', 'update_task', 'create_comment'] },
+      { key: 'listId', label: 'List ID', type: 'text', required: true },
+      { key: 'name', label: 'Task Name', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'status', label: 'Status', type: 'text' }
+    ]
+  },
+  integration_jira: {
+    name: 'Jira',
+    category: 'integration',
+    color: 'from-blue-600 to-blue-400',
+    icon: 'Bug',
+    description: 'Issue tracking with Jira',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_issue', 'update_issue', 'transition_issue', 'add_comment'] },
+      { key: 'projectKey', label: 'Project Key', type: 'text', required: true },
+      { key: 'issueType', label: 'Issue Type', type: 'select', options: ['Bug', 'Task', 'Story', 'Epic'] },
+      { key: 'summary', label: 'Summary', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' }
+    ]
+  },
+  integration_linear: {
+    name: 'Linear',
+    category: 'integration',
+    color: 'from-purple-700 to-indigo-600',
+    icon: 'Zap',
+    description: 'Modern issue tracking',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_issue', 'update_issue', 'create_comment'] },
+      { key: 'teamId', label: 'Team ID', type: 'text' },
+      { key: 'title', label: 'Title', type: 'text', required: true },
+      { key: 'description', label: 'Description', type: 'textarea' },
+      { key: 'priority', label: 'Priority', type: 'select', options: ['0', '1', '2', '3', '4'] }
+    ]
+  },
+  integration_calendly: {
+    name: 'Calendly',
+    category: 'integration',
+    color: 'from-blue-500 to-cyan-400',
+    icon: 'Calendar',
+    description: 'Scheduling automation',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['list_events', 'get_event', 'cancel_event'] },
+      { key: 'eventUri', label: 'Event URI', type: 'text' },
+      { key: 'minStartTime', label: 'Min Start Time', type: 'text' },
+      { key: 'maxStartTime', label: 'Max Start Time', type: 'text' }
+    ]
+  },
+
+  // ===== STORAGE & FILES =====
+  integration_google_drive: {
+    name: 'Google Drive',
+    category: 'integration',
+    color: 'from-yellow-500 to-green-400',
+    icon: 'HardDrive',
+    description: 'Upload and manage files in Drive',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list', 'delete', 'create_folder'] },
+      { key: 'folderId', label: 'Folder ID', type: 'text' },
+      { key: 'fileName', label: 'File Name', type: 'text' },
+      { key: 'mimeType', label: 'MIME Type', type: 'text' }
+    ]
+  },
+  integration_dropbox: {
+    name: 'Dropbox',
+    category: 'integration',
+    color: 'from-blue-500 to-blue-400',
+    icon: 'HardDrive',
+    description: 'File storage with Dropbox',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list', 'delete', 'create_folder'] },
+      { key: 'path', label: 'Path', type: 'text', placeholder: '/folder/file.txt' },
+      { key: 'mode', label: 'Write Mode', type: 'select', options: ['add', 'overwrite'] }
+    ]
+  },
+  integration_onedrive: {
+    name: 'OneDrive',
+    category: 'integration',
+    color: 'from-blue-600 to-sky-500',
+    icon: 'Cloud',
+    description: 'Microsoft OneDrive storage',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list', 'delete'] },
+      { key: 'path', label: 'Path', type: 'text' },
+      { key: 'fileName', label: 'File Name', type: 'text' }
+    ]
+  },
+  integration_box: {
+    name: 'Box',
+    category: 'integration',
+    color: 'from-blue-700 to-blue-500',
+    icon: 'Box',
+    description: 'Enterprise file storage',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list', 'delete', 'share'] },
+      { key: 'folderId', label: 'Folder ID', type: 'text' },
+      { key: 'fileName', label: 'File Name', type: 'text' }
+    ]
+  },
+  integration_aws_s3: {
+    name: 'AWS S3',
+    category: 'integration',
+    color: 'from-orange-500 to-yellow-400',
+    icon: 'Database',
+    description: 'Amazon S3 object storage',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['put_object', 'get_object', 'list_objects', 'delete_object'] },
+      { key: 'bucket', label: 'Bucket Name', type: 'text', required: true },
+      { key: 'key', label: 'Object Key', type: 'text' },
+      { key: 'region', label: 'Region', type: 'text', defaultValue: 'us-east-1' }
+    ]
+  },
+
+  // ===== PAYMENTS & FINANCE =====
+  integration_stripe: {
+    name: 'Stripe',
+    category: 'integration',
+    color: 'from-purple-600 to-indigo-500',
+    icon: 'CreditCard',
+    description: 'Payment processing with Stripe',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_customer', 'create_payment', 'create_subscription', 'create_invoice'] },
+      { key: 'email', label: 'Customer Email', type: 'text' },
+      { key: 'amount', label: 'Amount (cents)', type: 'number' },
+      { key: 'currency', label: 'Currency', type: 'select', options: ['usd', 'eur', 'gbp'] }
+    ]
+  },
+  integration_paypal: {
+    name: 'PayPal',
+    category: 'integration',
+    color: 'from-blue-700 to-sky-500',
+    icon: 'CreditCard',
+    description: 'PayPal payment operations',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_order', 'capture_payment', 'refund', 'send_invoice'] },
+      { key: 'amount', label: 'Amount', type: 'number' },
+      { key: 'currency', label: 'Currency', type: 'select', options: ['USD', 'EUR', 'GBP'] },
+      { key: 'recipientEmail', label: 'Recipient Email', type: 'text' }
+    ]
+  },
+  integration_shopify: {
+    name: 'Shopify',
+    category: 'integration',
+    color: 'from-green-600 to-lime-500',
+    icon: 'ShoppingCart',
+    description: 'E-commerce with Shopify',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_product', 'update_inventory', 'create_order', 'get_orders'] },
+      { key: 'shop', label: 'Shop Domain', type: 'text', placeholder: 'mystore.myshopify.com' },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+  integration_quickbooks: {
+    name: 'QuickBooks',
+    category: 'integration',
+    color: 'from-green-700 to-emerald-600',
+    icon: 'Calculator',
+    description: 'Accounting with QuickBooks',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_invoice', 'create_customer', 'create_payment', 'get_reports'] },
+      { key: 'realmId', label: 'Company ID', type: 'text' },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+
+  // ===== SOCIAL MEDIA =====
+  integration_twitter: {
+    name: 'Twitter/X',
+    category: 'integration',
+    color: 'from-gray-800 to-gray-600',
+    icon: 'Twitter',
+    description: 'Post tweets and manage Twitter',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['post_tweet', 'reply', 'retweet', 'like', 'search'] },
+      { key: 'text', label: 'Tweet Text', type: 'textarea', placeholder: 'Max 280 characters' },
+      { key: 'replyToId', label: 'Reply To Tweet ID', type: 'text' }
+    ]
+  },
+  integration_linkedin: {
+    name: 'LinkedIn',
+    category: 'integration',
+    color: 'from-blue-700 to-blue-500',
+    icon: 'Linkedin',
+    description: 'Post to LinkedIn',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_post', 'share_article'] },
+      { key: 'text', label: 'Post Text', type: 'textarea' },
+      { key: 'visibility', label: 'Visibility', type: 'select', options: ['PUBLIC', 'CONNECTIONS'] }
+    ]
+  },
+  integration_facebook: {
+    name: 'Facebook',
+    category: 'integration',
+    color: 'from-blue-600 to-indigo-500',
+    icon: 'Facebook',
+    description: 'Post to Facebook pages',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_post', 'create_photo', 'get_insights'] },
+      { key: 'pageId', label: 'Page ID', type: 'text' },
+      { key: 'message', label: 'Message', type: 'textarea' }
+    ]
+  },
+  integration_instagram: {
+    name: 'Instagram',
+    category: 'integration',
+    color: 'from-pink-500 to-purple-500',
+    icon: 'Instagram',
+    description: 'Instagram Business API',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_media', 'publish_media', 'get_insights'] },
+      { key: 'imageUrl', label: 'Image URL', type: 'text' },
+      { key: 'caption', label: 'Caption', type: 'textarea' }
+    ]
+  },
+  integration_youtube: {
+    name: 'YouTube',
+    category: 'integration',
+    color: 'from-red-600 to-red-500',
+    icon: 'Youtube',
+    description: 'YouTube Data API',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['upload_video', 'update_video', 'get_analytics', 'list_videos'] },
+      { key: 'videoId', label: 'Video ID', type: 'text' },
+      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' }
+    ]
+  },
+  integration_tiktok: {
+    name: 'TikTok',
+    category: 'integration',
+    color: 'from-gray-900 to-gray-700',
+    icon: 'Video',
+    description: 'TikTok for Business API',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['upload_video', 'get_analytics'] },
+      { key: 'videoUrl', label: 'Video URL', type: 'text' },
+      { key: 'caption', label: 'Caption', type: 'textarea' }
+    ]
+  },
+
+  // ===== DEVELOPMENT & DEVOPS =====
+  integration_github: {
+    name: 'GitHub',
+    category: 'integration',
+    color: 'from-gray-800 to-gray-600',
+    icon: 'Github',
+    description: 'GitHub repository operations',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_issue', 'create_pr', 'add_comment', 'create_release', 'trigger_workflow'] },
+      { key: 'owner', label: 'Owner', type: 'text', required: true },
+      { key: 'repo', label: 'Repository', type: 'text', required: true },
+      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'body', label: 'Body', type: 'textarea' }
+    ]
+  },
+  integration_gitlab: {
+    name: 'GitLab',
+    category: 'integration',
+    color: 'from-orange-600 to-red-500',
+    icon: 'Gitlab',
+    description: 'GitLab project operations',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_issue', 'create_mr', 'add_note', 'trigger_pipeline'] },
+      { key: 'projectId', label: 'Project ID', type: 'text', required: true },
+      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'description', label: 'Description', type: 'textarea' }
+    ]
+  },
+  integration_vercel: {
+    name: 'Vercel',
+    category: 'integration',
+    color: 'from-gray-900 to-gray-700',
+    icon: 'Triangle',
+    description: 'Vercel deployment operations',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_deployment', 'list_deployments', 'get_deployment'] },
+      { key: 'projectId', label: 'Project ID', type: 'text' },
+      { key: 'target', label: 'Target', type: 'select', options: ['production', 'preview'] }
+    ]
+  },
+  integration_supabase: {
+    name: 'Supabase',
+    category: 'integration',
+    color: 'from-emerald-600 to-green-500',
+    icon: 'Database',
+    description: 'Supabase database & auth',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['select', 'insert', 'update', 'delete', 'rpc'] },
+      { key: 'table', label: 'Table', type: 'text', required: true },
+      { key: 'data', label: 'Data (JSON)', type: 'json' },
+      { key: 'filters', label: 'Filters (JSON)', type: 'json' }
+    ]
+  },
+  integration_firebase: {
+    name: 'Firebase',
+    category: 'integration',
+    color: 'from-yellow-500 to-orange-400',
+    icon: 'Flame',
+    description: 'Firebase Firestore & Realtime DB',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['get', 'set', 'update', 'delete', 'query'] },
+      { key: 'collection', label: 'Collection', type: 'text', required: true },
+      { key: 'document', label: 'Document ID', type: 'text' },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+
+  // ===== ANALYTICS =====
+  integration_google_analytics: {
+    name: 'Google Analytics',
+    category: 'integration',
+    color: 'from-orange-500 to-yellow-400',
+    icon: 'BarChart3',
+    description: 'Track events and get reports',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['track_event', 'get_report'] },
+      { key: 'measurementId', label: 'Measurement ID', type: 'text' },
+      { key: 'eventName', label: 'Event Name', type: 'text' },
+      { key: 'eventParams', label: 'Event Params (JSON)', type: 'json' }
+    ]
+  },
+  integration_mixpanel: {
+    name: 'Mixpanel',
+    category: 'integration',
+    color: 'from-purple-600 to-indigo-500',
+    icon: 'BarChart2',
+    description: 'Product analytics tracking',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['track', 'set_profile', 'import_events'] },
+      { key: 'event', label: 'Event Name', type: 'text' },
+      { key: 'distinctId', label: 'Distinct ID', type: 'text' },
+      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
+    ]
+  },
+  integration_segment: {
+    name: 'Segment',
+    category: 'integration',
+    color: 'from-green-600 to-teal-500',
+    icon: 'Activity',
+    description: 'Customer data platform',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['track', 'identify', 'page', 'group'] },
+      { key: 'userId', label: 'User ID', type: 'text' },
+      { key: 'event', label: 'Event', type: 'text' },
+      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
+    ]
+  },
+  integration_amplitude: {
+    name: 'Amplitude',
+    category: 'integration',
+    color: 'from-blue-600 to-cyan-500',
+    icon: 'LineChart',
+    description: 'Product analytics platform',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['track', 'identify', 'set_group'] },
+      { key: 'userId', label: 'User ID', type: 'text' },
+      { key: 'eventType', label: 'Event Type', type: 'text' },
+      { key: 'eventProperties', label: 'Event Properties (JSON)', type: 'json' }
+    ]
+  },
+
+  // ===== AUTOMATION =====
+  integration_zapier: {
+    name: 'Zapier Webhooks',
+    category: 'integration',
+    color: 'from-orange-500 to-red-400',
+    icon: 'Zap',
+    description: 'Trigger Zapier workflows',
+    configFields: [
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+  integration_make: {
+    name: 'Make (Integromat)',
+    category: 'integration',
+    color: 'from-purple-600 to-pink-500',
+    icon: 'Workflow',
+    description: 'Trigger Make scenarios',
+    configFields: [
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+  integration_n8n: {
+    name: 'n8n',
+    category: 'integration',
+    color: 'from-red-600 to-orange-500',
+    icon: 'GitBranch',
+    description: 'Trigger n8n workflows',
+    configFields: [
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
+      { key: 'method', label: 'Method', type: 'select', options: ['GET', 'POST'] },
+      { key: 'data', label: 'Data (JSON)', type: 'json' }
+    ]
+  },
+
+  // ===== VIDEO & MEETINGS =====
+  integration_zoom: {
+    name: 'Zoom',
+    category: 'integration',
+    color: 'from-blue-500 to-sky-400',
+    icon: 'Video',
+    description: 'Zoom meeting management',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['create_meeting', 'get_meeting', 'list_meetings', 'delete_meeting'] },
+      { key: 'topic', label: 'Meeting Topic', type: 'text' },
+      { key: 'startTime', label: 'Start Time', type: 'text', placeholder: '2024-01-15T09:00:00Z' },
+      { key: 'duration', label: 'Duration (minutes)', type: 'number', defaultValue: 60 }
+    ]
+  },
+  integration_loom: {
+    name: 'Loom',
+    category: 'integration',
+    color: 'from-purple-500 to-indigo-400',
+    icon: 'Video',
+    description: 'Loom video management',
+    configFields: [
+      { key: 'action', label: 'Action', type: 'select', options: ['get_video', 'list_videos', 'get_transcript'] },
+      { key: 'videoId', label: 'Video ID', type: 'text' }
     ]
   },
 
@@ -565,7 +1487,7 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'system',
     color: 'from-red-500 to-rose-400',
     icon: 'Mail',
-    description: 'Send an email',
+    description: 'Send an email notification',
     configFields: [
       { key: 'to', label: 'To', type: 'text', placeholder: 'recipient@example.com' },
       { key: 'subject', label: 'Subject', type: 'text', placeholder: 'Workflow Notification' },
