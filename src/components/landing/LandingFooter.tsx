@@ -9,63 +9,46 @@ const links = {
     { label: "Compliance", path: "/tools/compliance" },
     { label: "Sales", path: "/tools/sales" },
   ],
-  resources: [
-    { label: "Documentation", path: "#" },
-    { label: "API", path: "#" },
-    { label: "Blog", path: "#" },
-    { label: "Changelog", path: "#" },
-  ],
   company: [
     { label: "À propos", path: "#" },
     { label: "Carrières", path: "#" },
+    { label: "Blog", path: "#" },
     { label: "Contact", path: "#" },
+  ],
+  resources: [
+    { label: "Documentation", path: "#" },
+    { label: "API", path: "#" },
+    { label: "Statut", path: "#" },
   ],
   legal: [
     { label: "Confidentialité", path: "#" },
-    { label: "CGU", path: "#" },
-    { label: "RGPD", path: "#" },
+    { label: "Conditions", path: "#" },
+    { label: "Sécurité", path: "#" },
   ],
 };
 
 export function LandingFooter() {
   return (
-    <footer className="bg-foreground text-background">
-      <div className="max-w-6xl mx-auto px-6 py-16">
+    <footer className="bg-background border-t border-border">
+      <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[hsl(280_100%_55%)] to-[hsl(250_100%_55%)] flex items-center justify-center">
-                <span className="text-sm font-bold text-white">A</span>
-              </div>
-              <span className="text-lg font-bold text-background">AETHER</span>
+            <Link to="/" className="text-lg font-semibold text-foreground">
+              AETHER
             </Link>
-            <p className="text-sm text-background/60">
-              La plateforme d'automatisation IA pour entreprises modernes.
+            <p className="text-sm text-muted-foreground mt-3">
+              Automatisation intelligente pour l'entreprise.
             </p>
           </div>
           
           {/* Product */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Produit</h4>
-            <ul className="space-y-2">
+            <h4 className="text-sm font-medium text-foreground mb-4">Produit</h4>
+            <ul className="space-y-3">
               {links.product.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-background/60 hover:text-background transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Resources */}
-          <div>
-            <h4 className="font-semibold text-background mb-4">Ressources</h4>
-            <ul className="space-y-2">
-              {links.resources.map((link) => (
-                <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-background/60 hover:text-background transition-colors">
+                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -75,11 +58,25 @@ export function LandingFooter() {
           
           {/* Company */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Entreprise</h4>
-            <ul className="space-y-2">
+            <h4 className="text-sm font-medium text-foreground mb-4">Entreprise</h4>
+            <ul className="space-y-3">
               {links.company.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-background/60 hover:text-background transition-colors">
+                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Resources */}
+          <div>
+            <h4 className="text-sm font-medium text-foreground mb-4">Ressources</h4>
+            <ul className="space-y-3">
+              {links.resources.map((link) => (
+                <li key={link.label}>
+                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -89,11 +86,11 @@ export function LandingFooter() {
           
           {/* Legal */}
           <div>
-            <h4 className="font-semibold text-background mb-4">Légal</h4>
-            <ul className="space-y-2">
+            <h4 className="text-sm font-medium text-foreground mb-4">Légal</h4>
+            <ul className="space-y-3">
               {links.legal.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-background/60 hover:text-background transition-colors">
+                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -103,13 +100,13 @@ export function LandingFooter() {
         </div>
         
         {/* Bottom */}
-        <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-background/60">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} AETHER. Tous droits réservés.
           </p>
           <div className="flex items-center gap-6">
             {["Twitter", "LinkedIn", "GitHub"].map((social) => (
-              <a key={social} href="#" className="text-sm text-background/60 hover:text-background transition-colors">
+              <a key={social} href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 {social}
               </a>
             ))}

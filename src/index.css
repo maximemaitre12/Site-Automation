@@ -7,73 +7,75 @@
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
 
-/* AETHER AI SUITE - Premium Light Design System
-   Clean, bright, confident - inspired by Linear, Notion, Stripe */
+/* AETHER AI SUITE - Clean Minimal Design System
+   Inspired by OpenAI, Anthropic, Apple - Pure elegance */
 
 @layer base {
   :root {
-    /* Pure light background */
+    /* Pure white background */
     --background: 0 0% 100%;
-    --foreground: 240 10% 10%;
+    --foreground: 0 0% 9%;
 
-    --card: 0 0% 99%;
-    --card-foreground: 240 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
+    --popover-foreground: 0 0% 9%;
 
-    /* Vibrant violet-blue primary */
-    --primary: 250 100% 60%;
+    /* Neutral black as primary */
+    --primary: 0 0% 9%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 10%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 240 5% 92%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 250 100% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 5% 90%;
-    --input: 240 5% 92%;
-    --ring: 250 100% 60%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 9%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Sidebar - slightly darker for contrast */
-    --sidebar-background: 240 5% 98%;
-    --sidebar-foreground: 240 10% 10%;
-    --sidebar-primary: 250 100% 60%;
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 0 0% 9%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 94%;
-    --sidebar-accent-foreground: 240 10% 10%;
-    --sidebar-border: 240 5% 90%;
-    --sidebar-ring: 250 100% 60%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 0% 9%;
 
     /* States */
-    --success: 160 84% 39%;
+    --success: 160 60% 40%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
   }
 
   .dark {
-    --background: 240 10% 4%;
+    --background: 0 0% 5%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 6%;
+    --card: 0 0% 8%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 5%;
+    --popover: 0 0% 5%;
     --popover-foreground: 0 0% 98%;
-    --secondary: 240 10% 10%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 10% 15%;
-    --muted-foreground: 240 5% 55%;
-    --border: 240 10% 15%;
-    --input: 240 10% 12%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --border: 0 0% 18%;
+    --input: 0 0% 15%;
   }
 }
 
@@ -86,6 +88,7 @@
     font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv11", "ss01";
   }
 
   body {
@@ -99,63 +102,22 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(240 5% 96%);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(240 5% 80%);
+    background: hsl(0 0% 85%);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(250 100% 60%);
+    background: hsl(0 0% 70%);
   }
 }
 
 @layer utilities {
-  /* Vibrant gradient text */
-  .text-gradient {
-    background: linear-gradient(135deg, hsl(280 100% 55%) 0%, hsl(250 100% 55%) 50%, hsl(220 100% 55%) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Subtle gradient for sections */
-  .bg-gradient-subtle {
-    background: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(250 50% 98%) 100%);
-  }
-
-  /* Card with subtle shadow */
-  .card-elevated {
-    background: white;
-    box-shadow: 
-      0 0 0 1px hsl(240 5% 90%),
-      0 2px 4px hsl(240 10% 10% / 0.02),
-      0 8px 16px hsl(240 10% 10% / 0.04);
-  }
-
-  /* Premium button glow */
-  .btn-glow {
-    box-shadow: 0 4px 14px hsl(250 100% 60% / 0.35);
-  }
-
-  .btn-glow:hover {
-    box-shadow: 0 6px 20px hsl(250 100% 60% / 0.45);
-  }
-
-  /* Dot pattern background */
-  .dot-pattern {
-    background-image: radial-gradient(hsl(240 5% 85%) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  /* Grid pattern */
-  .grid-pattern {
-    background-image: 
-      linear-gradient(to right, hsl(240 5% 92%) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(240 5% 92%) 1px, transparent 1px);
-    background-size: 48px 48px;
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
@@ -163,7 +125,7 @@
 @keyframes fade-up {
   from { 
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to { 
     opacity: 1;
@@ -171,35 +133,26 @@
   }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
 .animate-fade-up {
-  animation: fade-up 0.6s ease-out forwards;
+  animation: fade-up 0.5s ease-out forwards;
 }
 
 .animate-fade-up-delay-1 {
-  animation: fade-up 0.6s ease-out 0.1s forwards;
+  animation: fade-up 0.5s ease-out 0.1s forwards;
   opacity: 0;
 }
 
 .animate-fade-up-delay-2 {
-  animation: fade-up 0.6s ease-out 0.2s forwards;
+  animation: fade-up 0.5s ease-out 0.2s forwards;
   opacity: 0;
 }
 
 .animate-fade-up-delay-3 {
-  animation: fade-up 0.6s ease-out 0.3s forwards;
+  animation: fade-up 0.5s ease-out 0.3s forwards;
   opacity: 0;
 }
 
 .animate-fade-up-delay-4 {
-  animation: fade-up 0.6s ease-out 0.4s forwards;
+  animation: fade-up 0.5s ease-out 0.4s forwards;
   opacity: 0;
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
 }
