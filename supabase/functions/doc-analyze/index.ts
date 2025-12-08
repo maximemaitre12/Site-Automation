@@ -85,11 +85,23 @@ serve(async (req) => {
       : contentToAnalyze;
 
     // Analyze with AI
-    const systemPrompt = `Tu es un expert en analyse de documents d'entreprise. Tu extrais les informations clés de manière structurée.
+    const systemPrompt = `Tu es un expert en analyse et révision de documents d'entreprise. Tu fournis une analyse ACTIONNABLE et UTILE.
 
 Retourne TOUJOURS un JSON valide avec exactement cette structure:
 {
   "summary": "Résumé concis du document en 2-3 phrases",
+  "strengths": ["Point fort 1", "Point fort 2", "Point fort 3"],
+  "weaknesses": ["Point faible ou amélioration possible 1", "Point faible 2"],
+  "spellingErrors": [
+    {"original": "mot mal écrit", "correction": "correction suggérée", "context": "phrase où apparaît l'erreur"},
+    {"original": "autre erreur", "correction": "correction", "context": "contexte"}
+  ],
+  "grammarIssues": [
+    {"issue": "description du problème grammatical", "suggestion": "correction suggérée", "context": "phrase concernée"}
+  ],
+  "styleIssues": [
+    {"issue": "problème de style détecté", "suggestion": "amélioration suggérée"}
+  ],
   "keywords": ["mot1", "mot2", "mot3", "mot4", "mot5"],
   "entities": {
     "personnes": ["noms de personnes mentionnées"],
@@ -99,12 +111,21 @@ Retourne TOUJOURS un JSON valide avec exactement cette structure:
     "lieux": ["lieux mentionnés"]
   },
   "category": "contrat|rapport|procedure|facture|presentation|correspondance|technique|autre",
+  "readabilityScore": 85,
+  "readabilityComment": "Commentaire sur la lisibilité (facile à lire, phrases trop longues, etc.)",
+  "recommendations": ["Recommandation d'amélioration 1", "Recommandation 2"],
   "sentiment": "positif|neutre|negatif",
-  "language": "fr|en|autre",
-  "actionItems": ["actions à effectuer si mentionnées"]
-}`;
+  "language": "fr|en|autre"
+}
 
-    const userPrompt = `Analyse ce document et extrait les informations clés:
+IMPORTANT:
+- Détecte TOUTES les fautes d'orthographe et coquilles
+- Identifie les problèmes de grammaire (accords, conjugaisons, syntaxe)
+- Évalue les points forts ET faibles du document
+- Donne un score de lisibilité sur 100
+- Fournis des recommandations concrètes d'amélioration`;
+
+    const userPrompt = `Analyse ce document en profondeur - détecte les erreurs, points forts/faibles:
 
 Titre: ${document.title}
 Type de fichier: ${document.file_type || 'inconnu'}
@@ -163,7 +184,11 @@ Retourne uniquement le JSON, sans texte supplémentaire.`;
         summary: analysisContent.substring(0, 500),
         keywords: [],
         entities: {},
-        category: 'autre'
+        category: 'autre',
+        strengths: [],
+        weaknesses: [],
+        spellingErrors: [],
+        recommendations: []
       };
     }
 
@@ -181,7 +206,14 @@ Retourne uniquement le JSON, sans texte supplémentaire.`;
             category: analysis.category,
             sentiment: analysis.sentiment,
             language: analysis.language,
-            actionItems: analysis.actionItems || [],
+            strengths: analysis.strengths || [],
+            weaknesses: analysis.weaknesses || [],
+            spellingErrors: analysis.spellingErrors || [],
+            grammarIssues: analysis.grammarIssues || [],
+            styleIssues: analysis.styleIssues || [],
+            readabilityScore: analysis.readabilityScore,
+            readabilityComment: analysis.readabilityComment,
+            recommendations: analysis.recommendations || [],
             analyzedAt: new Date().toISOString()
           }
         }
