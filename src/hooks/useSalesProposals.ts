@@ -69,13 +69,32 @@ export function useSalesProposals() {
       const response = await callAI({
         messages: [{
           role: 'user',
-          content: `Génère une proposition commerciale professionnelle en français:
+          content: `Tu es un commercial senior expert. Génère une proposition commerciale NATURELLE et HUMAINE en français.
+
+RÈGLES STRICTES:
+- INTERDIT d'utiliser des astérisques (*), des étoiles, du markdown, des titres avec #
+- Écrire comme un humain, pas comme une IA
+- Phrases courtes et percutantes
+- Pas de longs paragraphes ennuyeux
+- Aller droit au but
+- Ton professionnel mais chaleureux
+
 Client: ${data.prospectName}
 Produit: ${data.productName}
-Persona/Contact: ${data.persona}
+Contact: ${data.persona}
 Objections potentielles: ${data.objections}
 
-Génère une proposition structurée avec: introduction, valeur ajoutée, réponse aux objections, call-to-action.`
+Réponds en JSON avec cette structure exacte (sans markdown autour):
+{
+  "accroche": "Une phrase d'accroche percutante personnalisée",
+  "probleme": "Le problème principal du client en 1-2 phrases",
+  "solution": "Comment notre solution résout ce problème en 2-3 phrases",
+  "benefices": ["Bénéfice concret 1", "Bénéfice concret 2", "Bénéfice concret 3"],
+  "preuves": "Chiffres ou témoignages courts",
+  "objection_reponse": "Réponse à la principale objection",
+  "prochaine_etape": "Une action concrète simple",
+  "email_court": "Un email de 4-5 lignes max, direct et humain"
+}`
         }],
         type: 'generate'
       });
