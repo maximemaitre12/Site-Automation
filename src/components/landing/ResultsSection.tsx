@@ -14,25 +14,35 @@ const testimonial = {
 
 export function ResultsSection() {
   return (
-    <section className="py-24 lg:py-32 bg-background border-t border-border">
-      <div className="max-w-5xl mx-auto px-6">
+    <section className="py-24 lg:py-32 bg-secondary/50">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+            Des résultats mesurables
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Nos clients transforment leurs opérations et mesurent l'impact dès les premières semaines.
+          </p>
+        </div>
+        
         {/* Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-24">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-20">
           {metrics.map((metric, i) => (
-            <div key={i}>
-              <div className="text-4xl md:text-5xl font-semibold text-foreground mb-2">{metric.value}</div>
+            <div key={i} className="text-center p-6 rounded-2xl bg-background border border-border">
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{metric.value}</div>
               <p className="text-sm text-muted-foreground">{metric.label}</p>
             </div>
           ))}
         </div>
         
         {/* Testimonial */}
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto text-center">
           <blockquote className="text-2xl md:text-3xl font-medium text-foreground leading-snug mb-8">
             "{testimonial.quote}"
           </blockquote>
           <div>
-            <p className="font-medium text-foreground">{testimonial.author}</p>
+            <p className="font-semibold text-foreground">{testimonial.author}</p>
             <p className="text-sm text-muted-foreground">{testimonial.role}, {testimonial.company}</p>
           </div>
         </div>

@@ -52,7 +52,7 @@ export function LandingHeader() {
               </Button>
             </Link>
             <Link to="/demo">
-              <Button size="sm" className="text-sm bg-foreground text-background hover:bg-foreground/90">
+              <Button size="sm" className="text-sm">
                 Commencer
               </Button>
             </Link>
@@ -81,7 +81,7 @@ export function LandingHeader() {
                   <Button variant="outline" size="sm" className="w-full text-sm">Se connecter</Button>
                 </Link>
                 <Link to="/demo" className="flex-1">
-                  <Button size="sm" className="w-full text-sm bg-foreground text-background">Commencer</Button>
+                  <Button size="sm" className="w-full text-sm">Commencer</Button>
                 </Link>
               </div>
             </nav>
