@@ -6,10 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { StorySection } from "@/components/landing/StorySection";
-import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { PainPointsSection } from "@/components/landing/PainPointsSection";
 import { ToolsShowcaseSection } from "@/components/landing/ToolsShowcaseSection";
-import { TrustSection } from "@/components/landing/TrustSection";
 import { ResultsSection } from "@/components/landing/ResultsSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 
@@ -44,12 +42,8 @@ export default function Landing() {
       
       <main>
         <HeroSection />
-        <StorySection />
-        <div id="how-it-works">
-          <HowItWorksSection />
-        </div>
+        <PainPointsSection />
         <ToolsShowcaseSection />
-        <TrustSection />
         <ResultsSection />
         <FinalCTASection />
       </main>
