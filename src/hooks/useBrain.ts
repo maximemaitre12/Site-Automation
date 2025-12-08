@@ -135,6 +135,10 @@ export function useBrain() {
   const createConversation = async (initialMessage?: string): Promise<Conversation | null> => {
     if (!user) return null;
 
+    // Reset streaming state when creating new conversation
+    setStreamingContent('');
+    setSendingMessage(false);
+
     const newConv: Partial<Conversation> = {
       title: initialMessage?.slice(0, 50) || 'Nouvelle conversation',
       messages: [],
@@ -287,6 +291,10 @@ Réponds en français de manière concise, professionnelle et utile.`;
   };
 
   const selectConversation = (id: string) => {
+    // Reset streaming state when switching conversations
+    setStreamingContent('');
+    setSendingMessage(false);
+    
     const conv = conversations.find(c => c.id === id);
     if (conv) setCurrentConversation(conv);
   };
