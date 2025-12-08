@@ -61,6 +61,96 @@ export type Database = {
           },
         ]
       }
+      aether_documents: {
+        Row: {
+          access_level: string | null
+          ai_entities: Json | null
+          ai_keywords: Json | null
+          ai_summary: string | null
+          content: string | null
+          created_at: string
+          description: string | null
+          embedding_status: string | null
+          extracted_data: Json | null
+          file_size: number | null
+          file_type: string | null
+          file_url: string | null
+          folder_id: string | null
+          id: string
+          metadata: Json | null
+          status: string | null
+          tags: Json | null
+          template_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          version: number | null
+        }
+        Insert: {
+          access_level?: string | null
+          ai_entities?: Json | null
+          ai_keywords?: Json | null
+          ai_summary?: string | null
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          embedding_status?: string | null
+          extracted_data?: Json | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
+          folder_id?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          tags?: Json | null
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          version?: number | null
+        }
+        Update: {
+          access_level?: string | null
+          ai_entities?: Json | null
+          ai_keywords?: Json | null
+          ai_summary?: string | null
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          embedding_status?: string | null
+          extracted_data?: Json | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
+          folder_id?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          tags?: Json | null
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aether_documents_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "doc_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "aether_documents_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "doc_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -367,6 +457,165 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      doc_access_logs: {
+        Row: {
+          action: string
+          created_at: string
+          document_id: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          document_id: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_access_logs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "aether_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doc_folders: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "doc_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doc_templates: {
+        Row: {
+          branding: Json | null
+          category: string
+          content_structure: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          is_system: boolean | null
+          name: string
+          updated_at: string
+          user_id: string
+          variables: Json | null
+        }
+        Insert: {
+          branding?: Json | null
+          category?: string
+          content_structure?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system?: boolean | null
+          name: string
+          updated_at?: string
+          user_id: string
+          variables?: Json | null
+        }
+        Update: {
+          branding?: Json | null
+          category?: string
+          content_structure?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system?: boolean | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      doc_versions: {
+        Row: {
+          changes_summary: string | null
+          content: string | null
+          created_at: string
+          created_by: string
+          document_id: string
+          file_url: string | null
+          id: string
+          version_number: number
+        }
+        Insert: {
+          changes_summary?: string | null
+          content?: string | null
+          created_at?: string
+          created_by: string
+          document_id: string
+          file_url?: string | null
+          id?: string
+          version_number: number
+        }
+        Update: {
+          changes_summary?: string | null
+          content?: string | null
+          created_at?: string
+          created_by?: string
+          document_id?: string
+          file_url?: string | null
+          id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "aether_documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       documents: {
         Row: {
