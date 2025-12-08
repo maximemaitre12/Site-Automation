@@ -1,15 +1,17 @@
-import { Brain, User, Copy, Check } from "lucide-react";
+import { Brain, User, Copy, Check, FileImage, File } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Attachment } from "@/lib/ai-stream";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
   content: string;
   timestamp?: Date;
+  attachments?: Attachment[];
 }
 
-export function ChatMessage({ role, content, timestamp }: ChatMessageProps) {
+export function ChatMessage({ role, content, timestamp, attachments }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async () => {
@@ -41,6 +43,34 @@ export function ChatMessage({ role, content, timestamp }: ChatMessageProps) {
           ? "bg-card border border-border" 
           : "bg-primary text-primary-foreground"
       )}>
+        {/* Attachments */}
+        {attachments && attachments.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {attachments.map((att, idx) => (
+              <div key={idx} className={cn(
+                "flex items-center gap-2 px-2 py-1 rounded-md",
+                role === 'assistant' ? "bg-muted" : "bg-primary-foreground/10"
+              )}>
+                {att.type === 'image' ? (
+                  <>
+                    <img 
+                      src={att.content} 
+                      alt={att.name} 
+                      className="w-16 h-16 rounded object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => window.open(att.content, '_blank')}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <File className="w-4 h-4" />
+                    <span className="text-sm">{att.name}</span>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        
         <div className="prose prose-sm max-w-none dark:prose-invert">
           {content.split('\n').map((line, i) => (
             <p key={i} className={cn(
