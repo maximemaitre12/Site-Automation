@@ -97,12 +97,12 @@ const DataCatalog = () => {
                 <div className="space-y-2">
                   <Label>Source</Label>
                   <Select 
-                    value={formData.source_id} 
-                    onValueChange={(v) => setFormData({ ...formData, source_id: v })}
+                    value={formData.source_id || "none"} 
+                    onValueChange={(v) => setFormData({ ...formData, source_id: v === "none" ? "" : v })}
                   >
                     <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Aucune</SelectItem>
+                      <SelectItem value="none">Aucune</SelectItem>
                       {sources.map(source => (
                         <SelectItem key={source.id} value={source.id}>{source.name}</SelectItem>
                       ))}
