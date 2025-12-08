@@ -817,6 +817,222 @@ export type Database = {
           },
         ]
       }
+      data_catalog: {
+        Row: {
+          column_count: number | null
+          created_at: string
+          description: string | null
+          id: string
+          last_updated_at: string | null
+          lineage: Json | null
+          name: string
+          owner: string | null
+          pii_detected: boolean | null
+          quality_score: number | null
+          row_count: number | null
+          schema_info: Json | null
+          sensitivity_level: string | null
+          source_id: string | null
+          tags: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          column_count?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_updated_at?: string | null
+          lineage?: Json | null
+          name: string
+          owner?: string | null
+          pii_detected?: boolean | null
+          quality_score?: number | null
+          row_count?: number | null
+          schema_info?: Json | null
+          sensitivity_level?: string | null
+          source_id?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          column_count?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_updated_at?: string | null
+          lineage?: Json | null
+          name?: string
+          owner?: string | null
+          pii_detected?: boolean | null
+          quality_score?: number | null
+          row_count?: number | null
+          schema_info?: Json | null
+          sensitivity_level?: string | null
+          source_id?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_catalog_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_pipeline_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          pipeline_name: string
+          records_failed: number | null
+          records_processed: number | null
+          source_id: string | null
+          started_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          pipeline_name: string
+          records_failed?: number | null
+          records_processed?: number | null
+          source_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          pipeline_name?: string
+          records_failed?: number | null
+          records_processed?: number | null
+          source_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_pipeline_runs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_quality_checks: {
+        Row: {
+          catalog_id: string | null
+          check_name: string
+          check_type: string
+          created_at: string
+          details: Json | null
+          executed_at: string | null
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          catalog_id?: string | null
+          check_name: string
+          check_type: string
+          created_at?: string
+          details?: Json | null
+          executed_at?: string | null
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          catalog_id?: string | null
+          check_name?: string
+          check_type?: string
+          created_at?: string
+          details?: Json | null
+          executed_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_quality_checks_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "data_catalog"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_sources: {
+        Row: {
+          config: Json | null
+          connector: string
+          created_at: string
+          error_message: string | null
+          id: string
+          last_sync_at: string | null
+          name: string
+          records_count: number | null
+          source_type: string
+          status: string | null
+          sync_frequency: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          config?: Json | null
+          connector: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          name: string
+          records_count?: number | null
+          source_type: string
+          status?: string | null
+          sync_frequency?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          config?: Json | null
+          connector?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          name?: string
+          records_count?: number | null
+          source_type?: string
+          status?: string | null
+          sync_frequency?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       datasets: {
         Row: {
           ai_insights: Json | null
