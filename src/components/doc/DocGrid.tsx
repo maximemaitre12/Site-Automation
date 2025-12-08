@@ -121,6 +121,16 @@ export function DocGrid({
                   )}
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  {doc.embedding_status === 'pending' && (
+                    <Badge variant="outline" className="text-xs text-amber-600 border-amber-300 bg-amber-50">
+                      Analyse...
+                    </Badge>
+                  )}
+                  {doc.embedding_status === 'completed' && doc.ai_summary && (
+                    <Badge variant="outline" className="text-xs text-primary border-primary/30 bg-primary/5">
+                      ✨ IA
+                    </Badge>
+                  )}
                   {doc.tags && doc.tags.length > 0 && (
                     <div className="flex gap-1">
                       {doc.tags.slice(0, 2).map((tag: string) => (
@@ -253,9 +263,14 @@ export function DocGrid({
                 )}
 
                 {/* AI Status */}
-                {doc.ai_summary && (
-                  <Badge variant="outline" className="mt-2 text-xs text-primary">
-                    IA analysé
+                {doc.embedding_status === 'pending' && (
+                  <Badge variant="outline" className="mt-2 text-xs text-amber-600 border-amber-300 bg-amber-50">
+                    Analyse en cours...
+                  </Badge>
+                )}
+                {doc.embedding_status === 'completed' && doc.ai_summary && (
+                  <Badge variant="outline" className="mt-2 text-xs text-primary border-primary/30 bg-primary/5">
+                    ✨ IA analysé
                   </Badge>
                 )}
               </div>

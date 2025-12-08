@@ -143,7 +143,7 @@ export function DocUploadDialog({
                 type="file"
                 className="hidden"
                 onChange={handleFileChange}
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.csv,.jpg,.jpeg,.png,.gif,.webp"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.csv,.jpg,.jpeg,.png,.gif,.webp,.json,.xml"
               />
               {file ? (
                 <div className="flex items-center justify-center gap-3">
