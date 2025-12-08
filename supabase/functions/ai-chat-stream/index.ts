@@ -7,11 +7,15 @@ const corsHeaders = {
 };
 
 interface ChatRequest {
-  messages: Array<{ role: string; content: string }>;
+  messages: Array<{ role: string; content: string | any[] }>;
   systemPrompt?: string;
   userId?: string;
-  enableWebSearch?: boolean;
-  enableDocumentSearch?: boolean;
+  attachments?: Array<{
+    type: 'image' | 'document';
+    content: string; // base64 or text content
+    name: string;
+    mimeType?: string;
+  }>;
 }
 
 serve(async (req) => {
@@ -20,7 +24,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, systemPrompt, userId, enableWebSearch = false, enableDocumentSearch = true } = await req.json() as ChatRequest;
+    const { messages, systemPrompt, userId, attachments } = await req.json() as ChatRequest;
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -31,7 +35,7 @@ serve(async (req) => {
     let documentContext = '';
 
     // Fetch documents if userId is provided
-    if (userId && enableDocumentSearch) {
+    if (userId) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
@@ -56,7 +60,10 @@ serve(async (req) => {
       if (allDocs.length > 0) {
         // Get the last user message for relevance scoring
         const lastUserMessage = messages.filter(m => m.role === 'user').pop();
-        const queryWords = (lastUserMessage?.content || '').toLowerCase().split(/\s+/).filter(w => w.length > 2);
+        const msgContent = typeof lastUserMessage?.content === 'string' 
+          ? lastUserMessage.content 
+          : (lastUserMessage?.content as any[])?.find(c => c.type === 'text')?.text || '';
+        const queryWords = msgContent.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
 
         // Score and sort documents
         const scoredDocs = allDocs.map(doc => {
@@ -64,7 +71,7 @@ serve(async (req) => {
           const titleLower = doc.title.toLowerCase();
           const contentLower = doc.content.toLowerCase();
           
-          queryWords.forEach(word => {
+          queryWords.forEach((word: string) => {
             if (titleLower.includes(word)) score += 5;
             if (contentLower.includes(word)) score += 1;
           });
@@ -79,7 +86,7 @@ serve(async (req) => {
 
         if (selectedDocs.length > 0) {
           documentContext = `\n\n=== BASE DE CONNAISSANCES INTERNE ===\nVoici les documents internes de l'entreprise à utiliser pour répondre:\n`;
-          selectedDocs.forEach((doc, i) => {
+          selectedDocs.forEach((doc) => {
             const excerpt = doc.content.slice(0, 1200);
             documentContext += `\n[${doc.title}]\n${excerpt}${doc.content.length > 1200 ? '...' : ''}\n`;
           });
@@ -87,23 +94,63 @@ serve(async (req) => {
       }
     }
 
+    // Add attachment context
+    let attachmentContext = '';
+    if (attachments && attachments.length > 0) {
+      attachmentContext = '\n\n=== FICHIERS JOINTS ===\n';
+      for (const att of attachments) {
+        if (att.type === 'document') {
+          attachmentContext += `\n[Document: ${att.name}]\n${att.content}\n`;
+        }
+      }
+    }
+
     // Build enhanced system prompt
-    const baseSystemPrompt = systemPrompt || `Tu es AETHER Brain, l'assistant IA interne d'une entreprise. Tu aides les utilisateurs à:
-- Répondre à leurs questions en utilisant la base de connaissances interne
-- Rédiger des procédures et de la documentation
-- Améliorer et reformuler des textes
-- Analyser et synthétiser des informations
-- Fournir des analyses basées sur les documents internes ET les connaissances générales`;
+    const baseSystemPrompt = systemPrompt || `Tu es AETHER Brain, l'assistant IA interne d'une entreprise ultra-performant et polyvalent.`;
 
-    const enhancedSystemPrompt = `${baseSystemPrompt}${documentContext}
+    const enhancedSystemPrompt = `${baseSystemPrompt}${documentContext}${attachmentContext}
 
-INSTRUCTIONS IMPORTANTES:
-- Utilise EN PRIORITÉ les informations des documents internes quand elles sont pertinentes
-- Si tu cites un document interne, mentionne son titre
-- Si la question nécessite des connaissances générales (actualités, réglementations, tendances), fournis-les également
-- Réponds toujours en français de manière professionnelle, claire et concise`;
+CAPACITÉS:
+- Analyser des images (photos, captures d'écran, graphiques, schémas)
+- Analyser tous types de documents (PDF, Word, texte)
+- Rechercher dans la base de connaissances interne
+- Fournir des informations à jour grâce à tes connaissances générales
 
-    console.log(`Processing streaming request with ${messages.length} messages, docs: ${documentContext.length > 0}`);
+INSTRUCTIONS:
+- Utilise EN PRIORITÉ les documents internes quand pertinents
+- Si tu cites un document, mentionne son titre
+- Si la question concerne des faits, actualités ou réglementations que tes connaissances permettent de couvrir, fournis l'information
+- Pour les images: décris, analyse, extrait le texte si pertinent
+- Pour les documents: analyse, résume, réponds aux questions
+- Réponds en français, de manière professionnelle, claire et concise`;
+
+    console.log(`Processing request: ${messages.length} messages, attachments: ${attachments?.length || 0}, docs context: ${documentContext.length > 0}`);
+
+    // Prepare messages with image support
+    const preparedMessages = messages.map((msg, idx) => {
+      // If this is the last user message and we have image attachments
+      if (msg.role === 'user' && idx === messages.length - 1 && attachments?.some(a => a.type === 'image')) {
+        const imageAttachments = attachments.filter(a => a.type === 'image');
+        const textContent = typeof msg.content === 'string' ? msg.content : 
+          (msg.content as any[])?.find(c => c.type === 'text')?.text || '';
+        
+        const content: any[] = [
+          { type: 'text', text: textContent }
+        ];
+        
+        for (const img of imageAttachments) {
+          content.push({
+            type: 'image_url',
+            image_url: {
+              url: img.content.startsWith('data:') ? img.content : `data:${img.mimeType || 'image/jpeg'};base64,${img.content}`
+            }
+          });
+        }
+        
+        return { role: msg.role, content };
+      }
+      return msg;
+    });
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -115,7 +162,7 @@ INSTRUCTIONS IMPORTANTES:
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: enhancedSystemPrompt },
-          ...messages,
+          ...preparedMessages,
         ],
         stream: true,
       }),

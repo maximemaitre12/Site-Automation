@@ -1,16 +1,22 @@
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat-stream`;
 
-interface AIMessage {
-  role: 'user' | 'assistant';
+export interface AIMessage {
+  role: 'user' | 'assistant' | 'system';
   content: string;
+}
+
+export interface Attachment {
+  type: 'image' | 'document';
+  content: string;
+  name: string;
+  mimeType?: string;
 }
 
 export interface StreamAIChatOptions {
   messages: AIMessage[];
   systemPrompt?: string;
   userId?: string;
-  enableWebSearch?: boolean;
-  enableDocumentSearch?: boolean;
+  attachments?: Attachment[];
   onDelta: (deltaText: string) => void;
   onDone: () => void;
   onError?: (error: Error) => void;
@@ -20,8 +26,7 @@ export async function streamAIChat({
   messages,
   systemPrompt,
   userId,
-  enableWebSearch = false,
-  enableDocumentSearch = true,
+  attachments,
   onDelta,
   onDone,
   onError,
@@ -37,8 +42,7 @@ export async function streamAIChat({
         messages, 
         systemPrompt,
         userId,
-        enableWebSearch,
-        enableDocumentSearch
+        attachments
       }),
     });
 
@@ -81,14 +85,12 @@ export async function streamAIChat({
           const content = parsed.choices?.[0]?.delta?.content as string | undefined;
           if (content) onDelta(content);
         } catch {
-          // Incomplete JSON, put back and wait
           textBuffer = line + '\n' + textBuffer;
           break;
         }
       }
     }
 
-    // Final flush
     if (textBuffer.trim()) {
       for (let raw of textBuffer.split('\n')) {
         if (!raw) continue;

@@ -3,13 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
-import { streamAIChat } from '@/lib/ai-stream';
+import { streamAIChat, Attachment } from '@/lib/ai-stream';
 
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  attachments?: Attachment[];
 }
 
 export interface Conversation {
@@ -162,7 +163,11 @@ export function useBrain() {
     return conversation;
   };
 
-  const sendMessage = useCallback(async (content: string, conversationId?: string, options?: { enableWebSearch?: boolean }): Promise<Message | null> => {
+  const sendMessage = useCallback(async (
+    content: string, 
+    conversationId?: string, 
+    options?: { attachments?: Attachment[] }
+  ): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
 
     setSendingMessage(true);
@@ -187,20 +192,19 @@ export function useBrain() {
         id: crypto.randomUUID(),
         role: 'user',
         content,
-        timestamp: new Date()
+        timestamp: new Date(),
+        attachments: options?.attachments
       };
 
       // Update local state immediately with user message
       const updatedMessages = [...conv.messages, userMessage];
       setCurrentConversation({ ...conv, messages: updatedMessages });
 
-      const systemPrompt = `Tu es AETHER Brain, l'assistant IA interne de l'entreprise. 
-Tu as accès à tous les documents internes de l'entreprise et tu peux effectuer des analyses en ligne.
-Utilise EN PRIORITÉ les informations des documents internes quand elles sont pertinentes.
-Si tu cites un document, mentionne son titre.
+      const systemPrompt = `Tu es AETHER Brain, l'assistant IA interne de l'entreprise ultra-performant.
+Tu as accès à tous les documents internes et tu peux analyser des images et documents.
 Réponds en français de manière concise, professionnelle et utile.`;
 
-      // Use streaming with document and web search capabilities
+      // Use streaming with document search and attachments
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
 
@@ -212,8 +216,7 @@ Réponds en français de manière concise, professionnelle et utile.`;
           })),
           systemPrompt,
           userId: user.id,
-          enableWebSearch: options?.enableWebSearch ?? false,
-          enableDocumentSearch: true,
+          attachments: options?.attachments,
           onDelta: (delta) => {
             fullContent += delta;
             setStreamingContent(fullContent);
