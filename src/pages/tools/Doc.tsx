@@ -25,7 +25,10 @@ export default function DocPage() {
     createDocument,
     deleteDocument,
     generateDocument,
-    moveDocument
+    analyzeDocument,
+    rewriteDocument,
+    moveDocument,
+    refreshDocuments
   } = useAetherDocs();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -131,6 +134,16 @@ export default function DocPage() {
         open={viewerOpen}
         onOpenChange={setViewerOpen}
         document={selectedDocument}
+        onAnalyze={analyzeDocument}
+        onRewrite={rewriteDocument}
+        onRefresh={() => {
+          refreshDocuments();
+          if (selectedDocument) {
+            // Refresh the selected document data
+            const updated = documents.find(d => d.id === selectedDocument.id);
+            if (updated) setSelectedDocument(updated);
+          }
+        }}
       />
     </DashboardLayout>
   );

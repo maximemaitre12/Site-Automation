@@ -21,5 +21,8 @@ verify_jwt = false
 [functions.doc-generate]
 verify_jwt = false
 
+[functions.doc-rewrite]
+verify_jwt = false
+
 [functions.send-workflow-email]
 verify_jwt = false
