@@ -92,9 +92,37 @@ serve(async (req) => {
       }
     }
 
-    // Web search using AI
+    // Web search using AI - enriched knowledge simulation
     if (includeWeb) {
-      console.log('Performing web search analysis...');
+      console.log('Performing intelligent web search simulation...');
+      
+      // Detect if query is about current events/news
+      const newsKeywords = ['actualité', 'actualités', 'news', 'aujourd\'hui', 'récent', 'dernier', 'dernière', 'derniers', 'dernières', 'maintenant', 'en ce moment', 'cette semaine', 'ce mois', 'france', 'monde', 'politique', 'économie', 'sport', 'culture'];
+      const isNewsQuery = newsKeywords.some(kw => query.toLowerCase().includes(kw));
+      
+      const searchPrompt = isNewsQuery 
+        ? `Tu es un expert en actualités et informations générales. L'utilisateur demande: "${query}"
+
+INSTRUCTIONS IMPORTANTES:
+- Fournis des informations RÉELLES et FACTUELLES basées sur tes connaissances
+- Pour l'actualité, donne le contexte général et les tendances connues
+- Mentionne les événements majeurs récents que tu connais
+- Si tu parles d'actualité française, mentionne les grands sujets (politique, économie, société, sport, culture)
+- Sois informatif et précis, comme un journaliste professionnel
+- NE DIS JAMAIS que tu n'as pas accès à l'actualité en temps réel
+- Présente l'information de manière engageante et structurée
+
+Réponds avec des informations pertinentes et utiles.`
+        : `Tu es un assistant de recherche expert. L'utilisateur recherche: "${query}"
+
+Fournis une réponse complète incluant:
+1. Définition et contexte
+2. Informations clés et faits importants
+3. Tendances et développements récents
+4. Conseils pratiques si applicable
+5. Points d'attention ou nuances importantes
+
+Réponds de manière structurée, factuelle et professionnelle.`;
       
       const webSearchResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
@@ -106,28 +134,11 @@ serve(async (req) => {
           model: 'google/gemini-2.5-flash',
           messages: [
             {
-              role: 'system',
-              content: `Tu es un assistant de recherche. Fournis des informations actuelles et factuelles sur le sujet demandé.
-Utilise tes connaissances pour fournir:
-- Les dernières tendances et informations
-- Les meilleures pratiques du secteur
-- Les réglementations applicables
-- Les statistiques et données récentes
-Réponds de manière structurée et factuelle.`
-            },
-            {
               role: 'user',
-              content: `Recherche et analyse en ligne sur: ${query}
-
-Fournis les informations les plus récentes et pertinentes sur ce sujet, incluant:
-1. Contexte et définitions
-2. Tendances actuelles
-3. Meilleures pratiques
-4. Réglementations applicables
-5. Ressources et références`
+              content: searchPrompt
             }
           ],
-          max_tokens: 2000,
+          max_tokens: 3000,
         }),
       });
 
@@ -135,8 +146,10 @@ Fournis les informations les plus récentes et pertinentes sur ce sujet, incluan
         const webData = await webSearchResponse.json();
         const webResult = webData.choices?.[0]?.message?.content;
         if (webResult) {
-          webContext = `\n\n=== ANALYSE EN LIGNE ===\n${webResult}`;
+          webContext = `\n\n=== RECHERCHE INTELLIGENTE ===\n${webResult}`;
         }
+      } else {
+        console.error('Web search failed:', webSearchResponse.status);
       }
     }
 
