@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2 } from "lucide-react";
+import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Globe, Database } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
@@ -10,6 +10,9 @@ import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export default function BrainPage() {
@@ -36,6 +39,7 @@ export default function BrainPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredDocs, setFilteredDocs] = useState(documents);
   const [showTools, setShowTools] = useState(false);
+  const [enableWebSearch, setEnableWebSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,7 +56,7 @@ export default function BrainPage() {
     
     const msg = message;
     setMessage("");
-    await sendMessage(msg);
+    await sendMessage(msg, undefined, { enableWebSearch });
   };
 
   const handleNewChat = async () => {
@@ -199,12 +203,45 @@ export default function BrainPage() {
         <div className="flex-1 flex flex-col">
           {/* Header */}
           <header className="px-6 py-4 border-b border-border flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-foreground flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center">
-                <Brain className="w-4 h-4 text-white" />
-              </div>
-              AETHER Brain
-            </h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-lg font-semibold text-foreground flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center">
+                  <Brain className="w-4 h-4 text-white" />
+                </div>
+                AETHER Brain
+              </h1>
+              
+              {/* Search Mode Indicators */}
+              <TooltipProvider>
+                <div className="flex items-center gap-3">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 text-primary">
+                        <Database className="w-3.5 h-3.5" />
+                        <span className="text-xs font-medium">{documents.length} docs</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Documents internes utilisés pour les réponses</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  
+                  {enableWebSearch && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-500/10 text-blue-500">
+                          <Globe className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">Web</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Recherche web activée</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              </TooltipProvider>
+            </div>
             
             <Sheet open={showTools} onOpenChange={setShowTools}>
               <SheetTrigger asChild>
@@ -243,8 +280,12 @@ export default function BrainPage() {
                     </p>
                     <ul className="mt-3 space-y-2 text-muted-foreground">
                       <li className="flex items-center gap-2">
-                        <Search className="w-4 h-4 text-primary" />
-                        Rechercher dans votre base de connaissances ({documents.length} documents)
+                        <Database className="w-4 h-4 text-primary" />
+                        Analyser et rechercher dans vos {documents.length} documents internes
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-blue-500" />
+                        Effectuer des recherches en ligne (activez l'option ci-dessous)
                       </li>
                       <li className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-primary" />
@@ -256,7 +297,7 @@ export default function BrainPage() {
                       </li>
                     </ul>
                     <p className="mt-4 text-sm text-muted-foreground">
-                      Commencez par me poser une question ou utilisez les outils IA dans le panneau de droite.
+                      Toutes mes réponses sont basées sur votre base de connaissances interne. Activez la recherche web pour des informations actualisées.
                     </p>
                   </div>
                 </div>
@@ -288,7 +329,7 @@ export default function BrainPage() {
                   <div className="flex-1 p-4 rounded-xl bg-card border border-border">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Connexion...</span>
+                      <span>Analyse des documents{enableWebSearch ? ' et recherche web' : ''}...</span>
                     </div>
                   </div>
                 </div>
@@ -299,28 +340,53 @@ export default function BrainPage() {
 
           {/* Input */}
           <div className="p-4 border-t border-border">
-            <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
-              <div className="flex gap-2">
-                <Input
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Posez une question sur vos documents..."
-                  className="flex-1 h-12 bg-card"
-                  disabled={sendingMessage}
-                />
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  disabled={sendingMessage || !message.trim()}
-                >
-                  {sendingMessage ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </Button>
+            <div className="max-w-3xl mx-auto space-y-3">
+              {/* Search Options */}
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="web-search"
+                      checked={enableWebSearch}
+                      onCheckedChange={setEnableWebSearch}
+                    />
+                    <Label htmlFor="web-search" className="text-sm text-muted-foreground flex items-center gap-1.5 cursor-pointer">
+                      <Globe className="w-3.5 h-3.5" />
+                      Recherche web
+                    </Label>
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Documents internes: toujours activés
+                </div>
               </div>
-            </form>
+              
+              <form onSubmit={handleSendMessage}>
+                <div className="flex gap-2">
+                  <Input
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={enableWebSearch 
+                      ? "Posez une question (documents internes + web)..." 
+                      : "Posez une question sur vos documents internes..."
+                    }
+                    className="flex-1 h-12 bg-card"
+                    disabled={sendingMessage}
+                  />
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    disabled={sendingMessage || !message.trim()}
+                  >
+                    {sendingMessage ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Send className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>

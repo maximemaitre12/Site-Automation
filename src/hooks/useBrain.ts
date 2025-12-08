@@ -162,7 +162,7 @@ export function useBrain() {
     return conversation;
   };
 
-  const sendMessage = useCallback(async (content: string, conversationId?: string): Promise<Message | null> => {
+  const sendMessage = useCallback(async (content: string, conversationId?: string, options?: { enableWebSearch?: boolean }): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
 
     setSendingMessage(true);
@@ -194,14 +194,13 @@ export function useBrain() {
       const updatedMessages = [...conv.messages, userMessage];
       setCurrentConversation({ ...conv, messages: updatedMessages });
 
-      // Build context from documents
-      const docContext = documents.length > 0 
-        ? `\n\nDocuments disponibles:\n${documents.slice(0, 5).map(d => `- ${d.title}: ${d.content?.slice(0, 300) || ''}`).join('\n')}`
-        : '';
+      const systemPrompt = `Tu es AETHER Brain, l'assistant IA interne de l'entreprise. 
+Tu as accès à tous les documents internes de l'entreprise et tu peux effectuer des analyses en ligne.
+Utilise EN PRIORITÉ les informations des documents internes quand elles sont pertinentes.
+Si tu cites un document, mentionne son titre.
+Réponds en français de manière concise, professionnelle et utile.`;
 
-      const systemPrompt = `Tu es AETHER Brain, l'assistant IA interne. Réponds en français de manière concise et utile.${docContext}`;
-
-      // Use streaming for faster perceived response
+      // Use streaming with document and web search capabilities
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
 
@@ -212,6 +211,9 @@ export function useBrain() {
             content: m.content 
           })),
           systemPrompt,
+          userId: user.id,
+          enableWebSearch: options?.enableWebSearch ?? false,
+          enableDocumentSearch: true,
           onDelta: (delta) => {
             fullContent += delta;
             setStreamingContent(fullContent);
@@ -268,7 +270,7 @@ export function useBrain() {
     } finally {
       setSendingMessage(false);
     }
-  }, [user, currentConversation, conversations, documents, toast]);
+  }, [user, currentConversation, conversations, toast]);
 
   const deleteConversation = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('conversations').delete().eq('id', id);
