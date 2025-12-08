@@ -211,11 +211,22 @@ Réponds en français de manière concise, professionnelle et utile.`;
       const assistantMessageId = crypto.randomUUID();
 
       await new Promise<void>((resolve, reject) => {
+        // Filter out base64 image data from message history to prevent context overflow
+        const cleanedMessages = updatedMessages.slice(-10).map(m => {
+          let content = m.content;
+          // Remove [IMAGE_GENERATED]data:... pattern from messages
+          if (content.includes('[IMAGE_GENERATED]data:')) {
+            content = content.replace(/\[IMAGE_GENERATED\]data:image\/[^;]+;base64,[^\s]*/g, '[Image générée]');
+          }
+          // Also clean up very long base64 data that might be in any message
+          if (content.length > 5000 && content.includes('base64,')) {
+            content = content.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[Image]');
+          }
+          return { role: m.role, content };
+        });
+
         streamAIChat({
-          messages: updatedMessages.slice(-10).map(m => ({ 
-            role: m.role, 
-            content: m.content 
-          })),
+          messages: cleanedMessages,
           systemPrompt,
           userId: user.id,
           attachments: options?.attachments,
