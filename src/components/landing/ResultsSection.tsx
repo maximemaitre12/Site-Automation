@@ -3,86 +3,73 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const metrics = [
-  { value: "70%", label: "Réduction des tâches manuelles", description: "Automatisation intelligente" },
-  { value: "120h", label: "Économisées par mois", description: "Par équipe en moyenne" },
-  { value: "99.7%", label: "Précision des traitements", description: "IA supervisée" },
-  { value: "<30j", label: "Retour sur investissement", description: "Amortissement rapide" },
+  { value: "70%", label: "Moins de tâches manuelles" },
+  { value: "120h", label: "Économisées par équipe/mois" },
+  { value: "99.7%", label: "Précision IA" },
+  { value: "<30j", label: "Retour sur investissement" },
 ];
 
 export function ResultsSection() {
   return (
-    <section className="relative py-24 lg:py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/3 to-background" />
+    <section className="relative py-24 lg:py-32">
+      {/* Subtle background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent" />
       
-      <div className="relative z-10 container mx-auto px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16 lg:mb-24">
-          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
-            Résultats mesurables
-          </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6">
-            L'impact est concret
+      <div className="relative max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="max-w-2xl mx-auto text-center mb-16">
+          <p className="text-sm font-medium text-primary mb-3">Impact mesurable</p>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+            Des résultats concrets.
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Des métriques vérifiables dès les premières semaines d'utilisation.
+          <p className="text-muted-foreground">
+            Métriques vérifiables dès les premières semaines.
           </p>
         </div>
         
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-20">
-          {metrics.map((metric, index) => (
-            <div
-              key={index}
-              className="group text-center p-8 lg:p-10 rounded-2xl bg-card/50 border border-border/30 hover:border-primary/30 transition-all duration-500"
+        {/* Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+          {metrics.map((metric, i) => (
+            <div 
+              key={i}
+              className="p-6 md:p-8 rounded-xl bg-card/50 border border-border/30 text-center hover:border-border/60 transition-colors"
             >
-              <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient mb-3 tracking-tight">
+              <div className="text-3xl md:text-4xl lg:text-5xl font-semibold text-gradient mb-2">
                 {metric.value}
               </div>
-              <p className="text-sm md:text-base font-semibold text-foreground mb-1">
-                {metric.label}
-              </p>
-              <p className="text-xs md:text-sm text-muted-foreground">
-                {metric.description}
-              </p>
+              <p className="text-sm text-muted-foreground">{metric.label}</p>
             </div>
           ))}
         </div>
         
         {/* Testimonial */}
-        <div className="max-w-4xl mx-auto">
-          <div className="relative p-8 lg:p-12 rounded-2xl lg:rounded-3xl bg-secondary/30 border border-border/30">
-            {/* Quote Mark */}
-            <div className="absolute -top-4 left-10 text-6xl text-primary/20 font-serif">"</div>
-            
-            <blockquote className="relative z-10">
-              <p className="text-xl md:text-2xl lg:text-3xl text-foreground font-light leading-relaxed mb-8">
-                AETHER a transformé notre façon de travailler. Ce qui prenait des jours 
-                se fait maintenant en quelques heures, <span className="text-primary font-medium">avec une précision remarquable.</span>
-              </p>
-              
-              <footer className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center text-primary-foreground font-bold">
-                  MD
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">Marie Dupont</p>
-                  <p className="text-sm text-muted-foreground">Directrice des Opérations, TechCorp</p>
-                </div>
-              </footer>
+        <div className="max-w-3xl mx-auto">
+          <div className="p-8 md:p-10 rounded-2xl bg-secondary/30 border border-border/30">
+            <blockquote className="text-xl md:text-2xl text-foreground leading-relaxed mb-6">
+              "AETHER a transformé notre façon de travailler. Ce qui prenait des jours 
+              se fait maintenant en heures."
             </blockquote>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-[hsl(280_100%_60%)] flex items-center justify-center text-sm font-semibold text-white">
+                MD
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Marie Dupont</p>
+                <p className="text-sm text-muted-foreground">COO, TechCorp</p>
+              </div>
+            </div>
           </div>
         </div>
         
         {/* CTA */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-12">
           <Link to="/demo">
             <Button 
               size="lg" 
-              className="bg-foreground text-background hover:bg-foreground/90 rounded-full font-semibold px-8"
+              className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-6"
             >
-              Obtenez ces résultats
-              <ArrowRight className="w-5 h-5 ml-2" />
+              Obtenir ces résultats
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>

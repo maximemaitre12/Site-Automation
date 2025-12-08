@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const footerLinks = {
+const links = {
   product: [
     { label: "Flow", path: "/tools/flow" },
     { label: "Brain", path: "/tools/brain" },
@@ -13,7 +13,6 @@ const footerLinks = {
     { label: "Documentation", path: "#" },
     { label: "API", path: "#" },
     { label: "Blog", path: "#" },
-    { label: "Changelog", path: "#" },
   ],
   company: [
     { label: "À propos", path: "#" },
@@ -23,49 +22,37 @@ const footerLinks = {
   legal: [
     { label: "Confidentialité", path: "#" },
     { label: "CGU", path: "#" },
-    { label: "RGPD", path: "#" },
   ],
 };
 
 export function LandingFooter() {
   return (
-    <footer className="relative border-t border-border/30 bg-secondary/5">
-      <div className="container mx-auto px-6 lg:px-8 py-16 lg:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12 mb-16">
+    <footer className="border-t border-border/30">
+      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
-          <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-6">
-              <div className="relative w-9 h-9">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary to-[hsl(260_100%_65%)]" />
-                <div className="absolute inset-[2px] rounded-[10px] bg-background flex items-center justify-center">
-                  <span className="text-lg font-black text-gradient">A</span>
-                </div>
+          <div className="col-span-2 md:col-span-1">
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <div className="w-7 h-7 rounded-md bg-gradient-to-br from-primary to-[hsl(280_100%_60%)] flex items-center justify-center">
+                <span className="text-xs font-bold text-white">A</span>
               </div>
-              <span className="text-xl font-bold text-foreground">AETHER</span>
+              <span className="font-semibold text-foreground">AETHER</span>
             </Link>
-            <p className="text-sm text-muted-foreground max-w-xs leading-relaxed mb-6">
-              La plateforme d'automatisation IA pour les entreprises qui veulent aller plus vite.
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Automatisation IA pour les entreprises modernes.
             </p>
-            <div className="flex items-center gap-4">
-              {["X", "LinkedIn", "GitHub"].map((social) => (
-                <a 
-                  key={social}
-                  href="#" 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {social}
-                </a>
-              ))}
-            </div>
           </div>
           
           {/* Product */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Produit</h4>
-            <ul className="space-y-3">
-              {footerLinks.product.map((link) => (
+            <h4 className="text-sm font-medium text-foreground mb-3">Produit</h4>
+            <ul className="space-y-2">
+              {links.product.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link 
+                    to={link.path} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -75,11 +62,14 @@ export function LandingFooter() {
           
           {/* Resources */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Ressources</h4>
-            <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
+            <h4 className="text-sm font-medium text-foreground mb-3">Ressources</h4>
+            <ul className="space-y-2">
+              {links.resources.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link 
+                    to={link.path} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -89,11 +79,14 @@ export function LandingFooter() {
           
           {/* Company */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Entreprise</h4>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
+            <h4 className="text-sm font-medium text-foreground mb-3">Entreprise</h4>
+            <ul className="space-y-2">
+              {links.company.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link 
+                    to={link.path} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -103,11 +96,14 @@ export function LandingFooter() {
           
           {/* Legal */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Légal</h4>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
+            <h4 className="text-sm font-medium text-foreground mb-3">Légal</h4>
+            <ul className="space-y-2">
+              {links.legal.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link 
+                    to={link.path} 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -116,14 +112,22 @@ export function LandingFooter() {
           </div>
         </div>
         
-        {/* Bottom bar */}
+        {/* Bottom */}
         <div className="pt-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AETHER AI Suite. Tous droits réservés.
+            © {new Date().getFullYear()} AETHER. Tous droits réservés.
           </p>
-          <p className="text-sm text-muted-foreground">
-            Conçu en France 🇫🇷
-          </p>
+          <div className="flex items-center gap-4">
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Twitter
+            </a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              LinkedIn
+            </a>
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              GitHub
+            </a>
+          </div>
         </div>
       </div>
     </footer>
