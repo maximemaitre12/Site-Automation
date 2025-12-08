@@ -8,39 +8,42 @@ export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
       scrolled 
-        ? "bg-background/80 backdrop-blur-xl border-b border-border/50" 
+        ? "bg-background/90 backdrop-blur-xl border-b border-border/50" 
         : "bg-transparent"
     }`}>
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[hsl(280_100%_60%)] flex items-center justify-center">
-              <span className="text-sm font-bold text-primary-foreground">A</span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(280_100%_60%)] to-[hsl(220_100%_60%)] rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(280_100%_60%)] via-[hsl(250_100%_60%)] to-[hsl(220_100%_60%)] flex items-center justify-center">
+                <span className="text-lg font-bold text-white">A</span>
+              </div>
             </div>
-            <span className="text-lg font-semibold text-foreground tracking-tight">AETHER</span>
+            <span className="text-xl font-bold text-foreground tracking-tight">AETHER</span>
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-8">
             {[
               { label: "Produit", href: "#tools" },
+              { label: "Solutions", href: "#solutions" },
               { label: "Tarifs", href: "#pricing" },
               { label: "Entreprise", href: "#enterprise" },
-              { label: "Ressources", href: "#resources" },
             ].map((item) => (
               <a 
                 key={item.label}
                 href={item.href} 
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
                 {item.label}
               </a>
@@ -48,57 +51,51 @@ export function LandingHeader() {
           </nav>
           
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
             <Link to="/auth?mode=login">
               <Button 
                 variant="ghost" 
-                size="sm" 
                 className="text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Button>
             </Link>
             <Link to="/demo">
-              <Button 
-                size="sm" 
-                className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-4"
-              >
-                Démarrer
+              <Button className="bg-gradient-to-r from-[hsl(280_100%_60%)] to-[hsl(250_100%_60%)] hover:from-[hsl(280_100%_65%)] hover:to-[hsl(250_100%_65%)] text-white border-0 shadow-lg shadow-[hsl(250_100%_60%/0.25)]">
+                Commencer gratuitement
               </Button>
             </Link>
           </div>
           
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+            className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
         
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/50 bg-background/95 backdrop-blur-xl">
-            <nav className="flex flex-col gap-1">
-              {["Produit", "Tarifs", "Entreprise", "Ressources"].map((item) => (
+          <div className="lg:hidden py-6 border-t border-border/50 bg-background/95 backdrop-blur-xl">
+            <nav className="flex flex-col gap-2">
+              {["Produit", "Solutions", "Tarifs", "Entreprise"].map((item) => (
                 <a 
                   key={item}
                   href="#" 
-                  className="px-3 py-2.5 text-sm text-foreground hover:bg-secondary/50 rounded-lg"
+                  className="px-4 py-3 text-foreground hover:bg-secondary/50 rounded-lg"
                 >
                   {item}
                 </a>
               ))}
-              <div className="flex flex-col gap-2 pt-3 mt-3 border-t border-border/50">
+              <div className="flex flex-col gap-3 pt-4 mt-4 border-t border-border/50">
                 <Link to="/auth?mode=login">
-                  <Button variant="ghost" size="sm" className="w-full justify-start">
-                    Connexion
-                  </Button>
+                  <Button variant="outline" className="w-full">Connexion</Button>
                 </Link>
                 <Link to="/demo">
-                  <Button size="sm" className="w-full bg-foreground text-background">
-                    Démarrer
+                  <Button className="w-full bg-gradient-to-r from-[hsl(280_100%_60%)] to-[hsl(250_100%_60%)] text-white border-0">
+                    Commencer gratuitement
                   </Button>
                 </Link>
               </div>

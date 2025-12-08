@@ -1,48 +1,57 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const benefits = [
-  "Démo gratuite",
-  "Déploiement 48h",
-  "Support dédié",
+  "Démo personnalisée gratuite",
+  "Déploiement en 48h",
+  "Support premium inclus",
   "Sans engagement",
 ];
 
 export function FinalCTASection() {
   return (
-    <section className="relative py-24 lg:py-32">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-transparent" />
+    <section className="relative py-32 overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-gradient-to-t from-secondary/20 to-background" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-[hsl(250_100%_60%/0.1)] to-transparent blur-[100px]" />
       
-      <div className="relative max-w-7xl mx-auto px-6">
-        <div className="max-w-3xl mx-auto text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/80 border border-[hsl(250_100%_60%/0.2)] mb-8">
+            <Sparkles className="w-4 h-4 text-[hsl(250_100%_70%)]" />
+            <span className="text-sm font-medium text-foreground">Commencez dès aujourd'hui</span>
+          </div>
+          
           {/* Headline */}
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-4">
-            Prêt à automatiser ?
+          <h2 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-foreground mb-6">
+            Prêt à<br />
+            <span className="text-gradient-hero">révolutionner</span><br />
+            vos opérations ?
           </h2>
           
           {/* Subtitle */}
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-8">
-            Rejoignez les équipes qui ont automatisé des milliers d'heures de travail.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
+            Rejoignez les entreprises qui ont automatisé des milliers d'heures de travail répétitif et multiplié leur productivité.
           </p>
           
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link to="/demo">
               <Button 
                 size="lg" 
-                className="bg-foreground text-background hover:bg-foreground/90 text-sm px-6 h-12 rounded-lg font-medium"
+                className="h-16 px-10 text-lg bg-gradient-to-r from-[hsl(280_100%_60%)] via-[hsl(250_100%_60%)] to-[hsl(220_100%_60%)] hover:from-[hsl(280_100%_65%)] hover:via-[hsl(250_100%_65%)] hover:to-[hsl(220_100%_65%)] text-white border-0 shadow-2xl shadow-[hsl(250_100%_60%/0.4)] transition-all duration-300 hover:shadow-[hsl(250_100%_60%/0.6)] hover:scale-105"
               >
-                Démarrer gratuitement
-                <ArrowRight className="w-4 h-4 ml-2" />
+                Commencer gratuitement
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link to="/demo">
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="text-sm px-6 h-12 rounded-lg font-medium border-border/50 bg-transparent hover:bg-secondary/50"
+                className="h-16 px-10 text-lg border-border/50 bg-secondary/30 hover:bg-secondary/50"
               >
                 Demander une démo
               </Button>
@@ -50,11 +59,13 @@ export function FinalCTASection() {
           </div>
           
           {/* Benefits */}
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            {benefits.map((benefit, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-success" />
-                <span className="text-sm text-muted-foreground">{benefit}</span>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[hsl(160_84%_39%/0.2)] flex items-center justify-center">
+                  <Check className="w-3 h-3 text-[hsl(160_84%_50%)]" />
+                </div>
+                <span className="text-muted-foreground">{benefit}</span>
               </div>
             ))}
           </div>
