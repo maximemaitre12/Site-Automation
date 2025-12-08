@@ -23,6 +23,7 @@ import HR from "./pages/tools/HR";
 import Support from "./pages/tools/Support";
 import BrainPage from "./pages/tools/Brain";
 import Compliance from "./pages/tools/Compliance";
+import CRM from "./pages/tools/CRM";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/tools/support" element={<RequireAuth><Support /></RequireAuth>} />
             <Route path="/tools/brain" element={<RequireAuth><BrainPage /></RequireAuth>} />
             <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
+            <Route path="/tools/crm" element={<RequireAuth><CRM /></RequireAuth>} />
             <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
             <Route path="/settings/company" element={<RequireAuth><CompanySettings /></RequireAuth>} />
             <Route path="/settings/api-keys" element={<RequireAuth><ApiKeys /></RequireAuth>} />
