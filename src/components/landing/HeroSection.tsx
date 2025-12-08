@@ -20,25 +20,28 @@ export function HeroSection() {
           {/* Announcement Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border/50 mb-8 animate-fade-in backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">Nouveau : Workflows IA génératifs</span>
+            <span className="text-sm font-medium text-foreground">La nouvelle ère de l&apos;automatisation</span>
             <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
           </div>
           
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <span className="text-foreground">L'IA qui</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <span className="text-foreground">Automatisez.</span>
             <br />
-            <span className="text-gradient">automatise tout</span>
+            <span className="text-foreground">Accélérez.</span>
+            <br />
+            <span className="text-gradient">Dominez.</span>
           </h1>
           
           {/* Subtitle */}
-          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in font-light" style={{ animationDelay: "0.2s" }}>
-            Déployez des agents IA en quelques clics. Support, RH, Ventes, Compliance — 
-            <span className="text-foreground font-medium"> une seule plateforme, zéro code.</span>
+          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-in font-light" style={{ animationDelay: "0.2s" }}>
+            AETHER est la plateforme d&apos;automatisation IA qui permet aux entreprises leaders 
+            de <span className="text-foreground font-medium">transformer leurs opérations</span> et 
+            de <span className="text-foreground font-medium">libérer leur plein potentiel.</span>
           </p>
           
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <Link to="/demo">
               <Button 
                 size="lg" 
@@ -48,22 +51,39 @@ export function HeroSection() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <a href="#tools">
+            <a href="#how-it-works">
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="text-base px-8 py-6 rounded-full font-medium border-border/50 hover:bg-secondary/50"
               >
                 <Play className="w-4 h-4 mr-2" />
-                Voir en action
+                Découvrir comment
               </Button>
             </a>
           </div>
           
-          {/* Social Proof */}
+          {/* Credibility Statement */}
           <div className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <p className="text-sm text-muted-foreground mb-6">Utilisé par des équipes visionnaires</p>
-            <div className="flex items-center justify-center gap-8 lg:gap-12 opacity-40">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-secondary/30 border border-border/30 mb-8">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div 
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-[hsl(260_100%_65%/0.2)] border-2 border-background flex items-center justify-center"
+                  >
+                    <span className="text-[10px] font-bold text-primary">{String.fromCharCode(64 + i)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="h-6 w-px bg-border/50" />
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">+500 entreprises</span> automatisent déjà avec AETHER
+              </p>
+            </div>
+            
+            {/* Enterprise Logos */}
+            <div className="flex items-center justify-center gap-8 lg:gap-16 opacity-30">
               {["Doctolib", "Qonto", "Alan", "Swile", "Payfit"].map((company) => (
                 <span key={company} className="text-lg lg:text-xl font-semibold text-foreground tracking-tight">
                   {company}
@@ -74,7 +94,7 @@ export function HeroSection() {
         </div>
         
         {/* Product Preview */}
-        <div className="mt-20 lg:mt-28 max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: "0.5s" }}>
+        <div className="mt-24 lg:mt-32 max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: "0.5s" }}>
           <div className="relative">
             {/* Glow Effect */}
             <div className="absolute -inset-4 lg:-inset-8 bg-gradient-to-r from-primary/20 via-[hsl(260_100%_65%/0.15)] to-primary/20 rounded-3xl blur-3xl opacity-50" />
@@ -90,11 +110,11 @@ export function HeroSection() {
                     <div className="w-3 h-3 rounded-full bg-success/60" />
                   </div>
                   <div className="hidden sm:block h-6 w-px bg-border/50" />
-                  <span className="hidden sm:block text-sm text-muted-foreground">aether.ai/workflows</span>
+                  <span className="hidden sm:block text-sm text-muted-foreground">aether.ai — Centre de contrôle</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-xs font-medium text-success">3 workflows actifs</span>
+                  <span className="text-xs font-medium text-success">Système opérationnel</span>
                 </div>
               </div>
               
@@ -103,9 +123,9 @@ export function HeroSection() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
                   {/* Stats Cards */}
                   {[
-                    { label: "Tâches automatisées", value: "12,847", change: "+23%" },
-                    { label: "Heures économisées", value: "847", change: "ce mois" },
-                    { label: "Précision IA", value: "99.7%", change: "moyenne" },
+                    { label: "Tâches automatisées", value: "12,847", change: "+23% ce mois" },
+                    { label: "Heures économisées", value: "847", change: "équivalent 5 ETP" },
+                    { label: "Précision IA", value: "99.7%", change: "SLA respecté" },
                   ].map((stat, i) => (
                     <div 
                       key={i}
@@ -114,8 +134,8 @@ export function HeroSection() {
                       <p className="text-sm text-muted-foreground mb-2">{stat.label}</p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl lg:text-3xl font-bold text-foreground">{stat.value}</span>
-                        <span className="text-xs text-success font-medium">{stat.change}</span>
                       </div>
+                      <p className="text-xs text-success font-medium mt-1">{stat.change}</p>
                     </div>
                   ))}
                 </div>
@@ -128,22 +148,22 @@ export function HeroSection() {
                         <Sparkles className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">Traitement factures</p>
-                        <p className="text-sm text-muted-foreground">En cours d'exécution...</p>
+                        <p className="font-semibold text-foreground">Workflow automatisé #1247</p>
+                        <p className="text-sm text-muted-foreground">Traitement factures fournisseurs</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-success">75% complété</p>
-                      <p className="text-xs text-muted-foreground">~2 min restantes</p>
+                      <p className="text-sm font-medium text-success">Succès</p>
+                      <p className="text-xs text-muted-foreground">Exécuté il y a 2 min</p>
                     </div>
                   </div>
                   
                   {/* Progress Steps */}
                   <div className="flex items-center gap-2">
-                    {["Réception", "Extraction", "Validation", "Export"].map((step, i) => (
+                    {["Email reçu", "Extraction IA", "Validation", "Intégration ERP"].map((step, i) => (
                       <div key={step} className="flex-1">
-                        <div className={`h-1.5 rounded-full ${i < 3 ? "bg-primary" : "bg-border/50"}`} />
-                        <p className={`text-xs mt-2 ${i < 3 ? "text-foreground" : "text-muted-foreground"}`}>{step}</p>
+                        <div className="h-1.5 rounded-full bg-success" />
+                        <p className="text-xs mt-2 text-foreground">{step}</p>
                       </div>
                     ))}
                   </div>
