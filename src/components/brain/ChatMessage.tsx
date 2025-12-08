@@ -179,6 +179,19 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             </div>
           )}
           
+          {/* Thinking state when no content yet */}
+          {isStreaming && !textContent && !generatedImageUrl && (
+            <div className="flex items-center gap-3 py-2">
+              <div className="relative">
+                <div className="w-6 h-6 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-foreground">Je réfléchis...</span>
+                <span className="text-xs text-muted-foreground">Analyse de votre demande en cours</span>
+              </div>
+            </div>
+          )}
+
           {/* Text Content */}
           {textContent && (
             <div className={cn(
@@ -195,8 +208,8 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             </div>
           )}
 
-          {/* Streaming indicator */}
-          {isStreaming && (
+          {/* Streaming indicator when content is already showing */}
+          {isStreaming && textContent && (
             <div className="flex items-center gap-1.5 mt-3 text-violet-500">
               <Sparkles className="w-3.5 h-3.5 animate-pulse" />
               <span className="text-xs font-medium">Génération en cours...</span>
