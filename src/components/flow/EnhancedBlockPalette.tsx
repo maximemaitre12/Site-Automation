@@ -5,7 +5,12 @@ import {
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
   Repeat, Timer, GitFork, Bell, FileText, Search, ChevronDown,
-  ChevronRight, Plus, MessageSquare, MessageCircle, Phone, Table
+  ChevronRight, Plus, MessageSquare, MessageCircle, Phone, Table,
+  Brain, Image, Volume2, Mic, Users, Cloud, TrendingUp, Calendar,
+  Columns, CheckSquare, Bug, Zap, HardDrive, Box, CreditCard,
+  ShoppingCart, Calculator, Twitter, Linkedin, Facebook, Instagram,
+  Youtube, Video, Github, Gitlab, Triangle, Flame, BarChart3,
+  BarChart2, Activity, LineChart, Workflow, Play, Headphones
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,7 +19,12 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
   Tags, Wand2, GitBranch, Mail, Send, Database, Clock, Eye,
   Heart, Languages, Braces, Filter, ArrowRightLeft, Combine,
-  Repeat, Timer, GitFork, Bell, FileText, MessageSquare, MessageCircle, Phone, Table
+  Repeat, Timer, GitFork, Bell, FileText, MessageSquare, MessageCircle, 
+  Phone, Table, Brain, Image, Volume2, Mic, Users, Cloud, TrendingUp,
+  Calendar, Columns, CheckSquare, Bug, Zap, HardDrive, Box, CreditCard,
+  ShoppingCart, Calculator, Twitter, Linkedin, Facebook, Instagram,
+  Youtube, Video, Github, Gitlab, Triangle, Flame, BarChart3, BarChart2,
+  Activity, LineChart, Workflow, Play, Headphones
 };
 
 interface EnhancedBlockPaletteProps {
