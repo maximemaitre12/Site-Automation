@@ -410,6 +410,413 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_activities: {
+        Row: {
+          activity_date: string
+          activity_type: string
+          ai_summary: string | null
+          company_id: string | null
+          contact_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          opportunity_id: string | null
+          sentiment: string | null
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          activity_date?: string
+          activity_type: string
+          ai_summary?: string | null
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          opportunity_id?: string | null
+          sentiment?: string | null
+          subject: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          activity_type?: string
+          ai_summary?: string | null
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          opportunity_id?: string | null
+          sentiment?: string | null
+          subject?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "crm_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_companies: {
+        Row: {
+          address: string | null
+          ai_enrichment: Json | null
+          annual_revenue: number | null
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          employees_count: number | null
+          id: string
+          industry: string | null
+          linkedin_url: string | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          tags: Json | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          ai_enrichment?: Json | null
+          annual_revenue?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          employees_count?: number | null
+          id?: string
+          industry?: string | null
+          linkedin_url?: string | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          ai_enrichment?: Json | null
+          annual_revenue?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          employees_count?: number | null
+          id?: string
+          industry?: string | null
+          linkedin_url?: string | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      crm_contacts: {
+        Row: {
+          ai_insights: Json | null
+          avatar_url: string | null
+          company_id: string | null
+          created_at: string
+          department: string | null
+          email: string | null
+          engagement_score: number | null
+          first_name: string
+          id: string
+          job_title: string | null
+          last_contacted_at: string | null
+          last_name: string
+          linkedin_url: string | null
+          notes: string | null
+          phone: string | null
+          tags: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_insights?: Json | null
+          avatar_url?: string | null
+          company_id?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          engagement_score?: number | null
+          first_name: string
+          id?: string
+          job_title?: string | null
+          last_contacted_at?: string | null
+          last_name: string
+          linkedin_url?: string | null
+          notes?: string | null
+          phone?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_insights?: Json | null
+          avatar_url?: string | null
+          company_id?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          engagement_score?: number | null
+          first_name?: string
+          id?: string
+          job_title?: string | null
+          last_contacted_at?: string | null
+          last_name?: string
+          linkedin_url?: string | null
+          notes?: string | null
+          phone?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_opportunities: {
+        Row: {
+          actual_close_date: string | null
+          ai_analysis: Json | null
+          ai_recommendations: Json | null
+          ai_risk_score: number | null
+          company_id: string | null
+          contact_id: string | null
+          created_at: string
+          currency: string | null
+          description: string | null
+          expected_close_date: string | null
+          id: string
+          loss_reason: string | null
+          name: string
+          probability: number | null
+          stage_id: string | null
+          status: string | null
+          tags: Json | null
+          updated_at: string
+          user_id: string
+          value: number | null
+        }
+        Insert: {
+          actual_close_date?: string | null
+          ai_analysis?: Json | null
+          ai_recommendations?: Json | null
+          ai_risk_score?: number | null
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          loss_reason?: string | null
+          name: string
+          probability?: number | null
+          stage_id?: string | null
+          status?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id: string
+          value?: number | null
+        }
+        Update: {
+          actual_close_date?: string | null
+          ai_analysis?: Json | null
+          ai_recommendations?: Json | null
+          ai_risk_score?: number | null
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          loss_reason?: string | null
+          name?: string
+          probability?: number | null
+          stage_id?: string | null
+          status?: string | null
+          tags?: Json | null
+          updated_at?: string
+          user_id?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_opportunities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "crm_pipeline_stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_pipeline_stages: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          position: number
+          probability: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          probability?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          probability?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      crm_tasks: {
+        Row: {
+          ai_reasoning: string | null
+          company_id: string | null
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          is_ai_generated: boolean | null
+          opportunity_id: string | null
+          priority: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          company_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          opportunity_id?: string | null
+          priority?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          company_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          opportunity_id?: string | null
+          priority?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_tasks_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "crm_companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tasks_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "crm_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets: {
         Row: {
           ai_insights: Json | null
