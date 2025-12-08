@@ -99,7 +99,7 @@ export function WorkspaceProjects({ workspace }: WorkspaceProjectsProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Priorité</Label>
-                  <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}>
+                  <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value as WorkspaceProject['priority'] })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {Object.entries(priorityConfig).map(([key, config]) => (<SelectItem key={key} value={key}>{config.label}</SelectItem>))}

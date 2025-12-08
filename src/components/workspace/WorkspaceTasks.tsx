@@ -147,7 +147,7 @@ export function WorkspaceTasks({ workspace }: WorkspaceTasksProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Priorité</Label>
-                  <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.entries(priorityConfig).map(([key, config]) => (<SelectItem key={key} value={key}>{config.label}</SelectItem>))}</SelectContent></Select>
+                  <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value as WorkspaceTask['priority'] })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.entries(priorityConfig).map(([key, config]) => (<SelectItem key={key} value={key}>{config.label}</SelectItem>))}</SelectContent></Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Projet</Label>
