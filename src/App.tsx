@@ -25,6 +25,7 @@ import BrainPage from "./pages/tools/Brain";
 import Compliance from "./pages/tools/Compliance";
 import CRM from "./pages/tools/CRM";
 import Workspace from "./pages/tools/Workspace";
+import Data from "./pages/tools/Data";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
             <Route path="/tools/crm" element={<RequireAuth><CRM /></RequireAuth>} />
             <Route path="/tools/workspace" element={<RequireAuth><Workspace /></RequireAuth>} />
+            <Route path="/tools/data" element={<RequireAuth><Data /></RequireAuth>} />
             <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
             <Route path="/settings/company" element={<RequireAuth><CompanySettings /></RequireAuth>} />
             <Route path="/settings/api-keys" element={<RequireAuth><ApiKeys /></RequireAuth>} />
