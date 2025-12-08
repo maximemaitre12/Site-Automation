@@ -36,8 +36,16 @@ import {
   Wand2,
   RefreshCw,
   FileDown,
-  Loader2
+  Loader2,
+  ThumbsUp,
+  ThumbsDown,
+  AlertTriangle,
+  Sparkles,
+  CheckCircle,
+  XCircle,
+  BarChart3
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -190,6 +198,7 @@ export function DocViewerDialog({
 
   const entities = document.ai_entities || {};
   const hasEntities = Object.keys(entities).length > 0;
+  const aiAnalysis = (document.metadata?.ai_analysis || {}) as Record<string, any>;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -269,205 +278,334 @@ export function DocViewerDialog({
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="ai" className="flex-1 min-h-0 mt-4 space-y-4">
-            {/* Action buttons */}
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleAnalyze} 
-                disabled={analyzing}
-                variant="outline"
-              >
-                {analyzing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyse en cours...
-                  </>
-                ) : (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    {document.ai_summary ? 'Relancer l\'analyse' : 'Lancer l\'analyse IA'}
-                  </>
+          <TabsContent value="ai" className="flex-1 min-h-0 mt-4">
+            <ScrollArea className="h-[400px]">
+              <div className="space-y-4 pr-4">
+                {/* Action buttons */}
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleAnalyze} 
+                    disabled={analyzing}
+                    variant="outline"
+                  >
+                    {analyzing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Analyse en cours...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        {document.ai_summary ? 'Relancer l\'analyse' : 'Lancer l\'analyse IA'}
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Readability Score */}
+                {aiAnalysis?.readabilityScore && (
+                  <Card className="p-4">
+                    <h4 className="font-medium flex items-center gap-2 mb-3">
+                      <BarChart3 className="w-4 h-4 text-primary" />
+                      Score de lisibilité
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold">{aiAnalysis.readabilityScore}/100</span>
+                        <Badge variant={aiAnalysis.readabilityScore >= 70 ? 'default' : aiAnalysis.readabilityScore >= 50 ? 'secondary' : 'destructive'}>
+                          {aiAnalysis.readabilityScore >= 70 ? 'Bon' : aiAnalysis.readabilityScore >= 50 ? 'Moyen' : 'À améliorer'}
+                        </Badge>
+                      </div>
+                      <Progress value={aiAnalysis.readabilityScore} className="h-2" />
+                      {aiAnalysis.readabilityComment && (
+                        <p className="text-sm text-muted-foreground">{aiAnalysis.readabilityComment}</p>
+                      )}
+                    </div>
+                  </Card>
                 )}
-              </Button>
-            </div>
 
-            {/* Summary */}
-            {document.ai_summary && (
-              <Card className="p-4">
-                <h4 className="font-medium flex items-center gap-2 mb-2">
-                  <Brain className="w-4 h-4 text-primary" />
-                  Résumé IA
-                </h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {document.ai_summary}
-                </p>
-              </Card>
-            )}
+                {/* Strengths & Weaknesses */}
+                {(aiAnalysis?.strengths?.length > 0 || aiAnalysis?.weaknesses?.length > 0) && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {aiAnalysis?.strengths?.length > 0 && (
+                      <Card className="p-4 border-green-200 bg-green-50/50">
+                        <h4 className="font-medium flex items-center gap-2 mb-3 text-green-700">
+                          <ThumbsUp className="w-4 h-4" />
+                          Points forts
+                        </h4>
+                        <ul className="space-y-2">
+                          {aiAnalysis.strengths.map((strength: string, i: number) => (
+                            <li key={i} className="text-sm flex items-start gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                              <span>{strength}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </Card>
+                    )}
+                    {aiAnalysis?.weaknesses?.length > 0 && (
+                      <Card className="p-4 border-amber-200 bg-amber-50/50">
+                        <h4 className="font-medium flex items-center gap-2 mb-3 text-amber-700">
+                          <ThumbsDown className="w-4 h-4" />
+                          Points faibles
+                        </h4>
+                        <ul className="space-y-2">
+                          {aiAnalysis.weaknesses.map((weakness: string, i: number) => (
+                            <li key={i} className="text-sm flex items-start gap-2">
+                              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                              <span>{weakness}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </Card>
+                    )}
+                  </div>
+                )}
 
-            {/* Keywords */}
-            {document.ai_keywords && document.ai_keywords.length > 0 && (
-              <Card className="p-4">
-                <h4 className="font-medium flex items-center gap-2 mb-3">
-                  <Key className="w-4 h-4 text-primary" />
-                  Mots-clés extraits
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {document.ai_keywords.map((keyword: string, i: number) => (
-                    <Badge key={i} variant="secondary">
-                      {keyword}
-                    </Badge>
-                  ))}
-                </div>
-              </Card>
-            )}
+                {/* Spelling Errors */}
+                {aiAnalysis?.spellingErrors?.length > 0 && (
+                  <Card className="p-4 border-red-200 bg-red-50/50">
+                    <h4 className="font-medium flex items-center gap-2 mb-3 text-red-700">
+                      <XCircle className="w-4 h-4" />
+                      Fautes d'orthographe ({aiAnalysis.spellingErrors.length})
+                    </h4>
+                    <div className="space-y-3">
+                      {aiAnalysis.spellingErrors.map((error: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between p-2 bg-white rounded border">
+                          <div className="flex-1">
+                            <span className="text-red-600 line-through">{error.original}</span>
+                            <span className="mx-2">→</span>
+                            <span className="text-green-600 font-medium">{error.correction}</span>
+                            {error.context && (
+                              <p className="text-xs text-muted-foreground mt-1 italic">"{error.context}"</p>
+                            )}
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => {
+                              if (document.content) {
+                                const newContent = document.content.replace(error.original, error.correction);
+                                navigator.clipboard.writeText(error.correction);
+                                toast.success(`"${error.correction}" copié`);
+                              }
+                            }}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
 
-            {/* Entities */}
-            {hasEntities && (
-              <Card className="p-4">
-                <h4 className="font-medium flex items-center gap-2 mb-3">
-                  <User className="w-4 h-4 text-primary" />
-                  Entités détectées
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  {(entities.personnes as string[])?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Personnes</p>
-                      <div className="flex flex-wrap gap-1">
-                        {(entities.personnes as string[]).map((p: string, i: number) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            <User className="w-3 h-3 mr-1" />
-                            {p}
-                          </Badge>
-                        ))}
-                      </div>
+                {/* Grammar Issues */}
+                {aiAnalysis?.grammarIssues?.length > 0 && (
+                  <Card className="p-4 border-orange-200 bg-orange-50/50">
+                    <h4 className="font-medium flex items-center gap-2 mb-3 text-orange-700">
+                      <AlertTriangle className="w-4 h-4" />
+                      Problèmes de grammaire ({aiAnalysis.grammarIssues.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {aiAnalysis.grammarIssues.map((issue: any, i: number) => (
+                        <div key={i} className="p-2 bg-white rounded border text-sm">
+                          <p className="font-medium text-orange-700">{issue.issue}</p>
+                          <p className="text-green-600">Suggestion: {issue.suggestion}</p>
+                          {issue.context && (
+                            <p className="text-xs text-muted-foreground mt-1 italic">"{issue.context}"</p>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  )}
-                  {(entities.organisations as string[])?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Organisations</p>
-                      <div className="flex flex-wrap gap-1">
-                        {(entities.organisations as string[]).map((o: string, i: number) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            <Building className="w-3 h-3 mr-1" />
-                            {o}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {(entities.dates as string[])?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Dates</p>
-                      <div className="flex flex-wrap gap-1">
-                        {(entities.dates as string[]).map((d: string, i: number) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            <Calendar className="w-3 h-3 mr-1" />
-                            {d}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {(entities.montants as string[])?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Montants</p>
-                      <div className="flex flex-wrap gap-1">
-                        {(entities.montants as string[]).map((m: string, i: number) => (
-                          <Badge key={i} variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                            {m}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {(entities.lieux as string[])?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Lieux</p>
-                      <div className="flex flex-wrap gap-1">
-                        {(entities.lieux as string[]).map((l: string, i: number) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {l}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            )}
+                  </Card>
+                )}
 
-            {/* AI Metadata */}
-            {document.metadata?.ai_analysis && (
-              <Card className="p-4">
-                <h4 className="font-medium flex items-center gap-2 mb-3">
-                  <Tag className="w-4 h-4 text-primary" />
-                  Classification
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {(document.metadata.ai_analysis as any).category && (
-                    <Badge variant="secondary" className="capitalize">
-                      {(document.metadata.ai_analysis as any).category}
-                    </Badge>
-                  )}
-                  {(document.metadata.ai_analysis as any).sentiment && (
-                    <Badge 
-                      variant="outline"
-                      className={
-                        (document.metadata.ai_analysis as any).sentiment === 'positif' 
-                          ? 'bg-green-50 text-green-700 border-green-200'
-                          : (document.metadata.ai_analysis as any).sentiment === 'negatif'
-                          ? 'bg-red-50 text-red-700 border-red-200'
-                          : ''
-                      }
-                    >
-                      {(document.metadata.ai_analysis as any).sentiment}
-                    </Badge>
-                  )}
-                  {(document.metadata.ai_analysis as any).language && (
-                    <Badge variant="outline">
-                      {(document.metadata.ai_analysis as any).language.toUpperCase()}
-                    </Badge>
-                  )}
-                </div>
-                {(document.metadata.ai_analysis as any).actionItems?.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Actions à effectuer</p>
-                    <ul className="space-y-1">
-                      {(document.metadata.ai_analysis as any).actionItems.map((item: string, i: number) => (
+                {/* Recommendations */}
+                {aiAnalysis?.recommendations?.length > 0 && (
+                  <Card className="p-4">
+                    <h4 className="font-medium flex items-center gap-2 mb-3">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      Recommandations d'amélioration
+                    </h4>
+                    <ul className="space-y-2">
+                      {aiAnalysis.recommendations.map((rec: string, i: number) => (
                         <li key={i} className="text-sm flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                          {item}
+                          <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                            {i + 1}
+                          </span>
+                          <span>{rec}</span>
                         </li>
                       ))}
                     </ul>
+                  </Card>
+                )}
+
+                {/* Summary */}
+                {document.ai_summary && (
+                  <Card className="p-4">
+                    <h4 className="font-medium flex items-center gap-2 mb-2">
+                      <Brain className="w-4 h-4 text-primary" />
+                      Résumé
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {document.ai_summary}
+                    </p>
+                  </Card>
+                )}
+
+                {/* Keywords */}
+                {document.ai_keywords && document.ai_keywords.length > 0 && (
+                  <Card className="p-4">
+                    <h4 className="font-medium flex items-center gap-2 mb-3">
+                      <Key className="w-4 h-4 text-primary" />
+                      Mots-clés
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {document.ai_keywords.map((keyword: string, i: number) => (
+                        <Badge key={i} variant="secondary">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Classification */}
+                {aiAnalysis && (
+                  <Card className="p-4">
+                    <h4 className="font-medium flex items-center gap-2 mb-3">
+                      <Tag className="w-4 h-4 text-primary" />
+                      Classification
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {aiAnalysis.category && (
+                        <Badge variant="secondary" className="capitalize">
+                          {aiAnalysis.category}
+                        </Badge>
+                      )}
+                      {aiAnalysis.sentiment && (
+                        <Badge 
+                          variant="outline"
+                          className={
+                            aiAnalysis.sentiment === 'positif' 
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : aiAnalysis.sentiment === 'negatif'
+                              ? 'bg-red-50 text-red-700 border-red-200'
+                              : ''
+                          }
+                        >
+                          {aiAnalysis.sentiment}
+                        </Badge>
+                      )}
+                      {aiAnalysis.language && (
+                        <Badge variant="outline">
+                          {aiAnalysis.language.toUpperCase()}
+                        </Badge>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Entities */}
+                {hasEntities && (
+                  <Card className="p-4">
+                    <h4 className="font-medium flex items-center gap-2 mb-3">
+                      <User className="w-4 h-4 text-primary" />
+                      Entités détectées
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {(entities.personnes as string[])?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Personnes</p>
+                          <div className="flex flex-wrap gap-1">
+                            {(entities.personnes as string[]).map((p: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                <User className="w-3 h-3 mr-1" />
+                                {p}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {(entities.organisations as string[])?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Organisations</p>
+                          <div className="flex flex-wrap gap-1">
+                            {(entities.organisations as string[]).map((o: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                <Building className="w-3 h-3 mr-1" />
+                                {o}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {(entities.dates as string[])?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Dates</p>
+                          <div className="flex flex-wrap gap-1">
+                            {(entities.dates as string[]).map((d: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                <Calendar className="w-3 h-3 mr-1" />
+                                {d}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {(entities.montants as string[])?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Montants</p>
+                          <div className="flex flex-wrap gap-1">
+                            {(entities.montants as string[]).map((m: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                {m}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {(entities.lieux as string[])?.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Lieux</p>
+                          <div className="flex flex-wrap gap-1">
+                            {(entities.lieux as string[]).map((l: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                {l}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                {!document.ai_summary && !aiAnalysis && (
+                  <div className="text-center py-8">
+                    <Brain className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground mb-4">
+                      {document.embedding_status === 'pending' 
+                        ? "Analyse IA en attente" 
+                        : "Aucune analyse IA disponible"}
+                    </p>
+                    <Button onClick={handleAnalyze} disabled={analyzing}>
+                      {analyzing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Analyse en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Brain className="w-4 h-4 mr-2" />
+                          Lancer l'analyse IA
+                        </>
+                      )}
+                    </Button>
                   </div>
                 )}
-              </Card>
-            )}
-
-            {!document.ai_summary && (!document.ai_keywords || document.ai_keywords.length === 0) && !hasEntities && (
-              <div className="text-center py-8">
-                <Brain className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground mb-4">
-                  {document.embedding_status === 'pending' 
-                    ? "Analyse IA en attente" 
-                    : "Aucune analyse IA disponible"}
-                </p>
-                <Button onClick={handleAnalyze} disabled={analyzing}>
-                  {analyzing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Analyse en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Brain className="w-4 h-4 mr-2" />
-                      Lancer l'analyse IA
-                    </>
-                  )}
-                </Button>
               </div>
-            )}
+            </ScrollArea>
           </TabsContent>
 
           <TabsContent value="rewrite" className="flex-1 min-h-0 mt-4 space-y-4">
