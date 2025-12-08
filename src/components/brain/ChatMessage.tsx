@@ -1,4 +1,4 @@
-import { Brain, User, Copy, Check, FileImage, File } from "lucide-react";
+import { Brain, User, Copy, Check, File, Download } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,24 @@ export function ChatMessage({ role, content, timestamp, attachments }: ChatMessa
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(content);
+    await navigator.clipboard.writeText(content.replace(/\[IMAGE_GENERATED\].*?\[\/IMAGE_GENERATED\]/g, ''));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Extract generated image from content
+  const imageMatch = content.match(/\[IMAGE_GENERATED\](.*?)\[\/IMAGE_GENERATED\]/);
+  const generatedImageUrl = imageMatch ? imageMatch[1] : null;
+  const textContent = content.replace(/\[IMAGE_GENERATED\].*?\[\/IMAGE_GENERATED\]/g, '').trim();
+
+  const handleDownloadImage = (url: string) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `generated-image-${Date.now()}.png`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -52,14 +67,12 @@ export function ChatMessage({ role, content, timestamp, attachments }: ChatMessa
                 role === 'assistant' ? "bg-muted" : "bg-primary-foreground/10"
               )}>
                 {att.type === 'image' ? (
-                  <>
-                    <img 
-                      src={att.content} 
-                      alt={att.name} 
-                      className="w-16 h-16 rounded object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => window.open(att.content, '_blank')}
-                    />
-                  </>
+                  <img 
+                    src={att.content} 
+                    alt={att.name} 
+                    className="w-16 h-16 rounded object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => window.open(att.content, '_blank')}
+                  />
                 ) : (
                   <>
                     <File className="w-4 h-4" />
@@ -71,16 +84,45 @@ export function ChatMessage({ role, content, timestamp, attachments }: ChatMessa
           </div>
         )}
         
-        <div className="prose prose-sm max-w-none dark:prose-invert">
-          {content.split('\n').map((line, i) => (
-            <p key={i} className={cn(
-              "mb-2 last:mb-0",
-              role === 'user' && "text-primary-foreground"
-            )}>
-              {line || <br />}
-            </p>
-          ))}
-        </div>
+        {/* Generated Image */}
+        {generatedImageUrl && (
+          <div className="mb-4">
+            <div className="relative group/image inline-block">
+              <img 
+                src={generatedImageUrl} 
+                alt="Image générée"
+                className="max-w-full max-h-96 rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => window.open(generatedImageUrl, '_blank')}
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                className="absolute bottom-2 right-2 opacity-0 group-hover/image:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownloadImage(generatedImageUrl);
+                }}
+              >
+                <Download className="w-4 h-4 mr-1" />
+                Télécharger
+              </Button>
+            </div>
+          </div>
+        )}
+        
+        {/* Text Content */}
+        {textContent && (
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            {textContent.split('\n').map((line, i) => (
+              <p key={i} className={cn(
+                "mb-2 last:mb-0",
+                role === 'user' && "text-primary-foreground"
+              )}>
+                {line || <br />}
+              </p>
+            ))}
+          </div>
+        )}
         
         {role === 'assistant' && (
           <Button

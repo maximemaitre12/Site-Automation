@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File } from "lucide-react";
+import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
@@ -11,6 +11,7 @@ import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Attachment } from "@/lib/ai-stream";
 import { useToast } from "@/hooks/use-toast";
@@ -45,6 +46,8 @@ export default function BrainPage() {
   const [showTools, setShowTools] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [generationMode, setGenerationMode] = useState<'chat' | 'image' | 'chart'>('chat');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -137,7 +140,13 @@ export default function BrainPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!message.trim() && attachments.length === 0) || sendingMessage) return;
+    if ((!message.trim() && attachments.length === 0) || sendingMessage || generatingImage) return;
+    
+    // Handle image/chart generation
+    if (generationMode !== 'chat' && message.trim()) {
+      await handleGenerateImage(message, generationMode);
+      return;
+    }
     
     const msg = message || (attachments.length > 0 ? `Analyse ${attachments.length > 1 ? 'ces fichiers' : 'ce fichier'}` : '');
     const currentAttachments = [...attachments];
@@ -146,6 +155,53 @@ export default function BrainPage() {
     setAttachments([]);
     
     await sendMessage(msg, undefined, { attachments: currentAttachments.length > 0 ? currentAttachments : undefined });
+  };
+
+  const handleGenerateImage = async (prompt: string, type: 'image' | 'chart') => {
+    if (!prompt.trim()) return;
+    
+    setGeneratingImage(true);
+    setMessage("");
+    
+    // Add user message to conversation
+    const userMsg = type === 'image' 
+      ? `🎨 Génère une image: ${prompt}` 
+      : `📊 Génère un graphique: ${prompt}`;
+    
+    await sendMessage(userMsg, undefined);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('brain-generate-image', {
+        body: { prompt, type }
+      });
+
+      if (error) throw error;
+
+      if (data?.imageUrl) {
+        // Add image response as a special message
+        await sendMessage(`[IMAGE_GENERATED]${data.imageUrl}[/IMAGE_GENERATED]${data.description || 'Image générée avec succès.'}`, undefined);
+        toast({
+          title: "Image générée",
+          description: type === 'chart' ? "Graphique créé avec succès" : "Image créée avec succès"
+        });
+      } else if (data?.error) {
+        toast({
+          title: "Erreur",
+          description: data.error,
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      console.error('Image generation error:', err);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer l'image",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingImage(false);
+      setGenerationMode('chat');
+    }
   };
 
   const handleNewChat = async () => {
@@ -511,6 +567,55 @@ export default function BrainPage() {
               )}
               
               <form onSubmit={handleSendMessage}>
+                {/* Generation Mode Buttons */}
+                <div className="flex items-center gap-2 mb-3">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant={generationMode === 'image' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setGenerationMode(generationMode === 'image' ? 'chat' : 'image')}
+                          disabled={sendingMessage || generatingImage}
+                        >
+                          <ImagePlus className="w-4 h-4 mr-1" />
+                          Image
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Générer une image avec l'IA</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant={generationMode === 'chart' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setGenerationMode(generationMode === 'chart' ? 'chat' : 'chart')}
+                          disabled={sendingMessage || generatingImage}
+                        >
+                          <BarChart3 className="w-4 h-4 mr-1" />
+                          Graphique
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Générer un graphique avec l'IA</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  
+                  {generationMode !== 'chat' && (
+                    <Badge variant="secondary" className="ml-auto">
+                      Mode: {generationMode === 'image' ? '🎨 Image' : '📊 Graphique'}
+                    </Badge>
+                  )}
+                </div>
+                
                 <div className="flex gap-2">
                   <input
                     ref={fileInputRef}
@@ -530,6 +635,7 @@ export default function BrainPage() {
                           size="icon"
                           className="h-12 w-12 flex-shrink-0"
                           onClick={() => fileInputRef.current?.click()}
+                          disabled={generationMode !== 'chat'}
                         >
                           <Paperclip className="w-5 h-5" />
                         </Button>
@@ -543,17 +649,25 @@ export default function BrainPage() {
                   <Input
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Posez une question, glissez une image..."
+                    placeholder={
+                      generationMode === 'image' 
+                        ? "Décrivez l'image à générer..." 
+                        : generationMode === 'chart'
+                          ? "Décrivez le graphique à créer..."
+                          : "Posez une question, glissez une image..."
+                    }
                     className="flex-1 h-12 bg-card"
-                    disabled={sendingMessage}
+                    disabled={sendingMessage || generatingImage}
                   />
                   <Button 
                     type="submit" 
                     size="lg" 
-                    disabled={sendingMessage || (!message.trim() && attachments.length === 0)}
+                    disabled={sendingMessage || generatingImage || (!message.trim() && attachments.length === 0)}
                   >
-                    {sendingMessage ? (
+                    {sendingMessage || generatingImage ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : generationMode !== 'chat' ? (
+                      <Sparkles className="w-5 h-5" />
                     ) : (
                       <Send className="w-5 h-5" />
                     )}

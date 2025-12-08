@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.brain-search]
 verify_jwt = false
+
+[functions.brain-generate-image]
+verify_jwt = false
