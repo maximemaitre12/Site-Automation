@@ -1,291 +1,180 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  Workflow, FileSearch, Bot, Headphones, Users, Shield,
-  ArrowRight, CheckCircle2, Zap, MessageSquare, FileText
+  Workflow, Bot, Headphones, Users, Shield, MessageSquare,
+  ArrowRight, Check
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const tools = [
   {
     id: "flow",
-    name: "AETHER Flow",
-    tagline: "Orchestration intelligente",
-    description: "Créez des workflows automatisés en quelques clics. Connectez vos outils, ajoutez de l'IA, et laissez le système travailler.",
+    name: "Flow",
+    fullName: "AETHER Flow",
+    description: "Orchestrez des workflows complexes en glisser-déposer. L'IA génère et optimise vos automatisations.",
     icon: Workflow,
-    color: "primary",
-    features: [
-      "Éditeur visuel drag & drop",
-      "Génération de workflows par IA",
-      "100+ connecteurs (Email, Slack, CRM...)",
-      "Exécution en temps réel 24/7",
-    ],
-    example: {
-      title: "Traitement factures",
-      steps: ["Email reçu", "Extraction IA", "Validation", "Export ERP"],
-    },
+    features: ["Éditeur visuel", "Génération IA", "100+ intégrations", "Temps réel"],
     path: "/tools/flow",
   },
   {
     id: "brain",
-    name: "AETHER Brain",
-    tagline: "Assistant IA interne",
-    description: "Un assistant qui connaît tous vos documents. Posez des questions, obtenez des réponses instantanées basées sur vos données.",
+    name: "Brain",
+    fullName: "AETHER Brain",
+    description: "Un assistant qui connaît tous vos documents. Questions en langage naturel, réponses instantanées.",
     icon: Bot,
-    color: "purple",
-    features: [
-      "Recherche sémantique intelligente",
-      "Analyse de documents automatique",
-      "Génération de procédures",
-      "Base de connaissances vivante",
-    ],
-    example: {
-      title: "Question employé",
-      steps: ["Question posée", "Recherche docs", "Réponse IA", "Source citée"],
-    },
+    features: ["Recherche sémantique", "Analyse de docs", "Base de connaissances", "Multi-langues"],
     path: "/tools/brain",
   },
   {
     id: "support",
-    name: "AETHER Support",
-    tagline: "Service client automatisé",
-    description: "Classifiez, priorisez et répondez aux tickets automatiquement. Réduisez le temps de réponse de 90%.",
+    name: "Support",
+    fullName: "AETHER Support",
+    description: "Classifiez et répondez aux tickets automatiquement. Réduisez le temps de réponse de 90%.",
     icon: Headphones,
-    color: "cyan",
-    features: [
-      "Classification intelligente",
-      "Réponses auto-générées",
-      "Escalade contextuelle",
-      "Dashboard KPI en temps réel",
-    ],
-    example: {
-      title: "Ticket client",
-      steps: ["Ticket reçu", "Classification IA", "Réponse auto", "Résolu"],
-    },
+    features: ["Classification IA", "Réponses auto", "Escalade smart", "Analytics"],
     path: "/tools/support",
   },
   {
     id: "hr",
-    name: "AETHER HR",
-    tagline: "Recrutement augmenté",
+    name: "HR",
+    fullName: "AETHER HR",
     description: "Analysez les CV, scorez les candidats et accélérez vos recrutements avec l'IA.",
     icon: Users,
-    color: "green",
-    features: [
-      "Analyse CV automatique",
-      "Matching candidat-poste",
-      "Score de compatibilité",
-      "Génération fiches de poste",
-    ],
-    example: {
-      title: "Nouveau CV",
-      steps: ["CV uploadé", "Extraction IA", "Scoring", "Shortlist"],
-    },
+    features: ["Analyse CV", "Matching", "Scoring", "Génération fiches"],
     path: "/tools/hr",
   },
   {
     id: "compliance",
-    name: "AETHER Compliance",
-    tagline: "Conformité automatisée",
-    description: "Auditez vos processus RGPD, détectez les risques et générez des rapports de conformité.",
+    name: "Compliance",
+    fullName: "AETHER Compliance",
+    description: "Auditez vos processus RGPD, détectez les risques et générez des rapports automatiquement.",
     icon: Shield,
-    color: "orange",
-    features: [
-      "Audit RGPD automatique",
-      "Détection de risques",
-      "Score de conformité",
-      "Rapports PDF exportables",
-    ],
-    example: {
-      title: "Audit process",
-      steps: ["Process analysé", "Risques détectés", "Score calculé", "Rapport"],
-    },
+    features: ["Audit RGPD", "Détection risques", "Score conformité", "Rapports PDF"],
     path: "/tools/compliance",
   },
   {
     id: "sales",
-    name: "AETHER Sales",
-    tagline: "Ventes augmentées",
-    description: "Analysez vos appels, scorez vos prospects et générez des propositions commerciales.",
+    name: "Sales",
+    fullName: "AETHER Sales",
+    description: "Transcrivez vos appels, analysez le sentiment et générez des propositions commerciales.",
     icon: MessageSquare,
-    color: "pink",
-    features: [
-      "Transcription d'appels",
-      "Analyse de sentiment",
-      "Scoring prospects",
-      "Génération de propositions",
-    ],
-    example: {
-      title: "Appel commercial",
-      steps: ["Appel enregistré", "Transcription", "Analyse IA", "Actions"],
-    },
+    features: ["Transcription", "Analyse sentiment", "Scoring", "Génération"],
     path: "/tools/sales",
   },
 ];
 
-const colorClasses = {
-  primary: {
-    bg: "bg-primary/10",
-    border: "border-primary/30",
-    text: "text-primary",
-    gradient: "from-primary to-[hsl(260_100%_65%)]",
-  },
-  purple: {
-    bg: "bg-[hsl(280_100%_60%/0.1)]",
-    border: "border-[hsl(280_100%_60%/0.3)]",
-    text: "text-[hsl(280_100%_60%)]",
-    gradient: "from-[hsl(280_100%_60%)] to-[hsl(320_100%_55%)]",
-  },
-  cyan: {
-    bg: "bg-[hsl(190_100%_50%/0.1)]",
-    border: "border-[hsl(190_100%_50%/0.3)]",
-    text: "text-[hsl(190_100%_50%)]",
-    gradient: "from-[hsl(190_100%_50%)] to-[hsl(170_100%_45%)]",
-  },
-  green: {
-    bg: "bg-success/10",
-    border: "border-success/30",
-    text: "text-success",
-    gradient: "from-success to-[hsl(160_76%_55%)]",
-  },
-  orange: {
-    bg: "bg-warning/10",
-    border: "border-warning/30",
-    text: "text-warning",
-    gradient: "from-warning to-[hsl(25_100%_55%)]",
-  },
-  pink: {
-    bg: "bg-[hsl(330_100%_60%/0.1)]",
-    border: "border-[hsl(330_100%_60%/0.3)]",
-    text: "text-[hsl(330_100%_60%)]",
-    gradient: "from-[hsl(330_100%_60%)] to-[hsl(350_100%_55%)]",
-  },
-};
-
 export function ToolsShowcaseSection() {
   const [activeTool, setActiveTool] = useState(tools[0]);
-  const colors = colorClasses[activeTool.color as keyof typeof colorClasses];
 
   return (
-    <section id="tools" className="relative py-16 md:py-24 overflow-hidden">
+    <section id="tools" className="relative py-24 lg:py-32 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background to-secondary/10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/5 to-background" />
       
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 max-w-7xl">
-        <div className="text-center mb-10 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
-            <Zap className="w-3 h-3 md:w-4 md:h-4 text-primary" />
-            <span className="text-xs md:text-sm font-medium text-primary">6 outils intégrés</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Une plateforme, <span className="text-gradient">toute l'automatisation</span>
+      <div className="relative z-10 container mx-auto px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="max-w-3xl mx-auto text-center mb-16 lg:mb-20">
+          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
+            Plateforme unifiée
+          </p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6">
+            Six outils, un seul objectif
           </h2>
-          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Chaque outil résout un problème métier concret. Ensemble, ils transforment vos opérations.
+          <p className="text-lg text-muted-foreground">
+            Chaque module résout un problème métier précis. Ensemble, ils transforment vos opérations.
           </p>
         </div>
         
-        {/* Tool Tabs */}
-        <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 mb-8 md:mb-12">
+        {/* Tool Selector */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12 lg:mb-16">
           {tools.map((tool) => {
             const isActive = tool.id === activeTool.id;
-            const toolColors = colorClasses[tool.color as keyof typeof colorClasses];
             return (
               <button
                 key={tool.id}
                 onClick={() => setActiveTool(tool)}
-                className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl border transition-all duration-300 ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 ${
                   isActive
-                    ? `${toolColors.bg} ${toolColors.border} ${toolColors.text}`
-                    : "bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-transparent border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
                 }`}
               >
-                <tool.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                <span className="text-xs md:text-sm font-medium hidden sm:inline">{tool.name}</span>
+                <tool.icon className="w-4 h-4" />
+                <span className="text-sm font-medium">{tool.name}</span>
               </button>
             );
           })}
         </div>
         
         {/* Active Tool Display */}
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center">
-          {/* Left - Info */}
-          <div className="order-2 lg:order-1">
-            <div className={`inline-flex items-center gap-2 px-2.5 md:px-3 py-1 md:py-1.5 rounded-full ${colors.bg} border ${colors.border} mb-3 md:mb-4`}>
-              <activeTool.icon className={`w-3.5 h-3.5 md:w-4 md:h-4 ${colors.text}`} />
-              <span className={`text-xs md:text-sm font-medium ${colors.text}`}>{activeTool.tagline}</span>
-            </div>
-            
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4">{activeTool.name}</h3>
-            <p className="text-sm md:text-lg text-muted-foreground mb-6 md:mb-8 leading-relaxed">{activeTool.description}</p>
-            
-            {/* Features */}
-            <ul className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-              {activeTool.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2 md:gap-3">
-                  <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
-                    <CheckCircle2 className={`w-2.5 h-2.5 md:w-3 md:h-3 ${colors.text}`} />
-                  </div>
-                  <span className="text-sm md:text-base text-foreground">{feature}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <Link to={activeTool.path}>
-              <Button variant="hero" size="default" className="md:text-base">
-                Découvrir {activeTool.name}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-          
-          {/* Right - Visual */}
-          <div className="order-1 lg:order-2">
-            <div className={`relative rounded-xl md:rounded-2xl border ${colors.border} bg-card/80 backdrop-blur-xl overflow-hidden`}>
-              {/* Header */}
-              <div className={`flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b ${colors.border} bg-gradient-to-r ${colors.gradient} bg-opacity-10`}>
-                <div className="flex items-center gap-2">
-                  <activeTool.icon className={`w-4 h-4 md:w-5 md:h-5 ${colors.text}`} />
-                  <span className="text-xs md:text-sm font-medium text-foreground">{activeTool.example.title}</span>
-                </div>
-                <div className={`flex items-center gap-1 px-2 py-0.5 md:py-1 rounded-full ${colors.bg}`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${colors.text.replace('text-', 'bg-')} animate-pulse`} />
-                  <span className={`text-[10px] md:text-xs font-medium ${colors.text}`}>En cours</span>
-                </div>
+        <div className="max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left - Info */}
+            <div className="order-2 lg:order-1">
+              <div className="mb-6">
+                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
+                  {activeTool.fullName}
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {activeTool.description}
+                </p>
               </div>
               
-              {/* Workflow Steps */}
-              <div className="p-4 md:p-6">
-                <div className="flex items-center justify-between gap-1 md:gap-2">
-                  {activeTool.example.steps.map((step, i) => (
-                    <div key={i} className="flex flex-col items-center flex-1">
-                      <div className={`w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl ${i < 3 ? 'bg-success/10 border-success/30' : colors.bg + ' ' + colors.border} border flex items-center justify-center mb-1.5 md:mb-2`}>
-                        {i < 3 ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 md:w-5 md:h-5 text-success" />
-                        ) : (
-                          <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        )}
-                      </div>
-                      <span className="text-[9px] md:text-xs text-center text-muted-foreground max-w-[50px] md:max-w-[70px] line-clamp-2">{step}</span>
+              {/* Features */}
+              <ul className="grid grid-cols-2 gap-3 mb-8">
+                {activeTool.features.map((feature, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-primary" />
                     </div>
-                  ))}
-                </div>
+                    <span className="text-sm text-foreground">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <Link to={activeTool.path}>
+                <Button 
+                  size="lg"
+                  className="bg-foreground text-background hover:bg-foreground/90 rounded-full font-semibold"
+                >
+                  Explorer {activeTool.name}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Right - Visual */}
+            <div className="order-1 lg:order-2">
+              <div className="relative aspect-square max-w-md mx-auto lg:max-w-none">
+                {/* Background Circle */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/5 to-[hsl(260_100%_65%/0.05)]" />
                 
-                {/* Progress bar */}
-                <div className="mt-4 md:mt-6 pt-3 md:pt-4 border-t border-border/30">
-                  <div className="flex justify-between text-[10px] md:text-xs text-muted-foreground mb-1.5 md:mb-2">
-                    <span>Progression</span>
-                    <span className={colors.text}>75%</span>
-                  </div>
-                  <div className="h-1.5 md:h-2 bg-secondary rounded-full overflow-hidden">
-                    <div className={`h-full w-3/4 bg-gradient-to-r ${colors.gradient} rounded-full transition-all duration-500`} />
+                {/* Icon Display */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    {/* Orbiting dots */}
+                    {[0, 1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="absolute w-3 h-3 rounded-full bg-primary/30"
+                        style={{
+                          top: `${50 + 45 * Math.sin((i * Math.PI) / 2)}%`,
+                          left: `${50 + 45 * Math.cos((i * Math.PI) / 2)}%`,
+                          transform: "translate(-50%, -50%)",
+                          animation: `orbit 8s linear infinite`,
+                          animationDelay: `${i * 2}s`,
+                        }}
+                      />
+                    ))}
+                    
+                    {/* Center Icon */}
+                    <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-3xl bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center shadow-2xl shadow-primary/20">
+                      <activeTool.icon className="w-16 h-16 lg:w-20 lg:h-20 text-primary-foreground" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Glow */}
-            <div className={`absolute -inset-4 -z-10 bg-gradient-to-r ${colors.gradient} blur-3xl opacity-20 hidden lg:block`} />
           </div>
         </div>
       </div>
