@@ -298,7 +298,7 @@ export function EnhancedWorkflowCanvas({
 
   if (blocks.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-muted/20">
+      <div className="flex-1 flex items-center justify-center p-8 bg-muted/20" style={{ minHeight: 0 }}>
         <div className="max-w-lg text-center px-4">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-6">
             <Zap className="w-10 h-10 text-primary/60" />
@@ -327,6 +327,7 @@ export function EnhancedWorkflowCanvas({
         "relative w-full flex-1 overflow-hidden bg-muted/20 touch-none",
         isPanning ? "cursor-grabbing" : "cursor-grab"
       )}
+      style={{ minHeight: 0 }}
       onMouseDown={startPanning}
       onTouchStart={startPanningTouch}
     >

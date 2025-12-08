@@ -55,10 +55,11 @@ function DashboardContent({ children, headerActions }: DashboardLayoutProps) {
 
       <main
         className={cn(
-          "transition-all duration-300 min-h-screen pt-14",
+          "transition-all duration-300 h-[calc(100vh-3.5rem)] pt-0 overflow-hidden",
           collapsed ? "lg:pl-16" : "lg:pl-64",
           "pl-0"
         )}
+        style={{ marginTop: '3.5rem' }}
       >
         {children}
       </main>
