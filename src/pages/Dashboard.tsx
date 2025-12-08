@@ -394,16 +394,16 @@ export default function Dashboard() {
                         <stop offset="95%" stopColor="hsl(260 100% 65%)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 30% 25%)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 13% 91%)" vertical={false} />
                     <XAxis
                       dataKey="name"
-                      stroke="hsl(220 14% 65%)"
+                      stroke="hsl(220 10% 46%)"
                       fontSize={10}
                       tickLine={false}
                       axisLine={false}
                     />
                     <YAxis
-                      stroke="hsl(220 14% 65%)"
+                      stroke="hsl(220 10% 46%)"
                       fontSize={10}
                       tickLine={false}
                       axisLine={false}
@@ -411,11 +411,12 @@ export default function Dashboard() {
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "hsl(220 55% 12%)",
-                        border: "1px solid hsl(220 30% 25%)",
+                        backgroundColor: "hsl(0 0% 100%)",
+                        border: "1px solid hsl(220 13% 91%)",
                         borderRadius: "8px",
-                        color: "hsl(220 14% 91%)",
+                        color: "hsl(220 15% 15%)",
                         fontSize: "12px",
+                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                       }}
                     />
                     <Area
@@ -475,11 +476,12 @@ export default function Dashboard() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "hsl(220 55% 12%)",
-                        border: "1px solid hsl(220 30% 25%)",
+                        backgroundColor: "hsl(0 0% 100%)",
+                        border: "1px solid hsl(220 13% 91%)",
                         borderRadius: "8px",
-                        color: "hsl(220 14% 91%)",
+                        color: "hsl(220 15% 15%)",
                         fontSize: "12px",
+                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                       }}
                     />
                   </PieChart>
