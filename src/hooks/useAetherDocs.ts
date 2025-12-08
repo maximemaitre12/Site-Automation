@@ -267,11 +267,11 @@ export function useAetherDocs() {
 
   const updateDocument = async (
     documentId: string,
-    updates: Partial<AetherDocument>
+    updates: Partial<Pick<AetherDocument, 'title' | 'description' | 'content' | 'tags' | 'status' | 'folder_id'>>
   ) => {
     const { data, error } = await supabase
       .from('aether_documents')
-      .update(updates)
+      .update(updates as Record<string, unknown>)
       .eq('id', documentId)
       .select()
       .single();
