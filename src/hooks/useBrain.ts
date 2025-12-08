@@ -21,13 +21,17 @@ export interface Conversation {
   updated_at: string;
 }
 
-export interface InternalDoc {
+// Documents from AETHER Docs
+export interface AetherDocument {
   id: string;
   title: string;
   content: string | null;
-  doc_type: string | null;
+  ai_summary: string | null;
+  description: string | null;
+  file_type: string | null;
   file_url: string | null;
-  tags: string[] | null;
+  tags: any;
+  ai_keywords: any;
   created_at: string;
 }
 
@@ -36,7 +40,7 @@ export function useBrain() {
   const { toast } = useToast();
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [documents, setDocuments] = useState<InternalDoc[]>([]);
+  const [documents, setDocuments] = useState<AetherDocument[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -69,18 +73,15 @@ export function useBrain() {
       return;
     }
     
+    // Fetch from AETHER Docs (aether_documents table)
     const { data, error } = await supabase
-      .from('internal_docs')
-      .select('*')
+      .from('aether_documents')
+      .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (!error) {
-      const docs = data?.map(doc => ({
-        ...doc,
-        tags: doc.tags as string[] | null
-      })) || [];
-      setDocuments(docs);
+    if (!error && data) {
+      setDocuments(data);
     }
   };
 
@@ -103,8 +104,8 @@ export function useBrain() {
             .eq('user_id', user.id)
             .order('updated_at', { ascending: false }),
           supabase
-            .from('internal_docs')
-            .select('*')
+            .from('aether_documents')
+            .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
         ]);
@@ -118,10 +119,7 @@ export function useBrain() {
           }
           
           if (!docsResult.error && docsResult.data) {
-            setDocuments(docsResult.data.map(doc => ({
-              ...doc,
-              tags: doc.tags as string[] | null
-            })));
+            setDocuments(docsResult.data);
           }
         }
       } finally {
@@ -293,20 +291,21 @@ Réponds en français de manière concise, professionnelle et utile.`;
     if (conv) setCurrentConversation(conv);
   };
 
-  // Document management
-  const uploadDocument = async (title: string, content: string, docType: string = 'text', tags: string[] = []): Promise<InternalDoc | null> => {
+  // Document management - now uses aether_documents
+  const uploadDocument = async (title: string, content: string, docType: string = 'text', tags: string[] = []): Promise<AetherDocument | null> => {
     if (!user) return null;
 
     const { data, error } = await supabase
-      .from('internal_docs')
+      .from('aether_documents')
       .insert({
         user_id: user.id,
         title,
         content,
-        doc_type: docType,
-        tags
+        file_type: docType,
+        tags: tags,
+        status: 'active'
       })
-      .select()
+      .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
       .single();
 
     if (error) {
@@ -314,14 +313,13 @@ Réponds en français de manière concise, professionnelle et utile.`;
       return null;
     }
 
-    const doc = { ...data, tags: data.tags as string[] | null };
-    setDocuments(prev => [doc, ...prev]);
-    toast({ title: 'Succès', description: 'Document ajouté' });
-    return doc;
+    setDocuments(prev => [data, ...prev]);
+    toast({ title: 'Succès', description: 'Document ajouté à AETHER Docs' });
+    return data;
   };
 
   const deleteDocument = async (id: string): Promise<boolean> => {
-    const { error } = await supabase.from('internal_docs').delete().eq('id', id);
+    const { error } = await supabase.from('aether_documents').delete().eq('id', id);
     if (error) {
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
@@ -331,20 +329,17 @@ Réponds en français de manière concise, professionnelle et utile.`;
     return true;
   };
 
-  const searchDocuments = async (query: string): Promise<InternalDoc[]> => {
+  const searchDocuments = async (query: string): Promise<AetherDocument[]> => {
     if (!user || !query.trim()) return documents;
 
     const { data, error } = await supabase
-      .from('internal_docs')
-      .select('*')
+      .from('aether_documents')
+      .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
       .eq('user_id', user.id)
-      .or(`title.ilike.%${query}%,content.ilike.%${query}%`);
+      .or(`title.ilike.%${query}%,content.ilike.%${query}%,ai_summary.ilike.%${query}%`);
 
     if (error) return [];
-    return data?.map(doc => ({
-      ...doc,
-      tags: doc.tags as string[] | null
-    })) || [];
+    return data || [];
   };
 
   // AI-powered features

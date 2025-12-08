@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils";
 import { Attachment } from "@/lib/ai-stream";
 import { useToast } from "@/hooks/use-toast";
+import { AetherDocument } from "@/hooks/useBrain";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -40,7 +41,7 @@ export default function BrainPage() {
 
   const [message, setMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredDocs, setFilteredDocs] = useState(documents);
+  const [filteredDocs, setFilteredDocs] = useState<AetherDocument[]>([]);
   const [showTools, setShowTools] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -243,7 +244,7 @@ export default function BrainPage() {
           <div className="border-t border-border pt-4 mt-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-2">
-                Base de connaissances
+                AETHER Docs
               </h3>
               <Badge variant="secondary" className="text-xs">
                 {documents.length}
@@ -268,8 +269,17 @@ export default function BrainPage() {
                     className="group flex items-center justify-between p-2 rounded-lg hover:bg-secondary"
                   >
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                      <span className="text-sm text-foreground truncate">{doc.title}</span>
+                      {doc.file_type?.includes('image') ? (
+                        <Image className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      ) : (
+                        <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm text-foreground truncate block">{doc.title}</span>
+                        {doc.ai_summary && (
+                          <span className="text-xs text-muted-foreground truncate block">{doc.ai_summary.slice(0, 40)}...</span>
+                        )}
+                      </div>
                     </div>
                     <Button
                       variant="ghost"
@@ -281,6 +291,11 @@ export default function BrainPage() {
                     </Button>
                   </div>
                 ))}
+                {filteredDocs.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-2">
+                    Aucun document dans AETHER Docs
+                  </p>
+                )}
               </div>
             </ScrollArea>
             
