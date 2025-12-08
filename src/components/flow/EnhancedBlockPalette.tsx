@@ -10,10 +10,12 @@ import {
   Columns, CheckSquare, Bug, Zap, HardDrive, Box, CreditCard,
   ShoppingCart, Calculator, Twitter, Linkedin, Facebook, Instagram,
   Youtube, Video, Github, Gitlab, Triangle, Flame, BarChart3,
-  BarChart2, Activity, LineChart, Workflow, Play, Headphones
+  BarChart2, Activity, LineChart, Workflow, Play, Headphones,
+  Cpu, Layers, Settings2, Star, X
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Type, FileUp, Globe, ClipboardList, Sparkles, FileSearch,
@@ -27,94 +29,105 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Activity, LineChart, Workflow, Play, Headphones
 };
 
-// Integration subcategories for better organization
+// Tab categories with icons
+const TABS = [
+  { id: 'all', name: 'Tous', icon: Layers },
+  { id: 'trigger', name: 'Triggers', icon: Zap },
+  { id: 'ai', name: 'IA', icon: Brain },
+  { id: 'integration', name: 'Apps', icon: Cpu },
+  { id: 'transform', name: 'Data', icon: Braces },
+  { id: 'control', name: 'Flow', icon: GitBranch },
+  { id: 'system', name: 'Actions', icon: Settings2 },
+] as const;
+
+// Integration subcategories
 const INTEGRATION_SUBCATEGORIES: Record<string, { 
   name: string; 
-  icon: string; 
+  emoji: string;
   color: string;
   blocks: BlockType[] 
 }> = {
   communication: {
-    name: '💬 Communication',
-    icon: 'MessageSquare',
+    name: 'Communication',
+    emoji: '💬',
     color: 'bg-blue-500',
     blocks: ['integration_telegram', 'integration_slack', 'integration_discord', 'integration_whatsapp', 'integration_teams', 'integration_intercom', 'integration_zendesk', 'integration_freshdesk', 'integration_crisp']
   },
   email: {
-    name: '📧 Email Marketing',
-    icon: 'Mail',
+    name: 'Email',
+    emoji: '📧',
     color: 'bg-rose-500',
     blocks: ['integration_sendgrid', 'integration_mailchimp', 'integration_brevo', 'integration_mailgun', 'integration_resend', 'integration_convertkit']
   },
   sms: {
-    name: '📱 SMS & Téléphone',
-    icon: 'Phone',
+    name: 'SMS & Téléphone',
+    emoji: '📱',
     color: 'bg-green-500',
     blocks: ['integration_twilio_sms', 'integration_twilio_voice']
   },
   ai_providers: {
-    name: '🤖 IA & Machine Learning',
-    icon: 'Brain',
+    name: 'IA & ML',
+    emoji: '🤖',
     color: 'bg-purple-500',
     blocks: ['integration_openai', 'integration_anthropic', 'integration_google_ai', 'integration_mistral', 'integration_huggingface', 'integration_replicate', 'integration_stability', 'integration_elevenlabs', 'integration_deepgram', 'integration_assemblyai']
   },
   crm: {
-    name: '👥 CRM & Ventes',
-    icon: 'Users',
+    name: 'CRM & Ventes',
+    emoji: '👥',
     color: 'bg-orange-500',
     blocks: ['integration_hubspot', 'integration_salesforce', 'integration_pipedrive', 'integration_zoho']
   },
   productivity: {
-    name: '📋 Productivité',
-    icon: 'CheckSquare',
+    name: 'Productivité',
+    emoji: '📋',
     color: 'bg-indigo-500',
     blocks: ['integration_notion', 'integration_airtable', 'integration_google_sheets', 'integration_google_calendar', 'integration_trello', 'integration_asana', 'integration_monday', 'integration_clickup', 'integration_jira', 'integration_linear', 'integration_calendly']
   },
   storage: {
-    name: '💾 Stockage & Fichiers',
-    icon: 'HardDrive',
+    name: 'Stockage',
+    emoji: '💾',
     color: 'bg-cyan-500',
     blocks: ['integration_google_drive', 'integration_dropbox', 'integration_onedrive', 'integration_box', 'integration_aws_s3']
   },
   payments: {
-    name: '💳 Paiements & Finance',
-    icon: 'CreditCard',
+    name: 'Paiements',
+    emoji: '💳',
     color: 'bg-emerald-500',
     blocks: ['integration_stripe', 'integration_paypal', 'integration_shopify', 'integration_quickbooks']
   },
   social: {
-    name: '📱 Réseaux Sociaux',
-    icon: 'Instagram',
+    name: 'Réseaux Sociaux',
+    emoji: '📱',
     color: 'bg-pink-500',
     blocks: ['integration_twitter', 'integration_linkedin', 'integration_facebook', 'integration_instagram', 'integration_youtube', 'integration_tiktok']
   },
   dev: {
-    name: '💻 Développement',
-    icon: 'Github',
+    name: 'Développement',
+    emoji: '💻',
     color: 'bg-gray-600',
     blocks: ['integration_github', 'integration_gitlab', 'integration_vercel', 'integration_supabase', 'integration_firebase']
   },
   analytics: {
-    name: '📊 Analytics',
-    icon: 'BarChart3',
+    name: 'Analytics',
+    emoji: '📊',
     color: 'bg-amber-500',
     blocks: ['integration_google_analytics', 'integration_mixpanel', 'integration_segment', 'integration_amplitude']
   },
   automation: {
-    name: '⚡ Automatisation',
-    icon: 'Zap',
+    name: 'Automatisation',
+    emoji: '⚡',
     color: 'bg-yellow-500',
     blocks: ['integration_zapier', 'integration_make', 'integration_n8n']
   },
   video: {
-    name: '🎥 Vidéo & Réunions',
-    icon: 'Video',
+    name: 'Vidéo',
+    emoji: '🎥',
     color: 'bg-red-500',
     blocks: ['integration_zoom', 'integration_loom']
   },
   http: {
-    name: '🌐 HTTP & Webhooks',
-    icon: 'Globe',
+    name: 'HTTP',
+    emoji: '🌐',
     color: 'bg-slate-500',
     blocks: ['http_request', 'http_webhook']
   }
@@ -126,282 +139,255 @@ interface EnhancedBlockPaletteProps {
 
 export function EnhancedBlockPalette({ onAddBlock }: EnhancedBlockPaletteProps) {
   const [search, setSearch] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(['trigger', 'ai', 'system'])
-  );
-  const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [expandedSubcats, setExpandedSubcats] = useState<Set<string>>(new Set(['communication', 'ai_providers', 'productivity']));
 
-  const toggleCategory = (category: string) => {
-    setExpandedCategories(prev => {
+  const toggleSubcat = (key: string) => {
+    setExpandedSubcats(prev => {
       const next = new Set(prev);
-      if (next.has(category)) next.delete(category);
-      else next.add(category);
-      return next;
-    });
-  };
-
-  const toggleSubcategory = (subcategory: string) => {
-    setExpandedSubcategories(prev => {
-      const next = new Set(prev);
-      if (next.has(subcategory)) next.delete(subcategory);
-      else next.add(subcategory);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };
 
   const allBlocks = Object.entries(BLOCK_DEFINITIONS) as [BlockType, typeof BLOCK_DEFINITIONS[BlockType]][];
   
-  const filteredBlocks = search
+  // Filter by search
+  const searchFiltered = search
     ? allBlocks.filter(([_, def]) => 
         def.name.toLowerCase().includes(search.toLowerCase()) ||
         def.description.toLowerCase().includes(search.toLowerCase())
       )
     : allBlocks;
 
-  // Group non-integration blocks by category
-  const nonIntegrationBlocks = filteredBlocks.filter(([_, def]) => def.category !== 'integration');
-  const blocksByCategory = nonIntegrationBlocks.reduce((acc, [type, def]) => {
-    if (!acc[def.category]) acc[def.category] = [];
-    acc[def.category].push([type, def] as const);
-    return acc;
-  }, {} as Record<BlockCategory, [BlockType, typeof BLOCK_DEFINITIONS[BlockType]][]>);
+  // Filter by active tab
+  const tabFiltered = activeTab === 'all' 
+    ? searchFiltered 
+    : searchFiltered.filter(([_, def]) => def.category === activeTab);
 
-  // Get integration blocks organized by subcategory
-  const integrationBlocks = filteredBlocks.filter(([_, def]) => def.category === 'integration');
-  const getSubcategoryBlocks = (subcatKey: string) => {
-    const subcat = INTEGRATION_SUBCATEGORIES[subcatKey];
-    return integrationBlocks.filter(([type]) => subcat.blocks.includes(type));
+  // Get blocks by subcategory for integrations
+  const getIntegrationBlocks = () => {
+    const integrationBlocks = tabFiltered.filter(([_, def]) => def.category === 'integration');
+    const grouped: Record<string, [BlockType, typeof BLOCK_DEFINITIONS[BlockType]][]> = {};
+    
+    for (const [subcatKey, subcat] of Object.entries(INTEGRATION_SUBCATEGORIES)) {
+      const blocks = integrationBlocks.filter(([type]) => subcat.blocks.includes(type));
+      if (blocks.length > 0) {
+        grouped[subcatKey] = blocks;
+      }
+    }
+    return grouped;
   };
 
-  const baseCategories: BlockCategory[] = ['trigger', 'ai', 'transform', 'control'];
-  const quickBlocks: BlockType[] = ['trigger_text', 'trigger_file', 'ai_summary', 'ai_extract', 'system_email', 'system_save'];
+  // Get non-integration blocks
+  const nonIntegrationBlocks = tabFiltered.filter(([_, def]) => def.category !== 'integration');
 
-  const renderBlockButton = (type: BlockType, def: typeof BLOCK_DEFINITIONS[BlockType]) => {
+  const renderBlockButton = (type: BlockType, def: typeof BLOCK_DEFINITIONS[BlockType], compact = false) => {
     const Icon = iconMap[def.icon] || Sparkles;
     return (
       <button
         key={type}
         onClick={() => onAddBlock(type)}
-        className="w-full p-2 lg:p-2.5 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group text-left flex items-center gap-2 lg:gap-3"
+        className={cn(
+          "w-full rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group text-left flex items-center gap-3",
+          compact ? "p-2" : "p-3"
+        )}
         title={def.description}
       >
-        <div className={`w-6 h-6 lg:w-8 lg:h-8 rounded-md lg:rounded-lg bg-gradient-to-br ${def.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
-          <Icon className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+        <div className={cn(
+          "rounded-lg bg-gradient-to-br flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm",
+          def.color,
+          compact ? "w-8 h-8" : "w-10 h-10"
+        )}>
+          <Icon className={cn("text-white", compact ? "w-4 h-4" : "w-5 h-5")} />
         </div>
         <div className="flex-1 min-w-0">
-          <span className="text-xs lg:text-sm font-medium text-foreground block truncate">
+          <span className={cn("font-medium text-foreground block truncate", compact ? "text-xs" : "text-sm")}>
             {def.name}
           </span>
-          <span className="text-[10px] lg:text-xs text-muted-foreground truncate block hidden lg:block">
-            {def.description}
-          </span>
+          {!compact && (
+            <span className="text-xs text-muted-foreground truncate block">
+              {def.description}
+            </span>
+          )}
         </div>
-        <Plus className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+        <Plus className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
       </button>
     );
   };
 
+  const integrationGroups = activeTab === 'all' || activeTab === 'integration' ? getIntegrationBlocks() : {};
+  const showIntegrations = Object.keys(integrationGroups).length > 0;
+
   return (
-    <aside className="w-56 lg:w-72 border-l border-border bg-card/50 flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="p-3 lg:p-4 border-b border-border">
-        <h3 className="text-xs lg:text-sm font-semibold text-foreground mb-2 lg:mb-3 flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Ajouter des blocs
-        </h3>
+    <aside className="w-72 lg:w-80 border-l border-border bg-card flex flex-col overflow-hidden">
+      {/* Search Header */}
+      <div className="p-4 border-b border-border bg-card">
         <div className="relative">
-          <Search className="absolute left-2.5 lg:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 lg:w-4 lg:h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher..."
-            className="pl-8 lg:pl-9 h-8 lg:h-9 text-sm"
+            placeholder="Rechercher un bloc..."
+            className="pl-10 pr-8 h-10 bg-background"
           />
+          {search && (
+            <button 
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
+        {search && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {tabFiltered.length} résultat{tabFiltered.length > 1 ? 's' : ''}
+          </p>
+        )}
       </div>
 
-      {/* Quick add section */}
-      {!search && (
-        <div className="p-3 lg:p-4 border-b border-border bg-primary/5">
-          <h4 className="text-[10px] lg:text-xs font-medium text-primary mb-2 uppercase tracking-wide">
-            ⚡ Blocs populaires
-          </h4>
-          <div className="grid grid-cols-2 gap-1.5">
-            {quickBlocks.map((type) => {
-              const def = BLOCK_DEFINITIONS[type];
-              const Icon = iconMap[def.icon] || Sparkles;
-              return (
-                <button
-                  key={type}
-                  onClick={() => onAddBlock(type)}
-                  className="flex items-center gap-1.5 p-2 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group text-left"
-                >
-                  <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${def.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-3 h-3 text-white" />
-                  </div>
-                  <span className="text-[10px] lg:text-xs font-medium text-foreground truncate">
-                    {def.name.replace('AI ', '').replace('Entrée ', '')}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Blocks list */}
+      {/* Blocks Content */}
       <ScrollArea className="flex-1">
-        <div className="p-3 lg:p-4 space-y-3 lg:space-y-4">
-          {/* Base categories (trigger, ai, transform, control) */}
-          {baseCategories.map(category => {
-            const blocks = blocksByCategory[category] || [];
-            const info = CATEGORY_INFO[category];
-            const isExpanded = expandedCategories.has(category);
-
-            if (blocks.length === 0) return null;
-
-            return (
-              <div key={category}>
-                <button
-                  onClick={() => toggleCategory(category)}
-                  className="w-full flex items-center justify-between py-1.5 lg:py-2 px-1 hover:bg-muted/50 rounded-lg transition-colors"
-                >
-                  <div className="flex items-center gap-1.5 lg:gap-2">
-                    <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${info.color}`} />
-                    <span className="text-[10px] lg:text-xs font-medium text-foreground uppercase tracking-wide">
-                      {info.name}
-                    </span>
-                    <span className="text-[10px] lg:text-xs text-muted-foreground">
-                      ({blocks.length})
-                    </span>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronDown className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground" />
-                  )}
-                </button>
-
-                {isExpanded && (
-                  <div className="space-y-1 mt-1.5 lg:mt-2">
-                    {blocks.map(([type, def]) => renderBlockButton(type, def))}
-                  </div>
-                )}
+        <div className="p-4 space-y-4">
+          {/* Popular blocks when showing all */}
+          {activeTab === 'all' && !search && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-amber-500" />
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                  Populaires
+                </span>
               </div>
-            );
-          })}
-
-          {/* Integrations section with subcategories */}
-          {integrationBlocks.length > 0 && (
-            <div>
-              <button
-                onClick={() => toggleCategory('integration')}
-                className="w-full flex items-center justify-between py-1.5 lg:py-2 px-1 hover:bg-muted/50 rounded-lg transition-colors"
-              >
-                <div className="flex items-center gap-1.5 lg:gap-2">
-                  <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-blue-600" />
-                  <span className="text-[10px] lg:text-xs font-medium text-foreground uppercase tracking-wide">
-                    🔌 Intégrations
-                  </span>
-                  <span className="text-[10px] lg:text-xs text-muted-foreground">
-                    ({integrationBlocks.length})
-                  </span>
-                </div>
-                {expandedCategories.has('integration') ? (
-                  <ChevronDown className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground" />
-                )}
-              </button>
-
-              {expandedCategories.has('integration') && (
-                <div className="mt-2 space-y-1">
-                  {Object.entries(INTEGRATION_SUBCATEGORIES).map(([subcatKey, subcat]) => {
-                    const subcatBlocks = getSubcategoryBlocks(subcatKey);
-                    if (subcatBlocks.length === 0) return null;
-
-                    const isSubcatExpanded = expandedSubcategories.has(subcatKey);
-
-                    return (
-                      <div key={subcatKey} className="ml-2">
-                        <button
-                          onClick={() => toggleSubcategory(subcatKey)}
-                          className="w-full flex items-center justify-between py-1.5 px-2 hover:bg-muted/30 rounded-md transition-colors"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${subcat.color}`} />
-                            <span className="text-[10px] lg:text-xs font-medium text-foreground">
-                              {subcat.name}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              ({subcatBlocks.length})
-                            </span>
-                          </div>
-                          {isSubcatExpanded ? (
-                            <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="w-3 h-3 text-muted-foreground" />
-                          )}
-                        </button>
-
-                        {isSubcatExpanded && (
-                          <div className="space-y-1 mt-1 ml-2">
-                            {subcatBlocks.map(([type, def]) => renderBlockButton(type, def))}
-                          </div>
-                        )}
+              <div className="grid grid-cols-2 gap-2">
+                {(['trigger_text', 'trigger_file', 'ai_summary', 'ai_generate', 'system_email', 'system_save'] as BlockType[]).map((type) => {
+                  const def = BLOCK_DEFINITIONS[type];
+                  const Icon = iconMap[def.icon] || Sparkles;
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => onAddBlock(type)}
+                      className="flex items-center gap-2 p-2.5 rounded-lg bg-background border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                    >
+                      <div className={`w-7 h-7 rounded-md bg-gradient-to-br ${def.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                        <Icon className="w-3.5 h-3.5 text-white" />
                       </div>
-                    );
-                  })}
-                </div>
-              )}
+                      <span className="text-xs font-medium text-foreground truncate">
+                        {def.name.replace('AI ', '').replace('Send ', '')}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
-          {/* System category */}
-          {blocksByCategory['system']?.length > 0 && (
-            <div>
-              <button
-                onClick={() => toggleCategory('system')}
-                className="w-full flex items-center justify-between py-1.5 lg:py-2 px-1 hover:bg-muted/50 rounded-lg transition-colors"
-              >
-                <div className="flex items-center gap-1.5 lg:gap-2">
-                  <div className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${CATEGORY_INFO['system'].color}`} />
-                  <span className="text-[10px] lg:text-xs font-medium text-foreground uppercase tracking-wide">
-                    {CATEGORY_INFO['system'].name}
+          {/* Non-integration blocks */}
+          {nonIntegrationBlocks.length > 0 && (
+            <div className="space-y-2">
+              {(activeTab !== 'all' && activeTab !== 'integration') && (
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-2 h-2 rounded-full ${CATEGORY_INFO[activeTab as BlockCategory]?.color || 'bg-primary'}`} />
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                    {CATEGORY_INFO[activeTab as BlockCategory]?.name || activeTab}
                   </span>
-                  <span className="text-[10px] lg:text-xs text-muted-foreground">
-                    ({blocksByCategory['system'].length})
-                  </span>
-                </div>
-                {expandedCategories.has('system') ? (
-                  <ChevronDown className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4 text-muted-foreground" />
-                )}
-              </button>
-
-              {expandedCategories.has('system') && (
-                <div className="space-y-1 mt-1.5 lg:mt-2">
-                  {blocksByCategory['system'].map(([type, def]) => renderBlockButton(type, def))}
+                  <span className="text-xs text-muted-foreground">({nonIntegrationBlocks.length})</span>
                 </div>
               )}
+              {nonIntegrationBlocks.map(([type, def]) => renderBlockButton(type, def, search !== ''))}
             </div>
           )}
 
-          {filteredBlocks.length === 0 && (
-            <div className="text-center py-6 lg:py-8">
-              <Search className="w-6 h-6 lg:w-8 lg:h-8 text-muted-foreground/30 mx-auto mb-2" />
-              <p className="text-xs lg:text-sm text-muted-foreground">Aucun bloc trouvé</p>
+          {/* Integration blocks grouped by subcategory */}
+          {showIntegrations && (
+            <div className="space-y-3">
+              {activeTab === 'all' && !search && (
+                <div className="flex items-center gap-2 pt-2">
+                  <Cpu className="w-4 h-4 text-blue-500" />
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                    Applications
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    ({Object.values(integrationGroups).flat().length})
+                  </span>
+                </div>
+              )}
+              
+              {Object.entries(integrationGroups).map(([subcatKey, blocks]) => {
+                const subcat = INTEGRATION_SUBCATEGORIES[subcatKey];
+                const isExpanded = expandedSubcats.has(subcatKey) || search !== '';
+                
+                return (
+                  <div key={subcatKey} className="border border-border rounded-lg overflow-hidden bg-background/50">
+                    <button
+                      onClick={() => toggleSubcat(subcatKey)}
+                      className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{subcat.emoji}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {subcat.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                          {blocks.length}
+                        </span>
+                      </div>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="p-2 pt-0 space-y-1.5 border-t border-border">
+                        {blocks.map(([type, def]) => renderBlockButton(type, def, true))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {tabFiltered.length === 0 && (
+            <div className="text-center py-12">
+              <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Aucun bloc trouvé</p>
+              <p className="text-xs text-muted-foreground mt-1">Essayez un autre terme de recherche</p>
             </div>
           )}
         </div>
       </ScrollArea>
 
-      {/* Quick tip */}
-      <div className="p-3 lg:p-4 border-t border-border bg-muted/30">
-        <p className="text-[10px] lg:text-xs text-muted-foreground">
-          💡 Cliquez pour ajouter, puis configurez le bloc sélectionné
-        </p>
+      {/* Tab Bar at Bottom */}
+      <div className="border-t border-border bg-muted/30 p-2">
+        <div className="flex gap-1 overflow-x-auto">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const count = tab.id === 'all' 
+              ? allBlocks.length 
+              : allBlocks.filter(([_, def]) => def.category === tab.id).length;
+            
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all flex-1 min-w-0",
+                  isActive 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-[10px] font-medium truncate">{tab.name}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </aside>
   );
