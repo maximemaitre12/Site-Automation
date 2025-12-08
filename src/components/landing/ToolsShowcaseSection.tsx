@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Workflow, Bot, Headphones, Users, Shield, TrendingUp,
-  ArrowRight, Check, Sparkles
+  ArrowRight, Check
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LucideIcon } from "lucide-react";
@@ -11,80 +11,105 @@ interface Tool {
   id: string;
   name: string;
   tagline: string;
-  description: string;
+  problem: string;
+  solution: string;
   icon: LucideIcon;
-  gradient: string;
+  color: string;
+  stats: { value: string; label: string }[];
   features: string[];
   path: string;
-  stat: { value: string; label: string };
 }
 
 const tools: Tool[] = [
   {
     id: "flow",
     name: "Flow",
-    tagline: "Orchestration visuelle",
-    description: "Créez des workflows complexes en glisser-déposer. L'IA génère et optimise vos automatisations automatiquement.",
+    tagline: "Automatisation visuelle",
+    problem: "Vos équipes perdent du temps sur des tâches répétitives",
+    solution: "Créez des workflows automatisés en glisser-déposer. L'IA exécute, vous supervisez.",
     icon: Workflow,
-    gradient: "from-[hsl(280_100%_60%)] to-[hsl(250_100%_60%)]",
-    features: ["Éditeur drag & drop", "Génération IA", "100+ intégrations", "Exécution temps réel"],
+    color: "from-violet-500 to-purple-600",
+    stats: [
+      { value: "10x", label: "plus rapide" },
+      { value: "0", label: "code requis" },
+    ],
+    features: ["Éditeur drag & drop", "100+ intégrations", "Exécution temps réel", "Logs détaillés"],
     path: "/tools/flow",
-    stat: { value: "10x", label: "plus rapide" },
   },
   {
     id: "brain",
     name: "Brain",
-    tagline: "Intelligence documentaire",
-    description: "Un assistant IA qui connaît tous vos documents. Posez des questions naturelles, obtenez des réponses précises.",
+    tagline: "IA documentaire",
+    problem: "L'information est dispersée, introuvable, inutilisée",
+    solution: "Un assistant qui a lu tous vos documents. Posez une question, obtenez LA réponse.",
     icon: Bot,
-    gradient: "from-[hsl(250_100%_60%)] to-[hsl(220_100%_60%)]",
-    features: ["Recherche sémantique", "Analyse multi-docs", "Base de connaissances", "Réponses sourcées"],
+    color: "from-blue-500 to-cyan-500",
+    stats: [
+      { value: "95%", label: "précision" },
+      { value: "<2s", label: "réponse" },
+    ],
+    features: ["Recherche sémantique", "Multi-documents", "Sources citées", "Multi-langues"],
     path: "/tools/brain",
-    stat: { value: "95%", label: "précision" },
   },
   {
     id: "support",
     name: "Support",
-    tagline: "Automatisation support",
-    description: "Classifiez et répondez aux tickets automatiquement. Réduisez le temps de réponse de 90%.",
+    tagline: "Support automatisé",
+    problem: "Vos agents sont submergés de tickets répétitifs",
+    solution: "L'IA classifie, répond, et escalade intelligemment. -90% de temps de réponse.",
     icon: Headphones,
-    gradient: "from-[hsl(220_100%_60%)] to-[hsl(180_100%_50%)]",
-    features: ["Classification IA", "Réponses auto", "Escalade intelligente", "Analytics avancés"],
+    color: "from-emerald-500 to-teal-500",
+    stats: [
+      { value: "-90%", label: "temps réponse" },
+      { value: "24/7", label: "disponibilité" },
+    ],
+    features: ["Classification auto", "Réponses suggérées", "Escalade smart", "Dashboard KPI"],
     path: "/tools/support",
-    stat: { value: "-90%", label: "temps réponse" },
   },
   {
     id: "hr",
     name: "HR",
     tagline: "Recrutement augmenté",
-    description: "Analysez les CV, scorez les candidats et matchez-les avec vos offres instantanément.",
+    problem: "Vous croulez sous les CV sans trouver les bons profils",
+    solution: "Analyse automatique des CV, scoring, matching avec vos offres. Recrutez 5x plus vite.",
     icon: Users,
-    gradient: "from-[hsl(180_100%_50%)] to-[hsl(160_84%_39%)]",
-    features: ["Parsing CV", "Scoring candidats", "Matching postes", "Génération fiches"],
+    color: "from-orange-500 to-amber-500",
+    stats: [
+      { value: "5x", label: "plus de CV traités" },
+      { value: "87%", label: "matching précis" },
+    ],
+    features: ["Parsing CV", "Scoring candidats", "Matching offres", "Génération fiches"],
     path: "/tools/hr",
-    stat: { value: "5x", label: "plus de CV traités" },
   },
   {
     id: "compliance",
     name: "Compliance",
-    tagline: "Conformité automatisée",
-    description: "Auditez vos processus RGPD, détectez les risques et générez des rapports en un clic.",
+    tagline: "Conformité auto",
+    problem: "L'audit RGPD est un cauchemar coûteux et chronophage",
+    solution: "Audit automatique de vos process. Détection des risques. Rapport en 1 clic.",
     icon: Shield,
-    gradient: "from-[hsl(160_84%_39%)] to-[hsl(200_100%_50%)]",
-    features: ["Audit RGPD", "Détection risques", "Score conformité", "Rapports PDF"],
+    color: "from-red-500 to-rose-500",
+    stats: [
+      { value: "100%", label: "couverture" },
+      { value: "1h", label: "vs 1 semaine" },
+    ],
+    features: ["Scan RGPD", "Score conformité", "Détection risques", "Rapports PDF"],
     path: "/tools/compliance",
-    stat: { value: "100%", label: "couverture" },
   },
   {
     id: "sales",
     name: "Sales",
-    tagline: "Intelligence commerciale",
-    description: "Transcrivez vos appels, analysez le sentiment et générez des propositions commerciales gagnantes.",
+    tagline: "Vente augmentée",
+    problem: "Vos commerciaux perdent du temps sur l'admin au lieu de vendre",
+    solution: "Transcription d'appels, analyse sentiment, propositions générées automatiquement.",
     icon: TrendingUp,
-    gradient: "from-[hsl(200_100%_50%)] to-[hsl(280_100%_60%)]",
-    features: ["Transcription", "Analyse sentiment", "Scoring leads", "Génération proposals"],
+    color: "from-pink-500 to-fuchsia-500",
+    stats: [
+      { value: "+35%", label: "conversion" },
+      { value: "30s", label: "proposition" },
+    ],
+    features: ["Transcription", "Analyse sentiment", "Scoring leads", "Génération auto"],
     path: "/tools/sales",
-    stat: { value: "+35%", label: "conversion" },
   },
 ];
 
@@ -92,28 +117,23 @@ export function ToolsShowcaseSection() {
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);
 
   return (
-    <section id="tools" className="relative py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/5 to-background" />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/80 border border-[hsl(250_100%_60%/0.2)] mb-6">
-            <Sparkles className="w-4 h-4 text-[hsl(250_100%_70%)]" />
-            <span className="text-sm font-medium text-foreground">Plateforme unifiée</span>
+    <section id="features" className="relative py-24 lg:py-32 bg-secondary/30">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border mb-6">
+            <span className="text-sm font-medium text-[hsl(250_100%_45%)]">6 outils, 1 plateforme</span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6">
-            Six outils.<br />
-            <span className="text-gradient-hero">Une révolution.</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6">
+            Chaque problème a <span className="text-gradient">son agent IA.</span>
           </h2>
           <p className="text-xl text-muted-foreground">
-            Chaque module résout un problème métier précis. Ensemble, ils transforment votre entreprise.
+            Cliquez sur un outil pour découvrir comment il transforme votre quotidien.
           </p>
         </div>
         
-        {/* Tools Grid */}
-        <div className="grid lg:grid-cols-3 gap-4 mb-12">
+        {/* Tool selector */}
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
           {tools.map((tool) => {
             const isActive = tool.id === activeTool.id;
             const IconComponent = tool.icon;
@@ -121,96 +141,91 @@ export function ToolsShowcaseSection() {
               <button
                 key={tool.id}
                 onClick={() => setActiveTool(tool)}
-                className={`relative group text-left p-6 rounded-2xl border transition-all duration-300 ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-200 ${
                   isActive
-                    ? "bg-secondary/60 border-[hsl(250_100%_60%/0.3)] shadow-lg shadow-[hsl(250_100%_60%/0.1)]"
-                    : "bg-card/30 border-border/30 hover:bg-secondary/40 hover:border-border/50"
+                    ? "bg-foreground text-background border-foreground shadow-lg"
+                    : "bg-white text-foreground border-border hover:border-[hsl(250_100%_70%)]"
                 }`}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tool.gradient} flex items-center justify-center shadow-lg`}>
-                    <IconComponent className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-foreground">{tool.stat.value}</div>
-                    <div className="text-xs text-muted-foreground">{tool.stat.label}</div>
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-1">AETHER {tool.name}</h3>
-                <p className="text-sm text-muted-foreground">{tool.tagline}</p>
+                <IconComponent className="w-4 h-4" />
+                <span className="font-medium">{tool.name}</span>
               </button>
             );
           })}
         </div>
         
-        {/* Active Tool Detail */}
-        <div className="relative">
-          <div className="absolute -inset-4 bg-gradient-to-r from-[hsl(280_100%_60%/0.1)] via-transparent to-[hsl(220_100%_60%/0.1)] rounded-3xl blur-xl" />
-          
-          <div className="relative p-8 lg:p-12 rounded-2xl bg-card/50 border border-border/30 backdrop-blur-sm">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left - Info */}
-              <div>
-                <div className={`inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br ${activeTool.gradient} items-center justify-center shadow-xl mb-6`}>
-                  <activeTool.icon className="w-8 h-8 text-white" />
-                </div>
-                
-                <h3 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-                  AETHER {activeTool.name}
-                </h3>
-                <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                  {activeTool.description}
-                </p>
-                
-                {/* Features */}
-                <ul className="grid grid-cols-2 gap-3 mb-8">
-                  {activeTool.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${activeTool.gradient} flex items-center justify-center`}>
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                      <span className="text-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Link to={activeTool.path}>
-                  <Button 
-                    size="lg"
-                    className={`bg-gradient-to-r ${activeTool.gradient} hover:opacity-90 text-white border-0 shadow-lg`}
-                  >
-                    Découvrir {activeTool.name}
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
+        {/* Active tool detail */}
+        <div className="bg-white rounded-3xl border border-border overflow-hidden shadow-xl">
+          <div className="grid lg:grid-cols-2">
+            {/* Left - Content */}
+            <div className="p-8 lg:p-12">
+              <div className={`inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br ${activeTool.color} items-center justify-center mb-6`}>
+                <activeTool.icon className="w-7 h-7 text-white" />
               </div>
               
-              {/* Right - Visual */}
-              <div className="relative">
-                <div className={`absolute inset-0 bg-gradient-to-br ${activeTool.gradient} opacity-5 rounded-2xl`} />
-                <div className="relative p-8 rounded-2xl bg-secondary/30 border border-border/20">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-3 h-3 rounded-full bg-[hsl(160_84%_39%)] animate-pulse" />
-                    <span className="text-sm text-muted-foreground">Aperçu en temps réel</span>
+              <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
+                AETHER {activeTool.name}
+              </h3>
+              <p className="text-lg text-[hsl(250_100%_55%)] font-medium mb-4">{activeTool.tagline}</p>
+              
+              <div className="mb-6">
+                <p className="text-muted-foreground mb-2">
+                  <span className="font-semibold text-foreground">Le problème :</span> {activeTool.problem}
+                </p>
+                <p className="text-muted-foreground">
+                  <span className="font-semibold text-foreground">La solution :</span> {activeTool.solution}
+                </p>
+              </div>
+              
+              {/* Stats */}
+              <div className="flex gap-6 mb-8">
+                {activeTool.stats.map((stat, i) => (
+                  <div key={i}>
+                    <div className="text-3xl font-bold text-gradient">{stat.value}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
                   </div>
-                  
-                  {/* Mock UI */}
-                  <div className="space-y-4">
-                    <div className="h-4 bg-secondary/50 rounded-full w-3/4" />
-                    <div className="h-4 bg-secondary/50 rounded-full w-1/2" />
-                    <div className="h-24 bg-secondary/30 rounded-xl mt-6" />
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="h-16 bg-secondary/40 rounded-lg" />
-                      <div className="h-16 bg-secondary/40 rounded-lg" />
-                      <div className="h-16 bg-secondary/40 rounded-lg" />
-                    </div>
+                ))}
+              </div>
+              
+              {/* Features */}
+              <ul className="grid grid-cols-2 gap-2 mb-8">
+                {activeTool.features.map((feature, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm">
+                    <Check className="w-4 h-4 text-[hsl(160_84%_39%)]" />
+                    <span className="text-foreground">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <Link to={activeTool.path}>
+                <Button className={`bg-gradient-to-r ${activeTool.color} hover:opacity-90 text-white rounded-full`}>
+                  Essayer {activeTool.name} gratuitement
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Right - Visual */}
+            <div className={`bg-gradient-to-br ${activeTool.color} p-8 lg:p-12 flex items-center justify-center`}>
+              <div className="w-full max-w-sm bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 rounded-full bg-white/30" />
+                  <div className="flex-1 h-2 bg-white/20 rounded-full" />
+                </div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-white/20 rounded w-3/4" />
+                  <div className="h-4 bg-white/20 rounded w-1/2" />
+                  <div className="h-20 bg-white/10 rounded-lg mt-4" />
+                  <div className="flex gap-2 mt-4">
+                    <div className="h-8 bg-white/30 rounded-lg flex-1" />
+                    <div className="h-8 bg-white/20 rounded-lg flex-1" />
                   </div>
-                  
-                  {/* Floating stat */}
-                  <div className="absolute -bottom-4 -right-4 px-4 py-2 rounded-xl bg-card border border-border/50 shadow-xl">
-                    <div className="text-2xl font-bold text-foreground">{activeTool.stat.value}</div>
-                    <div className="text-xs text-muted-foreground">{activeTool.stat.label}</div>
-                  </div>
+                </div>
+                
+                {/* Floating stats */}
+                <div className="absolute -bottom-4 -right-4 bg-white rounded-xl shadow-2xl p-4 hidden lg:block">
+                  <div className="text-2xl font-bold text-foreground">{activeTool.stats[0].value}</div>
+                  <div className="text-xs text-muted-foreground">{activeTool.stats[0].label}</div>
                 </div>
               </div>
             </div>
