@@ -17,6 +17,7 @@ import ApiKeys from "./pages/settings/ApiKeys";
 
 // Tools
 import Flow from "./pages/tools/Flow";
+import DocPage from "./pages/tools/Doc";
 import Sales from "./pages/tools/Sales";
 import HR from "./pages/tools/HR";
 import Support from "./pages/tools/Support";
@@ -53,6 +54,7 @@ const App = () => (
             {/* Protected routes */}
             <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
             <Route path="/tools/flow" element={<RequireAuth><Flow /></RequireAuth>} />
+            <Route path="/tools/doc" element={<RequireAuth><DocPage /></RequireAuth>} />
             <Route path="/tools/sales" element={<RequireAuth><Sales /></RequireAuth>} />
             <Route path="/tools/hr" element={<RequireAuth><HR /></RequireAuth>} />
             <Route path="/tools/support" element={<RequireAuth><Support /></RequireAuth>} />
