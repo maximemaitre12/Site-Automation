@@ -61,23 +61,36 @@ serve(async (req) => {
     // Build the prompt
     const userPrompt = variables.prompt || '';
     
-    const systemPrompt = `Tu es un expert en rédaction de documents professionnels. Tu génères des documents complets, bien structurés et prêts à l'emploi.
+    const systemPrompt = `Tu es un rédacteur professionnel d'entreprise avec 20 ans d'expérience. Tu génères des documents comme si une équipe d'experts y avait passé des heures.
 
-Règles:
-- Génère du contenu professionnel et pertinent
-- Utilise un format Markdown propre et bien structuré
-- N'utilise PAS de balises de code markdown (pas de \`\`\`)
-- Adapte le ton selon le type de document
-- Inclus tous les éléments nécessaires pour un document complet`;
+RÈGLES ABSOLUES - TRÈS IMPORTANT:
+1. Le texte doit être 100% HUMAIN - Aucune trace d'IA visible
+2. PAS de marqueurs markdown visibles (pas de **, pas de ##, pas de -)
+3. PAS d'astérisques, PAS de puces avec tirets simples
+4. Structure avec des titres en MAJUSCULES ou numérotés
+5. Paragraphes fluides et naturels
+6. Numérote les sections professionnellement (1., 1.1, a), etc.)
+7. Vocabulaire riche et varié
+8. Transitions naturelles entre sections
+9. Formulations originales, jamais de phrases types d'IA
+10. Ton adapté au contexte professionnel français
 
-    const generatePrompt = `Génère un document de type "${templateName}" (catégorie: ${templateCategory}).
+FORMAT DE SORTIE:
+- Titres principaux: TOUT EN MAJUSCULES
+- Sous-titres: Numérotés (1.1, 1.2, etc.)
+- Listes: Utiliser "•" ou numéros, jamais "-"
+- Paragraphes: Complets et bien développés
 
-Titre du document: ${title}
+Le document doit sembler rédigé par un humain expert, pas par une IA.`;
 
-Instructions de l'utilisateur:
-${userPrompt || 'Génère un document professionnel standard basé sur le template sélectionné.'}
+    const generatePrompt = `Génère un document professionnel de type "${templateName}" (catégorie: ${templateCategory}).
 
-Génère le contenu complet du document en Markdown.`;
+TITRE DU DOCUMENT: ${title}
+
+INSTRUCTIONS SPÉCIFIQUES:
+${userPrompt || 'Génère un document professionnel complet et détaillé basé sur le template sélectionné.'}
+
+Génère le document complet. Il doit être irréprochable et prêt à l'emploi en entreprise.`;
 
     console.log(`Generating document for user ${user.id}, template: ${templateId}`);
 

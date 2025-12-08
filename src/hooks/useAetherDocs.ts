@@ -304,17 +304,55 @@ export function useAetherDocs() {
 
   const analyzeDocument = async (documentId: string) => {
     try {
+      toast.info('Analyse IA en cours...');
       const { error } = await supabase.functions.invoke('doc-analyze', {
         body: { documentId }
       });
 
       if (error) {
         console.error('Analysis error:', error);
-      } else {
-        await fetchDocuments();
+        toast.error('Erreur lors de l\'analyse');
+        return false;
       }
+      
+      await fetchDocuments();
+      toast.success('Analyse IA terminée');
+      return true;
     } catch (e) {
       console.error('Analysis failed:', e);
+      toast.error('Erreur lors de l\'analyse');
+      return false;
+    }
+  };
+
+  const rewriteDocument = async (
+    documentId: string,
+    options?: {
+      instructions?: string;
+      style?: 'professional' | 'formal' | 'concise' | 'detailed' | 'simplified';
+      format?: 'report' | 'memo' | 'procedure' | 'email' | 'presentation' | 'contract';
+      companyRules?: string;
+    }
+  ) => {
+    try {
+      toast.info('Réécriture en cours...');
+      const { data, error } = await supabase.functions.invoke('doc-rewrite', {
+        body: { documentId, ...options }
+      });
+
+      if (error) {
+        console.error('Rewrite error:', error);
+        toast.error('Erreur lors de la réécriture');
+        return null;
+      }
+
+      await fetchDocuments();
+      toast.success('Document réécrit avec succès');
+      return data;
+    } catch (e) {
+      console.error('Rewrite failed:', e);
+      toast.error('Erreur lors de la réécriture');
+      return null;
     }
   };
 
@@ -413,6 +451,8 @@ export function useAetherDocs() {
     updateDocument,
     deleteDocument,
     generateDocument,
+    analyzeDocument,
+    rewriteDocument,
     searchDocuments,
     getDocumentsByTags,
     moveDocument,

@@ -10,6 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AetherDocument } from "@/hooks/useAetherDocs";
 import {
   FileText,
@@ -23,7 +32,11 @@ import {
   Calendar,
   Building,
   Copy,
-  Check
+  Check,
+  Wand2,
+  RefreshCw,
+  FileDown,
+  Loader2
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -33,14 +46,32 @@ interface DocViewerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   document: AetherDocument | null;
+  onAnalyze?: (documentId: string) => Promise<boolean>;
+  onRewrite?: (documentId: string, options?: {
+    instructions?: string;
+    style?: 'professional' | 'formal' | 'concise' | 'detailed' | 'simplified';
+    format?: 'report' | 'memo' | 'procedure' | 'email' | 'presentation' | 'contract';
+    companyRules?: string;
+  }) => Promise<any>;
+  onRefresh?: () => void;
 }
 
 export function DocViewerDialog({
   open,
   onOpenChange,
-  document
+  document,
+  onAnalyze,
+  onRewrite,
+  onRefresh
 }: DocViewerDialogProps) {
   const [copied, setCopied] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [rewriting, setRewriting] = useState(false);
+  const [showRewriteOptions, setShowRewriteOptions] = useState(false);
+  const [rewriteStyle, setRewriteStyle] = useState<string>('professional');
+  const [rewriteFormat, setRewriteFormat] = useState<string>('');
+  const [rewriteInstructions, setRewriteInstructions] = useState('');
+  const [companyRules, setCompanyRules] = useState('');
 
   if (!document) return null;
 
@@ -64,6 +95,96 @@ export function DocViewerDialog({
       a.download = `${document.title}.txt`;
       a.click();
       URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    if (!document.content) {
+      toast.error("Aucun contenu à exporter");
+      return;
+    }
+
+    // Create a printable version
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error("Impossible d'ouvrir la fenêtre d'impression");
+      return;
+    }
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${document.title}</title>
+        <style>
+          @page { margin: 2.5cm; }
+          body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+          }
+          h1 { font-size: 18pt; margin-bottom: 24px; text-align: center; }
+          h2 { font-size: 14pt; margin-top: 24px; margin-bottom: 12px; }
+          p { text-align: justify; margin-bottom: 12px; }
+          .header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }
+          .date { color: #666; font-size: 10pt; }
+          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 10pt; color: #666; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${document.title}</h1>
+          <p class="date">Document généré le ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}</p>
+        </div>
+        <div class="content">
+          ${document.content.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('')}
+        </div>
+        <div class="footer">
+          Version ${document.version} • Dernière modification: ${format(new Date(document.updated_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
+        </div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.print();
+    };
+  };
+
+  const handleAnalyze = async () => {
+    if (!onAnalyze) return;
+    setAnalyzing(true);
+    try {
+      await onAnalyze(document.id);
+      onRefresh?.();
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleRewrite = async () => {
+    if (!onRewrite) return;
+    setRewriting(true);
+    try {
+      const result = await onRewrite(document.id, {
+        instructions: rewriteInstructions || undefined,
+        style: rewriteStyle as any,
+        format: rewriteFormat as any || undefined,
+        companyRules: companyRules || undefined
+      });
+      if (result) {
+        setShowRewriteOptions(false);
+        setRewriteInstructions('');
+        onRefresh?.();
+      }
+    } finally {
+      setRewriting(false);
     }
   };
 
@@ -97,6 +218,9 @@ export function DocViewerDialog({
               <Button variant="outline" size="sm" onClick={handleDownload}>
                 <Download className="w-4 h-4" />
               </Button>
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF} title="Exporter en PDF">
+                <FileDown className="w-4 h-4" />
+              </Button>
               {document.file_url && (
                 <Button variant="outline" size="sm" onClick={() => window.open(document.file_url!, '_blank')}>
                   <ExternalLink className="w-4 h-4" />
@@ -112,6 +236,10 @@ export function DocViewerDialog({
             <TabsTrigger value="ai">
               <Brain className="w-4 h-4 mr-1.5" />
               Analyse IA
+            </TabsTrigger>
+            <TabsTrigger value="rewrite">
+              <Wand2 className="w-4 h-4 mr-1.5" />
+              Améliorer
             </TabsTrigger>
             <TabsTrigger value="metadata">Métadonnées</TabsTrigger>
           </TabsList>
@@ -142,6 +270,27 @@ export function DocViewerDialog({
           </TabsContent>
 
           <TabsContent value="ai" className="flex-1 min-h-0 mt-4 space-y-4">
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleAnalyze} 
+                disabled={analyzing}
+                variant="outline"
+              >
+                {analyzing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Analyse en cours...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    {document.ai_summary ? 'Relancer l\'analyse' : 'Lancer l\'analyse IA'}
+                  </>
+                )}
+              </Button>
+            </div>
+
             {/* Summary */}
             {document.ai_summary && (
               <Card className="p-4">
@@ -299,12 +448,123 @@ export function DocViewerDialog({
             {!document.ai_summary && (!document.ai_keywords || document.ai_keywords.length === 0) && !hasEntities && (
               <div className="text-center py-8">
                 <Brain className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mb-4">
                   {document.embedding_status === 'pending' 
-                    ? "Analyse IA en cours..." 
+                    ? "Analyse IA en attente" 
                     : "Aucune analyse IA disponible"}
                 </p>
+                <Button onClick={handleAnalyze} disabled={analyzing}>
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Brain className="w-4 h-4 mr-2" />
+                      Lancer l'analyse IA
+                    </>
+                  )}
+                </Button>
               </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="rewrite" className="flex-1 min-h-0 mt-4 space-y-4">
+            <Card className="p-4">
+              <h4 className="font-medium flex items-center gap-2 mb-4">
+                <Wand2 className="w-4 h-4 text-primary" />
+                Réécrire le document
+              </h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                L'IA va réécrire votre document de manière professionnelle, comme s'il avait été rédigé par une équipe d'experts. Le résultat sera 100% humain, sans aucune trace d'IA.
+              </p>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Style de rédaction</Label>
+                    <Select value={rewriteStyle} onValueChange={setRewriteStyle}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="professional">Professionnel</SelectItem>
+                        <SelectItem value="formal">Formel</SelectItem>
+                        <SelectItem value="concise">Concis</SelectItem>
+                        <SelectItem value="detailed">Détaillé</SelectItem>
+                        <SelectItem value="simplified">Simplifié</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Format du document</Label>
+                    <Select value={rewriteFormat} onValueChange={setRewriteFormat}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Automatique" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Automatique</SelectItem>
+                        <SelectItem value="report">Rapport</SelectItem>
+                        <SelectItem value="memo">Mémo</SelectItem>
+                        <SelectItem value="procedure">Procédure</SelectItem>
+                        <SelectItem value="email">Email</SelectItem>
+                        <SelectItem value="presentation">Présentation</SelectItem>
+                        <SelectItem value="contract">Contrat</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Instructions spécifiques (optionnel)</Label>
+                  <Textarea
+                    placeholder="Ex: Ajouter plus de détails techniques, utiliser un ton plus formel..."
+                    value={rewriteInstructions}
+                    onChange={(e) => setRewriteInstructions(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Règles de l'entreprise (optionnel)</Label>
+                  <Textarea
+                    placeholder="Ex: Toujours commencer par 'Cher client', utiliser 'nous' au lieu de 'je', etc."
+                    value={companyRules}
+                    onChange={(e) => setCompanyRules(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+
+                <Button 
+                  onClick={handleRewrite} 
+                  disabled={rewriting || !document.content}
+                  className="w-full"
+                >
+                  {rewriting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Réécriture en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Réécrire le document
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
+
+            {document.metadata?.lastRewrite && (
+              <Card className="p-4 bg-muted/50">
+                <p className="text-sm text-muted-foreground">
+                  Dernière réécriture: {format(new Date((document.metadata.lastRewrite as any).rewrittenAt), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                  {' '}• Style: {(document.metadata.lastRewrite as any).style}
+                  {(document.metadata.lastRewrite as any).format && ` • Format: ${(document.metadata.lastRewrite as any).format}`}
+                </p>
+              </Card>
             )}
           </TabsContent>
 
