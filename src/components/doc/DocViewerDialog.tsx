@@ -69,7 +69,7 @@ export function DocViewerDialog({
   const [rewriting, setRewriting] = useState(false);
   const [showRewriteOptions, setShowRewriteOptions] = useState(false);
   const [rewriteStyle, setRewriteStyle] = useState<string>('professional');
-  const [rewriteFormat, setRewriteFormat] = useState<string>('');
+  const [rewriteFormat, setRewriteFormat] = useState<string>('auto');
   const [rewriteInstructions, setRewriteInstructions] = useState('');
   const [companyRules, setCompanyRules] = useState('');
 
@@ -175,7 +175,7 @@ export function DocViewerDialog({
       const result = await onRewrite(document.id, {
         instructions: rewriteInstructions || undefined,
         style: rewriteStyle as any,
-        format: rewriteFormat as any || undefined,
+        format: rewriteFormat !== 'auto' ? rewriteFormat as any : undefined,
         companyRules: companyRules || undefined
       });
       if (result) {
@@ -505,7 +505,7 @@ export function DocViewerDialog({
                         <SelectValue placeholder="Automatique" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Automatique</SelectItem>
+                        <SelectItem value="auto">Automatique</SelectItem>
                         <SelectItem value="report">Rapport</SelectItem>
                         <SelectItem value="memo">Mémo</SelectItem>
                         <SelectItem value="procedure">Procédure</SelectItem>
