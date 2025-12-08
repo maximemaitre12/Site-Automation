@@ -14,10 +14,11 @@ import { useState } from "react";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
 import { CallRecorder } from "@/components/sales/CallRecorder";
 import { CallAnalysisResult } from "@/components/sales/CallAnalysisResult";
+import { ProposalDisplay } from "@/components/sales/ProposalDisplay";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Sales() {
-  const [activeTab, setActiveTab] = useState<"proposal" | "call" | "email">("proposal");
+  const [activeTab, setActiveTab] = useState<"proposal" | "call" | "email">("call");
   const { 
     proposals, 
     callAnalyses, 
@@ -161,8 +162,8 @@ export default function Sales() {
           {/* Tabs */}
           <div className="flex gap-2 mt-6">
             {[
-              { key: "proposal", label: "Générer Proposition", icon: FileText },
               { key: "call", label: "Analyser Appel", icon: Phone },
+              { key: "proposal", label: "Générer Proposition", icon: FileText },
               { key: "email", label: "Rédiger Email", icon: Mail },
             ].map((tab) => (
               <Button
@@ -264,32 +265,14 @@ export default function Sales() {
                   )}
                 </Button>
 
-                {/* Generated proposal */}
+                {/* Generated proposal - Visual Display */}
                 {generatedProposal && (
-                  <Card className="border-primary/30 bg-primary/5">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-success" />
-                          Proposition générée
-                        </CardTitle>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => copyToClipboard(generatedProposal)}
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <ScrollArea className="h-64">
-                        <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                          {generatedProposal}
-                        </div>
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
+                  <ProposalDisplay 
+                    proposal={generatedProposal}
+                    clientName={proposalForm.client}
+                    productName={proposalForm.product}
+                    onCopy={() => copyToClipboard(generatedProposal)}
+                  />
                 )}
               </div>
             )}
