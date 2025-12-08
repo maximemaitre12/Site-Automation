@@ -29,10 +29,10 @@ const features = [
 
 export function ToolsShowcaseSection() {
   return (
-    <section id="features" className="py-24 lg:py-32 bg-secondary/50">
-      <div className="max-w-5xl mx-auto px-6">
+    <section id="features" className="py-24 lg:py-32 bg-background">
+      <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
-        <div className="max-w-2xl mb-16">
+        <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
             Conçu pour l'entreprise
           </h2>
@@ -44,14 +44,16 @@ export function ToolsShowcaseSection() {
         {/* Features grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
           {features.map((feature, i) => (
-            <div key={i}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-5 h-5 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
-                  <Check className="w-3 h-3 text-background" strokeWidth={2.5} />
+            <div key={i} className="group">
+              <div className="flex items-start gap-4">
+                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-primary/20 transition-colors">
+                  <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
                 </div>
-                <h3 className="font-medium text-foreground">{feature.title}</h3>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1.5">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed pl-8">{feature.description}</p>
             </div>
           ))}
         </div>
