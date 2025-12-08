@@ -28,6 +28,7 @@ import { toast } from "sonner";
 
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Workspace", path: "/tools/workspace", icon: Building2, description: "Vue unifiée" },
   { name: "AETHER CRM", path: "/tools/crm", icon: DollarSign, description: "Sales CRM" },
   { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
   { name: "AETHER Doc", path: "/tools/doc", icon: FileText, description: "Document Management" },
