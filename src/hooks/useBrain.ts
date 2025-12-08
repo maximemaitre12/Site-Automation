@@ -201,11 +201,22 @@ export function useBrain() {
           conv = conversations.find(c => c.id === conversationId) || null;
         }
         if (!conv) {
+          console.log('Creating new conversation...');
           conv = await createConversation(content);
+          console.log('Created conversation:', conv);
         }
       }
       
-      if (!conv) throw new Error('No conversation');
+      if (!conv) {
+        console.error('Failed to create or find conversation');
+        toast({ 
+          title: 'Erreur', 
+          description: 'Impossible de créer la conversation. Veuillez vous reconnecter.', 
+          variant: 'destructive' 
+        });
+        setSendingMessage(false);
+        return null;
+      }
 
       const userMessage: Message = {
         id: crypto.randomUUID(),
