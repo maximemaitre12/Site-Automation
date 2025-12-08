@@ -48,19 +48,6 @@ export function HeroSection() {
           </Link>
         </div>
         
-        {/* Trust */}
-        <div className="animate-fade-up-delay-3">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-5">
-            Ils nous font confiance
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
-            {["Doctolib", "Qonto", "Alan", "Swile", "Payfit"].map((company) => (
-              <span key={company} className="text-base font-semibold text-muted-foreground/60 hover:text-muted-foreground transition-colors">
-                {company}
-              </span>
-            ))}
-          </div>
-        </div>
       </div>
     </section>
   );
