@@ -24,6 +24,159 @@ async function getUserApiKey(userId: string, serviceName: string): Promise<strin
   return data.api_key;
 }
 
+// Safe expression evaluator - replaces eval() for security
+// Supports: dot notation (a.b.c), bracket notation (a[0]), comparisons (>, <, ==, !=, >=, <=), logical ops (&&, ||, !)
+function safeEvaluate(expression: string, context: Record<string, any>): any {
+  // Sanitize expression - only allow safe characters
+  const safePattern = /^[\w\s\.\[\]\(\)\&\|\!\=\<\>\,\'\"\:\-\+\*\/\?]+$/;
+  if (!safePattern.test(expression)) {
+    throw new Error(`Invalid expression: contains unsafe characters`);
+  }
+
+  // Block dangerous patterns
+  const dangerousPatterns = [
+    /\beval\b/i,
+    /\bFunction\b/i,
+    /\bimport\b/i,
+    /\brequire\b/i,
+    /\bDeno\b/i,
+    /\bprocess\b/i,
+    /\bfetch\b/i,
+    /\bconstructor\b/i,
+    /\b__proto__\b/i,
+    /\bprototype\b/i,
+    /\bwindow\b/i,
+    /\bglobal\b/i,
+    /\bthis\b/i,
+    /\bself\b/i,
+  ];
+
+  for (const pattern of dangerousPatterns) {
+    if (pattern.test(expression)) {
+      throw new Error(`Invalid expression: contains blocked keyword`);
+    }
+  }
+
+  // Parse and evaluate simple path expressions like "data.field" or "data.items[0].name"
+  const getValueByPath = (obj: any, path: string): any => {
+    if (!path) return obj;
+    
+    const segments = path.match(/[^\.\[\]]+/g) || [];
+    let current = obj;
+    
+    for (const segment of segments) {
+      if (current === null || current === undefined) return undefined;
+      current = current[segment];
+    }
+    
+    return current;
+  };
+
+  // Handle simple comparisons and expressions
+  const evaluateSimple = (expr: string, data: Record<string, any>): any => {
+    expr = expr.trim();
+    
+    // Boolean literals
+    if (expr === 'true') return true;
+    if (expr === 'false') return false;
+    
+    // Numeric literals
+    if (/^-?\d+(\.\d+)?$/.test(expr)) return parseFloat(expr);
+    
+    // String literals
+    if (/^['"].*['"]$/.test(expr)) return expr.slice(1, -1);
+    
+    // Negation
+    if (expr.startsWith('!')) {
+      return !evaluateSimple(expr.slice(1), data);
+    }
+
+    // Comparison operators
+    const comparisonMatch = expr.match(/^(.+?)\s*(===|!==|==|!=|>=|<=|>|<)\s*(.+)$/);
+    if (comparisonMatch) {
+      const left = evaluateSimple(comparisonMatch[1], data);
+      const op = comparisonMatch[2];
+      const right = evaluateSimple(comparisonMatch[3], data);
+      
+      switch (op) {
+        case '===': return left === right;
+        case '!==': return left !== right;
+        case '==': return left == right;
+        case '!=': return left != right;
+        case '>': return left > right;
+        case '<': return left < right;
+        case '>=': return left >= right;
+        case '<=': return left <= right;
+      }
+    }
+
+    // Logical AND
+    if (expr.includes('&&')) {
+      const parts = expr.split('&&').map(p => p.trim());
+      return parts.every(p => evaluateSimple(p, data));
+    }
+
+    // Logical OR
+    if (expr.includes('||')) {
+      const parts = expr.split('||').map(p => p.trim());
+      return parts.some(p => evaluateSimple(p, data));
+    }
+
+    // Path expression (e.g., "item.status", "data.count")
+    // Replace known variable names with their values
+    let resolvedExpr = expr;
+    for (const [key, value] of Object.entries(data)) {
+      if (expr === key) return value;
+      if (expr.startsWith(key + '.') || expr.startsWith(key + '[')) {
+        const subPath = expr.slice(key.length);
+        return getValueByPath(value, subPath.replace(/^\./, ''));
+      }
+    }
+
+    // If it's a simple identifier, try to get it from context
+    if (/^[\w]+$/.test(expr) && expr in data) {
+      return data[expr];
+    }
+
+    return undefined;
+  };
+
+  return evaluateSimple(expression, context);
+}
+
+// Safe JSON path getter - replaces eval for data extraction
+function safeGetPath(data: any, path: string): any {
+  if (!path) return data;
+  
+  // Parse path like "field.subfield" or "array[0].item"
+  const segments = path.match(/[^\.\[\]]+/g) || [];
+  let current = data;
+  
+  for (const segment of segments) {
+    if (current === null || current === undefined) return undefined;
+    current = current[segment];
+  }
+  
+  return current;
+}
+
+// Safe filter function - replaces eval in filter operations
+function safeFilter(items: any[], condition: string): any[] {
+  return items.filter((item, index) => {
+    try {
+      // Create evaluation context with item and index
+      const context = {
+        item,
+        index,
+        ...item, // Spread item properties for direct access
+      };
+      return Boolean(safeEvaluate(condition, context));
+    } catch {
+      return true; // Keep items that can't be evaluated
+    }
+  });
+}
+
 interface WorkflowBlock {
   id: string;
   type: string;
@@ -289,10 +442,10 @@ Only output JSON, no other text.`;
       case 'transform_json': {
         const expression = block.config?.expression;
         const outputKey = block.config?.outputKey || 'result';
-        // Simple path extraction (not full JMESPath)
+        // Safe path extraction - no eval()
         try {
           const data = typeof context.input === 'string' ? JSON.parse(context.input) : context.input;
-          const result = expression ? eval(`data.${expression.replace(/\[/g, '?.[')}`) : data;
+          const result = expression ? safeGetPath(data, expression) : data;
           output = { [outputKey]: result };
         } catch (e) {
           output = { error: 'Transform failed', input: context.input };
@@ -307,13 +460,8 @@ Only output JSON, no other text.`;
           const data = typeof context.input === 'string' ? JSON.parse(context.input) : context.input;
           const items = data[field] || data;
           if (Array.isArray(items) && condition) {
-            const filtered = items.filter((item: any) => {
-              try {
-                return eval(condition);
-              } catch {
-                return true;
-              }
-            });
+            // Safe filter - no eval()
+            const filtered = safeFilter(items, condition);
             output = { [field]: filtered, originalCount: items.length, filteredCount: filtered.length };
           } else {
             output = data;
@@ -341,7 +489,8 @@ Only output JSON, no other text.`;
         let result = false;
         try {
           const input = context.input;
-          result = eval(condition);
+          // Safe evaluation - no eval()
+          result = Boolean(safeEvaluate(condition, { input, ...context.variables }));
         } catch {
           result = false;
         }
@@ -891,20 +1040,27 @@ serve(async (req) => {
   }
 
   try {
-    // Extract user ID from JWT token
+    // Extract user ID from JWT token - REQUIRED for authenticated access
     const authHeader = req.headers.get('authorization');
-    let userId: string | null = null;
-    
-    if (authHeader) {
-      try {
-        const token = authHeader.replace('Bearer ', '');
-        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-        const { data: { user } } = await supabase.auth.getUser(token);
-        userId = user?.id || null;
-      } catch (e) {
-        console.warn('Could not extract user from token:', e);
-      }
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authorization header required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired authentication token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = user.id;
 
     const { blocks, input, variables, workflowId } = await req.json();
 
