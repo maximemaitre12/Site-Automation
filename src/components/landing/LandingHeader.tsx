@@ -71,9 +71,19 @@ export function LandingHeader() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
-              {["Produit", "Fonctionnalités", "Tarifs", "Entreprise"].map((item) => (
-                <a key={item} href="#" className="text-sm text-foreground">
-                  {item}
+              {[
+                { label: "Produit", href: "#product" },
+                { label: "Fonctionnalités", href: "#features" },
+                { label: "Tarifs", href: "#pricing" },
+                { label: "Entreprise", href: "#enterprise" },
+              ].map((item) => (
+                <a 
+                  key={item.label} 
+                  href={item.href} 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-sm text-foreground hover:text-primary transition-colors"
+                >
+                  {item.label}
                 </a>
               ))}
               <div className="flex gap-3 pt-4 border-t border-border">
