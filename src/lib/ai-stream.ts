@@ -20,6 +20,7 @@ export interface StreamAIChatOptions {
   onDelta: (deltaText: string) => void;
   onDone: () => void;
   onError?: (error: Error) => void;
+  abortSignal?: AbortSignal;
 }
 
 export async function streamAIChat({
@@ -30,6 +31,7 @@ export async function streamAIChat({
   onDelta,
   onDone,
   onError,
+  abortSignal,
 }: StreamAIChatOptions) {
   try {
     const resp = await fetch(CHAT_URL, {
@@ -44,6 +46,7 @@ export async function streamAIChat({
         userId,
         attachments
       }),
+      signal: abortSignal,
     });
 
     if (!resp.ok) {
@@ -61,6 +64,12 @@ export async function streamAIChat({
     let streamDone = false;
 
     while (!streamDone) {
+      // Check if aborted
+      if (abortSignal?.aborted) {
+        reader.cancel();
+        throw new Error('Generation cancelled');
+      }
+
       const { done, value } = await reader.read();
       if (done) break;
       textBuffer += decoder.decode(value, { stream: true });
@@ -109,7 +118,76 @@ export async function streamAIChat({
 
     onDone();
   } catch (error) {
+    // Handle abort specifically
+    if (error instanceof Error && error.name === 'AbortError') {
+      onError?.(new Error('Generation cancelled'));
+      return;
+    }
     console.error('Stream error:', error);
     onError?.(error instanceof Error ? error : new Error('Unknown error'));
+  }
+}
+
+// Generate a smart conversation title based on the first message
+export async function generateConversationTitle(firstMessage: string): Promise<string> {
+  try {
+    const resp = await fetch(CHAT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ 
+        messages: [{ role: 'user', content: firstMessage }],
+        systemPrompt: `Tu es un assistant qui génère des titres courts et pertinents pour des conversations.
+Génère UN titre court (3-6 mots maximum) qui résume le sujet principal de ce message.
+Le titre doit être en français, clair et informatif.
+Réponds UNIQUEMENT avec le titre, sans guillemets, sans ponctuation finale, sans explication.
+Exemples de bons titres: "Analyse données ventes Q3", "Création workflow automatisé", "Questions RH recrutement".`,
+      }),
+    });
+
+    if (!resp.ok) {
+      return firstMessage.slice(0, 40);
+    }
+
+    if (!resp.body) {
+      return firstMessage.slice(0, 40);
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let fullTitle = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+      
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === '[DONE]') continue;
+        
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) fullTitle += content;
+        } catch { /* ignore */ }
+      }
+    }
+
+    // Clean up the title
+    const cleanTitle = fullTitle.trim()
+      .replace(/^["']|["']$/g, '') // Remove quotes
+      .replace(/\.$/g, '') // Remove trailing period
+      .slice(0, 50); // Max 50 chars
+
+    return cleanTitle || firstMessage.slice(0, 40);
+  } catch (error) {
+    console.error('Error generating title:', error);
+    return firstMessage.slice(0, 40);
   }
 }

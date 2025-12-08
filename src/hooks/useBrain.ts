@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
-import { streamAIChat, Attachment } from '@/lib/ai-stream';
+import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
 
 export interface Message {
   id: string;
@@ -45,6 +45,9 @@ export function useBrain() {
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
+  
+  // Abort controller for cancelling generation
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchConversations = async () => {
     if (!user) {
@@ -132,6 +135,17 @@ export function useBrain() {
     return () => { mounted = false; };
   }, [user?.id]);
 
+  // Cancel current generation
+  const cancelGeneration = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setSendingMessage(false);
+      setStreamingContent('');
+      toast({ title: 'Génération annulée', description: 'La réponse a été interrompue' });
+    }
+  }, [toast]);
+
   const createConversation = async (initialMessage?: string): Promise<Conversation | null> => {
     if (!user) return null;
 
@@ -140,7 +154,7 @@ export function useBrain() {
     setSendingMessage(false);
 
     const newConv: Partial<Conversation> = {
-      title: initialMessage?.slice(0, 50) || 'Nouvelle conversation',
+      title: 'Nouvelle conversation',
       messages: [],
     };
 
@@ -171,6 +185,9 @@ export function useBrain() {
     options?: { attachments?: Attachment[] }
   ): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
+
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
 
     setSendingMessage(true);
     setStreamingContent('');
@@ -230,6 +247,7 @@ Réponds en français de manière concise, professionnelle et utile.`;
           systemPrompt,
           userId: user.id,
           attachments: options?.attachments,
+          abortSignal: abortControllerRef.current?.signal,
           onDelta: (delta) => {
             fullContent += delta;
             setStreamingContent(fullContent);
@@ -247,7 +265,13 @@ Réponds en français de manière concise, professionnelle et utile.`;
       };
 
       const finalMessages = [...updatedMessages, assistantMessage];
-      const newTitle = conv.messages.length === 0 ? content.slice(0, 50) : conv.title;
+      
+      // Generate smart title for new conversations
+      let newTitle = conv.title;
+      if (conv.messages.length === 0) {
+        // Generate a smart title based on the first message
+        newTitle = await generateConversationTitle(content);
+      }
 
       // Save to database
       const messagesForDb = finalMessages.map(m => ({
@@ -274,12 +298,20 @@ Réponds en français de manière concise, professionnelle et utile.`;
       );
 
       setStreamingContent('');
+      abortControllerRef.current = null;
       return assistantMessage;
     } catch (err) {
       setStreamingContent('');
+      abortControllerRef.current = null;
+      
+      // Don't show error toast for cancelled requests
+      if (err instanceof Error && err.message === 'Generation cancelled') {
+        return null;
+      }
+      
       toast({ 
         title: 'Erreur', 
-        description: err instanceof Error ? err.message : 'Erreur lors de l\'envoi', 
+        description: err instanceof Error ? err.message : "Erreur lors de l'envoi", 
         variant: 'destructive' 
       });
       return null;
@@ -302,6 +334,12 @@ Réponds en français de manière concise, professionnelle et utile.`;
   };
 
   const selectConversation = (id: string) => {
+    // Cancel any ongoing generation when switching conversations
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    
     // Reset streaming state when switching conversations
     setStreamingContent('');
     setSendingMessage(false);
@@ -328,7 +366,7 @@ Réponds en français de manière concise, professionnelle et utile.`;
       .single();
 
     if (error) {
-      toast({ title: 'Erreur', description: 'Impossible d\'ajouter le document', variant: 'destructive' });
+      toast({ title: 'Erreur', description: "Impossible d'ajouter le document", variant: 'destructive' });
       return null;
     }
 
@@ -429,6 +467,7 @@ Réponds en français de manière concise, professionnelle et utile.`;
     streamingContent,
     createConversation,
     sendMessage,
+    cancelGeneration,
     deleteConversation,
     selectConversation,
     uploadDocument,

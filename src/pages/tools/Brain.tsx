@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3 } from "lucide-react";
+import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
@@ -29,6 +29,7 @@ export default function BrainPage() {
     sendingMessage,
     createConversation,
     sendMessage,
+    cancelGeneration,
     deleteConversation,
     selectConversation,
     uploadDocument,
@@ -506,22 +507,17 @@ export default function BrainPage() {
                 <ChatMessage 
                   role="assistant" 
                   content={streamingContent}
+                  isStreaming={true}
                 />
               )}
               
               {/* Loading indicator when no content yet */}
               {sendingMessage && !streamingContent && (
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center flex-shrink-0">
-                    <Brain className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1 p-4 rounded-xl bg-card border border-border">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Analyse en cours...</span>
-                    </div>
-                  </div>
-                </div>
+                <ChatMessage 
+                  role="assistant" 
+                  content=""
+                  isStreaming={true}
+                />
               )}
               <div ref={messagesEndRef} />
             </div>
@@ -654,17 +650,33 @@ export default function BrainPage() {
                         ? "Décrivez l'image à générer..." 
                         : generationMode === 'chart'
                           ? "Décrivez le graphique à créer..."
-                          : "Posez une question, glissez une image..."
+                          : sendingMessage 
+                            ? "Tapez votre prochain message..."
+                            : "Posez une question, glissez une image..."
                     }
                     className="flex-1 h-12 bg-card"
-                    disabled={sendingMessage || generatingImage}
+                    disabled={generatingImage}
                   />
+                  {/* Stop button when generating */}
+                  {sendingMessage && (
+                    <Button 
+                      type="button"
+                      size="lg"
+                      variant="destructive"
+                      onClick={cancelGeneration}
+                      className="flex-shrink-0"
+                    >
+                      <StopCircle className="w-5 h-5" />
+                    </Button>
+                  )}
+                  
                   <Button 
                     type="submit" 
                     size="lg" 
-                    disabled={sendingMessage || generatingImage || (!message.trim() && attachments.length === 0)}
+                    disabled={generatingImage || (!message.trim() && attachments.length === 0)}
+                    className="flex-shrink-0"
                   >
-                    {sendingMessage || generatingImage ? (
+                    {generatingImage ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : generationMode !== 'chat' ? (
                       <Sparkles className="w-5 h-5" />
