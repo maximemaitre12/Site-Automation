@@ -5,19 +5,27 @@ interface AIMessage {
   content: string;
 }
 
-export async function streamAIChat({
-  messages,
-  systemPrompt,
-  onDelta,
-  onDone,
-  onError,
-}: {
+export interface StreamAIChatOptions {
   messages: AIMessage[];
   systemPrompt?: string;
+  userId?: string;
+  enableWebSearch?: boolean;
+  enableDocumentSearch?: boolean;
   onDelta: (deltaText: string) => void;
   onDone: () => void;
   onError?: (error: Error) => void;
-}) {
+}
+
+export async function streamAIChat({
+  messages,
+  systemPrompt,
+  userId,
+  enableWebSearch = false,
+  enableDocumentSearch = true,
+  onDelta,
+  onDone,
+  onError,
+}: StreamAIChatOptions) {
   try {
     const resp = await fetch(CHAT_URL, {
       method: 'POST',
@@ -25,7 +33,13 @@ export async function streamAIChat({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages, systemPrompt }),
+      body: JSON.stringify({ 
+        messages, 
+        systemPrompt,
+        userId,
+        enableWebSearch,
+        enableDocumentSearch
+      }),
     });
 
     if (!resp.ok) {

@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.send-workflow-email]
 verify_jwt = false
+
+[functions.brain-search]
+verify_jwt = false
