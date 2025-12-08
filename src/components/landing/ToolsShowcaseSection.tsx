@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
-  Workflow, Bot, Headphones, Users, Shield, MessageSquare,
-  ArrowRight, Check
+  Workflow, Bot, Headphones, Users, Shield, TrendingUp,
+  ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -10,55 +10,55 @@ const tools = [
   {
     id: "flow",
     name: "Flow",
-    fullName: "AETHER Flow",
-    description: "Orchestrez des workflows complexes en glisser-déposer. L'IA génère et optimise vos automatisations.",
+    description: "Orchestration visuelle de workflows. Glissez-déposez, connectez, automatisez.",
     icon: Workflow,
-    features: ["Éditeur visuel", "Génération IA", "100+ intégrations", "Temps réel"],
+    color: "from-blue-500 to-cyan-500",
+    features: ["Éditeur visuel", "Génération IA", "100+ connecteurs"],
     path: "/tools/flow",
   },
   {
     id: "brain",
     name: "Brain",
-    fullName: "AETHER Brain",
-    description: "Un assistant qui connaît tous vos documents. Questions en langage naturel, réponses instantanées.",
+    description: "Assistant qui connaît vos documents. Posez des questions, obtenez des réponses.",
     icon: Bot,
-    features: ["Recherche sémantique", "Analyse de docs", "Base de connaissances", "Multi-langues"],
+    color: "from-violet-500 to-purple-500",
+    features: ["Recherche sémantique", "Analyse documents", "Base connaissances"],
     path: "/tools/brain",
   },
   {
     id: "support",
     name: "Support",
-    fullName: "AETHER Support",
-    description: "Classifiez et répondez aux tickets automatiquement. Réduisez le temps de réponse de 90%.",
+    description: "Classification et réponse automatique aux tickets. -90% temps de réponse.",
     icon: Headphones,
-    features: ["Classification IA", "Réponses auto", "Escalade smart", "Analytics"],
+    color: "from-emerald-500 to-teal-500",
+    features: ["Classification IA", "Réponses auto", "Analytics temps réel"],
     path: "/tools/support",
   },
   {
     id: "hr",
     name: "HR",
-    fullName: "AETHER HR",
-    description: "Analysez les CV, scorez les candidats et accélérez vos recrutements avec l'IA.",
+    description: "Analyse de CV, scoring candidats, matching intelligent avec vos offres.",
     icon: Users,
-    features: ["Analyse CV", "Matching", "Scoring", "Génération fiches"],
+    color: "from-orange-500 to-amber-500",
+    features: ["Analyse CV", "Scoring", "Matching postes"],
     path: "/tools/hr",
   },
   {
     id: "compliance",
     name: "Compliance",
-    fullName: "AETHER Compliance",
-    description: "Auditez vos processus RGPD, détectez les risques et générez des rapports automatiquement.",
+    description: "Audit RGPD automatisé. Détection des risques, génération de rapports.",
     icon: Shield,
-    features: ["Audit RGPD", "Détection risques", "Score conformité", "Rapports PDF"],
+    color: "from-rose-500 to-pink-500",
+    features: ["Audit RGPD", "Score conformité", "Rapports PDF"],
     path: "/tools/compliance",
   },
   {
     id: "sales",
     name: "Sales",
-    fullName: "AETHER Sales",
-    description: "Transcrivez vos appels, analysez le sentiment et générez des propositions commerciales.",
-    icon: MessageSquare,
-    features: ["Transcription", "Analyse sentiment", "Scoring", "Génération"],
+    description: "Transcription d'appels, analyse sentiment, génération de propositions.",
+    icon: TrendingUp,
+    color: "from-indigo-500 to-blue-500",
+    features: ["Transcription", "Sentiment", "Propositions"],
     path: "/tools/sales",
   },
 ];
@@ -67,111 +67,98 @@ export function ToolsShowcaseSection() {
   const [activeTool, setActiveTool] = useState(tools[0]);
 
   return (
-    <section id="tools" className="relative py-24 lg:py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/5 to-background" />
-      
-      <div className="relative z-10 container mx-auto px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16 lg:mb-20">
-          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-4">
-            Plateforme unifiée
-          </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6">
-            Six outils, un seul objectif
+    <section id="tools" className="relative py-24 lg:py-32">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Header */}
+        <div className="max-w-2xl mb-16">
+          <p className="text-sm font-medium text-primary mb-3">Plateforme</p>
+          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+            Six outils. Une mission.
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-muted-foreground">
             Chaque module résout un problème métier précis. Ensemble, ils transforment vos opérations.
           </p>
         </div>
         
-        {/* Tool Selector */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12 lg:mb-16">
-          {tools.map((tool) => {
-            const isActive = tool.id === activeTool.id;
-            return (
-              <button
-                key={tool.id}
-                onClick={() => setActiveTool(tool)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 ${
-                  isActive
-                    ? "bg-foreground text-background border-foreground"
-                    : "bg-transparent border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
-                }`}
-              >
-                <tool.icon className="w-4 h-4" />
-                <span className="text-sm font-medium">{tool.name}</span>
-              </button>
-            );
-          })}
-        </div>
-        
-        {/* Active Tool Display */}
-        <div className="max-w-5xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left - Info */}
-            <div className="order-2 lg:order-1">
-              <div className="mb-6">
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
-                  {activeTool.fullName}
-                </h3>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  {activeTool.description}
-                </p>
+        <div className="grid lg:grid-cols-5 gap-8">
+          {/* Tool list */}
+          <div className="lg:col-span-2 space-y-2">
+            {tools.map((tool) => {
+              const isActive = tool.id === activeTool.id;
+              const Icon = tool.icon;
+              return (
+                <button
+                  key={tool.id}
+                  onClick={() => setActiveTool(tool)}
+                  className={`w-full text-left p-4 rounded-xl border transition-all duration-200 ${
+                    isActive
+                      ? "bg-secondary/80 border-border"
+                      : "bg-transparent border-transparent hover:bg-secondary/40"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center flex-shrink-0`}>
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium mb-0.5 ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+                        {tool.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {tool.description}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          
+          {/* Active tool display */}
+          <div className="lg:col-span-3">
+            <div className="sticky top-24 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+              {/* Tool header */}
+              <div className="p-6 border-b border-border/30">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${activeTool.color} flex items-center justify-center`}>
+                    <activeTool.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground">AETHER {activeTool.name}</h3>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">{activeTool.description}</p>
               </div>
               
               {/* Features */}
-              <ul className="grid grid-cols-2 gap-3 mb-8">
-                {activeTool.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-primary" />
-                    </div>
-                    <span className="text-sm text-foreground">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Link to={activeTool.path}>
-                <Button 
-                  size="lg"
-                  className="bg-foreground text-background hover:bg-foreground/90 rounded-full font-semibold"
-                >
-                  Explorer {activeTool.name}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-            
-            {/* Right - Visual */}
-            <div className="order-1 lg:order-2">
-              <div className="relative aspect-square max-w-md mx-auto lg:max-w-none">
-                {/* Background Circle */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/5 to-[hsl(260_100%_65%/0.05)]" />
+              <div className="p-6">
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {activeTool.features.map((feature, i) => (
+                    <span 
+                      key={i}
+                      className="px-3 py-1.5 rounded-lg bg-secondary/50 text-sm text-foreground"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
                 
-                {/* Icon Display */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
-                    {/* Orbiting dots */}
-                    {[0, 1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="absolute w-3 h-3 rounded-full bg-primary/30"
-                        style={{
-                          top: `${50 + 45 * Math.sin((i * Math.PI) / 2)}%`,
-                          left: `${50 + 45 * Math.cos((i * Math.PI) / 2)}%`,
-                          transform: "translate(-50%, -50%)",
-                          animation: `orbit 8s linear infinite`,
-                          animationDelay: `${i * 2}s`,
-                        }}
-                      />
-                    ))}
-                    
-                    {/* Center Icon */}
-                    <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-3xl bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center shadow-2xl shadow-primary/20">
-                      <activeTool.icon className="w-16 h-16 lg:w-20 lg:h-20 text-primary-foreground" />
-                    </div>
-                  </div>
+                <Link to={activeTool.path}>
+                  <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-lg">
+                    Découvrir {activeTool.name}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+              
+              {/* Visual mockup */}
+              <div className="mx-6 mb-6 p-4 rounded-xl bg-secondary/30 border border-border/20">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                  <span className="text-xs text-muted-foreground">Aperçu en temps réel</span>
+                </div>
+                <div className="h-32 bg-gradient-to-br from-secondary/50 to-background rounded-lg flex items-center justify-center">
+                  <activeTool.icon className="w-12 h-12 text-muted-foreground/30" />
                 </div>
               </div>
             </div>

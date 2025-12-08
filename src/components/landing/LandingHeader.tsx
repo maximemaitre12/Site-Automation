@@ -8,98 +8,97 @@ export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled 
-        ? "bg-background/60 backdrop-blur-2xl border-b border-border/20" 
+        ? "bg-background/80 backdrop-blur-xl border-b border-border/50" 
         : "bg-transparent"
     }`}>
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative w-9 h-9">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary via-[hsl(260_100%_65%)] to-primary rotate-0 group-hover:rotate-180 transition-transform duration-700" />
-              <div className="absolute inset-[2px] rounded-[10px] bg-background flex items-center justify-center">
-                <span className="text-lg font-black text-gradient">A</span>
-              </div>
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[hsl(280_100%_60%)] flex items-center justify-center">
+              <span className="text-sm font-bold text-primary-foreground">A</span>
             </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-foreground">AETHER</span>
-              <span className="text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase -mt-0.5">AI Suite</span>
-            </div>
+            <span className="text-lg font-semibold text-foreground tracking-tight">AETHER</span>
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1">
             {[
               { label: "Produit", href: "#tools" },
-              { label: "Solutions", href: "#solutions" },
-              { label: "Ressources", href: "#" },
-              { label: "Tarifs", href: "#" },
+              { label: "Tarifs", href: "#pricing" },
+              { label: "Entreprise", href: "#enterprise" },
+              { label: "Ressources", href: "#resources" },
             ].map((item) => (
               <a 
                 key={item.label}
                 href={item.href} 
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-px bg-primary group-hover:w-1/2 transition-all duration-300" />
               </a>
             ))}
           </nav>
           
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <Link to="/auth?mode=login">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground font-medium">
-                Se connecter
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Connexion
               </Button>
             </Link>
             <Link to="/demo">
               <Button 
                 size="sm" 
-                className="bg-foreground text-background hover:bg-foreground/90 font-semibold px-5 rounded-full"
+                className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-4"
               >
-                Commencer
+                Démarrer
               </Button>
             </Link>
           </div>
           
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
         
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden py-6 border-t border-border/20 animate-fade-in bg-background/95 backdrop-blur-xl">
+          <div className="md:hidden py-4 border-t border-border/50 bg-background/95 backdrop-blur-xl">
             <nav className="flex flex-col gap-1">
-              {["Produit", "Solutions", "Ressources", "Tarifs"].map((item) => (
+              {["Produit", "Tarifs", "Entreprise", "Ressources"].map((item) => (
                 <a 
                   key={item}
                   href="#" 
-                  className="px-4 py-3 text-foreground hover:bg-secondary/50 rounded-lg transition-colors"
+                  className="px-3 py-2.5 text-sm text-foreground hover:bg-secondary/50 rounded-lg"
                 >
                   {item}
                 </a>
               ))}
-              <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-border/20">
+              <div className="flex flex-col gap-2 pt-3 mt-3 border-t border-border/50">
                 <Link to="/auth?mode=login">
-                  <Button variant="outline" className="w-full rounded-full">Se connecter</Button>
+                  <Button variant="ghost" size="sm" className="w-full justify-start">
+                    Connexion
+                  </Button>
                 </Link>
                 <Link to="/demo">
-                  <Button className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-full">
-                    Commencer
+                  <Button size="sm" className="w-full bg-foreground text-background">
+                    Démarrer
                   </Button>
                 </Link>
               </div>
