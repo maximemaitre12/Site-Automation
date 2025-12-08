@@ -12,6 +12,7 @@ import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
 import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
 import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
 import { TemplateGallery } from '@/components/flow/TemplateGallery';
+import { BlockPickerDialog } from '@/components/flow/BlockPickerDialog';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
   Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2
@@ -515,28 +516,11 @@ export default function Flow() {
       <TemplateGallery isOpen={isTemplateGalleryOpen} onClose={() => setIsTemplateGalleryOpen(false)} onSelect={handleTemplateSelect} />
 
       {/* Block Picker Dialog for Canvas mode */}
-      <Dialog open={isBlockPickerOpen} onOpenChange={setIsBlockPickerOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Ajouter un bloc</DialogTitle>
-            <DialogDescription>Choisissez le type de bloc à ajouter</DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 py-4">
-            {Object.entries(BLOCK_DEFINITIONS).map(([type, def]) => (
-              <button
-                key={type}
-                onClick={() => { handleAddBlock(type as BlockType); setIsBlockPickerOpen(false); }}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-center"
-              >
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${def.color} flex items-center justify-center`}>
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm font-medium">{def.name}</span>
-              </button>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <BlockPickerDialog 
+        isOpen={isBlockPickerOpen} 
+        onClose={() => setIsBlockPickerOpen(false)}
+        onAddBlock={(type) => { handleAddBlock(type); setIsBlockPickerOpen(false); }}
+      />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
