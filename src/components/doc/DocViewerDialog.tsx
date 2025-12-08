@@ -180,11 +180,11 @@ export function DocViewerDialog({
                   Entités détectées
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
-                  {entities.persons && (
+                  {(entities.personnes as string[])?.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Personnes</p>
                       <div className="flex flex-wrap gap-1">
-                        {(entities.persons as string[]).map((p: string, i: number) => (
+                        {(entities.personnes as string[]).map((p: string, i: number) => (
                           <Badge key={i} variant="outline" className="text-xs">
                             <User className="w-3 h-3 mr-1" />
                             {p}
@@ -193,11 +193,11 @@ export function DocViewerDialog({
                       </div>
                     </div>
                   )}
-                  {entities.organizations && (
+                  {(entities.organisations as string[])?.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Organisations</p>
                       <div className="flex flex-wrap gap-1">
-                        {(entities.organizations as string[]).map((o: string, i: number) => (
+                        {(entities.organisations as string[]).map((o: string, i: number) => (
                           <Badge key={i} variant="outline" className="text-xs">
                             <Building className="w-3 h-3 mr-1" />
                             {o}
@@ -206,7 +206,7 @@ export function DocViewerDialog({
                       </div>
                     </div>
                   )}
-                  {entities.dates && (
+                  {(entities.dates as string[])?.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Dates</p>
                       <div className="flex flex-wrap gap-1">
@@ -219,7 +219,80 @@ export function DocViewerDialog({
                       </div>
                     </div>
                   )}
+                  {(entities.montants as string[])?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Montants</p>
+                      <div className="flex flex-wrap gap-1">
+                        {(entities.montants as string[]).map((m: string, i: number) => (
+                          <Badge key={i} variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            {m}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(entities.lieux as string[])?.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Lieux</p>
+                      <div className="flex flex-wrap gap-1">
+                        {(entities.lieux as string[]).map((l: string, i: number) => (
+                          <Badge key={i} variant="outline" className="text-xs">
+                            {l}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
+              </Card>
+            )}
+
+            {/* AI Metadata */}
+            {document.metadata?.ai_analysis && (
+              <Card className="p-4">
+                <h4 className="font-medium flex items-center gap-2 mb-3">
+                  <Tag className="w-4 h-4 text-primary" />
+                  Classification
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {(document.metadata.ai_analysis as any).category && (
+                    <Badge variant="secondary" className="capitalize">
+                      {(document.metadata.ai_analysis as any).category}
+                    </Badge>
+                  )}
+                  {(document.metadata.ai_analysis as any).sentiment && (
+                    <Badge 
+                      variant="outline"
+                      className={
+                        (document.metadata.ai_analysis as any).sentiment === 'positif' 
+                          ? 'bg-green-50 text-green-700 border-green-200'
+                          : (document.metadata.ai_analysis as any).sentiment === 'negatif'
+                          ? 'bg-red-50 text-red-700 border-red-200'
+                          : ''
+                      }
+                    >
+                      {(document.metadata.ai_analysis as any).sentiment}
+                    </Badge>
+                  )}
+                  {(document.metadata.ai_analysis as any).language && (
+                    <Badge variant="outline">
+                      {(document.metadata.ai_analysis as any).language.toUpperCase()}
+                    </Badge>
+                  )}
+                </div>
+                {(document.metadata.ai_analysis as any).actionItems?.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs font-medium text-muted-foreground uppercase mb-2">Actions à effectuer</p>
+                    <ul className="space-y-1">
+                      {(document.metadata.ai_analysis as any).actionItems.map((item: string, i: number) => (
+                        <li key={i} className="text-sm flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </Card>
             )}
 
