@@ -1,34 +1,34 @@
 project_id = "gydrpmetswrkrjcbkgqd"
 
 [functions.workflow-execute]
-verify_jwt = false
+verify_jwt = true
 
 [functions.workflow-generate]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.ai-chat-stream]
-verify_jwt = false
+verify_jwt = true
 
 [functions.transcribe-audio]
-verify_jwt = false
+verify_jwt = true
 
 [functions.doc-analyze]
-verify_jwt = false
+verify_jwt = true
 
 [functions.doc-generate]
-verify_jwt = false
+verify_jwt = true
 
 [functions.doc-rewrite]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-workflow-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.brain-search]
-verify_jwt = false
+verify_jwt = true
 
 [functions.brain-generate-image]
-verify_jwt = false
+verify_jwt = true
