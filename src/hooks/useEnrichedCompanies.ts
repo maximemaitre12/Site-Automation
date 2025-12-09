@@ -200,43 +200,29 @@ export function useEnrichedCompanies() {
     setEnriching(true);
     
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase.functions.invoke('enrich-company', {
+        body: { queryType, queryValue }
+      });
       
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/enrich-company`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`
-          },
-          body: JSON.stringify({ queryType, queryValue })
-        }
-      );
-      
-      if (!response.ok) {
-        const error = await response.json();
-        if (response.status === 429) {
-          toast.error('Limite de requêtes atteinte. Réessayez plus tard.');
-        } else if (response.status === 402) {
-          toast.error('Crédits insuffisants. Veuillez recharger votre compte.');
-        } else {
-          toast.error(error.error || 'Erreur lors de l\'enrichissement');
-        }
+      if (error) {
+        console.error('Enrichment error:', error);
+        toast.error(error.message || 'Erreur lors de l\'enrichissement');
         return null;
       }
       
-      const result = await response.json();
+      if (!data?.success) {
+        toast.error(data?.error || 'Aucune donnée trouvée');
+        return null;
+      }
       
-      if (result.success && result.company) {
-        toast.success(`Entreprise "${result.company.name}" enrichie avec succès`);
+      if (data.company) {
+        toast.success(`Entreprise "${data.company.name}" enrichie avec succès`);
         await fetchCompanies();
         await fetchRequests();
-        return result.company;
-      } else {
-        toast.error(result.error || 'Aucune donnée trouvée');
-        return null;
+        return data.company;
       }
+      
+      return null;
     } catch (error) {
       console.error('Enrichment error:', error);
       toast.error('Erreur lors de l\'enrichissement');

@@ -44,24 +44,24 @@ export function CompanyEnrichment() {
 
   const getVerificationBadge = (status?: string, confidence?: number) => {
     if (status === 'verified' && confidence && confidence >= 70) {
-      return <Badge className="bg-green-500"><CheckCircle2 className="w-3 h-3 mr-1" /> Vérifié ({confidence}%)</Badge>;
+      return <Badge className="bg-green-500 gap-1"><CheckCircle2 className="w-3 h-3" /> Vérifié ({confidence}%)</Badge>;
     }
     if (status === 'partial') {
-      return <Badge variant="secondary"><AlertTriangle className="w-3 h-3 mr-1" /> Partiel ({confidence}%)</Badge>;
+      return <Badge variant="secondary" className="gap-1"><AlertTriangle className="w-3 h-3" /> Partiel ({confidence}%)</Badge>;
     }
     return <Badge variant="outline">Non vérifié</Badge>;
   };
 
   const getRiskBadge = (score?: number) => {
     if (!score) return null;
-    if (score >= 70) return <Badge variant="destructive"><TrendingDown className="w-3 h-3 mr-1" /> Risque élevé</Badge>;
+    if (score >= 70) return <Badge variant="destructive" className="gap-1"><TrendingDown className="w-3 h-3" /> Risque élevé</Badge>;
     if (score >= 40) return <Badge variant="secondary">Risque modéré</Badge>;
     return <Badge className="bg-green-500">Risque faible</Badge>;
   };
 
   const getOpportunityBadge = (score?: number) => {
     if (!score) return null;
-    if (score >= 70) return <Badge className="bg-blue-500"><TrendingUp className="w-3 h-3 mr-1" /> Forte opportunité</Badge>;
+    if (score >= 70) return <Badge className="bg-blue-500 gap-1"><TrendingUp className="w-3 h-3" /> Forte opportunité</Badge>;
     if (score >= 40) return <Badge variant="secondary">Opportunité modérée</Badge>;
     return <Badge variant="outline">Opportunité faible</Badge>;
   };
