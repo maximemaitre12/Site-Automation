@@ -10,7 +10,7 @@ import DataSearch from '@/components/data/DataSearch';
 import { CompanyEnrichment } from '@/components/data/CompanyEnrichment';
 
 const Data = () => {
-  const [activeTab, setActiveTab] = useState('enrichment');
+  const [activeTab, setActiveTab] = useState('catalog');
 
   return (
     <DashboardLayout>
@@ -24,6 +24,10 @@ const Data = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="catalog" className="flex items-center gap-2">
+              <FolderSearch className="h-4 w-4" />
+              <span className="hidden sm:inline">Catalogue</span>
+            </TabsTrigger>
             <TabsTrigger value="enrichment" className="flex items-center gap-2">
               <Building2 className="h-4 w-4" />
               <span className="hidden sm:inline">Enrichissement</span>
@@ -31,10 +35,6 @@ const Data = () => {
             <TabsTrigger value="sources" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               <span className="hidden sm:inline">Sources</span>
-            </TabsTrigger>
-            <TabsTrigger value="catalog" className="flex items-center gap-2">
-              <FolderSearch className="h-4 w-4" />
-              <span className="hidden sm:inline">Catalogue</span>
             </TabsTrigger>
             <TabsTrigger value="search" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
