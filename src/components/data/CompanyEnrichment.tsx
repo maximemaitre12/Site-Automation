@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,11 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, Building2, Globe, Hash, Loader2, CheckCircle2, 
   AlertTriangle, TrendingUp, TrendingDown, Users, Euro,
-  MapPin, Calendar, ExternalLink, Trash2, RefreshCw, Shield
+  MapPin, Calendar, ExternalLink, Trash2, RefreshCw, Shield,
+  Database, Bot, Landmark
 } from 'lucide-react';
 import { useEnrichedCompanies, EnrichedCompany } from '@/hooks/useEnrichedCompanies';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -31,6 +31,24 @@ export function CompanyEnrichment() {
   const [searchType, setSearchType] = useState<'name' | 'siren' | 'siret' | 'website'>('name');
   const [searchValue, setSearchValue] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<EnrichedCompany | null>(null);
+  const [enrichmentStep, setEnrichmentStep] = useState(0);
+
+  // Simulate enrichment steps for better UX
+  useEffect(() => {
+    if (enriching) {
+      setEnrichmentStep(1);
+      const timer1 = setTimeout(() => setEnrichmentStep(2), 1500);
+      const timer2 = setTimeout(() => setEnrichmentStep(3), 3000);
+      const timer3 = setTimeout(() => setEnrichmentStep(4), 4500);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    } else {
+      setEnrichmentStep(0);
+    }
+  }, [enriching]);
 
   const handleEnrich = async () => {
     if (!searchValue.trim()) return;
@@ -64,6 +82,31 @@ export function CompanyEnrichment() {
     if (score >= 70) return <Badge className="bg-blue-500 gap-1"><TrendingUp className="w-3 h-3" /> Forte opportunité</Badge>;
     if (score >= 40) return <Badge variant="secondary">Opportunité modérée</Badge>;
     return <Badge variant="outline">Opportunité faible</Badge>;
+  };
+
+  const getSourceBadge = (source: string) => {
+    if (source.includes('data.gouv') || source.includes('Registre officiel')) {
+      return (
+        <Badge key={source} className="bg-green-600 gap-1">
+          <Landmark className="w-3 h-3" /> {source}
+        </Badge>
+      );
+    }
+    if (source.includes('Site web') || source.includes('Website')) {
+      return (
+        <Badge key={source} variant="secondary" className="gap-1">
+          <Globe className="w-3 h-3" /> {source}
+        </Badge>
+      );
+    }
+    if (source.includes('IA') || source.includes('AI')) {
+      return (
+        <Badge key={source} variant="outline" className="gap-1">
+          <Bot className="w-3 h-3" /> {source}
+        </Badge>
+      );
+    }
+    return <Badge key={source} variant="outline">{source}</Badge>;
   };
 
   if (loading) {
@@ -152,12 +195,45 @@ export function CompanyEnrichment() {
           </div>
 
           {enriching && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Recherche en cours sur les sources officielles et web...
+            <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+              <div className="space-y-2">
+                <div className={`flex items-center gap-2 text-sm ${enrichmentStep >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {enrichmentStep >= 1 ? (
+                    enrichmentStep > 1 ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border-2 border-muted-foreground" />
+                  )}
+                  <Landmark className="h-4 w-4" />
+                  Recherche dans les registres officiels (INSEE/RCS)...
+                </div>
+                <div className={`flex items-center gap-2 text-sm ${enrichmentStep >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {enrichmentStep >= 2 ? (
+                    enrichmentStep > 2 ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border-2 border-muted-foreground" />
+                  )}
+                  <Database className="h-4 w-4" />
+                  Vérification des doublons...
+                </div>
+                <div className={`flex items-center gap-2 text-sm ${enrichmentStep >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {enrichmentStep >= 3 ? (
+                    enrichmentStep > 3 ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border-2 border-muted-foreground" />
+                  )}
+                  <Globe className="h-4 w-4" />
+                  Analyse du site web...
+                </div>
+                <div className={`flex items-center gap-2 text-sm ${enrichmentStep >= 4 ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {enrichmentStep >= 4 ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border-2 border-muted-foreground" />
+                  )}
+                  <Bot className="h-4 w-4" />
+                  Analyse IA et enrichissement...
+                </div>
               </div>
-              <Progress value={45} className="h-2" />
             </div>
           )}
         </CardContent>
@@ -396,12 +472,12 @@ export function CompanyEnrichment() {
 
                   {/* Data Sources */}
                   {selectedCompany.data_sources && selectedCompany.data_sources.length > 0 && (
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Sources de données</Label>
-                      <div className="flex gap-1 flex-wrap mt-1">
-                        {selectedCompany.data_sources.map((source: string, i: number) => (
-                          <Badge key={i} variant="secondary" className="text-xs">{source}</Badge>
-                        ))}
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Database className="h-3 w-3" /> Sources de données
+                      </Label>
+                      <div className="flex gap-2 flex-wrap mt-2">
+                        {selectedCompany.data_sources.map((source: string) => getSourceBadge(source))}
                       </div>
                     </div>
                   )}
