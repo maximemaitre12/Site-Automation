@@ -32,11 +32,16 @@ const typeConfig: Record<DataType, { label: string; icon: React.ReactNode; color
   call_analysis: { label: 'Analyse d\'appel', icon: <Phone className="h-4 w-4" />, color: 'bg-violet-500/10 text-violet-600' }
 };
 
-const sensitivityConfig = {
+const sensitivityConfig: Record<string, { label: string; color: string; icon: string }> = {
   public: { label: 'Public', color: 'bg-green-500/10 text-green-600', icon: '🌍' },
   internal: { label: 'Interne', color: 'bg-blue-500/10 text-blue-600', icon: '🏢' },
   confidential: { label: 'Confidentiel', color: 'bg-orange-500/10 text-orange-600', icon: '🔒' },
-  restricted: { label: 'Restreint', color: 'bg-red-500/10 text-red-600', icon: '⛔' }
+  restricted: { label: 'Restreint', color: 'bg-red-500/10 text-red-600', icon: '⛔' },
+  private: { label: 'Privé', color: 'bg-gray-500/10 text-gray-600', icon: '🔐' }
+};
+
+const getSensitivityInfo = (sensitivity: string) => {
+  return sensitivityConfig[sensitivity] || sensitivityConfig.internal;
 };
 
 const DataCatalog = () => {
@@ -236,7 +241,7 @@ const DataCatalog = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
             {filteredEntries.map(entry => {
               const typeInfo = typeConfig[entry.type];
-              const sensitivityInfo = sensitivityConfig[entry.sensitivity];
+              const sensitivityInfo = getSensitivityInfo(entry.sensitivity);
               
               return (
                 <Card key={`${entry.source_table}-${entry.id}`} className="hover:shadow-md transition-shadow">
