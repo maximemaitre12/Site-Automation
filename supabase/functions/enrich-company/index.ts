@@ -11,18 +11,61 @@ interface EnrichmentRequest {
   queryValue: string;
 }
 
+// Score a company based on size and importance
+function scoreCompany(company: any): number {
+  let score = 0;
+  
+  // Category scoring (GE > ETI > PME > TPE)
+  const category = company.categorie_entreprise || '';
+  if (category === 'GE') score += 1000; // Grande Entreprise
+  else if (category === 'ETI') score += 500; // Entreprise de Taille Intermédiaire
+  else if (category === 'PME') score += 100; // Petite/Moyenne Entreprise
+  
+  // Employee count scoring
+  const employeeCode = company.tranche_effectif_salarie || company.siege?.tranche_effectif_salarie || '00';
+  const employeeScores: Record<string, number> = {
+    '53': 500, '52': 400, '51': 300, '42': 200, '41': 150,
+    '32': 100, '31': 80, '22': 60, '21': 40, '12': 20,
+    '11': 10, '03': 5, '02': 2, '01': 1, '00': 0
+  };
+  score += employeeScores[employeeCode] || 0;
+  
+  // Financial data scoring (companies with financial data are more established)
+  if (company.finances && Object.keys(company.finances).length > 0) {
+    score += 50;
+    const years = Object.keys(company.finances);
+    const latestYear = years.sort().reverse()[0];
+    const revenue = company.finances[latestYear]?.ca || 0;
+    if (revenue > 1000000000) score += 500; // > 1B€
+    else if (revenue > 100000000) score += 300; // > 100M€
+    else if (revenue > 10000000) score += 100; // > 10M€
+    else if (revenue > 1000000) score += 50; // > 1M€
+  }
+  
+  // Active company scoring
+  if (company.etat_administratif === 'A') score += 20;
+  
+  // Has dirigeants
+  if (company.dirigeants && company.dirigeants.length > 0) score += 10;
+  
+  return score;
+}
+
 // API Recherche Entreprises - data.gouv.fr (FREE & OFFICIAL)
-// Source: https://recherche-entreprises.api.gouv.fr/
-async function fetchFromDataGouv(query: string, queryType: string): Promise<any> {
+// Now returns the BEST match (largest/most important company)
+async function fetchFromDataGouv(query: string, queryType: string, existingCompanyData?: any): Promise<any> {
   try {
     let url = '';
+    let perPage = 1;
     
     if (queryType === 'siren' || queryType === 'siret') {
-      // Direct search by SIREN/SIRET
+      // Direct search by SIREN/SIRET - only one result needed
       url = `https://recherche-entreprises.api.gouv.fr/search?q=${query}&per_page=1`;
     } else {
-      // Search by name
-      url = `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}&per_page=5`;
+      // Search by name - get multiple results to find the best one
+      // Increase per_page to get more candidates for scoring
+      perPage = 25;
+      url = `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}&per_page=${perPage}`;
     }
     
     console.log(`Fetching from data.gouv.fr: ${url}`);
@@ -46,9 +89,47 @@ async function fetchFromDataGouv(query: string, queryType: string): Promise<any>
       return null;
     }
     
-    // Get the best match (first result)
-    const company = data.results[0];
-    console.log(`Found company: ${company.nom_complet}`);
+    // For name searches, score all results and pick the best one
+    let company = data.results[0];
+    
+    if (queryType === 'name' && data.results.length > 1) {
+      console.log(`Found ${data.results.length} companies, scoring to find best match...`);
+      
+      // Score all companies
+      const scoredResults = data.results.map((c: any) => ({
+        company: c,
+        score: scoreCompany(c),
+        nameMatch: c.nom_complet.toLowerCase().includes(query.toLowerCase()) ? 1 : 0
+      }));
+      
+      // If we have existing CRM data, boost companies that match
+      if (existingCompanyData) {
+        for (const result of scoredResults) {
+          // Check if SIREN matches
+          if (existingCompanyData.siren && result.company.siren === existingCompanyData.siren) {
+            result.score += 2000; // Strong match
+            console.log(`SIREN match found: ${result.company.siren}`);
+          }
+          // Check if city matches
+          if (existingCompanyData.city && result.company.siege?.libelle_commune?.toLowerCase() === existingCompanyData.city.toLowerCase()) {
+            result.score += 100;
+          }
+        }
+      }
+      
+      // Sort by score (highest first)
+      scoredResults.sort((a: any, b: any) => b.score - a.score);
+      
+      // Log top 3 for debugging
+      console.log('Top 3 scored companies:');
+      scoredResults.slice(0, 3).forEach((r: any, i: number) => {
+        console.log(`  ${i + 1}. ${r.company.nom_complet} (${r.company.categorie_entreprise || 'N/A'}) - Score: ${r.score}`);
+      });
+      
+      company = scoredResults[0].company;
+    }
+    
+    console.log(`Selected company: ${company.nom_complet} (${company.categorie_entreprise || 'N/A'})`);
     
     // Parse financial data if available
     let revenue = null;
@@ -56,7 +137,6 @@ async function fetchFromDataGouv(query: string, queryType: string): Promise<any>
     let netIncome = null;
     
     if (company.finances && Object.keys(company.finances).length > 0) {
-      // Get most recent year
       const years = Object.keys(company.finances).sort().reverse();
       if (years.length > 0) {
         revenueYear = parseInt(years[0]);
@@ -120,7 +200,7 @@ async function fetchFromDataGouv(query: string, queryType: string): Promise<any>
       latitude: company.siege?.latitude || null,
       longitude: company.siege?.longitude || null,
       creation_date: company.date_creation || null,
-      capital: null, // Not available in this API
+      capital: null,
       revenue: revenue,
       revenue_year: revenueYear,
       net_income: netIncome,
@@ -130,7 +210,7 @@ async function fetchFromDataGouv(query: string, queryType: string): Promise<any>
       is_active: company.etat_administratif === 'A',
       category: company.categorie_entreprise || null, // PME, ETI, GE
       data_source: 'API Recherche Entreprises (data.gouv.fr)',
-      confidence: 95 // Official data = high confidence
+      confidence: 95
     };
   } catch (error) {
     console.error('data.gouv.fr fetch error:', error);
@@ -138,10 +218,86 @@ async function fetchFromDataGouv(query: string, queryType: string): Promise<any>
   }
 }
 
+// Find related data in existing database
+async function findExistingData(supabase: any, userId: string, searchName: string): Promise<any> {
+  try {
+    // Search in CRM companies
+    const { data: crmCompanies } = await supabase
+      .from('crm_companies')
+      .select('name, industry, city, country, website, employees_count, annual_revenue')
+      .eq('user_id', userId)
+      .ilike('name', `%${searchName}%`)
+      .limit(5);
+    
+    // Search in enriched companies (already enriched)
+    const { data: enrichedCompanies } = await supabase
+      .from('enriched_companies')
+      .select('name, siren, siret, city, website, employees_count, revenue')
+      .eq('user_id', userId)
+      .ilike('name', `%${searchName}%`)
+      .limit(5);
+    
+    // Search in CRM contacts (companies linked to contacts)
+    const { data: contacts } = await supabase
+      .from('crm_contacts')
+      .select(`
+        company_id,
+        crm_companies!inner(name, industry, city, website)
+      `)
+      .eq('user_id', userId)
+      .limit(10);
+    
+    const relatedData: any = {
+      crmCompanies: crmCompanies || [],
+      enrichedCompanies: enrichedCompanies || [],
+      fromContacts: []
+    };
+    
+    // Extract unique companies from contacts
+    if (contacts) {
+      const seen = new Set();
+      for (const c of contacts) {
+        const company = (c as any).crm_companies;
+        if (company && !seen.has(company.name)) {
+          seen.add(company.name);
+          relatedData.fromContacts.push(company);
+        }
+      }
+    }
+    
+    console.log(`Found existing data: ${relatedData.crmCompanies.length} CRM companies, ${relatedData.enrichedCompanies.length} enriched, ${relatedData.fromContacts.length} from contacts`);
+    
+    // Find best match to use for cross-referencing
+    let bestMatch = null;
+    
+    // Check enriched companies first (they have SIREN)
+    for (const ec of relatedData.enrichedCompanies) {
+      if (ec.name.toLowerCase().includes(searchName.toLowerCase().split(' ')[0])) {
+        bestMatch = { ...ec, source: 'enriched' };
+        break;
+      }
+    }
+    
+    // Check CRM companies
+    if (!bestMatch) {
+      for (const crm of relatedData.crmCompanies) {
+        if (crm.name.toLowerCase().includes(searchName.toLowerCase().split(' ')[0])) {
+          bestMatch = { ...crm, source: 'crm' };
+          break;
+        }
+      }
+    }
+    
+    return { relatedData, bestMatch };
+  } catch (error) {
+    console.error('Error finding existing data:', error);
+    return { relatedData: null, bestMatch: null };
+  }
+}
+
 // Fetch and analyze company website
 async function analyzeWebsite(url: string): Promise<any> {
   try {
-    // Ensure URL has protocol
     let fullUrl = url;
     if (!url.startsWith('http')) {
       fullUrl = `https://${url}`;
@@ -157,7 +313,6 @@ async function analyzeWebsite(url: string): Promise<any> {
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
     const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
     
-    // Try to find social links
     const linkedinMatch = html.match(/https?:\/\/(www\.)?linkedin\.com\/company\/[^"'\s]+/i);
     const twitterMatch = html.match(/https?:\/\/(www\.)?(twitter|x)\.com\/[^"'\s]+/i);
     
@@ -181,9 +336,9 @@ Tu dois UNIQUEMENT analyser et interpréter ces données, PAS inventer de nouvel
 Données officielles (source: API Recherche Entreprises - data.gouv.fr):
 - Nom: ${companyData.name}
 - SIREN: ${companyData.siren || 'N/A'}
+- Catégorie: ${companyData.category || 'N/A'} (GE=Grande Entreprise, ETI=Entreprise Taille Intermédiaire, PME=Petite/Moyenne Entreprise)
 - Secteur NAF: ${companyData.naf_label || 'N/A'} (${companyData.naf_code || 'N/A'})
 - Effectifs: ${companyData.employees_range || 'N/A'}
-- Catégorie: ${companyData.category || 'N/A'}
 - CA ${companyData.revenue_year || ''}: ${companyData.revenue ? companyData.revenue.toLocaleString('fr-FR') + ' €' : 'N/A'}
 - Résultat net: ${companyData.net_income ? companyData.net_income.toLocaleString('fr-FR') + ' €' : 'N/A'}
 - Localisation: ${companyData.city || 'N/A'}
@@ -194,7 +349,7 @@ Réponds en JSON STRICT (pas de markdown):
   "summary": "Résumé factuel en 2-3 phrases basé uniquement sur les données ci-dessus",
   "keywords": ["mot-clé1", "mot-clé2", "mot-clé3"],
   "industry_analysis": "Analyse du secteur ${companyData.naf_label || 'non spécifié'}",
-  "competitive_position": "Position estimée basée sur la taille et le CA",
+  "competitive_position": "Position estimée basée sur la catégorie (${companyData.category || 'N/A'}) et la taille",
   "risk_score": 0-100 (basé sur les données financières, 0=sain, 100=risqué),
   "opportunity_score": 0-100 (basé sur le secteur et la croissance)
 }`;
@@ -295,14 +450,27 @@ serve(async (req) => {
       console.error('Failed to create request record:', requestError);
     }
 
+    // ========== STEP 0: Check existing database for context ==========
+    console.log(`Step 0: Checking existing database for context on "${queryValue}"`);
+    sourcesChecked.push('internal_database');
+    
+    let existingContext = null;
+    if (queryType === 'name') {
+      existingContext = await findExistingData(supabase, user.id, queryValue);
+      if (existingContext?.bestMatch) {
+        console.log(`Found existing data match: ${existingContext.bestMatch.name} (source: ${existingContext.bestMatch.source})`);
+        dataSources.push('Base de données interne');
+      }
+    }
+
     // ========== STEP 1: Fetch from official API data.gouv.fr ==========
     console.log(`Step 1: Fetching from data.gouv.fr for ${queryType}: ${queryValue}`);
     sourcesChecked.push('api_data_gouv_fr');
     
-    const officialData = await fetchFromDataGouv(queryValue, queryType);
+    // Pass existing context to help prioritize results
+    const officialData = await fetchFromDataGouv(queryValue, queryType, existingContext?.bestMatch);
     
     if (!officialData) {
-      // Update request as failed
       if (requestRecord) {
         await supabase
           .from('enrichment_requests')
@@ -345,9 +513,14 @@ serve(async (req) => {
     // ========== STEP 3: Analyze website if we can find one ==========
     let websiteData = null;
     
+    // Use website from existing context if available
+    if (!officialData.website && existingContext?.bestMatch?.website) {
+      officialData.website = existingContext.bestMatch.website;
+      console.log(`Using website from existing data: ${officialData.website}`);
+    }
+    
     // Try to find website from company name
     if (!officialData.website && officialData.name) {
-      // Common patterns for French company websites
       const cleanName = officialData.name.toLowerCase()
         .replace(/[^a-z0-9]/g, '')
         .substring(0, 20);
@@ -434,7 +607,7 @@ serve(async (req) => {
       ai_opportunity_score: aiAnalysis?.opportunity_score || null,
       data_sources: dataSources,
       confidence_score: officialData.confidence,
-      verification_status: 'verified', // Official data = verified
+      verification_status: 'verified',
       verification_date: new Date().toISOString(),
       last_enriched_at: new Date().toISOString(),
       enrichment_status: 'completed'
@@ -443,7 +616,6 @@ serve(async (req) => {
     let savedCompany;
     
     if (existingCompany) {
-      // Update existing company
       console.log(`Updating existing company: ${existingCompany.id}`);
       const { data, error } = await supabase
         .from('enriched_companies')
@@ -458,7 +630,6 @@ serve(async (req) => {
       }
       savedCompany = data;
     } else {
-      // Insert new company
       console.log('Inserting new company');
       const { data, error } = await supabase
         .from('enriched_companies')
@@ -477,7 +648,6 @@ serve(async (req) => {
     if (officialData.revenue && officialData.revenue_year) {
       console.log(`Step 6: Saving financial data for year ${officialData.revenue_year}`);
       
-      // Check if financial record exists
       const { data: existingFinancial } = await supabase
         .from('company_financials')
         .select('id')
@@ -508,7 +678,9 @@ serve(async (req) => {
       }
     }
 
-    // Update enrichment request
+    // ========== STEP 7: Update enrichment request ==========
+    const processingTime = Date.now() - startTime;
+    
     if (requestRecord) {
       await supabase
         .from('enrichment_requests')
@@ -516,22 +688,21 @@ serve(async (req) => {
           status: 'completed',
           result_company_id: savedCompany.id,
           sources_checked: sourcesChecked,
-          processing_time_ms: Date.now() - startTime,
+          processing_time_ms: processingTime,
           completed_at: new Date().toISOString()
         })
         .eq('id', requestRecord.id);
     }
 
-    const wasUpdated = !!existingCompany;
-    
+    console.log(`Enrichment completed in ${processingTime}ms`);
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         company: savedCompany,
+        processingTime,
         sourcesChecked,
-        dataSources,
-        processingTime: Date.now() - startTime,
-        wasUpdated
+        dataSources
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -539,7 +710,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Enrichment error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
