@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useUnifiedDataCatalog } from '@/hooks/useUnifiedDataCatalog';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -15,7 +17,9 @@ import {
   Clock,
   ArrowUpRight,
   Brain,
-  Sparkles
+  Sparkles,
+  Database,
+  ExternalLink
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -25,8 +29,16 @@ interface CRMDashboardProps {
 }
 
 export function CRMDashboard({ crm }: CRMDashboardProps) {
+  const navigate = useNavigate();
   const { stats, opportunities, tasks, activities, stages, loading } = crm;
+  const { stats: catalogStats, entries: catalogEntries } = useUnifiedDataCatalog();
 
+  // Filter catalog entries for CRM data
+  const crmCatalogData = useMemo(() => {
+    return catalogEntries.filter(e => 
+      e.type === 'crm_company' || e.type === 'crm_contact' || e.type === 'crm_opportunity'
+    );
+  }, [catalogEntries]);
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
   };
@@ -325,6 +337,47 @@ export function CRMDashboard({ crm }: CRMDashboardProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Data Catalog Integration */}
+      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <Database className="h-5 w-5 text-primary" />
+            Catalogue de Données Unifié
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1 grid grid-cols-3 gap-4">
+              <div className="text-center p-3 rounded-lg bg-card/80">
+                <div className="text-2xl font-bold text-primary">{catalogStats.byType.crm_company}</div>
+                <div className="text-xs text-muted-foreground">Sociétés CRM</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-card/80">
+                <div className="text-2xl font-bold text-green-600">{catalogStats.byType.crm_contact}</div>
+                <div className="text-xs text-muted-foreground">Contacts CRM</div>
+              </div>
+              <div className="text-center p-3 rounded-lg bg-card/80">
+                <div className="text-2xl font-bold text-amber-600">{catalogStats.byType.crm_opportunity}</div>
+                <div className="text-xs text-muted-foreground">Opportunités</div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 justify-center">
+              <p className="text-sm text-muted-foreground">
+                Toutes vos données CRM sont synchronisées dans le catalogue unifié AETHER Data.
+              </p>
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => navigate('/tools/data')}
+              >
+                <ExternalLink className="h-4 w-4" />
+                Voir dans le Catalogue
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Won/Lost Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
