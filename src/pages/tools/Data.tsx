@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Database, FolderSearch, Activity, Shield, Search } from 'lucide-react';
+import { Database, FolderSearch, Activity, Shield, Search, Building2 } from 'lucide-react';
 import DataSources from '@/components/data/DataSources';
 import DataCatalog from '@/components/data/DataCatalog';
 import DataMonitoring from '@/components/data/DataMonitoring';
 import DataGovernance from '@/components/data/DataGovernance';
 import DataSearch from '@/components/data/DataSearch';
+import { CompanyEnrichment } from '@/components/data/CompanyEnrichment';
 
 const Data = () => {
-  const [activeTab, setActiveTab] = useState('sources');
+  const [activeTab, setActiveTab] = useState('enrichment');
 
   return (
     <DashboardLayout>
@@ -17,12 +18,16 @@ const Data = () => {
         <div>
           <h1 className="text-3xl font-bold">AETHER Data</h1>
           <p className="text-muted-foreground mt-1">
-            Plateforme de données unifiée - Sources, Gouvernance, Qualité et Monitoring
+            Plateforme de données d'entreprise - Enrichissement, Veille et Intelligence
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="enrichment" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Enrichissement</span>
+            </TabsTrigger>
             <TabsTrigger value="sources" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               <span className="hidden sm:inline">Sources</span>
@@ -45,6 +50,9 @@ const Data = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="enrichment">
+            <CompanyEnrichment />
+          </TabsContent>
           <TabsContent value="sources">
             <DataSources />
           </TabsContent>
