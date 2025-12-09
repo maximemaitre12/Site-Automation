@@ -383,6 +383,139 @@ export type Database = {
         }
         Relationships: []
       }
+      company_alerts: {
+        Row: {
+          alert_type: string
+          company_id: string
+          content: string | null
+          created_at: string
+          detected_at: string
+          id: string
+          is_read: boolean | null
+          severity: string | null
+          source_name: string | null
+          source_url: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          company_id: string
+          content?: string | null
+          created_at?: string
+          detected_at?: string
+          id?: string
+          is_read?: boolean | null
+          severity?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          company_id?: string
+          content?: string | null
+          created_at?: string
+          detected_at?: string
+          id?: string
+          is_read?: boolean | null
+          severity?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_alerts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "enriched_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_financials: {
+        Row: {
+          cash: number | null
+          company_id: string
+          created_at: string
+          current_ratio: number | null
+          debt: number | null
+          debt_ratio: number | null
+          ebitda: number | null
+          equity: number | null
+          fiscal_year: number
+          gross_margin: number | null
+          id: string
+          is_verified: boolean | null
+          net_income: number | null
+          operating_income: number | null
+          profit_margin: number | null
+          revenue: number | null
+          roe: number | null
+          source: string | null
+          source_date: string | null
+          total_assets: number | null
+          user_id: string
+        }
+        Insert: {
+          cash?: number | null
+          company_id: string
+          created_at?: string
+          current_ratio?: number | null
+          debt?: number | null
+          debt_ratio?: number | null
+          ebitda?: number | null
+          equity?: number | null
+          fiscal_year: number
+          gross_margin?: number | null
+          id?: string
+          is_verified?: boolean | null
+          net_income?: number | null
+          operating_income?: number | null
+          profit_margin?: number | null
+          revenue?: number | null
+          roe?: number | null
+          source?: string | null
+          source_date?: string | null
+          total_assets?: number | null
+          user_id: string
+        }
+        Update: {
+          cash?: number | null
+          company_id?: string
+          created_at?: string
+          current_ratio?: number | null
+          debt?: number | null
+          debt_ratio?: number | null
+          ebitda?: number | null
+          equity?: number | null
+          fiscal_year?: number
+          gross_margin?: number | null
+          id?: string
+          is_verified?: boolean | null
+          net_income?: number | null
+          operating_income?: number | null
+          profit_margin?: number | null
+          revenue?: number | null
+          roe?: number | null
+          source?: string | null
+          source_date?: string | null
+          total_assets?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_financials_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "enriched_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -1304,6 +1437,191 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enriched_companies: {
+        Row: {
+          address: string | null
+          ai_competitive_position: string | null
+          ai_industry_analysis: string | null
+          ai_keywords: Json | null
+          ai_opportunity_score: number | null
+          ai_risk_score: number | null
+          ai_summary: string | null
+          capital: number | null
+          city: string | null
+          confidence_score: number | null
+          country: string | null
+          created_at: string
+          creation_date: string | null
+          data_sources: Json | null
+          ebitda: number | null
+          employees_count: number | null
+          employees_range: string | null
+          enrichment_status: string | null
+          executives: Json | null
+          facebook_url: string | null
+          id: string
+          last_enriched_at: string | null
+          latitude: number | null
+          legal_form: string | null
+          linkedin_url: string | null
+          longitude: number | null
+          naf_code: string | null
+          naf_label: string | null
+          name: string
+          net_income: number | null
+          postal_code: string | null
+          revenue: number | null
+          revenue_year: number | null
+          siren: string | null
+          siret: string | null
+          tva_number: string | null
+          twitter_url: string | null
+          updated_at: string
+          user_id: string
+          verification_date: string | null
+          verification_status: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          ai_competitive_position?: string | null
+          ai_industry_analysis?: string | null
+          ai_keywords?: Json | null
+          ai_opportunity_score?: number | null
+          ai_risk_score?: number | null
+          ai_summary?: string | null
+          capital?: number | null
+          city?: string | null
+          confidence_score?: number | null
+          country?: string | null
+          created_at?: string
+          creation_date?: string | null
+          data_sources?: Json | null
+          ebitda?: number | null
+          employees_count?: number | null
+          employees_range?: string | null
+          enrichment_status?: string | null
+          executives?: Json | null
+          facebook_url?: string | null
+          id?: string
+          last_enriched_at?: string | null
+          latitude?: number | null
+          legal_form?: string | null
+          linkedin_url?: string | null
+          longitude?: number | null
+          naf_code?: string | null
+          naf_label?: string | null
+          name: string
+          net_income?: number | null
+          postal_code?: string | null
+          revenue?: number | null
+          revenue_year?: number | null
+          siren?: string | null
+          siret?: string | null
+          tva_number?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          user_id: string
+          verification_date?: string | null
+          verification_status?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          ai_competitive_position?: string | null
+          ai_industry_analysis?: string | null
+          ai_keywords?: Json | null
+          ai_opportunity_score?: number | null
+          ai_risk_score?: number | null
+          ai_summary?: string | null
+          capital?: number | null
+          city?: string | null
+          confidence_score?: number | null
+          country?: string | null
+          created_at?: string
+          creation_date?: string | null
+          data_sources?: Json | null
+          ebitda?: number | null
+          employees_count?: number | null
+          employees_range?: string | null
+          enrichment_status?: string | null
+          executives?: Json | null
+          facebook_url?: string | null
+          id?: string
+          last_enriched_at?: string | null
+          latitude?: number | null
+          legal_form?: string | null
+          linkedin_url?: string | null
+          longitude?: number | null
+          naf_code?: string | null
+          naf_label?: string | null
+          name?: string
+          net_income?: number | null
+          postal_code?: string | null
+          revenue?: number | null
+          revenue_year?: number | null
+          siren?: string | null
+          siret?: string | null
+          tva_number?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_date?: string | null
+          verification_status?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      enrichment_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          processing_time_ms: number | null
+          query_type: string
+          query_value: string
+          result_company_id: string | null
+          sources_checked: Json | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          processing_time_ms?: number | null
+          query_type: string
+          query_value: string
+          result_company_id?: string | null
+          sources_checked?: Json | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          processing_time_ms?: number | null
+          query_type?: string
+          query_value?: string
+          result_company_id?: string | null
+          sources_checked?: Json | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrichment_requests_result_company_id_fkey"
+            columns: ["result_company_id"]
+            isOneToOne: false
+            referencedRelation: "enriched_companies"
             referencedColumns: ["id"]
           },
         ]
