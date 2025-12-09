@@ -1,278 +1,431 @@
-import { useState, useRef, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useState, useRef, useCallback } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Upload, User, Mail, Phone, FileText, Loader2, Sparkles } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Upload, FileText, Loader2, Sparkles, CheckCircle, User, Mail, Phone, Briefcase, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { callAI } from '@/lib/ai';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AddCandidateDialogProps {
   onAdd: (data: { name: string; email?: string; phone?: string; cvText?: string }) => Promise<any>;
   children: React.ReactNode;
 }
 
+interface ExtractedInfo {
+  name: string;
+  email: string;
+  phone: string;
+  skills: string[];
+  experience_years: number;
+  education: string;
+  summary: string;
+  strengths: string[];
+  score: number;
+}
+
 export function AddCandidateDialog({ onAdd, children }: AddCandidateDialogProps) {
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isExtracting, setIsExtracting] = useState(false);
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    cvText: ''
-  });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [stage, setStage] = useState<'idle' | 'uploading' | 'parsing' | 'analyzing' | 'done'>('idle');
+  const [extractedInfo, setExtractedInfo] = useState<ExtractedInfo | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Extract CV info when cvText changes
-  const extractCVInfo = async (text: string) => {
-    if (!text || text.length < 50) return;
-    
-    setIsExtracting(true);
-    try {
-      const response = await callAI({
-        messages: [{
-          role: 'user',
-          content: `Analyse ce CV et extrais les informations suivantes en JSON:
-{
-  "name": "nom complet du candidat",
-  "email": "adresse email si présente",
-  "phone": "numéro de téléphone si présent"
-}
+  const supportedFormats = ['PDF', 'DOCX', 'DOC', 'TXT', 'RTF', 'ODT'];
 
-CV:
-${text}
+  const resetState = () => {
+    setIsProcessing(false);
+    setProgress(0);
+    setStage('idle');
+    setExtractedInfo(null);
+  };
 
-Réponds UNIQUEMENT avec le JSON, sans markdown ni explication.`
-        }],
-        type: 'extract'
-      });
+  const parseDocument = async (file: File): Promise<string> => {
+    // Convert file to base64
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode(...bytes.slice(i, i + chunkSize));
+    }
+    const base64 = btoa(binary);
 
-      if (response.content && !response.error) {
-        try {
-          // Handle potential markdown wrapping
-          let jsonStr = response.content.trim();
-          if (jsonStr.startsWith('```')) {
-            jsonStr = jsonStr.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-          }
-          
-          const extracted = JSON.parse(jsonStr);
-          
-          setForm(f => ({
-            ...f,
-            name: extracted.name || f.name,
-            email: extracted.email || f.email,
-            phone: extracted.phone || f.phone
-          }));
-          
-          toast({
-            title: 'Informations extraites',
-            description: 'Les données du CV ont été détectées automatiquement.'
-          });
-        } catch (parseError) {
-          console.error('Parse error:', parseError);
-        }
+    const { data, error } = await supabase.functions.invoke('cv-parse', {
+      body: {
+        fileBase64: base64,
+        fileName: file.name,
+        mimeType: file.type
       }
-    } catch (error) {
-      console.error('CV extraction error:', error);
-    } finally {
-      setIsExtracting(false);
-    }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Check file type
-    if (!file.type.includes('text') && !file.name.endsWith('.txt') && !file.name.endsWith('.md')) {
-      toast({
-        title: 'Format détecté',
-        description: 'Pour les fichiers PDF, veuillez coller le contenu du CV dans la zone de texte.',
-      });
-      return;
-    }
-
-    try {
-      const text = await file.text();
-      setForm(f => ({ ...f, cvText: text }));
-      toast({ title: 'CV chargé', description: 'Extraction des informations en cours...' });
-      
-      // Auto-extract info from uploaded CV
-      await extractCVInfo(text);
-    } catch (error) {
-      toast({ title: 'Erreur', description: 'Impossible de lire le fichier', variant: 'destructive' });
-    }
-  };
-
-  const handleCvTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    setForm(f => ({ ...f, cvText: text }));
-  };
-
-  // Trigger extraction when user pastes or finishes typing CV
-  const handleCvBlur = () => {
-    if (form.cvText && form.cvText.length > 50 && !form.name) {
-      extractCVInfo(form.cvText);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!form.name.trim()) {
-      toast({ title: 'Nom requis', description: 'Veuillez saisir le nom du candidat', variant: 'destructive' });
-      return;
-    }
-
-    setIsLoading(true);
-    const result = await onAdd({
-      name: form.name,
-      email: form.email || undefined,
-      phone: form.phone || undefined,
-      cvText: form.cvText || undefined
     });
 
-    if (result) {
-      setForm({ name: '', email: '', phone: '', cvText: '' });
-      setOpen(false);
+    if (error) throw new Error('Erreur lors du parsing du document');
+    return data?.text || '';
+  };
+
+  const analyzeCV = async (cvText: string): Promise<ExtractedInfo> => {
+    const { data, error } = await supabase.functions.invoke('ai-chat', {
+      body: {
+        messages: [{
+          role: 'user',
+          content: `Tu es un expert RH. Analyse ce CV et extrais toutes les informations en JSON strict.
+
+IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans markdown, sans explication.
+
+{
+  "name": "nom complet du candidat",
+  "email": "email si présent, sinon chaîne vide",
+  "phone": "téléphone si présent, sinon chaîne vide",
+  "skills": ["liste", "des", "compétences", "techniques", "et", "soft skills"],
+  "experience_years": nombre d'années d'expérience (entier),
+  "education": "formation principale / diplôme le plus élevé",
+  "summary": "résumé professionnel en 2-3 phrases",
+  "strengths": ["point fort 1", "point fort 2", "point fort 3"],
+  "score": score de qualité du profil de 0 à 100 basé sur la clarté du CV, les compétences, l'expérience et la cohérence du parcours
+}
+
+CV à analyser:
+${cvText.substring(0, 8000)}`
+        }]
+      }
+    });
+
+    if (error) throw new Error('Erreur lors de l\'analyse IA');
+
+    let content = data?.content || data?.choices?.[0]?.message?.content || '';
+    
+    // Clean markdown wrapper if present
+    if (content.includes('```')) {
+      content = content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
     }
-    setIsLoading(false);
+
+    try {
+      return JSON.parse(content);
+    } catch {
+      // Fallback extraction
+      return {
+        name: 'Candidat',
+        email: '',
+        phone: '',
+        skills: [],
+        experience_years: 0,
+        education: '',
+        summary: content.substring(0, 200),
+        strengths: [],
+        score: 50
+      };
+    }
+  };
+
+  const processFile = async (file: File) => {
+    setIsProcessing(true);
+    setProgress(0);
+    setStage('uploading');
+    setExtractedInfo(null);
+
+    try {
+      // Stage 1: Upload/Read file
+      setProgress(20);
+      setStage('parsing');
+
+      let cvText = '';
+      
+      // For text files, read directly
+      if (file.type.includes('text') || file.name.endsWith('.txt') || file.name.endsWith('.md')) {
+        cvText = await file.text();
+      } else {
+        // For other formats, use doc-analyze edge function
+        cvText = await parseDocument(file);
+      }
+
+      if (!cvText || cvText.length < 50) {
+        throw new Error('Le document ne contient pas assez de texte à analyser');
+      }
+
+      // Stage 2: AI Analysis
+      setProgress(50);
+      setStage('analyzing');
+
+      const extracted = await analyzeCV(cvText);
+      
+      setProgress(80);
+
+      // Stage 3: Create candidate
+      const result = await onAdd({
+        name: extracted.name || 'Candidat',
+        email: extracted.email || undefined,
+        phone: extracted.phone || undefined,
+        cvText: cvText
+      });
+
+      if (result) {
+        // Update with full analysis
+        await supabase
+          .from('candidates')
+          .update({
+            skills: extracted.skills,
+            experience_years: extracted.experience_years,
+            match_score: extracted.score,
+            ai_analysis: {
+              education: extracted.education,
+              summary: extracted.summary,
+              strengths: extracted.strengths,
+              score: extracted.score,
+              analyzed_at: new Date().toISOString()
+            },
+            status: 'analyzed'
+          })
+          .eq('id', result.id);
+      }
+
+      setProgress(100);
+      setStage('done');
+      setExtractedInfo(extracted);
+
+      toast({
+        title: 'Candidat ajouté avec succès',
+        description: `${extracted.name} - Score: ${extracted.score}/100`
+      });
+
+      // Auto close after showing results
+      setTimeout(() => {
+        setOpen(false);
+        resetState();
+      }, 3000);
+
+    } catch (error: any) {
+      console.error('Processing error:', error);
+      toast({
+        title: 'Erreur',
+        description: error.message || 'Impossible de traiter le document',
+        variant: 'destructive'
+      });
+      resetState();
+    }
+  };
+
+  const handleFileSelect = useCallback((file: File) => {
+    const validExtensions = ['.pdf', '.docx', '.doc', '.txt', '.rtf', '.odt', '.md'];
+    const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
+    
+    if (!validExtensions.includes(fileExt)) {
+      toast({
+        title: 'Format non supporté',
+        description: `Formats acceptés: ${supportedFormats.join(', ')}`,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    processFile(file);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  }, [handleFileSelect]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileSelect(file);
+  };
+
+  const getStageText = () => {
+    switch (stage) {
+      case 'uploading': return 'Chargement du fichier...';
+      case 'parsing': return 'Extraction du texte...';
+      case 'analyzing': return 'Analyse IA du CV...';
+      case 'done': return 'Terminé !';
+      default: return '';
+    }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-500';
+    if (score >= 60) return 'text-amber-500';
+    return 'text-red-500';
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetState(); }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Ajouter un candidat
+            <Sparkles className="w-5 h-5 text-primary" />
+            Ajouter un candidat par CV
           </DialogTitle>
+          <DialogDescription>
+            Uploadez un CV et l'IA analysera automatiquement le profil
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Basic Info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom complet *</Label>
-              <div className="relative">
-                <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input 
-                  id="name"
-                  placeholder="Jean Dupont"
-                  value={form.name}
-                  onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input 
-                  id="email"
-                  type="email"
-                  placeholder="jean@example.com"
-                  value={form.email}
-                  onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Téléphone</Label>
-            <div className="relative">
-              <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input 
-                id="phone"
-                placeholder="+33 6 12 34 56 78"
-                value={form.phone}
-                onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          {/* CV Upload */}
-          <div className="space-y-2">
-            <Label>CV / Résumé</Label>
+        {stage === 'idle' && (
+          <div className="space-y-4">
+            {/* Drop Zone */}
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`
+                border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
+                ${isDragging 
+                  ? 'border-primary bg-primary/10 scale-[1.02]' 
+                  : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                }
+              `}
             >
-              <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">
-                Cliquez pour uploader un fichier texte ou glissez-déposez
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                TXT, MD supportés. Pour les PDF, copiez-collez le texte ci-dessous.
-              </p>
+              <div className="flex flex-col items-center gap-4">
+                <div className={`
+                  w-16 h-16 rounded-full flex items-center justify-center transition-colors
+                  ${isDragging ? 'bg-primary/20' : 'bg-muted'}
+                `}>
+                  <Upload className={`w-8 h-8 ${isDragging ? 'text-primary' : 'text-muted-foreground'}`} />
+                </div>
+                <div>
+                  <p className="font-medium">
+                    Glissez-déposez un CV ici
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ou cliquez pour sélectionner
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {supportedFormats.map(format => (
+                    <span 
+                      key={format}
+                      className="px-2 py-0.5 text-xs bg-muted rounded-full text-muted-foreground"
+                    >
+                      {format}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".txt,.md,text/*"
-              onChange={handleFileUpload}
+              accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.md"
+              onChange={handleFileChange}
               className="hidden"
             />
-          </div>
 
-          {/* CV Text */}
-          <div className="space-y-2">
-            <Label htmlFor="cvText" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Contenu du CV
-              {isExtracting && (
-                <span className="flex items-center gap-1 text-xs text-primary">
-                  <Sparkles className="w-3 h-3 animate-pulse" />
-                  Extraction IA...
-                </span>
+            <p className="text-xs text-center text-muted-foreground">
+              L'IA extraira automatiquement les informations du candidat et attribuera un score
+            </p>
+          </div>
+        )}
+
+        {(stage === 'uploading' || stage === 'parsing' || stage === 'analyzing') && (
+          <div className="py-8 space-y-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                </div>
+                <Sparkles className="w-6 h-6 text-primary absolute -top-1 -right-1 animate-pulse" />
+              </div>
+              <div className="text-center">
+                <p className="font-medium">{getStageText()}</p>
+                <p className="text-sm text-muted-foreground">
+                  {stage === 'analyzing' && 'Extraction des compétences, expérience et score...'}
+                </p>
+              </div>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+        )}
+
+        {stage === 'done' && extractedInfo && (
+          <div className="py-4 space-y-4">
+            <div className="flex items-center justify-center gap-2 text-green-500">
+              <CheckCircle className="w-8 h-8" />
+              <span className="text-lg font-medium">Candidat ajouté !</span>
+            </div>
+
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              {/* Name & Score */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium">{extractedInfo.name}</span>
+                </div>
+                <div className={`flex items-center gap-1 font-bold ${getScoreColor(extractedInfo.score)}`}>
+                  <Star className="w-4 h-4 fill-current" />
+                  {extractedInfo.score}/100
+                </div>
+              </div>
+
+              {/* Contact Info */}
+              {extractedInfo.email && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Mail className="w-4 h-4" />
+                  <span>{extractedInfo.email}</span>
+                </div>
               )}
-              {form.cvText && !isExtracting && <span className="text-xs text-muted-foreground">({form.cvText.length} caractères)</span>}
-            </Label>
-            <Textarea 
-              id="cvText"
-              placeholder="Collez le contenu du CV ici pour l'analyse IA automatique..."
-              value={form.cvText}
-              onChange={handleCvTextChange}
-              onBlur={handleCvBlur}
-              className="min-h-[150px] font-mono text-sm"
-            />
-            {form.cvText && form.cvText.length > 50 && !form.name && !isExtracting && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
-                onClick={() => extractCVInfo(form.cvText)}
-                className="w-full"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Extraire les informations du CV
-              </Button>
-            )}
-          </div>
+              {extractedInfo.phone && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Phone className="w-4 h-4" />
+                  <span>{extractedInfo.phone}</span>
+                </div>
+              )}
 
-          {/* Submit */}
-          <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Ajout en cours...
-              </>
-            ) : (
-              <>
-                <User className="w-4 h-4 mr-2" />
-                Ajouter le candidat
-              </>
-            )}
-          </Button>
-        </div>
+              {/* Experience */}
+              <div className="flex items-center gap-2 text-sm">
+                <Briefcase className="w-4 h-4 text-muted-foreground" />
+                <span>{extractedInfo.experience_years} ans d'expérience</span>
+              </div>
+
+              {/* Skills */}
+              {extractedInfo.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {extractedInfo.skills.slice(0, 6).map((skill, i) => (
+                    <span 
+                      key={i}
+                      className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                  {extractedInfo.skills.length > 6 && (
+                    <span className="px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full">
+                      +{extractedInfo.skills.length - 6}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Summary */}
+              {extractedInfo.summary && (
+                <p className="text-sm text-muted-foreground italic">
+                  "{extractedInfo.summary}"
+                </p>
+              )}
+            </div>
+
+            <p className="text-xs text-center text-muted-foreground">
+              Fermeture automatique...
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
