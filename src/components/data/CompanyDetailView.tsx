@@ -152,7 +152,7 @@ export function CompanyDetailView({
   const unreadAlerts = alerts.filter(a => !a.is_read).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full overflow-auto pb-8">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
