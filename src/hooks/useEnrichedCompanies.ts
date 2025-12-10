@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 
 export interface EnrichedCompany {
   id: string;
@@ -103,32 +104,78 @@ export interface EnrichmentRequest {
 
 export function useEnrichedCompanies() {
   const { user } = useAuth();
-  const [companies, setCompanies] = useState<EnrichedCompany[]>([]);
-  const [financials, setFinancials] = useState<CompanyFinancial[]>([]);
-  const [alerts, setAlerts] = useState<CompanyAlert[]>([]);
-  const [requests, setRequests] = useState<EnrichmentRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [enriching, setEnriching] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchCompanies = useCallback(async () => {
-    if (!user) return;
-    
-    const { data, error } = await supabase
-      .from('enriched_companies')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching companies:', error);
-      return;
-    }
-    
-    setCompanies(data || []);
-  }, [user]);
+  // Fetch companies with React Query
+  const { data: companies = [], isLoading: companiesLoading } = useQuery({
+    queryKey: ['enriched-companies', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('enriched_companies')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching companies:', error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  const fetchFinancials = useCallback(async (companyId?: string) => {
-    if (!user) return;
+  // Fetch alerts with React Query
+  const { data: alerts = [], isLoading: alertsLoading } = useQuery({
+    queryKey: ['company-alerts', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('company_alerts')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('detected_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching alerts:', error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  // Fetch requests with React Query
+  const { data: requests = [], isLoading: requestsLoading } = useQuery({
+    queryKey: ['enrichment-requests', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('enrichment_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      
+      if (error) {
+        console.error('Error fetching requests:', error);
+        return [];
+      }
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  // Financials state (fetched on demand)
+  const fetchFinancials = useCallback(async (companyId?: string): Promise<CompanyFinancial[]> => {
+    if (!user) return [];
     
     let query = supabase
       .from('company_financials')
@@ -144,14 +191,14 @@ export function useEnrichedCompanies() {
     
     if (error) {
       console.error('Error fetching financials:', error);
-      return;
+      return [];
     }
     
-    setFinancials(data || []);
+    return data || [];
   }, [user]);
 
-  const fetchAlerts = useCallback(async (companyId?: string) => {
-    if (!user) return;
+  const fetchAlerts = useCallback(async (companyId?: string): Promise<CompanyAlert[]> => {
+    if (!user) return [];
     
     let query = supabase
       .from('company_alerts')
@@ -167,70 +214,48 @@ export function useEnrichedCompanies() {
     
     if (error) {
       console.error('Error fetching alerts:', error);
-      return;
+      return [];
     }
     
-    setAlerts(data || []);
+    return data || [];
   }, [user]);
 
-  const fetchRequests = useCallback(async () => {
-    if (!user) return;
-    
-    const { data, error } = await supabase
-      .from('enrichment_requests')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(50);
-    
-    if (error) {
-      console.error('Error fetching requests:', error);
-      return;
+  // Enrichment mutation
+  const enrichMutation = useMutation({
+    mutationFn: async ({ queryType, queryValue }: { queryType: 'siren' | 'siret' | 'name' | 'website', queryValue: string }) => {
+      const { data, error } = await supabase.functions.invoke('enrich-company', {
+        body: { queryType, queryValue }
+      });
+      
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Aucune donnée trouvée');
+      
+      return data.company;
+    },
+    onSuccess: (company) => {
+      if (company) {
+        toast.success(`Entreprise "${company.name}" enrichie avec succès`);
+        queryClient.invalidateQueries({ queryKey: ['enriched-companies'] });
+        queryClient.invalidateQueries({ queryKey: ['enrichment-requests'] });
+      }
+    },
+    onError: (error: any) => {
+      console.error('Enrichment error:', error);
+      toast.error(error.message || 'Erreur lors de l\'enrichissement');
     }
-    
-    setRequests(data || []);
-  }, [user]);
+  });
 
   const enrichCompany = useCallback(async (
     queryType: 'siren' | 'siret' | 'name' | 'website',
     queryValue: string
   ): Promise<EnrichedCompany | null> => {
     if (!user) return null;
-    
-    setEnriching(true);
-    
     try {
-      const { data, error } = await supabase.functions.invoke('enrich-company', {
-        body: { queryType, queryValue }
-      });
-      
-      if (error) {
-        console.error('Enrichment error:', error);
-        toast.error(error.message || 'Erreur lors de l\'enrichissement');
-        return null;
-      }
-      
-      if (!data?.success) {
-        toast.error(data?.error || 'Aucune donnée trouvée');
-        return null;
-      }
-      
-      if (data.company) {
-        toast.success(`Entreprise "${data.company.name}" enrichie avec succès`);
-        await fetchCompanies();
-        await fetchRequests();
-        return data.company;
-      }
-      
+      return await enrichMutation.mutateAsync({ queryType, queryValue });
+    } catch {
       return null;
-    } catch (error) {
-      console.error('Enrichment error:', error);
-      toast.error('Erreur lors de l\'enrichissement');
-      return null;
-    } finally {
-      setEnriching(false);
     }
-  }, [user, fetchCompanies, fetchRequests]);
+  }, [user, enrichMutation]);
 
   const deleteCompany = useCallback(async (id: string) => {
     const { error } = await supabase
@@ -244,9 +269,9 @@ export function useEnrichedCompanies() {
     }
     
     toast.success('Entreprise supprimée');
-    await fetchCompanies();
+    queryClient.invalidateQueries({ queryKey: ['enriched-companies'] });
     return true;
-  }, [fetchCompanies]);
+  }, [queryClient]);
 
   const markAlertAsRead = useCallback(async (id: string) => {
     const { error } = await supabase
@@ -259,21 +284,18 @@ export function useEnrichedCompanies() {
       return false;
     }
     
-    await fetchAlerts();
+    queryClient.invalidateQueries({ queryKey: ['company-alerts'] });
     return true;
-  }, [fetchAlerts]);
+  }, [queryClient]);
 
-  useEffect(() => {
-    if (user) {
-      Promise.all([
-        fetchCompanies(),
-        fetchAlerts(),
-        fetchRequests()
-      ]).finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, [user, fetchCompanies, fetchAlerts, fetchRequests]);
+  const invalidateCompanies = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['enriched-companies'] });
+    queryClient.invalidateQueries({ queryKey: ['company-alerts'] });
+    queryClient.invalidateQueries({ queryKey: ['enrichment-requests'] });
+  }, [queryClient]);
+
+  // Loading state
+  const loading = companiesLoading || alertsLoading || requestsLoading;
 
   // Statistics
   const stats = {
@@ -289,18 +311,19 @@ export function useEnrichedCompanies() {
 
   return {
     companies,
-    financials,
+    financials: [] as CompanyFinancial[],
     alerts,
     requests,
     loading,
-    enriching,
+    enriching: enrichMutation.isPending,
     stats,
     enrichCompany,
     deleteCompany,
-    fetchCompanies,
+    fetchCompanies: invalidateCompanies,
     fetchFinancials,
     fetchAlerts,
-    fetchRequests,
-    markAlertAsRead
+    fetchRequests: invalidateCompanies,
+    markAlertAsRead,
+    invalidateCompanies
   };
 }
