@@ -5,50 +5,61 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Star, Sparkles, Mail, Phone, Briefcase, 
   FileText, Trash2, UserCheck, MessageSquare, 
-  Loader2, ChevronDown, ChevronUp, Eye
+  Loader2, ChevronDown, ChevronUp, Eye, Check, 
+  Link, Edit, CheckCircle
 } from 'lucide-react';
 import { Candidate, JobDescription } from '@/hooks/useHR';
 
 interface CandidateCardProps {
   candidate: Candidate;
   jobs: JobDescription[];
-  onAnalyze: (id: string, cvText: string) => Promise<boolean>;
-  onMatch: (candidateId: string, jobId: string) => Promise<number | null>;
-  onAnalyzeInterview: (id: string, notes: string) => Promise<string | null>;
+  onValidateScore: (id: string, score: number) => Promise<boolean>;
+  onActivate: (id: string) => Promise<boolean>;
+  onLinkToJob: (candidateId: string, jobId: string) => Promise<boolean>;
+  onUpdateDescription: (id: string, description: string) => Promise<boolean>;
+  onAddInterviewNotes: (id: string, notes: string) => Promise<boolean>;
   onDelete: (id: string) => Promise<boolean>;
 }
 
 export function CandidateCard({ 
   candidate, 
   jobs, 
-  onAnalyze, 
-  onMatch, 
-  onAnalyzeInterview,
+  onValidateScore,
+  onActivate,
+  onLinkToJob,
+  onUpdateDescription,
+  onAddInterviewNotes,
   onDelete 
 }: CandidateCardProps) {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isMatching, setIsMatching] = useState(false);
-  const [isAnalyzingInterview, setIsAnalyzingInterview] = useState(false);
-  const [selectedJobId, setSelectedJobId] = useState<string>('');
-  const [interviewNotes, setInterviewNotes] = useState('');
   const [showDetails, setShowDetails] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
-  const [interviewResult, setInterviewResult] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
+  const [customScore, setCustomScore] = useState(candidate.match_score?.toString() || '');
+  const [showScoreDialog, setShowScoreDialog] = useState(false);
+  const [showJobDialog, setShowJobDialog] = useState(false);
+  const [showDescDialog, setShowDescDialog] = useState(false);
+  const [showNotesDialog, setShowNotesDialog] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState('');
+  const [description, setDescription] = useState(candidate.ai_analysis?.user_description || '');
+  const [interviewNotes, setInterviewNotes] = useState('');
+  const [isLinking, setIsLinking] = useState(false);
+  const [isSavingDesc, setIsSavingDesc] = useState(false);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
   const getStatusBadge = (status: string | null) => {
     switch (status) {
+      case 'new':
+        return <Badge variant="secondary">Nouveau</Badge>;
       case 'analyzed':
-        return <Badge className="bg-success/20 text-success border-success/30">Analysé</Badge>;
-      case 'interview':
-        return <Badge className="bg-primary/20 text-primary border-primary/30">Entretien</Badge>;
-      case 'screening':
-        return <Badge className="bg-warning/20 text-warning border-warning/30">Présélection</Badge>;
-      case 'hired':
-        return <Badge className="bg-success/20 text-success border-success/30">Embauché</Badge>;
+        return <Badge className="bg-primary/20 text-primary border-primary/30">Analysé</Badge>;
+      case 'active':
+        return <Badge className="bg-success/20 text-success border-success/30">Actif</Badge>;
       case 'rejected':
         return <Badge className="bg-destructive/20 text-destructive border-destructive/30">Rejeté</Badge>;
       default:
@@ -56,32 +67,56 @@ export function CandidateCard({
     }
   };
 
-  const handleAnalyze = async () => {
-    if (!candidate.cv_text) return;
-    setIsAnalyzing(true);
-    await onAnalyze(candidate.id, candidate.cv_text);
-    setIsAnalyzing(false);
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-success';
+    if (score >= 60) return 'text-primary';
+    if (score >= 40) return 'text-warning';
+    return 'text-destructive';
   };
 
-  const handleMatch = async () => {
-    if (!selectedJobId) return;
-    setIsMatching(true);
-    await onMatch(candidate.id, selectedJobId);
-    setIsMatching(false);
-  };
-
-  const handleAnalyzeInterview = async () => {
-    if (!interviewNotes.trim()) return;
-    setIsAnalyzingInterview(true);
-    const result = await onAnalyzeInterview(candidate.id, interviewNotes);
-    if (result) {
-      setInterviewResult(result);
+  const handleValidateScore = async (useCustom: boolean) => {
+    setIsValidating(true);
+    const score = useCustom ? parseInt(customScore) : (candidate.match_score || 0);
+    if (score >= 0 && score <= 100) {
+      await onValidateScore(candidate.id, score);
+      setShowScoreDialog(false);
     }
-    setIsAnalyzingInterview(false);
+    setIsValidating(false);
+  };
+
+  const handleLinkJob = async () => {
+    if (!selectedJobId) return;
+    setIsLinking(true);
+    await onLinkToJob(candidate.id, selectedJobId);
+    setShowJobDialog(false);
+    setIsLinking(false);
+  };
+
+  const handleSaveDescription = async () => {
+    setIsSavingDesc(true);
+    await onUpdateDescription(candidate.id, description);
+    setShowDescDialog(false);
+    setIsSavingDesc(false);
+  };
+
+  const handleSaveNotes = async () => {
+    if (!interviewNotes.trim()) return;
+    setIsSavingNotes(true);
+    await onAddInterviewNotes(candidate.id, interviewNotes);
+    setInterviewNotes('');
+    setShowNotesDialog(false);
+    setIsSavingNotes(false);
+  };
+
+  const handleActivate = async () => {
+    setIsActivating(true);
+    await onActivate(candidate.id);
+    setIsActivating(false);
   };
 
   const skills = Array.isArray(candidate.skills) ? candidate.skills : [];
   const analysis = candidate.ai_analysis || {};
+  const linkedJob = jobs.find(j => j.id === candidate.job_id);
 
   return (
     <Card className="border-border hover:border-primary/30 transition-all">
@@ -97,7 +132,7 @@ export function CandidateCard({
             <div className="flex items-start justify-between gap-3 mb-2">
               <div className="min-w-0">
                 <h3 className="font-semibold text-foreground truncate">{candidate.name}</h3>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
                   {candidate.email && (
                     <span className="flex items-center gap-1 truncate">
                       <Mail className="w-3 h-3" />
@@ -110,13 +145,19 @@ export function CandidateCard({
                       {candidate.experience_years} ans
                     </span>
                   )}
+                  {linkedJob && (
+                    <span className="flex items-center gap-1 text-primary">
+                      <Link className="w-3 h-3" />
+                      {linkedJob.title}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                {candidate.match_score && (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10">
-                    <Star className="w-3 h-3 text-primary fill-primary" />
-                    <span className="text-sm font-semibold text-primary">{candidate.match_score}%</span>
+                {candidate.match_score !== null && candidate.match_score !== undefined && (
+                  <div className={`flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 ${getScoreColor(candidate.match_score)}`}>
+                    <Star className="w-3 h-3 fill-current" />
+                    <span className="text-sm font-semibold">{candidate.match_score}%</span>
                   </div>
                 )}
                 {getStatusBadge(candidate.status)}
@@ -126,45 +167,255 @@ export function CandidateCard({
             {/* Skills */}
             {skills.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mb-3">
-                {skills.slice(0, 5).map((skill: string, i: number) => (
+                {skills.slice(0, 6).map((skill: string, i: number) => (
                   <span key={i} className="text-xs px-2 py-0.5 rounded bg-secondary text-muted-foreground">
                     {skill}
                   </span>
                 ))}
-                {skills.length > 5 && (
+                {skills.length > 6 && (
                   <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                    +{skills.length - 5}
+                    +{skills.length - 6}
                   </span>
                 )}
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* User Description (for analyzed/active candidates) */}
+            {analysis.user_description && (
+              <p className="text-sm text-muted-foreground mb-3 italic">
+                "{analysis.user_description}"
+              </p>
+            )}
+
+            {/* Action Buttons based on status */}
             <div className="flex flex-wrap gap-2">
-              {/* Analyze CV */}
-              {candidate.cv_text && !candidate.ai_analysis && (
-                <Button 
-                  variant="subtle" 
-                  size="sm" 
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing}
-                >
-                  {isAnalyzing ? (
-                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-3 h-3 mr-1" />
-                  )}
-                  Analyser CV
-                </Button>
+              {/* NEW STATUS: Validate score */}
+              {candidate.status === 'new' && (
+                <Dialog open={showScoreDialog} onOpenChange={setShowScoreDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="default" size="sm">
+                      <Check className="w-3 h-3 mr-1" />
+                      Valider le score
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Valider le score du candidat</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-lg bg-muted/50 text-center">
+                        <p className="text-sm text-muted-foreground mb-2">Score proposé par l'IA</p>
+                        <div className={`text-4xl font-bold ${getScoreColor(candidate.match_score || 0)}`}>
+                          {candidate.match_score || 0}%
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => handleValidateScore(false)}
+                          disabled={isValidating}
+                          className="flex-1"
+                        >
+                          {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Valider ce score'}
+                        </Button>
+                      </div>
+
+                      <div className="border-t pt-4">
+                        <Label className="text-sm">Ou définir un score personnalisé</Label>
+                        <div className="flex gap-2 mt-2">
+                          <Input 
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={customScore}
+                            onChange={(e) => setCustomScore(e.target.value)}
+                            placeholder="0-100"
+                            className="flex-1"
+                          />
+                          <Button 
+                            variant="outline"
+                            onClick={() => handleValidateScore(true)}
+                            disabled={isValidating || !customScore}
+                          >
+                            Appliquer
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               )}
 
-              {/* View Analysis */}
+              {/* ANALYZED STATUS: Link to job, add description, interview notes, activate */}
+              {candidate.status === 'analyzed' && (
+                <>
+                  {/* Link to Job */}
+                  <Dialog open={showJobDialog} onOpenChange={setShowJobDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Link className="w-3 h-3 mr-1" />
+                        {linkedJob ? 'Changer de poste' : 'Relier à un poste'}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Relier à un poste</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Sélectionner un poste</Label>
+                          <select 
+                            className="w-full h-10 rounded-lg bg-secondary border border-border px-3"
+                            value={selectedJobId}
+                            onChange={(e) => setSelectedJobId(e.target.value)}
+                          >
+                            <option value="">Choisir un poste...</option>
+                            {jobs.filter(j => j.is_active).map(job => (
+                              <option key={job.id} value={job.id}>{job.title}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <Button 
+                          onClick={handleLinkJob} 
+                          disabled={!selectedJobId || isLinking}
+                          className="w-full"
+                        >
+                          {isLinking ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Relier au poste'}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Edit Description */}
+                  <Dialog open={showDescDialog} onOpenChange={setShowDescDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Edit className="w-3 h-3 mr-1" />
+                        Description
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Description du candidat</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <Textarea 
+                          placeholder="Ajoutez une description personnelle du candidat..."
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          className="min-h-[150px]"
+                        />
+                        <Button 
+                          onClick={handleSaveDescription}
+                          disabled={isSavingDesc}
+                          className="w-full"
+                        >
+                          {isSavingDesc ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Interview Notes */}
+                  <Dialog open={showNotesDialog} onOpenChange={setShowNotesDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MessageSquare className="w-3 h-3 mr-1" />
+                        Notes d'entretien
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Notes d'entretien - {candidate.name}</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        {candidate.interview_notes && (
+                          <div className="border-b pb-4">
+                            <Label className="text-sm font-medium mb-2 block">Notes existantes</Label>
+                            <ScrollArea className="h-40 rounded-lg bg-muted/50 p-3">
+                              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{candidate.interview_notes}</p>
+                            </ScrollArea>
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          <Label>Ajouter de nouvelles notes</Label>
+                          <Textarea 
+                            placeholder="Saisissez vos notes d'entretien..."
+                            value={interviewNotes}
+                            onChange={(e) => setInterviewNotes(e.target.value)}
+                            className="min-h-[120px]"
+                          />
+                        </div>
+                        <Button 
+                          onClick={handleSaveNotes}
+                          disabled={!interviewNotes.trim() || isSavingNotes}
+                          className="w-full"
+                        >
+                          {isSavingNotes ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Ajouter les notes'}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Activate Candidate */}
+                  <Button 
+                    variant="subtle" 
+                    size="sm"
+                    onClick={handleActivate}
+                    disabled={isActivating}
+                    className="bg-success/10 hover:bg-success/20 text-success"
+                  >
+                    {isActivating ? (
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    ) : (
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                    )}
+                    Valider → Actif
+                  </Button>
+                </>
+              )}
+
+              {/* ACTIVE STATUS: View only with notes */}
+              {candidate.status === 'active' && (
+                <>
+                  {/* Interview Notes (read-only style) */}
+                  <Dialog open={showNotesDialog} onOpenChange={setShowNotesDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MessageSquare className="w-3 h-3 mr-1" />
+                        Voir les notes
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Notes d'entretien - {candidate.name}</DialogTitle>
+                      </DialogHeader>
+                      {candidate.interview_notes ? (
+                        <ScrollArea className="h-60 rounded-lg bg-muted/50 p-3">
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{candidate.interview_notes}</p>
+                        </ScrollArea>
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-8">Aucune note d'entretien</p>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+
+                  {linkedJob && (
+                    <Badge variant="outline" className="text-success border-success/30">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Poste: {linkedJob.title}
+                    </Badge>
+                  )}
+                </>
+              )}
+
+              {/* View Analysis (all statuses if analysis exists) */}
               {candidate.ai_analysis && (
                 <Dialog open={showAnalysis} onOpenChange={setShowAnalysis}>
                   <DialogTrigger asChild>
-                    <Button variant="subtle" size="sm">
+                    <Button variant="ghost" size="sm">
                       <Eye className="w-3 h-3 mr-1" />
-                      Voir analyse
+                      Analyse IA
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl">
@@ -205,137 +456,11 @@ export function CandidateCard({
                             </div>
                           </div>
                         )}
-                        {analysis.job_match && (
-                          <div className="border-t pt-4">
-                            <Label className="text-sm font-medium">Matching avec le poste</Label>
-                            <div className="mt-2 p-3 rounded-lg bg-muted/50">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Star className="w-4 h-4 text-primary fill-primary" />
-                                <span className="font-semibold">Score: {analysis.job_match.score}%</span>
-                              </div>
-                              {analysis.job_match.match_reasons && (
-                                <div className="text-sm text-muted-foreground">
-                                  <strong>Correspondances:</strong>
-                                  <ul className="list-disc list-inside">
-                                    {(analysis.job_match.match_reasons as string[]).map((r, i) => <li key={i}>{r}</li>)}
-                                  </ul>
-                                </div>
-                              )}
-                              {analysis.job_match.gaps && (
-                                <div className="text-sm text-muted-foreground mt-2">
-                                  <strong>Écarts:</strong>
-                                  <ul className="list-disc list-inside">
-                                    {(analysis.job_match.gaps as string[]).map((g, i) => <li key={i}>{g}</li>)}
-                                  </ul>
-                                </div>
-                              )}
-                              {analysis.job_match.recommendation && (
-                                <p className="text-sm mt-2"><strong>Recommandation:</strong> {analysis.job_match.recommendation}</p>
-                              )}
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
               )}
-
-              {/* Match with Job */}
-              {jobs.length > 0 && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <UserCheck className="w-3 h-3 mr-1" />
-                      Matcher
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Matcher avec un poste</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Sélectionner un poste</Label>
-                        <select 
-                          className="w-full h-10 rounded-lg bg-secondary border border-border px-3"
-                          value={selectedJobId}
-                          onChange={(e) => setSelectedJobId(e.target.value)}
-                        >
-                          <option value="">Choisir un poste...</option>
-                          {jobs.filter(j => j.is_active).map(job => (
-                            <option key={job.id} value={job.id}>{job.title}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <Button 
-                        onClick={handleMatch} 
-                        disabled={!selectedJobId || isMatching}
-                        className="w-full"
-                      >
-                        {isMatching ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        ) : (
-                          <Sparkles className="w-4 h-4 mr-2" />
-                        )}
-                        Calculer le matching
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-
-              {/* Interview Analysis */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <MessageSquare className="w-3 h-3 mr-1" />
-                    Entretien
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Analyse d'entretien - {candidate.name}</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Notes d'entretien</Label>
-                      <Textarea 
-                        placeholder="Collez ou saisissez vos notes d'entretien ici..."
-                        value={interviewNotes}
-                        onChange={(e) => setInterviewNotes(e.target.value)}
-                        className="min-h-[150px]"
-                      />
-                    </div>
-                    <Button 
-                      onClick={handleAnalyzeInterview}
-                      disabled={!interviewNotes.trim() || isAnalyzingInterview}
-                      className="w-full"
-                    >
-                      {isAnalyzingInterview ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Sparkles className="w-4 h-4 mr-2" />
-                      )}
-                      Analyser l'entretien
-                    </Button>
-                    {interviewResult && (
-                      <div className="p-4 rounded-lg bg-muted/50">
-                        <Label className="text-sm font-medium mb-2 block">Résultat de l'analyse</Label>
-                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{interviewResult}</p>
-                      </div>
-                    )}
-                    {candidate.interview_notes && (
-                      <div className="border-t pt-4">
-                        <Label className="text-sm font-medium mb-2 block">Notes précédentes</Label>
-                        <ScrollArea className="h-32">
-                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{candidate.interview_notes}</p>
-                        </ScrollArea>
-                      </div>
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
 
               {/* Delete */}
               <Button 
