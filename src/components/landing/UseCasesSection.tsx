@@ -15,8 +15,8 @@ const useCases = [
   },
   {
     icon: Users,
-    title: "Enrichissement CRM par IA",
-    description: "Nettoyage, déduplication et enrichissement automatique de vos bases de données clients.",
+    title: "Enrichissement données entreprises",
+    description: "Enrichissement automatique de vos bases de données entreprises avec des données officielles.",
     example: "Qualité des données améliorée de 40% en 30 jours.",
   },
   {

@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Search, Eye, Trash2, Shield, AlertTriangle, FileText, Loader2, 
-  Building2, Users, Briefcase, Bot, MessageSquare, FileCheck,
+  Building2, Users, Bot, MessageSquare, FileCheck,
   Phone, BarChart3, Database, RefreshCw, Filter
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -21,9 +21,6 @@ import { fr } from 'date-fns/locale';
 const typeConfig: Record<DataType, { label: string; icon: React.ReactNode; color: string }> = {
   document: { label: 'Document', icon: <FileText className="h-4 w-4" />, color: 'bg-blue-500/10 text-blue-600' },
   company: { label: 'Entreprise enrichie', icon: <Building2 className="h-4 w-4" />, color: 'bg-purple-500/10 text-purple-600' },
-  crm_company: { label: 'Société CRM', icon: <Building2 className="h-4 w-4" />, color: 'bg-indigo-500/10 text-indigo-600' },
-  crm_contact: { label: 'Contact CRM', icon: <Users className="h-4 w-4" />, color: 'bg-green-500/10 text-green-600' },
-  crm_opportunity: { label: 'Opportunité', icon: <Briefcase className="h-4 w-4" />, color: 'bg-amber-500/10 text-amber-600' },
   candidate: { label: 'Candidat', icon: <Users className="h-4 w-4" />, color: 'bg-pink-500/10 text-pink-600' },
   workflow: { label: 'Workflow', icon: <Bot className="h-4 w-4" />, color: 'bg-cyan-500/10 text-cyan-600' },
   ticket: { label: 'Ticket', icon: <MessageSquare className="h-4 w-4" />, color: 'bg-orange-500/10 text-orange-600' },

@@ -5,9 +5,7 @@ import {
   Workflow,
   FileText,
   TrendingUp,
-  DollarSign,
   Users,
-  HeadphonesIcon,
   BarChart3,
   Brain,
   Shield,
@@ -29,7 +27,6 @@ import { toast } from "sonner";
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "AETHER Data", path: "/tools/data", icon: BarChart3, description: "Data Platform" },
-  { name: "AETHER CRM", path: "/tools/crm", icon: DollarSign, description: "Sales CRM" },
   { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
   { name: "AETHER Doc", path: "/tools/doc", icon: FileText, description: "Document Management" },
   { name: "Sales Copilot", path: "/tools/sales", icon: TrendingUp, description: "Sales Assistant" },
