@@ -2,12 +2,13 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle } from "lucide-react";
+import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
 import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
+import { UniversalSearch } from "@/components/brain/UniversalSearch";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -49,6 +50,7 @@ export default function BrainPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [generationMode, setGenerationMode] = useState<'chat' | 'image' | 'chart'>('chat');
+  const [showUniversalSearch, setShowUniversalSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -408,6 +410,23 @@ export default function BrainPage() {
                 </div>
               </TooltipProvider>
             </div>
+            
+            <Sheet open={showUniversalSearch} onOpenChange={setShowUniversalSearch}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="mr-2">
+                  <Globe className="w-4 h-4 mr-2" />
+                  Recherche IA
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[600px] sm:w-[800px]">
+                <SheetHeader>
+                  <SheetTitle>Recherche Universelle IA</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 h-[calc(100vh-120px)]">
+                  <UniversalSearch />
+                </div>
+              </SheetContent>
+            </Sheet>
             
             <Sheet open={showTools} onOpenChange={setShowTools}>
               <SheetTrigger asChild>

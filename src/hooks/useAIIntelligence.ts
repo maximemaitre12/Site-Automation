@@ -369,18 +369,18 @@ export function useAIIntelligence() {
     try {
       const { data, error } = await supabase
         .from('sales_deals')
-        .insert({
+        .insert([{
           title: deal.title || 'New Deal',
           user_id: user.id,
-          status: deal.status || 'lead_created',
+          status: (deal.status || 'lead_created') as any,
           value: deal.value || 0,
           probability: deal.probability || 20,
-          contact_name: deal.contact_name,
-          contact_email: deal.contact_email,
-          description: deal.description,
-          expected_close_date: deal.expected_close_date,
-          source: deal.source,
-        })
+          contact_name: deal.contact_name || null,
+          contact_email: deal.contact_email || null,
+          description: deal.description || null,
+          expected_close_date: deal.expected_close_date || null,
+          source: deal.source || null,
+        }])
         .select()
         .single();
       if (error) throw error;

@@ -8,17 +8,18 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
   TrendingUp, FileText, Mail, Phone, Sparkles, User, Building, 
-  Loader2, CheckCircle, Copy, History, ChevronRight
+  Loader2, CheckCircle, Copy, History, ChevronRight, Kanban
 } from "lucide-react";
 import { useState } from "react";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
 import { CallRecorder } from "@/components/sales/CallRecorder";
 import { CallAnalysisResult } from "@/components/sales/CallAnalysisResult";
 import { ProposalDisplay } from "@/components/sales/ProposalDisplay";
+import { SalesPipeline } from "@/components/sales/SalesPipeline";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Sales() {
-  const [activeTab, setActiveTab] = useState<"proposal" | "call" | "email">("call");
+  const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email">("pipeline");
   const { 
     proposals, 
     callAnalyses, 
@@ -162,6 +163,7 @@ export default function Sales() {
           {/* Tabs */}
           <div className="flex gap-2 mt-6">
             {[
+              { key: "pipeline", label: "Pipeline", icon: Kanban },
               { key: "call", label: "Analyser Appel", icon: Phone },
               { key: "proposal", label: "Générer Proposition", icon: FileText },
               { key: "email", label: "Rédiger Email", icon: Mail },
@@ -183,6 +185,10 @@ export default function Sales() {
         <div className="flex-1 flex overflow-hidden">
           {/* Form Panel */}
           <div className="flex-1 p-8 overflow-y-auto">
+            {activeTab === "pipeline" && (
+              <SalesPipeline />
+            )}
+
             {activeTab === "proposal" && (
               <div className="max-w-3xl space-y-6">
                 <div className="grid grid-cols-2 gap-4">
