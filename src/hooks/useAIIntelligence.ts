@@ -452,6 +452,10 @@ export function useAIIntelligence() {
     }
   }, [user, queryClient, toast]);
 
+  // Separate loading states to avoid blocking everything
+  const dataLoading = dealsLoading;
+  const aiLoading = forecastsQueryLoading || anomaliesQueryLoading || segmentsQueryLoading || rulesLoading;
+
   return {
     // Data
     forecasts,
@@ -460,8 +464,9 @@ export function useAIIntelligence() {
     automationRules,
     deals,
     
-    // Loading states
-    loading: forecastsQueryLoading || anomaliesQueryLoading || segmentsQueryLoading || rulesLoading || dealsLoading,
+    // Loading states - deals are critical, AI features load in background
+    loading: dealsLoading,
+    aiLoading: forecastsQueryLoading || anomaliesQueryLoading || segmentsQueryLoading || rulesLoading,
     forecastLoading,
     anomaliesLoading,
     segmentationLoading,

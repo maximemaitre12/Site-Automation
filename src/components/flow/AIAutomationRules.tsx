@@ -43,7 +43,7 @@ const ACTION_TYPES = [
 export function AIAutomationRules() {
   const {
     automationRules,
-    loading,
+    aiLoading,
     createAutomationRule,
     toggleAutomationRule,
     getAutomationSuggestions,
@@ -65,17 +65,17 @@ export function AIAutomationRules() {
   });
 
   const loadSuggestions = async () => {
+    if (loadingSuggestions) return;
     setLoadingSuggestions(true);
-    const data = await getAutomationSuggestions();
-    if (data?.suggestions) {
-      setSuggestions(data.suggestions);
+    try {
+      const data = await getAutomationSuggestions();
+      if (data?.suggestions) {
+        setSuggestions(data.suggestions);
+      }
+    } finally {
+      setLoadingSuggestions(false);
     }
-    setLoadingSuggestions(false);
   };
-
-  useEffect(() => {
-    loadSuggestions();
-  }, []);
 
   const handleCreateRule = async () => {
     if (!newRule.name) return;
@@ -115,7 +115,7 @@ export function AIAutomationRules() {
     return ACTION_TYPES.find(a => a.value === type)?.label || type;
   };
 
-  if (loading) {
+  if (aiLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
