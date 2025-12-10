@@ -5,9 +5,6 @@ import { useAuth } from './useAuth';
 export type DataType = 
   | 'document' 
   | 'company' 
-  | 'crm_company' 
-  | 'crm_contact' 
-  | 'crm_opportunity'
   | 'candidate'
   | 'workflow'
   | 'ticket'
@@ -45,9 +42,6 @@ export function useUnifiedDataCatalog() {
     byType: {
       document: 0,
       company: 0,
-      crm_company: 0,
-      crm_contact: 0,
-      crm_opportunity: 0,
       candidate: 0,
       workflow: 0,
       ticket: 0,
@@ -68,9 +62,6 @@ export function useUnifiedDataCatalog() {
       const [
         documentsRes,
         enrichedCompaniesRes,
-        crmCompaniesRes,
-        crmContactsRes,
-        crmOpportunitiesRes,
         candidatesRes,
         workflowsRes,
         ticketsRes,
@@ -80,9 +71,6 @@ export function useUnifiedDataCatalog() {
       ] = await Promise.all([
         supabase.from('aether_documents').select('*').order('created_at', { ascending: false }),
         supabase.from('enriched_companies').select('*').order('created_at', { ascending: false }),
-        supabase.from('crm_companies').select('*').order('created_at', { ascending: false }),
-        supabase.from('crm_contacts').select('*').order('created_at', { ascending: false }),
-        supabase.from('crm_opportunities').select('*').order('created_at', { ascending: false }),
         supabase.from('candidates').select('*').order('created_at', { ascending: false }),
         supabase.from('workflows').select('*').order('created_at', { ascending: false }),
         supabase.from('support_tickets').select('*').order('created_at', { ascending: false }),
@@ -139,79 +127,6 @@ export function useUnifiedDataCatalog() {
           },
           source_table: 'enriched_companies',
           pii_detected: true // Companies may have executive data
-        });
-      });
-
-      // Transform CRM companies
-      (crmCompaniesRes.data || []).forEach(company => {
-        allEntries.push({
-          id: company.id,
-          type: 'crm_company',
-          name: company.name,
-          description: company.description,
-          created_at: company.created_at,
-          updated_at: company.updated_at,
-          sensitivity: 'internal',
-          tags: Array.isArray(company.tags) ? company.tags.map(String) : [],
-          metadata: {
-            industry: company.industry,
-            website: company.website,
-            city: company.city,
-            country: company.country,
-            employees_count: company.employees_count,
-            annual_revenue: company.annual_revenue
-          },
-          source_table: 'crm_companies',
-          pii_detected: !!company.email || !!company.phone
-        });
-      });
-
-      // Transform CRM contacts
-      (crmContactsRes.data || []).forEach(contact => {
-        allEntries.push({
-          id: contact.id,
-          type: 'crm_contact',
-          name: `${contact.first_name} ${contact.last_name}`,
-          description: contact.notes || `${contact.job_title || ''} - ${contact.department || ''}`.trim(),
-          created_at: contact.created_at,
-          updated_at: contact.updated_at,
-          sensitivity: 'confidential', // Contacts have PII
-          tags: Array.isArray(contact.tags) ? contact.tags.map(String) : [],
-          metadata: {
-            email: contact.email,
-            phone: contact.phone,
-            job_title: contact.job_title,
-            department: contact.department,
-            company_id: contact.company_id,
-            engagement_score: contact.engagement_score
-          },
-          source_table: 'crm_contacts',
-          pii_detected: true
-        });
-      });
-
-      // Transform CRM opportunities
-      (crmOpportunitiesRes.data || []).forEach(opp => {
-        allEntries.push({
-          id: opp.id,
-          type: 'crm_opportunity',
-          name: opp.name,
-          description: opp.description,
-          created_at: opp.created_at,
-          updated_at: opp.updated_at,
-          sensitivity: 'confidential',
-          tags: Array.isArray(opp.tags) ? opp.tags.map(String) : [],
-          metadata: {
-            value: opp.value,
-            currency: opp.currency,
-            status: opp.status,
-            probability: opp.probability,
-            expected_close_date: opp.expected_close_date,
-            company_id: opp.company_id,
-            contact_id: opp.contact_id
-          },
-          source_table: 'crm_opportunities',
-          pii_detected: false
         });
       });
 
@@ -363,9 +278,6 @@ export function useUnifiedDataCatalog() {
       const byType: Record<DataType, number> = {
         document: 0,
         company: 0,
-        crm_company: 0,
-        crm_contact: 0,
-        crm_opportunity: 0,
         candidate: 0,
         workflow: 0,
         ticket: 0,
