@@ -13,11 +13,13 @@ import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
 import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
 import { TemplateGallery } from '@/components/flow/TemplateGallery';
 import { BlockPickerDialog } from '@/components/flow/BlockPickerDialog';
+import { AIAutomationRules } from '@/components/flow/AIAutomationRules';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
-  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2
+  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2, Bot
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +59,7 @@ export default function Flow() {
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [viewMode, setViewMode] = useState<'canvas' | 'builder'>('canvas');
+  const [flowTab, setFlowTab] = useState<'workflows' | 'automation'>('workflows');
   
   // Undo/Redo history
   const [history, setHistory] = useState<HistoryState[]>([]);
@@ -331,9 +334,30 @@ export default function Flow() {
   return (
     <DashboardLayout headerActions={headerActions}>
       <div className="h-full flex flex-col overflow-hidden">
+        {/* Tabs for Workflows vs Automation */}
+        <div className="px-4 pt-4 border-b border-border bg-card/30">
+          <Tabs value={flowTab} onValueChange={(v) => setFlowTab(v as typeof flowTab)}>
+            <TabsList>
+              <TabsTrigger value="workflows" className="gap-2">
+                <Zap className="w-4 h-4" />
+                Workflows
+              </TabsTrigger>
+              <TabsTrigger value="automation" className="gap-2">
+                <Bot className="w-4 h-4" />
+                Automatisation IA
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+        {flowTab === 'automation' ? (
+          <div className="flex-1 overflow-auto p-6">
+            <AIAutomationRules />
+          </div>
+        ) : (
+          <>
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
           {/* Sidebar - Workflows List */}
           <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
             <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
@@ -474,7 +498,9 @@ export default function Flow() {
               </div>
             </div>
           )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Dialogs */}
