@@ -33,7 +33,7 @@ export default function HR() {
   const [activeTab, setActiveTab] = useState<"new" | "analyzed" | "active" | "jobs" | "generator">("new");
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter and sort candidates by status and skills
+  // Filter and sort candidates by status - ALWAYS sorted by score (best first)
   const filteredCandidates = useMemo(() => {
     let filtered = candidates.filter(c => {
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -46,19 +46,13 @@ export default function HR() {
       return matchesSearch;
     });
 
-    // Sort by skills count (most skilled first) for new candidates
-    if (activeTab === 'new') {
-      filtered.sort((a, b) => {
-        const skillsA = Array.isArray(a.skills) ? a.skills.length : 0;
-        const skillsB = Array.isArray(b.skills) ? b.skills.length : 0;
-        return skillsB - skillsA;
-      });
-    }
-
-    // Sort by score for analyzed candidates
-    if (activeTab === 'analyzed') {
-      filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
-    }
+    // ALWAYS sort by score (best first), then by date
+    filtered.sort((a, b) => {
+      const scoreA = a.match_score || 0;
+      const scoreB = b.match_score || 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
     return filtered;
   }, [candidates, searchQuery, activeTab]);
@@ -172,9 +166,7 @@ export default function HR() {
                         />
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {activeTab === 'new' && 'Triés par compétences'}
-                        {activeTab === 'analyzed' && 'Triés par score'}
-                        {activeTab === 'active' && 'Candidats validés'}
+                        Triés par score (meilleur → moins bon)
                       </p>
                     </div>
 
