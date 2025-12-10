@@ -20,6 +20,7 @@ export interface Candidate {
   ai_analysis: any;
   job_id: string | null;
   created_at: string;
+  description?: string | null;
 }
 
 export interface JobDescription {
@@ -75,6 +76,10 @@ export function useHR() {
     email?: string;
     phone?: string;
     cvText?: string;
+    skills?: string[];
+    experience_years?: number;
+    match_score?: number;
+    ai_analysis?: any;
   }): Promise<Candidate | null> => {
     if (!user) return null;
 
@@ -87,6 +92,10 @@ export function useHR() {
           email: data.email,
           phone: data.phone,
           cv_text: data.cvText,
+          skills: data.skills || [],
+          experience_years: data.experience_years,
+          match_score: data.match_score,
+          ai_analysis: data.ai_analysis,
           status: 'new'
         })
         .select()
@@ -100,6 +109,143 @@ export function useHR() {
     } catch (err) {
       toast({ title: 'Erreur', description: 'Erreur lors de l\'ajout', variant: 'destructive' });
       return null;
+    }
+  };
+
+  const updateCandidate = async (candidateId: string, updates: Partial<Candidate>): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('candidates')
+        .update(updates)
+        .eq('id', candidateId);
+
+      if (error) throw error;
+      
+      await fetchData();
+      return true;
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Erreur lors de la mise à jour', variant: 'destructive' });
+      return false;
+    }
+  };
+
+  const validateScore = async (candidateId: string, score: number): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('candidates')
+        .update({
+          match_score: score,
+          status: 'analyzed'
+        })
+        .eq('id', candidateId);
+
+      if (error) throw error;
+      
+      await fetchData();
+      toast({ title: 'Succès', description: 'Score validé, candidat passé en "Analysé"' });
+      return true;
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Erreur lors de la validation', variant: 'destructive' });
+      return false;
+    }
+  };
+
+  const activateCandidate = async (candidateId: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('candidates')
+        .update({
+          status: 'active'
+        })
+        .eq('id', candidateId);
+
+      if (error) throw error;
+      
+      await fetchData();
+      toast({ title: 'Succès', description: 'Candidat validé et passé en "Actif"' });
+      return true;
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Erreur lors de l\'activation', variant: 'destructive' });
+      return false;
+    }
+  };
+
+  const linkToJob = async (candidateId: string, jobId: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('candidates')
+        .update({ job_id: jobId })
+        .eq('id', candidateId);
+
+      if (error) throw error;
+      
+      await fetchData();
+      toast({ title: 'Succès', description: 'Candidat relié au poste' });
+      return true;
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Erreur lors de la liaison', variant: 'destructive' });
+      return false;
+    }
+  };
+
+  const updateDescription = async (candidateId: string, description: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      // Store description in ai_analysis.description field
+      const candidate = candidates.find(c => c.id === candidateId);
+      const currentAnalysis = candidate?.ai_analysis || {};
+      
+      const { error } = await supabase
+        .from('candidates')
+        .update({
+          ai_analysis: { ...currentAnalysis, user_description: description }
+        })
+        .eq('id', candidateId);
+
+      if (error) throw error;
+      
+      await fetchData();
+      toast({ title: 'Succès', description: 'Description mise à jour' });
+      return true;
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Erreur lors de la mise à jour', variant: 'destructive' });
+      return false;
+    }
+  };
+
+  const addInterviewNotes = async (candidateId: string, notes: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      const candidate = candidates.find(c => c.id === candidateId);
+      const existingNotes = candidate?.interview_notes || '';
+      const timestamp = new Date().toLocaleString('fr-FR');
+      const newNotes = existingNotes 
+        ? `${existingNotes}\n\n--- ${timestamp} ---\n${notes}`
+        : `--- ${timestamp} ---\n${notes}`;
+
+      const { error } = await supabase
+        .from('candidates')
+        .update({ interview_notes: newNotes })
+        .eq('id', candidateId);
+
+      if (error) throw error;
+      
+      await fetchData();
+      toast({ title: 'Succès', description: 'Notes d\'entretien ajoutées' });
+      return true;
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Erreur lors de l\'ajout des notes', variant: 'destructive' });
+      return false;
     }
   };
 
@@ -320,6 +466,12 @@ ${notes}`
     jobs,
     loading,
     createCandidate,
+    updateCandidate,
+    validateScore,
+    activateCandidate,
+    linkToJob,
+    updateDescription,
+    addInterviewNotes,
     analyzeCandidate,
     matchCandidateToJob,
     createJob,

@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Users, Upload, FileText, Sparkles, UserCheck, Briefcase,
-  History, Plus, Search, Filter, Loader2
+  Users, Upload, Sparkles, UserCheck, Briefcase,
+  Plus, Search, Loader2, UserPlus, CheckCircle, Clock
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
 import { CandidateCard } from "@/components/hr/CandidateCard";
@@ -21,34 +20,65 @@ export default function HR() {
     jobs, 
     loading,
     createCandidate,
-    analyzeCandidate,
-    matchCandidateToJob,
+    validateScore,
+    activateCandidate,
+    linkToJob,
+    updateDescription,
+    addInterviewNotes,
     createJob,
     generateJobPost,
-    analyzeInterview,
     deleteCandidate
   } = useHR();
 
-  const [activeTab, setActiveTab] = useState<"candidates" | "jobs" | "generator">("candidates");
+  const [activeTab, setActiveTab] = useState<"new" | "analyzed" | "active" | "jobs" | "generator">("new");
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  // Filter candidates
-  const filteredCandidates = candidates.filter(c => {
-    const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Filter and sort candidates by status and skills
+  const filteredCandidates = useMemo(() => {
+    let filtered = candidates.filter(c => {
+      const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.email?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Filter by active tab status
+      if (activeTab === 'new') return matchesSearch && c.status === 'new';
+      if (activeTab === 'analyzed') return matchesSearch && c.status === 'analyzed';
+      if (activeTab === 'active') return matchesSearch && c.status === 'active';
+      return matchesSearch;
+    });
+
+    // Sort by skills count (most skilled first) for new candidates
+    if (activeTab === 'new') {
+      filtered.sort((a, b) => {
+        const skillsA = Array.isArray(a.skills) ? a.skills.length : 0;
+        const skillsB = Array.isArray(b.skills) ? b.skills.length : 0;
+        return skillsB - skillsA;
+      });
+    }
+
+    // Sort by score for analyzed candidates
+    if (activeTab === 'analyzed') {
+      filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
+    }
+
+    return filtered;
+  }, [candidates, searchQuery, activeTab]);
 
   // Stats
   const stats = {
     total: candidates.length,
     new: candidates.filter(c => c.status === 'new').length,
     analyzed: candidates.filter(c => c.status === 'analyzed').length,
-    interview: candidates.filter(c => c.status === 'interview').length,
+    active: candidates.filter(c => c.status === 'active').length,
     activeJobs: jobs.filter(j => j.is_active).length
   };
+
+  const tabs = [
+    { key: "new", label: "Nouveaux", icon: UserPlus, count: stats.new },
+    { key: "analyzed", label: "Analysés", icon: Clock, count: stats.analyzed },
+    { key: "active", label: "Actifs", icon: CheckCircle, count: stats.active },
+    { key: "jobs", label: "Postes", icon: Briefcase, count: stats.activeJobs },
+    { key: "generator", label: "Générateur", icon: Sparkles },
+  ];
 
   return (
     <DashboardLayout>
@@ -64,13 +94,13 @@ export default function HR() {
                 HR Copilot
               </h1>
               <p className="text-muted-foreground mt-1">
-                Analyse de CV, matching candidats, génération d'offres
+                Workflow : Nouveau → Analysé (score validé) → Actif (entretiens passés)
               </p>
             </div>
             <AddCandidateDialog onAdd={createCandidate}>
               <Button variant="hero">
                 <Upload className="w-4 h-4 mr-2" />
-                Ajouter un candidat
+                Ajouter un CV
               </Button>
             </AddCandidateDialog>
           </div>
@@ -86,12 +116,12 @@ export default function HR() {
               <div className="text-xs text-muted-foreground">Nouveaux</div>
             </div>
             <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-success">{stats.analyzed}</div>
+              <div className="text-2xl font-bold text-warning">{stats.analyzed}</div>
               <div className="text-xs text-muted-foreground">Analysés</div>
             </div>
             <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-warning">{stats.interview}</div>
-              <div className="text-xs text-muted-foreground">En entretien</div>
+              <div className="text-2xl font-bold text-success">{stats.active}</div>
+              <div className="text-xs text-muted-foreground">Actifs</div>
             </div>
             <div className="p-3 rounded-lg bg-card border border-border">
               <div className="text-2xl font-bold text-indigo-500">{stats.activeJobs}</div>
@@ -100,20 +130,19 @@ export default function HR() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mt-6">
-            {[
-              { key: "candidates", label: "Candidats", icon: Users },
-              { key: "jobs", label: "Postes", icon: Briefcase },
-              { key: "generator", label: "Générateur", icon: Sparkles },
-            ].map((tab) => (
+          <div className="flex gap-2 mt-6 overflow-x-auto">
+            {tabs.map((tab) => (
               <Button
                 key={tab.key}
                 variant={activeTab === tab.key ? "default" : "ghost"}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className="gap-2"
+                className="gap-2 whitespace-nowrap"
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
+                {tab.count !== undefined && (
+                  <Badge variant="secondary" className="ml-1">{tab.count}</Badge>
+                )}
               </Button>
             ))}
           </div>
@@ -128,10 +157,10 @@ export default function HR() {
           ) : (
             <ScrollArea className="h-full">
               <div className="p-8">
-                {/* Candidates Tab */}
-                {activeTab === "candidates" && (
+                {/* Candidates Tabs (new, analyzed, active) */}
+                {(activeTab === "new" || activeTab === "analyzed" || activeTab === "active") && (
                   <div className="space-y-6">
-                    {/* Search & Filter */}
+                    {/* Search */}
                     <div className="flex items-center gap-4">
                       <div className="relative flex-1 max-w-md">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -142,19 +171,11 @@ export default function HR() {
                           className="pl-10"
                         />
                       </div>
-                      <select 
-                        className="h-10 rounded-lg bg-secondary border border-border px-3 text-sm"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                      >
-                        <option value="all">Tous les statuts</option>
-                        <option value="new">Nouveau</option>
-                        <option value="analyzed">Analysé</option>
-                        <option value="screening">Présélection</option>
-                        <option value="interview">Entretien</option>
-                        <option value="hired">Embauché</option>
-                        <option value="rejected">Rejeté</option>
-                      </select>
+                      <p className="text-sm text-muted-foreground">
+                        {activeTab === 'new' && 'Triés par compétences'}
+                        {activeTab === 'analyzed' && 'Triés par score'}
+                        {activeTab === 'active' && 'Candidats validés'}
+                      </p>
                     </div>
 
                     {/* Candidates List */}
@@ -165,9 +186,11 @@ export default function HR() {
                             key={candidate.id}
                             candidate={candidate}
                             jobs={jobs}
-                            onAnalyze={analyzeCandidate}
-                            onMatch={matchCandidateToJob}
-                            onAnalyzeInterview={analyzeInterview}
+                            onValidateScore={validateScore}
+                            onActivate={activateCandidate}
+                            onLinkToJob={linkToJob}
+                            onUpdateDescription={updateDescription}
+                            onAddInterviewNotes={addInterviewNotes}
                             onDelete={deleteCandidate}
                           />
                         ))}
@@ -177,18 +200,18 @@ export default function HR() {
                         <CardContent className="py-12 text-center">
                           <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                           <h3 className="text-lg font-medium text-foreground mb-2">
-                            {candidates.length === 0 ? 'Aucun candidat' : 'Aucun résultat'}
+                            {candidates.length === 0 ? 'Aucun candidat' : `Aucun candidat ${activeTab === 'new' ? 'nouveau' : activeTab === 'analyzed' ? 'analysé' : 'actif'}`}
                           </h3>
                           <p className="text-sm text-muted-foreground mb-4">
-                            {candidates.length === 0 
-                              ? 'Commencez par ajouter votre premier candidat'
-                              : 'Modifiez vos critères de recherche'}
+                            {activeTab === 'new' && 'Ajoutez un CV pour commencer'}
+                            {activeTab === 'analyzed' && 'Validez le score des nouveaux candidats'}
+                            {activeTab === 'active' && 'Validez les candidats après leurs entretiens'}
                           </p>
-                          {candidates.length === 0 && (
+                          {activeTab === 'new' && (
                             <AddCandidateDialog onAdd={createCandidate}>
                               <Button>
                                 <Plus className="w-4 h-4 mr-2" />
-                                Ajouter un candidat
+                                Ajouter un CV
                               </Button>
                             </AddCandidateDialog>
                           )}
@@ -243,7 +266,7 @@ export default function HR() {
                                   {new Date(job.created_at).toLocaleDateString('fr-FR')}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                  {candidates.filter(c => c.job_id === job.id).length} candidats matchés
+                                  {candidates.filter(c => c.job_id === job.id).length} candidats reliés
                                 </span>
                               </div>
                             </CardContent>
@@ -256,7 +279,7 @@ export default function HR() {
                           <Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                           <h3 className="text-lg font-medium text-foreground mb-2">Aucun poste</h3>
                           <p className="text-sm text-muted-foreground mb-4">
-                            Créez des postes pour matcher les candidats
+                            Créez des postes pour relier les candidats
                           </p>
                           <Button onClick={() => setActiveTab('generator')}>
                             <Plus className="w-4 h-4 mr-2" />
