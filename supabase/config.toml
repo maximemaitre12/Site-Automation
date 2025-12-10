@@ -38,3 +38,21 @@ verify_jwt = true
 
 [functions.cv-parse]
 verify_jwt = true
+
+[functions.ai-forecasting]
+verify_jwt = true
+
+[functions.ai-anomalies]
+verify_jwt = true
+
+[functions.ai-segmentation]
+verify_jwt = true
+
+[functions.ai-universal-search]
+verify_jwt = true
+
+[functions.ai-dedupe-enrich]
+verify_jwt = true
+
+[functions.ai-automation]
+verify_jwt = true

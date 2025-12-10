@@ -151,6 +151,242 @@ export type Database = {
           },
         ]
       }
+      ai_anomalies: {
+        Row: {
+          anomaly_type: string
+          created_at: string
+          description: string | null
+          detected_value: number | null
+          deviation_percent: number | null
+          entity_id: string | null
+          entity_type: string | null
+          expected_value: number | null
+          id: string
+          is_resolved: boolean | null
+          resolved_at: string | null
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          anomaly_type: string
+          created_at?: string
+          description?: string | null
+          detected_value?: number | null
+          deviation_percent?: number | null
+          entity_id?: string | null
+          entity_type?: string | null
+          expected_value?: number | null
+          id?: string
+          is_resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          anomaly_type?: string
+          created_at?: string
+          description?: string | null
+          detected_value?: number | null
+          deviation_percent?: number | null
+          entity_id?: string | null
+          entity_type?: string | null
+          expected_value?: number | null
+          id?: string
+          is_resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_automation_logs: {
+        Row: {
+          action_taken: string | null
+          created_at: string
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          result: string | null
+          rule_id: string | null
+          rule_name: string | null
+          trigger_data: Json | null
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          result?: string | null
+          rule_id?: string | null
+          rule_name?: string | null
+          trigger_data?: Json | null
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          result?: string | null
+          rule_id?: string | null
+          rule_name?: string | null
+          trigger_data?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_automation_logs_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "ai_automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_automation_rules: {
+        Row: {
+          action_config: Json
+          action_type: string
+          created_at: string
+          description: string | null
+          execution_count: number | null
+          id: string
+          is_active: boolean | null
+          last_executed_at: string | null
+          name: string
+          trigger_conditions: Json
+          trigger_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          created_at?: string
+          description?: string | null
+          execution_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_executed_at?: string | null
+          name: string
+          trigger_conditions?: Json
+          trigger_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          created_at?: string
+          description?: string | null
+          execution_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_executed_at?: string | null
+          name?: string
+          trigger_conditions?: Json
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_predictions: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          factors: Json | null
+          id: string
+          model_version: string | null
+          prediction_date: string
+          prediction_type: string
+          prediction_value: number | null
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          factors?: Json | null
+          id?: string
+          model_version?: string | null
+          prediction_date?: string
+          prediction_type: string
+          prediction_value?: number | null
+          updated_at?: string
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          factors?: Json | null
+          id?: string
+          model_version?: string | null
+          prediction_date?: string
+          prediction_type?: string
+          prediction_value?: number | null
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
+      ai_segments: {
+        Row: {
+          avg_score: number | null
+          cluster_id: number | null
+          created_at: string
+          criteria: Json | null
+          description: string | null
+          id: string
+          member_count: number | null
+          name: string
+          segment_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_score?: number | null
+          cluster_id?: number | null
+          created_at?: string
+          criteria?: Json | null
+          description?: string | null
+          id?: string
+          member_count?: number | null
+          name: string
+          segment_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_score?: number | null
+          cluster_id?: number | null
+          created_at?: string
+          criteria?: Json | null
+          description?: string | null
+          id?: string
+          member_count?: number | null
+          name?: string
+          segment_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1214,6 +1450,89 @@ export type Database = {
         }
         Relationships: []
       }
+      deal_status_history: {
+        Row: {
+          ai_triggered: boolean | null
+          change_reason: string | null
+          changed_by: string | null
+          created_at: string
+          deal_id: string
+          from_status: Database["public"]["Enums"]["sales_status"] | null
+          id: string
+          to_status: Database["public"]["Enums"]["sales_status"]
+          user_id: string
+        }
+        Insert: {
+          ai_triggered?: boolean | null
+          change_reason?: string | null
+          changed_by?: string | null
+          created_at?: string
+          deal_id: string
+          from_status?: Database["public"]["Enums"]["sales_status"] | null
+          id?: string
+          to_status: Database["public"]["Enums"]["sales_status"]
+          user_id: string
+        }
+        Update: {
+          ai_triggered?: boolean | null
+          change_reason?: string | null
+          changed_by?: string | null
+          created_at?: string
+          deal_id?: string
+          from_status?: Database["public"]["Enums"]["sales_status"] | null
+          id?: string
+          to_status?: Database["public"]["Enums"]["sales_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_status_history_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "sales_deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dedupe_candidates: {
+        Row: {
+          created_at: string
+          entity_1_id: string
+          entity_2_id: string
+          entity_type: string
+          id: string
+          matching_fields: Json | null
+          merged_at: string | null
+          similarity_score: number
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entity_1_id: string
+          entity_2_id: string
+          entity_type: string
+          id?: string
+          matching_fields?: Json | null
+          merged_at?: string | null
+          similarity_score: number
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entity_1_id?: string
+          entity_2_id?: string
+          entity_type?: string
+          id?: string
+          matching_fields?: Json | null
+          merged_at?: string | null
+          similarity_score?: number
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       doc_access_logs: {
         Row: {
           action: string
@@ -1885,6 +2204,135 @@ export type Database = {
           },
         ]
       }
+      sales_deals: {
+        Row: {
+          actual_close_date: string | null
+          ai_factors: Json | null
+          ai_risk_score: number | null
+          ai_score: number | null
+          assigned_to: string | null
+          company_id: string | null
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          currency: string | null
+          custom_fields: Json | null
+          description: string | null
+          expected_close_date: string | null
+          id: string
+          last_activity_at: string | null
+          lost_reason: string | null
+          probability: number | null
+          source: string | null
+          status: Database["public"]["Enums"]["sales_status"]
+          tags: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+          value: number | null
+        }
+        Insert: {
+          actual_close_date?: string | null
+          ai_factors?: Json | null
+          ai_risk_score?: number | null
+          ai_score?: number | null
+          assigned_to?: string | null
+          company_id?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          currency?: string | null
+          custom_fields?: Json | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          last_activity_at?: string | null
+          lost_reason?: string | null
+          probability?: number | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["sales_status"]
+          tags?: Json | null
+          title: string
+          updated_at?: string
+          user_id: string
+          value?: number | null
+        }
+        Update: {
+          actual_close_date?: string | null
+          ai_factors?: Json | null
+          ai_risk_score?: number | null
+          ai_score?: number | null
+          assigned_to?: string | null
+          company_id?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          currency?: string | null
+          custom_fields?: Json | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          last_activity_at?: string | null
+          lost_reason?: string | null
+          probability?: number | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["sales_status"]
+          tags?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
+      sales_forecasts: {
+        Row: {
+          confidence_interval_high: number | null
+          confidence_interval_low: number | null
+          created_at: string
+          factors: Json | null
+          forecast_period: string
+          id: string
+          model_accuracy: number | null
+          period_end: string
+          period_start: string
+          predicted_deals_lost: number | null
+          predicted_deals_won: number | null
+          predicted_revenue: number | null
+          user_id: string
+        }
+        Insert: {
+          confidence_interval_high?: number | null
+          confidence_interval_low?: number | null
+          created_at?: string
+          factors?: Json | null
+          forecast_period: string
+          id?: string
+          model_accuracy?: number | null
+          period_end: string
+          period_start: string
+          predicted_deals_lost?: number | null
+          predicted_deals_won?: number | null
+          predicted_revenue?: number | null
+          user_id: string
+        }
+        Update: {
+          confidence_interval_high?: number | null
+          confidence_interval_low?: number | null
+          created_at?: string
+          factors?: Json | null
+          forecast_period?: string
+          id?: string
+          model_accuracy?: number | null
+          period_end?: string
+          period_start?: string
+          predicted_deals_lost?: number | null
+          predicted_deals_won?: number | null
+          predicted_revenue?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       sales_proposals: {
         Row: {
           created_at: string
@@ -2413,6 +2861,19 @@ export type Database = {
     }
     Enums: {
       app_role: "owner" | "admin" | "manager" | "editor" | "viewer"
+      sales_status:
+        | "lead_created"
+        | "contacted"
+        | "engaged"
+        | "qualifying"
+        | "qualified"
+        | "proposal_sent"
+        | "negotiation"
+        | "closing_imminent"
+        | "won"
+        | "lost"
+        | "to_recontact"
+        | "inactive"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2541,6 +3002,20 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["owner", "admin", "manager", "editor", "viewer"],
+      sales_status: [
+        "lead_created",
+        "contacted",
+        "engaged",
+        "qualifying",
+        "qualified",
+        "proposal_sent",
+        "negotiation",
+        "closing_imminent",
+        "won",
+        "lost",
+        "to_recontact",
+        "inactive",
+      ],
     },
   },
 } as const
