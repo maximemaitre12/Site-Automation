@@ -49,15 +49,18 @@ import { fr } from "date-fns/locale";
 export default function Dashboard() {
   const { user } = useAuth();
   const { company, loading: companyLoading } = useCompany();
-  const { workflows } = useWorkflows();
-  const { runs: workflowRuns } = useWorkflowRuns();
-  const { audits } = useCompliance();
-  const { candidates, jobs } = useHR();
-  const { tickets } = useSupport();
-  const { conversations, documents: brainDocs } = useBrain();
-  const { proposals, callAnalyses } = useSalesProposals();
+  const { workflows, loading: workflowsLoading } = useWorkflows();
+  const { runs: workflowRuns, loading: runsLoading } = useWorkflowRuns();
+  const { audits, loading: auditsLoading } = useCompliance();
+  const { candidates, jobs, loading: hrLoading } = useHR();
+  const { tickets, loading: ticketsLoading } = useSupport();
+  const { conversations, documents: brainDocs, loading: brainLoading } = useBrain();
+  const { proposals, callAnalyses, loading: salesLoading } = useSalesProposals();
   
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Global loading state - only show skeleton on initial load
+  const isInitialLoading = workflowsLoading || runsLoading || auditsLoading || hrLoading || ticketsLoading || brainLoading || salesLoading;
 
   // Update time every minute
   useEffect(() => {
@@ -361,7 +364,11 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-0.5 md:mb-1 tabular-nums">
-                    {stat.value}
+                    {isInitialLoading ? (
+                      <div className="h-8 w-12 bg-muted animate-pulse rounded" />
+                    ) : (
+                      stat.value
+                    )}
                   </div>
                   <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
                 </div>
