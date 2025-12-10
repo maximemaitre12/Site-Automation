@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -51,6 +52,7 @@ export function CandidateCard({
   const [isLinking, setIsLinking] = useState(false);
   const [isSavingDesc, setIsSavingDesc] = useState(false);
   const [isSavingNotes, setIsSavingNotes] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const getStatusBadge = (status: string | null) => {
     switch (status) {
@@ -106,6 +108,12 @@ export function CandidateCard({
     setInterviewNotes('');
     setShowNotesDialog(false);
     setIsSavingNotes(false);
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    await onDelete(candidate.id);
+    setIsDeleting(false);
   };
 
   const handleActivate = async () => {
@@ -463,14 +471,32 @@ export function CandidateCard({
               )}
 
               {/* Delete */}
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="text-destructive hover:text-destructive"
-                onClick={() => onDelete(candidate.id)}
-              >
-                <Trash2 className="w-3 h-3" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Supprimer ce candidat ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Cette action est irréversible. {candidate.name} sera définitivement supprimé.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Supprimer
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             {/* CV Preview Toggle */}
