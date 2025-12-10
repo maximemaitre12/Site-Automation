@@ -142,15 +142,17 @@ export function useHR() {
           match_score: score,
           status: 'analyzed'
         })
-        .eq('id', candidateId);
+        .eq('id', candidateId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       
       await fetchData();
       toast({ title: 'Succès', description: 'Score validé, candidat passé en "Analysé"' });
       return true;
-    } catch (err) {
-      toast({ title: 'Erreur', description: 'Erreur lors de la validation', variant: 'destructive' });
+    } catch (err: any) {
+      console.error('validateScore error:', err);
+      toast({ title: 'Erreur', description: err.message || 'Erreur lors de la validation', variant: 'destructive' });
       return false;
     }
   };
@@ -164,15 +166,17 @@ export function useHR() {
         .update({
           status: 'active'
         })
-        .eq('id', candidateId);
+        .eq('id', candidateId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       
       await fetchData();
       toast({ title: 'Succès', description: 'Candidat validé et passé en "Actif"' });
       return true;
-    } catch (err) {
-      toast({ title: 'Erreur', description: 'Erreur lors de l\'activation', variant: 'destructive' });
+    } catch (err: any) {
+      console.error('activateCandidate error:', err);
+      toast({ title: 'Erreur', description: err.message || 'Erreur lors de l\'activation', variant: 'destructive' });
       return false;
     }
   };
@@ -184,15 +188,17 @@ export function useHR() {
       const { error } = await supabase
         .from('candidates')
         .update({ job_id: jobId })
-        .eq('id', candidateId);
+        .eq('id', candidateId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       
       await fetchData();
       toast({ title: 'Succès', description: 'Candidat relié au poste' });
       return true;
-    } catch (err) {
-      toast({ title: 'Erreur', description: 'Erreur lors de la liaison', variant: 'destructive' });
+    } catch (err: any) {
+      console.error('linkToJob error:', err);
+      toast({ title: 'Erreur', description: err.message || 'Erreur lors de la liaison', variant: 'destructive' });
       return false;
     }
   };
@@ -452,8 +458,16 @@ ${notes}`
   };
 
   const deleteCandidate = async (id: string): Promise<boolean> => {
-    const { error } = await supabase.from('candidates').delete().eq('id', id);
+    if (!user) return false;
+    
+    const { error } = await supabase
+      .from('candidates')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+      
     if (error) {
+      console.error('deleteCandidate error:', error);
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
