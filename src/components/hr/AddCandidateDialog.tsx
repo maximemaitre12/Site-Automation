@@ -7,7 +7,16 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AddCandidateDialogProps {
-  onAdd: (data: { name: string; email?: string; phone?: string; cvText?: string }) => Promise<any>;
+  onAdd: (data: { 
+    name: string; 
+    email?: string; 
+    phone?: string; 
+    cvText?: string;
+    skills?: string[];
+    experience_years?: number;
+    match_score?: number;
+    ai_analysis?: any;
+  }) => Promise<any>;
   children: React.ReactNode;
 }
 
@@ -152,33 +161,23 @@ ${cvText.substring(0, 8000)}`
       
       setProgress(80);
 
-      // Stage 3: Create candidate
-      const result = await onAdd({
+      // Stage 3: Create candidate with all extracted data
+      await onAdd({
         name: extracted.name || 'Candidat',
         email: extracted.email || undefined,
         phone: extracted.phone || undefined,
-        cvText: cvText
+        cvText: cvText,
+        skills: extracted.skills,
+        experience_years: extracted.experience_years,
+        match_score: extracted.score,
+        ai_analysis: {
+          education: extracted.education,
+          summary: extracted.summary,
+          strengths: extracted.strengths,
+          score: extracted.score,
+          analyzed_at: new Date().toISOString()
+        }
       });
-
-      if (result) {
-        // Update with full analysis
-        await supabase
-          .from('candidates')
-          .update({
-            skills: extracted.skills,
-            experience_years: extracted.experience_years,
-            match_score: extracted.score,
-            ai_analysis: {
-              education: extracted.education,
-              summary: extracted.summary,
-              strengths: extracted.strengths,
-              score: extracted.score,
-              analyzed_at: new Date().toISOString()
-            },
-            status: 'analyzed'
-          })
-          .eq('id', result.id);
-      }
 
       setProgress(100);
       setStage('done');

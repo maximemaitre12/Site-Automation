@@ -84,6 +84,8 @@ export function useHR() {
     if (!user) return null;
 
     try {
+      // If we have AI analysis data, create as 'new' with score visible
+      // User will need to validate the score to move to 'analyzed'
       const { data: candidate, error } = await supabase
         .from('candidates')
         .insert({
@@ -93,9 +95,9 @@ export function useHR() {
           phone: data.phone,
           cv_text: data.cvText,
           skills: data.skills || [],
-          experience_years: data.experience_years,
-          match_score: data.match_score,
-          ai_analysis: data.ai_analysis,
+          experience_years: data.experience_years || null,
+          match_score: data.match_score || null,
+          ai_analysis: data.ai_analysis || null,
           status: 'new'
         })
         .select()
@@ -104,7 +106,6 @@ export function useHR() {
       if (error) throw error;
       
       await fetchData();
-      toast({ title: 'Succès', description: 'Candidat ajouté' });
       return candidate;
     } catch (err) {
       toast({ title: 'Erreur', description: 'Erreur lors de l\'ajout', variant: 'destructive' });
