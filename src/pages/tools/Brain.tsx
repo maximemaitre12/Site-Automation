@@ -44,7 +44,6 @@ export default function BrainPage() {
 
   const [message, setMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredDocs, setFilteredDocs] = useState<AetherDocument[]>([]);
   const [showTools, setShowTools] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -53,14 +52,16 @@ export default function BrainPage() {
   const [showUniversalSearch, setShowUniversalSearch] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [localFilteredDocs, setLocalFilteredDocs] = useState<AetherDocument[]>([]);
+
+  // Use documents directly when no search, or localFilteredDocs when searching
+  const filteredDocs = searchQuery.trim() ? localFilteredDocs : documents;
 
   useEffect(() => {
-    setFilteredDocs(documents);
-  }, [documents]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentConversation?.messages, streamingContent]);
+    if (currentConversation?.messages || streamingContent) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [currentConversation?.messages?.length, streamingContent]);
 
   const handleFileSelect = async (files: FileList | null) => {
     if (!files) return;
@@ -215,11 +216,11 @@ export default function BrainPage() {
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     if (!query.trim()) {
-      setFilteredDocs(documents);
+      setLocalFilteredDocs([]);
       return;
     }
     const results = await searchDocuments(query);
-    setFilteredDocs(results);
+    setLocalFilteredDocs(results);
   };
 
   const formatTime = (dateStr: string) => {
