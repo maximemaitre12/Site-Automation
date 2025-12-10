@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
 import { CandidateCard } from "@/components/hr/CandidateCard";
+import { JobCard } from "@/components/hr/JobCard";
 import { AddCandidateDialog } from "@/components/hr/AddCandidateDialog";
 import { JobPostGenerator } from "@/components/hr/JobPostGenerator";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,8 @@ export default function HR() {
     addInterviewNotes,
     createJob,
     generateJobPost,
-    deleteCandidate
+    deleteCandidate,
+    deleteJob
   } = useHR();
 
   const [activeTab, setActiveTab] = useState<"new" | "analyzed" | "active" | "jobs" | "generator">("new");
@@ -215,56 +217,23 @@ export default function HR() {
 
                 {/* Jobs Tab */}
                 {activeTab === "jobs" && (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {jobs.length > 0 ? (
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {jobs.map((job) => (
-                          <Card key={job.id} className="hover:border-primary/30 transition-all">
-                            <CardHeader className="pb-3">
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <CardTitle className="text-base">{job.title}</CardTitle>
-                                  {job.department && (
-                                    <p className="text-sm text-muted-foreground">{job.department}</p>
-                                  )}
-                                </div>
-                                <Badge variant={job.is_active ? "default" : "secondary"}>
-                                  {job.is_active ? 'Actif' : 'Inactif'}
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                              {job.salary_range && (
-                                <p className="text-sm text-muted-foreground">
-                                  💰 {job.salary_range}
-                                </p>
-                              )}
-                              {Array.isArray(job.skills) && job.skills.length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                  {(job.skills as string[]).slice(0, 5).map((skill, i) => (
-                                    <span key={i} className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">
-                                      {skill}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                              {job.description && (
-                                <p className="text-sm text-muted-foreground line-clamp-3">
-                                  {job.description}
-                                </p>
-                              )}
-                              <div className="flex items-center justify-between pt-2 border-t border-border">
-                                <span className="text-xs text-muted-foreground">
-                                  {new Date(job.created_at).toLocaleDateString('fr-FR')}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {candidates.filter(c => c.job_id === job.id).length} candidats reliés
-                                </span>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                      <>
+                        <p className="text-sm text-muted-foreground">
+                          Cliquez sur un poste pour voir les détails complets
+                        </p>
+                        <div className="space-y-4">
+                          {jobs.map((job) => (
+                            <JobCard 
+                              key={job.id}
+                              job={job}
+                              candidatesCount={candidates.filter(c => c.job_id === job.id).length}
+                              onDelete={deleteJob}
+                            />
+                          ))}
+                        </div>
+                      </>
                     ) : (
                       <Card className="border-dashed">
                         <CardContent className="py-12 text-center">

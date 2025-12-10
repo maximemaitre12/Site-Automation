@@ -476,6 +476,25 @@ ${notes}`
     return true;
   };
 
+  const deleteJob = async (id: string): Promise<boolean> => {
+    if (!user) return false;
+    
+    const { error } = await supabase
+      .from('job_descriptions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+      
+    if (error) {
+      console.error('deleteJob error:', error);
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    await fetchData();
+    toast({ title: 'Succès', description: 'Poste supprimé' });
+    return true;
+  };
+
   return {
     candidates,
     jobs,
@@ -493,6 +512,7 @@ ${notes}`
     generateJobPost,
     analyzeInterview,
     deleteCandidate,
+    deleteJob,
     refreshData: fetchData
   };
 }
