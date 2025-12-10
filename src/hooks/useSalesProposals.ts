@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface SalesProposal {
   id: string;
@@ -34,28 +35,50 @@ export interface CallAnalysis {
 }
 
 export function useSalesProposals() {
-  const [proposals, setProposals] = useState<SalesProposal[]>([]);
-  const [callAnalyses, setCallAnalyses] = useState<CallAnalysis[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const fetchData = async () => {
-    if (!user) return;
-    
-    const [proposalsRes, callsRes] = await Promise.all([
-      supabase.from('sales_proposals').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('call_analyses').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-    ]);
+  const { data: proposals = [], isLoading: proposalsLoading } = useQuery({
+    queryKey: ['sales-proposals', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('sales_proposals')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-    if (!proposalsRes.error) setProposals(proposalsRes.data || []);
-    if (!callsRes.error) setCallAnalyses(callsRes.data || []);
-    setLoading(false);
-  };
+  const { data: callAnalyses = [], isLoading: callsLoading } = useQuery({
+    queryKey: ['call-analyses', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('call_analyses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [user]);
+  const loading = proposalsLoading || callsLoading;
+
+  const invalidateSales = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['sales-proposals', user?.id] });
+    queryClient.invalidateQueries({ queryKey: ['call-analyses', user?.id] });
+  }, [queryClient, user?.id]);
 
   const generateProposal = async (data: {
     prospectName: string;
@@ -134,7 +157,7 @@ Client: ${data.prospectName}, Produit: ${data.productName}, Objections: ${data.o
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateSales();
       toast({ title: 'Succès', description: 'Proposition générée' });
       return proposal;
     } catch (err) {
@@ -167,7 +190,6 @@ ${transcript}`
 
       let parsed: any = {};
       try {
-        // Handle markdown-wrapped JSON responses
         let jsonContent = response.content;
         const jsonMatch = jsonContent.match(/```(?:json)?\s*([\s\S]*?)```/);
         if (jsonMatch) {
@@ -196,7 +218,7 @@ ${transcript}`
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateSales();
       toast({ title: 'Succès', description: 'Appel analysé' });
       return analysis;
     } catch (err) {
@@ -244,6 +266,6 @@ Génère un email professionnel avec objet, corps et signature.`
     generateProposal,
     analyzeCall,
     generateEmail,
-    refreshData: fetchData
+    refreshData: invalidateSales
   };
 }

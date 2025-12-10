@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface SupportTicket {
   id: string;
@@ -25,32 +26,28 @@ export interface SupportTicket {
 export function useSupport() {
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchTickets = async () => {
-    if (!user) {
-      setTickets([]);
-      setLoading(false);
-      return;
-    }
-    
-    const { data, error } = await supabase
-      .from('support_tickets')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+  const { data: tickets = [], isLoading: loading } = useQuery({
+    queryKey: ['support-tickets', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-    if (!error) {
-      setTickets(data || []);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchTickets();
-  }, [user]);
+  const invalidateTickets = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['support-tickets', user?.id] });
+  }, [queryClient, user?.id]);
 
   const generateTicketNumber = () => {
     return `TKT-${Date.now().toString(36).toUpperCase()}`;
@@ -64,7 +61,6 @@ export function useSupport() {
     if (!user) return null;
 
     try {
-      // First create the ticket
       const { data: ticket, error } = await supabase
         .from('support_tickets')
         .insert({
@@ -81,7 +77,6 @@ export function useSupport() {
 
       if (error) throw error;
 
-      // Then classify it with AI
       await classifyTicket(ticket.id, data.subject + '\n' + data.content);
       
       toast({ title: 'Succès', description: 'Ticket créé et classifié' });
@@ -130,7 +125,7 @@ ${content}`
         })
         .eq('id', ticketId);
 
-      await fetchTickets();
+      invalidateTickets();
       return true;
     } catch (err) {
       return false;
@@ -168,7 +163,7 @@ La réponse doit:
         .update({ ai_suggested_response: response.content })
         .eq('id', ticketId);
 
-      await fetchTickets();
+      invalidateTickets();
       toast({ title: 'Succès', description: 'Réponse générée' });
       return response.content;
     } catch (err) {
@@ -190,7 +185,7 @@ La réponse doit:
         })
         .eq('id', ticketId);
 
-      await fetchTickets();
+      invalidateTickets();
       toast({ title: 'Succès', description: 'Ticket résolu' });
       return true;
     } catch (err) {
@@ -206,7 +201,7 @@ La réponse doit:
         .update({ status })
         .eq('id', ticketId);
 
-      await fetchTickets();
+      invalidateTickets();
       return true;
     } catch {
       return false;
@@ -219,7 +214,7 @@ La réponse doit:
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    await fetchTickets();
+    invalidateTickets();
     toast({ title: 'Succès', description: 'Ticket supprimé' });
     return true;
   };
@@ -233,8 +228,8 @@ La réponse doit:
       .filter(t => t.resolved_at)
       .reduce((sum, t) => {
         const created = new Date(t.created_at).getTime();
-        const resolved = new Date(t.resolved_at!).getTime();
-        return sum + (resolved - created);
+        const resolvedTime = new Date(t.resolved_at!).getTime();
+        return sum + (resolvedTime - created);
       }, 0) / (resolved || 1);
     
     return { 
@@ -257,6 +252,6 @@ La réponse doit:
     updateTicketStatus,
     deleteTicket,
     getStats,
-    refreshTickets: fetchTickets
+    refreshTickets: invalidateTickets
   };
 }

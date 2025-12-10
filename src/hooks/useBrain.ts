@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
 import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Message {
   id: string;
@@ -21,7 +22,6 @@ export interface Conversation {
   updated_at: string;
 }
 
-// Documents from AETHER Docs
 export interface AetherDocument {
   id: string;
   title: string;
@@ -38,104 +38,57 @@ export interface AetherDocument {
 export function useBrain() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [documents, setDocuments] = useState<AetherDocument[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
-  const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
-  
-  // Abort controller for cancelling generation
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchConversations = async () => {
-    if (!user) {
-      setConversations([]);
-      return;
-    }
-    
-    const { data, error } = await supabase
-      .from('conversations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false });
-
-    if (!error && data) {
-      const parsed = data.map(conv => ({
+  const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
+    queryKey: ['conversations', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(conv => ({
         ...conv,
         messages: (conv.messages as any[]) || []
       }));
-      setConversations(parsed);
-    }
-  };
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  const fetchDocuments = async () => {
-    if (!user) {
-      setDocuments([]);
-      return;
-    }
-    
-    // Fetch from AETHER Docs (aether_documents table)
-    const { data, error } = await supabase
-      .from('aether_documents')
-      .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+  const { data: documents = [], isLoading: documentsLoading } = useQuery({
+    queryKey: ['brain-documents', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('aether_documents')
+        .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-    if (!error && data) {
-      setDocuments(data);
-    }
-  };
+  const loading = conversationsLoading || documentsLoading;
 
-  useEffect(() => {
-    let mounted = true;
-    
-    const loadData = async () => {
-      if (!user) {
-        setConversations([]);
-        setDocuments([]);
-        setLoading(false);
-        return;
-      }
-      
-      try {
-        const [convResult, docsResult] = await Promise.all([
-          supabase
-            .from('conversations')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('updated_at', { ascending: false }),
-          supabase
-            .from('aether_documents')
-            .select('id, title, content, ai_summary, description, file_type, file_url, tags, ai_keywords, created_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-        ]);
+  const invalidateBrain = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['conversations', user?.id] });
+    queryClient.invalidateQueries({ queryKey: ['brain-documents', user?.id] });
+  }, [queryClient, user?.id]);
 
-        if (mounted) {
-          if (!convResult.error && convResult.data) {
-            setConversations(convResult.data.map(conv => ({
-              ...conv,
-              messages: (conv.messages as any[]) || []
-            })));
-          }
-          
-          if (!docsResult.error && docsResult.data) {
-            setDocuments(docsResult.data);
-          }
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    loadData();
-    
-    return () => { mounted = false; };
-  }, [user?.id]);
-
-  // Cancel current generation
   const cancelGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -149,20 +102,14 @@ export function useBrain() {
   const createConversation = async (initialMessage?: string): Promise<Conversation | null> => {
     if (!user) return null;
 
-    // Reset streaming state when creating new conversation
     setStreamingContent('');
     setSendingMessage(false);
-
-    const newConv: Partial<Conversation> = {
-      title: 'Nouvelle conversation',
-      messages: [],
-    };
 
     const { data, error } = await supabase
       .from('conversations')
       .insert({
         user_id: user.id,
-        title: newConv.title,
+        title: 'Nouvelle conversation',
         messages: []
       })
       .select()
@@ -174,7 +121,7 @@ export function useBrain() {
     }
 
     const conversation = { ...data, messages: [] };
-    setConversations(prev => [conversation, ...prev]);
+    invalidateBrain();
     setCurrentConversation(conversation);
     return conversation;
   };
@@ -186,29 +133,23 @@ export function useBrain() {
   ): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
 
-    // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
-
     setSendingMessage(true);
     setStreamingContent('');
     
     try {
       let conv = currentConversation;
       
-      // Create new conversation if needed
       if (!conv || (conversationId && conv.id !== conversationId)) {
         if (conversationId) {
           conv = conversations.find(c => c.id === conversationId) || null;
         }
         if (!conv) {
-          console.log('Creating new conversation...');
           conv = await createConversation(content);
-          console.log('Created conversation:', conv);
         }
       }
       
       if (!conv) {
-        console.error('Failed to create or find conversation');
         toast({ 
           title: 'Erreur', 
           description: 'Impossible de créer la conversation. Veuillez vous reconnecter.', 
@@ -226,7 +167,6 @@ export function useBrain() {
         attachments: options?.attachments
       };
 
-      // Update local state immediately with user message
       const updatedMessages = [...conv.messages, userMessage];
       setCurrentConversation({ ...conv, messages: updatedMessages });
 
@@ -249,23 +189,19 @@ COMPORTEMENT:
 - Sois un expert qui SAIT et qui INFORME
 - Réponds en français, de manière engageante et professionnelle`;
 
-      // Use streaming with document search and attachments
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
 
       await new Promise<void>((resolve, reject) => {
-        // Filter out base64 image data from message history to prevent context overflow
         const cleanedMessages = updatedMessages.slice(-10).map(m => {
-          let content = m.content;
-          // Remove [IMAGE_GENERATED]data:... pattern from messages
-          if (content.includes('[IMAGE_GENERATED]data:')) {
-            content = content.replace(/\[IMAGE_GENERATED\]data:image\/[^;]+;base64,[^\s]*/g, '[Image générée]');
+          let messageContent = m.content;
+          if (messageContent.includes('[IMAGE_GENERATED]data:')) {
+            messageContent = messageContent.replace(/\[IMAGE_GENERATED\]data:image\/[^;]+;base64,[^\s]*/g, '[Image générée]');
           }
-          // Also clean up very long base64 data that might be in any message
-          if (content.length > 5000 && content.includes('base64,')) {
-            content = content.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[Image]');
+          if (messageContent.length > 5000 && messageContent.includes('base64,')) {
+            messageContent = messageContent.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[Image]');
           }
-          return { role: m.role, content };
+          return { role: m.role, content: messageContent };
         });
 
         streamAIChat({
@@ -292,14 +228,11 @@ COMPORTEMENT:
 
       const finalMessages = [...updatedMessages, assistantMessage];
       
-      // Generate smart title for new conversations
       let newTitle = conv.title;
       if (conv.messages.length === 0) {
-        // Generate a smart title based on the first message
         newTitle = await generateConversationTitle(content);
       }
 
-      // Save to database
       const messagesForDb = finalMessages.map(m => ({
         id: m.id,
         role: m.role,
@@ -316,12 +249,9 @@ COMPORTEMENT:
         })
         .eq('id', conv.id);
 
-      // Update local state
       const updatedConv = { ...conv, messages: finalMessages, title: newTitle };
       setCurrentConversation(updatedConv);
-      setConversations(prev => 
-        prev.map(c => c.id === conv!.id ? updatedConv : c)
-      );
+      invalidateBrain();
 
       setStreamingContent('');
       abortControllerRef.current = null;
@@ -330,7 +260,6 @@ COMPORTEMENT:
       setStreamingContent('');
       abortControllerRef.current = null;
       
-      // Don't show error toast for cancelled requests
       if (err instanceof Error && err.message === 'Generation cancelled') {
         return null;
       }
@@ -344,7 +273,7 @@ COMPORTEMENT:
     } finally {
       setSendingMessage(false);
     }
-  }, [user, currentConversation, conversations, toast]);
+  }, [user, currentConversation, conversations, toast, invalidateBrain]);
 
   const deleteConversation = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('conversations').delete().eq('id', id);
@@ -352,7 +281,7 @@ COMPORTEMENT:
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    setConversations(prev => prev.filter(c => c.id !== id));
+    invalidateBrain();
     if (currentConversation?.id === id) {
       setCurrentConversation(null);
     }
@@ -360,13 +289,11 @@ COMPORTEMENT:
   };
 
   const selectConversation = (id: string) => {
-    // Cancel any ongoing generation when switching conversations
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
     
-    // Reset streaming state when switching conversations
     setStreamingContent('');
     setSendingMessage(false);
     
@@ -374,7 +301,6 @@ COMPORTEMENT:
     if (conv) setCurrentConversation(conv);
   };
 
-  // Document management - now uses aether_documents
   const uploadDocument = async (title: string, content: string, docType: string = 'text', tags: string[] = []): Promise<AetherDocument | null> => {
     if (!user) return null;
 
@@ -396,7 +322,7 @@ COMPORTEMENT:
       return null;
     }
 
-    setDocuments(prev => [data, ...prev]);
+    invalidateBrain();
     toast({ title: 'Succès', description: 'Document ajouté à AETHER Docs' });
     return data;
   };
@@ -407,7 +333,7 @@ COMPORTEMENT:
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    setDocuments(prev => prev.filter(d => d.id !== id));
+    invalidateBrain();
     toast({ title: 'Succès', description: 'Document supprimé' });
     return true;
   };
@@ -425,7 +351,6 @@ COMPORTEMENT:
     return data || [];
   };
 
-  // AI-powered features
   const generateProcedure = async (topic: string): Promise<string | null> => {
     const response = await callAI({
       messages: [{ 
@@ -488,6 +413,7 @@ COMPORTEMENT:
     conversations,
     documents,
     currentConversation,
+    setCurrentConversation,
     loading,
     sendingMessage,
     streamingContent,
@@ -501,9 +427,6 @@ COMPORTEMENT:
     searchDocuments,
     generateProcedure,
     improveText,
-    summarizeDocument,
-    refreshConversations: fetchConversations,
-    refreshDocuments: fetchDocuments,
-    setCurrentConversation
+    summarizeDocument
   };
 }

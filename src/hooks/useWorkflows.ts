@@ -1,59 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { Workflow, WorkflowBlock, WorkflowRun, BlockConnection } from '@/types/workflow';
 import { toast } from 'sonner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useWorkflows() {
   const { user } = useAuth();
-  
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchWorkflows();
-    } else {
-      setWorkflows([]);
-      setLoading(false);
-    }
-  }, [user?.id]);
-
-  const fetchWorkflows = async (retryCount = 0) => {
-    if (!user) {
-      setWorkflows([]);
-      setLoading(false);
-      return;
-    }
-    
-    try {
+  const { data: workflows = [], isLoading: loading } = useQuery({
+    queryKey: ['workflows', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
       const { data, error } = await supabase
         .from('workflows')
         .select('*')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
-
       if (error) throw error;
-      
-      const parsed = (data || []).map(w => ({
+      return (data || []).map(w => ({
         ...w,
         blocks: (w.blocks as unknown as WorkflowBlock[]) || [],
         connections: (w.connections as unknown as BlockConnection[]) || []
       }));
-      
-      setWorkflows(parsed);
-    } catch (error: any) {
-      console.error('Error fetching workflows:', error);
-      // Retry up to 3 times for network errors
-      if (retryCount < 3 && (error.message?.includes('Load failed') || error.message?.includes('network'))) {
-        setTimeout(() => fetchWorkflows(retryCount + 1), 1000 * (retryCount + 1));
-        return;
-      }
-      toast.error('Échec du chargement des workflows');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * (attemptIndex + 1), 3000),
+  });
+
+  const invalidateWorkflows = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['workflows', user?.id] });
+  }, [queryClient, user?.id]);
 
   const createWorkflow = async (name: string, description?: string): Promise<Workflow | null> => {
     if (!user) {
@@ -61,7 +42,6 @@ export function useWorkflows() {
       return null;
     }
 
-    // Verify session is still valid
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       toast.error('Session expirée, veuillez vous reconnecter');
@@ -84,7 +64,6 @@ export function useWorkflows() {
       if (error) {
         if (error.code === '42501') {
           toast.error('Session expirée, veuillez vous reconnecter');
-          // Force refresh auth state
           await supabase.auth.refreshSession();
           return null;
         }
@@ -97,7 +76,7 @@ export function useWorkflows() {
         connections: (data.connections as unknown as BlockConnection[]) || []
       } as Workflow;
       
-      setWorkflows(prev => [newWorkflow, ...prev]);
+      invalidateWorkflows();
       toast.success('Workflow créé');
       return newWorkflow;
     } catch (error) {
@@ -113,7 +92,6 @@ export function useWorkflows() {
       return false;
     }
 
-    // Verify session is still valid
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       toast.error('Session expirée, veuillez vous reconnecter');
@@ -142,14 +120,10 @@ export function useWorkflows() {
         throw error;
       }
       
-      setWorkflows(prev => prev.map(w => 
-        w.id === id ? { 
-          ...w, 
-          ...updates,
-          blocks: updates.blocks || w.blocks,
-          connections: updates.connections || w.connections
-        } : w
-      ));
+      // Optimistic update
+      queryClient.setQueryData(['workflows', user.id], (old: Workflow[] | undefined) => 
+        (old || []).map(w => w.id === id ? { ...w, ...updates } : w)
+      );
       return true;
     } catch (error) {
       console.error('Error updating workflow:', error);
@@ -167,7 +141,7 @@ export function useWorkflows() {
 
       if (error) throw error;
       
-      setWorkflows(prev => prev.filter(w => w.id !== id));
+      invalidateWorkflows();
       toast.success('Workflow deleted');
       return true;
     } catch (error) {
@@ -188,28 +162,18 @@ export function useWorkflows() {
     updateWorkflow,
     deleteWorkflow,
     duplicateWorkflow,
-    refreshWorkflows: fetchWorkflows
+    refreshWorkflows: invalidateWorkflows
   };
 }
 
 export function useWorkflowRuns(workflowId?: string) {
   const { user } = useAuth();
-  const [runs, setRuns] = useState<WorkflowRun[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchRuns();
-    } else {
-      setRuns([]);
-      setLoading(false);
-    }
-  }, [user?.id, workflowId]);
-
-  const fetchRuns = async () => {
-    if (!user) return;
-
-    try {
+  const { data: runs = [], isLoading: loading } = useQuery({
+    queryKey: ['workflow-runs', user?.id, workflowId],
+    queryFn: async () => {
+      if (!user) return [];
       let query = supabase
         .from('workflow_runs')
         .select('*')
@@ -222,18 +186,20 @@ export function useWorkflowRuns(workflowId?: string) {
       }
 
       const { data, error } = await query;
-
       if (error) throw error;
-      setRuns((data || []).map(r => ({
+      return (data || []).map(r => ({
         ...r,
         status: r.status as WorkflowRun['status']
-      })));
-    } catch (error) {
-      console.error('Error fetching runs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      }));
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
+
+  const invalidateRuns = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['workflow-runs', user?.id, workflowId] });
+  }, [queryClient, user?.id, workflowId]);
 
   const createRun = async (workflow_id: string, input_data: any): Promise<WorkflowRun | null> => {
     if (!user) return null;
@@ -256,7 +222,7 @@ export function useWorkflowRuns(workflowId?: string) {
         ...data,
         status: data.status as WorkflowRun['status']
       };
-      setRuns(prev => [typedRun, ...prev]);
+      invalidateRuns();
       return typedRun;
     } catch (error) {
       console.error('Error creating run:', error);
@@ -272,7 +238,7 @@ export function useWorkflowRuns(workflowId?: string) {
         .eq('id', id);
 
       if (error) throw error;
-      setRuns(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+      invalidateRuns();
       return true;
     } catch (error) {
       console.error('Error updating run:', error);
@@ -285,6 +251,6 @@ export function useWorkflowRuns(workflowId?: string) {
     loading,
     createRun,
     updateRun,
-    refreshRuns: fetchRuns
+    refreshRuns: invalidateRuns
   };
 }

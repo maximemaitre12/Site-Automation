@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Risk {
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -35,38 +36,33 @@ export interface Audit {
 export function useCompliance() {
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  const [audits, setAudits] = useState<Audit[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [analyzing, setAnalyzing] = useState(false);
 
-  const fetchAudits = async () => {
-    if (!user) {
-      setLoading(false);
-      setAudits([]);
-      return;
-    }
-    
-    const { data, error } = await supabase
-      .from('audits')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      const mappedAudits = data.map(audit => ({
+  const { data: audits = [], isLoading: loading } = useQuery({
+    queryKey: ['audits', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('audits')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(audit => ({
         ...audit,
         risks: (audit.risks as unknown) as Risk[] | null,
         recommendations: (audit.recommendations as unknown) as Recommendation[] | null
       }));
-      setAudits(mappedAudits);
-    }
-    setLoading(false);
-  };
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchAudits();
-  }, [user]);
+  const invalidateAudits = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['audits', user?.id] });
+  }, [queryClient, user?.id]);
 
   const runAudit = async (auditType: string, inputText: string, title?: string): Promise<Audit | null> => {
     if (!user || !inputText.trim()) return null;
@@ -210,7 +206,7 @@ ${inputText.slice(0, 8000)}`
         recommendations: (updatedAudit.recommendations as unknown) as Recommendation[] | null
       };
 
-      setAudits(prev => [finalAudit, ...prev.filter(a => a.id !== finalAudit.id)]);
+      invalidateAudits();
       toast({ title: 'Succès', description: 'Audit de conformité terminé' });
       return finalAudit;
     } catch (err) {
@@ -232,7 +228,7 @@ ${inputText.slice(0, 8000)}`
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    setAudits(prev => prev.filter(a => a.id !== id));
+    invalidateAudits();
     toast({ title: 'Succès', description: 'Audit supprimé' });
     return true;
   };
@@ -291,6 +287,6 @@ Le rapport doit inclure:
     deleteAudit,
     generateReport,
     getStats,
-    refreshAudits: fetchAudits
+    refreshAudits: invalidateAudits
   };
 }

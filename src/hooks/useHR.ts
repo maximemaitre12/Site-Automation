@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export interface Candidate {
   id: string;
@@ -39,37 +40,51 @@ export interface JobDescription {
 export function useHR() {
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [jobs, setJobs] = useState<JobDescription[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchData = async () => {
-    if (!user) {
-      setCandidates([]);
-      setJobs([]);
-      setLoading(false);
-      return;
-    }
-    
-    const [candidatesRes, jobsRes] = await Promise.all([
-      supabase.from('candidates').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('job_descriptions').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-    ]);
+  // Fetch candidates with React Query - staleTime ensures instant loading from cache
+  const { data: candidates = [], isLoading: candidatesLoading } = useQuery({
+    queryKey: ['candidates', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('candidates')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh
+    gcTime: 30 * 60 * 1000, // 30 minutes cache
+  });
 
-    if (!candidatesRes.error) {
-      setCandidates(candidatesRes.data || []);
-    }
-    if (!jobsRes.error) {
-      setJobs(jobsRes.data || []);
-    }
-    
-    setLoading(false);
-  };
+  // Fetch jobs with React Query
+  const { data: jobs = [], isLoading: jobsLoading } = useQuery({
+    queryKey: ['jobs', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from('job_descriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [user]);
+  const loading = candidatesLoading || jobsLoading;
+
+  // Invalidate all HR queries
+  const invalidateHR = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['candidates', user?.id] });
+    queryClient.invalidateQueries({ queryKey: ['jobs', user?.id] });
+  }, [queryClient, user?.id]);
 
   const createCandidate = async (data: {
     name: string;
@@ -84,8 +99,6 @@ export function useHR() {
     if (!user) return null;
 
     try {
-      // If we have AI analysis data, create as 'new' with score visible
-      // User will need to validate the score to move to 'analyzed'
       const { data: candidate, error } = await supabase
         .from('candidates')
         .insert({
@@ -105,7 +118,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       return candidate;
     } catch (err) {
       toast({ title: 'Erreur', description: 'Erreur lors de l\'ajout', variant: 'destructive' });
@@ -124,7 +137,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       return true;
     } catch (err) {
       toast({ title: 'Erreur', description: 'Erreur lors de la mise à jour', variant: 'destructive' });
@@ -147,7 +160,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Score validé, candidat passé en "Analysé"' });
       return true;
     } catch (err: any) {
@@ -171,7 +184,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Candidat validé et passé en "Actif"' });
       return true;
     } catch (err: any) {
@@ -193,7 +206,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Candidat relié au poste' });
       return true;
     } catch (err: any) {
@@ -207,9 +220,10 @@ export function useHR() {
     if (!user) return false;
 
     try {
-      // Store description in ai_analysis.description field
       const candidate = candidates.find(c => c.id === candidateId);
-      const currentAnalysis = candidate?.ai_analysis || {};
+      const currentAnalysis = typeof candidate?.ai_analysis === 'object' && candidate?.ai_analysis !== null 
+        ? candidate.ai_analysis 
+        : {};
       
       const { error } = await supabase
         .from('candidates')
@@ -220,7 +234,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Description mise à jour' });
       return true;
     } catch (err) {
@@ -247,7 +261,7 @@ export function useHR() {
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Notes d\'entretien ajoutées' });
       return true;
     } catch (err) {
@@ -296,7 +310,7 @@ ${cvText}`
         })
         .eq('id', candidateId);
 
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'CV analysé' });
       return true;
     } catch (err) {
@@ -345,17 +359,20 @@ Poste:
       } catch {}
 
       const score = result.score || 50;
+      const existingAnalysis = typeof candidate.ai_analysis === 'object' && candidate.ai_analysis !== null 
+        ? candidate.ai_analysis 
+        : {};
 
       await supabase
         .from('candidates')
         .update({
           match_score: score,
           job_id: jobId,
-          ai_analysis: { ...candidate.ai_analysis, job_match: result }
+          ai_analysis: { ...existingAnalysis, job_match: result }
         })
         .eq('id', candidateId);
 
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: `Score de matching: ${score}%` });
       return score;
     } catch (err) {
@@ -392,7 +409,7 @@ Poste:
 
       if (error) throw error;
       
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Poste créé' });
       return job;
     } catch (err) {
@@ -448,7 +465,7 @@ ${notes}`
         .update({ interview_notes: notes + '\n\n--- Analyse IA ---\n' + response.content })
         .eq('id', candidateId);
 
-      await fetchData();
+      invalidateHR();
       toast({ title: 'Succès', description: 'Entretien analysé' });
       return response.content;
     } catch (err) {
@@ -471,7 +488,7 @@ ${notes}`
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    await fetchData();
+    invalidateHR();
     toast({ title: 'Succès', description: 'Candidat supprimé' });
     return true;
   };
@@ -490,7 +507,7 @@ ${notes}`
       toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       return false;
     }
-    await fetchData();
+    invalidateHR();
     toast({ title: 'Succès', description: 'Poste supprimé' });
     return true;
   };
@@ -512,7 +529,6 @@ ${notes}`
     generateJobPost,
     analyzeInterview,
     deleteCandidate,
-    deleteJob,
-    refreshData: fetchData
+    deleteJob
   };
 }
