@@ -515,6 +515,65 @@ export type Database = {
         }
         Relationships: []
       }
+      candidate_interviews: {
+        Row: {
+          ai_suggested_questions: Json | null
+          candidate_id: string
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          interview_type: string | null
+          interviewers: Json | null
+          location: string | null
+          notes: string | null
+          outcome: string | null
+          scheduled_at: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_suggested_questions?: Json | null
+          candidate_id: string
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          interview_type?: string | null
+          interviewers?: Json | null
+          location?: string | null
+          notes?: string | null
+          outcome?: string | null
+          scheduled_at: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_suggested_questions?: Json | null
+          candidate_id?: string
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          interview_type?: string | null
+          interviewers?: Json | null
+          location?: string | null
+          notes?: string | null
+          outcome?: string | null
+          scheduled_at?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidate_interviews_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidates: {
         Row: {
           ai_analysis: Json | null

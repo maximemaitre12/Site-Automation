@@ -8,10 +8,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
-  AlertTriangle, DoorOpen
+  AlertTriangle, DoorOpen, Calendar
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useInterviews } from "@/hooks/useInterviews";
 import { CandidateCard } from "@/components/hr/CandidateCard";
 import { JobCard } from "@/components/hr/JobCard";
 import { AddCandidateDialog } from "@/components/hr/AddCandidateDialog";
@@ -20,6 +21,7 @@ import { EmployeeCard } from "@/components/hr/EmployeeCard";
 import { AddEmployeeDialog } from "@/components/hr/AddEmployeeDialog";
 import { DisputeCard } from "@/components/hr/DisputeCard";
 import { ConvertCandidateDialog } from "@/components/hr/ConvertCandidateDialog";
+import { InterviewCard } from "@/components/hr/InterviewCard";
 import { Input } from "@/components/ui/input";
 
 export default function HR() {
@@ -38,13 +40,16 @@ export default function HR() {
     convertCandidateToEmployee
   } = useEmployees();
 
+  const { interviews, loading: interviewsLoading, getUpcomingInterviews } = useInterviews();
+
   const [mainTab, setMainTab] = useState<"recruitment" | "team">("recruitment");
-  const [recruitmentTab, setRecruitmentTab] = useState<"new" | "analyzed" | "active" | "jobs" | "generator">("new");
+  const [recruitmentTab, setRecruitmentTab] = useState<"new" | "analyzed" | "active" | "jobs" | "interviews" | "generator">("new");
   const [teamTab, setTeamTab] = useState<"employees" | "performance" | "careers" | "disputes" | "departures">("employees");
   const [searchQuery, setSearchQuery] = useState('');
   const [convertCandidate, setConvertCandidate] = useState<any>(null);
 
-  const loading = hrLoading || employeesLoading;
+  const loading = hrLoading || employeesLoading || interviewsLoading;
+  const upcomingInterviews = getUpcomingInterviews();
 
   // Filter candidates
   const filteredCandidates = useMemo(() => {
@@ -83,6 +88,7 @@ export default function HR() {
     { key: "analyzed", label: "Analysés", icon: Clock, count: candidates.filter(c => c.status === 'analyzed').length },
     { key: "active", label: "Actifs", icon: CheckCircle, count: candidates.filter(c => c.status === 'active').length },
     { key: "jobs", label: "Postes", icon: Briefcase, count: stats.activeJobs },
+    { key: "interviews", label: "Entretiens", icon: Calendar, count: upcomingInterviews.length },
     { key: "generator", label: "Générateur", icon: Sparkles },
   ];
 
@@ -210,6 +216,7 @@ export default function HR() {
                               <div key={candidate.id} className="relative">
                                 <CandidateCard 
                                   candidate={candidate} jobs={jobs}
+                                  interviews={interviews}
                                   onValidateScore={validateScore} onActivate={activateCandidate}
                                   onLinkToJob={linkToJob} onUpdateDescription={updateDescription}
                                   onAddInterviewNotes={addInterviewNotes} onDelete={deleteCandidate}
@@ -232,13 +239,34 @@ export default function HR() {
                               <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                               <h3 className="text-lg font-medium mb-2">Aucun candidat</h3>
                               <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
-                                <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
-                              </AddCandidateDialog>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </div>
-                    )}
+                              <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
+                            </AddCandidateDialog>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  )}
+
+                  {recruitmentTab === "interviews" && (
+                    <div className="space-y-4">
+                      {upcomingInterviews.length > 0 ? (
+                        <div className="space-y-4">
+                          <h3 className="font-medium text-lg">Entretiens à venir</h3>
+                          {upcomingInterviews.map((interview) => (
+                            <InterviewCard key={interview.id} interview={interview} showCandidate />
+                          ))}
+                        </div>
+                      ) : (
+                        <Card className="border-dashed">
+                          <CardContent className="py-12 text-center">
+                            <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                            <h3 className="text-lg font-medium mb-2">Aucun entretien planifié</h3>
+                            <p className="text-sm text-muted-foreground">Planifiez des entretiens depuis les fiches candidats</p>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  )}
 
                     {recruitmentTab === "jobs" && (
                       <div className="space-y-4">
