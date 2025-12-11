@@ -97,6 +97,8 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
   }, [existingWorkflow]);
 
   const handleGenerate = async () => {
+    console.log('handleGenerate called, mode:', mode, 'objective:', objective, 'modificationRequest:', modificationRequest);
+    
     if (mode === 'create' && !objective.trim()) {
       toast.error('Please describe your workflow objective');
       return;
@@ -106,6 +108,9 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
       return;
     }
 
+    console.log('Validation passed, starting generation...');
+    toast.info('Starting workflow generation...');
+    
     setIsGenerating(true);
     setGeneratedPreview(null);
     setStreamingContent('');
