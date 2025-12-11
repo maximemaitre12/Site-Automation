@@ -34,7 +34,10 @@ serve(async (req) => {
       });
     }
 
-    const { action, rule_id, trigger_data } = await req.json();
+    const body = await req.json();
+    const { action, rule_id, trigger_data, name, description, trigger_type, trigger_conditions, action_type, action_config, is_active } = body;
+
+    console.log('AI Automation - Action:', action, 'Body:', JSON.stringify(body));
 
     if (action === 'execute_rules') {
       // Fetch active automation rules
@@ -45,6 +48,7 @@ serve(async (req) => {
         .eq('is_active', true);
 
       if (rulesError) {
+        console.error('Failed to fetch rules:', rulesError);
         return new Response(JSON.stringify({ error: 'Failed to fetch rules' }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -113,7 +117,7 @@ serve(async (req) => {
       });
 
     } else if (action === 'create_rule') {
-      const { name, description, trigger_type, trigger_conditions, action_type, action_config } = await req.json();
+      console.log('Creating rule:', { name, trigger_type, action_type });
 
       const { data: newRule, error: createError } = await supabaseClient
         .from('ai_automation_rules')
@@ -130,11 +134,14 @@ serve(async (req) => {
         .single();
 
       if (createError) {
-        return new Response(JSON.stringify({ error: 'Failed to create rule' }), {
+        console.error('Failed to create rule:', createError);
+        return new Response(JSON.stringify({ error: 'Failed to create rule', details: createError.message }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+
+      console.log('Rule created successfully:', newRule?.id);
 
       return new Response(JSON.stringify({ rule: newRule }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
