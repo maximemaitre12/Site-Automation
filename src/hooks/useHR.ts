@@ -95,6 +95,7 @@ export function useHR() {
     experience_years?: number;
     match_score?: number;
     ai_analysis?: any;
+    job_id?: string;
   }): Promise<Candidate | null> => {
     if (!user) return null;
 
@@ -111,6 +112,7 @@ export function useHR() {
           experience_years: data.experience_years || null,
           match_score: data.match_score || null,
           ai_analysis: data.ai_analysis || null,
+          job_id: data.job_id || null,
           status: 'new'
         })
         .select()
@@ -194,10 +196,11 @@ export function useHR() {
     }
   };
 
-  const linkToJob = async (candidateId: string, jobId: string): Promise<boolean> => {
+  const linkToJob = async (candidateId: string, jobId: string, recalculateScore: boolean = true): Promise<boolean> => {
     if (!user) return false;
 
     try {
+      // First, link the candidate to the job
       const { error } = await supabase
         .from('candidates')
         .update({ job_id: jobId })
@@ -205,6 +208,15 @@ export function useHR() {
         .eq('user_id', user.id);
 
       if (error) throw error;
+
+      // If recalculateScore is true, trigger AI matching
+      if (recalculateScore) {
+        const score = await matchCandidateToJob(candidateId, jobId);
+        if (score !== null) {
+          toast({ title: 'Succès', description: `Candidat relié au poste - Score: ${score}%` });
+          return true;
+        }
+      }
       
       invalidateHR();
       toast({ title: 'Succès', description: 'Candidat relié au poste' });

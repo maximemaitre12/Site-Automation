@@ -12,7 +12,7 @@ import {
   Star, Sparkles, Mail, Phone, Briefcase, 
   FileText, Trash2, UserCheck, MessageSquare, 
   Loader2, ChevronDown, ChevronUp, Eye, Check, 
-  Link, Edit, CheckCircle
+  Link, Edit, CheckCircle, Target
 } from 'lucide-react';
 import { Candidate, JobDescription } from '@/hooks/useHR';
 
@@ -74,6 +74,13 @@ export function CandidateCard({
     if (score >= 60) return 'text-primary';
     if (score >= 40) return 'text-warning';
     return 'text-destructive';
+  };
+
+  const getMatchBadge = (score: number) => {
+    if (score >= 80) return { label: 'Excellent', className: 'bg-success/20 text-success border-success/30' };
+    if (score >= 60) return { label: 'Bon', className: 'bg-primary/20 text-primary border-primary/30' };
+    if (score >= 40) return { label: 'À évaluer', className: 'bg-warning/20 text-warning border-warning/30' };
+    return { label: 'Peu adapté', className: 'bg-destructive/20 text-destructive border-destructive/30' };
   };
 
   const handleValidateScore = async (useCustom: boolean) => {
@@ -162,6 +169,12 @@ export function CandidateCard({
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Show match badge if job is linked and has job_match analysis */}
+                {linkedJob && analysis.job_match && candidate.match_score !== null && (
+                  <Badge className={`text-xs ${getMatchBadge(candidate.match_score).className}`}>
+                    {getMatchBadge(candidate.match_score).label}
+                  </Badge>
+                )}
                 {candidate.match_score !== null && candidate.match_score !== undefined && (
                   <div className={`flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 ${getScoreColor(candidate.match_score)}`}>
                     <Star className="w-3 h-3 fill-current" />
@@ -184,6 +197,26 @@ export function CandidateCard({
                   <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
                     +{skills.length - 6}
                   </span>
+                )}
+              </div>
+            )}
+
+            {/* Job Match Details (show if has job_match analysis) */}
+            {analysis.job_match && linkedJob && (
+              <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 mb-3 space-y-1">
+                <div className="flex items-center gap-2 text-xs font-medium text-primary">
+                  <Target className="w-3 h-3" />
+                  Adéquation: {linkedJob.title}
+                </div>
+                {analysis.job_match.match_reasons?.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-success">✓</span> {analysis.job_match.match_reasons.slice(0, 2).join(' • ')}
+                  </p>
+                )}
+                {analysis.job_match.gaps?.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-warning">!</span> {analysis.job_match.gaps.slice(0, 2).join(' • ')}
+                  </p>
                 )}
               </div>
             )}

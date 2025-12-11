@@ -171,7 +171,7 @@ export default function HR() {
             {/* Action button */}
             <div className="ml-auto">
               {mainTab === 'recruitment' && (
-                <AddCandidateDialog onAdd={createCandidate}>
+                <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
                   <Button variant="hero"><Upload className="w-4 h-4 mr-2" />Ajouter un CV</Button>
                 </AddCandidateDialog>
               )}
@@ -231,7 +231,7 @@ export default function HR() {
                             <CardContent className="py-12 text-center">
                               <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                               <h3 className="text-lg font-medium mb-2">Aucun candidat</h3>
-                              <AddCandidateDialog onAdd={createCandidate}>
+                              <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
                                 <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
                               </AddCandidateDialog>
                             </CardContent>
