@@ -56,28 +56,23 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    console.log('Request body:', JSON.stringify(body).substring(0, 500));
+    console.log('Request body received:', JSON.stringify(body).substring(0, 300));
     
-    const { objective, context, constraints, existingWorkflow, modificationRequest } = body;
+    const { objective, context, constraints, existingWorkflow, modificationRequest, stream } = body;
 
     // Mode: modification d'un workflow existant
     const isModification = existingWorkflow && modificationRequest;
 
     if (!isModification && !objective) {
+      console.error('Missing objective');
       return new Response(
         JSON.stringify({ error: 'objective is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (isModification && !modificationRequest) {
-      return new Response(
-        JSON.stringify({ error: 'modificationRequest is required for modifications' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
       return new Response(
         JSON.stringify({ error: 'AI service not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -88,7 +83,6 @@ serve(async (req) => {
     let userPrompt: string;
 
     if (isModification) {
-      // Mode modification
       systemPrompt = `You are "AETHER Flow Designer", an expert AI that modifies automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
@@ -113,7 +107,6 @@ MODIFICATION REQUEST: ${modificationRequest}
 Apply the modification and output the COMPLETE modified workflow as JSON. Preserve what should stay, modify what needs to change.`;
 
     } else {
-      // Mode création
       systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
@@ -140,8 +133,56 @@ ${constraints ? `Constraints: ${constraints}` : ''}
 Output ONLY the JSON workflow object with blocks AND connections. No explanations.`;
     }
 
-    console.log(isModification ? 'Modifying workflow:' : 'Generating workflow for:', isModification ? modificationRequest : objective);
+    console.log('Calling AI Gateway for:', isModification ? 'modification' : 'generation');
 
+    // Streaming mode for real-time block display
+    if (stream) {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          stream: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('AI Gateway streaming error:', response.status, error);
+        
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        if (response.status === 402) {
+          return new Response(
+            JSON.stringify({ error: 'Payment required. Please add credits to continue.' }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        return new Response(
+          JSON.stringify({ error: 'Failed to generate workflow' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Return the stream directly
+      return new Response(response.body, {
+        headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+      });
+    }
+
+    // Non-streaming mode (original behavior)
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -184,7 +225,7 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
     const aiResponse = await response.json();
     const content = aiResponse.choices?.[0]?.message?.content || '';
 
-    console.log('AI Response:', content.substring(0, 500));
+    console.log('AI Response received, length:', content.length);
 
     // Parse the JSON from the response
     let workflow;
@@ -195,10 +236,9 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
       workflow = JSON.parse(jsonStr);
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
-      console.error('Content was:', content);
+      console.error('Content was:', content.substring(0, 500));
       
       if (isModification) {
-        // En cas d'erreur de parsing en mode modification, retourner le workflow original
         return new Response(
           JSON.stringify({ error: 'Failed to parse AI response. Please try rephrasing your request.' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -246,7 +286,7 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
       workflow.connections = [];
     }
 
-    // Ensure positions are set correctly and spread out for canvas view
+    // Ensure positions are set correctly
     workflow.blocks = workflow.blocks.map((block: any, index: number) => ({
       ...block,
       id: block.id || `block-${index + 1}`,

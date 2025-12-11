@@ -84,6 +84,8 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
   const [generatedName, setGeneratedName] = useState('');
   const [step, setStep] = useState<'input' | 'preview' | 'success'>('input');
   const [mode, setMode] = useState<'create' | 'modify'>('create');
+  const [streamingContent, setStreamingContent] = useState('');
+  const [streamingBlocks, setStreamingBlocks] = useState<WorkflowBlock[]>([]);
 
   // Set mode based on whether we have an existing workflow
   useEffect(() => {
@@ -106,45 +108,98 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
 
     setIsGenerating(true);
     setGeneratedPreview(null);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    setStreamingContent('');
+    setStreamingBlocks([]);
+    setStep('preview'); // Show preview immediately to see streaming
 
     try {
-      const body = mode === 'modify' && existingWorkflow
+      const requestBody = mode === 'modify' && existingWorkflow
         ? {
             existingWorkflow: {
               blocks: existingWorkflow.blocks,
               connections: existingWorkflow.connections
             },
-            modificationRequest
+            modificationRequest,
+            stream: true
           }
         : {
             objective,
             context,
-            constraints: 'Keep the workflow focused and efficient. Use appropriate AI blocks for intelligent processing. Create connections between blocks.'
+            constraints: 'Keep the workflow focused and efficient. Use appropriate AI blocks for intelligent processing. Create connections between blocks.',
+            stream: true
           };
 
-      console.log('Calling workflow-generate with:', body);
+      console.log('Calling workflow-generate with streaming:', requestBody);
       
-      const { data, error } = await supabase.functions.invoke('workflow-generate', { body });
+      const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/workflow-generate`;
+      
+      const resp = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-      clearTimeout(timeoutId);
-
-      console.log('Response:', { data, error });
-
-      if (error) {
-        console.error('Generation error:', error);
-        toast.error(error.message || 'Failed to generate workflow');
-        setIsGenerating(false);
-        return;
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${resp.status}`);
       }
 
-      if (data?.workflow?.blocks && Array.isArray(data.workflow.blocks)) {
+      if (!resp.body) {
+        throw new Error('No response body');
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = '';
+      let fullContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        textBuffer += decoder.decode(value, { stream: true });
+
+        // Process line-by-line as data arrives
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              fullContent += content;
+              setStreamingContent(fullContent);
+              
+              // Try to parse partial JSON to show blocks progressively
+              tryParsePartialWorkflow(fullContent);
+            }
+          } catch {
+            // Incomplete JSON, continue
+          }
+        }
+      }
+
+      // Final parse of complete content
+      const workflow = parseWorkflowFromContent(fullContent);
+      
+      if (workflow && workflow.blocks.length > 0) {
         setGeneratedPreview({
-          blocks: data.workflow.blocks,
-          connections: data.workflow.connections || []
+          blocks: workflow.blocks,
+          connections: workflow.connections || []
         });
+        setStreamingBlocks([]);
         
         if (mode === 'create') {
           const name = objective.length > 50 
@@ -155,25 +210,90 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
           setGeneratedName(existingWorkflow?.name || 'Modified Workflow');
         }
         
-        setStep('preview');
-        toast.success(`${mode === 'modify' ? 'Modified' : 'Generated'} workflow with ${data.workflow.blocks.length} blocks`);
-      } else if (data?.error) {
-        console.error('API returned error:', data.error);
-        toast.error(data.error);
+        toast.success(`${mode === 'modify' ? 'Modified' : 'Generated'} workflow with ${workflow.blocks.length} blocks`);
       } else {
-        console.error('Invalid response structure:', data);
         toast.error('Invalid workflow generated - please try again');
+        setStep('input');
       }
     } catch (err: any) {
       console.error('Generation error:', err);
-      if (err.name === 'AbortError') {
-        toast.error('Generation timeout - please try a simpler request');
-      } else {
-        toast.error(err.message || 'Failed to generate workflow');
-      }
+      toast.error(err.message || 'Failed to generate workflow');
+      setStep('input');
     } finally {
-      clearTimeout(timeoutId);
       setIsGenerating(false);
+    }
+  };
+
+  const tryParsePartialWorkflow = (content: string) => {
+    try {
+      // Try to find and parse the blocks array progressively
+      const blocksMatch = content.match(/"blocks"\s*:\s*\[([\s\S]*)/);
+      if (!blocksMatch) return;
+      
+      const blocksContent = blocksMatch[1];
+      // Find complete block objects
+      const blockMatches = blocksContent.matchAll(/\{[^{}]*"id"\s*:\s*"[^"]+"\s*,[^{}]*"type"\s*:\s*"[^"]+"\s*,[^{}]*"name"\s*:\s*"[^"]+"\s*[^{}]*\}/g);
+      
+      const blocks: WorkflowBlock[] = [];
+      for (const match of blockMatches) {
+        try {
+          const block = JSON.parse(match[0]);
+          if (block.id && block.type && block.name) {
+            blocks.push({
+              id: block.id,
+              type: block.type as BlockType,
+              name: block.name,
+              config: block.config || {},
+              position: block.position || { x: 100, y: blocks.length * 140 }
+            });
+          }
+        } catch {
+          // Skip incomplete blocks
+        }
+      }
+      
+      if (blocks.length > streamingBlocks.length) {
+        setStreamingBlocks(blocks);
+      }
+    } catch {
+      // Ignore parsing errors during streaming
+    }
+  };
+
+  const parseWorkflowFromContent = (content: string) => {
+    try {
+      // Try to extract JSON from markdown code blocks if present
+      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || content.match(/(\{[\s\S]*\})/);
+      const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+      const workflow = JSON.parse(jsonStr);
+      
+      if (!workflow.blocks || !Array.isArray(workflow.blocks)) {
+        workflow.blocks = [];
+      }
+      if (!workflow.connections || !Array.isArray(workflow.connections)) {
+        workflow.connections = [];
+      }
+      
+      // Ensure positions are set
+      workflow.blocks = workflow.blocks.map((block: any, index: number) => ({
+        ...block,
+        id: block.id || `block-${index + 1}`,
+        position: block.position || { x: 100, y: 50 + index * 150 }
+      }));
+      
+      // Create linear connections if none exist
+      if (workflow.connections.length === 0 && workflow.blocks.length > 1) {
+        workflow.connections = workflow.blocks.slice(0, -1).map((block: any, index: number) => ({
+          id: `conn-${index + 1}`,
+          sourceBlockId: block.id,
+          targetBlockId: workflow.blocks[index + 1].id
+        }));
+      }
+      
+      return workflow;
+    } catch (e) {
+      console.error('Failed to parse workflow:', e);
+      return null;
     }
   };
 
@@ -373,10 +493,25 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
             </div>
           )}
 
-          {step === 'preview' && generatedPreview && (
+          {step === 'preview' && (
             <div className="space-y-6">
+              {/* Streaming indicator */}
+              {isGenerating && (
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/10 border border-primary/30">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Génération en cours...</p>
+                    <p className="text-xs text-muted-foreground">
+                      {streamingBlocks.length > 0 
+                        ? `${streamingBlocks.length} bloc${streamingBlocks.length > 1 ? 's' : ''} détecté${streamingBlocks.length > 1 ? 's' : ''}`
+                        : 'Analyse de votre demande...'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Workflow name */}
-              {mode === 'create' && (
+              {mode === 'create' && !isGenerating && generatedPreview && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Workflow Name</label>
                   <Input
@@ -387,67 +522,120 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
                 </div>
               )}
 
-              {/* Generated blocks preview */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
+              {/* Streaming blocks preview */}
+              {isGenerating && streamingBlocks.length > 0 && (
+                <div className="space-y-3">
                   <h4 className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-success" />
-                    {mode === 'modify' ? 'Workflow modifié' : 'Generated Workflow'} ({generatedPreview.blocks.length} blocs, {generatedPreview.connections.length} connexions)
+                    <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                    Blocs en cours de génération...
                   </h4>
-                </div>
-
-                <div className="space-y-3 max-h-96 overflow-y-auto p-4 bg-muted/30 rounded-xl">
-                  {generatedPreview.blocks.map((block, index) => {
-                    const def = BLOCK_DEFINITIONS[block.type as BlockType];
-                    const outgoingConnections = generatedPreview.connections.filter(c => c.sourceBlockId === block.id);
-                    
-                    return (
-                      <div key={block.id} className="flex items-start gap-4">
-                        {/* Step number and connector */}
-                        <div className="flex flex-col items-center">
-                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${def?.color || 'from-gray-500 to-gray-400'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
-                            {index + 1}
-                          </div>
-                          {outgoingConnections.length > 0 && (
-                            <div className="w-0.5 h-6 bg-border mt-1" />
-                          )}
-                        </div>
-
-                        {/* Block info */}
-                        <div className="flex-1 pb-3">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-foreground">{block.name}</span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                              def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
-                              def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
-                              def?.category === 'transform' ? 'bg-emerald-500/20 text-emerald-400' :
-                              def?.category === 'control' ? 'bg-amber-500/20 text-amber-400' :
-                              'bg-slate-500/20 text-slate-400'
-                            }`}>
-                              {def?.category}
-                            </span>
-                            {outgoingConnections.length > 1 && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
-                                {outgoingConnections.length} branches
-                              </span>
+                  <div className="space-y-3 max-h-96 overflow-y-auto p-4 bg-muted/30 rounded-xl">
+                    {streamingBlocks.map((block, index) => {
+                      const def = BLOCK_DEFINITIONS[block.type as BlockType];
+                      return (
+                        <div 
+                          key={block.id} 
+                          className="flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <div className="flex flex-col items-center">
+                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${def?.color || 'from-gray-500 to-gray-400'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+                              {index + 1}
+                            </div>
+                            {index < streamingBlocks.length - 1 && (
+                              <div className="w-0.5 h-6 bg-border mt-1" />
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground">{def?.description}</p>
-                          {Object.keys(block.config || {}).length > 0 && (
-                            <div className="mt-2 p-2 rounded-lg bg-muted/50 text-xs font-mono max-h-20 overflow-hidden">
-                              {Object.entries(block.config).slice(0, 2).map(([key, value]) => (
-                                <div key={key} className="truncate text-muted-foreground">
-                                  <span className="text-foreground/70">{key}:</span> {String(value).slice(0, 60)}
-                                </div>
-                              ))}
+                          <div className="flex-1 pb-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-foreground">{block.name}</span>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                                def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
+                                def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
+                                def?.category === 'integration' ? 'bg-emerald-500/20 text-emerald-400' :
+                                'bg-muted text-muted-foreground'
+                              }`}>
+                                {block.type}
+                              </span>
                             </div>
-                          )}
+                          </div>
                         </div>
+                      );
+                    })}
+                    {/* Loading indicator for next block */}
+                    <div className="flex items-center gap-4 opacity-50">
+                      <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                       </div>
-                    );
-                  })}
+                      <span className="text-sm text-muted-foreground">Génération du bloc suivant...</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Generated blocks preview (final) */}
+              {!isGenerating && generatedPreview && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-success" />
+                      {mode === 'modify' ? 'Workflow modifié' : 'Generated Workflow'} ({generatedPreview.blocks.length} blocs, {generatedPreview.connections.length} connexions)
+                    </h4>
+                  </div>
+
+                  <div className="space-y-3 max-h-96 overflow-y-auto p-4 bg-muted/30 rounded-xl">
+                    {generatedPreview.blocks.map((block, index) => {
+                      const def = BLOCK_DEFINITIONS[block.type as BlockType];
+                      const outgoingConnections = generatedPreview.connections.filter(c => c.sourceBlockId === block.id);
+                      
+                      return (
+                        <div key={block.id} className="flex items-start gap-4">
+                          {/* Step number and connector */}
+                          <div className="flex flex-col items-center">
+                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${def?.color || 'from-gray-500 to-gray-400'} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+                              {index + 1}
+                            </div>
+                            {outgoingConnections.length > 0 && (
+                              <div className="w-0.5 h-6 bg-border mt-1" />
+                            )}
+                          </div>
+
+                          {/* Block info */}
+                          <div className="flex-1 pb-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-foreground">{block.name}</span>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                                def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
+                                def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
+                                def?.category === 'transform' ? 'bg-emerald-500/20 text-emerald-400' :
+                                def?.category === 'control' ? 'bg-amber-500/20 text-amber-400' :
+                                'bg-slate-500/20 text-slate-400'
+                              }`}>
+                                {def?.category}
+                              </span>
+                              {outgoingConnections.length > 1 && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                                  {outgoingConnections.length} branches
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{def?.description}</p>
+                            {Object.keys(block.config || {}).length > 0 && (
+                              <div className="mt-2 p-2 rounded-lg bg-muted/50 text-xs font-mono max-h-20 overflow-hidden">
+                                {Object.entries(block.config).slice(0, 2).map(([key, value]) => (
+                                  <div key={key} className="truncate text-muted-foreground">
+                                    <span className="text-foreground/70">{key}:</span> {String(value).slice(0, 60)}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* AI tips */}
               <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
