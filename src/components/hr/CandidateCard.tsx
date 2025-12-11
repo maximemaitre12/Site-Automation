@@ -12,13 +12,17 @@ import {
   Star, Sparkles, Mail, Phone, Briefcase, 
   FileText, Trash2, UserCheck, MessageSquare, 
   Loader2, ChevronDown, ChevronUp, Eye, Check, 
-  Link, Edit, CheckCircle, Target
+  Link, Edit, CheckCircle, Target, Calendar
 } from 'lucide-react';
 import { Candidate, JobDescription } from '@/hooks/useHR';
+import { ScheduleInterviewDialog } from './ScheduleInterviewDialog';
+import { InterviewCard } from './InterviewCard';
+import { Interview } from '@/hooks/useInterviews';
 
 interface CandidateCardProps {
   candidate: Candidate;
   jobs: JobDescription[];
+  interviews?: Interview[];
   onValidateScore: (id: string, score: number) => Promise<boolean>;
   onActivate: (id: string) => Promise<boolean>;
   onLinkToJob: (candidateId: string, jobId: string) => Promise<boolean>;
@@ -30,6 +34,7 @@ interface CandidateCardProps {
 export function CandidateCard({ 
   candidate, 
   jobs, 
+  interviews = [],
   onValidateScore,
   onActivate,
   onLinkToJob,
@@ -53,6 +58,13 @@ export function CandidateCard({
   const [isSavingDesc, setIsSavingDesc] = useState(false);
   const [isSavingNotes, setIsSavingNotes] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showInterviewDialog, setShowInterviewDialog] = useState(false);
+
+  // Get interviews for this candidate
+  const candidateInterviews = interviews.filter(i => i.candidate_id === candidate.id);
+  const upcomingInterview = candidateInterviews.find(i => 
+    new Date(i.scheduled_at) > new Date() && i.status !== 'cancelled'
+  );
 
   const getStatusBadge = (status: string | null) => {
     switch (status) {
@@ -221,6 +233,19 @@ export function CandidateCard({
               </div>
             )}
 
+            {/* Upcoming Interview Banner */}
+            {upcomingInterview && (
+              <div className="p-3 rounded-lg bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800 mb-3">
+                <div className="flex items-center gap-2 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                  <Calendar className="w-3 h-3" />
+                  Entretien prévu le {new Date(upcomingInterview.scheduled_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à {new Date(upcomingInterview.scheduled_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                </div>
+                {upcomingInterview.ai_suggested_questions && Object.values(upcomingInterview.ai_suggested_questions).some(arr => arr && arr.length > 0) && (
+                  <p className="text-xs text-muted-foreground mt-1">✨ Questions IA disponibles</p>
+                )}
+              </div>
+            )}
+
             {/* User Description (for analyzed/active candidates) */}
             {analysis.user_description && (
               <p className="text-sm text-muted-foreground mb-3 italic">
@@ -356,6 +381,17 @@ export function CandidateCard({
                       </div>
                     </DialogContent>
                   </Dialog>
+
+                  {/* Schedule Interview Button */}
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowInterviewDialog(true)}
+                    className="bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-800"
+                  >
+                    <Calendar className="w-3 h-3 mr-1" />
+                    Planifier entretien
+                  </Button>
 
                   {/* Interview Notes */}
                   <Dialog open={showNotesDialog} onOpenChange={setShowNotesDialog}>
@@ -548,9 +584,37 @@ export function CandidateCard({
                 {candidate.cv_text}
               </div>
             )}
+
+            {/* Scheduled Interviews Section */}
+            {candidateInterviews.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Entretiens planifiés ({candidateInterviews.length})
+                </h4>
+                <div className="space-y-2">
+                  {candidateInterviews.slice(0, 2).map((interview) => (
+                    <InterviewCard key={interview.id} interview={interview} />
+                  ))}
+                  {candidateInterviews.length > 2 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      +{candidateInterviews.length - 2} autres entretiens
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
+
+      {/* Schedule Interview Dialog */}
+      <ScheduleInterviewDialog
+        open={showInterviewDialog}
+        onOpenChange={setShowInterviewDialog}
+        candidate={candidate}
+        job={linkedJob}
+      />
     </Card>
   );
 }
