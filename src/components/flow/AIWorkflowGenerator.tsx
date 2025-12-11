@@ -131,16 +131,30 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
 
       console.log('Calling workflow-generate with streaming:', requestBody);
       
+      // Get the session token for authenticated requests
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Please log in to generate workflows');
+        setStep('input');
+        setIsGenerating(false);
+        return;
+      }
+      
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/workflow-generate`;
+      
+      console.log('Fetching:', CHAT_URL);
       
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify(requestBody),
       });
+      
+      console.log('Response status:', resp.status);
 
       if (!resp.ok) {
         const errorData = await resp.json().catch(() => ({}));
