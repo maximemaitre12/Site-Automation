@@ -1760,6 +1760,145 @@ export type Database = {
           },
         ]
       }
+      employee_career_events: {
+        Row: {
+          bonus_amount: number | null
+          bonus_reason: string | null
+          created_at: string | null
+          description: string | null
+          employee_id: string
+          event_date: string
+          event_type: string
+          id: string
+          new_salary: number | null
+          new_title: string | null
+          old_salary: number | null
+          old_title: string | null
+          salary_change_percent: number | null
+          user_id: string
+          warning_severity: string | null
+          warning_type: string | null
+        }
+        Insert: {
+          bonus_amount?: number | null
+          bonus_reason?: string | null
+          created_at?: string | null
+          description?: string | null
+          employee_id: string
+          event_date: string
+          event_type: string
+          id?: string
+          new_salary?: number | null
+          new_title?: string | null
+          old_salary?: number | null
+          old_title?: string | null
+          salary_change_percent?: number | null
+          user_id: string
+          warning_severity?: string | null
+          warning_type?: string | null
+        }
+        Update: {
+          bonus_amount?: number | null
+          bonus_reason?: string | null
+          created_at?: string | null
+          description?: string | null
+          employee_id?: string
+          event_date?: string
+          event_type?: string
+          id?: string
+          new_salary?: number | null
+          new_title?: string | null
+          old_salary?: number | null
+          old_title?: string | null
+          salary_change_percent?: number | null
+          user_id?: string
+          warning_severity?: string | null
+          warning_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_career_events_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          avatar_url: string | null
+          candidate_id: string | null
+          contract_type: string | null
+          created_at: string | null
+          department: string | null
+          email: string | null
+          hire_date: string | null
+          id: string
+          is_active: boolean | null
+          job_title: string
+          left_date: string | null
+          left_details: string | null
+          left_reason: string | null
+          name: string
+          performance_metrics: Json | null
+          phone: string | null
+          salary_current: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          candidate_id?: string | null
+          contract_type?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          job_title: string
+          left_date?: string | null
+          left_details?: string | null
+          left_reason?: string | null
+          name: string
+          performance_metrics?: Json | null
+          phone?: string | null
+          salary_current?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          candidate_id?: string | null
+          contract_type?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          job_title?: string
+          left_date?: string | null
+          left_details?: string | null
+          left_reason?: string | null
+          name?: string
+          performance_metrics?: Json | null
+          phone?: string | null
+          salary_current?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enriched_companies: {
         Row: {
           address: string | null
@@ -1941,6 +2080,71 @@ export type Database = {
             columns: ["result_company_id"]
             isOneToOne: false
             referencedRelation: "enriched_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_disputes: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          dispute_type: string
+          documents: Json | null
+          employee_id: string
+          id: string
+          involved_parties: Json | null
+          resolution: string | null
+          resolution_date: string | null
+          resolved_by: string | null
+          severity: string | null
+          status: string | null
+          timeline: Json | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          dispute_type: string
+          documents?: Json | null
+          employee_id: string
+          id?: string
+          involved_parties?: Json | null
+          resolution?: string | null
+          resolution_date?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          status?: string | null
+          timeline?: Json | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          dispute_type?: string
+          documents?: Json | null
+          employee_id?: string
+          id?: string
+          involved_parties?: Json | null
+          resolution?: string | null
+          resolution_date?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          status?: string | null
+          timeline?: Json | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_disputes_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
         ]
@@ -2223,6 +2427,7 @@ export type Database = {
           last_activity_at: string | null
           lost_reason: string | null
           probability: number | null
+          salesperson_id: string | null
           source: string | null
           status: Database["public"]["Enums"]["sales_status"]
           tags: Json | null
@@ -2249,6 +2454,7 @@ export type Database = {
           last_activity_at?: string | null
           lost_reason?: string | null
           probability?: number | null
+          salesperson_id?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["sales_status"]
           tags?: Json | null
@@ -2275,6 +2481,7 @@ export type Database = {
           last_activity_at?: string | null
           lost_reason?: string | null
           probability?: number | null
+          salesperson_id?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["sales_status"]
           tags?: Json | null
@@ -2283,7 +2490,15 @@ export type Database = {
           user_id?: string
           value?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sales_deals_salesperson_id_fkey"
+            columns: ["salesperson_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales_forecasts: {
         Row: {

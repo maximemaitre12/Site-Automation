@@ -1,79 +1,97 @@
 import { useState, useMemo } from 'react';
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Users, Upload, Sparkles, UserCheck, Briefcase,
-  Plus, Search, Loader2, UserPlus, CheckCircle, Clock
+  Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
+  UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
+  AlertTriangle, DoorOpen
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
+import { useEmployees } from "@/hooks/useEmployees";
 import { CandidateCard } from "@/components/hr/CandidateCard";
 import { JobCard } from "@/components/hr/JobCard";
 import { AddCandidateDialog } from "@/components/hr/AddCandidateDialog";
 import { JobPostGenerator } from "@/components/hr/JobPostGenerator";
+import { EmployeeCard } from "@/components/hr/EmployeeCard";
+import { AddEmployeeDialog } from "@/components/hr/AddEmployeeDialog";
+import { DisputeCard } from "@/components/hr/DisputeCard";
+import { ConvertCandidateDialog } from "@/components/hr/ConvertCandidateDialog";
 import { Input } from "@/components/ui/input";
 
 export default function HR() {
   const { 
-    candidates, 
-    jobs, 
-    loading,
-    createCandidate,
-    validateScore,
-    activateCandidate,
-    linkToJob,
-    updateDescription,
-    addInterviewNotes,
-    createJob,
-    generateJobPost,
-    deleteCandidate,
-    deleteJob
+    candidates, jobs, loading: hrLoading,
+    createCandidate, validateScore, activateCandidate, linkToJob,
+    updateDescription, addInterviewNotes, createJob, generateJobPost,
+    deleteCandidate, deleteJob
   } = useHR();
 
-  const [activeTab, setActiveTab] = useState<"new" | "analyzed" | "active" | "jobs" | "generator">("new");
-  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    employees, activeEmployees, inactiveEmployees, disputes, openDisputes,
+    careerEvents, loading: employeesLoading,
+    createEmployee, updateEmployee, deleteEmployee, terminateEmployee,
+    addCareerEvent, createDispute, updateDispute, resolveDispute,
+    convertCandidateToEmployee
+  } = useEmployees();
 
-  // Filter and sort candidates by status - ALWAYS sorted by score (best first)
+  const [mainTab, setMainTab] = useState<"recruitment" | "team">("recruitment");
+  const [recruitmentTab, setRecruitmentTab] = useState<"new" | "analyzed" | "active" | "jobs" | "generator">("new");
+  const [teamTab, setTeamTab] = useState<"employees" | "performance" | "careers" | "disputes" | "departures">("employees");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [convertCandidate, setConvertCandidate] = useState<any>(null);
+
+  const loading = hrLoading || employeesLoading;
+
+  // Filter candidates
   const filteredCandidates = useMemo(() => {
     let filtered = candidates.filter(c => {
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.email?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Filter by active tab status
-      if (activeTab === 'new') return matchesSearch && c.status === 'new';
-      if (activeTab === 'analyzed') return matchesSearch && c.status === 'analyzed';
-      if (activeTab === 'active') return matchesSearch && c.status === 'active';
+      if (recruitmentTab === 'new') return matchesSearch && c.status === 'new';
+      if (recruitmentTab === 'analyzed') return matchesSearch && c.status === 'analyzed';
+      if (recruitmentTab === 'active') return matchesSearch && c.status === 'active';
       return matchesSearch;
     });
-
-    // ALWAYS sort by score (best first), then by date
-    filtered.sort((a, b) => {
-      const scoreA = a.match_score || 0;
-      const scoreB = b.match_score || 0;
-      if (scoreB !== scoreA) return scoreB - scoreA;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-
+    filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
     return filtered;
-  }, [candidates, searchQuery, activeTab]);
+  }, [candidates, searchQuery, recruitmentTab]);
+
+  // Filter employees
+  const filteredEmployees = useMemo(() => {
+    return activeEmployees.filter(e => 
+      e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.job_title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [activeEmployees, searchQuery]);
 
   // Stats
   const stats = {
-    total: candidates.length,
-    new: candidates.filter(c => c.status === 'new').length,
-    analyzed: candidates.filter(c => c.status === 'analyzed').length,
-    active: candidates.filter(c => c.status === 'active').length,
-    activeJobs: jobs.filter(j => j.is_active).length
+    candidates: candidates.length,
+    newCandidates: candidates.filter(c => c.status === 'new').length,
+    activeJobs: jobs.filter(j => j.is_active).length,
+    employees: activeEmployees.length,
+    openDisputes: openDisputes.length,
+    departures: inactiveEmployees.length,
   };
 
-  const tabs = [
-    { key: "new", label: "Nouveaux", icon: UserPlus, count: stats.new },
-    { key: "analyzed", label: "Analysés", icon: Clock, count: stats.analyzed },
-    { key: "active", label: "Actifs", icon: CheckCircle, count: stats.active },
+  const recruitmentTabs = [
+    { key: "new", label: "Nouveaux", icon: UserPlus, count: stats.newCandidates },
+    { key: "analyzed", label: "Analysés", icon: Clock, count: candidates.filter(c => c.status === 'analyzed').length },
+    { key: "active", label: "Actifs", icon: CheckCircle, count: candidates.filter(c => c.status === 'active').length },
     { key: "jobs", label: "Postes", icon: Briefcase, count: stats.activeJobs },
     { key: "generator", label: "Générateur", icon: Sparkles },
+  ];
+
+  const teamTabs = [
+    { key: "employees", label: "Collaborateurs", icon: UsersRound, count: stats.employees },
+    { key: "performance", label: "Performance", icon: TrendingUp },
+    { key: "careers", label: "Carrières", icon: Sparkles, count: careerEvents.length },
+    { key: "disputes", label: "Litiges", icon: AlertTriangle, count: stats.openDisputes },
+    { key: "departures", label: "Départs", icon: DoorOpen, count: stats.departures },
   ];
 
   return (
@@ -89,58 +107,80 @@ export default function HR() {
                 </div>
                 HR Copilot
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Workflow : Nouveau → Analysé (score validé) → Actif (entretiens passés)
-              </p>
+              <p className="text-muted-foreground mt-1">Recrutement et gestion d'équipe</p>
             </div>
-            <AddCandidateDialog onAdd={createCandidate}>
-              <Button variant="hero">
-                <Upload className="w-4 h-4 mr-2" />
-                Ajouter un CV
-              </Button>
-            </AddCandidateDialog>
+            
+            {/* Main tab toggle */}
+            <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
+              <TabsList className="grid grid-cols-2 w-80">
+                <TabsTrigger value="recruitment" className="gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Recrutement
+                </TabsTrigger>
+                <TabsTrigger value="team" className="gap-2">
+                  <UsersRound className="w-4 h-4" />
+                  Équipe
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-5 gap-4 mt-6">
+          {/* Stats row */}
+          <div className="grid grid-cols-6 gap-3 mt-6">
             <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-foreground">{stats.total}</div>
-              <div className="text-xs text-muted-foreground">Total candidats</div>
+              <div className="text-2xl font-bold text-foreground">{stats.candidates}</div>
+              <div className="text-xs text-muted-foreground">Candidats</div>
             </div>
             <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-primary">{stats.new}</div>
-              <div className="text-xs text-muted-foreground">Nouveaux</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-warning">{stats.analyzed}</div>
-              <div className="text-xs text-muted-foreground">Analysés</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-success">{stats.active}</div>
-              <div className="text-xs text-muted-foreground">Actifs</div>
+              <div className="text-2xl font-bold text-primary">{stats.newCandidates}</div>
+              <div className="text-xs text-muted-foreground">À traiter</div>
             </div>
             <div className="p-3 rounded-lg bg-card border border-border">
               <div className="text-2xl font-bold text-indigo-500">{stats.activeJobs}</div>
-              <div className="text-xs text-muted-foreground">Postes actifs</div>
+              <div className="text-xs text-muted-foreground">Postes ouverts</div>
+            </div>
+            <div className="p-3 rounded-lg bg-card border border-border">
+              <div className="text-2xl font-bold text-success">{stats.employees}</div>
+              <div className="text-xs text-muted-foreground">Employés actifs</div>
+            </div>
+            <div className="p-3 rounded-lg bg-card border border-border">
+              <div className="text-2xl font-bold text-warning">{stats.openDisputes}</div>
+              <div className="text-xs text-muted-foreground">Litiges ouverts</div>
+            </div>
+            <div className="p-3 rounded-lg bg-card border border-border">
+              <div className="text-2xl font-bold text-muted-foreground">{stats.departures}</div>
+              <div className="text-xs text-muted-foreground">Départs</div>
             </div>
           </div>
 
-          {/* Tabs */}
+          {/* Sub-tabs */}
           <div className="flex gap-2 mt-6 overflow-x-auto">
-            {tabs.map((tab) => (
+            {(mainTab === 'recruitment' ? recruitmentTabs : teamTabs).map((tab) => (
               <Button
                 key={tab.key}
-                variant={activeTab === tab.key ? "default" : "ghost"}
-                onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                variant={(mainTab === 'recruitment' ? recruitmentTab : teamTab) === tab.key ? "default" : "ghost"}
+                onClick={() => mainTab === 'recruitment' ? setRecruitmentTab(tab.key as any) : setTeamTab(tab.key as any)}
                 className="gap-2 whitespace-nowrap"
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
-                {tab.count !== undefined && (
-                  <Badge variant="secondary" className="ml-1">{tab.count}</Badge>
-                )}
+                {tab.count !== undefined && <Badge variant="secondary" className="ml-1">{tab.count}</Badge>}
               </Button>
             ))}
+            
+            {/* Action button */}
+            <div className="ml-auto">
+              {mainTab === 'recruitment' && (
+                <AddCandidateDialog onAdd={createCandidate}>
+                  <Button variant="hero"><Upload className="w-4 h-4 mr-2" />Ajouter un CV</Button>
+                </AddCandidateDialog>
+              )}
+              {mainTab === 'team' && teamTab === 'employees' && (
+                <AddEmployeeDialog onAdd={createEmployee}>
+                  <Button variant="hero"><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
+                </AddEmployeeDialog>
+              )}
+            </div>
           </div>
         </header>
 
@@ -153,119 +193,171 @@ export default function HR() {
           ) : (
             <ScrollArea className="h-full">
               <div className="p-8">
-                {/* Candidates Tabs (new, analyzed, active) */}
-                {(activeTab === "new" || activeTab === "analyzed" || activeTab === "active") && (
-                  <div className="space-y-6">
-                    {/* Search */}
-                    <div className="flex items-center gap-4">
-                      <div className="relative flex-1 max-w-md">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                        <Input 
-                          placeholder="Rechercher un candidat..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Triés par score (meilleur → moins bon)
-                      </p>
-                    </div>
-
-                    {/* Candidates List */}
-                    {filteredCandidates.length > 0 ? (
-                      <div className="space-y-4">
-                        {filteredCandidates.map((candidate) => (
-                          <CandidateCard 
-                            key={candidate.id}
-                            candidate={candidate}
-                            jobs={jobs}
-                            onValidateScore={validateScore}
-                            onActivate={activateCandidate}
-                            onLinkToJob={linkToJob}
-                            onUpdateDescription={updateDescription}
-                            onAddInterviewNotes={addInterviewNotes}
-                            onDelete={deleteCandidate}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <Card className="border-dashed">
-                        <CardContent className="py-12 text-center">
-                          <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                          <h3 className="text-lg font-medium text-foreground mb-2">
-                            {candidates.length === 0 ? 'Aucun candidat' : `Aucun candidat ${activeTab === 'new' ? 'nouveau' : activeTab === 'analyzed' ? 'analysé' : 'actif'}`}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            {activeTab === 'new' && 'Ajoutez un CV pour commencer'}
-                            {activeTab === 'analyzed' && 'Validez le score des nouveaux candidats'}
-                            {activeTab === 'active' && 'Validez les candidats après leurs entretiens'}
-                          </p>
-                          {activeTab === 'new' && (
-                            <AddCandidateDialog onAdd={createCandidate}>
-                              <Button>
-                                <Plus className="w-4 h-4 mr-2" />
-                                Ajouter un CV
-                              </Button>
-                            </AddCandidateDialog>
-                          )}
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                )}
-
-                {/* Jobs Tab */}
-                {activeTab === "jobs" && (
-                  <div className="space-y-4">
-                    {jobs.length > 0 ? (
-                      <>
-                        <p className="text-sm text-muted-foreground">
-                          Cliquez sur un poste pour voir les détails complets
-                        </p>
-                        <div className="space-y-4">
-                          {jobs.map((job) => (
-                            <JobCard 
-                              key={job.id}
-                              job={job}
-                              candidatesCount={candidates.filter(c => c.job_id === job.id).length}
-                              onDelete={deleteJob}
-                            />
-                          ))}
+                {/* RECRUITMENT MODULE */}
+                {mainTab === 'recruitment' && (
+                  <>
+                    {(recruitmentTab === "new" || recruitmentTab === "analyzed" || recruitmentTab === "active") && (
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-4">
+                          <div className="relative flex-1 max-w-md">
+                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                            <Input placeholder="Rechercher..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                          </div>
                         </div>
-                      </>
-                    ) : (
+                        {filteredCandidates.length > 0 ? (
+                          <div className="space-y-4">
+                            {filteredCandidates.map((candidate) => (
+                              <div key={candidate.id} className="relative">
+                                <CandidateCard 
+                                  candidate={candidate} jobs={jobs}
+                                  onValidateScore={validateScore} onActivate={activateCandidate}
+                                  onLinkToJob={linkToJob} onUpdateDescription={updateDescription}
+                                  onAddInterviewNotes={addInterviewNotes} onDelete={deleteCandidate}
+                                />
+                                {candidate.status === 'active' && (
+                                  <Button 
+                                    size="sm" variant="outline" 
+                                    className="absolute top-4 right-4 bg-success/10 text-success border-success/30 hover:bg-success/20"
+                                    onClick={() => setConvertCandidate(candidate)}
+                                  >
+                                    <CheckCircle className="w-3 h-3 mr-1" />Embaucher
+                                  </Button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <Card className="border-dashed">
+                            <CardContent className="py-12 text-center">
+                              <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                              <h3 className="text-lg font-medium mb-2">Aucun candidat</h3>
+                              <AddCandidateDialog onAdd={createCandidate}>
+                                <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
+                              </AddCandidateDialog>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
+                    {recruitmentTab === "jobs" && (
+                      <div className="space-y-4">
+                        {jobs.length > 0 ? jobs.map((job) => (
+                          <JobCard key={job.id} job={job} candidatesCount={candidates.filter(c => c.job_id === job.id).length} onDelete={deleteJob} />
+                        )) : (
+                          <Card className="border-dashed">
+                            <CardContent className="py-12 text-center">
+                              <Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                              <h3 className="text-lg font-medium mb-2">Aucun poste</h3>
+                              <Button onClick={() => setRecruitmentTab('generator')}><Plus className="w-4 h-4 mr-2" />Créer un poste</Button>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
+                    {recruitmentTab === "generator" && (
+                      <div className="max-w-2xl">
+                        <JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* TEAM MODULE */}
+                {mainTab === 'team' && (
+                  <>
+                    {teamTab === "employees" && (
+                      <div className="space-y-6">
+                        <div className="relative max-w-md">
+                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                          <Input placeholder="Rechercher un employé..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                        </div>
+                        {filteredEmployees.length > 0 ? (
+                          <div className="space-y-4">
+                            {filteredEmployees.map((emp) => (
+                              <EmployeeCard key={emp.id} employee={emp} onUpdate={updateEmployee} onTerminate={terminateEmployee} onDelete={deleteEmployee} onAddCareerEvent={addCareerEvent} />
+                            ))}
+                          </div>
+                        ) : (
+                          <Card className="border-dashed">
+                            <CardContent className="py-12 text-center">
+                              <UsersRound className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                              <h3 className="text-lg font-medium mb-2">Aucun employé</h3>
+                              <AddEmployeeDialog onAdd={createEmployee}>
+                                <Button><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
+                              </AddEmployeeDialog>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
+                    {teamTab === "disputes" && (
+                      <div className="space-y-4">
+                        {disputes.length > 0 ? disputes.map((d) => (
+                          <DisputeCard key={d.id} dispute={d} employee={employees.find(e => e.id === d.employee_id)} onResolve={resolveDispute} onUpdate={updateDispute} />
+                        )) : (
+                          <Card className="border-dashed">
+                            <CardContent className="py-12 text-center">
+                              <AlertTriangle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                              <h3 className="text-lg font-medium mb-2">Aucun litige</h3>
+                              <p className="text-sm text-muted-foreground">Les litiges RH apparaîtront ici</p>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
+                    {teamTab === "departures" && (
+                      <div className="space-y-4">
+                        {inactiveEmployees.length > 0 ? inactiveEmployees.map((emp) => (
+                          <EmployeeCard key={emp.id} employee={emp} onUpdate={updateEmployee} onTerminate={terminateEmployee} onDelete={deleteEmployee} onAddCareerEvent={addCareerEvent} />
+                        )) : (
+                          <Card className="border-dashed">
+                            <CardContent className="py-12 text-center">
+                              <DoorOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                              <h3 className="text-lg font-medium mb-2">Aucun départ</h3>
+                              <p className="text-sm text-muted-foreground">L'historique des départs apparaîtra ici</p>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
+                    {(teamTab === "performance" || teamTab === "careers") && (
                       <Card className="border-dashed">
                         <CardContent className="py-12 text-center">
-                          <Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                          <h3 className="text-lg font-medium text-foreground mb-2">Aucun poste</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Créez des postes pour relier les candidats
+                          <TrendingUp className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                          <h3 className="text-lg font-medium mb-2">
+                            {teamTab === "performance" ? "Dashboard Performance" : "Historique Carrières"}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {teamTab === "performance" 
+                              ? "Les métriques de performance des commerciaux seront affichées ici"
+                              : "L'historique des augmentations et promotions sera affiché ici"
+                            }
                           </p>
-                          <Button onClick={() => setActiveTab('generator')}>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Créer un poste
-                          </Button>
                         </CardContent>
                       </Card>
                     )}
-                  </div>
-                )}
-
-                {/* Generator Tab */}
-                {activeTab === "generator" && (
-                  <div className="max-w-2xl">
-                    <JobPostGenerator 
-                      onGeneratePost={generateJobPost}
-                      onCreateJob={createJob}
-                    />
-                  </div>
+                  </>
                 )}
               </div>
             </ScrollArea>
           )}
         </div>
       </div>
+
+      {/* Convert Candidate Dialog */}
+      {convertCandidate && (
+        <ConvertCandidateDialog
+          open={!!convertCandidate}
+          onOpenChange={(open) => !open && setConvertCandidate(null)}
+          candidate={convertCandidate}
+          onConvert={convertCandidateToEmployee}
+        />
+      )}
     </DashboardLayout>
   );
 }
