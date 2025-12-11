@@ -48,12 +48,17 @@ BLOCK CONFIG EXAMPLES:
 `;
 
 serve(async (req) => {
+  console.log('Workflow generate called:', req.method);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { objective, context, constraints, existingWorkflow, modificationRequest } = await req.json();
+    const body = await req.json();
+    console.log('Request body:', JSON.stringify(body).substring(0, 500));
+    
+    const { objective, context, constraints, existingWorkflow, modificationRequest } = body;
 
     // Mode: modification d'un workflow existant
     const isModification = existingWorkflow && modificationRequest;
