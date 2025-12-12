@@ -69,7 +69,7 @@ export function LandingHeader() {
         
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
+          <div className="md:hidden absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg py-4 px-6">
             <nav className="flex flex-col gap-4">
               {[
                 { label: "Produit", href: "#product" },
