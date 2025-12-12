@@ -320,6 +320,9 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
     setGeneratedPreview(null);
     setGeneratedName('');
     setStep('input');
+    setIsGenerating(false);
+    setStreamingContent('');
+    setStreamingBlocks([]);
   };
 
   const useExample = (prompt: string) => {
