@@ -149,15 +149,33 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
       
       console.log('Fetching:', CHAT_URL);
       
-      const resp = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify(requestBody),
-      });
+      // Add timeout for client-side
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log('Client timeout after 90s');
+        controller.abort();
+      }, 90000); // 90s timeout
+      
+      let resp;
+      try {
+        resp = await fetch(CHAT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify(requestBody),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch (fetchErr: any) {
+        clearTimeout(timeoutId);
+        if (fetchErr.name === 'AbortError') {
+          throw new Error('Request timed out - please try again');
+        }
+        throw fetchErr;
+      }
       
       console.log('Response status:', resp.status);
 
