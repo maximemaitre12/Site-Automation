@@ -151,7 +151,7 @@ export function Sidebar() {
       </nav>
 
       {/* User section */}
-      <div className="p-2 border-t border-sidebar-border space-y-2">
+      <div className="p-2 border-t border-sidebar-border space-y-2 relative z-50">
         {user && !collapsed && (
           <div className="px-3 py-2 text-xs text-muted-foreground truncate">
             {user.email}
@@ -161,7 +161,7 @@ export function Sidebar() {
           variant="ghost"
           size="sm"
           onClick={handleSignOut}
-          className="w-full justify-start text-muted-foreground hover:text-destructive"
+          className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
         >
           <LogOut className="w-4 h-4" />
           {!collapsed && <span className="ml-2">Sign out</span>}
