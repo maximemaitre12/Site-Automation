@@ -137,7 +137,79 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
 
     // Streaming mode for real-time block display
     if (stream) {
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      console.log('Using streaming mode...');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+      
+      try {
+        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt }
+            ],
+            stream: true,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const error = await response.text();
+          console.error('AI Gateway streaming error:', response.status, error);
+          
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          if (response.status === 402) {
+            return new Response(
+              JSON.stringify({ error: 'Payment required. Please add credits to continue.' }),
+              { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          return new Response(
+            JSON.stringify({ error: 'Failed to generate workflow' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Return the stream directly
+        return new Response(response.body, {
+          headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
+        });
+      } catch (err) {
+        clearTimeout(timeoutId);
+        console.error('Streaming error:', err);
+        return new Response(
+          JSON.stringify({ error: 'Request timeout or network error' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Non-streaming mode (more reliable)
+    console.log('Making AI request (non-streaming)...');
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.log('Request timeout after 60s');
+      controller.abort();
+    }, 60000); // 60s timeout
+    
+    let response;
+    try {
+      response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${LOVABLE_API_KEY}`,
@@ -149,55 +221,18 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
           ],
-          stream: true,
         }),
+        signal: controller.signal,
       });
-
-      if (!response.ok) {
-        const error = await response.text();
-        console.error('AI Gateway streaming error:', response.status, error);
-        
-        if (response.status === 429) {
-          return new Response(
-            JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        if (response.status === 402) {
-          return new Response(
-            JSON.stringify({ error: 'Payment required. Please add credits to continue.' }),
-            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        
-        return new Response(
-          JSON.stringify({ error: 'Failed to generate workflow' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      // Return the stream directly
-      return new Response(response.body, {
-        headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
-      });
+      clearTimeout(timeoutId);
+    } catch (fetchErr) {
+      clearTimeout(timeoutId);
+      console.error('Fetch error:', fetchErr);
+      return new Response(
+        JSON.stringify({ error: 'Request timeout - please try again' }),
+        { status: 504, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-
-    // Non-streaming mode (more reliable)
-    console.log('Making AI request...');
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-      }),
-    });
     
     console.log('AI response status:', response.status);
 
