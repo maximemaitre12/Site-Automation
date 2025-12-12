@@ -115,7 +115,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
     setGeneratedPreview(null);
     setStreamingContent('');
     setStreamingBlocks([]);
-    setStep('preview'); // Show preview immediately to see streaming
+    setStep('preview');
 
     try {
       const requestBody = mode === 'modify' && existingWorkflow
@@ -125,16 +125,16 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
               connections: existingWorkflow.connections
             },
             modificationRequest,
-            stream: true
+            stream: false // Use non-streaming for reliability
           }
         : {
             objective,
             context,
             constraints: 'Keep the workflow focused and efficient. Use appropriate AI blocks for intelligent processing. Create connections between blocks.',
-            stream: true
+            stream: false // Use non-streaming for reliability
           };
 
-      console.log('Calling workflow-generate with streaming:', requestBody);
+      console.log('Calling workflow-generate:', requestBody);
       
       // Get the session token for authenticated requests
       const { data: { session } } = await supabase.auth.getSession();
@@ -163,57 +163,20 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
 
       if (!resp.ok) {
         const errorData = await resp.json().catch(() => ({}));
+        console.error('Error response:', errorData);
         throw new Error(errorData.error || `HTTP ${resp.status}`);
       }
 
-      if (!resp.body) {
-        throw new Error('No response body');
+      const data = await resp.json();
+      console.log('Response data:', data);
+
+      if (data.error) {
+        throw new Error(data.error);
       }
 
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let textBuffer = '';
-      let fullContent = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        textBuffer += decoder.decode(value, { stream: true });
-
-        // Process line-by-line as data arrives
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith('\r')) line = line.slice(0, -1);
-          if (line.startsWith(':') || line.trim() === '') continue;
-          if (!line.startsWith('data: ')) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') break;
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              fullContent += content;
-              setStreamingContent(fullContent);
-              
-              // Try to parse partial JSON to show blocks progressively
-              tryParsePartialWorkflow(fullContent);
-            }
-          } catch {
-            // Incomplete JSON, continue
-          }
-        }
-      }
-
-      // Final parse of complete content
-      const workflow = parseWorkflowFromContent(fullContent);
+      const workflow = data.workflow;
       
-      if (workflow && workflow.blocks.length > 0) {
+      if (workflow && workflow.blocks && workflow.blocks.length > 0) {
         setGeneratedPreview({
           blocks: workflow.blocks,
           connections: workflow.connections || []
@@ -231,6 +194,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
         
         toast.success(`${mode === 'modify' ? 'Modified' : 'Generated'} workflow with ${workflow.blocks.length} blocks`);
       } else {
+        console.error('Invalid workflow structure:', workflow);
         toast.error('Invalid workflow generated - please try again');
         setStep('input');
       }
