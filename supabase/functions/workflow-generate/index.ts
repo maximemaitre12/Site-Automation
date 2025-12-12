@@ -182,7 +182,8 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
       });
     }
 
-    // Non-streaming mode (original behavior)
+    // Non-streaming mode (more reliable)
+    console.log('Making AI request...');
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -195,9 +196,10 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.7,
       }),
     });
+    
+    console.log('AI response status:', response.status);
 
     if (!response.ok) {
       const error = await response.text();
