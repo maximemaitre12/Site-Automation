@@ -23,6 +23,49 @@ export interface Interview {
   status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
+  // New fields for analysis
+  audio_recording_url?: string | null;
+  audio_duration_seconds?: number | null;
+  transcript?: string | null;
+  voice_analysis?: {
+    confidence_score?: number;
+    stress_level?: 'low' | 'medium' | 'high';
+    fluency_score?: number;
+    clarity_score?: number;
+    emotional_state?: string;
+    hesitation_count?: number;
+    speaking_pace?: 'slow' | 'moderate' | 'fast';
+    key_insights?: string[];
+  } | null;
+  technical_evaluation?: {
+    score?: number;
+    details?: Array<{ skill: string; score: number; evidence: string }>;
+  } | null;
+  behavioral_evaluation?: {
+    score?: number;
+    criteria?: Array<{ name: string; score: number; evidence: string }>;
+  } | null;
+  cultural_fit_evaluation?: {
+    score?: number;
+    alignment_points?: string[];
+    concerns?: string[];
+  } | null;
+  match_score?: number | null;
+  match_breakdown?: {
+    technical?: { score: number; weight: number };
+    behavioral?: { score: number; weight: number };
+    cultural?: { score: number; weight: number };
+  } | null;
+  ai_report?: {
+    summary?: string;
+    strengths?: string[];
+    areas_for_improvement?: string[];
+    recommendations?: string[];
+    suggested_follow_up_questions?: string[];
+    hiring_recommendation?: 'strongly_recommend' | 'recommend' | 'consider' | 'not_recommend';
+  } | null;
+  recruiter_feedback?: string | null;
+  feedback_rating?: number | null;
   candidate?: {
     id: string;
     name: string;
@@ -69,6 +112,12 @@ export function useInterviews() {
         interview_type: item.interview_type as Interview['interview_type'],
         outcome: item.outcome as Interview['outcome'],
         status: item.status as Interview['status'],
+        voice_analysis: item.voice_analysis as Interview['voice_analysis'],
+        technical_evaluation: item.technical_evaluation as Interview['technical_evaluation'],
+        behavioral_evaluation: item.behavioral_evaluation as Interview['behavioral_evaluation'],
+        cultural_fit_evaluation: item.cultural_fit_evaluation as Interview['cultural_fit_evaluation'],
+        match_breakdown: item.match_breakdown as Interview['match_breakdown'],
+        ai_report: item.ai_report as Interview['ai_report'],
       })));
     } catch (error) {
       console.error('Error fetching interviews:', error);

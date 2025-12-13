@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
-  AlertTriangle, DoorOpen, Calendar
+  AlertTriangle, DoorOpen, Calendar, CalendarDays, List
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -22,6 +22,7 @@ import { AddEmployeeDialog } from "@/components/hr/AddEmployeeDialog";
 import { DisputeCard } from "@/components/hr/DisputeCard";
 import { ConvertCandidateDialog } from "@/components/hr/ConvertCandidateDialog";
 import { InterviewCard } from "@/components/hr/InterviewCard";
+import { InterviewCalendar } from "@/components/hr/InterviewCalendar";
 import { Input } from "@/components/ui/input";
 
 export default function HR() {
@@ -40,13 +41,14 @@ export default function HR() {
     convertCandidateToEmployee
   } = useEmployees();
 
-  const { interviews, loading: interviewsLoading, getUpcomingInterviews } = useInterviews();
+  const { interviews, loading: interviewsLoading, getUpcomingInterviews, updateInterview, refetch: refetchInterviews } = useInterviews();
 
   const [mainTab, setMainTab] = useState<"recruitment" | "team">("recruitment");
   const [recruitmentTab, setRecruitmentTab] = useState<"new" | "analyzed" | "active" | "jobs" | "interviews" | "generator">("new");
   const [teamTab, setTeamTab] = useState<"employees" | "performance" | "careers" | "disputes" | "departures">("employees");
   const [searchQuery, setSearchQuery] = useState('');
   const [convertCandidate, setConvertCandidate] = useState<any>(null);
+  const [interviewViewMode, setInterviewViewMode] = useState<"calendar" | "list">("calendar");
 
   const loading = hrLoading || employeesLoading || interviewsLoading;
   const upcomingInterviews = getUpcomingInterviews();
@@ -249,21 +251,59 @@ export default function HR() {
 
                   {recruitmentTab === "interviews" && (
                     <div className="space-y-4">
-                      {upcomingInterviews.length > 0 ? (
-                        <div className="space-y-4">
-                          <h3 className="font-medium text-lg">Entretiens à venir</h3>
-                          {upcomingInterviews.map((interview) => (
-                            <InterviewCard key={interview.id} interview={interview} showCandidate />
-                          ))}
+                      {/* View mode toggle */}
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-medium text-lg">Entretiens</h3>
+                        <div className="flex gap-1 bg-muted p-1 rounded-lg">
+                          <Button 
+                            size="sm" 
+                            variant={interviewViewMode === "calendar" ? "default" : "ghost"}
+                            onClick={() => setInterviewViewMode("calendar")}
+                            className="gap-2"
+                          >
+                            <CalendarDays className="w-4 h-4" />
+                            Calendrier
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant={interviewViewMode === "list" ? "default" : "ghost"}
+                            onClick={() => setInterviewViewMode("list")}
+                            className="gap-2"
+                          >
+                            <List className="w-4 h-4" />
+                            Liste
+                          </Button>
                         </div>
+                      </div>
+
+                      {interviewViewMode === "calendar" ? (
+                        <InterviewCalendar 
+                          interviews={interviews} 
+                          onUpdateInterview={updateInterview}
+                        />
                       ) : (
-                        <Card className="border-dashed">
-                          <CardContent className="py-12 text-center">
-                            <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                            <h3 className="text-lg font-medium mb-2">Aucun entretien planifié</h3>
-                            <p className="text-sm text-muted-foreground">Planifiez des entretiens depuis les fiches candidats</p>
-                          </CardContent>
-                        </Card>
+                        <>
+                          {interviews.length > 0 ? (
+                            <div className="space-y-4">
+                              {interviews.map((interview) => (
+                                <InterviewCard 
+                                  key={interview.id} 
+                                  interview={interview} 
+                                  showCandidate 
+                                  onAnalysisComplete={refetchInterviews}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <Card className="border-dashed">
+                              <CardContent className="py-12 text-center">
+                                <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                <h3 className="text-lg font-medium mb-2">Aucun entretien planifié</h3>
+                                <p className="text-sm text-muted-foreground">Planifiez des entretiens depuis les fiches candidats</p>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </>
                       )}
                     </div>
                   )}

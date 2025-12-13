@@ -9,11 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 
 interface InterviewRecorderProps {
   interviewId: string;
-  onTranscriptReady: (transcript: string, audioUrl: string, duration: number) => void;
+  candidateId: string;
+  onComplete?: () => void;
+  onTranscriptReady?: (transcript: string, audioUrl: string, duration: number) => void;
   onRecordingStateChange?: (isRecording: boolean) => void;
 }
 
-export function InterviewRecorder({ interviewId, onTranscriptReady, onRecordingStateChange }: InterviewRecorderProps) {
+export function InterviewRecorder({ interviewId, candidateId, onComplete, onTranscriptReady, onRecordingStateChange }: InterviewRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -167,8 +169,51 @@ export function InterviewRecorder({ interviewId, onTranscriptReady, onRecordingS
           storedUrl = urlData.publicUrl;
         }
 
+        // Update interview with transcript and trigger analysis
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // First save the transcript
+          await supabase.from('candidate_interviews')
+            .update({ 
+              transcript: data.text, 
+              audio_recording_url: storedUrl,
+              audio_duration_seconds: recordingTime
+            })
+            .eq('id', interviewId);
+
+          // Then trigger AI analysis
+          try {
+            const analysisResponse = await fetch(
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-interview`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`,
+                  'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                },
+                body: JSON.stringify({
+                  interviewId,
+                  candidateId,
+                  transcript: data.text,
+                }),
+              }
+            );
+
+            if (analysisResponse.ok) {
+              toast({
+                title: "Analyse terminée",
+                description: "L'entretien a été analysé avec succès",
+              });
+            }
+          } catch (e) {
+            console.error('Error analyzing interview:', e);
+          }
+        }
+
         setStatus('success');
-        onTranscriptReady(data.text, storedUrl, recordingTime);
+        onTranscriptReady?.(data.text, storedUrl, recordingTime);
+        onComplete?.();
         toast({
           title: "Transcription terminée",
           description: "L'enregistrement a été transcrit avec succès",
