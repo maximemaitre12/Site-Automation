@@ -42,27 +42,32 @@ interface MatchBreakdown {
   cultural?: { score: number; weight: number };
 }
 
-interface InterviewAnalysisReportProps {
-  matchScore?: number | null;
-  matchBreakdown?: MatchBreakdown;
-  voiceAnalysis?: VoiceAnalysis;
-  technicalEvaluation?: Evaluation;
-  behavioralEvaluation?: Evaluation;
-  culturalFitEvaluation?: Evaluation;
-  aiReport?: AIReport;
-  candidateName?: string;
+interface InterviewData {
+  match_score?: number | null;
+  match_breakdown?: MatchBreakdown | null;
+  voice_analysis?: VoiceAnalysis | null;
+  technical_evaluation?: Evaluation | null;
+  behavioral_evaluation?: Evaluation | null;
+  cultural_fit_evaluation?: Evaluation | null;
+  ai_report?: AIReport | null;
+  candidate?: {
+    name: string;
+  };
 }
 
-export function InterviewAnalysisReport({
-  matchScore,
-  matchBreakdown,
-  voiceAnalysis,
-  technicalEvaluation,
-  behavioralEvaluation,
-  culturalFitEvaluation,
-  aiReport,
-  candidateName,
-}: InterviewAnalysisReportProps) {
+interface InterviewAnalysisReportProps {
+  interview: InterviewData;
+}
+
+export function InterviewAnalysisReport({ interview }: InterviewAnalysisReportProps) {
+  const matchScore = interview.match_score;
+  const matchBreakdown = interview.match_breakdown;
+  const voiceAnalysis = interview.voice_analysis;
+  const technicalEvaluation = interview.technical_evaluation;
+  const behavioralEvaluation = interview.behavioral_evaluation;
+  const culturalFitEvaluation = interview.cultural_fit_evaluation;
+  const aiReport = interview.ai_report;
+  const candidateName = interview.candidate?.name;
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
     if (score >= 60) return 'text-yellow-600';

@@ -14,12 +14,14 @@ import { fr } from 'date-fns/locale';
 
 interface InterviewCalendarProps {
   interviews: Interview[];
-  proposals: InterviewProposal[];
+  candidates?: Array<{ id: string; name: string }>;
+  proposals?: InterviewProposal[];
   onInterviewClick?: (interview: Interview) => void;
   onProposalClick?: (proposal: InterviewProposal) => void;
+  onUpdateInterview?: (id: string, updates: Partial<Interview>) => Promise<void>;
 }
 
-export function InterviewCalendar({ interviews, proposals, onInterviewClick, onProposalClick }: InterviewCalendarProps) {
+export function InterviewCalendar({ interviews, candidates, proposals = [], onInterviewClick, onProposalClick, onUpdateInterview }: InterviewCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
