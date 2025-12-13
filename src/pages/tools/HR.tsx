@@ -1,14 +1,16 @@
 import { useState, useMemo } from 'react';
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { 
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
-  AlertTriangle, DoorOpen, Calendar, CalendarDays, List
+  AlertTriangle, DoorOpen, Calendar, CalendarDays, List,
+  FileText, Target, Mic, BarChart3, Award, History
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -44,28 +46,37 @@ export default function HR() {
   const { interviews, loading: interviewsLoading, getUpcomingInterviews, updateInterview, refetch: refetchInterviews } = useInterviews();
 
   const [mainTab, setMainTab] = useState<"recruitment" | "team">("recruitment");
-  const [recruitmentTab, setRecruitmentTab] = useState<"new" | "analyzed" | "active" | "jobs" | "interviews" | "generator">("new");
-  const [teamTab, setTeamTab] = useState<"employees" | "performance" | "careers" | "disputes" | "departures">("employees");
+  
+  // Recruitment sub-sections
+  const [recruitmentSection, setRecruitmentSection] = useState<"pipeline" | "interviews" | "jobs">("pipeline");
+  const [pipelineTab, setPipelineTab] = useState<"new" | "analyzed" | "active">("new");
+  const [interviewTab, setInterviewTab] = useState<"upcoming" | "completed" | "calendar">("upcoming");
+  
+  // Team sub-sections
+  const [teamSection, setTeamSection] = useState<"employees" | "hr" | "analytics">("employees");
+  const [hrTab, setHrTab] = useState<"disputes" | "departures">("disputes");
+  const [analyticsTab, setAnalyticsTab] = useState<"performance" | "careers">("performance");
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [convertCandidate, setConvertCandidate] = useState<any>(null);
-  const [interviewViewMode, setInterviewViewMode] = useState<"calendar" | "list">("calendar");
 
   const loading = hrLoading || employeesLoading || interviewsLoading;
   const upcomingInterviews = getUpcomingInterviews();
+  const completedInterviews = interviews.filter(i => i.status === 'completed');
 
   // Filter candidates
   const filteredCandidates = useMemo(() => {
     let filtered = candidates.filter(c => {
       const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.email?.toLowerCase().includes(searchQuery.toLowerCase());
-      if (recruitmentTab === 'new') return matchesSearch && c.status === 'new';
-      if (recruitmentTab === 'analyzed') return matchesSearch && c.status === 'analyzed';
-      if (recruitmentTab === 'active') return matchesSearch && c.status === 'active';
+      if (pipelineTab === 'new') return matchesSearch && c.status === 'new';
+      if (pipelineTab === 'analyzed') return matchesSearch && c.status === 'analyzed';
+      if (pipelineTab === 'active') return matchesSearch && c.status === 'active';
       return matchesSearch;
     });
     filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
     return filtered;
-  }, [candidates, searchQuery, recruitmentTab]);
+  }, [candidates, searchQuery, pipelineTab]);
 
   // Filter employees
   const filteredEmployees = useMemo(() => {
@@ -79,34 +90,79 @@ export default function HR() {
   const stats = {
     candidates: candidates.length,
     newCandidates: candidates.filter(c => c.status === 'new').length,
+    analyzedCandidates: candidates.filter(c => c.status === 'analyzed').length,
+    activeCandidates: candidates.filter(c => c.status === 'active').length,
     activeJobs: jobs.filter(j => j.is_active).length,
     employees: activeEmployees.length,
     openDisputes: openDisputes.length,
     departures: inactiveEmployees.length,
+    upcomingInterviews: upcomingInterviews.length,
+    completedInterviews: completedInterviews.length,
   };
 
-  const recruitmentTabs = [
-    { key: "new", label: "Nouveaux", icon: UserPlus, count: stats.newCandidates },
-    { key: "analyzed", label: "Analysés", icon: Clock, count: candidates.filter(c => c.status === 'analyzed').length },
-    { key: "active", label: "Actifs", icon: CheckCircle, count: candidates.filter(c => c.status === 'active').length },
-    { key: "jobs", label: "Postes", icon: Briefcase, count: stats.activeJobs },
-    { key: "interviews", label: "Entretiens", icon: Calendar, count: upcomingInterviews.length },
-    { key: "generator", label: "Générateur", icon: Sparkles },
-  ];
+  // Section Header Component
+  const SectionHeader = ({ 
+    icon: Icon, 
+    title, 
+    description,
+    action 
+  }: { 
+    icon: any; 
+    title: string; 
+    description: string;
+    action?: React.ReactNode;
+  }) => (
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <h2 className="font-semibold text-foreground">{title}</h2>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+      </div>
+      {action}
+    </div>
+  );
 
-  const teamTabs = [
-    { key: "employees", label: "Collaborateurs", icon: UsersRound, count: stats.employees },
-    { key: "performance", label: "Performance", icon: TrendingUp },
-    { key: "careers", label: "Carrières", icon: Sparkles, count: careerEvents.length },
-    { key: "disputes", label: "Litiges", icon: AlertTriangle, count: stats.openDisputes },
-    { key: "departures", label: "Départs", icon: DoorOpen, count: stats.departures },
-  ];
+  // Sub-tab Button Component
+  const SubTabButton = ({ 
+    active, 
+    onClick, 
+    icon: Icon, 
+    label, 
+    count 
+  }: { 
+    active: boolean; 
+    onClick: () => void; 
+    icon: any; 
+    label: string; 
+    count?: number;
+  }) => (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        active 
+          ? 'bg-primary text-primary-foreground' 
+          : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+      {label}
+      {count !== undefined && (
+        <Badge variant={active ? "secondary" : "outline"} className="ml-1 text-xs">
+          {count}
+        </Badge>
+      )}
+    </button>
+  );
 
   return (
     <DashboardLayout>
       <div className="h-full flex flex-col">
         {/* Header */}
-        <header className="px-8 py-6 border-b border-border">
+        <header className="px-8 py-6 border-b border-border bg-card/50">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
@@ -115,7 +171,7 @@ export default function HR() {
                 </div>
                 HR Copilot
               </h1>
-              <p className="text-muted-foreground mt-1">Recrutement et gestion d'équipe</p>
+              <p className="text-muted-foreground mt-1">Recrutement intelligent et gestion d'équipe</p>
             </div>
             
             {/* Main tab toggle */}
@@ -132,86 +188,213 @@ export default function HR() {
               </TabsList>
             </Tabs>
           </div>
-
-          {/* Stats row */}
-          <div className="grid grid-cols-6 gap-3 mt-6">
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-foreground">{stats.candidates}</div>
-              <div className="text-xs text-muted-foreground">Candidats</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-primary">{stats.newCandidates}</div>
-              <div className="text-xs text-muted-foreground">À traiter</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-indigo-500">{stats.activeJobs}</div>
-              <div className="text-xs text-muted-foreground">Postes ouverts</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-success">{stats.employees}</div>
-              <div className="text-xs text-muted-foreground">Employés actifs</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-warning">{stats.openDisputes}</div>
-              <div className="text-xs text-muted-foreground">Litiges ouverts</div>
-            </div>
-            <div className="p-3 rounded-lg bg-card border border-border">
-              <div className="text-2xl font-bold text-muted-foreground">{stats.departures}</div>
-              <div className="text-xs text-muted-foreground">Départs</div>
-            </div>
-          </div>
-
-          {/* Sub-tabs */}
-          <div className="flex gap-2 mt-6 overflow-x-auto">
-            {(mainTab === 'recruitment' ? recruitmentTabs : teamTabs).map((tab) => (
-              <Button
-                key={tab.key}
-                variant={(mainTab === 'recruitment' ? recruitmentTab : teamTab) === tab.key ? "default" : "ghost"}
-                onClick={() => mainTab === 'recruitment' ? setRecruitmentTab(tab.key as any) : setTeamTab(tab.key as any)}
-                className="gap-2 whitespace-nowrap"
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-                {tab.count !== undefined && <Badge variant="secondary" className="ml-1">{tab.count}</Badge>}
-              </Button>
-            ))}
-            
-            {/* Action button */}
-            <div className="ml-auto">
-              {mainTab === 'recruitment' && (
-                <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
-                  <Button variant="hero"><Upload className="w-4 h-4 mr-2" />Ajouter un CV</Button>
-                </AddCandidateDialog>
-              )}
-              {mainTab === 'team' && teamTab === 'employees' && (
-                <AddEmployeeDialog onAdd={createEmployee}>
-                  <Button variant="hero"><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
-                </AddEmployeeDialog>
-              )}
-            </div>
-          </div>
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden flex">
+          {/* Left Sidebar - Sections */}
+          <aside className="w-64 border-r border-border bg-card/30 p-4 flex flex-col gap-2">
+            {mainTab === 'recruitment' ? (
+              <>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
+                
+                <button
+                  onClick={() => setRecruitmentSection('pipeline')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    recruitmentSection === 'pipeline' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  Pipeline Candidats
+                  <Badge variant="secondary" className="ml-auto">{stats.candidates}</Badge>
+                </button>
+                
+                <button
+                  onClick={() => setRecruitmentSection('interviews')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    recruitmentSection === 'interviews' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  Entretiens
+                  <Badge variant="secondary" className="ml-auto">{stats.upcomingInterviews}</Badge>
+                </button>
+                
+                <button
+                  onClick={() => setRecruitmentSection('jobs')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    recruitmentSection === 'jobs' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <Briefcase className="w-4 h-4" />
+                  Postes & Offres
+                  <Badge variant="secondary" className="ml-auto">{stats.activeJobs}</Badge>
+                </button>
+                
+                <Separator className="my-3" />
+                
+                {/* Quick Stats */}
+                <div className="px-3 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-foreground">{stats.newCandidates}</div>
+                      <div className="text-xs text-muted-foreground">Nouveaux</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-primary">{stats.analyzedCandidates}</div>
+                      <div className="text-xs text-muted-foreground">Analysés</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-success">{stats.activeCandidates}</div>
+                      <div className="text-xs text-muted-foreground">Actifs</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-warning">{stats.upcomingInterviews}</div>
+                      <div className="text-xs text-muted-foreground">Entretiens</div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
+                
+                <button
+                  onClick={() => setTeamSection('employees')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    teamSection === 'employees' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <UsersRound className="w-4 h-4" />
+                  Collaborateurs
+                  <Badge variant="secondary" className="ml-auto">{stats.employees}</Badge>
+                </button>
+                
+                <button
+                  onClick={() => setTeamSection('hr')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    teamSection === 'hr' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  Gestion RH
+                  <Badge variant="secondary" className="ml-auto">{stats.openDisputes}</Badge>
+                </button>
+                
+                <button
+                  onClick={() => setTeamSection('analytics')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    teamSection === 'analytics' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  Analytics
+                </button>
+                
+                <Separator className="my-3" />
+                
+                {/* Quick Stats */}
+                <div className="px-3 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-foreground">{stats.employees}</div>
+                      <div className="text-xs text-muted-foreground">Actifs</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-warning">{stats.openDisputes}</div>
+                      <div className="text-xs text-muted-foreground">Litiges</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-muted-foreground">{stats.departures}</div>
+                      <div className="text-xs text-muted-foreground">Départs</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-primary">{careerEvents.length}</div>
+                      <div className="text-xs text-muted-foreground">Événements</div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </aside>
+
+          {/* Main Content Area */}
           {loading ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex-1 flex items-center justify-center">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : (
-            <ScrollArea className="h-full">
+            <ScrollArea className="flex-1">
               <div className="p-8">
                 {/* RECRUITMENT MODULE */}
                 {mainTab === 'recruitment' && (
                   <>
-                    {(recruitmentTab === "new" || recruitmentTab === "analyzed" || recruitmentTab === "active") && (
+                    {/* Pipeline Section */}
+                    {recruitmentSection === 'pipeline' && (
                       <div className="space-y-6">
-                        <div className="flex items-center gap-4">
-                          <div className="relative flex-1 max-w-md">
+                        <SectionHeader 
+                          icon={Users} 
+                          title="Pipeline Candidats" 
+                          description="Gérez vos candidats à travers les étapes du recrutement"
+                          action={
+                            <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
+                              <Button variant="hero"><Upload className="w-4 h-4 mr-2" />Ajouter un CV</Button>
+                            </AddCandidateDialog>
+                          }
+                        />
+                        
+                        {/* Pipeline Tabs */}
+                        <div className="flex items-center gap-3">
+                          <SubTabButton 
+                            active={pipelineTab === 'new'} 
+                            onClick={() => setPipelineTab('new')} 
+                            icon={UserPlus} 
+                            label="Nouveaux" 
+                            count={stats.newCandidates} 
+                          />
+                          <SubTabButton 
+                            active={pipelineTab === 'analyzed'} 
+                            onClick={() => setPipelineTab('analyzed')} 
+                            icon={Target} 
+                            label="Analysés" 
+                            count={stats.analyzedCandidates} 
+                          />
+                          <SubTabButton 
+                            active={pipelineTab === 'active'} 
+                            onClick={() => setPipelineTab('active')} 
+                            icon={CheckCircle} 
+                            label="Actifs" 
+                            count={stats.activeCandidates} 
+                          />
+                          
+                          <div className="ml-auto relative max-w-xs flex-1">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                            <Input placeholder="Rechercher..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                            <Input 
+                              placeholder="Rechercher un candidat..." 
+                              value={searchQuery} 
+                              onChange={(e) => setSearchQuery(e.target.value)} 
+                              className="pl-10" 
+                            />
                           </div>
                         </div>
+                        
+                        <Separator />
+                        
+                        {/* Candidates List */}
                         {filteredCandidates.length > 0 ? (
                           <div className="space-y-4">
                             {filteredCandidates.map((candidate) => (
@@ -240,93 +423,142 @@ export default function HR() {
                             <CardContent className="py-12 text-center">
                               <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                               <h3 className="text-lg font-medium mb-2">Aucun candidat</h3>
+                              <p className="text-sm text-muted-foreground mb-4">
+                                {pipelineTab === 'new' && "Ajoutez des CV pour commencer le processus de recrutement"}
+                                {pipelineTab === 'analyzed' && "Les candidats analysés apparaîtront ici"}
+                                {pipelineTab === 'active' && "Les candidats actifs apparaîtront ici"}
+                              </p>
                               <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
-                              <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
-                            </AddCandidateDialog>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-                  )}
-
-                  {recruitmentTab === "interviews" && (
-                    <div className="space-y-4">
-                      {/* View mode toggle */}
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-lg">Entretiens</h3>
-                        <div className="flex gap-1 bg-muted p-1 rounded-lg">
-                          <Button 
-                            size="sm" 
-                            variant={interviewViewMode === "calendar" ? "default" : "ghost"}
-                            onClick={() => setInterviewViewMode("calendar")}
-                            className="gap-2"
-                          >
-                            <CalendarDays className="w-4 h-4" />
-                            Calendrier
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant={interviewViewMode === "list" ? "default" : "ghost"}
-                            onClick={() => setInterviewViewMode("list")}
-                            className="gap-2"
-                          >
-                            <List className="w-4 h-4" />
-                            Liste
-                          </Button>
-                        </div>
-                      </div>
-
-                      {interviewViewMode === "calendar" ? (
-                        <InterviewCalendar 
-                          interviews={interviews} 
-                          onUpdateInterview={updateInterview}
-                        />
-                      ) : (
-                        <>
-                          {interviews.length > 0 ? (
-                            <div className="space-y-4">
-                              {interviews.map((interview) => (
-                                <InterviewCard 
-                                  key={interview.id} 
-                                  interview={interview} 
-                                  showCandidate 
-                                  onAnalysisComplete={refetchInterviews}
-                                />
-                              ))}
-                            </div>
-                          ) : (
-                            <Card className="border-dashed">
-                              <CardContent className="py-12 text-center">
-                                <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                <h3 className="text-lg font-medium mb-2">Aucun entretien planifié</h3>
-                                <p className="text-sm text-muted-foreground">Planifiez des entretiens depuis les fiches candidats</p>
-                              </CardContent>
-                            </Card>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )}
-
-                    {recruitmentTab === "jobs" && (
-                      <div className="space-y-4">
-                        {jobs.length > 0 ? jobs.map((job) => (
-                          <JobCard key={job.id} job={job} candidatesCount={candidates.filter(c => c.job_id === job.id).length} onDelete={deleteJob} />
-                        )) : (
-                          <Card className="border-dashed">
-                            <CardContent className="py-12 text-center">
-                              <Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                              <h3 className="text-lg font-medium mb-2">Aucun poste</h3>
-                              <Button onClick={() => setRecruitmentTab('generator')}><Plus className="w-4 h-4 mr-2" />Créer un poste</Button>
+                                <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
+                              </AddCandidateDialog>
                             </CardContent>
                           </Card>
                         )}
                       </div>
                     )}
 
-                    {recruitmentTab === "generator" && (
-                      <div className="max-w-2xl">
-                        <JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />
+                    {/* Interviews Section */}
+                    {recruitmentSection === 'interviews' && (
+                      <div className="space-y-6">
+                        <SectionHeader 
+                          icon={Calendar} 
+                          title="Gestion des Entretiens" 
+                          description="Planifiez, suivez et analysez vos entretiens"
+                        />
+                        
+                        {/* Interview Tabs */}
+                        <div className="flex items-center gap-3">
+                          <SubTabButton 
+                            active={interviewTab === 'upcoming'} 
+                            onClick={() => setInterviewTab('upcoming')} 
+                            icon={Clock} 
+                            label="À venir" 
+                            count={stats.upcomingInterviews} 
+                          />
+                          <SubTabButton 
+                            active={interviewTab === 'completed'} 
+                            onClick={() => setInterviewTab('completed')} 
+                            icon={CheckCircle} 
+                            label="Terminés" 
+                            count={stats.completedInterviews} 
+                          />
+                          <SubTabButton 
+                            active={interviewTab === 'calendar'} 
+                            onClick={() => setInterviewTab('calendar')} 
+                            icon={CalendarDays} 
+                            label="Calendrier" 
+                          />
+                        </div>
+                        
+                        <Separator />
+                        
+                        {/* Interview Content */}
+                        {interviewTab === 'calendar' ? (
+                          <InterviewCalendar 
+                            interviews={interviews} 
+                            onUpdateInterview={updateInterview}
+                          />
+                        ) : (
+                          <>
+                            {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).length > 0 ? (
+                              <div className="space-y-4">
+                                {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).map((interview) => (
+                                  <InterviewCard 
+                                    key={interview.id} 
+                                    interview={interview} 
+                                    showCandidate 
+                                    onAnalysisComplete={refetchInterviews}
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <Card className="border-dashed">
+                                <CardContent className="py-12 text-center">
+                                  <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                  <h3 className="text-lg font-medium mb-2">
+                                    {interviewTab === 'upcoming' ? 'Aucun entretien à venir' : 'Aucun entretien terminé'}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    {interviewTab === 'upcoming' 
+                                      ? 'Planifiez des entretiens depuis les fiches candidats'
+                                      : "Les entretiens terminés apparaîtront ici avec leurs analyses"
+                                    }
+                                  </p>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Jobs Section */}
+                    {recruitmentSection === 'jobs' && (
+                      <div className="space-y-6">
+                        <SectionHeader 
+                          icon={Briefcase} 
+                          title="Postes & Offres d'Emploi" 
+                          description="Créez et gérez vos offres d'emploi"
+                        />
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {/* Jobs List */}
+                          <div className="space-y-4">
+                            <h3 className="font-medium text-foreground flex items-center gap-2">
+                              <FileText className="w-4 h-4" />
+                              Postes ouverts ({stats.activeJobs})
+                            </h3>
+                            
+                            {jobs.length > 0 ? (
+                              <div className="space-y-3">
+                                {jobs.map((job) => (
+                                  <JobCard 
+                                    key={job.id} 
+                                    job={job} 
+                                    candidatesCount={candidates.filter(c => c.job_id === job.id).length} 
+                                    onDelete={deleteJob} 
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <Card className="border-dashed">
+                                <CardContent className="py-8 text-center">
+                                  <Briefcase className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
+                                  <p className="text-sm text-muted-foreground">Aucun poste ouvert</p>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </div>
+                          
+                          {/* Job Generator */}
+                          <div className="space-y-4">
+                            <h3 className="font-medium text-foreground flex items-center gap-2">
+                              <Sparkles className="w-4 h-4" />
+                              Générateur IA
+                            </h3>
+                            <JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />
+                          </div>
+                        </div>
                       </div>
                     )}
                   </>
@@ -335,16 +567,43 @@ export default function HR() {
                 {/* TEAM MODULE */}
                 {mainTab === 'team' && (
                   <>
-                    {teamTab === "employees" && (
+                    {/* Employees Section */}
+                    {teamSection === 'employees' && (
                       <div className="space-y-6">
+                        <SectionHeader 
+                          icon={UsersRound} 
+                          title="Collaborateurs" 
+                          description="Gérez votre équipe et leurs informations"
+                          action={
+                            <AddEmployeeDialog onAdd={createEmployee}>
+                              <Button variant="hero"><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
+                            </AddEmployeeDialog>
+                          }
+                        />
+                        
                         <div className="relative max-w-md">
                           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                          <Input placeholder="Rechercher un employé..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                          <Input 
+                            placeholder="Rechercher un employé..." 
+                            value={searchQuery} 
+                            onChange={(e) => setSearchQuery(e.target.value)} 
+                            className="pl-10" 
+                          />
                         </div>
+                        
+                        <Separator />
+                        
                         {filteredEmployees.length > 0 ? (
                           <div className="space-y-4">
                             {filteredEmployees.map((emp) => (
-                              <EmployeeCard key={emp.id} employee={emp} onUpdate={updateEmployee} onTerminate={terminateEmployee} onDelete={deleteEmployee} onAddCareerEvent={addCareerEvent} />
+                              <EmployeeCard 
+                                key={emp.id} 
+                                employee={emp} 
+                                onUpdate={updateEmployee} 
+                                onTerminate={terminateEmployee} 
+                                onDelete={deleteEmployee} 
+                                onAddCareerEvent={addCareerEvent} 
+                              />
                             ))}
                           </div>
                         ) : (
@@ -361,53 +620,140 @@ export default function HR() {
                       </div>
                     )}
 
-                    {teamTab === "disputes" && (
-                      <div className="space-y-4">
-                        {disputes.length > 0 ? disputes.map((d) => (
-                          <DisputeCard key={d.id} dispute={d} employee={employees.find(e => e.id === d.employee_id)} onResolve={resolveDispute} onUpdate={updateDispute} />
-                        )) : (
-                          <Card className="border-dashed">
-                            <CardContent className="py-12 text-center">
-                              <AlertTriangle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                              <h3 className="text-lg font-medium mb-2">Aucun litige</h3>
-                              <p className="text-sm text-muted-foreground">Les litiges RH apparaîtront ici</p>
-                            </CardContent>
-                          </Card>
+                    {/* HR Management Section */}
+                    {teamSection === 'hr' && (
+                      <div className="space-y-6">
+                        <SectionHeader 
+                          icon={AlertTriangle} 
+                          title="Gestion RH" 
+                          description="Litiges, départs et situations particulières"
+                        />
+                        
+                        {/* HR Tabs */}
+                        <div className="flex items-center gap-3">
+                          <SubTabButton 
+                            active={hrTab === 'disputes'} 
+                            onClick={() => setHrTab('disputes')} 
+                            icon={AlertTriangle} 
+                            label="Litiges" 
+                            count={stats.openDisputes} 
+                          />
+                          <SubTabButton 
+                            active={hrTab === 'departures'} 
+                            onClick={() => setHrTab('departures')} 
+                            icon={DoorOpen} 
+                            label="Départs" 
+                            count={stats.departures} 
+                          />
+                        </div>
+                        
+                        <Separator />
+                        
+                        {hrTab === 'disputes' && (
+                          <>
+                            {disputes.length > 0 ? (
+                              <div className="space-y-4">
+                                {disputes.map((d) => (
+                                  <DisputeCard 
+                                    key={d.id} 
+                                    dispute={d} 
+                                    employee={employees.find(e => e.id === d.employee_id)} 
+                                    onResolve={resolveDispute} 
+                                    onUpdate={updateDispute} 
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <Card className="border-dashed">
+                                <CardContent className="py-12 text-center">
+                                  <AlertTriangle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                  <h3 className="text-lg font-medium mb-2">Aucun litige</h3>
+                                  <p className="text-sm text-muted-foreground">Les litiges RH apparaîtront ici</p>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </>
+                        )}
+                        
+                        {hrTab === 'departures' && (
+                          <>
+                            {inactiveEmployees.length > 0 ? (
+                              <div className="space-y-4">
+                                {inactiveEmployees.map((emp) => (
+                                  <EmployeeCard 
+                                    key={emp.id} 
+                                    employee={emp} 
+                                    onUpdate={updateEmployee} 
+                                    onTerminate={terminateEmployee} 
+                                    onDelete={deleteEmployee} 
+                                    onAddCareerEvent={addCareerEvent} 
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <Card className="border-dashed">
+                                <CardContent className="py-12 text-center">
+                                  <DoorOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                  <h3 className="text-lg font-medium mb-2">Aucun départ</h3>
+                                  <p className="text-sm text-muted-foreground">L'historique des départs apparaîtra ici</p>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </>
                         )}
                       </div>
                     )}
 
-                    {teamTab === "departures" && (
-                      <div className="space-y-4">
-                        {inactiveEmployees.length > 0 ? inactiveEmployees.map((emp) => (
-                          <EmployeeCard key={emp.id} employee={emp} onUpdate={updateEmployee} onTerminate={terminateEmployee} onDelete={deleteEmployee} onAddCareerEvent={addCareerEvent} />
-                        )) : (
-                          <Card className="border-dashed">
-                            <CardContent className="py-12 text-center">
-                              <DoorOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                              <h3 className="text-lg font-medium mb-2">Aucun départ</h3>
-                              <p className="text-sm text-muted-foreground">L'historique des départs apparaîtra ici</p>
-                            </CardContent>
-                          </Card>
-                        )}
+                    {/* Analytics Section */}
+                    {teamSection === 'analytics' && (
+                      <div className="space-y-6">
+                        <SectionHeader 
+                          icon={BarChart3} 
+                          title="Analytics & Performance" 
+                          description="Suivez les performances et l'évolution de carrière"
+                        />
+                        
+                        {/* Analytics Tabs */}
+                        <div className="flex items-center gap-3">
+                          <SubTabButton 
+                            active={analyticsTab === 'performance'} 
+                            onClick={() => setAnalyticsTab('performance')} 
+                            icon={TrendingUp} 
+                            label="Performance" 
+                          />
+                          <SubTabButton 
+                            active={analyticsTab === 'careers'} 
+                            onClick={() => setAnalyticsTab('careers')} 
+                            icon={History} 
+                            label="Carrières" 
+                            count={careerEvents.length} 
+                          />
+                        </div>
+                        
+                        <Separator />
+                        
+                        <Card className="border-dashed">
+                          <CardContent className="py-12 text-center">
+                            {analyticsTab === 'performance' ? (
+                              <>
+                                <TrendingUp className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                <h3 className="text-lg font-medium mb-2">Dashboard Performance</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Les métriques de performance seront affichées ici
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <History className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                <h3 className="text-lg font-medium mb-2">Historique Carrières</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  L'historique des promotions, augmentations et événements de carrière
+                                </p>
+                              </>
+                            )}
+                          </CardContent>
+                        </Card>
                       </div>
-                    )}
-
-                    {(teamTab === "performance" || teamTab === "careers") && (
-                      <Card className="border-dashed">
-                        <CardContent className="py-12 text-center">
-                          <TrendingUp className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                          <h3 className="text-lg font-medium mb-2">
-                            {teamTab === "performance" ? "Dashboard Performance" : "Historique Carrières"}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {teamTab === "performance" 
-                              ? "Les métriques de performance des commerciaux seront affichées ici"
-                              : "L'historique des augmentations et promotions sera affiché ici"
-                            }
-                          </p>
-                        </CardContent>
-                      </Card>
                     )}
                   </>
                 )}
