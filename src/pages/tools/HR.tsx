@@ -160,29 +160,28 @@ export default function HR() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col overflow-hidden">
+      <div className="absolute inset-0 flex flex-col">
         {/* Header */}
-        <header className="flex-shrink-0 px-6 py-4 border-b border-border bg-card/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-400 flex items-center justify-center">
-                  <Users className="w-4 h-4 text-white" />
-                </div>
-                HR Copilot
-              </h1>
-              <p className="text-muted-foreground mt-1">Recrutement intelligent et gestion d'équipe</p>
+        <header className="shrink-0 px-4 py-3 border-b border-border bg-card/50">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-400 flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-foreground truncate">HR Copilot</h1>
+              </div>
             </div>
             
             {/* Main tab toggle */}
             <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
-              <TabsList className="grid grid-cols-2 w-80">
-                <TabsTrigger value="recruitment" className="gap-2">
-                  <UserPlus className="w-4 h-4" />
+              <TabsList className="grid grid-cols-2 w-64">
+                <TabsTrigger value="recruitment" className="gap-1.5 text-sm">
+                  <UserPlus className="w-3.5 h-3.5" />
                   Recrutement
                 </TabsTrigger>
-                <TabsTrigger value="team" className="gap-2">
-                  <UsersRound className="w-4 h-4" />
+                <TabsTrigger value="team" className="gap-1.5 text-sm">
+                  <UsersRound className="w-3.5 h-3.5" />
                   Équipe
                 </TabsTrigger>
               </TabsList>
@@ -191,9 +190,9 @@ export default function HR() {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 min-h-0 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden">
           {/* Left Sidebar - Sections */}
-          <aside className="w-56 flex-shrink-0 border-r border-border bg-card/30 p-3 flex flex-col gap-1 overflow-y-auto">
+          <aside className="w-52 shrink-0 border-r border-border bg-card/30 p-3 overflow-y-auto">
             {mainTab === 'recruitment' ? (
               <>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
@@ -334,12 +333,12 @@ export default function HR() {
 
           {/* Main Content Area */}
           {loading ? (
-            <div className="flex-1 min-w-0 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : (
-            <ScrollArea className="flex-1 min-w-0">
-              <div className="p-6">
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-5">
                 {/* RECRUITMENT MODULE */}
                 {mainTab === 'recruitment' && (
                   <>
@@ -758,7 +757,7 @@ export default function HR() {
                   </>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </div>
       </div>
