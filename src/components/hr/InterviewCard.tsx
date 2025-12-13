@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, Clock, Video, Phone, Building, User, ChevronDown, Trash2, CheckCircle, XCircle, MessageSquare, Mic, FileText, BarChart3 } from 'lucide-react';
 import { Interview, useInterviews } from '@/hooks/useInterviews';
 import { format } from 'date-fns';
@@ -10,7 +10,7 @@ import { fr } from 'date-fns/locale';
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { InterviewRecorder } from './InterviewRecorder';
-import { InterviewAnalysisReport } from './InterviewAnalysisReport';
+import { InterviewAnalysisDialog } from './InterviewAnalysisDialog';
 import { MatchScoreGauge } from './MatchScoreGauge';
 
 interface InterviewCardProps {
@@ -283,14 +283,12 @@ export function InterviewCard({ interview, showCandidate = false, onAnalysisComp
       </Dialog>
 
       {/* Analysis Report Dialog */}
-      <Dialog open={showReport} onOpenChange={setShowReport}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Rapport d'analyse de l'entretien</DialogTitle>
-          </DialogHeader>
-          <InterviewAnalysisReport interview={interview} />
-        </DialogContent>
-      </Dialog>
+      <InterviewAnalysisDialog
+        interview={interview}
+        candidateName={interview.candidate?.name || 'Candidat'}
+        open={showReport}
+        onOpenChange={setShowReport}
+      />
     </Card>
   );
 }
