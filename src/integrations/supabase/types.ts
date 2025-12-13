@@ -517,52 +517,91 @@ export type Database = {
       }
       candidate_interviews: {
         Row: {
+          ai_report: Json | null
           ai_suggested_questions: Json | null
+          audio_duration_seconds: number | null
+          audio_recording_url: string | null
+          behavioral_evaluation: Json | null
           candidate_id: string
           created_at: string | null
+          cultural_fit_evaluation: Json | null
           duration_minutes: number | null
+          feedback_rating: number | null
           id: string
           interview_type: string | null
           interviewers: Json | null
           location: string | null
+          match_breakdown: Json | null
+          match_score: number | null
           notes: string | null
           outcome: string | null
+          recruiter_feedback: string | null
+          reminder_sent_at: string | null
           scheduled_at: string
           status: string | null
+          technical_evaluation: Json | null
+          transcript: string | null
           updated_at: string | null
           user_id: string
+          voice_analysis: Json | null
         }
         Insert: {
+          ai_report?: Json | null
           ai_suggested_questions?: Json | null
+          audio_duration_seconds?: number | null
+          audio_recording_url?: string | null
+          behavioral_evaluation?: Json | null
           candidate_id: string
           created_at?: string | null
+          cultural_fit_evaluation?: Json | null
           duration_minutes?: number | null
+          feedback_rating?: number | null
           id?: string
           interview_type?: string | null
           interviewers?: Json | null
           location?: string | null
+          match_breakdown?: Json | null
+          match_score?: number | null
           notes?: string | null
           outcome?: string | null
+          recruiter_feedback?: string | null
+          reminder_sent_at?: string | null
           scheduled_at: string
           status?: string | null
+          technical_evaluation?: Json | null
+          transcript?: string | null
           updated_at?: string | null
           user_id: string
+          voice_analysis?: Json | null
         }
         Update: {
+          ai_report?: Json | null
           ai_suggested_questions?: Json | null
+          audio_duration_seconds?: number | null
+          audio_recording_url?: string | null
+          behavioral_evaluation?: Json | null
           candidate_id?: string
           created_at?: string | null
+          cultural_fit_evaluation?: Json | null
           duration_minutes?: number | null
+          feedback_rating?: number | null
           id?: string
           interview_type?: string | null
           interviewers?: Json | null
           location?: string | null
+          match_breakdown?: Json | null
+          match_score?: number | null
           notes?: string | null
           outcome?: string | null
+          recruiter_feedback?: string | null
+          reminder_sent_at?: string | null
           scheduled_at?: string
           status?: string | null
+          technical_evaluation?: Json | null
+          transcript?: string | null
           updated_at?: string | null
           user_id?: string
+          voice_analysis?: Json | null
         }
         Relationships: [
           {
@@ -2240,6 +2279,72 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      interview_date_proposals: {
+        Row: {
+          candidate_counter_proposal: string | null
+          candidate_email_sent_at: string | null
+          candidate_id: string
+          candidate_response: string | null
+          confirmation_email_sent_at: string | null
+          confirmation_token: string | null
+          created_at: string | null
+          id: string
+          interview_id: string | null
+          message_to_candidate: string | null
+          proposed_slots: Json
+          selected_slot_index: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          candidate_counter_proposal?: string | null
+          candidate_email_sent_at?: string | null
+          candidate_id: string
+          candidate_response?: string | null
+          confirmation_email_sent_at?: string | null
+          confirmation_token?: string | null
+          created_at?: string | null
+          id?: string
+          interview_id?: string | null
+          message_to_candidate?: string | null
+          proposed_slots?: Json
+          selected_slot_index?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          candidate_counter_proposal?: string | null
+          candidate_email_sent_at?: string | null
+          candidate_id?: string
+          candidate_response?: string | null
+          confirmation_email_sent_at?: string | null
+          confirmation_token?: string | null
+          created_at?: string | null
+          id?: string
+          interview_id?: string | null
+          message_to_candidate?: string | null
+          proposed_slots?: Json
+          selected_slot_index?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_date_proposals_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_date_proposals_interview_id_fkey"
+            columns: ["interview_id"]
+            isOneToOne: false
+            referencedRelation: "candidate_interviews"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoices: {
         Row: {

@@ -56,3 +56,6 @@ verify_jwt = true
 
 [functions.ai-automation]
 verify_jwt = true
+
+[functions.analyze-interview]
+verify_jwt = true
