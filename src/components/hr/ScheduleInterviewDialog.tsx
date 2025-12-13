@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar as CalendarIcon, Clock, MapPin, Video, Phone, Building, Sparkles, Loader2, X, Plus, Copy, Check } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, Video, Phone, Building, Loader2, X, Plus } from 'lucide-react';
 import { useInterviews, CreateInterviewData, Interview } from '@/hooks/useInterviews';
+import { InterviewQuestionsDisplay } from './InterviewQuestionsDisplay';
 import { callAI } from '@/lib/ai';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -66,7 +67,6 @@ export function ScheduleInterviewDialog({ open, onOpenChange, candidate, job }: 
   const [generatedQuestions, setGeneratedQuestions] = useState<Interview['ai_suggested_questions'] | null>(null);
   const [generatingQuestions, setGeneratingQuestions] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [copiedQuestions, setCopiedQuestions] = useState(false);
 
   const handleGenerateQuestions = async () => {
     setGeneratingQuestions(true);
@@ -149,20 +149,6 @@ Les questions doivent être:
     setInterviewers(interviewers.filter(i => i !== name));
   };
 
-  const handleCopyQuestions = () => {
-    if (!generatedQuestions) return;
-    const allQuestions = [
-      ...(generatedQuestions.technical || []),
-      ...(generatedQuestions.behavioral || []),
-      ...(generatedQuestions.experience || []),
-      ...(generatedQuestions.motivation || []),
-      ...(generatedQuestions.specific || []),
-    ];
-    navigator.clipboard.writeText(allQuestions.join('\n• '));
-    setCopiedQuestions(true);
-    setTimeout(() => setCopiedQuestions(false), 2000);
-  };
-
   const handleSubmit = async () => {
     if (!selectedDate) return;
 
@@ -208,14 +194,6 @@ Les questions doivent être:
       default: return <Video className="h-4 w-4" />;
     }
   };
-
-  const questionCategories = [
-    { key: 'technical', label: 'Techniques', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-    { key: 'behavioral', label: 'Comportementales', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' },
-    { key: 'experience', label: 'Expérience', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-    { key: 'motivation', label: 'Motivation', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' },
-    { key: 'specific', label: 'Spécifiques', color: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400' },
-  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -339,70 +317,14 @@ Les questions doivent être:
 
             {/* Right column - AI Questions */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Questions suggérées par l'IA</Label>
-                {generatedQuestions && (
-                  <Button size="sm" variant="ghost" onClick={handleCopyQuestions}>
-                    {copiedQuestions ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                    {copiedQuestions ? 'Copié' : 'Copier'}
-                  </Button>
-                )}
-              </div>
-
-              {!generatedQuestions ? (
-                <div className="border rounded-lg p-6 text-center bg-muted/30">
-                  <Sparkles className="h-10 w-10 mx-auto mb-3 text-primary/50" />
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Générez des questions d'entretien personnalisées basées sur le CV du candidat
-                    {job && ` et les exigences du poste "${job.title}"`}
-                  </p>
-                  <Button onClick={handleGenerateQuestions} disabled={generatingQuestions}>
-                    {generatingQuestions ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Génération...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Générer les questions
-                      </>
-                    )}
-                  </Button>
-                </div>
-              ) : (
-                <div className="border rounded-lg p-4 space-y-4 bg-muted/20">
-                  {questionCategories.map(cat => {
-                    const questions = generatedQuestions[cat.key as keyof typeof generatedQuestions];
-                    if (!questions?.length) return null;
-                    
-                    return (
-                      <div key={cat.key}>
-                        <Badge className={`mb-2 ${cat.color}`}>{cat.label}</Badge>
-                        <ul className="space-y-2">
-                          {questions.map((q, i) => (
-                            <li key={i} className="text-sm flex gap-2">
-                              <span className="text-primary">•</span>
-                              <span>{q}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  })}
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={handleGenerateQuestions}
-                    disabled={generatingQuestions}
-                  >
-                    {generatingQuestions ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                    Régénérer les questions
-                  </Button>
-                </div>
-              )}
+              <InterviewQuestionsDisplay
+                questions={generatedQuestions}
+                candidateName={candidate.name}
+                jobTitle={job?.title}
+                matchScore={undefined}
+                onRegenerate={handleGenerateQuestions}
+                isGenerating={generatingQuestions}
+              />
             </div>
           </div>
         </ScrollArea>
