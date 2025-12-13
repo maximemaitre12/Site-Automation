@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { 
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
-  AlertTriangle, DoorOpen, Calendar, CalendarDays, List,
+  AlertTriangle, DoorOpen, Calendar, CalendarDays, List, LayoutGrid,
   FileText, Target, Mic, BarChart3, Award, History
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
@@ -20,12 +20,15 @@ import { JobCard } from "@/components/hr/JobCard";
 import { AddCandidateDialog } from "@/components/hr/AddCandidateDialog";
 import { JobPostGenerator } from "@/components/hr/JobPostGenerator";
 import { EmployeeCard } from "@/components/hr/EmployeeCard";
+import { EmployeeTable } from "@/components/hr/EmployeeTable";
+import { EmployeeStats } from "@/components/hr/EmployeeStats";
 import { AddEmployeeDialog } from "@/components/hr/AddEmployeeDialog";
 import { DisputeCard } from "@/components/hr/DisputeCard";
 import { ConvertCandidateDialog } from "@/components/hr/ConvertCandidateDialog";
 import { InterviewCard } from "@/components/hr/InterviewCard";
 import { InterviewCalendar } from "@/components/hr/InterviewCalendar";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function HR() {
   const { 
@@ -54,6 +57,9 @@ export default function HR() {
   
   // Team sub-sections
   const [teamSection, setTeamSection] = useState<"employees" | "hr" | "analytics">("employees");
+  const [employeeViewMode, setEmployeeViewMode] = useState<"table" | "cards">("table");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
+  const [contractFilter, setContractFilter] = useState<string>("all");
   const [hrTab, setHrTab] = useState<"disputes" | "departures">("disputes");
   const [analyticsTab, setAnalyticsTab] = useState<"performance" | "careers">("performance");
   
@@ -574,48 +580,121 @@ export default function HR() {
                           title="Collaborateurs" 
                           description="Gérez votre équipe et leurs informations"
                           action={
-                            <AddEmployeeDialog onAdd={createEmployee}>
-                              <Button variant="hero"><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
-                            </AddEmployeeDialog>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center border rounded-lg overflow-hidden">
+                                <Button 
+                                  variant={employeeViewMode === 'table' ? 'default' : 'ghost'} 
+                                  size="sm" 
+                                  className="rounded-none"
+                                  onClick={() => setEmployeeViewMode('table')}
+                                >
+                                  <List className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  variant={employeeViewMode === 'cards' ? 'default' : 'ghost'} 
+                                  size="sm" 
+                                  className="rounded-none"
+                                  onClick={() => setEmployeeViewMode('cards')}
+                                >
+                                  <LayoutGrid className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              <AddEmployeeDialog onAdd={createEmployee}>
+                                <Button variant="hero"><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
+                              </AddEmployeeDialog>
+                            </div>
                           }
                         />
                         
-                        <div className="relative max-w-md">
-                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                          <Input 
-                            placeholder="Rechercher un employé..." 
-                            value={searchQuery} 
-                            onChange={(e) => setSearchQuery(e.target.value)} 
-                            className="pl-10" 
-                          />
+                        {/* Stats */}
+                        <EmployeeStats employees={employees} />
+                        
+                        {/* Filters */}
+                        <div className="flex items-center gap-4">
+                          <div className="relative max-w-xs flex-1">
+                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                            <Input 
+                              placeholder="Rechercher un employé..." 
+                              value={searchQuery} 
+                              onChange={(e) => setSearchQuery(e.target.value)} 
+                              className="pl-10" 
+                            />
+                          </div>
+                          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                            <SelectTrigger className="w-40">
+                              <SelectValue placeholder="Département" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">Tous les dép.</SelectItem>
+                              {[...new Set(employees.map(e => e.department).filter(Boolean))].map(dep => (
+                                <SelectItem key={dep} value={dep!}>{dep}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select value={contractFilter} onValueChange={setContractFilter}>
+                            <SelectTrigger className="w-32">
+                              <SelectValue placeholder="Contrat" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">Tous</SelectItem>
+                              <SelectItem value="CDI">CDI</SelectItem>
+                              <SelectItem value="CDD">CDD</SelectItem>
+                              <SelectItem value="Stage">Stage</SelectItem>
+                              <SelectItem value="Freelance">Freelance</SelectItem>
+                              <SelectItem value="Alternance">Alternance</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         
                         <Separator />
                         
-                        {filteredEmployees.length > 0 ? (
-                          <div className="space-y-4">
-                            {filteredEmployees.map((emp) => (
-                              <EmployeeCard 
-                                key={emp.id} 
-                                employee={emp} 
-                                onUpdate={updateEmployee} 
-                                onTerminate={terminateEmployee} 
-                                onDelete={deleteEmployee} 
-                                onAddCareerEvent={addCareerEvent} 
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <Card className="border-dashed">
-                            <CardContent className="py-12 text-center">
-                              <UsersRound className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                              <h3 className="text-lg font-medium mb-2">Aucun employé</h3>
-                              <AddEmployeeDialog onAdd={createEmployee}>
-                                <Button><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
-                              </AddEmployeeDialog>
-                            </CardContent>
-                          </Card>
-                        )}
+                        {(() => {
+                          const filtered = activeEmployees.filter(e => {
+                            const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              e.job_title.toLowerCase().includes(searchQuery.toLowerCase());
+                            const matchesDept = departmentFilter === 'all' || e.department === departmentFilter;
+                            const matchesContract = contractFilter === 'all' || e.contract_type === contractFilter;
+                            return matchesSearch && matchesDept && matchesContract;
+                          });
+                          
+                          if (filtered.length === 0) {
+                            return (
+                              <Card className="border-dashed">
+                                <CardContent className="py-12 text-center">
+                                  <UsersRound className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                                  <h3 className="text-lg font-medium mb-2">Aucun employé</h3>
+                                  <AddEmployeeDialog onAdd={createEmployee}>
+                                    <Button><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
+                                  </AddEmployeeDialog>
+                                </CardContent>
+                              </Card>
+                            );
+                          }
+                          
+                          return employeeViewMode === 'table' ? (
+                            <EmployeeTable 
+                              employees={filtered}
+                              careerEvents={careerEvents}
+                              onUpdate={updateEmployee}
+                              onTerminate={terminateEmployee}
+                              onDelete={deleteEmployee}
+                              onAddCareerEvent={addCareerEvent}
+                            />
+                          ) : (
+                            <div className="space-y-4">
+                              {filtered.map((emp) => (
+                                <EmployeeCard 
+                                  key={emp.id} 
+                                  employee={emp} 
+                                  onUpdate={updateEmployee} 
+                                  onTerminate={terminateEmployee} 
+                                  onDelete={deleteEmployee} 
+                                  onAddCareerEvent={addCareerEvent} 
+                                />
+                              ))}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
 
