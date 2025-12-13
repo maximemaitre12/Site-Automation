@@ -160,14 +160,14 @@ export default function HR() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-8 py-6 border-b border-border bg-card/50">
+        <header className="flex-shrink-0 px-6 py-4 border-b border-border bg-card/50">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-400 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-400 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-white" />
                 </div>
                 HR Copilot
               </h1>
@@ -191,9 +191,9 @@ export default function HR() {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-hidden flex">
+        <div className="flex-1 min-h-0 flex overflow-hidden">
           {/* Left Sidebar - Sections */}
-          <aside className="w-64 border-r border-border bg-card/30 p-4 flex flex-col gap-2">
+          <aside className="w-56 flex-shrink-0 border-r border-border bg-card/30 p-3 flex flex-col gap-1 overflow-y-auto">
             {mainTab === 'recruitment' ? (
               <>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
@@ -334,12 +334,12 @@ export default function HR() {
 
           {/* Main Content Area */}
           {loading ? (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 min-w-0 flex items-center justify-center">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : (
-            <ScrollArea className="flex-1">
-              <div className="p-8">
+            <ScrollArea className="flex-1 min-w-0">
+              <div className="p-6">
                 {/* RECRUITMENT MODULE */}
                 {mainTab === 'recruitment' && (
                   <>
