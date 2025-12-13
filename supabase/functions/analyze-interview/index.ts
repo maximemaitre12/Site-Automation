@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -6,13 +7,9 @@ const corsHeaders = {
 };
 
 interface AnalyzeRequest {
+  interviewId: string;
+  candidateId: string;
   transcript: string;
-  candidateName: string;
-  candidateSkills?: string[];
-  candidateExperience?: number;
-  jobTitle?: string;
-  jobDescription?: string;
-  jobRequirements?: string[];
 }
 
 serve(async (req) => {
@@ -21,24 +18,64 @@ serve(async (req) => {
   }
 
   try {
-    const { 
-      transcript, 
-      candidateName, 
-      candidateSkills, 
-      candidateExperience,
-      jobTitle, 
-      jobDescription,
-      jobRequirements 
-    }: AnalyzeRequest = await req.json();
+    const { interviewId, candidateId, transcript }: AnalyzeRequest = await req.json();
 
     if (!transcript) {
       throw new Error('Transcript is required');
+    }
+
+    if (!interviewId) {
+      throw new Error('Interview ID is required');
     }
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
+
+    // Create Supabase client to fetch candidate and job data
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Fetch candidate data
+    let candidateName = 'Candidat';
+    let candidateSkills: string[] = [];
+    let candidateExperience = 0;
+    let jobTitle = '';
+    let jobDescription = '';
+    let jobRequirements: string[] = [];
+
+    if (candidateId) {
+      const { data: candidate } = await supabase
+        .from('candidates')
+        .select('name, skills, experience_years, job_id')
+        .eq('id', candidateId)
+        .single();
+
+      if (candidate) {
+        candidateName = candidate.name;
+        candidateSkills = Array.isArray(candidate.skills) ? candidate.skills : [];
+        candidateExperience = candidate.experience_years || 0;
+
+        // Fetch job data if linked
+        if (candidate.job_id) {
+          const { data: job } = await supabase
+            .from('job_descriptions')
+            .select('title, description, requirements')
+            .eq('id', candidate.job_id)
+            .single();
+
+          if (job) {
+            jobTitle = job.title;
+            jobDescription = job.description || '';
+            jobRequirements = Array.isArray(job.requirements) ? job.requirements : [];
+          }
+        }
+      }
+    }
+
+    console.log('Analyzing interview for candidate:', candidateName);
 
     const systemPrompt = `Tu es un expert RH senior spécialisé dans l'analyse d'entretiens d'embauche. 
 Tu dois analyser la transcription d'un entretien et fournir une évaluation complète et objective.
@@ -49,13 +86,13 @@ IMPORTANT: Réponds UNIQUEMENT en JSON valide, sans markdown ni texte supplémen
 
 CANDIDAT:
 - Nom: ${candidateName}
-- Compétences connues: ${candidateSkills?.join(', ') || 'Non spécifiées'}
+- Compétences connues: ${candidateSkills.join(', ') || 'Non spécifiées'}
 - Années d'expérience: ${candidateExperience || 'Non spécifié'}
 
 ${jobTitle ? `POSTE:
 - Titre: ${jobTitle}
 - Description: ${jobDescription || 'Non spécifiée'}
-- Compétences requises: ${jobRequirements?.join(', ') || 'Non spécifiées'}` : ''}
+- Compétences requises: ${jobRequirements.join(', ') || 'Non spécifiées'}` : ''}
 
 TRANSCRIPTION DE L'ENTRETIEN:
 ${transcript}
@@ -124,7 +161,6 @@ Génère une analyse JSON avec cette structure EXACTE:
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        temperature: 0.3,
       }),
     });
 
@@ -135,6 +171,12 @@ Génère une analyse JSON avec cette structure EXACTE:
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
           status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'Usage limit reached. Please add credits.' }), {
+          status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -193,7 +235,31 @@ Génère une analyse JSON avec cette structure EXACTE:
       };
     }
 
-    console.log('Interview analysis completed successfully');
+    console.log('Interview analysis completed, updating database...');
+
+    // Update the interview record with the analysis
+    const { error: updateError } = await supabase
+      .from('candidate_interviews')
+      .update({
+        voice_analysis: analysis.voice_analysis,
+        technical_evaluation: analysis.technical_evaluation,
+        behavioral_evaluation: analysis.behavioral_evaluation,
+        cultural_fit_evaluation: analysis.cultural_fit_evaluation,
+        match_score: analysis.match_score,
+        match_breakdown: analysis.match_breakdown,
+        ai_report: analysis.ai_report,
+        status: 'completed',
+        outcome: analysis.ai_report?.hiring_recommendation === 'strongly_recommend' || 
+                 analysis.ai_report?.hiring_recommendation === 'recommend' ? 'passed' : 'pending'
+      })
+      .eq('id', interviewId);
+
+    if (updateError) {
+      console.error('Error updating interview:', updateError);
+      throw new Error('Failed to save analysis to database');
+    }
+
+    console.log('Interview analysis saved successfully');
 
     return new Response(JSON.stringify(analysis), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
