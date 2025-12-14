@@ -107,6 +107,17 @@ export function CallRecorder({ onTranscriptReady, onRecordingStateChange }: Call
   const processAudio = useCallback(async () => {
     if (!audioBlob) return;
 
+    // Check file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (audioBlob.size > maxSize) {
+      toast({
+        title: 'Fichier trop volumineux',
+        description: 'L\'audio ne doit pas dépasser 5 MB. Utilisez un enregistrement plus court.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsProcessing(true);
     setStatus('processing');
 
@@ -116,7 +127,7 @@ export function CallRecorder({ onTranscriptReady, onRecordingStateChange }: Call
       const base64Promise = new Promise<string>((resolve, reject) => {
         reader.onload = () => {
           const result = reader.result as string;
-          const base64 = result.split(',')[1]; // Remove data:audio/...;base64, prefix
+          const base64 = result.split(',')[1];
           resolve(base64);
         };
         reader.onerror = reject;
@@ -124,28 +135,50 @@ export function CallRecorder({ onTranscriptReady, onRecordingStateChange }: Call
       reader.readAsDataURL(audioBlob);
       
       const base64Audio = await base64Promise;
+      console.log('Audio size (base64):', base64Audio.length, 'bytes');
 
-      // Call transcription edge function
-      const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+      // Create timeout promise (2 minutes)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout')), 120000);
+      });
+
+      // Call transcription edge function with timeout
+      const transcriptionPromise = supabase.functions.invoke('transcribe-audio', {
         body: { 
           audio: base64Audio,
-          mimeType: audioBlob.type
+          mimeType: audioBlob.type || 'audio/webm'
         }
       });
 
-      if (error) throw error;
+      const result = await Promise.race([transcriptionPromise, timeoutPromise]) as { data: any; error: any };
+      const { data, error } = result;
 
-      if (data.fallback) {
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+
+      if (data?.error) {
         toast({
-          title: 'Transcription manuelle requise',
-          description: 'La transcription automatique n\'est pas disponible. Veuillez coller le transcript manuellement.',
+          title: 'Transcription échouée',
+          description: data.error,
           variant: 'destructive'
         });
         setStatus('error');
         return;
       }
 
-      if (data.text) {
+      if (data?.fallback) {
+        toast({
+          title: 'Transcription manuelle requise',
+          description: data.error || 'La transcription automatique n\'est pas disponible.',
+          variant: 'destructive'
+        });
+        setStatus('error');
+        return;
+      }
+
+      if (data?.text) {
         onTranscriptReady(data.text);
         setStatus('success');
         toast({
@@ -153,15 +186,20 @@ export function CallRecorder({ onTranscriptReady, onRecordingStateChange }: Call
           description: 'L\'enregistrement a été transcrit avec succès.'
         });
       } else {
-        throw new Error('No transcription returned');
+        throw new Error('Aucune transcription retournée');
       }
 
     } catch (error) {
       console.error('Processing error:', error);
       setStatus('error');
+      
+      const errorMessage = error instanceof Error && error.message === 'Timeout'
+        ? 'La transcription a pris trop de temps. Utilisez un audio plus court ou collez le texte manuellement.'
+        : 'Impossible de transcrire l\'audio. Vérifiez votre connexion ou collez le transcript manuellement.';
+      
       toast({
         title: 'Erreur de traitement',
-        description: 'Impossible de transcrire l\'audio. Essayez de coller le transcript manuellement.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
