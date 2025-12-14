@@ -61,27 +61,24 @@ serve(async (req) => {
     // Build the prompt
     const userPrompt = variables.prompt || '';
     
-    const systemPrompt = `Tu es un rédacteur professionnel d'entreprise avec 20 ans d'expérience. Tu génères des documents comme si une équipe d'experts y avait passé des heures.
+    const systemPrompt = `Tu es un cadre supérieur avec 30 ans d'expérience en rédaction professionnelle. Tu génères des documents comme un humain expert.
 
-RÈGLES ABSOLUES - TRÈS IMPORTANT:
-1. Le texte doit être 100% HUMAIN - Aucune trace d'IA visible
-2. PAS de marqueurs markdown visibles (pas de **, pas de ##, pas de -)
-3. PAS d'astérisques, PAS de puces avec tirets simples
-4. Structure avec des titres en MAJUSCULES ou numérotés
-5. Paragraphes fluides et naturels
-6. Numérote les sections professionnellement (1., 1.1, a), etc.)
-7. Vocabulaire riche et varié
-8. Transitions naturelles entre sections
-9. Formulations originales, jamais de phrases types d'IA
-10. Ton adapté au contexte professionnel français
+INTERDICTIONS ABSOLUES (ne fais JAMAIS ceci):
+- Pas de crochets [] comme [Insérer la date] ou [Prénom Nom]
+- Pas de markdown: **, ##, #, ---, *, -
+- Pas de phrases d'introduction comme "Voici le contenu du document" ou "Ce document présente"
+- Pas de "Résumé du Mail" ou structure de template standard
+- Pas de placeholders ou texte à remplir
+- Pas de formules robotiques typiques d'IA
 
-FORMAT DE SORTIE:
-- Titres principaux: TOUT EN MAJUSCULES
-- Sous-titres: Numérotés (1.1, 1.2, etc.)
-- Listes: Utiliser "•" ou numéros, jamais "-"
-- Paragraphes: Complets et bien développés
+STYLE OBLIGATOIRE:
+- Écris comme si tu étais l'auteur original du document
+- Commence directement par le contenu, sans bloc d'introduction explicatif
+- Phrases fluides et naturelles, vocabulaire varié
+- Paragraphes continus, pas de listes à puces sauf si vraiment nécessaire
+- Ton adapté au contexte professionnel français
 
-Le document doit sembler rédigé par un humain expert, pas par une IA.`;
+Le document doit sembler rédigé par un humain expert, jamais par une IA.`;
 
     const generatePrompt = `Génère un document professionnel de type "${templateName}" (catégorie: ${templateCategory}).
 
@@ -116,11 +113,22 @@ Génère le document complet. Il doit être irréprochable et prêt à l'emploi 
     }
 
     const aiResponse = await response.json();
-    const content = aiResponse.choices?.[0]?.message?.content || '';
+    let content = aiResponse.choices?.[0]?.message?.content || '';
 
     if (!content) {
       throw new Error('No content generated');
     }
+
+    // Nettoyage agressif des traces d'IA / markdown / placeholders
+    content = content
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/^[#]+\s+/gm, '')
+      .replace(/\*\*/g, '')
+      .replace(/^---$/gm, '')
+      .replace(/\[[^\]]*\]/g, '')
+      .replace(/(^|\n)\s*Voici le contenu du document[^\n]*\n?/gi, '$1')
+      .replace(/(^|\n)\s*Résumé du Mail\s*:?/gi, '$1')
+      .trim();
 
     // Create the document in the database
     const { data: document, error: insertError } = await supabase
