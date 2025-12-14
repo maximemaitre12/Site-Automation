@@ -80,38 +80,37 @@ serve(async (req) => {
       contract: 'Format contractuel: clauses numérotées, termes juridiques précis, structure formelle'
     };
 
-    const systemPrompt = `Tu es un rédacteur professionnel d'entreprise avec 20 ans d'expérience. Tu réécris des documents pour qu'ils soient irréprochables, comme s'ils avaient été rédigés par une équipe de professionnels pendant des heures.
+    const systemPrompt = `Tu es un cadre supérieur avec 30 ans d'expérience en rédaction professionnelle. Tu réécris des documents comme un humain expert.
 
-RÈGLES ABSOLUES - TRÈS IMPORTANT:
-1. Le texte doit être 100% humain - JAMAIS de traces d'IA visible
-2. Pas de marqueurs markdown (pas de **, pas de ##, pas de -)
-3. Pas d'astérisques, pas de puces avec tirets
-4. Structure avec des titres en MAJUSCULES ou soulignés naturellement
-5. Utilise des paragraphes fluides et naturels
-6. Numérote les sections de façon professionnelle (1., 1.1, a), etc.)
-7. Vocabulaire varié et professionnel
-8. Transitions naturelles entre les sections
-9. Aucune répétition de formules types d'IA
+INTERDICTIONS ABSOLUES (ne fais JAMAIS ceci):
+- Pas de crochets [] comme [Insérer la date] ou [Prénom Nom]
+- Pas de markdown: **, ##, #, ---, *, -
+- Pas de phrases d'introduction comme "Voici le contenu" ou "Ce document présente"
+- Pas de "Résumé du Mail" ou structure type template
+- Pas de placeholders ou texte à remplir
+- Pas de formules robotiques type IA
 
-STYLE DE RÉDACTION:
+STYLE OBLIGATOIRE:
+- Écris comme si tu étais l'auteur original du document
+- Phrases fluides et naturelles, vocabulaire varié
+- Si des informations manquent (date, nom), invente-les de façon réaliste ou omets-les
+- Commence directement par le contenu, pas d'en-tête artificiel
+- Structure naturelle avec paragraphes, pas de listes à puces
+- Ton d'un professionnel expérimenté qui s'adresse à ses collègues
+
 ${styleInstructions[style] || styleInstructions.professional}
 
-${format ? `FORMAT ATTENDU:\n${formatInstructions[format] || ''}` : ''}
+${format ? `FORMAT: ${formatInstructions[format] || ''}` : ''}
 
-${companyRules ? `RÈGLES SPÉCIFIQUES DE L'ENTREPRISE:\n${companyRules}` : ''}
+${companyRules ? `RÈGLES ENTREPRISE: ${companyRules}` : ''}
 
-${instructions ? `INSTRUCTIONS SPÉCIFIQUES:\n${instructions}` : ''}
+${instructions ? `INSTRUCTIONS: ${instructions}` : ''}`;
 
-Le document final doit sembler avoir été rédigé par un expert humain, pas par une IA.`;
+    const userPrompt = `Réécris ce document comme si tu l'avais écrit toi-même, sans aucune trace d'IA:
 
-    const userPrompt = `Réécris ce document de manière professionnelle et humaine:
-
-TITRE: ${document.title}
-
-CONTENU ORIGINAL:
 ${document.content}
 
-Réécris complètement ce document en respectant toutes les règles ci-dessus. Le résultat doit être impeccable et prêt à être utilisé tel quel dans un contexte professionnel.`;
+Produis un texte final naturel, professionnel, prêt à l'emploi. Pas de crochets, pas de markdown, pas de placeholders.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
