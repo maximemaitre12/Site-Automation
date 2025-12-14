@@ -1,5 +1,4 @@
 import { WorkflowBlock, WorkflowRunLog, BLOCK_DEFINITIONS, BlockConnection } from '@/types/workflow';
-import { callAI, summarizeText, extractData, classifyText, generateContent } from './ai';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ExecutionContext {
@@ -16,6 +15,56 @@ export interface BranchResult {
   success: boolean;
   logs: WorkflowRunLog[];
 }
+
+// Execute workflow via Edge Function (server-side) for proper AI access
+export async function executeWorkflowViaServer(
+  blocks: WorkflowBlock[],
+  initialInput: any,
+  workflowId?: string,
+  variables?: Record<string, any>
+): Promise<{ success: boolean; output: any; logs: WorkflowRunLog[] }> {
+  try {
+    // Get user session for authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      throw new Error('Authentication required to execute workflow');
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/workflow-execute`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify({
+        blocks,
+        input: initialInput,
+        workflowId,
+        variables: variables || {}
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Server error' }));
+      throw new Error(errorData.error || `Server error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return {
+      success: result.success,
+      output: result.output,
+      logs: result.logs || []
+    };
+  } catch (error) {
+    console.error('Workflow execution via server failed:', error);
+    throw error;
+  }
+}
+
+// NOTE: AI blocks (ai_summary, ai_extract, ai_classify, etc.) are now executed server-side
+// via the workflow-execute Edge Function which has direct access to Lovable AI Gateway.
+// The client-side executeBlock is kept for non-AI blocks only as fallback.
 
 export async function executeBlock(
   block: WorkflowBlock,
@@ -41,123 +90,20 @@ export async function executeBlock(
         output = context.input;
         break;
 
-      case 'ai_summary': {
-        const style = block.config?.style || 'detailed';
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `Summarize the following content in a ${style} style:\n\n${inputText}\n\nProvide a clear, structured summary.`
-          }],
-          type: 'summarize'
-        });
-        if (response.error) throw new Error(response.error);
-        output = { summary: response.content, style };
+      // AI blocks are handled server-side - return placeholder for client fallback
+      case 'ai_summary':
+      case 'ai_extract':
+      case 'ai_classify':
+      case 'ai_generate':
+      case 'ai_decision':
+      case 'ai_sentiment':
+      case 'ai_translate':
+        // These should be executed via executeWorkflowViaServer, not locally
+        output = { 
+          error: 'AI blocks must be executed via server. Use executeWorkflowViaServer instead.',
+          requiresServer: true 
+        };
         break;
-      }
-
-      case 'ai_extract': {
-        const fields = block.config?.fields || 'name, email, date, amount';
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `Extract the following fields from this text: ${fields}\n\nText:\n${inputText}\n\nRespond ONLY with valid JSON containing the extracted fields. If a field is not found, use null.`
-          }],
-          type: 'extract'
-        });
-        if (response.error) throw new Error(response.error);
-        try {
-          const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-          output = jsonMatch ? JSON.parse(jsonMatch[0]) : { raw: response.content };
-        } catch {
-          output = { raw: response.content };
-        }
-        break;
-      }
-
-      case 'ai_classify': {
-        const categories = block.config?.categories || 'Finance, Legal, Support, Technical, Other';
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `Classify this text into ONE of these categories: ${categories}\n\nText:\n${inputText}\n\nRespond with JSON: {"category": "chosen_category", "confidence": 0.0-1.0, "reason": "brief explanation"}`
-          }],
-          type: 'classify'
-        });
-        if (response.error) throw new Error(response.error);
-        try {
-          const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-          output = jsonMatch ? JSON.parse(jsonMatch[0]) : { category: response.content, confidence: 0.8 };
-        } catch {
-          output = { category: response.content, confidence: 0.8 };
-        }
-        break;
-      }
-
-      case 'ai_generate': {
-        const prompt = block.config?.prompt || 'Generate a professional response';
-        const tone = block.config?.tone || 'professional';
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `${prompt}\n\nContext:\n${inputText}\n\nTone: ${tone}\n\nGenerate the requested content.`
-          }],
-          type: 'generate'
-        });
-        if (response.error) throw new Error(response.error);
-        output = { generated: response.content, tone };
-        break;
-      }
-
-      case 'ai_decision': {
-        const question = block.config?.question || 'Should this be approved?';
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `Based on this context:\n${inputText}\n\nAnswer this question: ${question}\n\nRespond with JSON: {"decision": "yes" or "no", "confidence": 0.0-1.0, "reasoning": "explanation"}`
-          }],
-          type: 'analyze'
-        });
-        if (response.error) throw new Error(response.error);
-        try {
-          const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-          output = jsonMatch ? JSON.parse(jsonMatch[0]) : { decision: 'unknown', reasoning: response.content };
-        } catch {
-          output = { decision: 'unknown', reasoning: response.content };
-        }
-        break;
-      }
-
-      case 'ai_sentiment': {
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `Analyze the sentiment of this text:\n\n${inputText}\n\nRespond with JSON: {"sentiment": "positive/negative/neutral", "score": -1.0 to 1.0, "emotions": ["list of detected emotions"]}`
-          }],
-          type: 'analyze'
-        });
-        if (response.error) throw new Error(response.error);
-        try {
-          const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-          output = jsonMatch ? JSON.parse(jsonMatch[0]) : { sentiment: 'neutral', score: 0 };
-        } catch {
-          output = { sentiment: 'neutral', score: 0, raw: response.content };
-        }
-        break;
-      }
-
-      case 'ai_translate': {
-        const targetLanguage = block.config?.targetLanguage || 'English';
-        const response = await callAI({
-          messages: [{
-            role: 'user',
-            content: `Translate the following text to ${targetLanguage}:\n\n${inputText}`
-          }],
-          type: 'generate'
-        });
-        if (response.error) throw new Error(response.error);
-        output = { translated: response.content, targetLanguage };
-        break;
-      }
 
       // Control flow blocks
       case 'control_condition': {
