@@ -453,14 +453,27 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
     
     const token = authHeader.replace('Bearer ', '');
+    console.log('Authenticating user with token...');
+    
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     
-    if (userError || !user) {
+    if (userError) {
+      console.error('Auth error:', userError.message);
       return new Response(
-        JSON.stringify({ error: 'Invalid token' }),
+        JSON.stringify({ error: 'Invalid token', details: userError.message }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    if (!user) {
+      console.error('No user found for token');
+      return new Response(
+        JSON.stringify({ error: 'User not found' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    console.log(`Authenticated user: ${user.id}`);
 
     const { queryType, queryValue }: EnrichmentRequest = await req.json();
     
