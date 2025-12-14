@@ -171,17 +171,23 @@ Client: ${data.prospectName}, Produit: ${data.productName}, Objections: ${data.o
     if (!user) return null;
 
     try {
+      const currentYear = new Date().getFullYear();
       const response = await callAI({
         messages: [{
           role: 'user',
-          content: `Analyse cet appel commercial. Réponds en JSON:
+          content: `Analyse cet appel commercial. Nous sommes en ${currentYear}. Réponds UNIQUEMENT en JSON valide:
 {
-  "summary": "résumé en 3-4 phrases",
-  "sentiment": "positif/neutre/négatif",
-  "key_points": ["point1", "point2"],
-  "objections": ["objection1"],
-  "next_steps": ["action1", "action2"]
+  "summary": "résumé concis en 2-3 phrases",
+  "sentiment": "positif" ou "neutre" ou "négatif",
+  "key_points": ["point clé 1", "point clé 2"],
+  "objections": ["objection soulevée"],
+  "next_steps": ["prochaine action"],
+  "mentioned_date": "YYYY-MM-DD ou null si aucune date de signature/décision mentionnée",
+  "budget_mentioned": nombre ou null,
+  "decision_maker_identified": true ou false
 }
+
+IMPORTANT: Si une date de signature, décision ou closing est mentionnée (ex: "en mars", "fin février", "le 15"), convertis-la en format YYYY-MM-DD. Pour "mars" sans jour précis, utilise le 15 du mois.
 
 Transcript:
 ${transcript}`
@@ -253,16 +259,31 @@ ${transcript}`
           last_call_sentiment: parsed.sentiment,
           last_call_next_steps: parsed.next_steps,
           last_call_objections: parsed.objections,
+          budget_mentioned: parsed.budget_mentioned,
+          decision_maker_identified: parsed.decision_maker_identified,
           call_notes: [noteContent, ...existingNotes]
         };
 
+        // Build update object
+        const updateData: Record<string, unknown> = {
+          last_activity_at: new Date().toISOString(),
+          probability: newProbability,
+          custom_fields: updatedCustomFields
+        };
+
+        // Update expected_close_date if a date was mentioned in the call
+        if (parsed.mentioned_date) {
+          updateData.expected_close_date = parsed.mentioned_date;
+        }
+
+        // Update value if budget was mentioned
+        if (parsed.budget_mentioned && typeof parsed.budget_mentioned === 'number') {
+          updateData.value = parsed.budget_mentioned;
+        }
+
         const { error: updateError } = await supabase
           .from('sales_deals')
-          .update({
-            last_activity_at: new Date().toISOString(),
-            probability: newProbability,
-            custom_fields: updatedCustomFields
-          })
+          .update(updateData)
           .eq('id', dealId);
 
         if (updateError) {
