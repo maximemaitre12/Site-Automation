@@ -917,6 +917,77 @@ Only output JSON, no other text.`;
         break;
       }
 
+      // ===== AETHER DOCUMENT CREATION (REAL PDF GENERATION) =====
+      case 'aether_doc_create': {
+        const title = block.config?.title;
+        const content = block.config?.content;
+        const prompt = block.config?.prompt;
+        const docType = block.config?.type || 'rapport';
+        const tone = block.config?.tone || 'professionnel';
+        const folderId = block.config?.folderId;
+        const tagsStr = block.config?.tags || '';
+        const userId = context.variables?._userId;
+        
+        if (!userId) {
+          output = { created: false, error: 'User ID required for document creation' };
+          break;
+        }
+        
+        if (!title) {
+          output = { created: false, error: 'Document title is required' };
+          break;
+        }
+
+        // Build context from workflow input
+        const workflowContext = typeof context.input === 'string' 
+          ? context.input 
+          : JSON.stringify(context.input, null, 2);
+
+        try {
+          // Call the workflow-generate-document edge function
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          const tags = tagsStr.split(',').map((t: string) => t.trim()).filter((t: string) => t);
+          
+          const { data: fnResult, error: fnError } = await supabase.functions.invoke('workflow-generate-document', {
+            body: {
+              title,
+              content: content || undefined,
+              prompt: prompt || undefined,
+              type: docType,
+              tone,
+              userId,
+              workflowId: context.variables?._workflowId,
+              workflowRunId: context.variables?._workflowRunId,
+              context: workflowContext,
+              folderId: folderId || undefined,
+              tags: tags.length > 0 ? tags : ['workflow', 'auto-generated']
+            }
+          });
+
+          if (fnError) {
+            console.error('Document generation error:', fnError);
+            output = { created: false, error: fnError.message || 'Document generation failed' };
+          } else if (fnResult?.success) {
+            output = {
+              created: true,
+              document: fnResult.document,
+              documentId: fnResult.document?.id,
+              title: fnResult.document?.title,
+              fileUrl: fnResult.document?.file_url,
+              fileType: 'application/pdf',
+              timestamp: new Date().toISOString()
+            };
+          } else {
+            output = { created: false, error: fnResult?.error || 'Unknown error during document generation' };
+          }
+        } catch (e) {
+          console.error('Document creation error:', e);
+          output = { created: false, error: e instanceof Error ? e.message : 'Document creation failed' };
+        }
+        break;
+      }
+
       default:
         output = context.input;
     }

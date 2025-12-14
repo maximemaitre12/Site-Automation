@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.workflow-generate]
 verify_jwt = true
 
+[functions.workflow-generate-document]
+verify_jwt = false
+
 [functions.ai-chat]
 verify_jwt = true
 
