@@ -24,6 +24,7 @@ export interface SalesProposal {
 export interface CallAnalysis {
   id: string;
   user_id: string;
+  deal_id: string | null;
   title: string;
   transcript: string | null;
   summary: string | null;
@@ -166,7 +167,7 @@ Client: ${data.prospectName}, Produit: ${data.productName}, Objections: ${data.o
     }
   };
 
-  const analyzeCall = async (title: string, transcript: string): Promise<CallAnalysis | null> => {
+  const analyzeCall = async (title: string, transcript: string, dealId?: string): Promise<CallAnalysis | null> => {
     if (!user) return null;
 
     try {
@@ -205,6 +206,7 @@ ${transcript}`
         .from('call_analyses')
         .insert({
           user_id: user.id,
+          deal_id: dealId || null,
           title,
           transcript,
           summary: parsed.summary || '',

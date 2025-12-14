@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
   TrendingUp, FileText, Mail, Phone, Sparkles, User, Building, 
-  Loader2, CheckCircle, Copy, History, ChevronRight, Kanban
+  Loader2, CheckCircle, Copy, History, ChevronRight, Kanban, Target
 } from "lucide-react";
 import { useState } from "react";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
@@ -16,10 +16,13 @@ import { CallRecorder } from "@/components/sales/CallRecorder";
 import { CallAnalysisResult } from "@/components/sales/CallAnalysisResult";
 import { ProposalDisplay } from "@/components/sales/ProposalDisplay";
 import { SalesPipeline } from "@/components/sales/SalesPipeline";
+import { DealSelector } from "@/components/sales/DealSelector";
+import { NegotiationSheetGenerator } from "@/components/sales/NegotiationSheetGenerator";
 import { useToast } from "@/hooks/use-toast";
+import { SalesDeal } from "@/hooks/useAIIntelligence";
 
 export default function Sales() {
-  const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email">("pipeline");
+  const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email" | "negotiation">("pipeline");
   const { 
     proposals, 
     callAnalyses, 
@@ -46,6 +49,7 @@ export default function Sales() {
   const [transcript, setTranscript] = useState('');
   const [analyzingCall, setAnalyzingCall] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
+  const [selectedCallDeal, setSelectedCallDeal] = useState<SalesDeal | null>(null);
 
   // Email form state
   const [emailForm, setEmailForm] = useState({
@@ -96,7 +100,8 @@ export default function Sales() {
     setAnalyzingCall(true);
     const result = await analyzeCall(
       callTitle || `Appel du ${new Date().toLocaleDateString('fr-FR')}`,
-      transcript
+      transcript,
+      selectedCallDeal?.id
     );
     
     if (result) {
@@ -161,10 +166,11 @@ export default function Sales() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mt-6">
+          <div className="flex gap-2 mt-6 flex-wrap">
             {[
               { key: "pipeline", label: "Pipeline", icon: Kanban },
               { key: "call", label: "Analyser Appel", icon: Phone },
+              { key: "negotiation", label: "Fiches Négociation", icon: Target },
               { key: "proposal", label: "Générer Proposition", icon: FileText },
               { key: "email", label: "Rédiger Email", icon: Mail },
             ].map((tab) => (
@@ -285,6 +291,29 @@ export default function Sales() {
 
             {activeTab === "call" && (
               <div className="max-w-3xl space-y-6">
+                {/* Deal Selector */}
+                <DealSelector
+                  selectedDealId={selectedCallDeal?.id || null}
+                  onSelectDeal={setSelectedCallDeal}
+                />
+                
+                {selectedCallDeal && (
+                  <Card className="border-primary/30 bg-primary/5">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{selectedCallDeal.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedCallDeal.contact_name && `${selectedCallDeal.contact_name} • `}
+                            {selectedCallDeal.value && `€${selectedCallDeal.value.toLocaleString('fr-FR')}`}
+                          </p>
+                        </div>
+                        <Badge variant="secondary">{selectedCallDeal.status}</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
                 {/* Call Recorder Component */}
                 <CallRecorder 
                   onTranscriptReady={handleTranscriptReady}
@@ -346,6 +375,12 @@ export default function Sales() {
                     onClose={() => setCurrentAnalysis(null)}
                   />
                 )}
+              </div>
+            )}
+
+            {activeTab === "negotiation" && (
+              <div className="max-w-4xl">
+                <NegotiationSheetGenerator />
               </div>
             )}
 

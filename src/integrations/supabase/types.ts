@@ -479,6 +479,7 @@ export type Database = {
       call_analyses: {
         Row: {
           created_at: string
+          deal_id: string | null
           id: string
           key_points: Json | null
           next_steps: Json | null
@@ -491,6 +492,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deal_id?: string | null
           id?: string
           key_points?: Json | null
           next_steps?: Json | null
@@ -503,6 +505,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deal_id?: string | null
           id?: string
           key_points?: Json | null
           next_steps?: Json | null
@@ -513,7 +516,15 @@ export type Database = {
           transcript?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "call_analyses_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "sales_deals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       candidate_interviews: {
         Row: {
@@ -2494,6 +2505,80 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "knowledge_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      negotiation_sheets: {
+        Row: {
+          anticipated_objections: Json | null
+          closing_strategies: Json | null
+          company_context: string | null
+          competitive_advantages: Json | null
+          contact_context: string | null
+          counter_arguments: Json | null
+          created_at: string
+          current_situation: string | null
+          deal_id: string | null
+          follow_up_date: string | null
+          follow_up_notes: string | null
+          id: string
+          key_arguments: Json | null
+          negotiation_status: string | null
+          next_steps: Json | null
+          price_justification: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anticipated_objections?: Json | null
+          closing_strategies?: Json | null
+          company_context?: string | null
+          competitive_advantages?: Json | null
+          contact_context?: string | null
+          counter_arguments?: Json | null
+          created_at?: string
+          current_situation?: string | null
+          deal_id?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
+          id?: string
+          key_arguments?: Json | null
+          negotiation_status?: string | null
+          next_steps?: Json | null
+          price_justification?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anticipated_objections?: Json | null
+          closing_strategies?: Json | null
+          company_context?: string | null
+          competitive_advantages?: Json | null
+          contact_context?: string | null
+          counter_arguments?: Json | null
+          created_at?: string
+          current_situation?: string | null
+          deal_id?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
+          id?: string
+          key_arguments?: Json | null
+          negotiation_status?: string | null
+          next_steps?: Json | null
+          price_justification?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negotiation_sheets_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "sales_deals"
             referencedColumns: ["id"]
           },
         ]
