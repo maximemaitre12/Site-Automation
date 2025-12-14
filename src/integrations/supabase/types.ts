@@ -2664,6 +2664,7 @@ export type Database = {
           ai_risk_score: number | null
           ai_score: number | null
           assigned_to: string | null
+          company_enrichment: Json | null
           company_id: string | null
           contact_email: string | null
           contact_name: string | null
@@ -2691,6 +2692,7 @@ export type Database = {
           ai_risk_score?: number | null
           ai_score?: number | null
           assigned_to?: string | null
+          company_enrichment?: Json | null
           company_id?: string | null
           contact_email?: string | null
           contact_name?: string | null
@@ -2718,6 +2720,7 @@ export type Database = {
           ai_risk_score?: number | null
           ai_score?: number | null
           assigned_to?: string | null
+          company_enrichment?: Json | null
           company_id?: string | null
           contact_email?: string | null
           contact_name?: string | null

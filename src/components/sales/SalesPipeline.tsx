@@ -31,7 +31,14 @@ import {
   Sparkles,
   Activity,
   Loader2,
-  GripVertical
+  GripVertical,
+  Building2,
+  Globe,
+  Linkedin,
+  Users,
+  MapPin,
+  FileText,
+  RefreshCw
 } from 'lucide-react';
 import { useAIIntelligence, SalesDeal } from '@/hooks/useAIIntelligence';
 import { supabase } from '@/integrations/supabase/client';
@@ -684,8 +691,12 @@ export function SalesPipeline() {
                 </DialogHeader>
                 
                 <Tabs defaultValue="overview" className="mt-4">
-                  <TabsList className="grid grid-cols-3 w-full">
+                  <TabsList className="grid grid-cols-4 w-full">
                     <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+                    <TabsTrigger value="company" className="flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      Entreprise
+                    </TabsTrigger>
                     <TabsTrigger value="ai">Score IA</TabsTrigger>
                     <TabsTrigger value="notes">Notes</TabsTrigger>
                   </TabsList>
@@ -782,6 +793,194 @@ export function SalesPipeline() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="company" className="space-y-4 mt-4">
+                    {selectedDeal.company_enrichment ? (
+                      <>
+                        {/* Header entreprise */}
+                        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-primary/10">
+                                  <Building2 className="h-6 w-6 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-lg">{selectedDeal.company_enrichment.name || selectedDeal.title}</h3>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    {selectedDeal.company_enrichment.naf_label && (
+                                      <Badge variant="secondary" className="text-xs">{selectedDeal.company_enrichment.naf_label}</Badge>
+                                    )}
+                                    {selectedDeal.company_enrichment.legal_form && (
+                                      <Badge variant="outline" className="text-xs">{selectedDeal.company_enrichment.legal_form}</Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Enrichi
+                              </Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Infos clés */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <Card>
+                            <CardContent className="p-4 space-y-3">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                  <Label className="text-muted-foreground text-xs">Adresse</Label>
+                                  <p className="text-sm">
+                                    {selectedDeal.company_enrichment.address && `${selectedDeal.company_enrichment.address}, `}
+                                    {selectedDeal.company_enrichment.postal_code} {selectedDeal.company_enrichment.city}
+                                  </p>
+                                </div>
+                              </div>
+                              {selectedDeal.company_enrichment.siren && (
+                                <div className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <Label className="text-muted-foreground text-xs">SIREN</Label>
+                                    <p className="text-sm font-mono">{selectedDeal.company_enrichment.siren}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {selectedDeal.company_enrichment.creation_date && (
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <Label className="text-muted-foreground text-xs">Création</Label>
+                                    <p className="text-sm">{selectedDeal.company_enrichment.creation_date}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4 space-y-3">
+                              {selectedDeal.company_enrichment.employees_range && (
+                                <div className="flex items-center gap-2">
+                                  <Users className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <Label className="text-muted-foreground text-xs">Effectif</Label>
+                                    <p className="text-sm">{selectedDeal.company_enrichment.employees_range}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {selectedDeal.company_enrichment.revenue && (
+                                <div className="flex items-center gap-2">
+                                  <Euro className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <Label className="text-muted-foreground text-xs">Chiffre d'affaires {selectedDeal.company_enrichment.revenue_year}</Label>
+                                    <p className="text-sm font-semibold">
+                                      €{selectedDeal.company_enrichment.revenue.toLocaleString('fr-FR')}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              {selectedDeal.company_enrichment.capital && (
+                                <div className="flex items-center gap-2">
+                                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <Label className="text-muted-foreground text-xs">Capital</Label>
+                                    <p className="text-sm">€{selectedDeal.company_enrichment.capital.toLocaleString('fr-FR')}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Liens */}
+                        {(selectedDeal.company_enrichment.website || selectedDeal.company_enrichment.linkedin_url) && (
+                          <Card>
+                            <CardContent className="p-4 flex items-center gap-4">
+                              {selectedDeal.company_enrichment.website && (
+                                <a 
+                                  href={selectedDeal.company_enrichment.website.startsWith('http') ? selectedDeal.company_enrichment.website : `https://${selectedDeal.company_enrichment.website}`}
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <Globe className="h-4 w-4" />
+                                  Site web
+                                </a>
+                              )}
+                              {selectedDeal.company_enrichment.linkedin_url && (
+                                <a 
+                                  href={selectedDeal.company_enrichment.linkedin_url}
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <Linkedin className="h-4 w-4" />
+                                  LinkedIn
+                                </a>
+                              )}
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {/* Résumé IA */}
+                        {selectedDeal.company_enrichment.ai_summary && (
+                          <Card className="bg-primary/5 border-primary/20">
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-sm flex items-center gap-2">
+                                <Sparkles className="h-4 w-4 text-primary" />
+                                Résumé IA
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm">{selectedDeal.company_enrichment.ai_summary}</p>
+                              {selectedDeal.company_enrichment.ai_keywords && selectedDeal.company_enrichment.ai_keywords.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-3">
+                                  {selectedDeal.company_enrichment.ai_keywords.slice(0, 6).map((keyword: string, i: number) => (
+                                    <Badge key={i} variant="secondary" className="text-xs">{keyword}</Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {/* Dirigeants */}
+                        {selectedDeal.company_enrichment.executives && selectedDeal.company_enrichment.executives.length > 0 && (
+                          <Card>
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-sm flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                Dirigeants
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                              {selectedDeal.company_enrichment.executives.slice(0, 5).map((exec: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between py-1.5 border-b last:border-0">
+                                  <span className="text-sm font-medium">
+                                    {exec.prenom || exec.prenoms} {exec.nom}
+                                  </span>
+                                  <Badge variant="outline" className="text-xs">{exec.qualite || exec.fonction}</Badge>
+                                </div>
+                              ))}
+                            </CardContent>
+                          </Card>
+                        )}
+                      </>
+                    ) : (
+                      <Card>
+                        <CardContent className="p-8 text-center">
+                          <Building2 className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                          <p className="text-muted-foreground mb-4">Aucune donnée d'entreprise enrichie</p>
+                          <p className="text-sm text-muted-foreground">
+                            L'enrichissement se lance automatiquement lors de la création du deal.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
                   </TabsContent>
 
                   <TabsContent value="ai" className="space-y-4 mt-4">
