@@ -51,31 +51,172 @@ function scoreCompany(company: any): number {
   return score;
 }
 
-// Common misspellings and variations for famous French companies
-const COMPANY_CORRECTIONS: Record<string, string[]> = {
-  'saint gaubin': ['saint-gobain', 'saint gobain'],
-  'saintgaubin': ['saint-gobain', 'saintgobain'],
-  'saint gobin': ['saint-gobain', 'saint gobain'],
-  'saintgobin': ['saint-gobain', 'saintgobain'],
-  'total energie': ['totalenergies', 'total energies'],
-  'totalenergie': ['totalenergies'],
-  'bmparibase': ['bnp paribas'],
-  'bnparibase': ['bnp paribas'],
-  'societe general': ['societe generale'],
-  'credit agricol': ['credit agricole'],
-  'axa assurance': ['axa'],
-  'lvmh moet': ['lvmh'],
-  'carfour': ['carrefour'],
-  'carrefourt': ['carrefour'],
-  'danonne': ['danone'],
-  'oreal': ["l'oreal", 'loreal'],
-  'loréal': ["l'oreal", 'loreal'],
-  'michlin': ['michelin'],
-  'capgeminie': ['capgemini'],
-  'capgeminii': ['capgemini'],
-  'onepoint': ['onepoint'],
-  'one point': ['onepoint'],
+// ========== BASE DE DONNÉES DES GRANDES ENTREPRISES FRANÇAISES ==========
+// Contient les principales entreprises du CAC40 et autres grandes entreprises
+const MAJOR_FRENCH_COMPANIES: Record<string, { name: string; siren: string; aliases: string[] }> = {
+  'saint-gobain': { name: 'SAINT-GOBAIN', siren: '542039532', aliases: ['saintgobain', 'saint gobain', 'st gobain', 'stgobain', 'saint gaubin', 'saintgaubin', 'sen gobin', 'saint gobin', 'saintgobin', 'saint goban', 'compagnie de saint gobain', 'compagnie de saint-gobain'] },
+  'totalenergies': { name: 'TOTALENERGIES SE', siren: '542051180', aliases: ['total', 'total energie', 'totalenergie', 'total energies', 'total energy', 'totale energie', 'totale', 'total sa'] },
+  'bnp paribas': { name: 'BNP PARIBAS', siren: '662042449', aliases: ['bnp', 'bnpparibas', 'bmpparibas', 'bnp pariba', 'bnppariba', 'bnp paris', 'bmp paribas'] },
+  'societe generale': { name: 'SOCIETE GENERALE', siren: '552120222', aliases: ['socgen', 'sg', 'societe general', 'societegenerale', 'societegeneral', 'société générale', 'sociétégénérale', 'soc gen', 'socgene'] },
+  'credit agricole': { name: 'CREDIT AGRICOLE SA', siren: '784608416', aliases: ['ca', 'creditagricole', 'credit agricol', 'creditagricol', 'credi agricole', 'crédit agricole'] },
+  'axa': { name: 'AXA SA', siren: '572093920', aliases: ['axa assurance', 'axa assurances', 'axa france', 'axas'] },
+  'lvmh': { name: 'LVMH MOET HENNESSY LOUIS VUITTON', siren: '775670417', aliases: ['lvmh moet', 'louis vuitton', 'louisvuitton', 'moet hennessy', 'lvmhmoet', 'lv', 'lvm'] },
+  'carrefour': { name: 'CARREFOUR', siren: '652014051', aliases: ['carfour', 'carrefourt', 'carefour', 'carefore', 'carrefoure'] },
+  'danone': { name: 'DANONE', siren: '552032534', aliases: ['danonne', 'danonn', 'danon', 'danonne'] },
+  'loreal': { name: "L'OREAL", siren: '632012100', aliases: ['oreal', "l'oreal", 'loréal', "l'oréal", 'loreale', 'loriale', 'lorial'] },
+  'michelin': { name: 'COMPAGNIE GENERALE DES ETABLISSEMENTS MICHELIN', siren: '855200507', aliases: ['michlin', 'micheline', 'michelain', 'michellin', 'pneu michelin'] },
+  'capgemini': { name: 'CAPGEMINI SE', siren: '330703844', aliases: ['capgeminii', 'capgeminie', 'cap gemini', 'capjemini', 'cap jemini', 'capge', 'cap gémini'] },
+  'sanofi': { name: 'SANOFI', siren: '395030844', aliases: ['sanoffi', 'sanoffy', 'sanofie', 'sanofi aventis', 'sanofiaventis'] },
+  'orange': { name: 'ORANGE', siren: '380129866', aliases: ['orange sa', 'orange france', 'france telecom', 'francetelecom'] },
+  'engie': { name: 'ENGIE', siren: '542107651', aliases: ['engi', 'engies', 'gdf suez', 'gdfsuez', 'gdf', 'suez'] },
+  'airbus': { name: 'AIRBUS SE', siren: '383474814', aliases: ['airbu', 'airbuss', 'airbus group', 'eads', 'airbuse'] },
+  'safran': { name: 'SAFRAN', siren: '562082909', aliases: ['safrane', 'saffran', 'safrant'] },
+  'thales': { name: 'THALES', siren: '552059024', aliases: ['thalès', 'thale', 'thaless', 'talès', 'tales'] },
+  'schneider electric': { name: 'SCHNEIDER ELECTRIC SE', siren: '542048574', aliases: ['schneider', 'schneidere', 'schneiderelectric', 'shneider', 'shneideur'] },
+  'dassault': { name: 'DASSAULT SYSTEMES SE', siren: '322306440', aliases: ['dassault systemes', 'dassaultsystemes', 'dassault system', 'dasault', 'dassauld'] },
+  'veolia': { name: 'VEOLIA ENVIRONNEMENT', siren: '403210032', aliases: ['veolia environnement', 'veoliia', 'veola', 'veolia eau'] },
+  'bouygues': { name: 'BOUYGUES', siren: '572015246', aliases: ['bouygue', 'bouigue', 'bouig', 'bouyges', 'boyg', 'bouygue telecom', 'bouygues telecom'] },
+  'vinci': { name: 'VINCI', siren: '552037806', aliases: ['vinsci', 'vincis', 'vinci construction', 'vinci autoroutes'] },
+  'renault': { name: 'RENAULT SAS', siren: '780129987', aliases: ['renaut', 'renauld', 'renau', 'reno', 'renault groupe'] },
+  'peugeot': { name: 'PEUGEOT SA', siren: '552100554', aliases: ['peugot', 'peugeaot', 'psa', 'psa peugeot', 'stellantis'] },
+  'kering': { name: 'KERING', siren: '552075020', aliases: ['kerring', 'kerin', 'gucci', 'kering group', 'ppr'] },
+  'hermes': { name: 'HERMES INTERNATIONAL', siren: '572076396', aliases: ['hermès', 'hermes paris', 'hermesparis', 'herme', 'hermess'] },
+  'publicis': { name: 'PUBLICIS GROUPE SA', siren: '542080601', aliases: ['publiciss', 'pubicis', 'publicis groupe', 'publicisgroupe'] },
+  'essilor': { name: 'ESSILORLUXOTTICA', siren: '712049618', aliases: ['essilor luxottica', 'essilorluxottica', 'luxottica', 'essillor', 'esilor'] },
+  'accor': { name: 'ACCOR SA', siren: '602036444', aliases: ['acor', 'accorhotel', 'accor hotels', 'acoorhotels'] },
+  'legrand': { name: 'LEGRAND SA', siren: '421259615', aliases: ['legran', 'le grand', 'legrands'] },
+  'pernod ricard': { name: 'PERNOD RICARD', siren: '582041943', aliases: ['pernodricard', 'pernod', 'ricard', 'pernod-ricard'] },
+  'stmicroelectronics': { name: 'STMICROELECTRONICS NV', siren: '341459386', aliases: ['st micro', 'stm', 'st microelectronics', 'stmicro'] },
+  'worldline': { name: 'WORLDLINE SA', siren: '378901946', aliases: ['wordline', 'world line', 'worlline'] },
+  'edf': { name: 'ELECTRICITE DE FRANCE', siren: '552081317', aliases: ['electricite de france', 'electricité de france', 'edf energie', 'edf sa'] },
+  'alstom': { name: 'ALSTOM', siren: '389058447', aliases: ['alstome', 'alsthom', 'alsthome', 'alstomm'] },
+  'sodexo': { name: 'SODEXO', siren: '301940219', aliases: ['sodexho', 'sodex', 'sodexoo'] },
+  'atos': { name: 'ATOS SE', siren: '323623603', aliases: ['atoss', 'atos origin', 'atosorigin', 'attos'] },
+  'jcdecaux': { name: 'JC DECAUX SA', siren: '307570747', aliases: ['jc decaux', 'jc deco', 'decaux', 'jcdeco'] },
+  'vallourec': { name: 'VALLOUREC SA', siren: '552142200', aliases: ['valourec', 'valoureck', 'valloureck'] },
+  'arkema': { name: 'ARKEMA', siren: '445074685', aliases: ['arkéma', 'arcema', 'arkemma'] },
+  'vivendi': { name: 'VIVENDI SE', siren: '343134763', aliases: ['vivandi', 'vivendis', 'vivendi universal'] },
+  'bolloré': { name: 'BOLLORE SE', siren: '955804007', aliases: ['bollore', 'bolore', 'bolloré group', 'groupe bollore'] },
+  'teleperformance': { name: 'TELEPERFORMANCE SE', siren: '301292702', aliases: ['teleperformence', 'teleperfomance', 'tp', 'tele performance'] },
+  'valeo': { name: 'VALEO SE', siren: '552030967', aliases: ['valéo', 'valeos', 'vaeo'] },
+  'ubisoft': { name: 'UBISOFT ENTERTAINMENT SA', siren: '335186094', aliases: ['ubisof', 'ubi soft', 'ubisofd'] },
+  'ipsen': { name: 'IPSEN SA', siren: '419838529', aliases: ['ipssen', 'ipsene'] },
+  'eutelsat': { name: 'EUTELSAT COMMUNICATIONS SA', siren: '481043040', aliases: ['eutesat', 'eutelsatt'] },
+  'gecina': { name: 'GECINA', siren: '592014476', aliases: ['gécina', 'jecsina', 'jescina'] },
+  'unibail': { name: 'UNIBAIL-RODAMCO-WESTFIELD NV', siren: '682024096', aliases: ['unibail rodamco', 'unibailrodamco', 'westfield', 'unibail rodamco westfield'] },
+  'nexity': { name: 'NEXITY SA', siren: '444346795', aliases: ['nexiti', 'nexite'] },
+  'klepierre': { name: 'KLEPIERRE SA', siren: '780152914', aliases: ['klépierre', 'klepiére', 'klépierr'] },
+  'scor': { name: 'SCOR SE', siren: '562033357', aliases: ['score', 'scorr'] },
+  'cgg': { name: 'CGG SA', siren: '969202241', aliases: ['cg', 'cggs'] },
+  'covivio': { name: 'COVIVIO', siren: '364800060', aliases: ['covivo', 'covivios'] },
+  'suez': { name: 'SUEZ SA', siren: '433466570', aliases: ['sueze', 'suezs'] },
+  'elior': { name: 'ELIOR GROUP SA', siren: '408168003', aliases: ['eloire', 'eliors'] },
+  'orpea': { name: 'ORPEA SA', siren: '401251566', aliases: ['orpéa', 'orpeas'] },
+  'casino': { name: 'CASINO GUICHARD PERRACHON', siren: '554501171', aliases: ['casino guichard', 'casinoguichard', 'casino groupe'] },
+  'edenred': { name: 'EDENRED SA', siren: '493322978', aliases: ['edenreed', 'eden red'] },
+  'rexel': { name: 'REXEL SA', siren: '479973513', aliases: ['rexell', 'rexxel'] },
+  'sartorius': { name: 'SARTORIUS STEDIM BIOTECH SA', siren: '718200356', aliases: ['sartorius stedim', 'sartoriusbiotech'] },
+  'biomerieux': { name: 'BIOMERIEUX SA', siren: '673620399', aliases: ['bio merieux', 'bionerieux', 'biomeriaux', 'biomérieux'] },
+  'technip': { name: 'TECHNIPFMC PLC', siren: '589803261', aliases: ['technipfmc', 'technip fmc', 'fmc', 'technipf'] },
+  'nexans': { name: 'NEXANS SA', siren: '393525852', aliases: ['nexan', 'nexanss'] },
+  'imerys': { name: 'IMERYS SA', siren: '562008151', aliases: ['imeriss', 'imérys'] },
+  'bureau veritas': { name: 'BUREAU VERITAS SA', siren: '775690621', aliases: ['bureauveritas', 'bureau verita', 'bureauvéritas'] },
+  'eiffage': { name: 'EIFFAGE SA', siren: '709802094', aliases: ['eiffajes', 'eifage', 'eifaje'] },
+  'faurecia': { name: 'FAURECIA SE', siren: '542005376', aliases: ['faurécia', 'faurecia forvia', 'forvia'] },
+  'neoen': { name: 'NEOEN SA', siren: '508320017', aliases: ['neon', 'néoen'] },
+  'quadient': { name: 'QUADIENT', siren: '352383715', aliases: ['quadiant', 'neopost'] },
+  'sopra steria': { name: 'SOPRA STERIA GROUP SA', siren: '326820065', aliases: ['soprasteria', 'sopra', 'steria', 'sopra stéria'] },
+  'altran': { name: 'ALTRAN TECHNOLOGIES SA', siren: '702012956', aliases: ['altrane', 'capgemini engineering'] },
+  'colas': { name: 'COLAS SA', siren: '552025314', aliases: ['collas', 'colas group'] },
+  'spie': { name: 'SPIE SA', siren: '592007892', aliases: ['spies', 'spie group'] },
+  'bpce': { name: 'BPCE', siren: '493455042', aliases: ['bpce groupe', 'natixis', 'caisse epargne', 'banque populaire'] },
+  'la poste': { name: 'LA POSTE', siren: '356000000', aliases: ['laposte', 'poste france', 'la post'] },
+  'sncf': { name: 'SNCF', siren: '552049447', aliases: ['sncf voyageurs', 'snfc', 'sncf reseau'] },
+  'ratp': { name: 'RATP', siren: '775663438', aliases: ['ratpe', 'rtp', 'ratp group'] },
+  'air france': { name: 'AIR FRANCE-KLM', siren: '552043002', aliases: ['airfrance', 'air france klm', 'airfranceklm', 'klm', 'air frans'] },
+  'decathlon': { name: 'DECATHLON SA', siren: '500569405', aliases: ['decatlon', 'décathlon', 'dechatlon'] },
+  'auchan': { name: 'AUCHAN RETAIL INTERNATIONAL SA', siren: '410409460', aliases: ['auchant', 'aucahn', 'auchan holding'] },
+  'leclerc': { name: 'E.LECLERC', siren: '389393406', aliases: ['e leclerc', 'eleclerc', 'e.leclec', 'lecler'] },
+  'intermarche': { name: 'ITM ENTREPRISES', siren: '572152556', aliases: ['intermarché', 'itm', 'mousquetaires', 'les mousquetaires'] },
+  'fnac': { name: 'FNAC DARTY SA', siren: '055800296', aliases: ['fnac darty', 'fnacdary', 'darty'] },
+  'cdiscount': { name: 'CDISCOUNT', siren: '424059822', aliases: ['c discount', 'c-discount'] },
+  'leroy merlin': { name: 'LEROY MERLIN FRANCE', siren: '384560942', aliases: ['leroymerlin', 'leroy merlan', 'leroi merlin'] },
+  'ikea': { name: 'IKEA FRANCE', siren: '303885422', aliases: ['ikéa', 'ikeas'] },
+  'lidl': { name: 'LIDL SNC', siren: '343262697', aliases: ['lidel', 'lild'] },
+  'aldi': { name: 'ALDI MARCHE', siren: '399324847', aliases: ['aldi france'] },
+  'thales alenia': { name: 'THALES ALENIA SPACE SAS', siren: '414815217', aliases: ['thalesalenia', 'thales alenia space', 'thalessalenia'] },
+  'safran aircraft': { name: 'SAFRAN AIRCRAFT ENGINES', siren: '414815068', aliases: ['safranaircraft', 'snecma'] },
+  'airbus helicopters': { name: 'AIRBUS HELICOPTERS SAS', siren: '352383236', aliases: ['airbushelicopters', 'eurocopter'] },
+  'mbda': { name: 'MBDA FRANCE', siren: '379495708', aliases: ['mbda missile', 'mbdafrance'] },
+  'naval group': { name: 'NAVAL GROUP SA', siren: '441133808', aliases: ['navalgroup', 'dcns', 'naval groupe'] },
+  'dassault aviation': { name: 'DASSAULT AVIATION SA', siren: '712042356', aliases: ['dassaultaviation', 'avion dassault'] },
+  'psa': { name: 'STELLANTIS NV', siren: '399436858', aliases: ['stellantis', 'psa group', 'opel', 'citroen', 'citroën', 'ds automobiles'] },
 };
+
+// ========== ALGORITHME PHONÉTIQUE (SOUNDEX FRANÇAIS AMÉLIORÉ) ==========
+function frenchSoundex(str: string): string {
+  if (!str) return '';
+  
+  // Normaliser et nettoyer
+  let s = str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlever accents
+    .replace(/[^a-z]/g, '');
+  
+  if (s.length === 0) return '';
+  
+  // Conversions phonétiques françaises
+  const replacements: [RegExp, string][] = [
+    [/ph/g, 'f'],
+    [/qu/g, 'k'],
+    [/gu(?=[eiy])/g, 'g'],
+    [/ch/g, 's'],
+    [/tion/g, 'sion'],
+    [/gn/g, 'n'],
+    [/eau/g, 'o'],
+    [/au/g, 'o'],
+    [/ou/g, 'u'],
+    [/ai/g, 'e'],
+    [/ei/g, 'e'],
+    [/oi/g, 'wa'],
+    [/an/g, 'a'],
+    [/en/g, 'a'],
+    [/in/g, 'e'],
+    [/on/g, 'o'],
+    [/un/g, 'e'],
+    [/ll/g, 'l'],
+    [/ss/g, 's'],
+    [/tt/g, 't'],
+    [/mm/g, 'm'],
+    [/nn/g, 'n'],
+    [/rr/g, 'r'],
+    [/cc/g, 'k'],
+    [/c(?=[eiy])/g, 's'],
+    [/c/g, 'k'],
+    [/y/g, 'i'],
+    [/w/g, 'v'],
+    [/x/g, 'ks'],
+    [/q/g, 'k'],
+    [/h/g, ''],  // H muet
+  ];
+  
+  for (const [pattern, replacement] of replacements) {
+    s = s.replace(pattern, replacement);
+  }
+  
+  // Garder première lettre + consonnes uniques
+  const firstLetter = s[0];
+  const rest = s.slice(1).replace(/[aeiou]/g, ''); // Supprimer voyelles
+  
+  // Dédupliquer consonnes consécutives identiques
+  let result = firstLetter;
+  for (let i = 0; i < rest.length; i++) {
+    if (rest[i] !== result[result.length - 1]) {
+      result += rest[i];
+    }
+  }
+  
+  return result.slice(0, 6).toUpperCase();
+}
 
 // Levenshtein distance for fuzzy matching
 function levenshteinDistance(a: string, b: string): number {
@@ -102,19 +243,109 @@ function levenshteinDistance(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
-// Normalize company name for better matching
+// ========== FONCTION DE MATCHING INTELLIGENTE ==========
+function findBestCompanyMatch(query: string): { match: typeof MAJOR_FRENCH_COMPANIES[keyof typeof MAJOR_FRENCH_COMPANIES] | null; confidence: number; key: string } {
+  const normalizedQuery = query.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .trim();
+  
+  const queryNoSpaces = normalizedQuery.replace(/\s+/g, '');
+  const querySoundex = frenchSoundex(normalizedQuery);
+  
+  let bestMatch: { key: string; company: typeof MAJOR_FRENCH_COMPANIES[keyof typeof MAJOR_FRENCH_COMPANIES]; score: number } | null = null;
+  
+  for (const [key, company] of Object.entries(MAJOR_FRENCH_COMPANIES)) {
+    const keyNormalized = key.replace(/-/g, '');
+    const keySoundex = frenchSoundex(key);
+    
+    // Score 100: Correspondance exacte clé
+    if (keyNormalized === queryNoSpaces || key === normalizedQuery) {
+      return { match: company, confidence: 100, key };
+    }
+    
+    // Score 95: Correspondance exacte d'un alias
+    for (const alias of company.aliases) {
+      const aliasNormalized = alias.replace(/[\s\-]/g, '');
+      if (aliasNormalized === queryNoSpaces || alias === normalizedQuery) {
+        return { match: company, confidence: 95, key };
+      }
+    }
+    
+    // Score basé sur similarité
+    let currentScore = 0;
+    
+    // Soundex match (phonétique)
+    if (querySoundex === keySoundex) {
+      currentScore = Math.max(currentScore, 80);
+    }
+    
+    // Levenshtein sur la clé
+    const keyDistance = levenshteinDistance(queryNoSpaces, keyNormalized);
+    const maxLen = Math.max(queryNoSpaces.length, keyNormalized.length);
+    if (keyDistance <= 3 && maxLen > 0) {
+      const levenScore = 90 - (keyDistance * 10);
+      currentScore = Math.max(currentScore, levenScore);
+    }
+    
+    // Levenshtein sur les alias
+    for (const alias of company.aliases) {
+      const aliasNormalized = alias.replace(/[\s\-]/g, '');
+      const aliasDistance = levenshteinDistance(queryNoSpaces, aliasNormalized);
+      const aliasMaxLen = Math.max(queryNoSpaces.length, aliasNormalized.length);
+      
+      // Soundex sur alias
+      const aliasSoundex = frenchSoundex(alias);
+      if (querySoundex === aliasSoundex) {
+        currentScore = Math.max(currentScore, 75);
+      }
+      
+      if (aliasDistance <= 3 && aliasMaxLen > 0) {
+        const aliasScore = 85 - (aliasDistance * 10);
+        currentScore = Math.max(currentScore, aliasScore);
+      }
+      
+      // Substring match
+      if (aliasNormalized.includes(queryNoSpaces) || queryNoSpaces.includes(aliasNormalized)) {
+        currentScore = Math.max(currentScore, 70);
+      }
+    }
+    
+    // Substring match sur la clé
+    if (keyNormalized.includes(queryNoSpaces) || queryNoSpaces.includes(keyNormalized.substring(0, 6))) {
+      currentScore = Math.max(currentScore, 65);
+    }
+    
+    if (currentScore > (bestMatch?.score || 0)) {
+      bestMatch = { key, company, score: currentScore };
+    }
+  }
+  
+  // Retourner seulement si score >= 60
+  if (bestMatch && bestMatch.score >= 60) {
+    return { match: bestMatch.company, confidence: bestMatch.score, key: bestMatch.key };
+  }
+  
+  return { match: null, confidence: 0, key: '' };
+}
+
+// Normalize company name for better matching (pour l'API)
 function normalizeCompanyName(name: string): string[] {
   const normalized = name.trim().toLowerCase();
   const variations: string[] = [name.trim()];
   
-  // Check for known misspellings first
-  for (const [misspelling, corrections] of Object.entries(COMPANY_CORRECTIONS)) {
-    if (normalized.includes(misspelling) || levenshteinDistance(normalized, misspelling) <= 2) {
-      variations.push(...corrections);
-    }
+  // D'abord, chercher dans notre base de grandes entreprises
+  const knownMatch = findBestCompanyMatch(normalized);
+  if (knownMatch.match && knownMatch.confidence >= 60) {
+    console.log(`Matched "${name}" to known company "${knownMatch.match.name}" (confidence: ${knownMatch.confidence}%)`);
+    // Ajouter le nom officiel en premier
+    variations.unshift(knownMatch.match.name);
+    // Ajouter les alias les plus courts
+    const sortedAliases = [...knownMatch.match.aliases].sort((a, b) => b.length - a.length);
+    variations.push(...sortedAliases.slice(0, 3));
   }
   
-  // Remove common words and try variations
+  // Variations standard
   const withoutSpaces = normalized.replace(/\s+/g, '');
   if (withoutSpaces !== normalized) {
     variations.push(name.trim().replace(/\s+/g, ''));
@@ -612,65 +843,100 @@ serve(async (req) => {
       }
     }
 
-    // ========== STEP 1: Fetch from official API data.gouv.fr ==========
-    console.log(`Step 1: Fetching from data.gouv.fr for ${queryType}: ${queryValue}`);
-    sourcesChecked.push('api_data_gouv_fr');
+    // ========== STEP 1: CHECK IF KNOWN MAJOR COMPANY ==========
+    console.log(`Step 1: Checking if "${queryValue}" matches a known major French company...`);
+    sourcesChecked.push('known_companies_database');
     
+    let knownCompanyMatch = null;
     let officialData = null;
     
-    // For name searches, try multiple variations to find the best match
     if (queryType === 'name') {
-      const nameVariations = normalizeCompanyName(queryValue);
-      console.log(`Trying ${nameVariations.length} name variations: ${nameVariations.join(', ')}`);
+      knownCompanyMatch = findBestCompanyMatch(queryValue);
       
-      let bestResult = null;
-      let bestScore = 0;
-      
-      for (const variation of nameVariations) {
-        const result = await fetchFromDataGouv(variation, queryType, existingContext?.bestMatch, queryValue);
-        if (result) {
-          console.log(`Variation "${variation}" found: ${result.name} (category: ${result.category})`);
-          
-          // Calculate score based on company category - heavily favor GE/ETI
-          let resultScore = 0;
-          if (result.category === 'GE') resultScore = 3000;
-          else if (result.category === 'ETI') resultScore = 1500;
-          else if (result.category === 'PME') resultScore = 100;
-          
-          // Add score for financial data
-          if (result.revenue) resultScore += 200;
-          if (result.employees_count) resultScore += 100;
-          
-          // Check if this result's name matches better (fuzzy)
-          const resultNameLower = (result.name || '').toLowerCase().replace(/[\s\-]/g, '');
-          const queryLower = queryValue.toLowerCase().replace(/[\s\-]/g, '');
-          
-          // Check name similarity
-          let nameBonus = 0;
-          if (resultNameLower.includes(queryLower) || queryLower.includes(resultNameLower.substring(0, 8))) {
-            nameBonus = 500;
-          } else {
-            // Fuzzy match
-            const distance = levenshteinDistance(resultNameLower.substring(0, 12), queryLower.substring(0, 12));
-            if (distance <= 3) {
-              nameBonus = 300 - (distance * 50);
-            }
-          }
-          
-          const adjustedScore = resultScore + nameBonus;
-          console.log(`  -> Score: ${adjustedScore} (category: ${result.category}, name bonus: ${nameBonus})`);
-          
-          if (adjustedScore > bestScore) {
-            bestScore = adjustedScore;
-            bestResult = result;
-          }
+      if (knownCompanyMatch.match && knownCompanyMatch.confidence >= 60) {
+        console.log(`✓ Matched "${queryValue}" to "${knownCompanyMatch.match.name}" (SIREN: ${knownCompanyMatch.match.siren}, confidence: ${knownCompanyMatch.confidence}%)`);
+        dataSources.push('Base connaissance entreprises françaises');
+        
+        // Recherche directe par SIREN - beaucoup plus fiable !
+        console.log(`Step 2: Fetching official data for SIREN ${knownCompanyMatch.match.siren}...`);
+        sourcesChecked.push('api_data_gouv_fr');
+        officialData = await fetchFromDataGouv(knownCompanyMatch.match.siren, 'siren', existingContext?.bestMatch, queryValue);
+        
+        if (officialData) {
+          console.log(`✓ Found official data for ${officialData.name} via SIREN lookup`);
         }
       }
+    }
+    
+    // ========== STEP 2: Fetch from official API data.gouv.fr (fallback) ==========
+    if (!officialData) {
+      console.log(`Step 2: Fetching from data.gouv.fr for ${queryType}: ${queryValue}`);
+      sourcesChecked.push('api_data_gouv_fr');
       
-      officialData = bestResult;
-    } else {
-      // Direct SIREN/SIRET search
-      officialData = await fetchFromDataGouv(queryValue, queryType, existingContext?.bestMatch);
+      // For name searches, try multiple variations to find the best match
+      if (queryType === 'name') {
+        const nameVariations = normalizeCompanyName(queryValue);
+        console.log(`Trying ${nameVariations.length} name variations: ${nameVariations.slice(0, 5).join(', ')}${nameVariations.length > 5 ? '...' : ''}`);
+        
+        let bestResult = null;
+        let bestScore = 0;
+        
+        // Limiter le nombre de requêtes pour éviter les timeouts
+        const variationsToTry = nameVariations.slice(0, 5);
+        
+        for (const variation of variationsToTry) {
+          const result = await fetchFromDataGouv(variation, queryType, existingContext?.bestMatch, queryValue);
+          if (result) {
+            console.log(`Variation "${variation}" found: ${result.name} (category: ${result.category})`);
+            
+            // Calculate score based on company category - heavily favor GE/ETI
+            let resultScore = 0;
+            if (result.category === 'GE') resultScore = 3000;
+            else if (result.category === 'ETI') resultScore = 1500;
+            else if (result.category === 'PME') resultScore = 100;
+            
+            // Add score for financial data
+            if (result.revenue) resultScore += 200;
+            if (result.employees_count) resultScore += 100;
+            
+            // Check if this result's name matches better (fuzzy)
+            const resultNameLower = (result.name || '').toLowerCase().replace(/[\s\-]/g, '');
+            const queryLower = queryValue.toLowerCase().replace(/[\s\-]/g, '');
+            
+            // Check name similarity using our Soundex algorithm
+            const resultSoundex = frenchSoundex(result.name || '');
+            const querySoundex = frenchSoundex(queryValue);
+            if (resultSoundex === querySoundex) {
+              resultScore += 400; // Phonetic match bonus
+            }
+            
+            // Check name similarity
+            let nameBonus = 0;
+            if (resultNameLower.includes(queryLower) || queryLower.includes(resultNameLower.substring(0, 8))) {
+              nameBonus = 500;
+            } else {
+              // Fuzzy match
+              const distance = levenshteinDistance(resultNameLower.substring(0, 12), queryLower.substring(0, 12));
+              if (distance <= 3) {
+                nameBonus = 300 - (distance * 50);
+              }
+            }
+            
+            const adjustedScore = resultScore + nameBonus;
+            console.log(`  -> Score: ${adjustedScore} (category: ${result.category}, name bonus: ${nameBonus})`);
+            
+            if (adjustedScore > bestScore) {
+              bestScore = adjustedScore;
+              bestResult = result;
+            }
+          }
+        }
+        
+        officialData = bestResult;
+      } else {
+        // Direct SIREN/SIRET search
+        officialData = await fetchFromDataGouv(queryValue, queryType, existingContext?.bestMatch);
+      }
     }
     
     if (!officialData) {
