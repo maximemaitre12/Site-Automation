@@ -1923,3 +1923,143 @@ export function isRealActionBlock(type: BlockType): boolean {
 export function requiresAuthentication(type: BlockType): boolean {
   return BLOCK_DEFINITIONS[type]?.requiresAuth === true;
 }
+
+// Category info for UI display
+export const CATEGORY_INFO: Record<BlockCategory, { name: string; color: string; icon: string }> = {
+  trigger: { name: 'Triggers', color: 'bg-blue-500', icon: 'Zap' },
+  aether: { name: 'AETHER', color: 'bg-violet-500', icon: 'Star' },
+  ai: { name: 'IA', color: 'bg-purple-500', icon: 'Brain' },
+  transform: { name: 'Transform', color: 'bg-amber-500', icon: 'Braces' },
+  control: { name: 'Control Flow', color: 'bg-green-500', icon: 'GitBranch' },
+  integration: { name: 'Intégrations', color: 'bg-cyan-500', icon: 'Plug' },
+  system: { name: 'Système', color: 'bg-gray-500', icon: 'Settings' }
+};
+
+// Workflow template interface
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: string;
+  icon: string;
+  color: string;
+  useCases: string[];
+  blocks: WorkflowBlock[];
+  connections: BlockConnection[];
+}
+
+// Pre-built workflow templates
+export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
+  {
+    id: 'invoice-processor',
+    name: 'Traitement de Factures',
+    description: 'Analyser les factures PDF reçues par email, extraire les données et les enregistrer dans le CRM',
+    category: 'Finance',
+    difficulty: 'intermediate',
+    estimatedTime: '5 min',
+    icon: 'Receipt',
+    color: 'from-emerald-500 to-green-400',
+    useCases: ['Comptabilité', 'Facturation', 'Automatisation finance'],
+    blocks: [
+      { id: 'trigger-1', type: 'trigger_email', name: 'Email Reçu', config: { subjectFilter: 'Facture*' }, position: { x: 100, y: 50 } },
+      { id: 'extract-1', type: 'ai_extract', name: 'Extraire Données', config: { fields: 'vendor, amount, date, invoice_number' }, position: { x: 100, y: 200 } },
+      { id: 'classify-1', type: 'ai_classify', name: 'Classifier', config: { categories: 'Fournisseur, Service, Produit' }, position: { x: 100, y: 350 } },
+      { id: 'save-1', type: 'system_save', name: 'Sauvegarder', config: { table: 'invoices', operation: 'insert' }, position: { x: 100, y: 500 } }
+    ],
+    connections: [
+      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'extract-1' },
+      { id: 'conn-2', sourceBlockId: 'extract-1', targetBlockId: 'classify-1' },
+      { id: 'conn-3', sourceBlockId: 'classify-1', targetBlockId: 'save-1' }
+    ]
+  },
+  {
+    id: 'lead-enrichment',
+    name: 'Enrichissement Leads',
+    description: 'Enrichir automatiquement les nouveaux leads avec des données entreprise et les scorer',
+    category: 'Sales',
+    difficulty: 'intermediate',
+    estimatedTime: '10 min',
+    icon: 'Users',
+    color: 'from-blue-500 to-indigo-400',
+    useCases: ['CRM', 'Prospection', 'Lead scoring'],
+    blocks: [
+      { id: 'trigger-1', type: 'trigger_webhook', name: 'Nouveau Lead', config: { method: 'POST' }, position: { x: 100, y: 50 } },
+      { id: 'http-1', type: 'http_request', name: 'Enrichir Données', config: { method: 'GET', url: 'https://api.clearbit.com/...' }, position: { x: 100, y: 200 } },
+      { id: 'ai-1', type: 'ai_generate', name: 'Scorer Lead', config: { prompt: 'Analyse this lead data and provide a score from 1-100' }, position: { x: 100, y: 350 } },
+      { id: 'crm-1', type: 'aether_crm_create_lead', name: 'Créer dans CRM', config: {}, position: { x: 100, y: 500 } }
+    ],
+    connections: [
+      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'http-1' },
+      { id: 'conn-2', sourceBlockId: 'http-1', targetBlockId: 'ai-1' },
+      { id: 'conn-3', sourceBlockId: 'ai-1', targetBlockId: 'crm-1' }
+    ]
+  },
+  {
+    id: 'support-triage',
+    name: 'Triage Support',
+    description: 'Classifier et router automatiquement les tickets support avec réponse IA',
+    category: 'Support',
+    difficulty: 'beginner',
+    estimatedTime: '3 min',
+    icon: 'Headphones',
+    color: 'from-purple-500 to-pink-400',
+    useCases: ['Service client', 'Helpdesk', 'Automatisation support'],
+    blocks: [
+      { id: 'trigger-1', type: 'trigger_text', name: 'Ticket Reçu', config: { placeholder: 'Décrivez votre problème...' }, position: { x: 100, y: 50 } },
+      { id: 'sentiment-1', type: 'ai_sentiment', name: 'Analyser Sentiment', config: {}, position: { x: 100, y: 200 } },
+      { id: 'classify-1', type: 'ai_classify', name: 'Classifier Ticket', config: { categories: 'Technique, Facturation, Commercial, Autre' }, position: { x: 100, y: 350 } },
+      { id: 'generate-1', type: 'ai_generate', name: 'Générer Réponse', config: { prompt: 'Generate a helpful response', tone: 'professional' }, position: { x: 100, y: 500 } }
+    ],
+    connections: [
+      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'sentiment-1' },
+      { id: 'conn-2', sourceBlockId: 'sentiment-1', targetBlockId: 'classify-1' },
+      { id: 'conn-3', sourceBlockId: 'classify-1', targetBlockId: 'generate-1' }
+    ]
+  },
+  {
+    id: 'content-summarizer',
+    name: 'Résumeur de Contenu',
+    description: 'Résumer des documents longs et générer des points clés',
+    category: 'Content',
+    difficulty: 'beginner',
+    estimatedTime: '2 min',
+    icon: 'FileText',
+    color: 'from-amber-500 to-orange-400',
+    useCases: ['Documentation', 'Veille', 'Recherche'],
+    blocks: [
+      { id: 'trigger-1', type: 'trigger_file', name: 'Document Uploadé', config: { acceptedTypes: '.pdf,.docx,.txt' }, position: { x: 100, y: 50 } },
+      { id: 'summary-1', type: 'ai_summary', name: 'Résumer', config: { style: 'executive', maxLength: 500 }, position: { x: 100, y: 200 } },
+      { id: 'extract-1', type: 'ai_extract', name: 'Points Clés', config: { fields: 'key_points, action_items, decisions' }, position: { x: 100, y: 350 } }
+    ],
+    connections: [
+      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'summary-1' },
+      { id: 'conn-2', sourceBlockId: 'summary-1', targetBlockId: 'extract-1' }
+    ]
+  },
+  {
+    id: 'data-sync',
+    name: 'Synchronisation Données',
+    description: 'Récupérer des données API, transformer et stocker dans la base',
+    category: 'Data',
+    difficulty: 'advanced',
+    estimatedTime: '15 min',
+    icon: 'Database',
+    color: 'from-cyan-500 to-teal-400',
+    useCases: ['ETL', 'Intégration données', 'Synchronisation'],
+    blocks: [
+      { id: 'trigger-1', type: 'trigger_schedule', name: 'Toutes les heures', config: { cron: '0 * * * *' }, position: { x: 100, y: 50 } },
+      { id: 'http-1', type: 'http_request', name: 'Fetch API', config: { method: 'GET', url: 'https://api.example.com/data' }, position: { x: 100, y: 200 } },
+      { id: 'transform-1', type: 'transform_map', name: 'Transformer', config: { mapping: '{ "id": "$.id", "name": "$.attributes.name" }' }, position: { x: 100, y: 350 } },
+      { id: 'filter-1', type: 'transform_filter', name: 'Filtrer Actifs', config: { condition: 'item.status === "active"' }, position: { x: 100, y: 500 } },
+      { id: 'save-1', type: 'system_save', name: 'Sauvegarder', config: { table: 'synced_data', operation: 'upsert' }, position: { x: 100, y: 650 } }
+    ],
+    connections: [
+      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'http-1' },
+      { id: 'conn-2', sourceBlockId: 'http-1', targetBlockId: 'transform-1' },
+      { id: 'conn-3', sourceBlockId: 'transform-1', targetBlockId: 'filter-1' },
+      { id: 'conn-4', sourceBlockId: 'filter-1', targetBlockId: 'save-1' }
+    ]
+  }
+];
