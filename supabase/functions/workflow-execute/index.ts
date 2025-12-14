@@ -362,83 +362,40 @@ Generate the requested content.`;
                               userPrompt.match(/title[:\s]+['"]?([^'"]+)['"]?/i);
             const docTitle = titleMatch?.[1] || `Document Workflow - ${block.name}`;
             
-            // Convert markdown to HTML for storage
-            const htmlContent = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>${docTitle}</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
-    h1 { color: #0A1A3C; border-bottom: 2px solid #3C4DFE; padding-bottom: 10px; }
-    h2 { color: #3C4DFE; margin-top: 30px; }
-    p { margin: 15px 0; }
-    ul, ol { margin: 15px 0; padding-left: 30px; }
-  </style>
-</head>
-<body>
-${result.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
-        .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
-        .replace(/^### (.*?)$/gm, '<h3>$1</h3>')}
-</body>
-</html>`;
+            // Get user_id from context or variables (server passes _userId)
+            const userId = context.variables?._userId || context.variables?.userId || context.variables?.user_id;
             
-            // Upload to storage
-            const fileName = `workflow-docs/${Date.now()}-${block.id}.html`;
-            const { data: uploadData, error: uploadError } = await supabase.storage
-              .from('documents')
-              .upload(fileName, new Blob([htmlContent], { type: 'text/html' }), {
-                contentType: 'text/html',
-                upsert: true
-              });
-            
-            if (uploadError) {
-              console.error('Storage upload error:', uploadError);
-            } else {
-              // Get public URL
-              const { data: { publicUrl } } = supabase.storage
-                .from('documents')
-                .getPublicUrl(fileName);
+            if (userId) {
+              // Create document record directly in aether_documents (no file upload needed)
+              const { data: docData, error: docError } = await supabase
+                .from('aether_documents')
+                .insert({
+                  user_id: userId,
+                  title: docTitle,
+                  content: result,
+                  file_type: 'text/markdown',
+                  status: 'active',
+                  tags: ['workflow', 'generated', block.name],
+                  metadata: {
+                    source: 'workflow',
+                    workflow_block: block.id,
+                    workflow_block_name: block.name,
+                    generated_at: new Date().toISOString(),
+                    output_format: 'PDF'
+                  }
+                })
+                .select()
+                .single();
               
-              // Get user_id from context or variables (server passes _userId)
-              const userId = context.variables?._userId || context.variables?.userId || context.variables?.user_id;
-              
-              if (userId) {
-                // Create document record in aether_documents
-                const { data: docData, error: docError } = await supabase
-                  .from('aether_documents')
-                  .insert({
-                    user_id: userId,
-                    title: docTitle,
-                    content: result,
-                    file_type: 'application/pdf',
-                    file_url: publicUrl,
-                    status: 'active',
-                    tags: ['workflow', 'generated', block.name],
-                    metadata: {
-                      source: 'workflow',
-                      workflow_block: block.id,
-                      workflow_block_name: block.name,
-                      generated_at: new Date().toISOString()
-                    }
-                  })
-                  .select()
-                  .single();
-                
-                if (docError) {
-                  console.error('Document creation error:', docError);
-                } else {
-                  console.log('Document created in AETHER Doc:', docData.id);
-                  output.documentId = docData.id;
-                  output.documentUrl = publicUrl;
-                  output.savedToAetherDoc = true;
-                }
+              if (docError) {
+                console.error('Document creation error:', docError);
               } else {
-                console.warn('No userId available, document not saved to AETHER Doc');
+                console.log('Document created in AETHER Doc:', docData.id);
+                output.documentId = docData.id;
+                output.savedToAetherDoc = true;
               }
+            } else {
+              console.warn('No userId available, document not saved to AETHER Doc');
             }
           } catch (docError) {
             console.error('Failed to create document:', docError);
