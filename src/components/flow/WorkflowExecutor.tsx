@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { WorkflowBlock, WorkflowRunLog, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
-import { executeWorkflow } from '@/lib/workflow-executor';
+import { executeWorkflowViaServer } from '@/lib/workflow-executor';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -39,19 +39,14 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
     setLogs([]);
     setResult(null);
 
-    // Create a timeout promise (60 seconds max)
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Workflow execution timeout (60s)')), 60000);
-    });
-
     try {
-      // Race between execution and timeout
-      const execution = await Promise.race([
-        executeWorkflow(blocks, input, (log) => {
-          setLogs(prev => [...prev.filter(l => l.blockId !== log.blockId), log]);
-        }, connections),
-        timeoutPromise
-      ]);
+      // Execute via server-side Edge Function for proper AI access
+      const execution = await executeWorkflowViaServer(blocks, input, workflowId);
+      
+      // Update logs progressively from server response
+      if (execution.logs) {
+        setLogs(execution.logs);
+      }
 
       setResult(execution);
       
