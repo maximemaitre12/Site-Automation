@@ -340,6 +340,11 @@ Only output JSON, no other text.`;
         const tone = block.config?.tone || 'professional';
         const maxTokens = block.config?.maxTokens || 500;
         const outputFormat = block.config?.output_format || 'text';
+        const docType = block.config?.document_type || block.config?.type || 'professionnel';
+        const folderId = block.config?.folder_id || context.variables?.folderId || context.variables?.folder_id;
+        const tags = block.config?.tags;
+        const workflowId = context.variables?.workflowId || context.variables?.workflow_id;
+        const workflowRunId = context.variables?.workflowRunId || context.variables?.workflow_run_id;
         
         const systemPrompt = `You are a ${tone} content generator. Be concise and focused. Max ~${maxTokens} tokens.`;
         const prompt = `${userPrompt}
@@ -352,13 +357,13 @@ Generate the requested content.`;
         const result = await callLovableAI(prompt, systemPrompt);
         output = { generated: result, tone, characterCount: result.length };
         
-        // If output format is PDF, create document in AETHER Doc
+        // If output format is PDF, delegate to workflow-generate-document so layout & PDF metadata are consistent with AETHER Doc
         if (outputFormat === 'PDF' || outputFormat === 'pdf') {
           try {
             const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
             
             // Extract title from prompt or use default
-            const titleMatch = userPrompt.match(/titre[:\s]+['"]?([^'"]+)['"]?/i) || 
+            const titleMatch = userPrompt.match(/titre[:\s]+['"]?([^'"]+)['"]?/i) ||
                               userPrompt.match(/title[:\s]+['"]?([^'"]+)['"]?/i);
             const docTitle = titleMatch?.[1] || `Document Workflow - ${block.name}`;
             
@@ -366,39 +371,33 @@ Generate the requested content.`;
             const userId = context.variables?._userId || context.variables?.userId || context.variables?.user_id;
             
             if (userId) {
-              // Create document record directly in aether_documents (no file upload needed)
-              const { data: docData, error: docError } = await supabase
-                .from('aether_documents')
-                .insert({
-                  user_id: userId,
+              const { data, error } = await supabase.functions.invoke('workflow-generate-document', {
+                body: {
                   title: docTitle,
                   content: result,
-                  file_type: 'text/markdown',
-                  status: 'active',
-                  tags: ['workflow', 'generated', block.name],
-                  metadata: {
-                    source: 'workflow',
-                    workflow_block: block.id,
-                    workflow_block_name: block.name,
-                    generated_at: new Date().toISOString(),
-                    output_format: 'PDF'
-                  }
-                })
-                .select()
-                .single();
+                  type: docType,
+                  tone,
+                  userId,
+                  workflowId,
+                  workflowRunId,
+                  context: inputText,
+                  folderId,
+                  tags,
+                },
+              });
               
-              if (docError) {
-                console.error('Document creation error:', docError);
-              } else {
-                console.log('Document created in AETHER Doc:', docData.id);
-                output.documentId = docData.id;
+              if (error) {
+                console.error('workflow-generate-document error:', error);
+              } else if (data?.success && data.document?.id) {
+                output.documentId = data.document.id;
                 output.savedToAetherDoc = true;
+                output.fileUrl = data.document.file_url;
               }
             } else {
-              console.warn('No userId available, document not saved to AETHER Doc');
+              console.warn('No userId available, PDF document not generated in AETHER Doc');
             }
           } catch (docError) {
-            console.error('Failed to create document:', docError);
+            console.error('Failed to call workflow-generate-document:', docError);
           }
         }
         break;
