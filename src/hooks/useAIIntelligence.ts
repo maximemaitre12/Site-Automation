@@ -57,6 +57,29 @@ export interface AutomationRule {
   last_executed_at?: string | null;
 }
 
+export interface CompanyEnrichment {
+  name?: string;
+  siren?: string;
+  siret?: string;
+  address?: string;
+  city?: string;
+  postal_code?: string;
+  naf_code?: string;
+  naf_label?: string;
+  legal_form?: string;
+  employees_range?: string;
+  creation_date?: string;
+  revenue?: number;
+  revenue_year?: number;
+  capital?: number;
+  executives?: any[];
+  website?: string;
+  linkedin_url?: string;
+  ai_summary?: string;
+  ai_keywords?: string[];
+  enriched_at?: string;
+}
+
 export interface SalesDeal {
   id: string;
   user_id: string;
@@ -79,6 +102,7 @@ export interface SalesDeal {
   assigned_to?: string | null;
   tags?: any;
   last_activity_at?: string | null;
+  company_enrichment?: any;
   created_at: string;
   updated_at: string;
 }
@@ -363,6 +387,60 @@ export function useAIIntelligence() {
     }
   }, [user, queryClient, toast]);
 
+  // Enrich company for deal context
+  const enrichCompanyForDeal = useCallback(async (companyName: string, dealId: string) => {
+    if (!user || !companyName.trim()) return null;
+    try {
+      const { data, error } = await supabase.functions.invoke('enrich-company', {
+        body: { 
+          queryType: 'name', 
+          queryValue: companyName.trim()
+        },
+      });
+      
+      if (error) throw error;
+      
+      if (data?.company) {
+        // Update deal with enriched company data
+        const enrichment = {
+          name: data.company.name,
+          siren: data.company.siren,
+          siret: data.company.siret,
+          address: data.company.address,
+          city: data.company.city,
+          postal_code: data.company.postal_code,
+          naf_code: data.company.naf_code,
+          naf_label: data.company.naf_label,
+          legal_form: data.company.legal_form,
+          employees_range: data.company.employees_range,
+          creation_date: data.company.creation_date,
+          revenue: data.company.revenue,
+          revenue_year: data.company.revenue_year,
+          capital: data.company.capital,
+          executives: data.company.executives,
+          website: data.company.website,
+          linkedin_url: data.company.linkedin_url,
+          ai_summary: data.company.ai_summary,
+          ai_keywords: data.company.ai_keywords,
+          enriched_at: new Date().toISOString(),
+        };
+
+        await supabase
+          .from('sales_deals')
+          .update({ company_enrichment: enrichment })
+          .eq('id', dealId)
+          .eq('user_id', user.id);
+        
+        queryClient.invalidateQueries({ queryKey: ['sales-deals'] });
+        return enrichment;
+      }
+      return null;
+    } catch (err) {
+      console.error('Enrich company for deal error:', err);
+      return null;
+    }
+  }, [user, queryClient]);
+
   // Create deal
   const createDeal = useCallback(async (deal: Partial<SalesDeal>) => {
     if (!user) return null;
@@ -386,13 +464,26 @@ export function useAIIntelligence() {
       if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ['sales-deals'] });
       toast({ title: 'Deal créé' });
+      
+      // Trigger company enrichment in background based on title
+      if (data?.id && deal.title) {
+        enrichCompanyForDeal(deal.title, data.id).then(enrichment => {
+          if (enrichment) {
+            toast({ 
+              title: 'Entreprise enrichie', 
+              description: `Données de ${enrichment.name || deal.title} ajoutées.` 
+            });
+          }
+        });
+      }
+      
       return data;
     } catch (err) {
       console.error('Create deal error:', err);
       toast({ title: 'Erreur', description: 'Impossible de créer le deal.', variant: 'destructive' });
       return null;
     }
-  }, [user, queryClient, toast]);
+  }, [user, queryClient, toast, enrichCompanyForDeal]);
 
   // Update deal status
   const updateDealStatus = useCallback(async (dealId: string, newStatus: string, reason?: string) => {
