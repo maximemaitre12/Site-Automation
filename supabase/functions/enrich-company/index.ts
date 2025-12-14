@@ -597,69 +597,35 @@ serve(async (req) => {
     }
     
     // ========== STEP 3: Analyze website if we can find one ==========
-    let websiteData = null;
-    
     // Use website from existing context if available
     if (!officialData.website && existingContext?.bestMatch?.website) {
       officialData.website = existingContext.bestMatch.website;
       console.log(`Using website from existing data: ${officialData.website}`);
     }
-    
-    // Try to find website from company name
-    if (!officialData.website && officialData.name) {
-      const cleanName = officialData.name.toLowerCase()
-        .replace(/[^a-z0-9]/g, '')
-        .substring(0, 20);
-      
-      const possibleUrls = [
-        `https://www.${cleanName}.fr`,
-        `https://www.${cleanName}.com`,
-        `https://${cleanName}.fr`,
-      ];
-      
-      for (const url of possibleUrls) {
-        try {
-          const testResponse = await fetch(url, { 
-            method: 'HEAD',
-            headers: { 'User-Agent': 'AETHER-Data-Bot/1.0' }
-          });
-          if (testResponse.ok) {
-            officialData.website = url;
-            break;
-          }
-        } catch {
-          // Continue to next URL
-        }
-      }
-    }
-    
-    if (officialData.website) {
-      console.log(`Step 3: Analyzing website: ${officialData.website}`);
-      sourcesChecked.push('website_analysis');
-      websiteData = await analyzeWebsite(officialData.website);
-      
-      if (websiteData) {
-        dataSources.push('Site web');
-        if (websiteData.linkedin_url) {
-          officialData.linkedin_url = websiteData.linkedin_url;
-        }
-        if (websiteData.twitter_url) {
-          officialData.twitter_url = websiteData.twitter_url;
-        }
-      }
-    }
 
-    // ========== STEP 4: AI Analysis (interpretation only) ==========
-    console.log('Step 4: AI Analysis');
+    // ========== STEP 3: AI Analysis (quick, with timeout) ==========
+    console.log('Step 3: AI Analysis (with 15s timeout)');
     sourcesChecked.push('ai_analysis');
     
-    const aiAnalysis = await analyzeWithAI(officialData, aiKey);
-    
-    if (aiAnalysis) {
-      dataSources.push('Analyse IA');
+    let aiAnalysis = null;
+    try {
+      // Add timeout to AI analysis to prevent function timeout
+      const aiPromise = analyzeWithAI(officialData, aiKey);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('AI timeout')), 15000)
+      );
+      aiAnalysis = await Promise.race([aiPromise, timeoutPromise]) as any;
+      
+      if (aiAnalysis) {
+        dataSources.push('Analyse IA');
+        console.log('AI analysis completed successfully');
+      }
+    } catch (aiError) {
+      console.warn('AI analysis skipped (timeout or error):', aiError);
+      // Continue without AI analysis - official data is more important
     }
 
-    // ========== STEP 5: Save or Update company ==========
+    // ========== STEP 4: Save or Update company ==========
     const companyData = {
       user_id: user.id,
       name: officialData.name,
@@ -730,7 +696,7 @@ serve(async (req) => {
       savedCompany = data;
     }
 
-    // ========== STEP 6: Save financial data ==========
+    // ========== STEP 5: Save financial data ==========
     if (officialData.revenue && officialData.revenue_year) {
       console.log(`Step 6: Saving financial data for year ${officialData.revenue_year}`);
       
