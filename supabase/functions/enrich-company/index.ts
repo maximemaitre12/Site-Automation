@@ -521,16 +521,26 @@ serve(async (req) => {
       for (const variation of nameVariations) {
         const result = await fetchFromDataGouv(variation, queryType, existingContext?.bestMatch);
         if (result) {
-          const resultScore = scoreCompany(result);
-          console.log(`Variation "${variation}" found: ${result.nom_complet} (score: ${resultScore})`);
+          console.log(`Variation "${variation}" found: ${result.name} (category: ${result.category})`);
+          
+          // Calculate score based on company category
+          let resultScore = 0;
+          if (result.category === 'GE') resultScore = 1000;
+          else if (result.category === 'ETI') resultScore = 500;
+          else if (result.category === 'PME') resultScore = 100;
+          
+          // Add score for financial data
+          if (result.revenue) resultScore += 200;
+          if (result.employees_count) resultScore += 100;
           
           // Check if this result's name matches better
-          const resultNameLower = (result.nom_complet || '').toLowerCase().replace(/\s+/g, '');
+          const resultNameLower = (result.name || '').toLowerCase().replace(/\s+/g, '');
           const queryLower = queryValue.toLowerCase().replace(/\s+/g, '');
           const isNameMatch = resultNameLower.includes(queryLower) || queryLower.includes(resultNameLower.substring(0, 10));
           
           // Prioritize larger companies (GE > ETI > PME) with name match
           const adjustedScore = resultScore + (isNameMatch ? 500 : 0);
+          console.log(`  -> Score: ${adjustedScore} (name match: ${isNameMatch})`);
           
           if (adjustedScore > bestScore) {
             bestScore = adjustedScore;
@@ -568,7 +578,7 @@ serve(async (req) => {
       );
     }
     
-    console.log(`Selected best company: ${officialData.nom_complet} (${officialData.categorie_entreprise || 'N/A'})`);
+    console.log(`Selected best company: ${officialData.name} (${officialData.category || 'N/A'})`);
     dataSources.push('Registre officiel (data.gouv.fr)');
     
     // ========== STEP 2: Check for duplicates by SIREN ==========
