@@ -6,34 +6,86 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Maximum audio size in bytes (5MB for base64 ~ 3.75MB raw)
+const MAX_AUDIO_SIZE = 5 * 1024 * 1024;
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { audio, mimeType = 'audio/webm' } = await req.json();
+    console.log('Transcribe-audio function started');
+    
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request body',
+        text: '',
+        fallback: true
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { audio, mimeType = 'audio/webm' } = requestBody;
     
     if (!audio) {
-      throw new Error('No audio data provided');
+      console.error('No audio data provided');
+      return new Response(JSON.stringify({ 
+        error: 'No audio data provided',
+        text: '',
+        fallback: true
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log('Received audio data, processing...');
     console.log('MIME type:', mimeType);
-    console.log('Audio data length:', audio.length);
-
-    // Use Lovable AI Gateway for transcription via Gemini
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+    console.log('Audio data length (base64):', audio.length);
+    
+    // Check audio size
+    if (audio.length > MAX_AUDIO_SIZE) {
+      console.error('Audio too large:', audio.length, 'bytes');
+      return new Response(JSON.stringify({ 
+        error: 'Audio file too large. Maximum size is 5MB. Please use a shorter recording.',
+        text: '',
+        fallback: true
+      }), {
+        status: 413,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    // Set a timeout for the request (60 seconds)
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      console.error('LOVABLE_API_KEY not configured');
+      return new Response(JSON.stringify({ 
+        error: 'Transcription service not configured',
+        text: '',
+        fallback: true
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Set a timeout for the request (90 seconds for longer audio)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    const timeoutId = setTimeout(() => {
+      console.log('Request timeout triggered after 90s');
+      controller.abort();
+    }, 90000);
 
     try {
-      // Use Gemini's multimodal capabilities with inline_data format
+      console.log('Calling Lovable AI Gateway for transcription...');
+      
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -49,16 +101,17 @@ serve(async (req) => {
 
 Instructions:
 - Identifie les différents interlocuteurs avec [Locuteur 1], [Locuteur 2], etc.
-- Transcris dans la langue de l'audio
-- Inclure les hésitations notables
-- Si l'audio est inaudible ou vide, indique-le`
+- Transcris dans la langue de l'audio (français, anglais, etc.)
+- Inclure les hésitations notables (euh, hmm)
+- Si l'audio est inaudible, vide ou trop court, indique "[Audio inaudible]"
+- Ne fais pas de résumé, transcris mot à mot`
             },
             {
               role: 'user',
               content: [
                 {
                   type: 'text',
-                  text: 'Transcris cet enregistrement audio.'
+                  text: 'Transcris cet enregistrement audio mot à mot.'
                 },
                 {
                   type: 'image_url',
@@ -75,6 +128,7 @@ Instructions:
       });
 
       clearTimeout(timeoutId);
+      console.log('AI Gateway response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -82,7 +136,8 @@ Instructions:
         
         if (response.status === 429) {
           return new Response(JSON.stringify({ 
-            error: 'Rate limit exceeded. Please try again later.',
+            error: 'Service surchargé. Veuillez réessayer dans quelques instants.',
+            text: '',
             fallback: true 
           }), {
             status: 429,
@@ -91,7 +146,8 @@ Instructions:
         }
         if (response.status === 402) {
           return new Response(JSON.stringify({ 
-            error: 'Usage limit reached. Please add credits.',
+            error: 'Limite d\'utilisation atteinte. Veuillez ajouter des crédits.',
+            text: '',
             fallback: true 
           }), {
             status: 402,
@@ -99,13 +155,12 @@ Instructions:
           });
         }
         
-        // Fallback for other errors
-        console.error('Returning fallback due to API error');
         return new Response(JSON.stringify({ 
           text: '',
-          error: 'Audio transcription not available. Please paste the transcript manually.',
+          error: 'Erreur de transcription. Veuillez coller le transcript manuellement.',
           fallback: true
         }), {
+          status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -113,13 +168,13 @@ Instructions:
       const data = await response.json();
       const transcription = data.choices?.[0]?.message?.content || '';
       
-      console.log('Transcription completed, length:', transcription.length);
+      console.log('Transcription completed successfully, length:', transcription.length);
 
-      if (!transcription || transcription.trim() === '') {
+      if (!transcription || transcription.trim() === '' || transcription.includes('[Audio inaudible]')) {
         return new Response(JSON.stringify({ 
-          text: '',
-          error: 'Empty transcription returned. Please paste the transcript manually.',
-          fallback: true
+          text: transcription || '',
+          error: transcription ? null : 'Transcription vide. L\'audio est peut-être trop court ou inaudible.',
+          fallback: !transcription
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -134,16 +189,18 @@ Instructions:
       clearTimeout(timeoutId);
       
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        console.error('Request timed out');
+        console.error('Request timed out after 90s');
         return new Response(JSON.stringify({ 
           text: '',
-          error: 'Transcription timed out. Please try with a shorter audio or paste manually.',
+          error: 'Transcription trop longue. Utilisez un audio plus court (< 2 min) ou collez le texte manuellement.',
           fallback: true
         }), {
           status: 504,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+      
+      console.error('Fetch error:', fetchError);
       throw fetchError;
     }
 
@@ -151,7 +208,7 @@ Instructions:
     console.error('Transcription error:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : 'Erreur inconnue',
         text: '',
         fallback: true
       }),
