@@ -220,21 +220,54 @@ ${transcript}`
 
       if (error) throw error;
 
-      // Update deal with last activity and notes if dealId is provided
+      // Update deal with last activity, probability, and notes if dealId is provided
       if (dealId) {
-        const noteContent = `[Appel ${new Date().toLocaleDateString('fr-FR')}] ${parsed.summary || title}`;
+        // Get current deal to update probability based on sentiment
+        const { data: currentDeal } = await supabase
+          .from('sales_deals')
+          .select('probability, custom_fields')
+          .eq('id', dealId)
+          .single();
+
+        // Calculate new probability based on call sentiment
+        let probabilityChange = 0;
+        const sentiment = (parsed.sentiment || 'neutre').toLowerCase();
+        if (sentiment === 'positif' || sentiment === 'positive' || sentiment === 'très positif') {
+          probabilityChange = 10;
+        } else if (sentiment === 'négatif' || sentiment === 'negative' || sentiment === 'très négatif') {
+          probabilityChange = -10;
+        }
+
+        const currentProbability = currentDeal?.probability || 50;
+        const newProbability = Math.max(0, Math.min(100, currentProbability + probabilityChange));
+
+        // Merge with existing custom_fields
+        const existingCustomFields = (currentDeal?.custom_fields as Record<string, unknown>) || {};
+        const existingNotes = (existingCustomFields.call_notes as string[]) || [];
+        const noteContent = `[${new Date().toLocaleDateString('fr-FR')}] ${parsed.summary || title}`;
         
-        await supabase
+        const updatedCustomFields = {
+          ...existingCustomFields,
+          last_call_date: new Date().toISOString(),
+          last_call_summary: parsed.summary,
+          last_call_sentiment: parsed.sentiment,
+          last_call_next_steps: parsed.next_steps,
+          last_call_objections: parsed.objections,
+          call_notes: [noteContent, ...existingNotes]
+        };
+
+        const { error: updateError } = await supabase
           .from('sales_deals')
           .update({
             last_activity_at: new Date().toISOString(),
-            custom_fields: supabase.rpc ? undefined : {
-              last_call_summary: parsed.summary,
-              last_call_sentiment: parsed.sentiment,
-              last_call_next_steps: parsed.next_steps
-            }
+            probability: newProbability,
+            custom_fields: updatedCustomFields
           })
           .eq('id', dealId);
+
+        if (updateError) {
+          console.error('Error updating deal:', updateError);
+        }
 
         // Invalidate deals query to refresh pipeline
         queryClient.invalidateQueries({ queryKey: ['sales-deals'] });
