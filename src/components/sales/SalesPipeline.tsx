@@ -602,7 +602,7 @@ export function SalesPipeline() {
                                 )}
                                 <div className="flex items-center gap-1.5 font-medium text-foreground">
                                   <Euro className="h-3 w-3" />
-                                  €{(deal.value || 0).toLocaleString('fr-FR')}
+                                  {(deal.value || 0).toLocaleString('fr-FR')}
                                 </div>
                                 {deal.expected_close_date && (
                                   <div className={`flex items-center gap-1.5 ${
