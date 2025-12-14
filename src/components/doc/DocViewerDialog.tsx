@@ -48,6 +48,21 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+
+// Helper to safely parse tags (can be JSON string, array, or null)
+const parseTags = (tags: any): string[] => {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags;
+  if (typeof tags === 'string') {
+    try {
+      const parsed = JSON.parse(tags);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
 import { toast } from "sonner";
 
 interface DocViewerDialogProps {
@@ -746,16 +761,19 @@ export function DocViewerDialog({
                 <div className="col-span-2">
                   <p className="text-muted-foreground mb-2">Tags</p>
                   <div className="flex flex-wrap gap-1">
-                    {document.tags && document.tags.length > 0 ? (
-                      document.tags.map((tag: string, i: number) => (
-                        <Badge key={i} variant="secondary">
-                          <Tag className="w-3 h-3 mr-1" />
-                          {tag}
-                        </Badge>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Aucun tag</p>
-                    )}
+                    {(() => {
+                      const tagsArray = parseTags(document.tags);
+                      return tagsArray.length > 0 ? (
+                        tagsArray.map((tag: string, i: number) => (
+                          <Badge key={i} variant="secondary">
+                            <Tag className="w-3 h-3 mr-1" />
+                            {tag}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Aucun tag</p>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
