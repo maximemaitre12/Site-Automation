@@ -51,6 +51,32 @@ function scoreCompany(company: any): number {
   return score;
 }
 
+// Normalize company name for better matching
+function normalizeCompanyName(name: string): string[] {
+  const normalized = name.trim().toLowerCase();
+  const variations: string[] = [name.trim()];
+  
+  // Remove common words and try variations
+  const withoutSpaces = normalized.replace(/\s+/g, '');
+  if (withoutSpaces !== normalized) {
+    // Add version without spaces (e.g., "Total Energie" -> "TotalEnergie")
+    variations.push(name.trim().replace(/\s+/g, ''));
+  }
+  
+  // Common company name patterns
+  const suffixes = [' se', ' sa', ' sas', ' sarl', ' groupe', ' group', ' france', ' energy', ' energies', ' énergie', ' énergies'];
+  for (const suffix of suffixes) {
+    if (!normalized.includes(suffix.trim())) {
+      // Try adding common suffixes
+      if (normalized.includes('total') || normalized.includes('energie') || normalized.includes('energy')) {
+        variations.push(name.trim() + suffix.toUpperCase());
+      }
+    }
+  }
+  
+  return [...new Set(variations)]; // Remove duplicates
+}
+
 // API Recherche Entreprises - data.gouv.fr (FREE & OFFICIAL)
 // Now returns the BEST match (largest/most important company)
 async function fetchFromDataGouv(query: string, queryType: string, existingCompanyData?: any): Promise<any> {
@@ -63,7 +89,6 @@ async function fetchFromDataGouv(query: string, queryType: string, existingCompa
       url = `https://recherche-entreprises.api.gouv.fr/search?q=${query}&per_page=1`;
     } else {
       // Search by name - get multiple results to find the best one
-      // Increase per_page to get more candidates for scoring
       perPage = 25;
       url = `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}&per_page=${perPage}`;
     }
@@ -91,16 +116,32 @@ async function fetchFromDataGouv(query: string, queryType: string, existingCompa
     
     // For name searches, score all results and pick the best one
     let company = data.results[0];
+    const queryLower = query.toLowerCase().replace(/\s+/g, '');
     
     if (queryType === 'name' && data.results.length > 1) {
       console.log(`Found ${data.results.length} companies, scoring to find best match...`);
       
       // Score all companies
-      const scoredResults = data.results.map((c: any) => ({
-        company: c,
-        score: scoreCompany(c),
-        nameMatch: c.nom_complet.toLowerCase().includes(query.toLowerCase()) ? 1 : 0
-      }));
+      const scoredResults = data.results.map((c: any) => {
+        const companyNameLower = (c.nom_complet || '').toLowerCase();
+        const companyNameNoSpaces = companyNameLower.replace(/\s+/g, '');
+        
+        // Calculate name similarity score
+        let nameMatchScore = 0;
+        if (companyNameLower.includes(query.toLowerCase())) {
+          nameMatchScore = 500; // Exact substring match
+        } else if (companyNameNoSpaces.includes(queryLower)) {
+          nameMatchScore = 400; // Match without spaces (e.g., TotalEnergies vs Total Energie)
+        } else if (query.toLowerCase().split(/\s+/).every(word => companyNameLower.includes(word))) {
+          nameMatchScore = 300; // All words match
+        }
+        
+        return {
+          company: c,
+          score: scoreCompany(c) + nameMatchScore,
+          nameMatch: nameMatchScore
+        };
+      });
       
       // If we have existing CRM data, boost companies that match
       if (existingCompanyData) {
@@ -123,7 +164,7 @@ async function fetchFromDataGouv(query: string, queryType: string, existingCompa
       // Log top 3 for debugging
       console.log('Top 3 scored companies:');
       scoredResults.slice(0, 3).forEach((r: any, i: number) => {
-        console.log(`  ${i + 1}. ${r.company.nom_complet} (${r.company.categorie_entreprise || 'N/A'}) - Score: ${r.score}`);
+        console.log(`  ${i + 1}. ${r.company.nom_complet} (${r.company.categorie_entreprise || 'N/A'}) - Score: ${r.score} (name match: ${r.nameMatch})`);
       });
       
       company = scoredResults[0].company;
@@ -467,8 +508,42 @@ serve(async (req) => {
     console.log(`Step 1: Fetching from data.gouv.fr for ${queryType}: ${queryValue}`);
     sourcesChecked.push('api_data_gouv_fr');
     
-    // Pass existing context to help prioritize results
-    const officialData = await fetchFromDataGouv(queryValue, queryType, existingContext?.bestMatch);
+    let officialData = null;
+    
+    // For name searches, try multiple variations to find the best match
+    if (queryType === 'name') {
+      const nameVariations = normalizeCompanyName(queryValue);
+      console.log(`Trying ${nameVariations.length} name variations: ${nameVariations.join(', ')}`);
+      
+      let bestResult = null;
+      let bestScore = 0;
+      
+      for (const variation of nameVariations) {
+        const result = await fetchFromDataGouv(variation, queryType, existingContext?.bestMatch);
+        if (result) {
+          const resultScore = scoreCompany(result);
+          console.log(`Variation "${variation}" found: ${result.nom_complet} (score: ${resultScore})`);
+          
+          // Check if this result's name matches better
+          const resultNameLower = (result.nom_complet || '').toLowerCase().replace(/\s+/g, '');
+          const queryLower = queryValue.toLowerCase().replace(/\s+/g, '');
+          const isNameMatch = resultNameLower.includes(queryLower) || queryLower.includes(resultNameLower.substring(0, 10));
+          
+          // Prioritize larger companies (GE > ETI > PME) with name match
+          const adjustedScore = resultScore + (isNameMatch ? 500 : 0);
+          
+          if (adjustedScore > bestScore) {
+            bestScore = adjustedScore;
+            bestResult = result;
+          }
+        }
+      }
+      
+      officialData = bestResult;
+    } else {
+      // Direct SIREN/SIRET search
+      officialData = await fetchFromDataGouv(queryValue, queryType, existingContext?.bestMatch);
+    }
     
     if (!officialData) {
       if (requestRecord) {
@@ -493,6 +568,7 @@ serve(async (req) => {
       );
     }
     
+    console.log(`Selected best company: ${officialData.nom_complet} (${officialData.categorie_entreprise || 'N/A'})`);
     dataSources.push('Registre officiel (data.gouv.fr)');
     
     // ========== STEP 2: Check for duplicates by SIREN ==========
