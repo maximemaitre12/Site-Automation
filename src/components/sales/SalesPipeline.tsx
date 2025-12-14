@@ -64,10 +64,119 @@ interface DealActivity {
   created_at: string;
 }
 
-// Calcul du score IA basé sur les données réelles
+// Calcul du score IA basé sur les données réelles ET l'entreprise enrichie
 function calculateAIScore(deal: SalesDeal): { score: number; factors: { label: string; impact: 'positive' | 'negative' | 'neutral'; weight: number }[] } {
   const factors: { label: string; impact: 'positive' | 'negative' | 'neutral'; weight: number }[] = [];
   let score = 50;
+  
+  const enrichment = deal.company_enrichment as any;
+
+  // ========== FACTEURS ENTREPRISE (nouveaux) ==========
+  
+  // Entreprise enrichie = plus fiable
+  if (enrichment?.name) {
+    factors.push({ label: 'Entreprise vérifiée', impact: 'positive', weight: 10 });
+    score += 10;
+    
+    // Chiffre d'affaires de l'entreprise
+    if (enrichment.revenue) {
+      const revenue = enrichment.revenue;
+      if (revenue > 100000000) { // > 100M€
+        factors.push({ label: 'Grande entreprise (>100M€)', impact: 'positive', weight: 15 });
+        score += 15;
+      } else if (revenue > 10000000) { // > 10M€
+        factors.push({ label: 'ETI (>10M€ CA)', impact: 'positive', weight: 10 });
+        score += 10;
+      } else if (revenue > 1000000) { // > 1M€
+        factors.push({ label: 'PME établie (>1M€ CA)', impact: 'positive', weight: 5 });
+        score += 5;
+      } else if (revenue < 100000) { // < 100k€
+        factors.push({ label: 'Petite structure (<100k€ CA)', impact: 'negative', weight: -5 });
+        score -= 5;
+      }
+    }
+    
+    // Taille de l'entreprise (effectifs)
+    if (enrichment.employees_range) {
+      const range = enrichment.employees_range.toLowerCase();
+      if (range.includes('1000') || range.includes('5000') || range.includes('10000')) {
+        factors.push({ label: 'Grand groupe (+1000 emp.)', impact: 'positive', weight: 10 });
+        score += 10;
+      } else if (range.includes('250') || range.includes('500')) {
+        factors.push({ label: 'ETI (250-1000 emp.)', impact: 'positive', weight: 5 });
+        score += 5;
+      } else if (range.includes('1 à') || range.includes('0 à') || range === '1-2' || range === '0') {
+        factors.push({ label: 'TPE (<10 emp.)', impact: 'negative', weight: -5 });
+        score -= 5;
+      }
+    }
+    
+    // Capital social
+    if (enrichment.capital) {
+      if (enrichment.capital > 1000000) { // > 1M€ capital
+        factors.push({ label: 'Capital solide (>1M€)', impact: 'positive', weight: 8 });
+        score += 8;
+      } else if (enrichment.capital < 10000) { // < 10k€ capital
+        factors.push({ label: 'Faible capital (<10k€)', impact: 'negative', weight: -5 });
+        score -= 5;
+      }
+    }
+    
+    // Ancienneté de l'entreprise
+    if (enrichment.creation_date) {
+      const creationYear = new Date(enrichment.creation_date).getFullYear();
+      const age = new Date().getFullYear() - creationYear;
+      if (age > 20) {
+        factors.push({ label: `Entreprise établie (${age} ans)`, impact: 'positive', weight: 8 });
+        score += 8;
+      } else if (age > 5) {
+        factors.push({ label: `Entreprise mature (${age} ans)`, impact: 'positive', weight: 5 });
+        score += 5;
+      } else if (age < 2) {
+        factors.push({ label: 'Startup/Nouvelle entreprise', impact: 'neutral', weight: 0 });
+      }
+    }
+    
+    // Présence en ligne
+    if (enrichment.website && enrichment.linkedin_url) {
+      factors.push({ label: 'Présence digitale complète', impact: 'positive', weight: 5 });
+      score += 5;
+    } else if (!enrichment.website && !enrichment.linkedin_url) {
+      factors.push({ label: 'Faible présence en ligne', impact: 'negative', weight: -3 });
+      score -= 3;
+    }
+    
+    // Score IA opportunité (si disponible)
+    if (enrichment.ai_opportunity_score) {
+      if (enrichment.ai_opportunity_score >= 70) {
+        factors.push({ label: `Fort potentiel IA (${enrichment.ai_opportunity_score}%)`, impact: 'positive', weight: 12 });
+        score += 12;
+      } else if (enrichment.ai_opportunity_score >= 40) {
+        factors.push({ label: `Potentiel moyen IA (${enrichment.ai_opportunity_score}%)`, impact: 'neutral', weight: 5 });
+        score += 5;
+      }
+    }
+    
+    // Score de risque IA (si disponible)
+    if (enrichment.ai_risk_score) {
+      if (enrichment.ai_risk_score >= 70) {
+        factors.push({ label: `Risque élevé IA (${enrichment.ai_risk_score}%)`, impact: 'negative', weight: -15 });
+        score -= 15;
+      } else if (enrichment.ai_risk_score >= 40) {
+        factors.push({ label: `Risque modéré IA (${enrichment.ai_risk_score}%)`, impact: 'negative', weight: -5 });
+        score -= 5;
+      } else if (enrichment.ai_risk_score < 30) {
+        factors.push({ label: `Faible risque IA (${enrichment.ai_risk_score}%)`, impact: 'positive', weight: 8 });
+        score += 8;
+      }
+    }
+  } else {
+    // Pas d'enrichissement = moins fiable
+    factors.push({ label: 'Entreprise non vérifiée', impact: 'negative', weight: -8 });
+    score -= 8;
+  }
+
+  // ========== FACTEURS DEAL (existants) ==========
 
   // Valeur du deal
   if ((deal.value || 0) > 50000) {
