@@ -60,6 +60,21 @@ const formatFileSize = (bytes: number | null) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+// Helper to safely parse tags (can be JSON string, array, or null)
+const parseTags = (tags: any): string[] => {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags;
+  if (typeof tags === 'string') {
+    try {
+      const parsed = JSON.parse(tags);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 export function DocGrid({
   documents,
   folders,
@@ -252,15 +267,18 @@ export function DocGrid({
                 </div>
 
                 {/* Tags */}
-                {doc.tags && doc.tags.length > 0 && (
-                  <div className="flex gap-1 mt-2 flex-wrap justify-center">
-                    {doc.tags.slice(0, 2).map((tag: string) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                {(() => {
+                  const tagsArray = parseTags(doc.tags);
+                  return tagsArray.length > 0 ? (
+                    <div className="flex gap-1 mt-2 flex-wrap justify-center">
+                      {tagsArray.slice(0, 2).map((tag: string) => (
+                        <Badge key={tag} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
 
                 {/* AI Status */}
                 {doc.embedding_status === 'pending' && (
