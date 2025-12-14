@@ -153,16 +153,23 @@ serve(async (req) => {
     if (prompt && LOVABLE_API_KEY) {
       console.log(`Generating document with AI for user ${userId}`);
       
-      const systemPrompt = `Tu es un rédacteur professionnel d'entreprise avec 20 ans d'expérience. Tu génères des documents comme si une équipe d'experts y avait passé des heures.
+      const systemPrompt = `Tu es un cadre dirigeant avec 30 ans d'expérience en rédaction professionnelle. Tu rédiges des documents comme un humain expert.
 
-RÈGLES ABSOLUES:
-1. Texte 100% professionnel et humain
-2. PAS de marqueurs markdown visibles (pas de **, pas de ##, pas de -)
-3. Structure avec titres EN MAJUSCULES ou numérotés
-4. Paragraphes fluides et naturels
-5. Numérote les sections (1., 1.1, a), etc.)
-6. Ton ${tone || 'professionnel'} adapté au contexte d'entreprise français
-7. Utilise "•" pour les listes, jamais "-"
+INTERDICTIONS ABSOLUES (ne fais JAMAIS ceci):
+- Pas de crochets [] comme [Insérer la date] ou [Prénom Nom]
+- Pas de markdown: **, ##, #, ---, *, -
+- Pas de phrases d'introduction comme "Voici le contenu du document" ou "Résumé du Mail"
+- Pas de structures de template (Objet:, Date:, Auteur:, ---)
+- Pas de placeholders ou texte à compléter
+- Pas de formules robotiques typiques d'IA
+
+STYLE OBLIGATOIRE:
+- Écris comme si tu étais l'auteur original du document
+- Commence directement par le contenu, sans en-tête artificiel
+- Phrases fluides, naturelles, vocabulaire riche
+- Paragraphes continus, pas de listes à puces sauf si c'est absolument indispensable
+- Si des informations manquent (date, nom), invente-les de façon crédible ou omets-les
+- Ton ${tone || 'professionnel'} adapté au contexte d'entreprise français
 
 Type de document: ${type || 'professionnel'}`;
 
@@ -200,6 +207,17 @@ Génère le document complet. Il doit être prêt à l'emploi en entreprise.`;
         if (!documentContent) {
           throw new Error('AI returned empty content');
         }
+
+        // Nettoyage agressif des traces d'IA / markdown / placeholders
+        documentContent = documentContent
+          .replace(/```[\s\S]*?```/g, '')
+          .replace(/^[#]+\s+/gm, '')
+          .replace(/\*\*/g, '')
+          .replace(/^---$/gm, '')
+          .replace(/\[[^\]]*\]/g, '')
+          .replace(/(^|\n)\s*Voici le contenu du document[^\n]*\n?/gi, '$1')
+          .replace(/(^|\n)\s*Résumé du Mail\s*:?/gi, '$1')
+          .trim();
       } catch (aiError) {
         console.error('AI generation error:', aiError);
         // Fallback to simple content if AI fails
