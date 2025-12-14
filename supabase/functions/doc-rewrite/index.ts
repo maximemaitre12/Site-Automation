@@ -154,12 +154,19 @@ Produis un texte final naturel, professionnel, prêt à l'emploi. Pas de crochet
       throw new Error('Aucun contenu généré');
     }
 
-    // Clean up any remaining markdown artifacts
+    // Clean up any remaining markdown or template artifacts
     rewrittenContent = rewrittenContent
+      .replace(/```[\s\S]*?```/g, '')
       .replace(/\*\*/g, '')
       .replace(/\*\s/g, '')
-      .replace(/^#+\s/gm, '')
-      .replace(/^-\s/gm, '• ')
+      .replace(/^#+\s+/gm, '')
+      .replace(/^---$/gm, '')
+      .replace(/^[-]\s+/gm, '')
+      .replace(/\[[^\]]*\]/g, '')
+      .replace(/(^|\n)\s*Résumé du Mail\s*:?/gi, '$1')
+      .replace(/(^|\n)\s*Voici le contenu du document[^\n]*\n?/gi, '$1')
+      .replace(/(^|\n)\s*Date\s*:\s*[^\n]*/gi, '$1')
+      .replace(/(^|\n)\s*Auteur\s*:\s*[^\n]*/gi, '$1')
       .trim();
 
     // Update the document with the new version
