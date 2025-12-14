@@ -391,10 +391,21 @@ export function useAIIntelligence() {
   const enrichCompanyForDeal = useCallback(async (companyName: string, dealId: string) => {
     if (!user || !companyName.trim()) return null;
     try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error('Session invalide, veuillez vous reconnecter');
+      }
+
       const { data, error } = await supabase.functions.invoke('enrich-company', {
         body: { 
           queryType: 'name', 
           queryValue: companyName.trim()
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       

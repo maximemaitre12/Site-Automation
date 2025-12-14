@@ -223,8 +223,23 @@ export function useEnrichedCompanies() {
   // Enrichment mutation
   const enrichMutation = useMutation({
     mutationFn: async ({ queryType, queryValue }: { queryType: 'siren' | 'siret' | 'name' | 'website', queryValue: string }) => {
+      if (!user) {
+        throw new Error('Vous devez être connecté pour enrichir une entreprise');
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error('Session invalide, veuillez vous reconnecter');
+      }
+
       const { data, error } = await supabase.functions.invoke('enrich-company', {
-        body: { queryType, queryValue }
+        body: { queryType, queryValue },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
       
       if (error) throw error;
