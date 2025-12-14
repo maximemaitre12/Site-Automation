@@ -219,11 +219,32 @@ ${transcript}`
         .single();
 
       if (error) throw error;
+
+      // Update deal with last activity and notes if dealId is provided
+      if (dealId) {
+        const noteContent = `[Appel ${new Date().toLocaleDateString('fr-FR')}] ${parsed.summary || title}`;
+        
+        await supabase
+          .from('sales_deals')
+          .update({
+            last_activity_at: new Date().toISOString(),
+            custom_fields: supabase.rpc ? undefined : {
+              last_call_summary: parsed.summary,
+              last_call_sentiment: parsed.sentiment,
+              last_call_next_steps: parsed.next_steps
+            }
+          })
+          .eq('id', dealId);
+
+        // Invalidate deals query to refresh pipeline
+        queryClient.invalidateQueries({ queryKey: ['sales-deals'] });
+      }
       
       invalidateSales();
-      toast({ title: 'Succès', description: 'Appel analysé' });
+      toast({ title: 'Succès', description: dealId ? 'Appel analysé et deal mis à jour' : 'Appel analysé' });
       return analysis;
     } catch (err) {
+      console.error('Analyze call error:', err);
       toast({ title: 'Erreur', description: 'Erreur lors de l\'analyse', variant: 'destructive' });
       return null;
     }
