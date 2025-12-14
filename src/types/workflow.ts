@@ -526,19 +526,21 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
 
   // ===== AETHER DOCUMENTS (REAL OPERATIONS) =====
   aether_doc_create: {
-    name: 'Doc - Créer Document',
+    name: 'Doc - Créer Document PDF',
     category: 'aether',
     subCategory: 'aether_internal',
     color: 'from-teal-500 to-emerald-400',
     icon: 'FileText',
-    description: 'Créer un document dans Aether Doc (ACTION RÉELLE)',
+    description: 'Créer un document PDF dans Aether Doc (ACTION RÉELLE)',
     isRealAction: true,
     configFields: [
-      { key: 'title', label: 'Titre', type: 'text', required: true },
-      { key: 'content', label: 'Contenu', type: 'textarea', required: true },
-      { key: 'folderId', label: 'ID Dossier', type: 'text' },
-      { key: 'tags', label: 'Tags (séparés par virgule)', type: 'text', placeholder: 'contrat, client, important' },
-      { key: 'generatePdf', label: 'Générer PDF', type: 'boolean', defaultValue: false }
+      { key: 'title', label: 'Titre du document', type: 'text', required: true },
+      { key: 'content', label: 'Contenu (ou vide pour génération IA)', type: 'textarea', helpText: 'Laissez vide pour utiliser le prompt IA ci-dessous' },
+      { key: 'prompt', label: 'Prompt IA (génération automatique)', type: 'textarea', placeholder: 'Génère un rapport professionnel sur...' },
+      { key: 'type', label: 'Type de document', type: 'select', options: ['rapport', 'contrat', 'proposition', 'memo', 'procedure', 'email', 'presentation', 'autre'], defaultValue: 'rapport' },
+      { key: 'tone', label: 'Ton', type: 'select', options: ['professionnel', 'formel', 'concis', 'détaillé', 'commercial'], defaultValue: 'professionnel' },
+      { key: 'folderId', label: 'ID Dossier (optionnel)', type: 'text' },
+      { key: 'tags', label: 'Tags (séparés par virgule)', type: 'text', placeholder: 'workflow, auto-généré, important' }
     ]
   },
   aether_doc_analyze: {
