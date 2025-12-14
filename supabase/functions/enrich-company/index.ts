@@ -51,35 +51,99 @@ function scoreCompany(company: any): number {
   return score;
 }
 
+// Common misspellings and variations for famous French companies
+const COMPANY_CORRECTIONS: Record<string, string[]> = {
+  'saint gaubin': ['saint-gobain', 'saint gobain'],
+  'saintgaubin': ['saint-gobain', 'saintgobain'],
+  'saint gobin': ['saint-gobain', 'saint gobain'],
+  'saintgobin': ['saint-gobain', 'saintgobain'],
+  'total energie': ['totalenergies', 'total energies'],
+  'totalenergie': ['totalenergies'],
+  'bmparibase': ['bnp paribas'],
+  'bnparibase': ['bnp paribas'],
+  'societe general': ['societe generale'],
+  'credit agricol': ['credit agricole'],
+  'axa assurance': ['axa'],
+  'lvmh moet': ['lvmh'],
+  'carfour': ['carrefour'],
+  'carrefourt': ['carrefour'],
+  'danonne': ['danone'],
+  'oreal': ["l'oreal", 'loreal'],
+  'loréal': ["l'oreal", 'loreal'],
+  'michlin': ['michelin'],
+  'capgeminie': ['capgemini'],
+  'capgeminii': ['capgemini'],
+  'onepoint': ['onepoint'],
+  'one point': ['onepoint'],
+};
+
+// Levenshtein distance for fuzzy matching
+function levenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
 // Normalize company name for better matching
 function normalizeCompanyName(name: string): string[] {
   const normalized = name.trim().toLowerCase();
   const variations: string[] = [name.trim()];
   
+  // Check for known misspellings first
+  for (const [misspelling, corrections] of Object.entries(COMPANY_CORRECTIONS)) {
+    if (normalized.includes(misspelling) || levenshteinDistance(normalized, misspelling) <= 2) {
+      variations.push(...corrections);
+    }
+  }
+  
   // Remove common words and try variations
   const withoutSpaces = normalized.replace(/\s+/g, '');
   if (withoutSpaces !== normalized) {
-    // Add version without spaces (e.g., "Total Energie" -> "TotalEnergie")
     variations.push(name.trim().replace(/\s+/g, ''));
   }
   
+  // Try with hyphen variations
+  if (normalized.includes(' ')) {
+    variations.push(name.trim().replace(/\s+/g, '-'));
+  }
+  if (normalized.includes('-')) {
+    variations.push(name.trim().replace(/-/g, ' '));
+  }
+  
   // Common company name patterns
-  const suffixes = [' se', ' sa', ' sas', ' sarl', ' groupe', ' group', ' france', ' energy', ' energies', ' énergie', ' énergies'];
+  const suffixes = [' se', ' sa', ' sas', ' groupe', ' group', ' france'];
   for (const suffix of suffixes) {
     if (!normalized.includes(suffix.trim())) {
-      // Try adding common suffixes
-      if (normalized.includes('total') || normalized.includes('energie') || normalized.includes('energy')) {
+      if (['total', 'saint', 'bnp', 'axa', 'engie'].some(w => normalized.includes(w))) {
         variations.push(name.trim() + suffix.toUpperCase());
       }
     }
   }
   
-  return [...new Set(variations)]; // Remove duplicates
+  return [...new Set(variations)];
 }
 
 // API Recherche Entreprises - data.gouv.fr (FREE & OFFICIAL)
 // Now returns the BEST match (largest/most important company)
-async function fetchFromDataGouv(query: string, queryType: string, existingCompanyData?: any): Promise<any> {
+async function fetchFromDataGouv(query: string, queryType: string, existingCompanyData?: any, originalQuery?: string): Promise<any> {
   try {
     let url = '';
     let perPage = 1;
@@ -117,6 +181,7 @@ async function fetchFromDataGouv(query: string, queryType: string, existingCompa
     // For name searches, score all results and pick the best one
     let company = data.results[0];
     const queryLower = query.toLowerCase().replace(/\s+/g, '');
+    const originalQueryLower = originalQuery?.toLowerCase().replace(/\s+/g, '') || queryLower;
     
     if (queryType === 'name' && data.results.length > 1) {
       console.log(`Found ${data.results.length} companies, scoring to find best match...`);
@@ -124,34 +189,64 @@ async function fetchFromDataGouv(query: string, queryType: string, existingCompa
       // Score all companies
       const scoredResults = data.results.map((c: any) => {
         const companyNameLower = (c.nom_complet || '').toLowerCase();
-        const companyNameNoSpaces = companyNameLower.replace(/\s+/g, '');
+        const companyNameNoSpaces = companyNameLower.replace(/\s+/g, '').replace(/-/g, '');
         
-        // Calculate name similarity score
+        // Calculate name similarity score with fuzzy matching
         let nameMatchScore = 0;
-        if (companyNameLower.includes(query.toLowerCase())) {
-          nameMatchScore = 500; // Exact substring match
-        } else if (companyNameNoSpaces.includes(queryLower)) {
-          nameMatchScore = 400; // Match without spaces (e.g., TotalEnergies vs Total Energie)
-        } else if (query.toLowerCase().split(/\s+/).every(word => companyNameLower.includes(word))) {
-          nameMatchScore = 300; // All words match
+        
+        // Exact match (highest priority)
+        if (companyNameLower === query.toLowerCase() || companyNameNoSpaces === queryLower) {
+          nameMatchScore = 1000;
+        }
+        // Name starts with query
+        else if (companyNameLower.startsWith(query.toLowerCase()) || companyNameNoSpaces.startsWith(queryLower)) {
+          nameMatchScore = 800;
+        }
+        // Exact substring match
+        else if (companyNameLower.includes(query.toLowerCase())) {
+          nameMatchScore = 600;
+        }
+        // Match without spaces/hyphens
+        else if (companyNameNoSpaces.includes(queryLower)) {
+          nameMatchScore = 500;
+        }
+        // All words match
+        else if (query.toLowerCase().split(/\s+/).every(word => companyNameLower.includes(word))) {
+          nameMatchScore = 400;
+        }
+        // Fuzzy match with Levenshtein distance
+        else {
+          const mainName = companyNameLower.split(/[\s\(\)]/)[0];
+          const queryMain = query.toLowerCase().split(/\s+/)[0];
+          const distance = levenshteinDistance(mainName, queryMain);
+          if (distance <= 2) {
+            nameMatchScore = 300 - (distance * 50);
+          }
+        }
+        
+        // Bonus for GE/ETI when user searches for something that sounds like a major company
+        let categoryBonus = 0;
+        if (c.categorie_entreprise === 'GE') {
+          categoryBonus = 2000; // Huge bonus for major companies
+        } else if (c.categorie_entreprise === 'ETI') {
+          categoryBonus = 1000;
         }
         
         return {
           company: c,
-          score: scoreCompany(c) + nameMatchScore,
-          nameMatch: nameMatchScore
+          score: scoreCompany(c) + nameMatchScore + categoryBonus,
+          nameMatch: nameMatchScore,
+          categoryBonus
         };
       });
       
       // If we have existing CRM data, boost companies that match
       if (existingCompanyData) {
         for (const result of scoredResults) {
-          // Check if SIREN matches
           if (existingCompanyData.siren && result.company.siren === existingCompanyData.siren) {
-            result.score += 2000; // Strong match
+            result.score += 3000;
             console.log(`SIREN match found: ${result.company.siren}`);
           }
-          // Check if city matches
           if (existingCompanyData.city && result.company.siege?.libelle_commune?.toLowerCase() === existingCompanyData.city.toLowerCase()) {
             result.score += 100;
           }
@@ -164,7 +259,7 @@ async function fetchFromDataGouv(query: string, queryType: string, existingCompa
       // Log top 3 for debugging
       console.log('Top 3 scored companies:');
       scoredResults.slice(0, 3).forEach((r: any, i: number) => {
-        console.log(`  ${i + 1}. ${r.company.nom_complet} (${r.company.categorie_entreprise || 'N/A'}) - Score: ${r.score} (name match: ${r.nameMatch})`);
+        console.log(`  ${i + 1}. ${r.company.nom_complet} (${r.company.categorie_entreprise || 'N/A'}) - Score: ${r.score} (name: ${r.nameMatch}, cat: ${r.categoryBonus})`);
       });
       
       company = scoredResults[0].company;
@@ -532,28 +627,38 @@ serve(async (req) => {
       let bestScore = 0;
       
       for (const variation of nameVariations) {
-        const result = await fetchFromDataGouv(variation, queryType, existingContext?.bestMatch);
+        const result = await fetchFromDataGouv(variation, queryType, existingContext?.bestMatch, queryValue);
         if (result) {
           console.log(`Variation "${variation}" found: ${result.name} (category: ${result.category})`);
           
-          // Calculate score based on company category
+          // Calculate score based on company category - heavily favor GE/ETI
           let resultScore = 0;
-          if (result.category === 'GE') resultScore = 1000;
-          else if (result.category === 'ETI') resultScore = 500;
+          if (result.category === 'GE') resultScore = 3000;
+          else if (result.category === 'ETI') resultScore = 1500;
           else if (result.category === 'PME') resultScore = 100;
           
           // Add score for financial data
           if (result.revenue) resultScore += 200;
           if (result.employees_count) resultScore += 100;
           
-          // Check if this result's name matches better
-          const resultNameLower = (result.name || '').toLowerCase().replace(/\s+/g, '');
-          const queryLower = queryValue.toLowerCase().replace(/\s+/g, '');
-          const isNameMatch = resultNameLower.includes(queryLower) || queryLower.includes(resultNameLower.substring(0, 10));
+          // Check if this result's name matches better (fuzzy)
+          const resultNameLower = (result.name || '').toLowerCase().replace(/[\s\-]/g, '');
+          const queryLower = queryValue.toLowerCase().replace(/[\s\-]/g, '');
           
-          // Prioritize larger companies (GE > ETI > PME) with name match
-          const adjustedScore = resultScore + (isNameMatch ? 500 : 0);
-          console.log(`  -> Score: ${adjustedScore} (name match: ${isNameMatch})`);
+          // Check name similarity
+          let nameBonus = 0;
+          if (resultNameLower.includes(queryLower) || queryLower.includes(resultNameLower.substring(0, 8))) {
+            nameBonus = 500;
+          } else {
+            // Fuzzy match
+            const distance = levenshteinDistance(resultNameLower.substring(0, 12), queryLower.substring(0, 12));
+            if (distance <= 3) {
+              nameBonus = 300 - (distance * 50);
+            }
+          }
+          
+          const adjustedScore = resultScore + nameBonus;
+          console.log(`  -> Score: ${adjustedScore} (category: ${result.category}, name bonus: ${nameBonus})`);
           
           if (adjustedScore > bestScore) {
             bestScore = adjustedScore;
