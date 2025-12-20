@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [initialized]);
 
   const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/dashboard`;
+    const redirectUrl = `${window.location.origin}/select-plan`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -103,6 +103,7 @@ export function useAuth() {
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -120,4 +121,58 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   }
 
   return user ? <>{children}</> : null;
+}
+
+// Protected route that also requires an active subscription
+export function RequireSubscription({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [hasSubscription, setHasSubscription] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+      return;
+    }
+
+    if (user) {
+      // Check subscription status
+      const checkSubscription = async () => {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('status')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (data && (data.status === 'active' || data.status === 'trial')) {
+          setHasSubscription(true);
+        } else {
+          setHasSubscription(false);
+          // Redirect to plan selection if not on that page
+          if (location.pathname !== '/select-plan') {
+            navigate('/select-plan');
+          }
+        }
+        setSubscriptionLoading(false);
+      };
+
+      checkSubscription();
+    }
+  }, [user, loading, navigate, location.pathname]);
+
+  // Show loading during auth or subscription check
+  if (loading || subscriptionLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
+  if (!hasSubscription && location.pathname !== '/select-plan') return null;
+
+  return <>{children}</>;
 }
