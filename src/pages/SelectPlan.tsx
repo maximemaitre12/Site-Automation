@@ -110,7 +110,7 @@ export default function SelectPlan() {
             </div>
             <span className="text-xl font-bold text-foreground">AETHER</span>
           </div>
-          <Button variant="outline" onClick={() => navigate('/')}>
+          <Button variant="ghost" onClick={() => navigate('/')}>
             Accueil
           </Button>
         </div>
