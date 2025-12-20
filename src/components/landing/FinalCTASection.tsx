@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export function FinalCTASection() {
   return (
-    <section className="py-24 lg:py-32 bg-primary text-primary-foreground">
+    <section id="enterprise" className="py-24 lg:py-32 bg-primary text-primary-foreground">
       <div className="max-w-3xl mx-auto px-6 text-center">
         {/* Headline */}
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-6">
