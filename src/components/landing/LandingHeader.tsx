@@ -15,7 +15,7 @@ export function LandingHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
-  const getNavHref = (anchor: string) => isHomePage ? anchor : `/${anchor}`;
+  
   
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -37,15 +37,25 @@ export function LandingHeader() {
               { label: "Fonctionnalités", href: "#features" },
               { label: "Tarifs", href: "#pricing" },
               { label: "Entreprise", href: "#enterprise" },
-            ].map((item) => (
-              <Link 
-                key={item.label}
-                to={getNavHref(item.href)} 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+            ].map((item) => 
+              isHomePage ? (
+                <a 
+                  key={item.label}
+                  href={item.href} 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link 
+                  key={item.label}
+                  to={`/${item.href}`} 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
           </nav>
           
           {/* Desktop CTA */}
@@ -80,16 +90,27 @@ export function LandingHeader() {
                 { label: "Fonctionnalités", href: "#features" },
                 { label: "Tarifs", href: "#pricing" },
                 { label: "Entreprise", href: "#enterprise" },
-              ].map((item) => (
-                <Link 
-                  key={item.label} 
-                  to={getNavHref(item.href)} 
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-sm text-foreground hover:text-primary transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              ].map((item) => 
+                isHomePage ? (
+                  <a 
+                    key={item.label} 
+                    href={item.href} 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-sm text-foreground hover:text-primary transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link 
+                    key={item.label} 
+                    to={`/${item.href}`} 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-sm text-foreground hover:text-primary transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
               <div className="flex gap-3 pt-4 border-t border-border">
                 <Link to="/auth?mode=login" className="flex-1">
                   <Button variant="outline" size="sm" className="w-full text-sm">Se connecter</Button>
