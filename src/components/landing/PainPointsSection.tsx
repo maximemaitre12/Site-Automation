@@ -1,5 +1,5 @@
 import { 
-  Workflow, Bot, Headphones, Users, Shield, TrendingUp
+  Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -14,44 +14,44 @@ interface Tool {
 const tools: Tool[] = [
   {
     name: "Flow",
-    tagline: "Workflows intelligents",
-    description: "Créez des automatisations visuellement. Connectez vos outils, l'IA décide et exécute.",
-    icon: Workflow,
+    tagline: "Automatisation prédictive",
+    description: "L'IA anticipe vos besoins et déclenche les workflows avant même que vous y pensiez.",
+    icon: Zap,
     color: "bg-blue-500",
   },
   {
     name: "Brain",
-    tagline: "Mémoire d'entreprise",
-    description: "Un assistant qui connaît vos documents. Posez des questions, obtenez des réponses précises.",
-    icon: Bot,
+    tagline: "Intelligence contextuelle",
+    description: "Une IA qui comprend le contexte de votre entreprise et répond avec précision.",
+    icon: Brain,
     color: "bg-violet-500",
   },
   {
     name: "Support",
-    tagline: "Support automatisé",
-    description: "Classification et réponse automatique aux tickets. Réduisez le temps de traitement de 90%.",
-    icon: Headphones,
+    tagline: "IA conversationnelle",
+    description: "Résolution autonome des tickets avec apprentissage continu. 90% de réduction du temps.",
+    icon: Sparkles,
     color: "bg-emerald-500",
   },
   {
     name: "HR",
-    tagline: "Recrutement accéléré",
-    description: "Analysez les CV, scorez les candidats et accélérez vos recrutements.",
-    icon: Users,
+    tagline: "Matching prédictif",
+    description: "L'IA prédit la compatibilité candidat-poste et accélère vos recrutements.",
+    icon: ScanSearch,
     color: "bg-orange-500",
   },
   {
     name: "Compliance",
-    tagline: "Conformité RGPD",
-    description: "Auditez automatiquement vos processus. Détectez les risques, générez des rapports.",
-    icon: Shield,
+    tagline: "Détection proactive",
+    description: "Anticipez les risques avant qu'ils ne surviennent. Conformité RGPD automatisée.",
+    icon: ShieldCheck,
     color: "bg-rose-500",
   },
   {
     name: "Sales",
-    tagline: "Ventes augmentées",
-    description: "Transcription d'appels, analyse du sentiment, génération de propositions commerciales.",
-    icon: TrendingUp,
+    tagline: "Prévisions intelligentes",
+    description: "Prédisez vos ventes, analysez le sentiment et générez des propositions gagnantes.",
+    icon: LineChart,
     color: "bg-cyan-500",
   },
 ];
