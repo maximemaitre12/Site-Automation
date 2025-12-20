@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, RequireAuth } from "@/hooks/useAuth";
+import { AuthProvider, RequireAuth, RequireSubscription } from "@/hooks/useAuth";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -53,20 +53,20 @@ const App = () => (
             <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
             <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
             
-            {/* Protected routes */}
-            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/tools/flow" element={<RequireAuth><Flow /></RequireAuth>} />
-            <Route path="/tools/doc" element={<RequireAuth><DocPage /></RequireAuth>} />
-            <Route path="/tools/sales" element={<RequireAuth><Sales /></RequireAuth>} />
-            <Route path="/tools/hr" element={<RequireAuth><HR /></RequireAuth>} />
-            <Route path="/tools/support" element={<RequireAuth><Support /></RequireAuth>} />
-            <Route path="/tools/brain" element={<RequireAuth><BrainPage /></RequireAuth>} />
-            <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
-            <Route path="/tools/data" element={<RequireAuth><Data /></RequireAuth>} />
-            <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+            {/* Protected routes - require subscription */}
+            <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
+            <Route path="/tools/flow" element={<RequireSubscription><Flow /></RequireSubscription>} />
+            <Route path="/tools/doc" element={<RequireSubscription><DocPage /></RequireSubscription>} />
+            <Route path="/tools/sales" element={<RequireSubscription><Sales /></RequireSubscription>} />
+            <Route path="/tools/hr" element={<RequireSubscription><HR /></RequireSubscription>} />
+            <Route path="/tools/support" element={<RequireSubscription><Support /></RequireSubscription>} />
+            <Route path="/tools/brain" element={<RequireSubscription><BrainPage /></RequireSubscription>} />
+            <Route path="/tools/compliance" element={<RequireSubscription><Compliance /></RequireSubscription>} />
+            <Route path="/tools/data" element={<RequireSubscription><Data /></RequireSubscription>} />
+            <Route path="/onboarding" element={<RequireSubscription><Onboarding /></RequireSubscription>} />
             <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
-            <Route path="/settings/company" element={<RequireAuth><CompanySettings /></RequireAuth>} />
-            <Route path="/settings/api-keys" element={<RequireAuth><ApiKeys /></RequireAuth>} />
+            <Route path="/settings/company" element={<RequireSubscription><CompanySettings /></RequireSubscription>} />
+            <Route path="/settings/api-keys" element={<RequireSubscription><ApiKeys /></RequireSubscription>} />
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
