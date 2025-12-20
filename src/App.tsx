@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
+import SelectPlan from "./pages/SelectPlan";
 import CompanySettings from "./pages/settings/CompanySettings";
 import ApiKeys from "./pages/settings/ApiKeys";
 
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/tools/compliance" element={<RequireAuth><Compliance /></RequireAuth>} />
             <Route path="/tools/data" element={<RequireAuth><Data /></RequireAuth>} />
             <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+            <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
             <Route path="/settings/company" element={<RequireAuth><CompanySettings /></RequireAuth>} />
             <Route path="/settings/api-keys" element={<RequireAuth><ApiKeys /></RequireAuth>} />
             
