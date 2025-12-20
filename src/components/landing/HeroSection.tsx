@@ -23,7 +23,7 @@ export function HeroSection() {
         
         {/* Subtitle */}
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up-delay-1">
-          6 agents IA spécialisés. Une seule plateforme. Support, RH, ventes, compliance — automatisez 90% de vos opérations sans écrire une ligne de code.
+          6 agents IA spécialisés. Une seule plateforme. Automatisez 90% de vos opérations en support, RH, ventes et compliance sans écrire une ligne de code.
         </p>
         
         {/* CTAs */}
