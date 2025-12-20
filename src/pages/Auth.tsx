@@ -28,11 +28,18 @@ export default function Auth() {
   const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
+  // Track if user just signed up to redirect to plan selection
+  const [justSignedUp, setJustSignedUp] = useState(false);
+
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      if (justSignedUp) {
+        navigate('/select-plan');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, justSignedUp]);
 
   const validateForm = () => {
     try {
@@ -80,8 +87,8 @@ export default function Auth() {
             toast.error(error.message);
           }
         } else {
+          setJustSignedUp(true);
           toast.success('Account created successfully!');
-          // Navigation is handled by useEffect when user state updates
         }
       } else if (mode === 'reset') {
         const { error } = await resetPassword(email);
