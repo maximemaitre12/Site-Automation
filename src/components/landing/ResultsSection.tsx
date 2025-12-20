@@ -14,7 +14,7 @@ const testimonial = {
 
 export function ResultsSection() {
   return (
-    <section className="py-24 lg:py-32 bg-secondary/50">
+    <section id="pricing" className="py-24 lg:py-32 bg-secondary/50">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
