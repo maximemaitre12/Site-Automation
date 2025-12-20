@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Check, Sparkles, Zap, Crown, Building2, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Plan {
   id: string;
@@ -72,7 +73,13 @@ const plans: Plan[] = [
 
 export default function SelectPlan() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
+
+  const handleGoHome = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const handleSelectPlan = async (plan: Plan) => {
     if (plan.contactUs) {
@@ -110,7 +117,7 @@ export default function SelectPlan() {
             </div>
             <span className="text-xl font-bold text-foreground">AETHER</span>
           </div>
-          <Button variant="ghost" onClick={() => navigate('/')}>
+          <Button variant="ghost" onClick={handleGoHome}>
             Accueil
           </Button>
         </div>
