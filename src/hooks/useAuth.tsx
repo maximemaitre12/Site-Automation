@@ -138,37 +138,52 @@ export function RequireSubscription({ children }: { children: ReactNode }) {
   }, [user, loading, navigate]);
 
   const {
-    data: subscriptionStatus,
+    data: subscriptionStatusRaw,
     isLoading: subscriptionLoading,
+    isFetching: subscriptionFetching,
     isError: subscriptionError,
     refetch,
   } = useQuery({
-    queryKey: ['subscription-status', user?.id],
-    enabled: !!user && !loading,
-    queryFn: async () => {
+    queryKey: ['subscription-status', user?.id ?? null],
+    enabled: !!user?.id && !loading,
+    queryFn: async ({ queryKey }) => {
+      const userId = queryKey[1] as string;
+
       const { data, error } = await supabase
         .from('subscriptions')
         .select('status')
-        .eq('user_id', user!.id)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;
       return (data?.status as string | null) ?? null;
     },
     retry: 2,
-    staleTime: 1000 * 60 * 5,
+    // Pour un contrôle d’accès, on force une donnée toujours fraîche pour éviter
+    // de rediriger sur un cache "null" après un changement (ex: switch d’agent).
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   });
+
+  const subscriptionStatus = (subscriptionStatusRaw as string | null) ?? null;
 
   const hasSubscription =
     subscriptionStatus === 'active' || subscriptionStatus === 'trial';
 
+  const subscriptionBusy =
+    subscriptionLoading || (subscriptionStatus === null && subscriptionFetching);
+
   useEffect(() => {
-    if (!loading && user && !subscriptionLoading && !subscriptionError && !hasSubscription) {
+    if (!loading && user && !subscriptionBusy && !subscriptionError && !hasSubscription) {
       if (location.pathname !== '/select-plan') {
         navigate('/select-plan');
       }
     }
-  }, [loading, user, subscriptionLoading, subscriptionError, hasSubscription, navigate, location.pathname]);
+  }, [loading, user, subscriptionBusy, subscriptionError, hasSubscription, navigate, location.pathname]);
 
   if (loading || (user && subscriptionLoading)) {
     return (
