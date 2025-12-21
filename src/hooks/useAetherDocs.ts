@@ -303,24 +303,43 @@ export function useAetherDocs() {
   };
 
   const analyzeDocument = async (documentId: string) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
     try {
       toast.info('Analyse IA en cours...');
-      const { error } = await supabase.functions.invoke('doc-analyze', {
+      
+      const { data, error } = await supabase.functions.invoke('doc-analyze', {
         body: { documentId }
       });
 
+      clearTimeout(timeoutId);
+
       if (error) {
         console.error('Analysis error:', error);
-        toast.error('Erreur lors de l\'analyse');
+        toast.error('Erreur lors de l\'analyse: ' + (error.message || 'Erreur inconnue'));
+        return false;
+      }
+
+      // Check if the response indicates an error
+      if (data?.error) {
+        console.error('Analysis response error:', data.error);
+        toast.error('Erreur lors de l\'analyse: ' + data.error);
         return false;
       }
       
       await fetchDocuments();
       toast.success('Analyse IA terminée');
       return true;
-    } catch (e) {
+    } catch (e: any) {
+      clearTimeout(timeoutId);
       console.error('Analysis failed:', e);
-      toast.error('Erreur lors de l\'analyse');
+      
+      if (e.name === 'AbortError') {
+        toast.error('L\'analyse a pris trop de temps. Réessayez plus tard.');
+      } else {
+        toast.error('Erreur lors de l\'analyse: ' + (e.message || 'Erreur inconnue'));
+      }
       return false;
     }
   };
