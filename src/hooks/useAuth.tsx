@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthContextType {
@@ -128,42 +130,47 @@ export function RequireSubscription({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
-  const [hasSubscription, setHasSubscription] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
-      return;
     }
+  }, [user, loading, navigate]);
 
-    if (user) {
-      // Check subscription status
-      const checkSubscription = async () => {
-        const { data, error } = await supabase
-          .from('subscriptions')
-          .select('status')
-          .eq('user_id', user.id)
-          .maybeSingle();
+  const {
+    data: subscriptionStatus,
+    isLoading: subscriptionLoading,
+    isError: subscriptionError,
+    refetch,
+  } = useQuery({
+    queryKey: ['subscription-status', user?.id],
+    enabled: !!user && !loading,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', user!.id)
+        .maybeSingle();
 
-        if (data && (data.status === 'active' || data.status === 'trial')) {
-          setHasSubscription(true);
-        } else {
-          setHasSubscription(false);
-          // Redirect to plan selection if not on that page
-          if (location.pathname !== '/select-plan') {
-            navigate('/select-plan');
-          }
-        }
-        setSubscriptionLoading(false);
-      };
+      if (error) throw error;
+      return (data?.status as string | null) ?? null;
+    },
+    retry: 2,
+    staleTime: 1000 * 60 * 5,
+  });
 
-      checkSubscription();
+  const hasSubscription =
+    subscriptionStatus === 'active' || subscriptionStatus === 'trial';
+
+  useEffect(() => {
+    if (!loading && user && !subscriptionLoading && !subscriptionError && !hasSubscription) {
+      if (location.pathname !== '/select-plan') {
+        navigate('/select-plan');
+      }
     }
-  }, [user, loading, navigate, location.pathname]);
+  }, [loading, user, subscriptionLoading, subscriptionError, hasSubscription, navigate, location.pathname]);
 
-  // Show loading during auth or subscription check
-  if (loading || subscriptionLoading) {
+  if (loading || (user && subscriptionLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
@@ -172,6 +179,24 @@ export function RequireSubscription({ children }: { children: ReactNode }) {
   }
 
   if (!user) return null;
+
+  if (subscriptionError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 text-card-foreground">
+          <h2 className="text-lg font-semibold">Vérification d’abonnement impossible</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Un problème temporaire empêche de vérifier votre abonnement. Réessayez.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Button onClick={() => refetch()} variant="default">Réessayer</Button>
+            <Button onClick={() => navigate('/dashboard')} variant="outline">Aller au tableau de bord</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!hasSubscription && location.pathname !== '/select-plan') return null;
 
   return <>{children}</>;
