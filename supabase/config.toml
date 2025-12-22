@@ -68,3 +68,6 @@ verify_jwt = true
 
 [functions.hr-email-send]
 verify_jwt = true
+
+[functions.hr-email-extract]
+verify_jwt = true
