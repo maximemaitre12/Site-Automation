@@ -62,3 +62,9 @@ verify_jwt = true
 
 [functions.analyze-interview]
 verify_jwt = true
+
+[functions.hr-email-compose]
+verify_jwt = true
+
+[functions.hr-email-send]
+verify_jwt = true
