@@ -628,6 +628,7 @@ export type Database = {
         Row: {
           ai_analysis: Json | null
           created_at: string
+          cv_file_url: string | null
           cv_text: string | null
           cv_url: string | null
           email: string | null
@@ -645,6 +646,7 @@ export type Database = {
         Insert: {
           ai_analysis?: Json | null
           created_at?: string
+          cv_file_url?: string | null
           cv_text?: string | null
           cv_url?: string | null
           email?: string | null
@@ -662,6 +664,7 @@ export type Database = {
         Update: {
           ai_analysis?: Json | null
           created_at?: string
+          cv_file_url?: string | null
           cv_text?: string | null
           cv_url?: string | null
           email?: string | null
@@ -2265,9 +2268,16 @@ export type Database = {
           auto_parse_cv: boolean | null
           created_at: string | null
           email_address: string
+          extraction_enabled: boolean | null
+          extraction_interval_minutes: number | null
           id: string
           is_active: boolean | null
+          last_extraction_at: string | null
           last_sync_at: string | null
+          oauth_access_token: string | null
+          oauth_provider_user_id: string | null
+          oauth_refresh_token: string | null
+          oauth_token_expires_at: string | null
           provider: string
           refresh_token: string | null
           sender_name: string | null
@@ -2284,9 +2294,16 @@ export type Database = {
           auto_parse_cv?: boolean | null
           created_at?: string | null
           email_address: string
+          extraction_enabled?: boolean | null
+          extraction_interval_minutes?: number | null
           id?: string
           is_active?: boolean | null
+          last_extraction_at?: string | null
           last_sync_at?: string | null
+          oauth_access_token?: string | null
+          oauth_provider_user_id?: string | null
+          oauth_refresh_token?: string | null
+          oauth_token_expires_at?: string | null
           provider: string
           refresh_token?: string | null
           sender_name?: string | null
@@ -2303,9 +2320,16 @@ export type Database = {
           auto_parse_cv?: boolean | null
           created_at?: string | null
           email_address?: string
+          extraction_enabled?: boolean | null
+          extraction_interval_minutes?: number | null
           id?: string
           is_active?: boolean | null
+          last_extraction_at?: string | null
           last_sync_at?: string | null
+          oauth_access_token?: string | null
+          oauth_provider_user_id?: string | null
+          oauth_refresh_token?: string | null
+          oauth_token_expires_at?: string | null
           provider?: string
           refresh_token?: string | null
           sender_name?: string | null
