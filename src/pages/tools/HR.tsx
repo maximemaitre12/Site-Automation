@@ -10,7 +10,7 @@ import {
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
   AlertTriangle, DoorOpen, Calendar, CalendarDays, List, LayoutGrid,
-  FileText, Target, Mic, BarChart3, Award, History
+  FileText, Target, Mic, BarChart3, Award, History, Mail
 } from "lucide-react";
 import { useHR } from "@/hooks/useHR";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -29,6 +29,9 @@ import { InterviewCard } from "@/components/hr/InterviewCard";
 import { InterviewCalendar } from "@/components/hr/InterviewCalendar";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { EmailInbox } from "@/components/hr/email/EmailInbox";
+import { EmailAccountConnect } from "@/components/hr/email/EmailAccountConnect";
+import { useHREmails } from "@/hooks/useHREmails";
 
 export default function HR() {
   const { 
@@ -47,11 +50,12 @@ export default function HR() {
   } = useEmployees();
 
   const { interviews, loading: interviewsLoading, getUpcomingInterviews, updateInterview, refetch: refetchInterviews } = useInterviews();
+  const { newEmails, loading: emailsLoading } = useHREmails();
 
   const [mainTab, setMainTab] = useState<"recruitment" | "team">("recruitment");
   
   // Recruitment sub-sections
-  const [recruitmentSection, setRecruitmentSection] = useState<"pipeline" | "interviews" | "jobs">("pipeline");
+  const [recruitmentSection, setRecruitmentSection] = useState<"pipeline" | "interviews" | "jobs" | "emails">("pipeline");
   const [pipelineTab, setPipelineTab] = useState<"new" | "analyzed" | "active">("new");
   const [interviewTab, setInterviewTab] = useState<"upcoming" | "completed" | "calendar">("upcoming");
   
@@ -104,6 +108,7 @@ export default function HR() {
     departures: inactiveEmployees.length,
     upcomingInterviews: upcomingInterviews.length,
     completedInterviews: completedInterviews.length,
+    newEmails: newEmails.length,
   };
 
   // Section Header Component
@@ -240,6 +245,21 @@ export default function HR() {
                   <Briefcase className="w-4 h-4" />
                   Postes & Offres
                   <Badge variant="secondary" className="ml-auto">{stats.activeJobs}</Badge>
+                </button>
+                
+                <button
+                  onClick={() => setRecruitmentSection('emails')}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    recruitmentSection === 'emails' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <Mail className="w-4 h-4" />
+                  Messagerie
+                  {stats.newEmails > 0 && (
+                    <Badge variant="destructive" className="ml-auto">{stats.newEmails}</Badge>
+                  )}
                 </button>
                 
                 <Separator className="my-3" />
@@ -564,6 +584,17 @@ export default function HR() {
                             <JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />
                           </div>
                         </div>
+                      </div>
+                    )}
+
+                    {/* Emails Section */}
+                    {recruitmentSection === 'emails' && (
+                      <div className="space-y-6">
+                        <EmailInbox 
+                          candidates={candidates}
+                          jobs={jobs}
+                          onCreateCandidate={createCandidate}
+                        />
                       </div>
                     )}
                   </>
