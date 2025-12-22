@@ -119,20 +119,6 @@ export function EmailInbox({ candidates = [], jobs = [], onCreateCandidate }: Em
     );
   }
 
-  if (selectedEmail) {
-    return (
-      <EmailDetailPanel
-        email={selectedEmail}
-        candidates={candidates}
-        onBack={() => setSelectedEmail(null)}
-        onReply={() => handleReply(selectedEmail)}
-        onArchive={() => handleArchive(selectedEmail)}
-        onDelete={() => handleDelete(selectedEmail)}
-        onCreateCandidate={onCreateCandidate}
-      />
-    );
-  }
-
   return (
     <div className="space-y-4">
       {/* Header */}
