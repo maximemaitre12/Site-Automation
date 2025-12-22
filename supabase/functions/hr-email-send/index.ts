@@ -30,6 +30,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Get user from token
@@ -48,13 +49,52 @@ serve(async (req) => {
       .eq('is_active', true)
       .single();
 
-    // For now, we'll use a simulated send (store in DB)
-    // In production, this would use Gmail API or Microsoft Graph
-    
     const fromEmail = emailAccount?.email_address || user.email || 'noreply@aether.app';
     const fromName = senderName || emailAccount?.sender_name || 'Service RH';
 
-    // Store the outbound email
+    let emailSent = false;
+    let sendError: string | null = null;
+
+    // Try to send via Resend if API key is configured
+    if (resendApiKey) {
+      try {
+        console.log('Attempting to send email via Resend...');
+        
+        const resendResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: `${fromName} <${fromEmail}>`,
+            to: [to],
+            subject: subject,
+            html: bodyHtml,
+            text: bodyText || bodyHtml?.replace(/<[^>]*>/g, ''),
+            reply_to: replyToEmail || fromEmail,
+          }),
+        });
+
+        const resendResult = await resendResponse.json();
+
+        if (!resendResponse.ok) {
+          console.error('Resend API error:', resendResult);
+          sendError = resendResult.message || 'Erreur Resend';
+        } else {
+          console.log('Email sent successfully via Resend:', resendResult.id);
+          emailSent = true;
+        }
+      } catch (resendError: any) {
+        console.error('Error calling Resend:', resendError);
+        sendError = resendError.message;
+      }
+    } else {
+      console.log('No RESEND_API_KEY configured - email will be stored only');
+      sendError = 'Envoi non configuré (clé Resend manquante)';
+    }
+
+    // Store the outbound email regardless of send status
     const { data: emailRecord, error: insertError } = await supabase
       .from('hr_emails')
       .insert({
@@ -68,9 +108,9 @@ serve(async (req) => {
         subject: subject,
         body_html: bodyHtml,
         body_text: bodyText || bodyHtml?.replace(/<[^>]*>/g, ''),
-        status: 'replied',
+        status: emailSent ? 'replied' : 'new',
         parent_email_id: parentEmailId,
-        provider: emailAccount?.provider || 'manual',
+        provider: resendApiKey ? 'resend' : 'manual',
         email_date: new Date().toISOString(),
       })
       .select()
@@ -94,7 +134,6 @@ serve(async (req) => {
 
     // Update candidate last contact date if linked
     if (candidateId) {
-      // Update candidate status to show activity
       await supabase
         .from('candidates')
         .update({ 
@@ -104,19 +143,16 @@ serve(async (req) => {
         .eq('id', candidateId);
     }
 
-    console.log(`Email sent successfully to ${to}, stored with ID: ${emailRecord.id}`);
-
-    // In a real implementation with OAuth:
-    // - For Gmail: Use Gmail API with stored access_token
-    // - For Outlook: Use Microsoft Graph API with stored access_token
-    // The email would actually be sent from the user's connected account
+    console.log(`Email processing complete. Sent: ${emailSent}, Stored ID: ${emailRecord.id}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
       emailId: emailRecord.id,
-      message: 'Email envoyé et enregistré avec succès',
-      // In production with OAuth, this would be the actual send status
-      note: 'Email stocké. Connectez votre compte email pour l\'envoi réel.'
+      sent: emailSent,
+      message: emailSent 
+        ? 'Email envoyé et enregistré avec succès'
+        : 'Email enregistré (envoi non effectué)',
+      note: sendError || undefined,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

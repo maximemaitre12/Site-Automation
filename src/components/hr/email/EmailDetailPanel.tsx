@@ -26,7 +26,7 @@ interface EmailDetailPanelProps {
   email: HREmail;
   candidates?: any[];
   onBack: () => void;
-  onReply: () => void;
+  onReply: (suggestion?: string) => void;
   onArchive: () => void;
   onDelete: () => void;
   onCreateCandidate?: (data: any) => Promise<any>;
@@ -107,7 +107,7 @@ export function EmailDetailPanel({
             <Trash2 className="w-4 h-4 mr-2" />
             Supprimer
           </Button>
-          <Button variant="default" onClick={onReply}>
+          <Button variant="default" onClick={() => onReply()}>
             <Reply className="w-4 h-4 mr-2" />
             Répondre
           </Button>
@@ -303,7 +303,7 @@ export function EmailDetailPanel({
                     variant="default" 
                     size="sm" 
                     className="w-full"
-                    onClick={onReply}
+                    onClick={() => onReply(suggestedResponse)}
                   >
                     <Reply className="w-4 h-4 mr-2" />
                     Utiliser cette réponse

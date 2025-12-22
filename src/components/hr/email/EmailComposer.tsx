@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 
 interface EmailComposerProps {
   replyTo?: HREmail;
+  initialBody?: string;
   candidates?: any[];
   jobs?: any[];
   onClose: () => void;
@@ -30,6 +31,7 @@ interface EmailComposerProps {
 
 export function EmailComposer({
   replyTo,
+  initialBody,
   candidates = [],
   jobs = [],
   onClose,
@@ -39,7 +41,7 @@ export function EmailComposer({
   
   const [to, setTo] = useState(replyTo?.from_email || '');
   const [subject, setSubject] = useState(replyTo ? `Re: ${replyTo.subject}` : '');
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(initialBody || '');
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(
     replyTo?.candidate_id || null
   );

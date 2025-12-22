@@ -38,6 +38,7 @@ export function EmailInbox({ candidates = [], jobs = [], onCreateCandidate }: Em
   const [selectedEmail, setSelectedEmail] = useState<HREmail | null>(null);
   const [isComposing, setIsComposing] = useState(false);
   const [replyToEmail, setReplyToEmail] = useState<HREmail | null>(null);
+  const [initialBody, setInitialBody] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<'all' | 'new' | 'replied' | 'archived'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -58,8 +59,9 @@ export function EmailInbox({ candidates = [], jobs = [], onCreateCandidate }: Em
     }
   };
 
-  const handleReply = (email: HREmail) => {
+  const handleReply = (email: HREmail, suggestion?: string) => {
     setReplyToEmail(email);
+    setInitialBody(suggestion);
     setIsComposing(true);
     setSelectedEmail(null);
   };
@@ -83,17 +85,34 @@ export function EmailInbox({ candidates = [], jobs = [], onCreateCandidate }: Em
     return (
       <EmailComposer
         replyTo={replyToEmail || undefined}
+        initialBody={initialBody}
         candidates={candidates}
         jobs={jobs}
         onClose={() => {
           setIsComposing(false);
           setReplyToEmail(null);
+          setInitialBody(undefined);
         }}
         onSent={() => {
           setIsComposing(false);
           setReplyToEmail(null);
+          setInitialBody(undefined);
           fetchEmails();
         }}
+      />
+    );
+  }
+
+  if (selectedEmail) {
+    return (
+      <EmailDetailPanel
+        email={selectedEmail}
+        candidates={candidates}
+        onBack={() => setSelectedEmail(null)}
+        onReply={(suggestion) => handleReply(selectedEmail, suggestion)}
+        onArchive={() => handleArchive(selectedEmail)}
+        onDelete={() => handleDelete(selectedEmail)}
+        onCreateCandidate={onCreateCandidate}
       />
     );
   }
@@ -201,7 +220,7 @@ export function EmailInbox({ candidates = [], jobs = [], onCreateCandidate }: Em
                 <div
                   key={email.id}
                   onClick={() => handleEmailClick(email)}
-                  className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
+                  className={`group p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
                     email.status === 'new' ? 'bg-primary/5' : ''
                   }`}
                 >
