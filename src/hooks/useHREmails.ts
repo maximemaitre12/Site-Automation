@@ -263,7 +263,15 @@ export function useHREmails() {
       if (error) throw error;
       
       await fetchEmails();
-      toast.success('Email envoyé avec succès');
+      
+      // Show appropriate message based on whether email was actually sent
+      if (data?.sent) {
+        toast.success('Email envoyé avec succès');
+      } else {
+        toast.success('Email enregistré', {
+          description: data?.note || 'L\'email sera envoyé une fois Resend configuré',
+        });
+      }
       return data;
     } catch (error: any) {
       console.error('Error sending email:', error);
