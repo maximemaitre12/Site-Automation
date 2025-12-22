@@ -2258,6 +2258,172 @@ export type Database = {
           },
         ]
       }
+      hr_email_accounts: {
+        Row: {
+          access_token: string | null
+          auto_create_candidate: boolean | null
+          auto_parse_cv: boolean | null
+          created_at: string | null
+          email_address: string
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          provider: string
+          refresh_token: string | null
+          sender_name: string | null
+          signature_html: string | null
+          sync_folder: string | null
+          sync_keywords: Json | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          auto_create_candidate?: boolean | null
+          auto_parse_cv?: boolean | null
+          created_at?: string | null
+          email_address: string
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          provider: string
+          refresh_token?: string | null
+          sender_name?: string | null
+          signature_html?: string | null
+          sync_folder?: string | null
+          sync_keywords?: Json | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          auto_create_candidate?: boolean | null
+          auto_parse_cv?: boolean | null
+          created_at?: string | null
+          email_address?: string
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          provider?: string
+          refresh_token?: string | null
+          sender_name?: string | null
+          signature_html?: string | null
+          sync_folder?: string | null
+          sync_keywords?: Json | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hr_emails: {
+        Row: {
+          account_id: string | null
+          ai_analysis: Json | null
+          ai_improvements: Json | null
+          ai_suggested_response: string | null
+          attachments: Json | null
+          body_html: string | null
+          body_text: string | null
+          candidate_id: string | null
+          created_at: string | null
+          direction: string
+          email_date: string | null
+          external_id: string | null
+          from_email: string
+          from_name: string | null
+          id: string
+          parent_email_id: string | null
+          provider: string | null
+          read_at: string | null
+          replied_at: string | null
+          status: string | null
+          subject: string
+          thread_id: string | null
+          to_email: string
+          to_name: string | null
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          ai_analysis?: Json | null
+          ai_improvements?: Json | null
+          ai_suggested_response?: string | null
+          attachments?: Json | null
+          body_html?: string | null
+          body_text?: string | null
+          candidate_id?: string | null
+          created_at?: string | null
+          direction: string
+          email_date?: string | null
+          external_id?: string | null
+          from_email: string
+          from_name?: string | null
+          id?: string
+          parent_email_id?: string | null
+          provider?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string | null
+          subject: string
+          thread_id?: string | null
+          to_email: string
+          to_name?: string | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          ai_analysis?: Json | null
+          ai_improvements?: Json | null
+          ai_suggested_response?: string | null
+          attachments?: Json | null
+          body_html?: string | null
+          body_text?: string | null
+          candidate_id?: string | null
+          created_at?: string | null
+          direction?: string
+          email_date?: string | null
+          external_id?: string | null
+          from_email?: string
+          from_name?: string | null
+          id?: string
+          parent_email_id?: string | null
+          provider?: string | null
+          read_at?: string | null
+          replied_at?: string | null
+          status?: string | null
+          subject?: string
+          thread_id?: string | null
+          to_email?: string
+          to_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_emails_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "hr_email_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_emails_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hr_emails_parent_email_id_fkey"
+            columns: ["parent_email_id"]
+            isOneToOne: false
+            referencedRelation: "hr_emails"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       internal_docs: {
         Row: {
           content: string | null
