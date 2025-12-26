@@ -16,17 +16,11 @@ export function Navbar() {
 
         {/* Nav Links */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <a href="#tools" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             Products
-          </Link>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Pricing
           </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Docs
-          </a>
-          <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Blog
+          <a href="#results" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Results
           </a>
         </nav>
 
