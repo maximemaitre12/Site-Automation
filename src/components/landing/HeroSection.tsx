@@ -28,7 +28,7 @@ export function HeroSection() {
         
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 animate-fade-up-delay-2">
-          <Link to="/demo" className="w-full sm:w-auto">
+          <Link to="/signup" className="w-full sm:w-auto">
             <Button 
               size="lg" 
               className="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 text-sm font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
