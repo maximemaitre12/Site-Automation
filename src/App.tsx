@@ -15,6 +15,7 @@ import Onboarding from "./pages/Onboarding";
 import SelectPlan from "./pages/SelectPlan";
 import CompanySettings from "./pages/settings/CompanySettings";
 import ApiKeys from "./pages/settings/ApiKeys";
+import DemoRequests from "./pages/admin/DemoRequests";
 
 // Tools
 import Flow from "./pages/tools/Flow";
@@ -67,6 +68,9 @@ const App = () => (
             <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
             <Route path="/settings/company" element={<RequireSubscription><CompanySettings /></RequireSubscription>} />
             <Route path="/settings/api-keys" element={<RequireSubscription><ApiKeys /></RequireSubscription>} />
+            
+            {/* Admin routes */}
+            <Route path="/admin/demo-requests" element={<RequireAuth><DemoRequests /></RequireAuth>} />
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
