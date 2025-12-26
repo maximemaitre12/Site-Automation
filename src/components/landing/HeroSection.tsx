@@ -33,7 +33,7 @@ export function HeroSection() {
               size="lg" 
               className="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8 text-sm font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
             >
-              Start free
+              Get Started
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
