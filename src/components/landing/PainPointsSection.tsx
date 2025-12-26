@@ -50,7 +50,7 @@ const tools: Tool[] = [
   {
     name: "Sales",
     tagline: "Intelligent forecasting",
-    description: "Predict your sales, analyze sentiment, and generate winning proposals.",
+    description: "Forecast revenue, analyze sentiment, and generate winning proposals.",
     icon: LineChart,
     color: "bg-cyan-500",
   },
