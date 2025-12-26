@@ -9,6 +9,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { PainPointsSection } from "@/components/landing/PainPointsSection";
 import { ToolsShowcaseSection } from "@/components/landing/ToolsShowcaseSection";
 import { ResultsSection } from "@/components/landing/ResultsSection";
+import { TestimonialSection } from "@/components/landing/TestimonialSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 
 export default function Landing() {
@@ -45,6 +46,7 @@ export default function Landing() {
         <PainPointsSection />
         <ToolsShowcaseSection />
         <ResultsSection />
+        <TestimonialSection />
         <FinalCTASection />
       </main>
       

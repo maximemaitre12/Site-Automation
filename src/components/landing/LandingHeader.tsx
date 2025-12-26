@@ -65,7 +65,7 @@ export function LandingHeader() {
                 Sign in
               </Button>
             </Link>
-            <Link to="/demo">
+            <Link to="/signup">
               <Button size="sm" className="text-sm">
                 Get started
               </Button>
@@ -115,7 +115,7 @@ export function LandingHeader() {
                 <Link to="/auth?mode=login" className="flex-1">
                   <Button variant="outline" size="sm" className="w-full text-sm">Sign in</Button>
                 </Link>
-                <Link to="/demo" className="flex-1">
+                <Link to="/signup" className="flex-1">
                   <Button size="sm" className="w-full text-sm">Get started</Button>
                 </Link>
               </div>
