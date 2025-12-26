@@ -14,43 +14,43 @@ interface Tool {
 const tools: Tool[] = [
   {
     name: "Flow",
-    tagline: "Automatisation prédictive",
-    description: "L'IA anticipe vos besoins et déclenche les workflows avant même que vous y pensiez.",
+    tagline: "Predictive automation",
+    description: "AI anticipates your needs and triggers workflows before you even think about it.",
     icon: Zap,
     color: "bg-blue-500",
   },
   {
     name: "Brain",
-    tagline: "Intelligence contextuelle",
-    description: "Une IA qui comprend le contexte de votre entreprise et répond avec précision.",
+    tagline: "Contextual intelligence",
+    description: "An AI that understands your business context and responds with precision.",
     icon: Brain,
     color: "bg-violet-500",
   },
   {
     name: "Support",
-    tagline: "IA conversationnelle",
-    description: "Résolution autonome des tickets avec apprentissage continu. 90% de réduction du temps.",
+    tagline: "Conversational AI",
+    description: "Autonomous ticket resolution with continuous learning. Significant time reduction.",
     icon: Sparkles,
     color: "bg-emerald-500",
   },
   {
     name: "HR",
-    tagline: "Matching prédictif",
-    description: "L'IA prédit la compatibilité candidat-poste et accélère vos recrutements.",
+    tagline: "Predictive matching",
+    description: "AI predicts candidate-job compatibility and accelerates your hiring process.",
     icon: ScanSearch,
     color: "bg-orange-500",
   },
   {
     name: "Compliance",
-    tagline: "Détection proactive",
-    description: "Anticipez les risques avant qu'ils ne surviennent. Conformité RGPD automatisée.",
+    tagline: "Proactive detection",
+    description: "Anticipate risks before they occur. Automated GDPR compliance.",
     icon: ShieldCheck,
     color: "bg-rose-500",
   },
   {
     name: "Sales",
-    tagline: "Prévisions intelligentes",
-    description: "Prédisez vos ventes, analysez le sentiment et générez des propositions gagnantes.",
+    tagline: "Intelligent forecasting",
+    description: "Predict your sales, analyze sentiment, and generate winning proposals.",
     icon: LineChart,
     color: "bg-cyan-500",
   },
@@ -63,10 +63,10 @@ export function PainPointsSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
-            Six agents IA. Une révolution.
+            Six AI agents. One revolution.
           </h2>
           <p className="text-lg text-muted-foreground">
-            Chaque agent résout un problème métier précis. Ensemble, ils transforment vos opérations.
+            Each agent solves a specific business problem. Together, they transform your operations.
           </p>
         </div>
         

@@ -44,7 +44,6 @@ import {
   Cell,
 } from "recharts";
 import { format, subDays, isToday, isThisWeek } from "date-fns";
-import { fr } from "date-fns/locale";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -76,10 +75,10 @@ export default function Dashboard() {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
     
-    if (minutes < 1) return "À l'instant";
-    if (minutes < 60) return `Il y a ${minutes} min`;
-    if (hours < 24) return `Il y a ${hours}h`;
-    return `Il y a ${days}j`;
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes} min ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
   };
 
   // Calculate real stats
@@ -191,9 +190,8 @@ export default function Dashboard() {
       .slice(0, 5);
   }, [workflowRuns, workflows, tickets, audits, conversations]);
 
-  // Build weekly activity data
   const activityData = useMemo(() => {
-    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const today = new Date();
     
     return days.map((name, index) => {
@@ -222,9 +220,9 @@ export default function Dashboard() {
 
   const greeting = () => {
     const hour = currentTime.getHours();
-    if (hour < 12) return "Bonjour";
-    if (hour < 18) return "Bon après-midi";
-    return "Bonsoir";
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
   };
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "là";
@@ -232,7 +230,7 @@ export default function Dashboard() {
   const tools = [
     {
       name: "AETHER Flow",
-      description: "Automatisation visuelle",
+      description: "Visual automation",
       icon: Workflow,
       color: "from-blue-500 to-cyan-400",
       path: "/tools/flow",
@@ -240,7 +238,7 @@ export default function Dashboard() {
     },
     {
       name: "Sales Copilot",
-      description: "Assistant commercial IA",
+      description: "AI sales assistant",
       icon: TrendingUp,
       color: "from-green-500 to-emerald-400",
       path: "/tools/sales",
@@ -248,7 +246,7 @@ export default function Dashboard() {
     },
     {
       name: "HR Copilot",
-      description: "Assistant RH",
+      description: "HR assistant",
       icon: Users,
       color: "from-indigo-500 to-blue-400",
       path: "/tools/hr",
@@ -256,7 +254,7 @@ export default function Dashboard() {
     },
     {
       name: "Support Copilot",
-      description: "Support IA",
+      description: "AI support",
       icon: HeadphonesIcon,
       color: "from-rose-500 to-red-400",
       path: "/tools/support",
@@ -264,7 +262,7 @@ export default function Dashboard() {
     },
     {
       name: "Brain",
-      description: "Assistant interne",
+      description: "Internal assistant",
       icon: Brain,
       color: "from-violet-500 to-purple-400",
       path: "/tools/brain",
@@ -272,7 +270,7 @@ export default function Dashboard() {
     },
     {
       name: "Compliance",
-      description: "Audit & conformité",
+      description: "Audit & compliance",
       icon: Shield,
       color: "from-slate-500 to-gray-400",
       path: "/tools/compliance",
@@ -290,7 +288,7 @@ export default function Dashboard() {
               {greeting()}, <span className="text-gradient">{userName}</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground">
-              {format(currentTime, "EEEE d MMMM", { locale: fr })}
+              {format(currentTime, "EEEE, MMMM d")}
               {company && (
                 <span className="ml-2 text-primary">• {company.name}</span>
               )}
@@ -301,7 +299,7 @@ export default function Dashboard() {
             <div className="relative hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher..."
+                placeholder="Search..."
                 className="w-40 md:w-64 pl-9 bg-secondary/50 border-border"
               />
             </div>
@@ -323,25 +321,25 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[
             {
-              label: "Workflows actifs",
+              label: "Active workflows",
               value: stats.activeWorkflows,
               icon: Activity,
               color: "from-blue-500/20 to-cyan-500/20",
             },
             {
-              label: "Appels IA",
+              label: "AI calls",
               value: stats.aiCalls,
               icon: Zap,
               color: "from-purple-500/20 to-pink-500/20",
             },
             {
-              label: "Documents traités",
+              label: "Documents processed",
               value: stats.totalDocuments,
               icon: FileText,
               color: "from-green-500/20 to-emerald-500/20",
             },
             {
-              label: "Tickets support",
+              label: "Support tickets",
               value: stats.totalTickets,
               icon: MessageSquare,
               color: "from-orange-500/20 to-yellow-500/20",
@@ -384,7 +382,7 @@ export default function Dashboard() {
             <CardHeader className="pb-2 px-4 md:px-6">
               <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
                 <Activity className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                Activité de la semaine
+                Weekly activity
               </CardTitle>
             </CardHeader>
             <CardContent className="px-2 md:px-6">
@@ -461,7 +459,7 @@ export default function Dashboard() {
             <CardHeader className="pb-2 px-4 md:px-6">
               <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
                 <Zap className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                Utilisation par outil
+                Usage by tool
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 md:px-6">
@@ -514,15 +512,15 @@ export default function Dashboard() {
             <CardHeader className="pb-2 px-4 md:px-6">
               <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
                 <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                Activité récente
+                Recent activity
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 md:px-6">
               {recentActivity.length === 0 ? (
                 <div className="text-center py-6 md:py-8 text-muted-foreground">
                   <Activity className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 opacity-50" />
-                  <p className="text-xs md:text-sm">Aucune activité récente</p>
-                  <p className="text-[10px] md:text-xs mt-1">Commencez à utiliser les outils AETHER</p>
+                  <p className="text-xs md:text-sm">No recent activity</p>
+                  <p className="text-[10px] md:text-xs mt-1">Start using AETHER tools</p>
                 </div>
               ) : (
                 <div className="space-y-2 md:space-y-3">
@@ -555,7 +553,7 @@ export default function Dashboard() {
           {/* Tools Grid */}
           <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: "0.6s" }}>
             <div className="flex items-center justify-between mb-3 md:mb-4">
-              <h2 className="text-base md:text-lg font-semibold text-foreground">Vos outils</h2>
+              <h2 className="text-base md:text-lg font-semibold text-foreground">Your tools</h2>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
               {tools.map((tool, index) => (

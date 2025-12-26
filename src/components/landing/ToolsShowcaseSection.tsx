@@ -2,28 +2,28 @@ import { Check } from "lucide-react";
 
 const features = [
   {
-    title: "Déploiement en minutes",
-    description: "Configurez vos agents IA en quelques clics. Aucune expertise technique requise.",
+    title: "Deploy in minutes",
+    description: "Configure your AI agents in a few clicks. No technical expertise required.",
   },
   {
-    title: "Intégrations natives",
-    description: "Connectez vos outils existants. Slack, Gmail, Salesforce, et plus de 100 autres.",
+    title: "Native integrations",
+    description: "Connect your existing tools. Slack, Gmail, Salesforce, and 100+ more.",
   },
   {
-    title: "IA supervisée",
-    description: "Gardez le contrôle. Validez les actions critiques, ajustez les paramètres en temps réel.",
+    title: "Supervised AI",
+    description: "Stay in control. Validate critical actions, adjust parameters in real-time.",
   },
   {
-    title: "Sécurité entreprise",
-    description: "Conformité RGPD, chiffrement de bout en bout, hébergement en Europe.",
+    title: "Enterprise security",
+    description: "GDPR compliant, end-to-end encryption, hosted in Europe.",
   },
   {
-    title: "Analyses détaillées",
-    description: "Suivez les performances de vos automatisations. Mesurez le temps économisé.",
+    title: "Detailed analytics",
+    description: "Track the performance of your automations. Measure time saved.",
   },
   {
-    title: "Support dédié",
-    description: "Une équipe d'experts vous accompagne dans le déploiement et l'optimisation.",
+    title: "Dedicated support",
+    description: "A team of experts guides you through deployment and optimization.",
   },
 ];
 
@@ -34,10 +34,10 @@ export function ToolsShowcaseSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
-            Conçu pour l'entreprise
+            Built for enterprise
           </h2>
           <p className="text-lg text-muted-foreground">
-            Les fonctionnalités dont vous avez besoin pour automatiser à grande échelle.
+            The features you need to automate at scale.
           </p>
         </div>
         
