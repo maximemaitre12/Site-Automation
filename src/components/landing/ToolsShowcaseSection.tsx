@@ -29,20 +29,20 @@ const features = [
 
 export function ToolsShowcaseSection() {
   return (
-    <section id="features" className="py-24 lg:py-32 bg-background">
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="features" className="py-16 sm:py-24 lg:py-32 bg-background">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3 sm:mb-4">
             Built for enterprise
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-2">
             The features you need to automate at scale.
           </p>
         </div>
         
         {/* Features grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-x-12 sm:gap-y-10">
           {features.map((feature, i) => (
             <div key={i} className="group">
               <div className="flex items-start gap-4">

@@ -30,14 +30,14 @@ const links = {
 export function LandingFooter() {
   return (
     <footer className="bg-background border-t border-border">
-      <div className="max-w-5xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 mb-10 sm:mb-12">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 sm:col-span-3 md:col-span-1 mb-4 md:mb-0">
             <Link to="/" className="text-lg font-semibold text-foreground">
               AETHER
             </Link>
-            <p className="text-sm text-muted-foreground mt-3">
+            <p className="text-sm text-muted-foreground mt-2 sm:mt-3">
               Intelligent automation for enterprise.
             </p>
           </div>
