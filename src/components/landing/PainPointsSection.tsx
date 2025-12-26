@@ -58,20 +58,20 @@ const tools: Tool[] = [
 
 export function PainPointsSection() {
   return (
-    <section id="product" className="py-24 lg:py-32 bg-secondary/50">
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3 sm:mb-4">
             Six AI agents. One revolution.
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-muted-foreground px-2">
             Each agent solves a specific business problem. Together, they transform your operations.
           </p>
         </div>
         
         {/* Tools grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {tools.map((tool, i) => {
             const IconComponent = tool.icon;
             return (
