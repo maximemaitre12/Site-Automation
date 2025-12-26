@@ -8,6 +8,8 @@ import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { ArrowRight, CheckCircle2, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
 const benefits = [
   "Personalized demo based on your use cases",
@@ -16,21 +18,83 @@ const benefits = [
   "Custom implementation plan",
 ];
 
+const demoRequestSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Invalid email address").max(255),
+  company: z.string().trim().max(100).optional(),
+  phone: z.string().trim().max(20).optional(),
+  message: z.string().trim().max(1000).optional(),
+});
+
 export default function Demo() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    company: "",
+    role: "",
+    size: "",
+    message: "",
+  });
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    toast.success("Request sent!", {
-      description: "We'll contact you within 24 hours.",
-    });
-    
-    setIsSubmitting(false);
+    try {
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const messageWithContext = [
+        formData.message,
+        formData.role ? `Role: ${formData.role}` : null,
+        formData.size ? `Company size: ${formData.size}` : null,
+      ].filter(Boolean).join("\n");
+      
+      const validated = demoRequestSchema.parse({
+        name: fullName,
+        email: formData.email,
+        company: formData.company || undefined,
+        message: messageWithContext || undefined,
+      });
+      
+      const { error } = await supabase
+        .from("demo_requests")
+        .insert({
+          name: validated.name,
+          email: validated.email,
+          company: validated.company,
+          message: validated.message,
+          status: "new",
+        });
+      
+      if (error) throw error;
+      
+      toast.success("Request sent!", {
+        description: "We'll contact you within 24 hours.",
+      });
+      
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        company: "",
+        role: "",
+        size: "",
+        message: "",
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast.error("Please check your input", {
+          description: error.errors[0]?.message,
+        });
+      } else {
+        toast.error("Something went wrong", {
+          description: "Please try again later.",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -79,32 +143,67 @@ export default function Demo() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First name *</Label>
-                    <Input id="firstName" placeholder="John" required className="bg-background/50" />
+                    <Input 
+                      id="firstName" 
+                      placeholder="John" 
+                      required 
+                      className="bg-background/50"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last name *</Label>
-                    <Input id="lastName" placeholder="Doe" required className="bg-background/50" />
+                    <Input 
+                      id="lastName" 
+                      placeholder="Doe" 
+                      required 
+                      className="bg-background/50"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="email">Professional email *</Label>
-                  <Input id="email" type="email" placeholder="john.doe@company.com" required className="bg-background/50" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="john.doe@company.com" 
+                    required 
+                    className="bg-background/50"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="company">Company *</Label>
-                  <Input id="company" placeholder="Your company name" required className="bg-background/50" />
+                  <Input 
+                    id="company" 
+                    placeholder="Your company name" 
+                    required 
+                    className="bg-background/50"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Input id="role" placeholder="Director of Operations" className="bg-background/50" />
+                  <Input 
+                    id="role" 
+                    placeholder="Director of Operations" 
+                    className="bg-background/50"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  />
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="size">Company size</Label>
-                  <Select>
+                  <Select value={formData.size} onValueChange={(value) => setFormData({ ...formData, size: value })}>
                     <SelectTrigger className="bg-background/50">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
@@ -125,6 +224,8 @@ export default function Demo() {
                     placeholder="Describe your automation needs..."
                     rows={4}
                     className="bg-background/50 resize-none"
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   />
                 </div>
                 
