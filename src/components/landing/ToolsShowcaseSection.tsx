@@ -29,7 +29,7 @@ const features = [
 
 export function ToolsShowcaseSection() {
   return (
-    <section id="tools" className="py-16 sm:py-24 lg:py-32 bg-background">
+    <section id="features" className="py-16 sm:py-24 lg:py-32 bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">

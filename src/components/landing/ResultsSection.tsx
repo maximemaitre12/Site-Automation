@@ -7,7 +7,7 @@ const benefits = [
 
 export function ResultsSection() {
   return (
-    <section id="results" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
+    <section id="pricing" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
