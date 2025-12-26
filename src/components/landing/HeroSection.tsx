@@ -12,18 +12,18 @@ export function HeroSection() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8 animate-fade-up">
           <Sparkles className="w-4 h-4" />
-          <span>Nouvelle génération d'automatisation IA</span>
+          <span>Next-gen AI automation</span>
         </div>
         
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground leading-[1.1] mb-6 animate-fade-up text-balance">
-          L'IA qui travaille{" "}
-          <span className="text-primary">pour vous</span>
+          AI that works{" "}
+          <span className="text-primary">for you</span>
         </h1>
         
         {/* Subtitle */}
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up-delay-1">
-          6 agents IA spécialisés. Une seule plateforme. Automatisez 90% de vos opérations en support, RH, ventes et compliance sans écrire une ligne de code.
+          6 specialized AI agents. One platform. Automate your operations in support, HR, sales, and compliance — without writing a single line of code.
         </p>
         
         {/* CTAs */}
@@ -33,7 +33,7 @@ export function HeroSection() {
               size="lg" 
               className="h-12 px-8 text-sm font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
             >
-              Essayer gratuitement
+              Start free
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
@@ -43,7 +43,7 @@ export function HeroSection() {
               size="lg" 
               className="h-12 px-8 text-sm font-medium"
             >
-              Voir une démo
+              Watch demo
             </Button>
           </Link>
         </div>

@@ -8,12 +8,12 @@ export function FinalCTASection() {
       <div className="max-w-3xl mx-auto px-6 text-center">
         {/* Headline */}
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight mb-6">
-          Prêt à automatiser vos opérations ?
+          Ready to automate your operations?
         </h2>
         
         {/* Subtitle */}
         <p className="text-lg text-primary-foreground/80 max-w-xl mx-auto mb-10">
-          Rejoignez les entreprises qui économisent des centaines d'heures chaque mois grâce à l'automatisation intelligente.
+          Join companies saving hundreds of hours every month with intelligent automation.
         </p>
         
         {/* CTAs */}
@@ -23,7 +23,7 @@ export function FinalCTASection() {
               size="lg" 
               className="h-12 px-8 text-sm font-medium bg-white text-primary hover:bg-white/90 shadow-lg"
             >
-              Commencer gratuitement
+              Start free
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
@@ -33,7 +33,7 @@ export function FinalCTASection() {
               size="lg" 
               className="h-12 px-8 text-sm font-medium border-white/30 text-white hover:bg-white/10 bg-transparent"
             >
-              Contacter l'équipe commerciale
+              Contact sales
             </Button>
           </Link>
         </div>
