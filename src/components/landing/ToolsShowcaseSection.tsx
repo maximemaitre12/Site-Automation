@@ -36,7 +36,7 @@ const features = [
 ];
 
 export function ToolsShowcaseSection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
 
   return (
     <section id="features" className="py-16 sm:py-24 lg:py-32 bg-background">
