@@ -18,7 +18,7 @@ interface AgentSupportDemoProps {
 }
 
 export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: false });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const [phase, setPhase] = useState(0);
   const [resolvedCount, setResolvedCount] = useState(0);
   const [typedMessage, setTypedMessage] = useState("");

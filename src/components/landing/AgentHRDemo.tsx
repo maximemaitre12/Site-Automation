@@ -22,7 +22,7 @@ interface AgentHRDemoProps {
 }
 
 export function AgentHRDemo({ className }: AgentHRDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: false });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const [phase, setPhase] = useState(0);
   const [animatedScores, setAnimatedScores] = useState<number[]>([0, 0, 0]);
   const [skillsProgress, setSkillsProgress] = useState(0);

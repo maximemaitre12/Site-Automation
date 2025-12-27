@@ -121,6 +121,11 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Prevent browser scroll anchoring “teleport” during expanding sections */
+  .no-scroll-anchoring {
+    overflow-anchor: none;
+  }
 }
 
 /* Animations */

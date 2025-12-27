@@ -234,7 +234,7 @@ const tools: Tool[] = [
 
 export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shouldStagger = isVisible && expandedIndex === null;
 
