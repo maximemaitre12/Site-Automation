@@ -16,9 +16,9 @@ export function LandingHeader() {
   }, []);
   
   const navItems = [
-    { label: "Produits", href: "#product" },
-    { label: "Fonctionnalités", href: "#features" },
-    { label: "Résultats", href: "#results" },
+    { label: "Products", href: "#product" },
+    { label: "Features", href: "#features" },
+    { label: "Results", href: "#results" },
     { label: "Contact", href: "#contact" },
   ];
   
@@ -62,12 +62,12 @@ export function LandingHeader() {
           <div className="hidden md:flex items-center gap-4">
             <Link to="/auth?mode=login">
               <Button variant="ghost" size="sm" className="text-sm">
-                Connexion
+                Log in
               </Button>
             </Link>
             <Link to="/signup">
               <Button size="sm" className="text-sm">
-                Commencer
+                Get Started
               </Button>
             </Link>
           </div>
@@ -108,10 +108,10 @@ export function LandingHeader() {
               )}
               <div className="flex gap-3 pt-4 border-t border-border">
                 <Link to="/auth?mode=login" className="flex-1">
-                  <Button variant="outline" size="sm" className="w-full text-sm">Connexion</Button>
+                  <Button variant="outline" size="sm" className="w-full text-sm">Log in</Button>
                 </Link>
                 <Link to="/signup" className="flex-1">
-                  <Button size="sm" className="w-full text-sm">Commencer</Button>
+                  <Button size="sm" className="w-full text-sm">Get Started</Button>
                 </Link>
               </div>
             </nav>
