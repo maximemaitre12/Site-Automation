@@ -1,4 +1,4 @@
-import { useState, useRef, type CSSProperties } from "react";
+import { Fragment, useRef, useState, type CSSProperties } from "react";
 import { 
   Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart,
   ChevronDown, Workflow, MessageSquare, FileText, Target, Users,
@@ -257,7 +257,7 @@ export function PainPointsSection() {
     // so the clicked card stays at the same viewport position.
     requestAnimationFrame(() => {
       const start = performance.now();
-      const durationMs = 650; // transition-all duration-500 + buffer
+      const durationMs = 950; // collapse + expand (duration-500) + buffer
 
       const tick = (now: number) => {
         const lock = scrollLockRef.current;
@@ -313,83 +313,84 @@ export function PainPointsSection() {
             const isExpanded = expandedIndex === i;
             
             return (
-              <div 
-                key={i}
-                ref={(el) => { cardRefs.current[i] = el; }}
-                className={cn(
-                  "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
-                  isExpanded 
-                    ? "border-primary shadow-xl shadow-primary/10 lg:col-span-2" 
-                    : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
-                )}
-                style={
-                  ({
-                    overflowAnchor: "none",
-                    ...(shouldStagger ? { transitionDelay: `${i * 100}ms` } : {}),
-                  } as CSSProperties)
-                }
-                onClick={() => handleToggle(i)}
-              >
-                {/* Header - always visible */}
-                <div className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                        <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <div className={cn("text-xs font-semibold uppercase tracking-wider mb-1", tool.colorClass)}>
-                          {tool.tagline}
-                        </div>
-                        <h3 className="text-xl font-bold text-foreground">
-                          AETHER {tool.name}
-                        </h3>
-                      </div>
-                    </div>
-                    <div className={cn(
-                      "w-10 h-10 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
-                      isExpanded && "rotate-180 bg-primary/10"
-                    )}>
-                      <ChevronDown className={cn("w-5 h-5", isExpanded ? "text-primary" : "text-muted-foreground")} />
-                    </div>
-                  </div>
-                  
-                  <p className="text-muted-foreground text-sm leading-relaxed mt-4">
-                    {tool.description}
-                  </p>
-
-                  {/* Quick stats preview when collapsed */}
-                  {!isExpanded && (
-                    <div className="flex gap-6 mt-4 pt-4 border-t border-border/50">
-                      {tool.stats.slice(0, 3).map((stat, j) => (
-                        <div key={j} className="text-center">
-                          <div className={cn("text-lg font-bold", tool.colorClass)}>{stat.value}</div>
-                          <div className="text-xs text-muted-foreground">{stat.label}</div>
-                        </div>
-                      ))}
-                    </div>
+              <Fragment key={i}>
+                <div 
+                  ref={(el) => { cardRefs.current[i] = el; }}
+                  className={cn(
+                    "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
+                    isExpanded 
+                      ? "border-primary shadow-xl shadow-primary/10" 
+                      : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
                   )}
+                  style={
+                    ({
+                      overflowAnchor: "none",
+                      ...(shouldStagger ? { transitionDelay: `${i * 100}ms` } : {}),
+                    } as CSSProperties)
+                  }
+                  onClick={() => handleToggle(i)}
+                >
+                  {/* Header - always visible */}
+                  <div className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                          <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
+                        </div>
+                        <div>
+                          <div className={cn("text-xs font-semibold uppercase tracking-wider mb-1", tool.colorClass)}>
+                            {tool.tagline}
+                          </div>
+                          <h3 className="text-xl font-bold text-foreground">
+                            AETHER {tool.name}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className={cn(
+                        "w-10 h-10 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
+                        isExpanded && "rotate-180 bg-primary/10"
+                      )}>
+                        <ChevronDown className={cn("w-5 h-5", isExpanded ? "text-primary" : "text-muted-foreground")} />
+                      </div>
+                    </div>
+                    
+                    <p className="text-muted-foreground text-sm leading-relaxed mt-4">
+                      {tool.description}
+                    </p>
+
+                    {/* Quick stats preview when collapsed */}
+                    {!isExpanded && (
+                      <div className="flex gap-6 mt-4 pt-4 border-t border-border/50">
+                        {tool.stats.slice(0, 3).map((stat, j) => (
+                          <div key={j} className="text-center">
+                            <div className={cn("text-lg font-bold", tool.colorClass)}>{stat.value}</div>
+                            <div className="text-xs text-muted-foreground">{stat.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Expanded content */}
-                <div className={cn(
-                  "grid transition-all duration-500 ease-in-out",
-                  isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                )}>
-                  <div className="overflow-hidden">
-                    <div className="px-6 pb-6 border-t border-border/50">
-                      
+                {/* Expanded panel (full width) */}
+                {isExpanded && (
+                  <div
+                    className={cn(
+                      "lg:col-span-2 rounded-2xl bg-background border border-primary/20 shadow-xl shadow-primary/10 overflow-hidden",
+                      "animate-enter"
+                    )}
+                    style={{ overflowAnchor: "none" }}
+                  >
+                    <div className="p-6">
                       {/* Agent-specific animated demos */}
-                      {isExpanded && (
-                        <div className="mt-6 mb-8">
-                          {tool.name === "Flow" && <AgentFlowDemo />}
-                          {tool.name === "Brain" && <AgentBrainDemo />}
-                          {tool.name === "Support" && <AgentSupportDemo />}
-                          {tool.name === "HR" && <AgentHRDemo />}
-                          {tool.name === "Compliance" && <AgentComplianceDemo />}
-                          {tool.name === "Sales" && <AgentSalesDemo />}
-                        </div>
-                      )}
+                      <div className="mb-8">
+                        {tool.name === "Flow" && <AgentFlowDemo />}
+                        {tool.name === "Brain" && <AgentBrainDemo />}
+                        {tool.name === "Support" && <AgentSupportDemo />}
+                        {tool.name === "HR" && <AgentHRDemo />}
+                        {tool.name === "Compliance" && <AgentComplianceDemo />}
+                        {tool.name === "Sales" && <AgentSalesDemo />}
+                      </div>
 
                       {/* Features grid */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -458,7 +459,7 @@ export function PainPointsSection() {
 
                       {/* CTA */}
                       <div className="mt-6 text-center">
-                        <Link to="/signup" onClick={(e) => e.stopPropagation()}>
+                        <Link to="/signup">
                           <Button className={cn("shadow-lg", tool.color, "hover:opacity-90")}>
                             Create Your Agent
                             <ArrowRight className="w-4 h-4 ml-2" />
@@ -467,8 +468,8 @@ export function PainPointsSection() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                )}
+              </Fragment>
             );
           })}
         </div>
