@@ -1,20 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { FloatingLogos } from "./FloatingLogos";
+import { BrandLogosGrid } from "./BrandLogos";
+import { TechBackground } from "./TechBackground";
 
 export function HeroSection() {
   return (
     <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center bg-background pt-20 md:pt-14 overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-transparent to-primary/[0.03] animate-gradient-shift" />
-      
-      {/* Floating particles decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "0s" }} />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "1s" }} />
-        <div className="absolute top-1/2 right-1/3 w-32 h-32 bg-primary/5 rounded-full blur-2xl animate-float" style={{ animationDelay: "2s" }} />
-      </div>
+      {/* Tech background */}
+      <TechBackground variant="combined" intensity="subtle" />
       
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32 text-center">
         {/* Badge */}
@@ -56,10 +50,10 @@ export function HeroSection() {
           </Link>
         </div>
 
-        {/* Floating integration logos */}
+        {/* Real brand logos */}
         <div className="animate-fade-up-delay-3">
           <p className="text-xs text-muted-foreground mb-4">Integrates with your favorite tools</p>
-          <FloatingLogos />
+          <BrandLogosGrid maxItems={8} animate={true} />
         </div>
       </div>
     </section>
