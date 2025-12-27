@@ -239,18 +239,7 @@ export function PainPointsSection() {
   const shouldStagger = isVisible && expandedIndex === null;
 
   const handleToggle = (index: number) => {
-    const isClosing = expandedIndex === index;
-    setExpandedIndex(isClosing ? null : index);
-
-    // Keep the card pinned at the top when expanding (prevents the "jump to bottom" effect)
-    if (!isClosing) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const cardElement = cardRefs.current[index];
-          cardElement?.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-      });
-    }
+    setExpandedIndex(expandedIndex === index ? null : index);
   };
 
   return (
