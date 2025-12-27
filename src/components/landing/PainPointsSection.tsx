@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, type CSSProperties } from "react";
 import { 
   Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart,
   ChevronDown, Workflow, MessageSquare, FileText, Target, Users,
@@ -236,26 +236,20 @@ export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const shouldStagger = isVisible && expandedIndex === null;
 
   const handleToggle = (index: number) => {
     const isClosing = expandedIndex === index;
     setExpandedIndex(isClosing ? null : index);
-    
-    // Scroll to top of expanded card after a short delay for the DOM to update
+
+    // Keep the card pinned at the top when expanding (prevents the "jump to bottom" effect)
     if (!isClosing) {
-      setTimeout(() => {
-        const cardElement = cardRefs.current[index];
-        if (cardElement) {
-          const headerOffset = 100; // Account for fixed header
-          const elementPosition = cardElement.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.scrollY - headerOffset;
-          
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const cardElement = cardRefs.current[index];
+          cardElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
     }
   };
 
@@ -289,12 +283,17 @@ export function PainPointsSection() {
                 key={i}
                 ref={(el) => { cardRefs.current[i] = el; }}
                 className={cn(
-                  "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden",
+                  "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
                   isExpanded 
                     ? "border-primary shadow-xl shadow-primary/10 lg:col-span-2" 
                     : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
                 )}
-                style={{ transitionDelay: `${i * 100}ms` }}
+                style={
+                  ({
+                    overflowAnchor: "none",
+                    ...(shouldStagger ? { transitionDelay: `${i * 100}ms` } : {}),
+                  } as CSSProperties)
+                }
                 onClick={() => handleToggle(i)}
               >
                 {/* Header - always visible */}
