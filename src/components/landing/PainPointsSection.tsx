@@ -238,32 +238,8 @@ export function PainPointsSection() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shouldStagger = isVisible && expandedIndex === null;
 
-  const toggleScrollLockRef = useRef<{ index: number; top: number } | null>(null);
-
   const handleToggle = (index: number) => {
-    const el = cardRefs.current[index];
-    if (el) {
-      toggleScrollLockRef.current = { index, top: el.getBoundingClientRect().top };
-    }
-
     setExpandedIndex((prev) => (prev === index ? null : index));
-
-    // Compense le “scroll anchoring” du navigateur lors des gros changements de hauteur
-    requestAnimationFrame(() => {
-      const lock = toggleScrollLockRef.current;
-      if (!lock) return;
-
-      const afterEl = cardRefs.current[lock.index];
-      if (!afterEl) return;
-
-      const newTop = afterEl.getBoundingClientRect().top;
-      const delta = newTop - lock.top;
-      if (Math.abs(delta) > 1) {
-        window.scrollTo({ top: window.scrollY + delta });
-      }
-
-      toggleScrollLockRef.current = null;
-    });
   };
 
   return (
