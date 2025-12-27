@@ -19,7 +19,7 @@ interface AgentBrainDemoProps {
 }
 
 export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.5, triggerOnce: false });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: false });
   const [phase, setPhase] = useState(0); // 0: idle, 1: docs uploading, 2: processing, 3: searching, 4: responding
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");

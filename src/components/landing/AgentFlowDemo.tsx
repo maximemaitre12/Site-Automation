@@ -31,7 +31,7 @@ interface AgentFlowDemoProps {
 }
 
 export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.5, triggerOnce: false });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: false });
   const [activeStep, setActiveStep] = useState(-1);
   const [showComplete, setShowComplete] = useState(false);
   const [dataParticles, setDataParticles] = useState<number[]>([]);
