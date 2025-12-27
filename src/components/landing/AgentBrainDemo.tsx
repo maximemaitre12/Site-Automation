@@ -135,7 +135,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
                 key={doc.name}
                 className={cn(
                   "relative flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary/50 border border-border/50 transition-all duration-700",
-                  phase >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+                  phase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8",
                   phase >= 2 && "border-violet-500/30 bg-violet-500/5"
                 )}
                 style={{ transitionDelay: `${i * 150}ms` }}
@@ -158,7 +158,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
             {/* AI Brain processing */}
             <div className={cn(
               "flex items-center gap-3 transition-all duration-500",
-              phase >= 2 ? "opacity-100" : "opacity-0"
+              phase >= 2 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"
             )}>
               <ArrowRight className="w-5 h-5 text-violet-500/50" />
               <div className={cn(

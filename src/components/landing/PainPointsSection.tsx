@@ -238,9 +238,54 @@ export function PainPointsSection() {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shouldStagger = isVisible && expandedIndex === null;
 
+  const scrollLockRef = useRef<{ index: number; top: number } | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
+
   const handleToggle = (index: number) => {
+    // Cancel any previous stabilization loop
+    if (scrollRafRef.current) {
+      cancelAnimationFrame(scrollRafRef.current);
+      scrollRafRef.current = null;
+    }
+
+    const el = cardRefs.current[index];
+    scrollLockRef.current = el ? { index, top: el.getBoundingClientRect().top } : null;
+
     setExpandedIndex((prev) => (prev === index ? null : index));
+
+    // Stabilize scroll during the whole height transition (collapse above / expand current)
+    // so the clicked card stays at the same viewport position.
+    requestAnimationFrame(() => {
+      const start = performance.now();
+      const durationMs = 650; // transition-all duration-500 + buffer
+
+      const tick = (now: number) => {
+        const lock = scrollLockRef.current;
+        if (!lock) return;
+
+        const afterEl = cardRefs.current[lock.index];
+        if (!afterEl) return;
+
+        const newTop = afterEl.getBoundingClientRect().top;
+        const delta = lock.top - newTop;
+
+        if (Math.abs(delta) > 0.5) {
+          window.scrollTo({ top: window.scrollY + delta });
+        }
+
+        if (now - start < durationMs) {
+          scrollRafRef.current = requestAnimationFrame(tick);
+          return;
+        }
+
+        scrollLockRef.current = null;
+        scrollRafRef.current = null;
+      };
+
+      scrollRafRef.current = requestAnimationFrame(tick);
+    });
   };
+
 
   return (
     <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
