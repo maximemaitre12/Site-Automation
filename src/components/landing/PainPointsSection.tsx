@@ -10,7 +10,12 @@ import {
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { AnimatedWorkflowDemo } from "./AnimatedWorkflowDemo";
+import { AgentFlowDemo } from "./AgentFlowDemo";
+import { AgentBrainDemo } from "./AgentBrainDemo";
+import { AgentSupportDemo } from "./AgentSupportDemo";
+import { AgentHRDemo } from "./AgentHRDemo";
+import { AgentComplianceDemo } from "./AgentComplianceDemo";
+import { AgentSalesDemo } from "./AgentSalesDemo";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -321,42 +326,15 @@ export function PainPointsSection() {
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 border-t border-border/50">
                       
-                      {/* Animated Workflow Demo for Flow agent */}
-                      {tool.name === "Flow" && isExpanded && (
+                      {/* Agent-specific animated demos */}
+                      {isExpanded && (
                         <div className="mt-6 mb-8">
-                          <AnimatedWorkflowDemo agentType="flow" />
-                        </div>
-                      )}
-
-                      {/* Standard workflow visualization for other agents */}
-                      {tool.name !== "Flow" && (
-                        <div className="mt-6 mb-8">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                            How It Works
-                          </div>
-                          <div className="flex items-center justify-between bg-secondary/50 rounded-xl p-4 overflow-x-auto">
-                            {tool.workflow.map((step, j) => {
-                              const StepIcon = step.icon;
-                              return (
-                                <div key={j} className="flex items-center">
-                                  <div className="flex flex-col items-center gap-2">
-                                    <div className={cn(
-                                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500",
-                                      tool.color + "/20"
-                                    )}>
-                                      <StepIcon className={cn("w-6 h-6", tool.colorClass)} strokeWidth={1.5} />
-                                    </div>
-                                    <span className="text-xs font-medium text-foreground whitespace-nowrap">
-                                      {step.label}
-                                    </span>
-                                  </div>
-                                  {j < tool.workflow.length - 1 && (
-                                    <ArrowRight className="w-5 h-5 text-muted-foreground mx-3 shrink-0" />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
+                          {tool.name === "Flow" && <AgentFlowDemo />}
+                          {tool.name === "Brain" && <AgentBrainDemo />}
+                          {tool.name === "Support" && <AgentSupportDemo />}
+                          {tool.name === "HR" && <AgentHRDemo />}
+                          {tool.name === "Compliance" && <AgentComplianceDemo />}
+                          {tool.name === "Sales" && <AgentSalesDemo />}
                         </div>
                       )}
 
