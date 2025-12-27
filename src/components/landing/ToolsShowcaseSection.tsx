@@ -1,29 +1,35 @@
-import { Check } from "lucide-react";
+import { Check, Zap, Shield, Globe, BarChart3, Users, Headphones } from "lucide-react";
 
 const features = [
   {
-    title: "Deploy in minutes",
-    description: "Configure your AI agents in a few clicks. No technical expertise required.",
+    icon: Zap,
+    title: "Déploiement en minutes",
+    description: "Configurez vos agents IA en quelques clics. Aucune expertise technique requise.",
   },
   {
-    title: "Native integrations",
-    description: "Connect your existing tools. Slack, Gmail, Salesforce, and 100+ more.",
+    icon: Globe,
+    title: "Intégrations natives",
+    description: "Connectez vos outils existants. Slack, Gmail, Salesforce et 100+ autres.",
   },
   {
-    title: "Supervised AI",
-    description: "Stay in control. Validate critical actions, adjust parameters in real-time.",
+    icon: Shield,
+    title: "IA supervisée",
+    description: "Gardez le contrôle. Validez les actions critiques, ajustez les paramètres en temps réel.",
   },
   {
-    title: "Enterprise security",
-    description: "GDPR compliant, end-to-end encryption, hosted in Europe.",
+    icon: Users,
+    title: "Sécurité entreprise",
+    description: "Conforme RGPD, chiffrement de bout en bout, hébergé en Europe.",
   },
   {
-    title: "Detailed analytics",
-    description: "Track the performance of your automations. Measure time saved.",
+    icon: BarChart3,
+    title: "Analytics détaillées",
+    description: "Suivez la performance de vos automatisations. Mesurez le temps gagné.",
   },
   {
-    title: "Dedicated support",
-    description: "A team of experts guides you through deployment and optimization.",
+    icon: Headphones,
+    title: "Support dédié",
+    description: "Une équipe d'experts vous accompagne dans le déploiement et l'optimisation.",
   },
 ];
 
@@ -34,28 +40,31 @@ export function ToolsShowcaseSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3 sm:mb-4">
-            Built for enterprise
+            Conçu pour l'entreprise
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground px-2">
-            The features you need to automate at scale.
+            Les fonctionnalités dont vous avez besoin pour automatiser à grande échelle.
           </p>
         </div>
         
         {/* Features grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-x-12 sm:gap-y-10">
-          {features.map((feature, i) => (
-            <div key={i} className="group">
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-primary/20 transition-colors">
-                  <Check className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1.5">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+          {features.map((feature, i) => {
+            const IconComponent = feature.icon;
+            return (
+              <div key={i} className="group">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <IconComponent className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1.5">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

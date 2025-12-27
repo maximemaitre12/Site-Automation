@@ -10,20 +10,20 @@ const links = {
     { label: "Sales", path: "/tools/sales" },
   ],
   company: [
-    { label: "About", path: "#" },
-    { label: "Careers", path: "#" },
+    { label: "À propos", path: "#" },
+    { label: "Carrières", path: "#" },
     { label: "Blog", path: "#" },
-    { label: "Contact", path: "#" },
+    { label: "Contact", path: "#contact" },
   ],
   resources: [
     { label: "Documentation", path: "#" },
     { label: "API", path: "#" },
-    { label: "Status", path: "#" },
+    { label: "Statut", path: "#" },
   ],
   legal: [
-    { label: "Privacy", path: "#" },
-    { label: "Terms", path: "#" },
-    { label: "Security", path: "#" },
+    { label: "Confidentialité", path: "#" },
+    { label: "CGU", path: "#" },
+    { label: "Sécurité", path: "#" },
   ],
 };
 
@@ -38,13 +38,13 @@ export function LandingFooter() {
               AETHER
             </Link>
             <p className="text-sm text-muted-foreground mt-2 sm:mt-3">
-              Intelligent automation for enterprise.
+              Automatisation intelligente pour l'entreprise.
             </p>
           </div>
           
           {/* Product */}
           <div>
-            <h4 className="text-sm font-medium text-foreground mb-4">Product</h4>
+            <h4 className="text-sm font-medium text-foreground mb-4">Produits</h4>
             <ul className="space-y-3">
               {links.product.map((link) => (
                 <li key={link.label}>
@@ -58,13 +58,13 @@ export function LandingFooter() {
           
           {/* Company */}
           <div>
-            <h4 className="text-sm font-medium text-foreground mb-4">Company</h4>
+            <h4 className="text-sm font-medium text-foreground mb-4">Entreprise</h4>
             <ul className="space-y-3">
               {links.company.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <a href={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -72,7 +72,7 @@ export function LandingFooter() {
           
           {/* Resources */}
           <div>
-            <h4 className="text-sm font-medium text-foreground mb-4">Resources</h4>
+            <h4 className="text-sm font-medium text-foreground mb-4">Ressources</h4>
             <ul className="space-y-3">
               {links.resources.map((link) => (
                 <li key={link.label}>
@@ -86,7 +86,7 @@ export function LandingFooter() {
           
           {/* Legal */}
           <div>
-            <h4 className="text-sm font-medium text-foreground mb-4">Legal</h4>
+            <h4 className="text-sm font-medium text-foreground mb-4">Légal</h4>
             <ul className="space-y-3">
               {links.legal.map((link) => (
                 <li key={link.label}>
@@ -102,7 +102,7 @@ export function LandingFooter() {
         {/* Bottom */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AETHER. All rights reserved.
+            © {new Date().getFullYear()} AETHER. Tous droits réservés.
           </p>
           <div className="flex items-center gap-6">
             {["Twitter", "LinkedIn", "GitHub"].map((social) => (

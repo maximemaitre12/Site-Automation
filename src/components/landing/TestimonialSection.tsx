@@ -7,12 +7,12 @@ export function TestimonialSection() {
         <Quote className="w-10 h-10 sm:w-12 sm:h-12 text-primary/20 mx-auto mb-6 sm:mb-8" />
         
         <blockquote className="text-xl sm:text-2xl md:text-3xl font-medium text-foreground leading-relaxed mb-6 sm:mb-8">
-          "We built Aether because we believe AI should work for you, not the other way around. Our mission is to give every team the power of intelligent automation."
+          "Nous avons créé Aether parce que nous croyons que l'IA doit travailler pour vous, pas l'inverse. Notre mission est de donner à chaque équipe le pouvoir de l'automatisation intelligente."
         </blockquote>
         
         <div className="flex flex-col items-center">
-          <p className="font-semibold text-foreground">The Aether Team</p>
-          <p className="text-sm text-muted-foreground">Building the future of work</p>
+          <p className="font-semibold text-foreground">L'équipe Aether</p>
+          <p className="text-sm text-muted-foreground">Construire le futur du travail</p>
         </div>
       </div>
     </section>
