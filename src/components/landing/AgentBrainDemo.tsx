@@ -129,19 +129,19 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
           </div>
 
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             {documents.map((doc, i) => (
               <div
                 key={doc.name}
                 className={cn(
-                  "relative flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary/50 border border-border/50 transition-all duration-700",
+                  "relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl bg-secondary/50 border border-border/50 transition-all duration-700 min-w-[70px] sm:min-w-[80px]",
                   phase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8",
                   phase >= 2 && "border-violet-500/30 bg-violet-500/5"
                 )}
                 style={{ transitionDelay: `${i * 150}ms` }}
               >
-                <span className="text-2xl">{doc.icon}</span>
-                <span className="text-xs font-medium text-muted-foreground">{doc.name}</span>
+                <span className="text-xl sm:text-2xl">{doc.icon}</span>
+                <span className="text-[10px] sm:text-xs font-medium text-muted-foreground truncate max-w-[60px] sm:max-w-none">{doc.name}</span>
                 
                 {/* Processing indicator */}
                 {phase === 2 && (
@@ -157,15 +157,15 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
 
             {/* AI Brain processing */}
             <div className={cn(
-              "flex items-center gap-3 transition-all duration-500",
+              "flex items-center gap-2 sm:gap-3 transition-all duration-500",
               phase >= 2 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"
             )}>
-              <ArrowRight className="w-5 h-5 text-violet-500/50" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-violet-500/50" />
               <div className={cn(
-                "w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg",
+                "w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg",
                 phase === 2 && "animate-pulse"
               )}>
-                <Brain className="w-8 h-8 text-white" />
+                <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
             </div>
           </div>
