@@ -5,10 +5,14 @@ import {
   BarChart3, Mail, Calendar, Shield, AlertTriangle, TrendingUp,
   Phone, FileCheck, Database, ArrowRight, CheckCircle2, Clock,
   Bot, Search, PieChart, FileSpreadsheet, Upload, GitBranch,
-  Mic, Star, Building2, Euro, FileWarning, Scale, Handshake
+  Mic, Star, Building2, Scale, Handshake
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { AnimatedWorkflowDemo } from "./AnimatedWorkflowDemo";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface Feature {
   icon: LucideIcon;
@@ -37,185 +41,185 @@ interface Tool {
 const tools: Tool[] = [
   {
     name: "Flow",
-    tagline: "Automatisation prédictive",
-    description: "L'IA anticipe vos besoins et déclenche des workflows avant même que vous y pensiez.",
+    tagline: "Predictive Automation",
+    description: "AI anticipates your needs and triggers workflows before you even think about them.",
     icon: Zap,
     color: "bg-blue-500",
     colorClass: "text-blue-500",
     features: [
-      { icon: Workflow, title: "Builder visuel no-code", description: "Créez des workflows complexes par glisser-déposer. Conditions, boucles, branchements sans une ligne de code." },
-      { icon: GitBranch, title: "Déclencheurs intelligents", description: "Détection automatique d'événements : nouveau lead, email reçu, seuil atteint, horaire, webhook externe." },
-      { icon: Mail, title: "Actions multi-canaux", description: "Envoi d'emails, SMS, notifications Slack, appels API, mise à jour CRM, génération de documents." },
-      { icon: Bot, title: "IA dans le workflow", description: "Intégrez l'analyse IA : classification, extraction, génération de contenu à chaque étape." },
+      { icon: Workflow, title: "No-Code Visual Builder", description: "Create complex workflows with drag & drop. Conditions, loops, branches — no code required." },
+      { icon: GitBranch, title: "Smart Triggers", description: "Auto-detect events: new lead, email received, threshold reached, schedule, external webhook." },
+      { icon: Mail, title: "Multi-Channel Actions", description: "Send emails, SMS, Slack notifications, API calls, CRM updates, document generation." },
+      { icon: Bot, title: "AI in the Workflow", description: "Integrate AI analysis: classification, extraction, content generation at every step." },
     ],
     workflow: [
       { label: "Trigger", icon: Zap },
       { label: "Condition", icon: GitBranch },
-      { label: "Action IA", icon: Brain },
+      { label: "AI Action", icon: Brain },
       { label: "Notification", icon: Mail },
     ],
     stats: [
-      { value: "80%", label: "Temps gagné" },
-      { value: "0", label: "Code requis" },
-      { value: "∞", label: "Workflows possibles" },
+      { value: "80%", label: "Time Saved" },
+      { value: "0", label: "Code Required" },
+      { value: "∞", label: "Possible Workflows" },
     ],
     useCases: [
-      "Onboarding client automatisé",
-      "Relance intelligente des leads",
-      "Alertes seuil de stock",
-      "Rapports hebdo auto-générés",
+      "Automated client onboarding",
+      "Smart lead follow-ups",
+      "Stock threshold alerts",
+      "Auto-generated weekly reports",
     ],
   },
   {
     name: "Brain",
-    tagline: "Intelligence contextuelle",
-    description: "Une IA qui comprend le contexte de votre entreprise et répond avec précision.",
+    tagline: "Contextual Intelligence",
+    description: "An AI that understands your company context and responds with precision.",
     icon: Brain,
     color: "bg-violet-500",
     colorClass: "text-violet-500",
     features: [
-      { icon: MessageSquare, title: "Chat conversationnel", description: "Posez des questions en langage naturel. L'IA comprend le contexte et fournit des réponses précises." },
-      { icon: Upload, title: "Import de documents", description: "Uploadez PDF, Word, Excel. L'IA analyse, indexe et rend le contenu interrogeable instantanément." },
-      { icon: Search, title: "Recherche sémantique", description: "Trouvez l'information pertinente même avec des termes différents. Comprend le sens, pas juste les mots." },
-      { icon: FileText, title: "Génération de contenu", description: "Créez emails, rapports, résumés basés sur vos données et le contexte de votre entreprise." },
+      { icon: MessageSquare, title: "Conversational Chat", description: "Ask questions in natural language. AI understands context and provides precise answers." },
+      { icon: Upload, title: "Document Import", description: "Upload PDF, Word, Excel. AI analyzes, indexes, and makes content instantly searchable." },
+      { icon: Search, title: "Semantic Search", description: "Find relevant information even with different terms. Understands meaning, not just words." },
+      { icon: FileText, title: "Content Generation", description: "Create emails, reports, summaries based on your data and company context." },
     ],
     workflow: [
       { label: "Upload", icon: Upload },
-      { label: "Analyse IA", icon: Brain },
-      { label: "Indexation", icon: Database },
-      { label: "Requête", icon: Search },
+      { label: "AI Analysis", icon: Brain },
+      { label: "Indexing", icon: Database },
+      { label: "Query", icon: Search },
     ],
     stats: [
-      { value: "95%", label: "Précision réponses" },
-      { value: "<2s", label: "Temps de réponse" },
-      { value: "100+", label: "Formats supportés" },
+      { value: "95%", label: "Response Accuracy" },
+      { value: "<2s", label: "Response Time" },
+      { value: "100+", label: "Supported Formats" },
     ],
     useCases: [
-      "Assistant juridique interne",
-      "Base de connaissance produit",
-      "FAQ intelligente employés",
-      "Analyse de contrats",
+      "Internal legal assistant",
+      "Product knowledge base",
+      "Smart employee FAQ",
+      "Contract analysis",
     ],
   },
   {
     name: "Support",
-    tagline: "IA conversationnelle",
-    description: "Résolution autonome des tickets avec apprentissage continu. Réduction significative du temps.",
+    tagline: "Conversational AI",
+    description: "Autonomous ticket resolution with continuous learning. Significant time reduction.",
     icon: Sparkles,
     color: "bg-emerald-500",
     colorClass: "text-emerald-500",
     features: [
-      { icon: Bot, title: "Réponses automatiques 24/7", description: "L'IA résout 70% des demandes sans intervention humaine. Disponible nuit et week-end." },
-      { icon: Target, title: "Routage intelligent", description: "Analyse du contenu et de l'urgence pour diriger vers le bon agent avec le contexte complet." },
-      { icon: Clock, title: "SLA prédictif", description: "Anticipation des délais de réponse, alertes avant dépassement, priorisation automatique." },
-      { icon: BarChart3, title: "Analytics temps réel", description: "Satisfaction client, temps de résolution, sujets récurrents, performance agents." },
+      { icon: Bot, title: "24/7 Auto-Responses", description: "AI resolves 70% of requests without human intervention. Available nights and weekends." },
+      { icon: Target, title: "Smart Routing", description: "Content and urgency analysis to direct to the right agent with full context." },
+      { icon: Clock, title: "Predictive SLA", description: "Response time anticipation, pre-breach alerts, automatic prioritization." },
+      { icon: BarChart3, title: "Real-Time Analytics", description: "Customer satisfaction, resolution time, recurring topics, agent performance." },
     ],
     workflow: [
-      { label: "Ticket reçu", icon: Mail },
-      { label: "Classification IA", icon: Brain },
-      { label: "Réponse auto", icon: Bot },
-      { label: "Escalade si besoin", icon: Users },
+      { label: "Ticket In", icon: Mail },
+      { label: "AI Classification", icon: Brain },
+      { label: "Auto Response", icon: Bot },
+      { label: "Escalate if Needed", icon: Users },
     ],
     stats: [
-      { value: "70%", label: "Résolution auto" },
-      { value: "-60%", label: "Temps réponse" },
+      { value: "70%", label: "Auto Resolution" },
+      { value: "-60%", label: "Response Time" },
       { value: "4.8/5", label: "Satisfaction" },
     ],
     useCases: [
-      "Support client e-commerce",
-      "Help desk IT interne",
-      "SAV produits techniques",
-      "Gestion des réclamations",
+      "E-commerce customer support",
+      "Internal IT help desk",
+      "Technical product support",
+      "Complaint management",
     ],
   },
   {
     name: "HR",
-    tagline: "Matching prédictif",
-    description: "L'IA prédit la compatibilité candidat-poste et accélère votre processus de recrutement.",
+    tagline: "Predictive Matching",
+    description: "AI predicts candidate-position compatibility and accelerates your hiring process.",
     icon: ScanSearch,
     color: "bg-orange-500",
     colorClass: "text-orange-500",
     features: [
-      { icon: FileSpreadsheet, title: "Parsing CV intelligent", description: "Extraction automatique : compétences, expériences, formations, langues. Standardisation des profils." },
-      { icon: Target, title: "Score de matching", description: "Algorithme IA comparant profil et exigences du poste. Score de compatibilité expliqué." },
-      { icon: Mic, title: "Analyse d'entretien", description: "Transcription, analyse du discours, détection soft skills, rapport objectif post-entretien." },
-      { icon: Calendar, title: "Planification intelligente", description: "Proposition de créneaux, relances automatiques, synchronisation calendriers, rappels." },
+      { icon: FileSpreadsheet, title: "Smart CV Parsing", description: "Automatic extraction: skills, experiences, education, languages. Profile standardization." },
+      { icon: Target, title: "Match Score", description: "AI algorithm comparing profile and job requirements. Explained compatibility score." },
+      { icon: Mic, title: "Interview Analysis", description: "Transcription, speech analysis, soft skills detection, objective post-interview report." },
+      { icon: Calendar, title: "Smart Scheduling", description: "Slot suggestions, automatic follow-ups, calendar sync, reminders." },
     ],
     workflow: [
-      { label: "CV reçu", icon: FileText },
-      { label: "Parsing IA", icon: Brain },
+      { label: "CV Received", icon: FileText },
+      { label: "AI Parsing", icon: Brain },
       { label: "Matching", icon: Target },
-      { label: "Entretien", icon: Mic },
+      { label: "Interview", icon: Mic },
     ],
     stats: [
-      { value: "-75%", label: "Temps screening" },
-      { value: "92%", label: "Précision matching" },
-      { value: "2x", label: "Plus de recrutements" },
+      { value: "-75%", label: "Screening Time" },
+      { value: "92%", label: "Match Accuracy" },
+      { value: "2x", label: "More Hires" },
     ],
     useCases: [
-      "Recrutement volume",
-      "Chasse de profils tech",
-      "Mobilité interne",
-      "Gestion des talents",
+      "Volume recruiting",
+      "Tech profile hunting",
+      "Internal mobility",
+      "Talent management",
     ],
   },
   {
     name: "Compliance",
-    tagline: "Détection proactive",
-    description: "Anticipez les risques avant qu'ils ne surviennent. Conformité RGPD automatisée.",
+    tagline: "Proactive Detection",
+    description: "Anticipate risks before they occur. Automated GDPR compliance.",
     icon: ShieldCheck,
     color: "bg-rose-500",
     colorClass: "text-rose-500",
     features: [
-      { icon: Search, title: "Scan automatique", description: "Analyse continue de vos documents, emails, bases de données. Détection des données sensibles." },
-      { icon: AlertTriangle, title: "Alertes en temps réel", description: "Notification immédiate en cas de risque détecté : donnée exposée, clause non-conforme, deadline approchant." },
-      { icon: FileCheck, title: "Rapports de conformité", description: "Génération automatique de rapports RGPD, audits, registres de traitement, preuves de conformité." },
-      { icon: Scale, title: "Veille réglementaire", description: "Suivi des évolutions légales, impact sur vos process, recommandations de mise en conformité." },
+      { icon: Search, title: "Automatic Scan", description: "Continuous analysis of your documents, emails, databases. Sensitive data detection." },
+      { icon: AlertTriangle, title: "Real-Time Alerts", description: "Immediate notification on detected risk: exposed data, non-compliant clause, approaching deadline." },
+      { icon: FileCheck, title: "Compliance Reports", description: "Automatic generation of GDPR reports, audits, processing registers, compliance evidence." },
+      { icon: Scale, title: "Regulatory Watch", description: "Legal evolution tracking, process impact, compliance recommendations." },
     ],
     workflow: [
-      { label: "Scan données", icon: Search },
-      { label: "Détection risque", icon: AlertTriangle },
-      { label: "Alerte", icon: Mail },
-      { label: "Rapport", icon: FileCheck },
+      { label: "Data Scan", icon: Search },
+      { label: "Risk Detection", icon: AlertTriangle },
+      { label: "Alert", icon: Mail },
+      { label: "Report", icon: FileCheck },
     ],
     stats: [
-      { value: "99%", label: "Risques détectés" },
-      { value: "-90%", label: "Temps audit" },
-      { value: "0€", label: "Amendes RGPD" },
+      { value: "99%", label: "Risks Detected" },
+      { value: "-90%", label: "Audit Time" },
+      { value: "$0", label: "GDPR Fines" },
     ],
     useCases: [
-      "Conformité RGPD",
-      "Audit contractuel",
-      "Protection données santé",
-      "Due diligence M&A",
+      "GDPR Compliance",
+      "Contract audit",
+      "Health data protection",
+      "M&A Due diligence",
     ],
   },
   {
     name: "Sales",
-    tagline: "Prévision intelligente",
-    description: "Prévisionnez le chiffre d'affaires, analysez le sentiment et générez des propositions gagnantes.",
+    tagline: "Intelligent Forecasting",
+    description: "Forecast revenue, analyze sentiment, and generate winning proposals.",
     icon: LineChart,
     color: "bg-cyan-500",
     colorClass: "text-cyan-500",
     features: [
-      { icon: TrendingUp, title: "Forecasting IA", description: "Prédiction du CA à 30/60/90 jours. Analyse des deals en cours, probabilités de closing, alertes sur deals à risque." },
-      { icon: Phone, title: "Analyse des appels", description: "Transcription, analyse du sentiment, objections détectées, points clés, coaching personnalisé." },
-      { icon: FileText, title: "Propositions auto-générées", description: "Création de devis et propositions commerciales personnalisées basées sur le contexte client." },
-      { icon: Handshake, title: "Fiches de négociation", description: "Brief complet avant RDV : historique, enjeux, concurrence, arguments clés, prix plancher." },
+      { icon: TrendingUp, title: "AI Forecasting", description: "30/60/90 day revenue prediction. Deal analysis, closing probabilities, at-risk deal alerts." },
+      { icon: Phone, title: "Call Analysis", description: "Transcription, sentiment analysis, objection detection, key points, personalized coaching." },
+      { icon: FileText, title: "Auto-Generated Proposals", description: "Create personalized quotes and proposals based on client context." },
+      { icon: Handshake, title: "Negotiation Sheets", description: "Complete brief before meetings: history, stakes, competition, key arguments, floor price." },
     ],
     workflow: [
-      { label: "Appel client", icon: Phone },
+      { label: "Client Call", icon: Phone },
       { label: "Transcription", icon: FileText },
-      { label: "Analyse IA", icon: Brain },
+      { label: "AI Analysis", icon: Brain },
       { label: "Actions", icon: CheckCircle2 },
     ],
     stats: [
-      { value: "+35%", label: "Taux conversion" },
-      { value: "95%", label: "Précision forecast" },
-      { value: "-50%", label: "Temps proposition" },
+      { value: "+35%", label: "Conversion Rate" },
+      { value: "95%", label: "Forecast Accuracy" },
+      { value: "-50%", label: "Proposal Time" },
     ],
     useCases: [
-      "Équipe commerciale B2B",
+      "B2B sales team",
       "Inside sales",
       "Account management",
       "Business development",
@@ -225,6 +229,7 @@ const tools: Tool[] = [
 
 export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   const handleToggle = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -236,15 +241,21 @@ export function PainPointsSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3 sm:mb-4">
-            Six agents IA. Une révolution.
+            Six AI Agents. One Revolution.
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground px-2">
-            Chaque agent résout un problème métier spécifique. Ensemble, ils transforment vos opérations.
+            Each agent solves a specific business problem. Together, they transform your operations.
           </p>
         </div>
         
         {/* Tools grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div 
+          ref={ref}
+          className={cn(
+            "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 stagger-children",
+            isVisible && "visible"
+          )}
+        >
           {tools.map((tool, i) => {
             const IconComponent = tool.icon;
             const isExpanded = expandedIndex === i;
@@ -258,13 +269,14 @@ export function PainPointsSection() {
                     ? "border-primary shadow-xl shadow-primary/10 lg:col-span-2" 
                     : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
                 )}
+                style={{ transitionDelay: `${i * 100}ms` }}
                 onClick={() => handleToggle(i)}
               >
                 {/* Header - always visible */}
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg`}>
+                      <div className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                         <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
                       </div>
                       <div>
@@ -309,35 +321,44 @@ export function PainPointsSection() {
                   <div className="overflow-hidden">
                     <div className="px-6 pb-6 border-t border-border/50">
                       
-                      {/* Workflow visualization */}
-                      <div className="mt-6 mb-8">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                          Comment ça fonctionne
+                      {/* Animated Workflow Demo for Flow agent */}
+                      {tool.name === "Flow" && isExpanded && (
+                        <div className="mt-6 mb-8">
+                          <AnimatedWorkflowDemo agentType="flow" />
                         </div>
-                        <div className="flex items-center justify-between bg-secondary/50 rounded-xl p-4 overflow-x-auto">
-                          {tool.workflow.map((step, j) => {
-                            const StepIcon = step.icon;
-                            return (
-                              <div key={j} className="flex items-center">
-                                <div className="flex flex-col items-center gap-2">
-                                  <div className={cn(
-                                    "w-12 h-12 rounded-xl flex items-center justify-center",
-                                    tool.color + "/20"
-                                  )}>
-                                    <StepIcon className={cn("w-6 h-6", tool.colorClass)} strokeWidth={1.5} />
+                      )}
+
+                      {/* Standard workflow visualization for other agents */}
+                      {tool.name !== "Flow" && (
+                        <div className="mt-6 mb-8">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                            How It Works
+                          </div>
+                          <div className="flex items-center justify-between bg-secondary/50 rounded-xl p-4 overflow-x-auto">
+                            {tool.workflow.map((step, j) => {
+                              const StepIcon = step.icon;
+                              return (
+                                <div key={j} className="flex items-center">
+                                  <div className="flex flex-col items-center gap-2">
+                                    <div className={cn(
+                                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500",
+                                      tool.color + "/20"
+                                    )}>
+                                      <StepIcon className={cn("w-6 h-6", tool.colorClass)} strokeWidth={1.5} />
+                                    </div>
+                                    <span className="text-xs font-medium text-foreground whitespace-nowrap">
+                                      {step.label}
+                                    </span>
                                   </div>
-                                  <span className="text-xs font-medium text-foreground whitespace-nowrap">
-                                    {step.label}
-                                  </span>
+                                  {j < tool.workflow.length - 1 && (
+                                    <ArrowRight className="w-5 h-5 text-muted-foreground mx-3 shrink-0" />
+                                  )}
                                 </div>
-                                {j < tool.workflow.length - 1 && (
-                                  <ArrowRight className="w-5 h-5 text-muted-foreground mx-3 shrink-0" />
-                                )}
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Features grid */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -346,7 +367,7 @@ export function PainPointsSection() {
                           return (
                             <div 
                               key={j}
-                              className="p-4 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-colors"
+                              className="p-4 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-md"
                             >
                               <div className="flex items-start gap-3">
                                 <div className={cn(
@@ -374,13 +395,15 @@ export function PainPointsSection() {
                         {/* Stats */}
                         <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
                           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                            Résultats mesurés
+                            Measured Results
                           </div>
                           <div className="grid grid-cols-3 gap-4">
                             {tool.stats.map((stat, j) => (
                               <div key={j} className="text-center">
-                                <div className={cn("text-2xl font-bold", tool.colorClass)}>{stat.value}</div>
-                                <div className="text-xs text-muted-foreground mt-1">{stat.label}</div>
+                                <div className={cn("text-2xl font-bold", tool.colorClass)}>
+                                  {stat.value}
+                                </div>
+                                <div className="text-xs text-muted-foreground">{stat.label}</div>
                               </div>
                             ))}
                           </div>
@@ -389,19 +412,28 @@ export function PainPointsSection() {
                         {/* Use cases */}
                         <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
                           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                            Cas d'usage
+                            Use Cases
                           </div>
-                          <div className="space-y-2">
+                          <ul className="space-y-2">
                             {tool.useCases.map((useCase, j) => (
-                              <div key={j} className="flex items-center gap-2">
+                              <li key={j} className="flex items-center gap-2 text-sm text-foreground">
                                 <CheckCircle2 className={cn("w-4 h-4 shrink-0", tool.colorClass)} />
-                                <span className="text-sm text-foreground">{useCase}</span>
-                              </div>
+                                {useCase}
+                              </li>
                             ))}
-                          </div>
+                          </ul>
                         </div>
                       </div>
 
+                      {/* CTA */}
+                      <div className="mt-6 text-center">
+                        <Link to="/signup" onClick={(e) => e.stopPropagation()}>
+                          <Button className={cn("shadow-lg", tool.color, "hover:opacity-90")}>
+                            Create Your Agent
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
