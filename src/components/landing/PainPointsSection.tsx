@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { 
   Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart,
   ChevronDown, Workflow, MessageSquare, FileText, Target, Users,
@@ -235,9 +235,28 @@ const tools: Tool[] = [
 export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleToggle = (index: number) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
+    const isClosing = expandedIndex === index;
+    setExpandedIndex(isClosing ? null : index);
+    
+    // Scroll to top of expanded card after a short delay for the DOM to update
+    if (!isClosing) {
+      setTimeout(() => {
+        const cardElement = cardRefs.current[index];
+        if (cardElement) {
+          const headerOffset = 100; // Account for fixed header
+          const elementPosition = cardElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - headerOffset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }
   };
 
   return (
@@ -267,7 +286,8 @@ export function PainPointsSection() {
             
             return (
               <div 
-                key={i} 
+                key={i}
+                ref={(el) => { cardRefs.current[i] = el; }}
                 className={cn(
                   "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden",
                   isExpanded 

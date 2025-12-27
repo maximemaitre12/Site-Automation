@@ -16,7 +16,7 @@ interface AgentSalesDemoProps {
 }
 
 export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.5, triggerOnce: false });
   const [phase, setPhase] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [dealProgress, setDealProgress] = useState<number[]>([0, 0, 0]);

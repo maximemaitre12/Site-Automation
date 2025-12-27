@@ -16,7 +16,7 @@ interface AgentHRDemoProps {
 }
 
 export function AgentHRDemo({ className }: AgentHRDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.5, triggerOnce: false });
   const [phase, setPhase] = useState(0);
   const [animatedScores, setAnimatedScores] = useState<number[]>([0, 0, 0]);
   const [skillsProgress, setSkillsProgress] = useState(0);

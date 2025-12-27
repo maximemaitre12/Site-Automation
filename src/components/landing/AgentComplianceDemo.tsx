@@ -17,7 +17,7 @@ interface AgentComplianceDemoProps {
 }
 
 export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.5, triggerOnce: false });
   const [phase, setPhase] = useState(0);
   const [scanProgress, setScanProgress] = useState(0);
   const [currentFile, setCurrentFile] = useState("");
