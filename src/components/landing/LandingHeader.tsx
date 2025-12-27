@@ -15,7 +15,12 @@ export function LandingHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
-  
+  const navItems = [
+    { label: "Produits", href: "#product" },
+    { label: "Fonctionnalités", href: "#features" },
+    { label: "Résultats", href: "#results" },
+    { label: "Contact", href: "#contact" },
+  ];
   
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -32,12 +37,7 @@ export function LandingHeader() {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            {[
-              { label: "Product", href: "#product" },
-              { label: "Features", href: "#features" },
-              { label: "Pricing", href: "#pricing" },
-              { label: "Enterprise", href: "#enterprise" },
-            ].map((item) => 
+            {navItems.map((item) => 
               isHomePage ? (
                 <a 
                   key={item.label}
@@ -62,12 +62,12 @@ export function LandingHeader() {
           <div className="hidden md:flex items-center gap-4">
             <Link to="/auth?mode=login">
               <Button variant="ghost" size="sm" className="text-sm">
-                Sign in
+                Connexion
               </Button>
             </Link>
             <Link to="/signup">
               <Button size="sm" className="text-sm">
-                Get started
+                Commencer
               </Button>
             </Link>
           </div>
@@ -85,12 +85,7 @@ export function LandingHeader() {
         {isMenuOpen && (
           <div className="md:hidden absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg py-4 px-6">
             <nav className="flex flex-col gap-4">
-              {[
-                { label: "Product", href: "#product" },
-                { label: "Features", href: "#features" },
-                { label: "Pricing", href: "#pricing" },
-                { label: "Enterprise", href: "#enterprise" },
-              ].map((item) => 
+              {navItems.map((item) => 
                 isHomePage ? (
                   <a 
                     key={item.label} 
@@ -113,10 +108,10 @@ export function LandingHeader() {
               )}
               <div className="flex gap-3 pt-4 border-t border-border">
                 <Link to="/auth?mode=login" className="flex-1">
-                  <Button variant="outline" size="sm" className="w-full text-sm">Sign in</Button>
+                  <Button variant="outline" size="sm" className="w-full text-sm">Connexion</Button>
                 </Link>
                 <Link to="/signup" className="flex-1">
-                  <Button size="sm" className="w-full text-sm">Get started</Button>
+                  <Button size="sm" className="w-full text-sm">Commencer</Button>
                 </Link>
               </div>
             </nav>
