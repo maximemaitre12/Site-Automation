@@ -8,286 +8,245 @@ import { toast } from "@/hooks/use-toast";
 const featuredPost = {
   id: "founders-story",
   title: "From Shanghai Cafés to Enterprise AI: The AETHER Story",
-  excerpt: "How two emlyon business school students turned a late-night conversation in Shanghai into a global enterprise AI platform. The story of Youriy and Maxime Maître.",
+  excerpt: "Two emlyon students turned a casual chat in Shanghai into a global AI platform. Here's how Youriy and Maxime started building AETHER.",
   image: "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=400&fit=crop",
   author: "AETHER Team",
   date: "December 20, 2025",
   readTime: "8 min read",
   category: "Company",
   featured: true,
-  fullContent: `It all started in the spring of 2025, in the bustling streets of Shanghai.
+  fullContent: `It started in spring 2025, somewhere in the busy streets of Shanghai.
 
-Youriy and Maxime Maître had never met before landing in China. Both were second-year students at emlyon business school, embarking on an exchange program that would change their lives forever.
+Youriy and Maxime had never crossed paths before landing in China. Both were second-year students at emlyon, there for an exchange program that would end up changing everything.
 
-"We met at a welcome dinner for international students," recalls Youriy. "I was complaining about how my previous internship made me spend hours on repetitive data entry tasks. Maxime looked at me and said, 'What if AI could do all of that?'"
+"We met at a welcome dinner," Youriy remembers. "I was venting about my last internship—hours wasted on repetitive data entry. Maxime just looked at me and said, 'What if we could get AI to handle all that?'"
 
-That conversation sparked something. Over the following weeks, the two students found themselves meeting regularly at coffee shops around Putuo district, sketching out ideas on napkins and laptops.
+That one question stuck. Over the next few weeks, they kept meeting at coffee shops around Putuo, scribbling ideas on napkins and laptops.
 
-Shanghai: The Perfect Incubator
+**Shanghai felt like the right place for this.**
 
-"Shanghai is a city where you feel like anything is possible," explains Maxime. "The energy, the pace of innovation – it's infectious. We were surrounded by tech companies pushing boundaries, and we thought: why not us?"
+"There's this energy here," Maxime explains. "You walk around and everyone seems to be building something. We figured—why not us?"
 
-The city's vibrant startup ecosystem provided the perfect backdrop. While their classmates explored the Bund and Yu Garden, Youriy and Maxime spent their weekends in co-working spaces, absorbing everything they could about machine learning, enterprise software, and automation.
+While their classmates hit the tourist spots, they spent weekends in co-working spaces, digging into machine learning, enterprise software, and automation. The first prototype came together in a small Putuo apartment, fueled by baozi, endless tea, and the Shanghai skyline outside their window.
 
-The first prototype of AETHER was built in a small apartment in Putuo, with the iconic Shanghai skyline as their backdrop. Late nights fueled by baozi and endless cups of tea, they coded the foundation of what would become an enterprise AI platform.
+**No big funding story. Just conviction.**
 
-The Vision
+"We don't have investors lining up," Youriy admits. "But we've seen how much time companies waste on stuff AI could do in seconds. That's the gap we're going after."
 
-"We don't have much funding," admits Youriy. "But we have conviction. We know that enterprises waste countless hours on tasks that AI could handle in seconds."
-
-The Road Ahead
-
-The AETHER journey is just beginning. With ambitious plans for 2025 – including new AI capabilities and innovative features – the two founders are building something they believe in.
-
-"We want to make enterprise AI accessible to everyone," concludes Youriy. "Not just large corporations, but every business that wants to work smarter. That's the AETHER mission."`
+The AETHER journey is still early. There's a lot planned for 2025—new capabilities, new features. But the mission stays simple: make enterprise AI something any business can actually use, not just the giants with massive budgets.`
 };
 
 const posts = [
   {
     id: "why-enterprises-waste-time",
-    title: "Why Enterprises Waste 30% of Their Time on Repetitive Tasks",
-    excerpt: "A deep dive into research showing how much time knowledge workers spend on tasks AI could handle. The data is staggering.",
+    title: "The 30% Problem: Where Your Team's Time Actually Goes",
+    excerpt: "We looked at the research. The amount of time knowledge workers spend on automatable tasks is honestly surprising.",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop",
     author: "Maxime Maître",
     date: "December 18, 2025",
     readTime: "5 min read",
     category: "Industry",
     icon: TrendingUp,
-    fullContent: `According to McKinsey research, knowledge workers spend an average of 30% of their time on repetitive, automatable tasks. That's 12 hours per week, per employee, potentially lost.
+    fullContent: `McKinsey found that knowledge workers spend about 30% of their time on repetitive tasks that could be automated. That's 12 hours a week, per person.
 
-The Hidden Cost of Manual Work
+**Where does all that time go?**
 
-Let's break down where this time goes:
+The breakdown is pretty telling:
+• Moving data between systems: 8%
+• Hunting for information across tools: 7%  
+• Building and formatting reports: 6%
+• Sorting through emails: 5%
+• Coordinating meetings and schedules: 4%
 
-• Data entry and transfer between systems: 8% of work time
-• Searching for information across tools: 7% of work time  
-• Report generation and formatting: 6% of work time
-• Email management and sorting: 5% of work time
-• Meeting scheduling and coordination: 4% of work time
+For a 100-person company with average salaries around €60k, that adds up to €1.8 million yearly on work that doesn't move the needle.
 
-For a company of 100 knowledge workers at an average salary of €60,000, that's €1.8 million per year spent on tasks that add no strategic value.
+**So why isn't everyone automating?**
 
-The Automation Gap
+Turns out, it's complicated. Deloitte found only 13% of companies have actually scaled automation beyond pilot projects.
 
-Despite the availability of automation tools, adoption remains slow. A Deloitte survey found that only 13% of enterprises have scaled their automation efforts beyond pilots.
+The blockers people mention most:
+• Legacy systems are a nightmare to integrate (67%)
+• Nobody on the team knows how to do it (54%)
+• Hard to prove ROI to get budget (48%)
 
-The main barriers cited:
-• Integration complexity with legacy systems (67%)
-• Lack of technical expertise (54%)
-• Unclear ROI measurement (48%)
+**What's different now?**
 
-What This Means for 2025
-
-The enterprises that solve this problem will have a significant competitive advantage. The question isn't whether to automate, but how quickly you can do it intelligently.
-
-AI is now mature enough to handle complex, judgment-based tasks – not just simple rule-based automation. The 30% is no longer inevitable.`
+AI has gotten good enough to handle tasks that need judgment—not just simple if-then rules. That 30% isn't inevitable anymore. The companies figuring this out first will have a real edge.`
   },
   {
     id: "ai-voice-agents",
-    title: "How Voice AI Actually Works: A Technical Primer",
-    excerpt: "From speech recognition to natural language understanding – here's what happens in the milliseconds between your question and the AI's response.",
+    title: "What Actually Happens When You Talk to an AI",
+    excerpt: "The milliseconds between your question and the response involve some fascinating tech. Here's a plain-language breakdown.",
     image: "https://images.unsplash.com/photo-1590650153855-d9e808231d41?w=600&h=300&fit=crop",
     author: "Youriy",
     date: "December 15, 2025",
     readTime: "6 min read",
     category: "Innovation",
     icon: Brain,
-    fullContent: `Voice AI has made remarkable progress, but few understand what happens behind the scenes. Let's demystify the technology.
+    fullContent: `Voice AI has gotten remarkably good, but most people have no idea what happens under the hood. Let's break it down.
 
-The Voice AI Pipeline
+**The journey from your voice to a response:**
 
-When you speak to an AI assistant, here's what happens:
+1. **Capturing audio (0-50ms)**
+Your voice becomes a digital waveform. Modern systems sample at 16kHz or higher to catch all the details.
 
-1. Audio Capture (0-50ms)
-Your voice is captured and converted to digital format. Modern systems sample at 16kHz or higher, creating detailed audio waveforms.
+2. **Turning sound into text (50-200ms)**
+Speech recognition models—often transformer-based like Whisper—convert those sound waves into words. Accuracy is now above 95% in most situations.
 
-2. Speech Recognition (50-200ms)
-The audio is processed by an ASR (Automatic Speech Recognition) model. These models, often based on transformer architectures like Whisper, convert sound waves into text with remarkable accuracy – now exceeding 95% in most conditions.
+3. **Understanding what you meant (100-300ms)**
+This is where it gets interesting. The system figures out your intent, pulls out relevant details (names, dates, numbers), and considers what you said before.
 
-3. Natural Language Understanding (100-300ms)
-The transcribed text is analyzed for intent. What does the user want? This involves parsing entities (names, dates, numbers) and understanding context from previous conversation turns.
+4. **Generating a response (200-500ms)**
+Based on what it understood, the system might query databases, call APIs, or generate text with a language model.
 
-4. Response Generation (200-500ms)
-Based on the understood intent, the system generates a response. This might involve querying databases, calling APIs, or generating text with a large language model.
+5. **Making it sound human (100-200ms)**
+Text-to-speech turns the response into natural-sounding audio. The best neural TTS is nearly indistinguishable from a real person.
 
-5. Speech Synthesis (100-200ms)
-The text response is converted back to natural-sounding speech using TTS (Text-to-Speech) models. Modern neural TTS produces nearly indistinguishable from human voice.
+**Why timing matters so much**
 
-The Latency Challenge
+Natural conversation has pauses of 200-500ms. For AI to feel conversational, total latency needs to stay under a second. The big breakthrough recently has been running these steps in parallel rather than one after another.
 
-Total end-to-end latency of 500-1000ms is crucial for natural conversation. Human conversation has natural pauses of 200-500ms, so AI needs to respond within this window to feel natural.
+**What this means for businesses**
 
-The breakthrough in recent years has been parallel processing – running recognition, understanding, and early response generation simultaneously rather than sequentially.
-
-Why This Matters for Enterprise
-
-Enterprise voice AI isn't just about chatbots. It's about:
-• Automated phone systems that actually understand you
-• Meeting transcription and action item extraction
-• Voice-controlled data queries and reporting
-• Accessibility improvements for all employees`
+This isn't just chatbot stuff. Think automated phone systems that actually get what you're saying, meeting transcription that pulls out action items, or voice-controlled data queries.`
   },
   {
     id: "enterprise-ai-trends-2025",
-    title: "Enterprise AI in 2025: 5 Trends Backed by Data",
-    excerpt: "From multimodal AI to autonomous agents, we analyze the trends shaping enterprise AI based on recent research and market data.",
+    title: "5 Enterprise AI Trends Worth Paying Attention To",
+    excerpt: "From AI agents going live to governance spending exploding—here's what the data shows about where things are heading.",
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=crop",
     author: "Maxime Maître",
     date: "December 10, 2025",
     readTime: "7 min read",
     category: "Industry",
     icon: Globe,
-    fullContent: `The enterprise AI landscape is evolving rapidly. Here are five trends backed by recent research and market data.
+    fullContent: `Things are moving fast in enterprise AI. Here are five trends that actually have data behind them.
 
-1. AI Agents Are Moving from Hype to Production
+**1. AI agents are leaving the lab**
 
-Gartner predicts that by 2028, 33% of enterprise software applications will include agentic AI. These aren't chatbots – they're systems that can execute multi-step tasks autonomously.
+Gartner predicts 33% of enterprise software will include agentic AI by 2028. These aren't chatbots—they execute multi-step tasks on their own.
 
-Current adoption: 8% of enterprises have deployed AI agents in production
-Projected 2025: 23% adoption rate
+Right now: 8% of companies have agents in production
+By end of 2025: expected to hit 23%
 
-2. Multimodal AI Is Now Table Stakes
+**2. Multimodal is now the default**
 
-The distinction between text, image, and voice AI is disappearing. According to IDC, 67% of new enterprise AI projects in 2024 were multimodal.
+Text, image, voice—the boundaries are blurring. IDC says 67% of new enterprise AI projects last year were multimodal.
 
-Document processing now combines:
-• OCR for text extraction
-• Layout analysis for structure understanding  
-• Image recognition for diagrams and signatures
-• Language models for semantic understanding
+Document processing now combines OCR, layout analysis, image recognition, and language understanding all at once.
 
-3. AI Governance Spending Is Exploding
+**3. Governance is suddenly a priority**
 
-Forrester reports that spending on AI governance tools grew 340% in 2024. Enterprises are realizing that deploying AI without proper controls creates significant risk.
+Spending on AI governance tools jumped 340% in 2024, according to Forrester. Turns out, deploying AI without controls creates real risk.
 
-Key governance requirements:
-• Audit trails for all AI decisions
-• Explainability for compliance
-• Bias detection and mitigation
-• Data lineage tracking
+Companies are now requiring audit trails, explainability, bias detection, and data lineage tracking.
 
-4. ROI Measurement Is Maturing
+**4. ROI measurement is getting serious**
 
-Early AI projects focused on cost savings. Now, enterprises are measuring:
-• Time-to-value for new hires
-• Customer satisfaction improvements
-• Employee experience scores
-• Revenue acceleration
+Early AI projects focused on cost savings. Now the metrics are broader: time-to-value for new hires, customer satisfaction, employee experience, revenue acceleration.
 
-McKinsey found that enterprises with mature AI measurement frameworks see 2.5x better returns.
+McKinsey found that companies with mature measurement frameworks see 2.5x better returns.
 
-5. Human-AI Collaboration Is the Model
+**5. Humans + AI beats either alone**
 
-The most successful deployments augment humans rather than replace them. Accenture research shows that human-AI teams outperform either alone by 30% on complex tasks.
+The most successful deployments augment people rather than replace them. Accenture's research shows human-AI teams outperform either alone by 30% on complex work.
 
-The pattern: AI handles volume and speed, humans provide judgment and creativity.`
+The pattern that works: AI handles volume and speed, humans bring judgment and creativity.`
   },
   {
     id: "document-processing-evolution",
-    title: "The Evolution of Document Processing: From OCR to AI Understanding",
-    excerpt: "How document processing evolved from simple text extraction to systems that actually understand what they're reading.",
+    title: "From Basic OCR to AI That Actually Understands Documents",
+    excerpt: "Document processing has come a long way. Here's the evolution from simple text extraction to genuine comprehension.",
     image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=600&h=300&fit=crop",
     author: "Youriy",
     date: "December 8, 2025",
     readTime: "5 min read",
     category: "Innovation",
     icon: Zap,
-    fullContent: `Document processing has come a long way from the early days of OCR. Here's how the technology evolved.
+    fullContent: `Document processing has evolved through distinct generations. Each one changed what was possible.
 
-Generation 1: OCR (1990s-2000s)
+**Generation 1: OCR (1990s-2000s)**
 
-Optical Character Recognition could convert scanned documents to text, but that was it. No understanding of structure, context, or meaning.
+Optical Character Recognition could turn scanned documents into text. That was it. No understanding of structure, context, or meaning.
 
-Accuracy was around 85-90%, which sounds good until you realize that means 1-2 errors per line of text.
+Accuracy hovered around 85-90%. Sounds okay until you realize that's 1-2 errors per line.
 
-Generation 2: Template-Based IDP (2010s)
+**Generation 2: Template-based (2010s)**
 
-Intelligent Document Processing introduced templates. Define where the invoice number is, where the total is, and the system extracts those fields.
+You could define where the invoice number goes, where the total is, and the system would extract those fields.
 
-The problem: every new document type required a new template. Template maintenance became a full-time job.
+The catch: every new document type needed a new template. Template maintenance became someone's entire job.
 
-Generation 3: ML-Based Extraction (2018-2022)
+**Generation 3: Machine learning (2018-2022)**
 
-Machine learning models could learn from examples. Show the system 100 invoices, and it learns to extract fields from new invoices automatically.
+Systems started learning from examples. Show it 100 invoices, and it figures out how to extract from new ones.
 
-Accuracy improved to 95%+, but the systems still didn't understand what they were extracting.
+Accuracy jumped above 95%, but the systems still didn't understand what they were pulling out.
 
-Generation 4: LLM-Powered Understanding (2023+)
+**Generation 4: LLM-powered (2023+)**
 
-Large language models changed everything. Now, document processing systems can:
+Large language models changed the game completely. Now document processing can:
 
-• Understand context and relationships between fields
-• Handle documents they've never seen before
-• Answer questions about document content
-• Summarize and extract insights, not just data
-• Identify anomalies and inconsistencies
+• Understand how fields relate to each other
+• Handle document types it's never seen before
+• Answer questions about content
+• Summarize and find insights, not just data
+• Spot anomalies and inconsistencies
 
-Real-World Impact
+**The real-world difference**
 
-A traditional invoice processing workflow:
-1. Receive invoice (email, mail, portal)
-2. Manual data entry or template-based extraction
-3. Manual validation and matching
-4. Approval routing
-5. Payment processing
+Traditional invoice processing: receive, manually enter or template-extract, validate, route for approval, process payment. 15-30 minutes per invoice.
 
-Time: 15-30 minutes per invoice
+AI-powered: receive, automatic extraction and validation, human review only for exceptions. 2-5 minutes total.
 
-AI-powered workflow:
-1. Receive invoice
-2. Automatic extraction, validation, and matching
-3. Exception handling only for anomalies
-4. Automatic approval for standard cases
-5. Payment processing
-
-Time: 2-5 minutes per invoice (mostly human review time)
-
-That's an 80% reduction in processing time – and more importantly, near-zero data entry errors.`
+That's 80% less time—and almost no data entry errors.`
   },
   {
     id: "shanghai-startup-ecosystem",
-    title: "Building a Startup in Shanghai: What We Learned",
-    excerpt: "From co-working spaces in Putuo to tech meetups in Jing'an – lessons from building AETHER in one of the world's most dynamic cities.",
+    title: "What Building a Startup in Shanghai Taught Us",
+    excerpt: "From Putuo co-working spaces to Jing'an tech meetups—lessons from launching AETHER in one of the world's most dynamic cities.",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=300&fit=crop",
     author: "AETHER Team",
     date: "December 5, 2025",
     readTime: "6 min read",
     category: "Company",
     icon: Sparkles,
-    fullContent: `Shanghai isn't just where AETHER was born – it shaped how we think about building products. Here's what we learned.
+    fullContent: `Shanghai didn't just happen to be where AETHER started—it shaped how we think about building products.
 
-The Energy Is Real
+**The pace is real**
 
-Shanghai moves fast. Walking through Lujiazui or Zhangjiang Hi-Tech Park, you feel the pace of innovation. Companies ship products in weeks that would take months elsewhere.
+Walking through Lujiazui or Zhangjiang, you feel it. Companies ship in weeks what would take months elsewhere.
 
-This rubbed off on us. Our first prototype was built in 6 weeks, working from a small apartment in Putuo. The city's energy made anything less feel unacceptable.
+That rubbed off on us. Our first prototype took 6 weeks, built from a small Putuo apartment. Anything slower felt wrong.
 
-The Tech Scene Is Global
+**The scene is surprisingly global**
 
-One surprise: Shanghai's tech community is incredibly international. Tech meetups in Jing'an draw founders and engineers from dozens of countries. WeChat groups connect French entrepreneurs, American engineers, and Chinese investors.
+One thing we didn't expect: Shanghai's tech community is incredibly international. Meetups in Jing'an draw founders and engineers from everywhere. WeChat groups connect French entrepreneurs, American engineers, Chinese investors.
 
-We found advisors, early users, and inspiration in this mix. AETHER's global perspective – building for enterprises everywhere, not just one market – comes directly from this environment.
+We found advisors, early users, and ideas in this mix. AETHER's global perspective—building for businesses everywhere, not just one market—came directly from being here.
 
-Frugality Breeds Creativity
+**No money forces creativity**
 
-We started with almost no funding. In Shanghai, that's common. Many successful startups here bootstrapped longer than their Silicon Valley counterparts.
+We started with almost nothing. In Shanghai, that's normal. Many successful startups here bootstrapped longer than their Silicon Valley counterparts.
 
-This forced us to:
-• Focus ruthlessly on what matters
-• Build MVPs that actually work, not demos
-• Find creative solutions instead of throwing money at problems
+This meant:
+• Ruthless focus on what actually matters
+• Building MVPs that work, not just demos
+• Finding creative solutions instead of buying our way out
 
-The Result: A Different Mindset
+**A different mindset**
 
-AETHER doesn't feel like a typical enterprise software company because we didn't build it like one. We built it like a Shanghai startup:
+AETHER doesn't feel like typical enterprise software because we didn't build it like that. We built it like a Shanghai startup:
+
 • Ship fast, iterate faster
 • Global from day one
-• Resource-efficient by design
-• Hungry to prove ourselves
+• Efficient by necessity
+• Always hungry
 
-The Shanghai chapter of our story is just the beginning, but it defined who we are.`
+The Shanghai chapter is just our beginning. But it defined who we are.`
   }
 ];
+
 
 const categories = ["All", "Company", "Innovation", "Industry"];
 
