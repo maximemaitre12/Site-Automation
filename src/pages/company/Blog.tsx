@@ -1,6 +1,6 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Calendar, Clock, User, ArrowRight, Tag, TrendingUp, Sparkles, GraduationCap, Globe, Zap, Brain, Workflow, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, Tag, TrendingUp, Sparkles, GraduationCap, Globe, Zap, Brain, Workflow, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
@@ -255,8 +255,9 @@ export default function Blog() {
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     if (!email || !email.includes("@")) {
       toast({
         title: "Invalid email",
@@ -265,6 +266,13 @@ export default function Blog() {
       });
       return;
     }
+    
+    setIsSubscribing(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsSubscribing(false);
     setIsSubscribed(true);
     setEmail("");
     toast({
@@ -478,13 +486,22 @@ export default function Blog() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-2.5 md:py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm md:text-base"
+                  disabled={isSubscribing}
+                  className="flex-1 px-4 py-2.5 md:py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm md:text-base disabled:opacity-50"
                 />
                 <button 
                   onClick={handleSubscribe}
-                  className="px-5 md:px-6 py-2.5 md:py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm md:text-base"
+                  disabled={isSubscribing}
+                  className="px-5 md:px-6 py-2.5 md:py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm md:text-base disabled:opacity-70 flex items-center justify-center gap-2 min-w-[120px]"
                 >
-                  Subscribe
+                  {isSubscribing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Subscribing...</span>
+                    </>
+                  ) : (
+                    "Subscribe"
+                  )}
                 </button>
               </div>
             )}
