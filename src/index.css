@@ -60,6 +60,14 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
+
+    /* Agent colors - muted tones */
+    --agent-flow: 220 60% 50%;
+    --agent-brain: 270 45% 50%;
+    --agent-support: 160 50% 40%;
+    --agent-hr: 340 45% 50%;
+    --agent-compliance: 25 60% 50%;
+    --agent-sales: 190 60% 45%;
   }
 
   .dark {

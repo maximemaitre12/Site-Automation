@@ -58,6 +58,14 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        agent: {
+          flow: "hsl(var(--agent-flow))",
+          brain: "hsl(var(--agent-brain))",
+          support: "hsl(var(--agent-support))",
+          hr: "hsl(var(--agent-hr))",
+          compliance: "hsl(var(--agent-compliance))",
+          sales: "hsl(var(--agent-sales))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
