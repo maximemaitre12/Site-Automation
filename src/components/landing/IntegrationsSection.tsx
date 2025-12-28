@@ -42,23 +42,23 @@ export function IntegrationsSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
 
   return (
-    <section className="relative py-16 sm:py-24 lg:py-32 bg-background overflow-hidden">
+    <section className="relative py-12 sm:py-16 lg:py-20 bg-background overflow-hidden">
 
-      <div ref={ref} className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+      <div ref={ref} className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-cloud-fade-in">
-            <Key className="w-4 h-4" />
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4 animate-cloud-fade-in">
+            <Key className="w-3.5 h-3.5" />
             <span>Simple API Integration</span>
           </div>
           <h2 className={cn(
-            "text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4 transition-all duration-700",
+            "text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2 transition-all duration-700",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
             Connect Everything in Seconds
           </h2>
           <p className={cn(
-            "text-base sm:text-lg text-muted-foreground transition-all duration-700 delay-100",
+            "text-sm sm:text-base text-muted-foreground transition-all duration-700 delay-100",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
             One API key. Instant connection. No complex setup required.
@@ -67,13 +67,13 @@ export function IntegrationsSection() {
 
         {/* Visual Integration Diagram */}
         <div className={cn(
-          "relative mb-16 transition-all duration-1000 delay-200",
+          "relative mb-10 transition-all duration-1000 delay-200",
           isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
         )}>
           {/* Central Hub */}
           <div className="relative flex items-center justify-center">
             {/* Orbiting platforms */}
-            <div className="relative w-full max-w-lg mx-auto aspect-square">
+            <div className="relative w-full max-w-sm mx-auto aspect-square">
               {/* Connection lines */}
               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
                 {platforms.map((_, i) => {
@@ -97,8 +97,8 @@ export function IntegrationsSection() {
 
               {/* Center Aether logo */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                  <span className="text-primary-foreground font-bold text-lg sm:text-xl">A</span>
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                  <span className="text-primary-foreground font-bold text-base sm:text-lg">A</span>
                 </div>
               </div>
 
@@ -112,7 +112,7 @@ export function IntegrationsSection() {
                 return (
                   <div
                     key={platform.name}
-                    className="absolute w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary border border-border flex items-center justify-center shadow-sm transition-all duration-300 hover:scale-110 hover:shadow-md hover:border-primary/30"
+                    className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-secondary border border-border flex items-center justify-center shadow-sm transition-all duration-300 hover:scale-110 hover:border-primary/30"
                     style={{
                       left: `${x}%`,
                       top: `${y}%`,
@@ -120,7 +120,7 @@ export function IntegrationsSection() {
                     }}
                     title={platform.name}
                   >
-                    <platform.Logo className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+                    <platform.Logo className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
                   </div>
                 );
               })}
@@ -130,7 +130,7 @@ export function IntegrationsSection() {
 
         {/* 3-Step Process */}
         <div className={cn(
-          "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 transition-all duration-1000 delay-400",
+          "grid grid-cols-1 md:grid-cols-3 gap-4 transition-all duration-1000 delay-400",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           {steps.map((step, i) => {
@@ -139,24 +139,24 @@ export function IntegrationsSection() {
               <div key={i} className="relative group">
                 {/* Connector arrow (except last) */}
                 {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-12 -right-4 z-10">
-                    <ArrowRight className="w-6 h-6 text-border" />
+                  <div className="hidden md:block absolute top-10 -right-2 z-10">
+                    <ArrowRight className="w-4 h-4 text-border" />
                   </div>
                 )}
                 
-                <div className="relative text-center p-6 rounded-xl bg-secondary/50 border border-border hover:border-primary/30 transition-all duration-300">
+                <div className="relative text-center p-4 rounded-lg bg-secondary/50 border border-border hover:border-primary/30 transition-all duration-300">
                   {/* Step number */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center">
                     {i + 1}
                   </div>
                   
                   {/* Icon */}
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <StepIcon className="w-6 h-6 text-primary" strokeWidth={1.5} />
+                  <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <StepIcon className="w-5 h-5 text-primary" strokeWidth={1.5} />
                   </div>
                   
-                  <h3 className="text-base font-semibold text-foreground mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  <h3 className="text-sm font-semibold text-foreground mb-1">{step.title}</h3>
+                  <p className="text-xs text-muted-foreground">{step.description}</p>
                 </div>
               </div>
             );
@@ -165,17 +165,17 @@ export function IntegrationsSection() {
 
         {/* Bottom tagline */}
         <div className={cn(
-          "text-center mt-12 transition-all duration-1000 delay-600",
+          "text-center mt-8 transition-all duration-1000 delay-600",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
-          <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <Check className="w-4 h-4 text-primary" />
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <Check className="w-3.5 h-3.5 text-primary" />
             <span>No coding required</span>
-            <span className="mx-2">•</span>
-            <Check className="w-4 h-4 text-primary" />
+            <span className="mx-1">•</span>
+            <Check className="w-3.5 h-3.5 text-primary" />
             <span>100+ integrations</span>
-            <span className="mx-2">•</span>
-            <Check className="w-4 h-4 text-primary" />
+            <span className="mx-1">•</span>
+            <Check className="w-3.5 h-3.5 text-primary" />
             <span>Secure & encrypted</span>
           </div>
         </div>
