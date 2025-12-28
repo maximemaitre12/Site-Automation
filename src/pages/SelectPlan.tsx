@@ -124,7 +124,7 @@ export default function SelectPlan() {
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <div className="flex items-center gap-2 shrink-0">
-              <img src={aetherLogo} alt="Aether" className="h-10 sm:h-14 w-auto" />
+              <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
             </div>
             
             {/* Exit Button */}
