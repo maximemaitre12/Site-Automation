@@ -456,7 +456,6 @@ export function PainPointsSection() {
           </div>
         )}
       </div>
-      </div>
     </section>
   );
 }
