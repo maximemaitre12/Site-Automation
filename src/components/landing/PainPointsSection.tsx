@@ -312,7 +312,7 @@ export function PainPointsSection() {
         <div 
           ref={ref}
           className={cn(
-            "flex flex-col gap-3 sm:gap-4 stagger-children",
+            "flex flex-col gap-5 sm:gap-6 stagger-children",
             isVisible && "visible"
           )}
         >
@@ -321,94 +321,108 @@ export function PainPointsSection() {
             const isExpanded = expandedIndices.has(i);
 
             return (
-              <div
-                key={i}
-                ref={(el) => {
-                  cardRefs.current[i] = el;
-                }}
-                className={cn(
-                  "group relative rounded-2xl border transition-all duration-500 overflow-hidden",
-                  "backdrop-blur-sm",
-                  "border-primary/20 shadow-lg",
-                  isExpanded && "border-primary/40 shadow-xl"
+              <div key={i}>
+                {/* Creative separator between agents */}
+                {i > 0 && (
+                  <div className="flex items-center gap-4 mb-5 sm:mb-6">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                      <div className="w-2 h-2 rounded-full bg-primary/60" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                    </div>
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                  </div>
                 )}
-                style={
-                  shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
-                }
-              >
-                {/* Glass background with agent color tint */}
+                
                 <div
+                  ref={(el) => {
+                    cardRefs.current[i] = el;
+                  }}
                   className={cn(
-                    "absolute inset-0 -z-10",
-                    tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_50%_94%)] via-[hsl(220_40%_97%)] to-[hsl(220_50%_95%)]",
-                    tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_50%_94%)] via-[hsl(270_40%_97%)] to-[hsl(270_50%_95%)]",
-                    tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_50%_94%)] via-[hsl(160_40%_97%)] to-[hsl(160_50%_95%)]",
-                    tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_50%_94%)] via-[hsl(340_40%_97%)] to-[hsl(340_50%_95%)]",
-                    tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_50%_94%)] via-[hsl(25_40%_97%)] to-[hsl(25_50%_95%)]",
-                    tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_50%_94%)] via-[hsl(190_40%_97%)] to-[hsl(190_50%_95%)]",
+                    "group relative rounded-2xl border transition-all duration-500 overflow-hidden",
+                    "backdrop-blur-sm",
+                    "border-primary/20 shadow-lg",
+                    isExpanded && "border-primary/40 shadow-xl"
                   )}
-                />
-                {/* Shimmer glass reflection - behind content */}
-                <div
-                  className="absolute inset-0 -z-10 pointer-events-none bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.3)_35%,rgba(255,255,255,0.5)_50%,rgba(255,255,255,0.3)_65%,transparent_75%)] bg-[length:250%_100%] animate-[shimmer_3s_ease-in-out_infinite]"
-                />
-
-                {/* Header - clickable */}
-                <div 
-                  className="p-4 sm:p-5 cursor-pointer"
-                  onClick={() => handleToggle(i)}
+                  style={
+                    shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
+                  }
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-11 h-11 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300 bg-secondary/80",
-                        tool.colorClass
-                      )}>
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <div className={cn("text-xs font-semibold uppercase tracking-wider mb-0.5", tool.colorClass)}>
-                          {tool.tagline}
+                  {/* Glass background with agent color tint */}
+                  <div
+                    className={cn(
+                      "absolute inset-0 -z-10",
+                      tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_50%_94%)] via-[hsl(220_40%_97%)] to-[hsl(220_50%_95%)]",
+                      tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_50%_94%)] via-[hsl(270_40%_97%)] to-[hsl(270_50%_95%)]",
+                      tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_50%_94%)] via-[hsl(160_40%_97%)] to-[hsl(160_50%_95%)]",
+                      tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_50%_94%)] via-[hsl(340_40%_97%)] to-[hsl(340_50%_95%)]",
+                      tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_50%_94%)] via-[hsl(25_40%_97%)] to-[hsl(25_50%_95%)]",
+                      tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_50%_94%)] via-[hsl(190_40%_97%)] to-[hsl(190_50%_95%)]",
+                    )}
+                  />
+                  {/* Shimmer glass reflection - behind content */}
+                  <div
+                    className="absolute inset-0 -z-10 pointer-events-none bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.3)_35%,rgba(255,255,255,0.5)_50%,rgba(255,255,255,0.3)_65%,transparent_75%)] bg-[length:250%_100%] animate-[shimmer_3s_ease-in-out_infinite]"
+                  />
+
+                  {/* Header - clickable */}
+                  <div 
+                    className="p-4 sm:p-5 cursor-pointer"
+                    onClick={() => handleToggle(i)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-11 h-11 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300 bg-secondary/80",
+                          tool.colorClass
+                        )}>
+                          <IconComponent className="w-6 h-6" />
                         </div>
-                        <h3 className="text-base sm:text-lg font-bold text-foreground">AETHER {tool.name}</h3>
+                        <div>
+                          <div className={cn("text-xs font-semibold uppercase tracking-wider mb-0.5", tool.colorClass)}>
+                            {tool.tagline}
+                          </div>
+                          <h3 className="text-base sm:text-lg font-bold text-foreground">AETHER {tool.name}</h3>
+                        </div>
+                      </div>
+                      <div
+                        className={cn(
+                          "w-8 h-8 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
+                          isExpanded && "rotate-180 bg-primary/10"
+                        )}
+                      >
+                        <ChevronDown
+                          className={cn(
+                            "w-4 h-4",
+                            isExpanded ? "text-primary" : "text-muted-foreground"
+                          )}
+                        />
                       </div>
                     </div>
-                    <div
-                      className={cn(
-                        "w-8 h-8 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
-                        isExpanded && "rotate-180 bg-primary/10"
-                      )}
-                    >
-                      <ChevronDown
-                        className={cn(
-                          "w-4 h-4",
-                          isExpanded ? "text-primary" : "text-muted-foreground"
-                        )}
-                      />
-                    </div>
+
+                    <p className="text-muted-foreground text-sm leading-relaxed mt-3">{tool.description}</p>
+
+                    {/* Quick stats preview when collapsed */}
+                    {!isExpanded && (
+                      <div className="flex gap-4 mt-3 pt-3 border-t border-border/50">
+                        {tool.stats.slice(0, 3).map((stat, j) => (
+                          <div key={j} className="text-center">
+                            <div className={cn("text-base font-bold", tool.colorClass)}>{stat.value}</div>
+                            <div className="text-xs text-muted-foreground">{stat.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  <p className="text-muted-foreground text-sm leading-relaxed mt-3">{tool.description}</p>
-
-                  {/* Quick stats preview when collapsed */}
-                  {!isExpanded && (
-                    <div className="flex gap-4 mt-3 pt-3 border-t border-border/50">
-                      {tool.stats.slice(0, 3).map((stat, j) => (
-                        <div key={j} className="text-center">
-                          <div className={cn("text-base font-bold", tool.colorClass)}>{stat.value}</div>
-                          <div className="text-xs text-muted-foreground">{stat.label}</div>
-                        </div>
-                      ))}
+                  {/* Expanded content - inline accordion style */}
+                  {isExpanded && (
+                    <div className="px-6 pb-6">
+                      <ExpandedContent tool={tool} />
                     </div>
                   )}
                 </div>
-
-                {/* Expanded content - inline accordion style */}
-                {isExpanded && (
-                  <div className="px-6 pb-6">
-                    <ExpandedContent tool={tool} />
-                  </div>
-                )}
               </div>
             );
           })}
