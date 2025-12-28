@@ -24,7 +24,6 @@ const navSections = {
     items: [
       { label: "About Us", href: "/about", description: "Our story & mission" },
       { label: "Blog", href: "/blog", description: "News & insights" },
-      { label: "Careers", href: "/careers", description: "Join the team" },
       { label: "Contact", href: "/contact", description: "Get in touch" },
     ]
   },
@@ -84,9 +83,6 @@ export function LandingHeader() {
             </Link>
             <Link to="/blog" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
               Blog
-            </Link>
-            <Link to="/careers" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
-              Careers
             </Link>
             <Link to="/contact" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
               Contact

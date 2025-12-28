@@ -30,7 +30,6 @@ import Data from "./pages/tools/Data";
 
 // Company pages
 import About from "./pages/company/About";
-import Careers from "./pages/company/Careers";
 import Blog from "./pages/company/Blog";
 import Contact from "./pages/company/Contact";
 
@@ -72,7 +71,6 @@ const App = () => (
             
             {/* Company pages */}
             <Route path="/about" element={<About />} />
-            <Route path="/careers" element={<Careers />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/contact" element={<Contact />} />
             
