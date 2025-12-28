@@ -3,10 +3,10 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 
 const benefits = [
-  { icon: Clock, label: "Save Time" },
-  { icon: TrendingUp, label: "Boost Productivity" },
-  { icon: Target, label: "High Accuracy" },
-  { icon: Zap, label: "Quick Setup" },
+  { icon: Clock, label: "Save Time", stat: "90%" },
+  { icon: TrendingUp, label: "Boost Productivity", stat: "3x" },
+  { icon: Target, label: "High Accuracy", stat: "99%" },
+  { icon: Zap, label: "Quick Setup", stat: "5min" },
 ];
 
 export function ResultsSection() {
@@ -19,9 +19,9 @@ export function ResultsSection() {
         className="max-w-4xl mx-auto px-4 sm:px-6"
       >
         <div className={cn(
-          "flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 lg:gap-14",
+          "flex flex-wrap items-center justify-center gap-8 sm:gap-12 lg:gap-16",
           "transition-all duration-700",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          isVisible ? "opacity-100" : "opacity-0"
         )}>
           {benefits.map((benefit, i) => {
             const IconComponent = benefit.icon;
@@ -29,13 +29,18 @@ export function ResultsSection() {
               <div 
                 key={i} 
                 className={cn(
-                  "flex items-center gap-2.5 transition-all duration-500",
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                  "flex flex-col items-center text-center transition-all duration-500",
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 )}
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <IconComponent className="w-4 h-4 text-primary" strokeWidth={1.5} />
-                <span className="text-sm font-medium text-foreground">{benefit.label}</span>
+                <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">
+                  {benefit.stat}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <IconComponent className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
+                  <span className="text-xs sm:text-sm text-muted-foreground">{benefit.label}</span>
+                </div>
               </div>
             );
           })}
