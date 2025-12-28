@@ -148,3 +148,79 @@ export function BrandLogosGrid({ className, maxItems = 8, animate = true }: Bran
     </div>
   );
 }
+
+// Cloud-style layout positions for creative display
+const cloudPositions = [
+  { x: 50, y: 15, scale: 1.15, delay: 0 },
+  { x: 20, y: 35, scale: 1, delay: 80 },
+  { x: 80, y: 30, scale: 1.05, delay: 120 },
+  { x: 35, y: 55, scale: 0.95, delay: 160 },
+  { x: 65, y: 50, scale: 1.1, delay: 200 },
+  { x: 10, y: 65, scale: 0.9, delay: 240 },
+  { x: 90, y: 60, scale: 0.95, delay: 280 },
+  { x: 50, y: 75, scale: 1, delay: 320 },
+  { x: 25, y: 85, scale: 0.85, delay: 360 },
+  { x: 75, y: 80, scale: 0.9, delay: 400 },
+];
+
+interface BrandLogosCloudProps {
+  className?: string;
+  maxItems?: number;
+}
+
+export function BrandLogosCloud({ className, maxItems = 8 }: BrandLogosCloudProps) {
+  const logos = brandLogos.slice(0, Math.min(maxItems, cloudPositions.length));
+  
+  return (
+    <div className={cn("relative w-full h-48 sm:h-56 md:h-64", className)}>
+      {/* Soft glow background */}
+      <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-3xl" />
+      
+      {logos.map((logo, i) => {
+        const pos = cloudPositions[i];
+        return (
+          <div
+            key={logo.name}
+            className="absolute animate-fade-up"
+            style={{
+              left: `${pos.x}%`,
+              top: `${pos.y}%`,
+              transform: `translate(-50%, -50%) scale(${pos.scale})`,
+              animationDelay: `${pos.delay}ms`,
+            }}
+          >
+            <div
+              className="group relative w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-125 hover:shadow-xl hover:z-10"
+              style={{ backgroundColor: logo.color }}
+              title={logo.name}
+            >
+              <logo.Logo className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
+              
+              {/* Tooltip on hover */}
+              <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                <span className="text-[10px] sm:text-xs font-medium text-muted-foreground whitespace-nowrap bg-background/95 px-2 py-0.5 rounded shadow-sm border border-border/50">
+                  {logo.name}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      
+      {/* "+more" indicator */}
+      <div
+        className="absolute animate-fade-up"
+        style={{
+          left: "50%",
+          top: "92%",
+          transform: "translate(-50%, -50%)",
+          animationDelay: "450ms",
+        }}
+      >
+        <span className="text-xs text-muted-foreground font-medium bg-secondary/60 px-3 py-1 rounded-full border border-border/30">
+          +100 integrations
+        </span>
+      </div>
+    </div>
+  );
+}
