@@ -77,13 +77,6 @@ const sections = [
   }
 ];
 
-const popularArticles = [
-  { title: "How to create your first workflow", category: "Getting Started", readTime: "5 min" },
-  { title: "Connecting to Salesforce", category: "Integrations", readTime: "8 min" },
-  { title: "Using AI in your automations", category: "Advanced", readTime: "10 min" },
-  { title: "Setting up webhooks", category: "API", readTime: "6 min" },
-  { title: "Team permissions explained", category: "Admin", readTime: "4 min" }
-];
 
 export default function Documentation() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,23 +110,14 @@ export default function Documentation() {
           </div>
         </section>
 
-        {/* Popular Articles */}
+        {/* Coming Soon Notice */}
         <section className="py-12 px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-xl font-semibold text-foreground mb-6">Popular Articles</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {popularArticles.map((article) => (
-                <div 
-                  key={article.title}
-                  className="p-4 rounded-lg border border-border bg-card hover:border-primary/50 hover:shadow-sm transition-all cursor-pointer group"
-                >
-                  <span className="text-xs font-medium text-primary">{article.category}</span>
-                  <h3 className="text-sm font-medium text-foreground mt-1 group-hover:text-primary transition-colors">
-                    {article.title}
-                  </h3>
-                  <span className="text-xs text-muted-foreground">{article.readTime}</span>
-                </div>
-              ))}
+            <div className="p-6 rounded-xl border border-primary/20 bg-primary/5 text-center">
+              <h2 className="text-lg font-semibold text-foreground mb-2">Documentation Coming Soon</h2>
+              <p className="text-sm text-muted-foreground">
+                We're working on comprehensive documentation. In the meantime, contact us for any questions.
+              </p>
             </div>
           </div>
         </section>
@@ -155,13 +139,10 @@ export default function Documentation() {
                   <ul className="space-y-2">
                     {section.articles.map((article) => (
                       <li key={article}>
-                        <a 
-                          href="#" 
-                          className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                        >
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
                           <ArrowRight className="w-3 h-3" />
                           {article}
-                        </a>
+                        </span>
                       </li>
                     ))}
                   </ul>
