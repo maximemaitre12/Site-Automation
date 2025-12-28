@@ -164,25 +164,6 @@ export default function Status() {
           </div>
         </section>
 
-        {/* Subscribe */}
-        <section className="py-16 px-4">
-          <div className="max-w-xl mx-auto text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Stay Informed</h2>
-            <p className="text-muted-foreground mb-6">
-              Subscribe to receive real-time updates about AETHER system status.
-            </p>
-            <div className="flex gap-2">
-              <input 
-                type="email" 
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-lg border border-border bg-background text-foreground"
-              />
-              <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </section>
       </main>
 
       <LandingFooter />

@@ -72,9 +72,7 @@ export function LandingFooter() {
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} AETHER. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            {["Twitter", "LinkedIn", "GitHub"].map((social) => (
-              <a key={social} href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{social}</a>
-            ))}
+            <span className="text-sm text-muted-foreground">Shanghai • Paris</span>
           </div>
         </div>
       </div>
