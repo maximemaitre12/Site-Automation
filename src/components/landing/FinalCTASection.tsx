@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mail, Phone } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -65,13 +65,6 @@ export function FinalCTASection() {
           </Link>
         </div>
 
-        {/* Contact info */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-primary-foreground/70 text-sm">
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4" />
-            <span>contact@aether-ai.com</span>
-          </div>
-        </div>
       </div>
     </section>
   );
