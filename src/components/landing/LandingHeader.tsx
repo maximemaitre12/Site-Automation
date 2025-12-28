@@ -16,7 +16,6 @@ const navSections = {
   platform: {
     label: "Platform",
     items: [
-      { label: "All Products", href: "/products", description: "Explore our AI modules" },
       { label: "Documentation", href: "/resources/documentation", description: "Learn how to use AETHER" },
       { label: "API Reference", href: "/resources/api", description: "Build integrations" },
       { label: "System Status", href: "/resources/status", description: "Service availability" },
@@ -77,9 +76,6 @@ export function LandingHeader() {
             )}
             
             {/* Platform */}
-            <Link to="/products" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
-              Products
-            </Link>
             <Link to="/resources/documentation" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
               Docs
             </Link>

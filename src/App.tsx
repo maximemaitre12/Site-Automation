@@ -33,7 +33,6 @@ import About from "./pages/company/About";
 import Careers from "./pages/company/Careers";
 import Blog from "./pages/company/Blog";
 import Contact from "./pages/company/Contact";
-import Products from "./pages/company/Products";
 
 // Resources pages
 import Documentation from "./pages/resources/Documentation";
@@ -74,7 +73,6 @@ const App = () => (
             <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
             
             {/* Company pages */}
-            <Route path="/products" element={<Products />} />
             <Route path="/about" element={<About />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/blog" element={<Blog />} />
