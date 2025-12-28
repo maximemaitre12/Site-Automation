@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Sparkles, Zap, Crown, Building2, ArrowRight, Loader2 } from 'lucide-react';
+import { Check, Zap, Crown, Building2, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import aetherLogo from '@/assets/aether-new-logo.jpeg';
 
 interface Plan {
   id: string;
@@ -22,29 +23,29 @@ const plans: Plan[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: '250€',
+    price: '€250',
     priceValue: 250,
-    description: 'Idéal pour les petites équipes qui débutent',
+    description: 'Ideal for small teams getting started',
     features: [
-      '5 utilisateurs inclus',
-      '3 outils IA',
-      '1 000 requêtes IA/mois',
-      'Support email',
-      'Stockage 10 Go',
+      '5 users included',
+      '3 AI tools',
+      '1,000 AI requests/month',
+      'Email support',
+      '10 GB storage',
     ],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: '750€',
+    price: '€750',
     priceValue: 750,
-    description: 'Pour les entreprises en croissance',
+    description: 'For growing businesses',
     features: [
-      '25 utilisateurs inclus',
-      '9 outils IA complets',
-      '10 000 requêtes IA/mois',
-      'Support prioritaire 24/7',
-      'Stockage 100 Go',
+      '25 users included',
+      '9 complete AI tools',
+      '10,000 AI requests/month',
+      '24/7 priority support',
+      '100 GB storage',
       'API Access',
       'SSO & SAML',
     ],
@@ -53,19 +54,19 @@ const plans: Plan[] = [
   {
     id: 'unlimited',
     name: 'Unlimited',
-    price: 'Sur mesure',
+    price: 'Custom',
     priceValue: null,
-    description: 'Fonctionnalités illimitées pour les grandes organisations',
+    description: 'Unlimited features for large organizations',
     features: [
-      'Utilisateurs illimités',
-      'Tous les outils IA',
-      'Requêtes IA illimitées',
-      'Account Manager dédié',
-      'Stockage illimité',
-      'API illimitée',
+      'Unlimited users',
+      'All AI tools',
+      'Unlimited AI requests',
+      'Dedicated Account Manager',
+      'Unlimited storage',
+      'Unlimited API',
       'SSO, SAML, SCIM',
-      'SLA personnalisé',
-      'Formation sur site',
+      'Custom SLA',
+      'On-site training',
     ],
     contactUs: true,
   },
@@ -76,15 +77,14 @@ export default function SelectPlan() {
   const { signOut } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
 
-  const handleGoHome = async () => {
-    await signOut();
-    navigate('/');
+  const handleGoBack = () => {
+    navigate(-1);
   };
 
   const handleSelectPlan = async (plan: Plan) => {
     if (plan.contactUs) {
-      toast.info('Notre équipe commerciale vous contactera sous 24h.', {
-        description: 'Merci de votre intérêt pour le forfait Unlimited.',
+      toast.info('Our sales team will contact you within 24 hours.', {
+        description: 'Thank you for your interest in the Unlimited plan.',
       });
       return;
     }
@@ -95,8 +95,8 @@ export default function SelectPlan() {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Show error as requested
-    toast.error('Erreur de paiement', {
-      description: 'Le service de paiement est temporairement indisponible. Veuillez réessayer plus tard ou contacter le support.',
+    toast.error('Payment Error', {
+      description: 'The payment service is temporarily unavailable. Please try again later or contact support.',
     });
     
     setLoading(null);
@@ -112,13 +112,16 @@ export default function SelectPlan() {
       <div className="border-b border-border bg-card/50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
-            </div>
+            <img 
+              src={aetherLogo} 
+              alt="AETHER Logo" 
+              className="w-10 h-10 rounded-xl object-cover"
+            />
             <span className="text-xl font-bold text-foreground">AETHER</span>
           </div>
-          <Button variant="ghost" onClick={handleGoHome}>
-            Accueil
+          <Button variant="ghost" onClick={handleGoBack} className="gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Back
           </Button>
         </div>
       </div>
@@ -127,11 +130,11 @@ export default function SelectPlan() {
       <div className="flex-1 container mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Choisissez votre forfait
+            Choose Your Plan
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Sélectionnez le plan qui correspond le mieux à vos besoins. 
-            Vous pouvez changer de forfait à tout moment.
+            Select the plan that best fits your needs. 
+            You can change your plan at any time.
           </p>
         </div>
 
@@ -145,7 +148,7 @@ export default function SelectPlan() {
             >
               {plan.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                  Le plus populaire
+                  Most Popular
                 </Badge>
               )}
               
@@ -166,7 +169,7 @@ export default function SelectPlan() {
                 <div className="mt-4">
                   <span className="text-4xl font-bold text-foreground">{plan.price}</span>
                   {plan.priceValue && (
-                    <span className="text-muted-foreground">/mois</span>
+                    <span className="text-muted-foreground">/month</span>
                   )}
                 </div>
               </CardHeader>
@@ -192,13 +195,13 @@ export default function SelectPlan() {
                   {loading === plan.id ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Traitement en cours...
+                      Processing...
                     </>
                   ) : plan.contactUs ? (
-                    'Nous contacter'
+                    'Contact Us'
                   ) : (
                     <>
-                      Choisir ce forfait
+                      Choose This Plan
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   )}
@@ -209,7 +212,7 @@ export default function SelectPlan() {
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-8">
-          Tous les prix sont HT. Facturation mensuelle. Annulez à tout moment.
+          All prices exclude VAT. Monthly billing. Cancel anytime.
         </p>
       </div>
     </div>
