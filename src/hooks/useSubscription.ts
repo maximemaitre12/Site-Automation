@@ -1,54 +1,70 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-interface Subscription {
-  id: string;
-  user_id: string;
-  plan_id: string;
-  plan_name: string;
-  price_monthly: number | null;
-  status: string;
-  created_at: string;
-  updated_at: string;
+interface StripeSubscription {
+  subscribed: boolean;
+  trial: boolean;
+  trial_end: string | null;
+  product_id: string | null;
+  subscription_end: string | null;
+  status: string | null;
 }
 
 export function useSubscription() {
-  const { user } = useAuth();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const { user, session } = useAuth();
+  const [subscription, setSubscription] = useState<StripeSubscription | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
+  const checkSubscription = useCallback(async () => {
+    if (!user || !session) {
       setSubscription(null);
       setLoading(false);
       return;
     }
 
-    const fetchSubscription = async () => {
+    try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-      if (!error && data) {
-        setSubscription(data);
-      } else {
+      if (error) {
+        console.error('Error checking subscription:', error);
         setSubscription(null);
+      } else {
+        setSubscription(data);
       }
+    } catch (err) {
+      console.error('Failed to check subscription:', err);
+      setSubscription(null);
+    } finally {
       setLoading(false);
-    };
+    }
+  }, [user, session]);
 
-    fetchSubscription();
-  }, [user]);
+  useEffect(() => {
+    checkSubscription();
+  }, [checkSubscription]);
 
-  const hasActiveSubscription = subscription?.status === 'active' || subscription?.status === 'trial';
+  // Auto-refresh every minute
+  useEffect(() => {
+    if (!user) return;
+    
+    const interval = setInterval(checkSubscription, 60000);
+    return () => clearInterval(interval);
+  }, [user, checkSubscription]);
+
+  const hasActiveSubscription = subscription?.subscribed === true;
+  const isTrial = subscription?.trial === true;
 
   return {
     subscription,
     loading,
     hasActiveSubscription,
+    isTrial,
+    checkSubscription,
   };
 }
