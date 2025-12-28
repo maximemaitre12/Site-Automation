@@ -27,11 +27,28 @@ import BrainPage from "./pages/tools/Brain";
 import Compliance from "./pages/tools/Compliance";
 import Data from "./pages/tools/Data";
 
+// Company pages
+import About from "./pages/company/About";
+import Careers from "./pages/company/Careers";
+import Blog from "./pages/company/Blog";
+import Contact from "./pages/company/Contact";
+import Products from "./pages/company/Products";
+
+// Resources pages
+import Documentation from "./pages/resources/Documentation";
+import API from "./pages/resources/API";
+import Status from "./pages/resources/Status";
+
+// Legal pages
+import Privacy from "./pages/legal/Privacy";
+import Terms from "./pages/legal/Terms";
+import Security from "./pages/legal/Security";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes - data stays fresh
-      gcTime: 1000 * 60 * 30, // 30 minutes cache
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 30,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       retry: 1,
@@ -53,6 +70,23 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
             <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
+            
+            {/* Company pages */}
+            <Route path="/products" element={<Products />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/contact" element={<Contact />} />
+            
+            {/* Resources pages */}
+            <Route path="/resources/documentation" element={<Documentation />} />
+            <Route path="/resources/api" element={<API />} />
+            <Route path="/resources/status" element={<Status />} />
+            
+            {/* Legal pages */}
+            <Route path="/legal/privacy" element={<Privacy />} />
+            <Route path="/legal/terms" element={<Terms />} />
+            <Route path="/legal/security" element={<Security />} />
             
             {/* Protected routes - require subscription */}
             <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
