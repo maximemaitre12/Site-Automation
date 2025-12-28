@@ -467,21 +467,25 @@ export default function Flow() {
                     
                     {/* Right side: AI, Add Block, Execute */}
                     <div className="flex items-center gap-1 md:gap-2">
-                      <AIWorkflowGenerator 
-                        onGenerate={handleAIGenerate}
-                        onModify={handleAIModify}
-                        existingBlocks={localBlocks}
-                        existingConnections={localConnections}
-                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setIsAIGeneratorOpen(true)} 
+                        className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">IA</span>
+                      </Button>
                       <Button variant="outline" size="sm" onClick={() => setIsBlockPickerOpen(true)} className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm">
                         <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         <span className="hidden sm:inline">Block</span>
                       </Button>
                       <WorkflowExecutor
-                        workflow={selectedWorkflow}
                         blocks={localBlocks}
                         connections={localConnections}
-                        onRunCompleted={(logs, output) => handleRunCompleted(selectedWorkflow.id, logs, output)}
+                        workflowId={selectedWorkflow.id}
+                        workflowName={selectedWorkflow.name}
+                        onRunCreated={(runId, logs, output) => handleRunCompleted(selectedWorkflow.id, logs, output)}
                       />
                     </div>
                   </div>
@@ -498,6 +502,7 @@ export default function Flow() {
                       onDuplicateBlock={handleDuplicateBlock}
                       onAddConnection={handleAddConnection}
                       onRemoveConnection={handleRemoveConnection}
+                      onAddBlock={() => setIsBlockPickerOpen(true)}
                     />
                   </div>
                 </div>
@@ -562,28 +567,31 @@ export default function Flow() {
       </Dialog>
 
       {/* AI Generator Dialog */}
-      <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Generate Workflow with AI</DialogTitle>
-            <DialogDescription>Describe your workflow and AI will create it</DialogDescription>
-          </DialogHeader>
-          <AIWorkflowGenerator onGenerate={(blocks, name, desc, connections) => { handleAIGenerate(blocks, name, desc, connections); setIsAIGeneratorOpen(false); }} />
-        </DialogContent>
-      </Dialog>
+      <AIWorkflowGenerator 
+        isOpen={isAIGeneratorOpen}
+        onClose={() => setIsAIGeneratorOpen(false)}
+        onGenerate={(blocks, name, desc, connections) => { handleAIGenerate(blocks, name, desc, connections); setIsAIGeneratorOpen(false); }}
+        existingWorkflow={selectedWorkflow ? {
+          id: selectedWorkflow.id,
+          name: selectedWorkflow.name,
+          blocks: localBlocks,
+          connections: localConnections
+        } : undefined}
+        onModify={handleAIModify}
+      />
 
       {/* Template Gallery */}
       <TemplateGallery
-        open={isTemplateGalleryOpen}
-        onOpenChange={setIsTemplateGalleryOpen}
-        onSelectTemplate={handleTemplateSelect}
+        isOpen={isTemplateGalleryOpen}
+        onClose={() => setIsTemplateGalleryOpen(false)}
+        onSelect={handleTemplateSelect}
       />
 
       {/* Block Picker */}
       <BlockPickerDialog
-        open={isBlockPickerOpen}
-        onOpenChange={setIsBlockPickerOpen}
-        onSelectBlock={handleAddBlock}
+        isOpen={isBlockPickerOpen}
+        onClose={() => setIsBlockPickerOpen(false)}
+        onAddBlock={handleAddBlock}
       />
 
       {/* Delete Confirmation */}
