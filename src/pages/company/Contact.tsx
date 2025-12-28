@@ -103,19 +103,19 @@ export default function Contact() {
       
       <main className="pt-20">
         {/* Hero */}
-        <section className="py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
+        <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">We'd Love to Hear From You</span>
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4 md:mb-6">
+              <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="text-xs md:text-sm font-medium">We'd Love to Hear From You</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 md:mb-6">
               Get in{" "}
               <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
                 Touch
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
               Whether you have a question about features, pricing, or anything else, 
               our team is ready to answer all your questions.
             </p>
@@ -123,24 +123,24 @@ export default function Contact() {
         </section>
 
         {/* Contact Options */}
-        <section className="py-12 px-4">
+        <section className="py-8 md:py-12 px-4">
           <div className="max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
               {contactOptions.map((option) => (
-                <div key={option.title} className="p-6 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all group">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <option.icon className="w-6 h-6 text-primary" />
+                <div key={option.title} className="p-4 md:p-6 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all group">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                    <option.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{option.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{option.description}</p>
+                  <h3 className="font-semibold text-foreground mb-1.5 md:mb-2 text-sm md:text-base">{option.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">{option.description}</p>
                   <a 
                     href={`mailto:${option.email}`} 
-                    className="text-primary hover:underline text-sm font-medium flex items-center gap-2"
+                    className="text-primary hover:underline text-xs md:text-sm font-medium flex items-center gap-2 break-all"
                   >
                     {option.email}
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3 shrink-0" />
                   </a>
-                  <p className="text-xs text-muted-foreground mt-2">{option.response}</p>
+                  <p className="text-[10px] md:text-xs text-muted-foreground mt-2">{option.response}</p>
                 </div>
               ))}
             </div>
