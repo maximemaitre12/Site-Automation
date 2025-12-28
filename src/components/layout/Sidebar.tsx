@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
-  Sparkles,
   LogOut,
   Building2,
   Settings,
@@ -23,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebarState } from "@/hooks/useSidebar";
 import { toast } from "sonner";
+import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -66,11 +66,9 @@ export function Sidebar() {
       {/* Header */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
         <NavLink to="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src={aetherLogo} alt="Aether" className="h-8 w-auto" />
           {!collapsed && (
-            <span className="font-bold text-lg text-foreground">AETHER</span>
+            <span className="font-bold text-lg text-foreground sr-only">AETHER</span>
           )}
         </NavLink>
         {/* Close button on mobile */}
