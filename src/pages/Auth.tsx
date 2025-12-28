@@ -136,24 +136,25 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="border-b border-border bg-card/50">
-        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center shrink-0">
-            <img 
-              src={aetherLogo} 
-              alt="AETHER Logo" 
-              className="h-10 sm:h-14 w-auto"
-            />
-          </Link>
-          <Link to="/">
-            <Button variant="ghost" className="gap-2 text-sm">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back</span>
-            </Button>
-          </Link>
+      {/* Header - same style as Landing Page */}
+      <header className="border-b border-border bg-background">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2 shrink-0">
+              <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
+            </Link>
+            
+            {/* Back button */}
+            <Link to="/">
+              <span className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </span>
+            </Link>
+          </div>
         </div>
-      </div>
+      </header>
 
       <div className="flex-1 flex">
         {/* Left side - Visual (hidden on mobile) */}
