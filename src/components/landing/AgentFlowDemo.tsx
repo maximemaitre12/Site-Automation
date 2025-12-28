@@ -202,18 +202,15 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           </div>
         </div>
 
-        {/* Success CTA */}
+        {/* Success indicator */}
         <div className={cn(
           "text-center transition-all duration-700",
           showComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
-          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-medium mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-medium">
             <Check className="w-3 h-3" />
             Workflow executed
           </div>
-          <p className="text-xs font-medium text-foreground">
-            Build intelligent automations in minutes
-          </p>
         </div>
       </div>
     </div>

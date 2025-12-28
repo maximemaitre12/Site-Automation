@@ -193,34 +193,6 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
           </div>
         </div>
 
-        {/* Stats - compact */}
-        <div className={cn(
-          "grid grid-cols-3 gap-2 mb-3 transition-all duration-500",
-          phase >= 3 ? "opacity-100" : "opacity-0"
-        )}>
-          <div className="text-center p-1.5 rounded bg-primary/10">
-            <div className="text-sm font-bold text-primary">99%</div>
-            <div className="text-[8px] text-muted-foreground">Detected</div>
-          </div>
-          <div className="text-center p-1.5 rounded bg-violet-500/10">
-            <div className="text-sm font-bold text-violet-500">-90%</div>
-            <div className="text-[8px] text-muted-foreground">Audit Time</div>
-          </div>
-          <div className="text-center p-1.5 rounded bg-primary/10">
-            <div className="text-sm font-bold text-primary">$0</div>
-            <div className="text-[8px] text-muted-foreground">Fines</div>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className={cn(
-          "text-center transition-all duration-500",
-          phase >= 3 ? "opacity-100" : "opacity-0"
-        )}>
-          <p className="text-xs font-medium text-foreground">
-            Protect your business with automated compliance
-          </p>
-        </div>
       </div>
     </div>
   );

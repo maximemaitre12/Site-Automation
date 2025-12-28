@@ -99,30 +99,6 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
       <div className="absolute bottom-0 left-0 w-20 h-20 bg-blue-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
-        {/* Header stats */}
-        <div className="flex items-center justify-center gap-4 mb-3">
-          <div className={cn(
-            "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
-            phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          )}>
-            <div className="text-lg font-bold text-violet-500">{responseTime}s</div>
-            <div className="text-[9px] text-muted-foreground">Avg. Response</div>
-          </div>
-          <div className={cn(
-            "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
-            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          )}>
-            <div className="text-lg font-bold text-violet-500">{autoResolved}%</div>
-            <div className="text-[9px] text-muted-foreground">Auto-Resolved</div>
-          </div>
-          <div className={cn(
-            "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
-            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          )} style={{ transitionDelay: "150ms" }}>
-            <div className="text-lg font-bold text-violet-500">4.8</div>
-            <div className="text-[9px] text-muted-foreground">Satisfaction</div>
-          </div>
-        </div>
 
         {/* Ticket + AI response grid */}
         <div className="grid grid-cols-2 gap-3 mb-3">
@@ -200,15 +176,6 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className={cn(
-          "text-center transition-all duration-500",
-          phase >= 4 && typedMessage.length >= aiTypingMessage.length ? "opacity-100" : "opacity-0"
-        )}>
-          <p className="text-xs font-medium text-foreground">
-            Resolve 70% of support tickets automatically
-          </p>
-        </div>
       </div>
     </div>
   );
