@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { ArrowRight, FileText, Search, Brain, MessageSquare, Sparkles } from "lucide-react";
 
 const documents = [
@@ -17,35 +16,24 @@ interface AgentBrainDemoProps {
 }
 
 export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+  const ref = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(0);
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");
   const [queryComplete, setQueryComplete] = useState(false);
-  const [animationStarted, setAnimationStarted] = useState(false);
 
-  // Start animation when visible
+  // Start animation immediately on mount
   useEffect(() => {
-    if (!isVisible || animationStarted) return;
-
-    // Reset all states
-    setPhase(0);
-    setTypedQuery("");
-    setTypedResponse("");
-    setQueryComplete(false);
-    setAnimationStarted(true);
-    
-    // Start the animation sequence
     const phase1 = setTimeout(() => setPhase(1), 300);
-    const phase2 = setTimeout(() => setPhase(2), 1500);
-    const phase3 = setTimeout(() => setPhase(3), 2800);
+    const phase2 = setTimeout(() => setPhase(2), 1200);
+    const phase3 = setTimeout(() => setPhase(3), 2000);
 
     return () => {
       clearTimeout(phase1);
       clearTimeout(phase2);
       clearTimeout(phase3);
     };
-  }, [isVisible, animationStarted]);
+  }, []);
 
   useEffect(() => {
     if (phase < 3) return;
