@@ -111,13 +111,6 @@ export function CompanyEnrichment() {
     ? alerts.filter(a => a.company_id === selectedCompany.id)
     : [];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   // Show detail view if company is selected
   if (selectedCompany) {
