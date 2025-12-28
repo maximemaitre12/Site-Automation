@@ -149,10 +149,10 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
               Revenue
             </div>
             <div className="p-2 rounded bg-secondary/50 border border-border/50">
-              <div className="flex items-end justify-between h-16 gap-1.5">
+              <div className="flex items-end justify-between gap-1.5">
                 {["Q1", "Q2", "Q3", "Q4"].map((quarter, i) => (
                   <div key={quarter} className="flex-1 flex flex-col items-center gap-0.5">
-                    <div className="w-full relative flex-1 flex items-end">
+                    <div className="h-14 w-full relative flex items-end">
                       <div
                         className={cn(
                           "w-full rounded-t transition-all duration-500",
