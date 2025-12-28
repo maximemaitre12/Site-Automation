@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import aetherLogo from "@/assets/aether-logo.jpeg";
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,7 +33,7 @@ export function LandingHeader() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-xl font-semibold text-foreground">AETHER</span>
+            <img src={aetherLogo} alt="Aether" className="h-8 w-auto" />
           </Link>
           
           {/* Desktop Navigation */}
