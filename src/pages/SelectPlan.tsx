@@ -24,7 +24,7 @@ const plans = [
     id: 'starter',
     name: 'Starter',
     price: 99,
-    priceId: 'price_1SjCzsH7wcmjTpOiQjG1ToVL',
+    priceId: 'price_1SjDdfH0Zbdp95xiOR8DuSYt',
     description: '1 agent of your choice',
     icon: Zap,
     features: [
@@ -39,7 +39,7 @@ const plans = [
     id: 'business',
     name: 'Business',
     price: 249,
-    priceId: 'price_1SjCztH7wcmjTpOiFJ2DfMOm',
+    priceId: 'price_1SjDdgH0Zbdp95xibryjWuXj',
     description: '3 agents of your choice',
     icon: Rocket,
     features: [
@@ -54,7 +54,7 @@ const plans = [
     id: 'enterprise',
     name: 'Enterprise',
     price: 399,
-    priceId: 'price_1SjCzvH7wcmjTpOi4KL5q7ZH',
+    priceId: 'price_1SjDdiH0Zbdp95xi0qdIcMC6',
     description: '6 agents of your choice',
     icon: Crown,
     features: [

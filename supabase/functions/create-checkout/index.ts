@@ -13,7 +13,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 // Default price if none provided (Starter plan)
-const DEFAULT_PRICE_ID = "price_1SjCzsH7wcmjTpOiQjG1ToVL";
+const DEFAULT_PRICE_ID = "price_1SjDdfH0Zbdp95xiOR8DuSYt";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
