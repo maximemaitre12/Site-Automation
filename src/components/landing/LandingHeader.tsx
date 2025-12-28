@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkles, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
@@ -70,22 +70,24 @@ export function LandingHeader() {
           </nav>
           
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             <Link to="/auth?mode=login">
-              <Button variant="ghost" size="sm" className="text-sm">
-                Log in
-              </Button>
+              <button className="relative px-4 py-2 text-sm font-medium text-foreground rounded-full border border-border/50 bg-transparent hover:bg-muted/50 hover:border-border transition-all duration-300 group">
+                <span className="relative z-10">Log in</span>
+              </button>
             </Link>
             <Link to="/demo">
-              <Button size="sm" className="text-sm">
-                Request Demo
-              </Button>
+              <button className="relative px-4 py-2 text-sm font-medium text-primary-foreground rounded-full bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_100%] hover:bg-[position:100%_0] transition-all duration-500 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 group flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 opacity-80 group-hover:opacity-100 transition-opacity" />
+                <span>Request Demo</span>
+                <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              </button>
             </Link>
           </div>
           
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -94,14 +96,14 @@ export function LandingHeader() {
         
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg py-4 px-4">
+          <div className="md:hidden absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl py-4 px-4 animate-fade-in">
             <nav className="flex flex-col gap-1">
               {/* Home link for mobile */}
               {!isHomePage && (
                 <Link
                   to="/"
                   onClick={() => setIsMenuOpen(false)}
-                  className="py-2 px-3 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                  className="py-2.5 px-4 text-sm text-foreground hover:bg-muted rounded-lg transition-colors"
                 >
                   Home
                 </Link>
@@ -113,19 +115,24 @@ export function LandingHeader() {
                   key={link.href}
                   to={link.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="py-2 px-3 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                  className="py-2.5 px-4 text-sm text-foreground hover:bg-muted rounded-lg transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
               
               {/* CTA buttons */}
-              <div className="flex gap-3 pt-4 mt-2 border-t border-border">
-                <Link to="/auth?mode=login" className="flex-1" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full text-sm">Log in</Button>
+              <div className="flex flex-col gap-2 pt-4 mt-3 border-t border-border">
+                <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)}>
+                  <button className="w-full py-2.5 px-4 text-sm font-medium text-foreground rounded-xl border border-border bg-transparent hover:bg-muted transition-all">
+                    Log in
+                  </button>
                 </Link>
-                <Link to="/demo" className="flex-1" onClick={() => setIsMenuOpen(false)}>
-                  <Button size="sm" className="w-full text-sm">Demo</Button>
+                <Link to="/demo" onClick={() => setIsMenuOpen(false)}>
+                  <button className="w-full py-2.5 px-4 text-sm font-medium text-primary-foreground rounded-xl bg-gradient-to-r from-primary to-violet-500 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Request Demo
+                  </button>
                 </Link>
               </div>
             </nav>
