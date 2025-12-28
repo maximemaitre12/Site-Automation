@@ -25,13 +25,13 @@ const plans = [
     name: 'Starter',
     price: 99,
     priceId: 'price_1SjCzsH7wcmjTpOiQjG1ToVL',
-    description: '1 agent au choix',
+    description: '1 agent of your choice',
     icon: Zap,
     features: [
-      '1 agent IA au choix',
-      'Choisissez parmi : Data, Flow, Doc, Sales, HR, Brain ou Compliance',
-      'Workflows illimités',
-      'Support par email',
+      '1 AI agent of your choice',
+      'Choose from: Data, Flow, Doc, Sales, HR, Brain or Compliance',
+      'Unlimited workflows',
+      'Email support',
     ],
     popular: false,
   },
@@ -40,13 +40,13 @@ const plans = [
     name: 'Business',
     price: 249,
     priceId: 'price_1SjCztH7wcmjTpOiFJ2DfMOm',
-    description: '3 agents au choix',
+    description: '3 agents of your choice',
     icon: Rocket,
     features: [
-      '3 agents IA au choix',
-      'Choisissez parmi : Data, Flow, Doc, Sales, HR, Brain ou Compliance',
-      'Workflows illimités',
-      'Support prioritaire',
+      '3 AI agents of your choice',
+      'Choose from: Data, Flow, Doc, Sales, HR, Brain or Compliance',
+      'Unlimited workflows',
+      'Priority support',
     ],
     popular: true,
   },
@@ -55,14 +55,14 @@ const plans = [
     name: 'Enterprise',
     price: 399,
     priceId: 'price_1SjCzvH7wcmjTpOi4KL5q7ZH',
-    description: '6 agents au choix',
+    description: '6 agents of your choice',
     icon: Crown,
     features: [
-      '6 agents IA au choix',
-      'Choisissez parmi : Data, Flow, Doc, Sales, HR, Brain ou Compliance',
-      'Workflows illimités',
-      'Support dédié',
-      'Intégrations personnalisées',
+      '6 AI agents of your choice',
+      'Choose from: Data, Flow, Doc, Sales, HR, Brain or Compliance',
+      'Unlimited workflows',
+      'Dedicated support',
+      'Custom integrations',
     ],
     popular: false,
   },
@@ -133,7 +133,7 @@ export default function SelectPlan() {
               className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:border-primary/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 text-sm"
             >
               <X className="w-4 h-4" />
-              <span className="hidden sm:inline">Quitter</span>
+              <span className="hidden sm:inline">Exit</span>
             </button>
           </div>
         </div>
@@ -147,21 +147,21 @@ export default function SelectPlan() {
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
             <AlertDialogTitle className="text-center text-xl">
-              Êtes-vous sûr de vouloir quitter ?
+              Are you sure you want to leave?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              Vous pourrez vous reconnecter à tout moment pour continuer votre inscription.
+              You can log back in anytime to continue your registration.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
             <AlertDialogCancel className="w-full sm:w-auto">
-              Rester et choisir un plan
+              Stay and choose a plan
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmLeave}
               className="w-full sm:w-auto bg-transparent border border-border text-foreground hover:bg-muted"
             >
-              Quitter quand même
+              Leave anyway
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -173,13 +173,13 @@ export default function SelectPlan() {
           <div className="text-center mb-8 sm:mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>3 jours d'essai gratuit</span>
+              <span>3-day free trial</span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-4">
-              Choisissez votre plan
+              Choose your plan
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Sélectionnez les agents IA dont vous avez besoin. Essai gratuit de 3 jours, annulez à tout moment.
+              Select the AI agents you need. 3-day free trial, cancel anytime.
             </p>
           </div>
 
@@ -197,7 +197,7 @@ export default function SelectPlan() {
                 >
                   {plan.popular && (
                     <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                      Le plus populaire
+                      Most popular
                     </Badge>
                   )}
                   
@@ -223,7 +223,7 @@ export default function SelectPlan() {
                     </div>
                     
                     <Badge variant="secondary" className="mt-2 text-xs">
-                      Après 3 jours d'essai gratuit
+                      After 3-day free trial
                     </Badge>
                   </CardHeader>
                   
@@ -246,11 +246,11 @@ export default function SelectPlan() {
                       {loading === plan.id ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Chargement...
+                          Loading...
                         </>
                       ) : (
                         <>
-                          Commencer l'essai gratuit
+                          Start free trial
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </>
                       )}
@@ -262,12 +262,12 @@ export default function SelectPlan() {
           </div>
 
           <p className="text-center text-[10px] sm:text-xs text-muted-foreground mt-6 sm:mt-8">
-            Aucun prélèvement pendant l'essai de 3 jours. Paiement sécurisé par Stripe. Prix HT.
+            No charges during the 3-day trial. Secure payment by Stripe. Prices exclude VAT.
           </p>
           
           <p className="text-center text-sm text-muted-foreground mt-4">
             <a href="/contact" className="text-primary hover:underline transition-colors">
-              Besoin d'aide ? Contactez-nous
+              Need help? Contact us
             </a>
           </p>
         </div>
