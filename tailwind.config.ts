@@ -127,6 +127,10 @@ export default {
           from: { opacity: "0", transform: "translateY(20px) scale(0.9)" },
           to: { opacity: "1", transform: "translateY(0) scale(1)" },
         },
+        "shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
