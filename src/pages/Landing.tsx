@@ -44,8 +44,8 @@ export default function Landing() {
         <HeroSection />
         <PainPointsSection />
         <ApiSection />
-        <TestimonialSection />
         <FinalCTASection />
+        <TestimonialSection />
       </main>
       
       <LandingFooter />
