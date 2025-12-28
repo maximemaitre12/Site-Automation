@@ -16,14 +16,14 @@ const links = {
     { label: "Contact", path: "/contact" },
   ],
   resources: [
-    { label: "Documentation", path: "/docs" },
-    { label: "API", path: "/api" },
-    { label: "Status", path: "/status" },
+    { label: "Documentation", path: "/resources/documentation" },
+    { label: "API", path: "/resources/api" },
+    { label: "Status", path: "/resources/status" },
   ],
   legal: [
-    { label: "Privacy", path: "/privacy" },
-    { label: "Terms", path: "/terms" },
-    { label: "Security", path: "/security" },
+    { label: "Privacy", path: "/legal/privacy" },
+    { label: "Terms", path: "/legal/terms" },
+    { label: "Security", path: "/legal/security" },
   ],
 };
 
