@@ -95,6 +95,30 @@ export default {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
+        "cloud-float": {
+          "0%, 100%": { transform: "translateY(0) translateX(0)" },
+          "25%": { transform: "translateY(-8px) translateX(4px)" },
+          "50%": { transform: "translateY(-4px) translateX(-4px)" },
+          "75%": { transform: "translateY(-12px) translateX(2px)" },
+        },
+        "cloud-drift": {
+          "0%, 100%": { transform: "translateX(0) scale(1)" },
+          "50%": { transform: "translateX(10px) scale(1.02)" },
+        },
+        "cloud-morph": {
+          "0%, 100%": { borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" },
+          "25%": { borderRadius: "30% 60% 70% 40% / 50% 60% 30% 60%" },
+          "50%": { borderRadius: "50% 60% 30% 60% / 30% 60% 70% 40%" },
+          "75%": { borderRadius: "60% 40% 60% 30% / 70% 30% 50% 60%" },
+        },
+        "cloud-pulse": {
+          "0%, 100%": { opacity: "0.6", transform: "scale(1)" },
+          "50%": { opacity: "0.8", transform: "scale(1.05)" },
+        },
+        "cloud-fade-in": {
+          from: { opacity: "0", transform: "translateY(20px) scale(0.9)" },
+          to: { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -102,6 +126,11 @@ export default {
         "fade-in": "fade-in 0.5s ease-out forwards",
         "slide-in-left": "slide-in-left 0.4s ease-out forwards",
         "scale-in": "scale-in 0.3s ease-out forwards",
+        "cloud-float": "cloud-float 8s ease-in-out infinite",
+        "cloud-drift": "cloud-drift 6s ease-in-out infinite",
+        "cloud-morph": "cloud-morph 12s ease-in-out infinite",
+        "cloud-pulse": "cloud-pulse 4s ease-in-out infinite",
+        "cloud-fade-in": "cloud-fade-in 0.6s ease-out forwards",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

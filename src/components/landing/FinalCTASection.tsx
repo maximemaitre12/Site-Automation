@@ -9,12 +9,22 @@ export function FinalCTASection() {
 
   return (
     <section id="contact" className="py-16 sm:py-24 lg:py-32 bg-primary text-primary-foreground relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/90 animate-gradient-shift" />
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
-      </div>
+      {/* Cloud-style animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/90" />
+      
+      {/* Cloud decorations */}
+      <div 
+        className="absolute top-0 right-[10%] w-80 h-56 bg-white/10 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl animate-cloud-float"
+        style={{ animationDuration: "12s" }}
+      />
+      <div 
+        className="absolute bottom-0 left-[5%] w-64 h-48 bg-white/8 rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-3xl animate-cloud-drift"
+        style={{ animationDuration: "15s", animationDelay: "-3s" }}
+      />
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-64 bg-white/5 rounded-[50%_50%_40%_60%/40%_60%_50%_50%] blur-3xl animate-cloud-pulse"
+        style={{ animationDuration: "10s", animationDelay: "-5s" }}
+      />
 
       <div 
         ref={ref}

@@ -2,34 +2,34 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BrandLogosCloud } from "./BrandLogos";
-import { TechBackground } from "./TechBackground";
+import { FloatingClouds } from "./CloudShapes";
 
 export function HeroSection() {
   return (
     <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center bg-background pt-20 md:pt-14 overflow-hidden">
-      {/* Tech background */}
-      <TechBackground variant="combined" intensity="subtle" />
+      {/* Cloud-style background */}
+      <FloatingClouds />
       
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32 text-center">
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32 text-center z-10">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-6 sm:mb-8 animate-fade-up">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-6 sm:mb-8 animate-cloud-fade-in">
           <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           <span>Next-Generation AI Automation</span>
         </div>
         
         {/* Headline */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight text-foreground leading-[1.1] mb-4 sm:mb-6 animate-fade-up text-balance">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight text-foreground leading-[1.1] mb-4 sm:mb-6 animate-cloud-fade-in text-balance" style={{ animationDelay: "0.1s" }}>
           AI That Works{" "}
           <span className="text-primary">For You</span>
         </h1>
         
         {/* Subtitle */}
-        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed animate-fade-up-delay-1 px-2">
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed animate-cloud-fade-in px-2" style={{ animationDelay: "0.2s", opacity: 0 }}>
           6 specialized AI agents. One platform. Automate your operations in support, HR, sales, and compliance — without writing a single line of code.
         </p>
         
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 animate-fade-up-delay-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 animate-cloud-fade-in" style={{ animationDelay: "0.3s", opacity: 0 }}>
           <Link to="/signup" className="w-full sm:w-auto">
             <Button 
               size="lg" 
@@ -51,7 +51,7 @@ export function HeroSection() {
         </div>
 
         {/* Real brand logos cloud */}
-        <div className="animate-fade-up-delay-3">
+        <div className="animate-cloud-fade-in" style={{ animationDelay: "0.4s", opacity: 0 }}>
           <p className="text-xs text-muted-foreground mb-2">Integrates with your favorite tools</p>
           <BrandLogosCloud maxItems={8} />
         </div>
