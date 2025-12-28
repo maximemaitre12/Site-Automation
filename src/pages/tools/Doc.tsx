@@ -1,14 +1,29 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAetherDocs, AetherDocument, DocFolder } from "@/hooks/useAetherDocs";
 import { DocSidebar } from "@/components/doc/DocSidebar";
 import { DocGrid } from "@/components/doc/DocGrid";
 import { DocHeader } from "@/components/doc/DocHeader";
+import { DocStats } from "@/components/doc/DocStats";
+import { DocCategoryTabs, DocCategory } from "@/components/doc/DocCategoryTabs";
 import { DocUploadDialog } from "@/components/doc/DocUploadDialog";
 import { DocGenerateDialog } from "@/components/doc/DocGenerateDialog";
 import { DocViewerDialog } from "@/components/doc/DocViewerDialog";
-import { Loader2, Menu, X, FileText } from "lucide-react";
+import { Loader2, Menu, X, FileText, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Map template categories to document categories
+const templateCategoryMap: Record<string, DocCategory> = {
+  'hr': 'hr',
+  'sales': 'sales',
+  'compliance': 'compliance',
+  'report': 'report',
+  'project': 'project',
+  'proposal': 'sales',
+  'contract': 'hr',
+  'procedure': 'compliance',
+  'general': 'all'
+};
 
 export default function DocPage() {
   const {
@@ -38,6 +53,58 @@ export default function DocPage() {
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<DocCategory>('all');
+
+  // Filter documents by category
+  const filteredDocuments = useMemo(() => {
+    if (activeCategory === 'all') return documents;
+    if (activeCategory === 'ai') return documents.filter(d => d.ai_summary);
+    
+    // Filter by template category
+    return documents.filter(doc => {
+      if (!doc.template_id) return false;
+      const template = templates.find(t => t.id === doc.template_id);
+      if (!template) return false;
+      const mappedCategory = templateCategoryMap[template.category] || 'all';
+      return mappedCategory === activeCategory;
+    });
+  }, [documents, activeCategory, templates]);
+
+  // Count documents per category
+  const categoryCounts = useMemo(() => {
+    const counts: Record<DocCategory, number> = {
+      all: documents.length,
+      hr: 0,
+      sales: 0,
+      compliance: 0,
+      report: 0,
+      project: 0,
+      ai: documents.filter(d => d.ai_summary).length
+    };
+
+    documents.forEach(doc => {
+      if (doc.template_id) {
+        const template = templates.find(t => t.id === doc.template_id);
+        if (template) {
+          const mappedCategory = templateCategoryMap[template.category];
+          if (mappedCategory && mappedCategory !== 'all') {
+            counts[mappedCategory]++;
+          }
+        }
+      }
+    });
+
+    return counts;
+  }, [documents, templates]);
+
+  // Filter templates by active category for generation dialog
+  const filteredTemplates = useMemo(() => {
+    if (activeCategory === 'all' || activeCategory === 'ai') return templates;
+    return templates.filter(t => {
+      const mappedCategory = templateCategoryMap[t.category];
+      return mappedCategory === activeCategory;
+    });
+  }, [templates, activeCategory]);
 
   const currentFolderData = currentFolder 
     ? folders.find(f => f.id === currentFolder) 
@@ -85,7 +152,7 @@ export default function DocPage() {
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
+        <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border shrink-0 bg-gradient-to-r from-violet-600/5 to-purple-500/5">
           <div className="flex items-center gap-2 md:gap-3">
             <button
               className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted shrink-0"
@@ -93,15 +160,33 @@ export default function DocPage() {
             >
               {showMobileSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center shrink-0">
-              <FileText className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center shrink-0 shadow-lg shadow-violet-500/20">
+              <FileText className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Doc</h1>
-              <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Gestion intelligente de documents</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">AETHER Doc</h1>
+                <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  <Sparkles className="w-3 h-3" />
+                  IA intégrée
+                </span>
+              </div>
+              <p className="text-xs md:text-sm text-muted-foreground hidden md:block">
+                Génération et gestion intelligente de documents professionnels
+              </p>
             </div>
           </div>
         </header>
+
+        {/* Stats Dashboard */}
+        <DocStats documents={documents} foldersCount={folders.length} />
+
+        {/* Category Tabs */}
+        <DocCategoryTabs 
+          activeCategory={activeCategory} 
+          onCategoryChange={setActiveCategory}
+          counts={categoryCounts}
+        />
 
         {/* Main content area */}
         <div className="flex flex-1 overflow-hidden relative">
@@ -149,7 +234,7 @@ export default function DocPage() {
             />
 
             <DocGrid
-              documents={documents}
+              documents={filteredDocuments}
               folders={folders.filter(f => f.parent_id === currentFolder)}
               viewMode={viewMode}
               onDocumentClick={handleDocumentClick}
@@ -170,7 +255,7 @@ export default function DocPage() {
         <DocGenerateDialog
           open={generateDialogOpen}
           onOpenChange={setGenerateDialogOpen}
-          templates={templates}
+          templates={filteredTemplates}
           onGenerate={handleGenerate}
         />
 

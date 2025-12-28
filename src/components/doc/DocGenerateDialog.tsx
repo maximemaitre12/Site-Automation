@@ -38,7 +38,10 @@ const categoryIcons: Record<string, React.ElementType> = {
   report: ClipboardList,
   procedure: FileText,
   project: FolderKanban,
-  general: FileText
+  general: FileText,
+  hr: FileSignature,
+  sales: Presentation,
+  compliance: ClipboardList
 };
 
 const categoryLabels: Record<string, string> = {
@@ -47,7 +50,10 @@ const categoryLabels: Record<string, string> = {
   report: 'Rapport',
   procedure: 'Procédure',
   project: 'Projet',
-  general: 'Général'
+  general: 'Général',
+  hr: 'Ressources Humaines',
+  sales: 'Commercial',
+  compliance: 'Conformité'
 };
 
 export function DocGenerateDialog({
