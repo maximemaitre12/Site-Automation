@@ -145,12 +145,12 @@ export default function Auth() {
               <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
             </Link>
             
-            {/* Back button */}
-            <Link to="/">
-              <span className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </span>
+            {/* Back button - stylized icon only */}
+            <Link 
+              to="/"
+              className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5" />
             </Link>
           </div>
         </div>
