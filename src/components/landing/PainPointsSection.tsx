@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useState, useRef, type CSSProperties } from "react";
 import { 
   Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart,
   ChevronDown, Workflow, MessageSquare, FileText, Target, Users,
@@ -100,192 +100,249 @@ const tools: Tool[] = [
       { value: "100+", label: "Supported Formats" },
     ],
     useCases: [
-      "Internal legal assistant",
-      "Product knowledge base",
-      "Smart employee FAQ",
-      "Contract analysis",
+      "Instant document search",
+      "Automated FAQ responses",
+      "Internal knowledge base",
+      "Contextual report generation",
     ],
   },
   {
     name: "Support",
-    tagline: "Conversational AI",
-    description: "Autonomous ticket resolution with continuous learning. Significant time reduction.",
-    icon: Sparkles,
+    tagline: "Empathic Agent",
+    description: "AI that handles tickets, detects urgency, and resolves issues before they escalate.",
+    icon: MessageSquare,
     color: "bg-emerald-500",
     colorClass: "text-emerald-500",
     features: [
-      { icon: Bot, title: "24/7 Auto-Responses", description: "AI resolves 70% of requests without human intervention. Available nights and weekends." },
-      { icon: Target, title: "Smart Routing", description: "Content and urgency analysis to direct to the right agent with full context." },
-      { icon: Clock, title: "Predictive SLA", description: "Response time anticipation, pre-breach alerts, automatic prioritization." },
-      { icon: BarChart3, title: "Real-Time Analytics", description: "Customer satisfaction, resolution time, recurring topics, agent performance." },
+      { icon: Mail, title: "Omnichannel", description: "Unified management of emails, chat, phone, social media in one interface." },
+      { icon: AlertTriangle, title: "Urgency Detection", description: "AI automatically prioritizes tickets based on sentiment and business impact." },
+      { icon: Bot, title: "Smart Auto-Response", description: "Contextual automatic responses based on ticket history and knowledge base." },
+      { icon: TrendingUp, title: "Predictive Analytics", description: "Anticipate support peaks and recurring issues before they occur." },
     ],
     workflow: [
-      { label: "Ticket In", icon: Mail },
+      { label: "Ticket Received", icon: Mail },
       { label: "AI Classification", icon: Brain },
-      { label: "Auto Response", icon: Bot },
-      { label: "Escalate if Needed", icon: Users },
+      { label: "Auto-Response", icon: MessageSquare },
+      { label: "Resolution", icon: CheckCircle2 },
     ],
     stats: [
-      { value: "70%", label: "Auto Resolution" },
-      { value: "-60%", label: "Response Time" },
+      { value: "70%", label: "Auto-Resolved" },
+      { value: "-40%", label: "Response Time" },
       { value: "4.8/5", label: "Satisfaction" },
     ],
     useCases: [
-      "E-commerce customer support",
-      "Internal IT help desk",
-      "Technical product support",
-      "Complaint management",
+      "24/7 customer support",
+      "Technical ticket triage",
+      "SLA monitoring",
+      "Trend analysis",
     ],
   },
   {
     name: "HR",
-    tagline: "Predictive Matching",
-    description: "AI predicts candidate-position compatibility and accelerates your hiring process.",
-    icon: ScanSearch,
-    color: "bg-orange-500",
-    colorClass: "text-orange-500",
+    tagline: "Talent Agent",
+    description: "From sourcing to onboarding, AI transforms your recruitment process.",
+    icon: Users,
+    color: "bg-pink-500",
+    colorClass: "text-pink-500",
     features: [
-      { icon: FileSpreadsheet, title: "Smart CV Parsing", description: "Automatic extraction: skills, experiences, education, languages. Profile standardization." },
-      { icon: Target, title: "Match Score", description: "AI algorithm comparing profile and job requirements. Explained compatibility score." },
-      { icon: Mic, title: "Interview Analysis", description: "Transcription, speech analysis, soft skills detection, objective post-interview report." },
-      { icon: Calendar, title: "Smart Scheduling", description: "Slot suggestions, automatic follow-ups, calendar sync, reminders." },
+      { icon: FileSpreadsheet, title: "CV Parsing", description: "Automatic extraction of skills, experience, qualifications with 98% accuracy." },
+      { icon: Target, title: "Intelligent Matching", description: "AI scores candidates based on culture fit, skills, and team dynamics." },
+      { icon: Calendar, title: "Interview Scheduling", description: "Automatic scheduling with calendar sync and intelligent reminders." },
+      { icon: Mic, title: "Interview Analysis", description: "Transcription and analysis of interviews for objective evaluation." },
     ],
     workflow: [
       { label: "CV Received", icon: FileText },
       { label: "AI Parsing", icon: Brain },
       { label: "Matching", icon: Target },
-      { label: "Interview", icon: Mic },
+      { label: "Schedule", icon: Calendar },
     ],
     stats: [
-      { value: "-75%", label: "Screening Time" },
-      { value: "92%", label: "Match Accuracy" },
-      { value: "2x", label: "More Hires" },
+      { value: "3x", label: "Faster Hiring" },
+      { value: "85%", label: "Match Accuracy" },
+      { value: "-60%", label: "Admin Time" },
     ],
     useCases: [
-      "Volume recruiting",
-      "Tech profile hunting",
+      "Volume recruitment",
+      "Executive search",
       "Internal mobility",
-      "Talent management",
+      "Skill mapping",
     ],
   },
   {
     name: "Compliance",
-    tagline: "Proactive Detection",
-    description: "Anticipate risks before they occur. Automated GDPR compliance.",
+    tagline: "Regulatory Vigilance",
+    description: "Stay compliant 24/7 with AI that monitors, alerts, and documents.",
     icon: ShieldCheck,
-    color: "bg-rose-500",
-    colorClass: "text-rose-500",
+    color: "bg-orange-500",
+    colorClass: "text-orange-500",
     features: [
-      { icon: Search, title: "Automatic Scan", description: "Continuous analysis of your documents, emails, databases. Sensitive data detection." },
-      { icon: AlertTriangle, title: "Real-Time Alerts", description: "Immediate notification on detected risk: exposed data, non-compliant clause, approaching deadline." },
-      { icon: FileCheck, title: "Compliance Reports", description: "Automatic generation of GDPR reports, audits, processing registers, compliance evidence." },
-      { icon: Scale, title: "Regulatory Watch", description: "Legal evolution tracking, process impact, compliance recommendations." },
+      { icon: Shield, title: "Risk Monitoring", description: "Continuous scanning of internal processes for anomalies and non-compliance." },
+      { icon: FileCheck, title: "Auto Documentation", description: "Automatic generation of audit and compliance reports." },
+      { icon: AlertTriangle, title: "Proactive Alerts", description: "Instant notifications for detected risks with remediation recommendations." },
+      { icon: Database, title: "Audit Trail", description: "Complete and immutable traceability of all compliance actions." },
     ],
     workflow: [
-      { label: "Data Scan", icon: Search },
-      { label: "Risk Detection", icon: AlertTriangle },
+      { label: "Scan", icon: ScanSearch },
+      { label: "Detection", icon: AlertTriangle },
       { label: "Alert", icon: Mail },
       { label: "Report", icon: FileCheck },
     ],
     stats: [
-      { value: "99%", label: "Risks Detected" },
-      { value: "-90%", label: "Audit Time" },
-      { value: "$0", label: "GDPR Fines" },
+      { value: "99.9%", label: "Detection Rate" },
+      { value: "24/7", label: "Monitoring" },
+      { value: "100%", label: "Traceability" },
     ],
     useCases: [
-      "GDPR Compliance",
-      "Contract audit",
-      "Health data protection",
-      "M&A Due diligence",
+      "GDPR compliance",
+      "Internal audits",
+      "Risk prevention",
+      "Regulatory reporting",
     ],
   },
   {
     name: "Sales",
-    tagline: "Intelligent Forecasting",
-    description: "Forecast revenue, analyze sentiment, and generate winning proposals.",
+    tagline: "Revenue Intelligence",
+    description: "AI that qualifies, prioritizes, and accelerates every sales opportunity.",
     icon: LineChart,
     color: "bg-cyan-500",
     colorClass: "text-cyan-500",
     features: [
-      { icon: TrendingUp, title: "AI Forecasting", description: "30/60/90 day revenue prediction. Deal analysis, closing probabilities, at-risk deal alerts." },
-      { icon: Phone, title: "Call Analysis", description: "Transcription, sentiment analysis, objection detection, key points, personalized coaching." },
-      { icon: FileText, title: "Auto-Generated Proposals", description: "Create personalized quotes and proposals based on client context." },
-      { icon: Handshake, title: "Negotiation Sheets", description: "Complete brief before meetings: history, stakes, competition, key arguments, floor price." },
+      { icon: Star, title: "Lead Scoring", description: "AI scoring of prospects based on behavior, profile, and conversion likelihood." },
+      { icon: Phone, title: "Call Analysis", description: "Automatic transcription and analysis of calls with improvement suggestions." },
+      { icon: Building2, title: "Company Enrichment", description: "Automatic enrichment with financial data, news, and key contacts." },
+      { icon: Handshake, title: "Negotiation Sheets", description: "AI-generated negotiation guides with personalized strategies." },
     ],
     workflow: [
-      { label: "Client Call", icon: Phone },
-      { label: "Transcription", icon: FileText },
-      { label: "AI Analysis", icon: Brain },
-      { label: "Actions", icon: CheckCircle2 },
+      { label: "Lead", icon: Target },
+      { label: "Scoring", icon: Star },
+      { label: "Enrichment", icon: Database },
+      { label: "Close", icon: Handshake },
     ],
     stats: [
-      { value: "+35%", label: "Conversion Rate" },
-      { value: "95%", label: "Forecast Accuracy" },
-      { value: "-50%", label: "Proposal Time" },
+      { value: "+45%", label: "Conversion Rate" },
+      { value: "2x", label: "Pipeline Velocity" },
+      { value: "+30%", label: "Deal Size" },
     ],
     useCases: [
-      "B2B sales team",
-      "Inside sales",
-      "Account management",
+      "Lead qualification",
+      "Sales coaching",
+      "Pipeline forecasting",
       "Business development",
     ],
   },
 ];
 
+// Inline expanded content component
+function ExpandedContent({ tool }: { tool: Tool }) {
+  return (
+    <div className="pt-6 border-t border-border/50 animate-cloud-fade-in">
+      {/* Agent-specific animated demos */}
+      <div className="mb-6">
+        {tool.name === "Flow" && <AgentFlowDemo />}
+        {tool.name === "Brain" && <AgentBrainDemo />}
+        {tool.name === "Support" && <AgentSupportDemo />}
+        {tool.name === "HR" && <AgentHRDemo />}
+        {tool.name === "Compliance" && <AgentComplianceDemo />}
+        {tool.name === "Sales" && <AgentSalesDemo />}
+      </div>
+
+      {/* Features grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+        {tool.features.map((feature, j) => {
+          const FeatureIcon = feature.icon;
+          return (
+            <div
+              key={j}
+              className="p-3 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-all duration-300"
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={cn(
+                    "w-9 h-9 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] flex items-center justify-center shrink-0",
+                    tool.color + "/20"
+                  )}
+                >
+                  <FeatureIcon
+                    className={cn("w-4 h-4", tool.colorClass)}
+                    strokeWidth={1.5}
+                  />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-foreground mb-0.5">
+                    {feature.title}
+                  </div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Stats and use cases */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Stats */}
+        <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-4">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Measured Results
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {tool.stats.map((stat, j) => (
+              <div key={j} className="text-center">
+                <div className={cn("text-xl font-bold", tool.colorClass)}>
+                  {stat.value}
+                </div>
+                <div className="text-xs text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Use cases */}
+        <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-4">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Use Cases
+          </div>
+          <ul className="space-y-1.5">
+            {tool.useCases.map((useCase, j) => (
+              <li key={j} className="flex items-center gap-2 text-sm text-foreground">
+                <CheckCircle2
+                  className={cn("w-3.5 h-3.5 shrink-0", tool.colorClass)}
+                />
+                {useCase}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="mt-5 text-center">
+        <Link to="/signup">
+          <Button className={cn("shadow-lg", tool.color, "hover:opacity-90")}>
+            Create Your Agent
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const shouldStagger = isVisible && expandedIndex === null;
-
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const expandedPanelRef = useRef<HTMLDivElement | null>(null);
-  const pinRef = useRef<{ index: number; top: number } | null>(null);
-
-  const expandedTool = expandedIndex !== null ? tools[expandedIndex] : null;
 
   const handleToggle = (index: number) => {
-    const el = cardRefs.current[index];
-    pinRef.current = el ? { index, top: el.getBoundingClientRect().top } : null;
-
-    const next = expandedIndex === index ? null : index;
-    setExpandedIndex(next);
+    setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  // Apply scroll correction before paint to avoid visible "teleport".
-  useLayoutEffect(() => {
-    const pin = pinRef.current;
-    if (!pin) return;
-
-    const el = cardRefs.current[pin.index];
-    if (!el) {
-      pinRef.current = null;
-      return;
-    }
-
-    const newTop = el.getBoundingClientRect().top;
-    const delta = pin.top - newTop;
-    if (Math.abs(delta) > 0.5) {
-      window.scrollTo({ top: window.scrollY + delta, behavior: "auto" });
-    }
-
-    pinRef.current = null;
-  }, [expandedIndex]);
-
-  // Then optionally smooth-scroll to the panel if it's out of view.
-  useEffect(() => {
-    if (expandedIndex === null) return;
-    const panel = expandedPanelRef.current;
-    if (!panel) return;
-
-    const rect = panel.getBoundingClientRect();
-    if (rect.top > window.innerHeight * 0.75 || rect.top < 0) {
-      panel.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [expandedIndex]);
-
-
   return (
-    <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50" style={{ overflowAnchor: "none" }}>
+    <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
@@ -297,11 +354,11 @@ export function PainPointsSection() {
           </p>
         </div>
         
-        {/* Tools grid */}
+        {/* Tools grid - single column for proper accordion behavior */}
         <div 
           ref={ref}
           className={cn(
-            "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 stagger-children",
+            "flex flex-col gap-4 sm:gap-6 stagger-children",
             isVisible && "visible"
           )}
         >
@@ -316,18 +373,14 @@ export function PainPointsSection() {
                   cardRefs.current[i] = el;
                 }}
                 className={cn(
-                  "group relative rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
+                  "group relative rounded-2xl bg-background border transition-all duration-500 overflow-hidden",
                   isExpanded
                     ? "border-primary shadow-xl shadow-primary/10"
                     : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
                 )}
                 style={
-                  ({
-                    overflowAnchor: "none",
-                    ...(shouldStagger ? { transitionDelay: `${i * 100}ms` } : {}),
-                  } as CSSProperties)
+                  shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
                 }
-                onClick={() => handleToggle(i)}
               >
                 {/* Cloud decoration behind card */}
                 <div
@@ -338,11 +391,13 @@ export function PainPointsSection() {
                       ? "bg-gradient-to-br from-[hsl(200_80%_75%)] to-[hsl(220_70%_85%)]"
                       : "bg-gradient-to-br from-[hsl(260_70%_75%)] to-[hsl(280_60%_85%)]"
                   )}
-                  style={{ animationDuration: `${12 + i * 2}s` }}
                 />
 
-                {/* Header - always visible */}
-                <div className="p-6">
+                {/* Header - clickable */}
+                <div 
+                  className="p-6 cursor-pointer"
+                  onClick={() => handleToggle(i)}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
                       <div
@@ -389,119 +444,17 @@ export function PainPointsSection() {
                     </div>
                   )}
                 </div>
+
+                {/* Expanded content - inline accordion style */}
+                {isExpanded && (
+                  <div className="px-6 pb-6">
+                    <ExpandedContent tool={tool} />
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
-
-        {expandedTool && (
-          <div
-            ref={expandedPanelRef}
-            className="mt-6 lg:mt-8 scroll-mt-24"
-            style={{ overflowAnchor: "none" }}
-          >
-            <div
-              className={cn(
-                "rounded-2xl bg-background border border-primary/20 shadow-xl shadow-primary/10 overflow-hidden",
-                "animate-enter"
-              )}
-            >
-              <div className="p-6">
-                {/* Agent-specific animated demos */}
-                <div className="mb-8">
-                  {expandedTool.name === "Flow" && <AgentFlowDemo />}
-                  {expandedTool.name === "Brain" && <AgentBrainDemo />}
-                  {expandedTool.name === "Support" && <AgentSupportDemo />}
-                  {expandedTool.name === "HR" && <AgentHRDemo />}
-                  {expandedTool.name === "Compliance" && <AgentComplianceDemo />}
-                  {expandedTool.name === "Sales" && <AgentSalesDemo />}
-                </div>
-
-                {/* Features grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  {expandedTool.features.map((feature, j) => {
-                    const FeatureIcon = feature.icon;
-                    return (
-                      <div
-                        key={j}
-                        className="p-4 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-md"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div
-                            className={cn(
-                              "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                              expandedTool.color + "/20"
-                            )}
-                          >
-                            <FeatureIcon
-                              className={cn("w-5 h-5", expandedTool.colorClass)}
-                              strokeWidth={1.5}
-                            />
-                          </div>
-                          <div>
-                            <div className="text-sm font-semibold text-foreground mb-1">
-                              {feature.title}
-                            </div>
-                            <div className="text-xs text-muted-foreground leading-relaxed">
-                              {feature.description}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Stats and use cases */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Stats */}
-                  <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                      Measured Results
-                    </div>
-                    <div className="grid grid-cols-3 gap-4">
-                      {expandedTool.stats.map((stat, j) => (
-                        <div key={j} className="text-center">
-                          <div className={cn("text-2xl font-bold", expandedTool.colorClass)}>
-                            {stat.value}
-                          </div>
-                          <div className="text-xs text-muted-foreground">{stat.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Use cases */}
-                  <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                      Use Cases
-                    </div>
-                    <ul className="space-y-2">
-                      {expandedTool.useCases.map((useCase, j) => (
-                        <li key={j} className="flex items-center gap-2 text-sm text-foreground">
-                          <CheckCircle2
-                            className={cn("w-4 h-4 shrink-0", expandedTool.colorClass)}
-                          />
-                          {useCase}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <div className="mt-6 text-center">
-                  <Link to="/signup">
-                    <Button className={cn("shadow-lg", expandedTool.color, "hover:opacity-90")}>
-                      Create Your Agent
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
