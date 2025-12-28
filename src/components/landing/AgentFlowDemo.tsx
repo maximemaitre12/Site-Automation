@@ -144,10 +144,9 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
             {dataParticles.map((step, i) => (
               <div
                 key={i}
-                className="absolute top-1/2 w-2 h-2 bg-blue-400 rounded-full -translate-y-1/2 animate-ping hidden md:block"
+                className="absolute top-1/2 w-2 h-2 bg-blue-400/80 rounded-full -translate-y-1/2 animate-fade-in hidden md:block"
                 style={{
                   left: `${(step / (workflowSteps.length - 1)) * 100}%`,
-                  animationDuration: "1s"
                 }}
               />
             ))}
@@ -167,7 +166,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                           isActive
                             ? `${step.color} scale-100`
                             : "bg-secondary scale-90",
-                          isCurrent && "ring-4 ring-blue-500/30 animate-pulse"
+                          isCurrent && "ring-2 ring-blue-500/25"
                         )}
                       >
                         {showComplete && i === workflowSteps.length - 1 ? (
