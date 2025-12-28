@@ -398,7 +398,7 @@ export default function Compliance() {
                                         risk.severity === 'low' && "border-blue-500 text-blue-600"
                                       )}
                                     >
-                                      {risk.title?.slice(0, 20) || 'Risque'}...
+                                      {risk.category?.slice(0, 20) || 'Risque'}...
                                     </Badge>
                                   ))}
                                   {audit.risks.length > 3 && (
@@ -423,9 +423,9 @@ export default function Compliance() {
         <ReportDialog
           open={reportDialogOpen}
           onOpenChange={setReportDialogOpen}
-          audit={selectedAudit}
           report={report}
           loading={generatingReport}
+          auditTitle={selectedAudit?.title || 'Audit'}
         />
       </div>
     </DashboardLayout>
