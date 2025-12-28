@@ -24,7 +24,7 @@ export function HeroSection() {
         
         {/* Subtitle */}
         <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed animate-cloud-fade-in px-2" style={{ animationDelay: "0.2s", opacity: 0 }}>
-          6 specialized AI agents. One platform. Automate your operations in support, HR, sales, and compliance — without writing a single line of code.
+          6 specialized AI agents. One platform. Automate your operations in support, HR, sales, and compliance, without writing a single line of code.
         </p>
         
         {/* Real brand logos cloud - moved above CTAs */}

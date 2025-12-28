@@ -223,7 +223,7 @@ The scene is surprisingly global
 
 One thing we didn't expect: Shanghai's tech community is incredibly international. Meetups in Jing'an draw founders and engineers from everywhere. WeChat groups connect French entrepreneurs, American engineers, Chinese investors.
 
-We found advisors, early users, and ideas in this mix. AETHER's global perspective—building for businesses everywhere, not just one market—came directly from being here.
+We found advisors, early users, and ideas in this mix. AETHER's global perspective, building for businesses everywhere, not just one market, came directly from being here.
 
 No money forces creativity
 
