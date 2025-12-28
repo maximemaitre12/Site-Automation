@@ -72,7 +72,7 @@ export function TestimonialSection() {
               <span
                 key={index}
                 className={cn(
-                  "inline-block animate-fade-in",
+                  "inline animate-fade-in mr-[0.3em]",
                   isHighlight ? "text-primary font-semibold" : "text-foreground"
                 )}
                 style={{ 
@@ -80,7 +80,7 @@ export function TestimonialSection() {
                   animationDuration: "300ms"
                 }}
               >
-                {word}{" "}
+                {word}
               </span>
             );
           })}
