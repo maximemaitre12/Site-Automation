@@ -28,25 +28,17 @@ Shanghai: The Perfect Incubator
 
 The city's vibrant startup ecosystem provided the perfect backdrop. While their classmates explored the Bund and Yu Garden, Youriy and Maxime spent their weekends in co-working spaces, absorbing everything they could about machine learning, enterprise software, and automation.
 
-The first prototype of AETHER was built in a small apartment in Pudong, with the iconic Shanghai skyline as their backdrop. Late nights fueled by baozi and endless cups of tea, they coded the foundation of what would become an enterprise AI platform.
+The first prototype of AETHER was built in a small apartment in Putuo, with the iconic Shanghai skyline as their backdrop. Late nights fueled by baozi and endless cups of tea, they coded the foundation of what would become an enterprise AI platform.
 
-From Zero to One
+The Vision
 
-"We didn't have much funding," admits Youriy. "But we had conviction. We knew that enterprises were wasting millions of hours on tasks that AI could handle in seconds."
-
-The breakthrough came when they demonstrated their MVP to a logistics company in Pudong. The CEO, impressed by what two French students had built, became their first beta customer.
-
-By the end of their exchange program, they had a working product and three beta clients – all Chinese companies impressed by what they had built in just a few months.
+"We don't have much funding," admits Youriy. "But we have conviction. We know that enterprises waste countless hours on tasks that AI could handle in seconds."
 
 The Road Ahead
 
-Today, AETHER continues to grow and serve enterprises globally. But Youriy and Maxime never forgot their roots.
+The AETHER journey is just beginning. With ambitious plans for 2025 – including new AI capabilities and innovative features – the two founders are building something they believe in.
 
-"We still have a team in Shanghai," says Maxime with a smile. "And every time we visit, we go back to that first coffee shop in Putuo. It reminds us why we started."
-
-The AETHER journey is far from over. With ambitious plans for 2025 – including new AI capabilities, global expansion, and innovative partnerships – the two founders are just getting started.
-
-"We want to make enterprise AI accessible to everyone," concludes Youriy. "Not just the Fortune 500, but every business that wants to work smarter. That's the AETHER mission."`
+"We want to make enterprise AI accessible to everyone," concludes Youriy. "Not just large corporations, but every business that wants to work smarter. That's the AETHER mission."`
 };
 
 const posts = [
