@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Blog", href: "/blog" },
   { label: "Docs", href: "/resources/documentation" },
   { label: "Contact", href: "/contact" },
+  { label: "Privacy", href: "/legal/privacy" },
 ];
 
 export function LandingHeader() {
