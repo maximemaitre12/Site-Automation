@@ -163,13 +163,21 @@ export default function Auth() {
       {/* Right side - Form */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-2xl text-foreground">AETHER</span>
-          </Link>
+          {/* Logo & Back */}
+          <div className="flex items-center justify-between mb-8">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <span className="font-bold text-2xl text-foreground">AETHER</span>
+            </Link>
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour
+              </Button>
+            </Link>
+          </div>
 
           {/* Header */}
           <h1 className="text-3xl font-bold text-foreground mb-2">
