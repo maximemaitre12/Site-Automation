@@ -166,12 +166,14 @@ export default function Auth() {
         <div className="w-full max-w-md">
           {/* Logo & Back */}
           <div className="flex items-center justify-between mb-8">
-            <Link to="/" className="flex items-center gap-3">
-              <img src={aetherLogo} alt="Aether" className="h-12 w-auto" />
+            <Link to="/" className="flex items-center gap-3 group">
+              <img src={aetherLogo} alt="Aether" className="h-12 w-auto group-hover:scale-105 transition-transform" />
             </Link>
-            <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group">
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              <span>Retour</span>
+            <Link 
+              to="/" 
+              className="w-9 h-9 rounded-full bg-secondary/80 border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-primary/30 hover:scale-105 transition-all duration-300 group"
+            >
+              <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </Link>
           </div>
 
