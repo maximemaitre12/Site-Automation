@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Brain, Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Attachment } from "@/lib/ai-stream";
 import { useToast } from "@/hooks/use-toast";
 import { AetherDocument } from "@/hooks/useBrain";
+import agentBrainLogo from "@/assets/agent-brain.png";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -53,6 +54,7 @@ export default function BrainPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [localFilteredDocs, setLocalFilteredDocs] = useState<AetherDocument[]>([]);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   // Use documents directly when no search, or localFilteredDocs when searching
   const filteredDocs = searchQuery.trim() ? localFilteredDocs : documents;
@@ -247,14 +249,12 @@ export default function BrainPage() {
     );
   }
 
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col md:flex-row relative">
+      <div className="h-full flex flex-col md:flex-row relative overflow-hidden">
         {/* Mobile toggle button */}
         <button
-          className="md:hidden fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+          className="md:hidden fixed bottom-20 right-4 z-50 w-12 h-12 rounded-full bg-[hsl(var(--agent-brain))] text-white shadow-lg flex items-center justify-center"
           onClick={() => setShowMobileSidebar(!showMobileSidebar)}
         >
           {showMobileSidebar ? <X className="w-5 h-5" /> : <MessageSquarePlus className="w-5 h-5" />}
@@ -262,11 +262,11 @@ export default function BrainPage() {
 
         {/* Sidebar */}
         <aside className={cn(
-          "w-full md:w-72 border-r border-border p-4 flex flex-col bg-card/50 transition-all",
+          "w-full md:w-64 lg:w-72 border-r border-border p-3 md:p-4 flex flex-col bg-card/50 transition-all",
           "fixed md:relative inset-0 z-40 md:z-auto",
           showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}>
-          <Button variant="default" className="w-full mb-4" onClick={() => { handleNewChat(); setShowMobileSidebar(false); }}>
+          <Button variant="default" className="w-full mb-4 bg-[hsl(var(--agent-brain))] hover:bg-[hsl(var(--agent-brain))]/90" onClick={() => { handleNewChat(); setShowMobileSidebar(false); }}>
             <MessageSquarePlus className="w-4 h-4 mr-2" />
             Nouvelle conversation
           </Button>
@@ -285,7 +285,7 @@ export default function BrainPage() {
                   <div
                     key={conv.id}
                     className={cn(
-                      "group flex items-center justify-between p-3 rounded-lg hover:bg-secondary cursor-pointer transition-colors",
+                      "group flex items-center justify-between p-2.5 md:p-3 rounded-lg hover:bg-secondary cursor-pointer transition-colors",
                       currentConversation?.id === conv.id && "bg-secondary"
                     )}
                     onClick={() => { selectConversation(conv.id); setShowMobileSidebar(false); }}
@@ -301,7 +301,7 @@ export default function BrainPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0"
+                      className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 shrink-0"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteConversation(conv.id);
@@ -315,7 +315,7 @@ export default function BrainPage() {
             </div>
           </ScrollArea>
 
-          <div className="border-t border-border pt-4 mt-4 space-y-3">
+          <div className="border-t border-border pt-3 md:pt-4 mt-3 md:mt-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-2">
                 AETHER Docs
@@ -335,7 +335,7 @@ export default function BrainPage() {
               />
             </div>
 
-            <ScrollArea className="h-32">
+            <ScrollArea className="h-28 md:h-32">
               <div className="space-y-1">
                 {filteredDocs.map((doc) => (
                   <div 
@@ -358,7 +358,7 @@ export default function BrainPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
+                      className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 shrink-0"
                       onClick={() => deleteDocument(doc.id)}
                     >
                       <Trash2 className="w-3 h-3 text-destructive" />
@@ -377,10 +377,18 @@ export default function BrainPage() {
           </div>
         </aside>
 
+        {/* Mobile overlay */}
+        {showMobileSidebar && (
+          <div 
+            className="fixed inset-0 bg-black/20 z-30 md:hidden"
+            onClick={() => setShowMobileSidebar(false)}
+          />
+        )}
+
         {/* Main Chat Area */}
         <div 
           className={cn(
-            "flex-1 flex flex-col transition-colors",
+            "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden",
             isDragging && "bg-primary/5 ring-2 ring-primary ring-inset"
           )}
           onDragOver={handleDragOver}
@@ -388,20 +396,20 @@ export default function BrainPage() {
           onDrop={handleDrop}
         >
           {/* Header */}
-          <header className="px-6 py-4 border-b border-border flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-lg font-semibold text-foreground flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center">
-                  <Brain className="w-4 h-4 text-white" />
+          <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2 md:gap-4 min-w-0">
+              <h1 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center overflow-hidden shrink-0">
+                  <img src={agentBrainLogo} alt="Brain" className="w-full h-full object-cover" />
                 </div>
-                AETHER Brain
+                <span className="hidden sm:inline">AETHER Brain</span>
               </h1>
               
               <TooltipProvider>
-                <div className="flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 text-primary">
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[hsl(var(--agent-brain))]/10 text-[hsl(var(--agent-brain))]">
                         <Database className="w-3.5 h-3.5" />
                         <span className="text-xs font-medium">{documents.length} docs</span>
                       </div>
@@ -426,301 +434,215 @@ export default function BrainPage() {
               </TooltipProvider>
             </div>
             
-            <Sheet open={showUniversalSearch} onOpenChange={setShowUniversalSearch}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="mr-2">
-                  <Globe className="w-4 h-4 mr-2" />
-                  Recherche IA
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="w-[600px] sm:w-[800px]">
-                <SheetHeader>
-                  <SheetTitle>Recherche Universelle IA</SheetTitle>
-                </SheetHeader>
-                <div className="mt-6 h-[calc(100vh-120px)]">
-                  <UniversalSearch />
-                </div>
-              </SheetContent>
-            </Sheet>
-            
-            <Sheet open={showTools} onOpenChange={setShowTools}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Wand2 className="w-4 h-4 mr-2" />
-                  Outils IA
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="w-[400px] sm:w-[540px]">
-                <SheetHeader>
-                  <SheetTitle>Outils IA avancés</SheetTitle>
-                </SheetHeader>
-                <div className="mt-6">
-                  <AIToolsPanel 
-                    onGenerateProcedure={generateProcedure}
-                    onImproveText={improveText}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
+              <Sheet open={showUniversalSearch} onOpenChange={setShowUniversalSearch}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 px-2 md:px-3">
+                    <Globe className="w-4 h-4 md:mr-2" />
+                    <span className="hidden md:inline">Recherche IA</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:w-[600px] md:w-[800px]">
+                  <SheetHeader>
+                    <SheetTitle>Recherche Universelle IA</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 h-[calc(100vh-120px)]">
+                    <UniversalSearch />
+                  </div>
+                </SheetContent>
+              </Sheet>
+              
+              <Sheet open={showTools} onOpenChange={setShowTools}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 px-2 md:px-3">
+                    <Wand2 className="w-4 h-4 md:mr-2" />
+                    <span className="hidden md:inline">Outils IA</span>
+                    <ChevronRight className="w-4 h-4 ml-1 hidden md:inline" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:w-[400px] md:w-[540px]">
+                  <SheetHeader>
+                    <SheetTitle>Outils IA avancés</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <AIToolsPanel 
+                      onGenerateProcedure={generateProcedure}
+                      onImproveText={improveText}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </header>
 
-          {/* Drop Zone Overlay */}
+          {/* Chat Messages */}
+          <ScrollArea className="flex-1 px-3 md:px-6 py-4">
+            {!currentConversation && conversations.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center mb-4 overflow-hidden">
+                  <img src={agentBrainLogo} alt="Brain" className="w-full h-full object-cover" />
+                </div>
+                <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">Bienvenue sur AETHER Brain</h2>
+                <p className="text-muted-foreground max-w-md text-sm md:text-base">
+                  Votre assistant IA intelligent. Posez des questions, analysez des documents, ou générez des images.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 mt-6">
+                  {['💬 Chat', '🖼️ Images', '📊 Charts', '📄 Documents'].map(tag => (
+                    <span key={tag} className="px-3 py-1.5 rounded-full bg-[hsl(var(--agent-brain))]/10 text-[hsl(var(--agent-brain))] text-xs md:text-sm font-medium">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : !currentConversation ? (
+              <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center mb-4 overflow-hidden">
+                  <img src={agentBrainLogo} alt="Brain" className="w-full h-full object-cover" />
+                </div>
+                <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">Nouvelle conversation</h2>
+                <p className="text-muted-foreground text-sm md:text-base">Commencez à discuter ou sélectionnez une conversation.</p>
+              </div>
+            ) : (
+              <div className="space-y-4 max-w-3xl mx-auto">
+                {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
+                  <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
+                ))}
+                {streamingContent && (
+                  <ChatMessage role="assistant" content={streamingContent} isStreaming />
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </ScrollArea>
+
+          {/* Drag overlay */}
           {isDragging && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm pointer-events-none">
-              <div className="flex flex-col items-center gap-3 p-8 rounded-xl border-2 border-dashed border-primary bg-card">
-                <Paperclip className="w-12 h-12 text-primary" />
-                <p className="text-lg font-medium">Déposez vos fichiers ici</p>
-                <p className="text-sm text-muted-foreground">Images, documents texte, PDF...</p>
+            <div className="absolute inset-0 bg-primary/10 flex items-center justify-center z-20 pointer-events-none">
+              <div className="bg-card p-6 md:p-8 rounded-2xl shadow-xl flex flex-col items-center">
+                <FileImage className="w-10 h-10 md:w-12 md:h-12 text-primary mb-2" />
+                <p className="text-base md:text-lg font-semibold text-foreground">Déposez vos fichiers ici</p>
+                <p className="text-sm text-muted-foreground">Images, texte, documents...</p>
               </div>
             </div>
           )}
 
-          {/* Messages */}
-          <ScrollArea className="flex-1 p-6">
-            <div className="max-w-3xl mx-auto space-y-6">
-              {!currentConversation || currentConversation.messages.length === 0 ? (
-                /* Welcome Message */
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center flex-shrink-0">
-                    <Brain className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1 p-4 rounded-xl bg-card border border-border">
-                    <p className="text-foreground font-medium">
-                      Bonjour ! Je suis AETHER Brain, votre assistant IA polyvalent.
-                    </p>
-                    <div className="mt-4 grid grid-cols-2 gap-3">
-                      <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Image className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-sm">Analyse d'images</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Photos, captures, graphiques, schémas...</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <div className="flex items-center gap-2 mb-2">
-                          <FileText className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-sm">Analyse de documents</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Texte, markdown, CSV, JSON...</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Database className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-sm">Base de connaissances</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">{documents.length} documents internes</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sparkles className="w-4 h-4 text-primary" />
-                          <span className="font-medium text-sm">Génération & amélioration</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Procédures, textes, synthèses...</p>
-                      </div>
-                    </div>
-                    <p className="mt-4 text-sm text-muted-foreground">
-                      Glissez-déposez des fichiers ou utilisez le bouton 📎 pour ajouter des pièces jointes.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                currentConversation.messages.map((msg) => (
-                  <ChatMessage 
-                    key={msg.id} 
-                    role={msg.role} 
-                    content={msg.content}
-                    timestamp={msg.timestamp ? new Date(msg.timestamp) : undefined}
-                    attachments={msg.attachments}
-                  />
-                ))
-              )}
-              
-              {/* Streaming response */}
-              {sendingMessage && streamingContent && (
-                <ChatMessage 
-                  role="assistant" 
-                  content={streamingContent}
-                  isStreaming={true}
-                />
-              )}
-              
-              {/* Loading indicator when no content yet */}
-              {sendingMessage && !streamingContent && (
-                <ChatMessage 
-                  role="assistant" 
-                  content=""
-                  isStreaming={true}
-                />
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          </ScrollArea>
-
-          {/* Input */}
-          <div className="p-4 border-t border-border">
-            <div className="max-w-3xl mx-auto space-y-3">
-              {/* Attachments Preview */}
-              {attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 rounded-lg bg-muted/50">
-                  {attachments.map((att, idx) => (
-                    <div 
-                      key={idx} 
-                      className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-card border border-border"
-                    >
-                      {att.type === 'image' ? (
-                        <>
-                          <img 
-                            src={att.content} 
-                            alt={att.name} 
-                            className="w-8 h-8 rounded object-cover"
-                          />
-                          <span className="text-sm truncate max-w-[120px]">{att.name}</span>
-                        </>
-                      ) : (
-                        <>
-                          <File className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm truncate max-w-[120px]">{att.name}</span>
-                        </>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-5 w-5 p-0"
-                        onClick={() => removeAttachment(idx)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              <form onSubmit={handleSendMessage}>
-                {/* Generation Mode Buttons */}
-                <div className="flex items-center gap-2 mb-3">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant={generationMode === 'image' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setGenerationMode(generationMode === 'image' ? 'chat' : 'image')}
-                          disabled={sendingMessage || generatingImage}
-                        >
-                          <ImagePlus className="w-4 h-4 mr-1" />
-                          Image
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Générer une image avec l'IA</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant={generationMode === 'chart' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setGenerationMode(generationMode === 'chart' ? 'chat' : 'chart')}
-                          disabled={sendingMessage || generatingImage}
-                        >
-                          <BarChart3 className="w-4 h-4 mr-1" />
-                          Graphique
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Générer un graphique avec l'IA</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  {generationMode !== 'chat' && (
-                    <Badge variant="secondary" className="ml-auto">
-                      Mode: {generationMode === 'image' ? '🎨 Image' : '📊 Graphique'}
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="flex gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*,.txt,.md,.json,.csv"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => handleFileSelect(e.target.files)}
-                  />
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="h-12 w-12 flex-shrink-0"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={generationMode !== 'chat'}
-                        >
-                          <Paperclip className="w-5 h-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Ajouter des fichiers</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <Input
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder={
-                      generationMode === 'image' 
-                        ? "Décrivez l'image à générer..." 
-                        : generationMode === 'chart'
-                          ? "Décrivez le graphique à créer..."
-                          : sendingMessage 
-                            ? "Tapez votre prochain message..."
-                            : "Posez une question, glissez une image..."
-                    }
-                    className="flex-1 h-12 bg-card"
-                    disabled={generatingImage}
-                  />
-                  {/* Stop button when generating */}
-                  {sendingMessage && (
-                    <Button 
-                      type="button"
-                      size="lg"
-                      variant="destructive"
-                      onClick={cancelGeneration}
-                      className="flex-shrink-0"
-                    >
-                      <StopCircle className="w-5 h-5" />
-                    </Button>
-                  )}
-                  
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    disabled={generatingImage || (!message.trim() && attachments.length === 0)}
-                    className="flex-shrink-0"
-                  >
-                    {generatingImage ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : generationMode !== 'chat' ? (
-                      <Sparkles className="w-5 h-5" />
+          {/* Input Area */}
+          <div className="border-t border-border px-3 md:px-6 py-3 md:py-4 shrink-0">
+            {/* Attachments preview */}
+            {attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {attachments.map((att, idx) => (
+                  <div key={idx} className="relative group">
+                    {att.type === 'image' ? (
+                      <img 
+                        src={att.content} 
+                        alt={att.name} 
+                        className="w-14 h-14 md:w-16 md:h-16 rounded-lg object-cover border border-border"
+                      />
                     ) : (
-                      <Send className="w-5 h-5" />
+                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg bg-secondary flex items-center justify-center border border-border">
+                        <File className="w-6 h-6 text-muted-foreground" />
+                      </div>
                     )}
-                  </Button>
-                </div>
-              </form>
+                    <button
+                      onClick={() => removeAttachment(idx)}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                    <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-1 py-0.5 truncate rounded-b-lg">
+                      {att.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Mode selector */}
+            <div className="flex items-center gap-1 md:gap-2 mb-3">
+              <TooltipProvider>
+                {[
+                  { mode: 'chat' as const, icon: Sparkles, label: 'Chat' },
+                  { mode: 'image' as const, icon: ImagePlus, label: 'Image' },
+                  { mode: 'chart' as const, icon: BarChart3, label: 'Chart' },
+                ].map(({ mode, icon: Icon, label }) => (
+                  <Tooltip key={mode}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={generationMode === mode ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setGenerationMode(mode)}
+                        className={cn(
+                          "h-8 px-2 md:px-3",
+                          generationMode === mode && "bg-[hsl(var(--agent-brain))] hover:bg-[hsl(var(--agent-brain))]/90"
+                        )}
+                      >
+                        <Icon className="w-4 h-4 md:mr-1" />
+                        <span className="hidden md:inline text-xs">{label}</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{label}</TooltipContent>
+                  </Tooltip>
+                ))}
+              </TooltipProvider>
             </div>
+
+            <form onSubmit={handleSendMessage} className="flex items-end gap-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={(e) => handleFileSelect(e.target.files)}
+                multiple
+                accept="image/*,.txt,.md,.json,.csv"
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                className="shrink-0 h-10 w-10"
+              >
+                <Paperclip className="w-5 h-5" />
+              </Button>
+
+              <div className="flex-1 relative">
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={
+                    generationMode === 'image' 
+                      ? "Décrivez l'image à générer..." 
+                      : generationMode === 'chart'
+                      ? "Décrivez le graphique à générer..."
+                      : "Posez votre question..."
+                  }
+                  className="pr-12 h-10 md:h-11 text-sm md:text-base"
+                  disabled={sendingMessage || generatingImage}
+                />
+              </div>
+
+              {(sendingMessage || generatingImage) ? (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={cancelGeneration}
+                  className="shrink-0 h-10 w-10"
+                >
+                  <StopCircle className="w-5 h-5" />
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  size="icon"
+                  disabled={!message.trim() && attachments.length === 0}
+                  className="shrink-0 h-10 w-10 bg-[hsl(var(--agent-brain))] hover:bg-[hsl(var(--agent-brain))]/90"
+                >
+                  <Send className="w-5 h-5" />
+                </Button>
+              )}
+            </form>
           </div>
         </div>
       </div>

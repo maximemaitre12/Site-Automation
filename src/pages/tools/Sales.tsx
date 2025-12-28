@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
-  TrendingUp, FileText, Mail, Phone, Sparkles, User, Building, 
+  FileText, Mail, Phone, Sparkles, User, Building, 
   Loader2, CheckCircle, Copy, History, ChevronRight, Kanban, Target
 } from "lucide-react";
 import { useState } from "react";
@@ -20,6 +20,7 @@ import { DealSelector } from "@/components/sales/DealSelector";
 import { NegotiationSheetGenerator } from "@/components/sales/NegotiationSheetGenerator";
 import { useToast } from "@/hooks/use-toast";
 import { SalesDeal } from "@/hooks/useAIIntelligence";
+import agentSalesLogo from "@/assets/agent-sales.png";
 
 export default function Sales() {
   const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email" | "negotiation">("pipeline");
@@ -142,32 +143,32 @@ export default function Sales() {
     <DashboardLayout>
       <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-4 md:px-8 py-4 md:py-6 border-b border-border shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                </div>
-                Sales Copilot
-              </h1>
-              <p className="text-muted-foreground mt-1 text-sm hidden md:block">
-                Propositions IA, analyse d'appels, et emails personnalisés
-              </p>
+        <header className="px-3 md:px-8 py-3 md:py-6 border-b border-border shrink-0">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center overflow-hidden shrink-0">
+                <img src={agentSalesLogo} alt="Sales" className="w-full h-full object-cover" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">Sales Copilot</h1>
+                <p className="text-muted-foreground text-xs md:text-sm hidden md:block">
+                  Propositions IA, analyse d'appels, et emails personnalisés
+                </p>
+              </div>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowHistory(!showHistory)}
-              className="gap-2"
+              className="gap-1 md:gap-2 shrink-0 h-8 px-2 md:px-3"
             >
               <History className="w-4 h-4" />
-              <span className="hidden md:inline">Historique</span>
+              <span className="hidden sm:inline">Historique</span>
             </Button>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mt-4 md:mt-6 overflow-x-auto pb-2">
+          <div className="flex gap-1.5 md:gap-2 mt-3 md:mt-6 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0">
             {[
               { key: "pipeline", label: "Pipeline", icon: Kanban },
               { key: "call", label: "Appels", icon: Phone },
@@ -179,11 +180,11 @@ export default function Sales() {
                 key={tab.key}
                 variant={activeTab === tab.key ? "default" : "ghost"}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className="gap-2 shrink-0"
+                className={`gap-1.5 shrink-0 h-8 px-2.5 md:px-3 text-xs md:text-sm ${activeTab === tab.key ? "bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90" : ""}`}
                 size="sm"
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="hidden xs:inline sm:inline">{tab.label}</span>
               </Button>
             ))}
           </div>
@@ -192,14 +193,14 @@ export default function Sales() {
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Form Panel */}
-          <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+          <div className="flex-1 p-3 md:p-8 overflow-y-auto">
             {activeTab === "pipeline" && (
               <SalesPipeline />
             )}
 
             {activeTab === "proposal" && (
-              <div className="max-w-3xl space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="max-w-3xl space-y-4 md:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="client">Nom du client *</Label>
                     <div className="relative">
@@ -207,7 +208,7 @@ export default function Sales() {
                       <Input 
                         id="client" 
                         placeholder="Nom de l'entreprise" 
-                        className="pl-10"
+                        className="pl-10 h-10"
                         value={proposalForm.client}
                         onChange={(e) => setProposalForm(p => ({ ...p, client: e.target.value }))}
                       />
@@ -220,7 +221,7 @@ export default function Sales() {
                       <Input 
                         id="contact" 
                         placeholder="Décideur" 
-                        className="pl-10"
+                        className="pl-10 h-10"
                         value={proposalForm.contact}
                         onChange={(e) => setProposalForm(p => ({ ...p, contact: e.target.value }))}
                       />
@@ -233,6 +234,7 @@ export default function Sales() {
                   <Input 
                     id="product" 
                     placeholder="Que vendez-vous ?"
+                    className="h-10"
                     value={proposalForm.product}
                     onChange={(e) => setProposalForm(p => ({ ...p, product: e.target.value }))}
                   />
@@ -243,7 +245,7 @@ export default function Sales() {
                   <Textarea 
                     id="needs" 
                     placeholder="Décrivez les défis et besoins du client..." 
-                    className="min-h-[120px]"
+                    className="min-h-[100px] md:min-h-[120px]"
                     value={proposalForm.needs}
                     onChange={(e) => setProposalForm(p => ({ ...p, needs: e.target.value }))}
                   />
@@ -254,15 +256,14 @@ export default function Sales() {
                   <Textarea 
                     id="objections" 
                     placeholder="Quelles préoccupations pourraient-ils avoir ?" 
-                    className="min-h-[80px]"
+                    className="min-h-[60px] md:min-h-[80px]"
                     value={proposalForm.objections}
                     onChange={(e) => setProposalForm(p => ({ ...p, objections: e.target.value }))}
                   />
                 </div>
 
                 <Button 
-                  variant="hero" 
-                  className="w-full"
+                  className="w-full bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90"
                   onClick={handleGenerateProposal}
                   disabled={generatingProposal}
                 >
@@ -292,7 +293,7 @@ export default function Sales() {
             )}
 
             {activeTab === "call" && (
-              <div className="max-w-3xl space-y-6">
+              <div className="max-w-3xl space-y-4 md:space-y-6">
                 {/* Deal Selector */}
                 <DealSelector
                   selectedDealId={selectedCallDeal?.id || null}
@@ -300,17 +301,17 @@ export default function Sales() {
                 />
                 
                 {selectedCallDeal && (
-                  <Card className="border-primary/30 bg-primary/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{selectedCallDeal.title}</p>
-                          <p className="text-sm text-muted-foreground">
+                  <Card className="border-[hsl(var(--agent-sales))]/30 bg-[hsl(var(--agent-sales))]/5">
+                    <CardContent className="p-3 md:p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{selectedCallDeal.title}</p>
+                          <p className="text-xs md:text-sm text-muted-foreground truncate">
                             {selectedCallDeal.contact_name && `${selectedCallDeal.contact_name} • `}
                             {selectedCallDeal.value && `€${selectedCallDeal.value.toLocaleString('fr-FR')}`}
                           </p>
                         </div>
-                        <Badge variant="secondary">{selectedCallDeal.status}</Badge>
+                        <Badge variant="secondary" className="shrink-0">{selectedCallDeal.status}</Badge>
                       </div>
                     </CardContent>
                   </Card>
@@ -327,6 +328,7 @@ export default function Sales() {
                   <Input 
                     id="callTitle" 
                     placeholder="Ex: Appel découverte - Acme Corp"
+                    className="h-10"
                     value={callTitle}
                     onChange={(e) => setCallTitle(e.target.value)}
                   />
@@ -337,7 +339,7 @@ export default function Sales() {
                   <Label htmlFor="transcript">
                     Transcript de l'appel
                     {transcript && (
-                      <Badge variant="secondary" className="ml-2">
+                      <Badge variant="secondary" className="ml-2 text-xs">
                         {transcript.length} caractères
                       </Badge>
                     )}
@@ -345,15 +347,14 @@ export default function Sales() {
                   <Textarea 
                     id="transcript" 
                     placeholder="Le transcript apparaîtra ici après l'enregistrement, ou collez-le manuellement..." 
-                    className="min-h-[250px] font-mono text-sm"
+                    className="min-h-[150px] md:min-h-[250px] font-mono text-sm"
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
                   />
                 </div>
 
                 <Button 
-                  variant="hero" 
-                  className="w-full"
+                  className="w-full bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90"
                   onClick={handleAnalyzeCall}
                   disabled={analyzingCall || !transcript.trim()}
                 >
@@ -387,12 +388,12 @@ export default function Sales() {
             )}
 
             {activeTab === "email" && (
-              <div className="max-w-3xl space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="max-w-3xl space-y-4 md:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   <div className="space-y-2">
                     <Label>Type d'email</Label>
                     <select 
-                      className="w-full h-10 rounded-lg bg-secondary border border-border px-3 text-foreground"
+                      className="w-full h-10 rounded-lg bg-secondary border border-border px-3 text-foreground text-sm"
                       value={emailForm.type}
                       onChange={(e) => setEmailForm(f => ({ ...f, type: e.target.value }))}
                     >
@@ -407,7 +408,7 @@ export default function Sales() {
                   <div className="space-y-2">
                     <Label>Ton</Label>
                     <select 
-                      className="w-full h-10 rounded-lg bg-secondary border border-border px-3 text-foreground"
+                      className="w-full h-10 rounded-lg bg-secondary border border-border px-3 text-foreground text-sm"
                       value={emailForm.tone}
                       onChange={(e) => setEmailForm(f => ({ ...f, tone: e.target.value }))}
                     >
@@ -424,15 +425,14 @@ export default function Sales() {
                   <Textarea 
                     id="context" 
                     placeholder="Décrivez brièvement la situation et ce que vous voulez communiquer..." 
-                    className="min-h-[150px]"
+                    className="min-h-[120px] md:min-h-[150px]"
                     value={emailForm.context}
                     onChange={(e) => setEmailForm(f => ({ ...f, context: e.target.value }))}
                   />
                 </div>
 
                 <Button 
-                  variant="hero" 
-                  className="w-full"
+                  className="w-full bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90"
                   onClick={handleGenerateEmail}
                   disabled={generatingEmail}
                 >
@@ -451,28 +451,23 @@ export default function Sales() {
 
                 {/* Generated email */}
                 {generatedEmail && (
-                  <Card className="border-primary/30 bg-primary/5">
+                  <Card className="mt-6 border-[hsl(var(--agent-sales))]/30">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-success" />
+                        <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                          <Mail className="w-5 h-5 text-[hsl(var(--agent-sales))]" />
                           Email généré
                         </CardTitle>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => copyToClipboard(generatedEmail)}
-                        >
-                          <Copy className="w-4 h-4" />
+                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(generatedEmail)}>
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copier
                         </Button>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <ScrollArea className="h-64">
-                        <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                          {generatedEmail}
-                        </div>
-                      </ScrollArea>
+                      <div className="p-3 md:p-4 bg-secondary rounded-lg whitespace-pre-wrap text-sm">
+                        {generatedEmail}
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -482,100 +477,37 @@ export default function Sales() {
 
           {/* History Sidebar */}
           {showHistory && (
-            <aside className="w-96 border-l border-border bg-card/30 flex flex-col">
-              <div className="p-4 border-b border-border">
-                <h3 className="font-semibold text-foreground">Historique</h3>
-              </div>
-              <ScrollArea className="flex-1">
-                <div className="p-4 space-y-6">
-                  {/* Recent Proposals */}
+            <aside className="w-72 md:w-80 border-l border-border bg-card/50 p-4 overflow-hidden hidden md:block">
+              <h3 className="font-semibold text-foreground mb-4">Historique</h3>
+              <ScrollArea className="h-[calc(100%-2rem)]">
+                <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      Propositions récentes
-                    </h4>
-                    <div className="space-y-2">
-                      {proposals.slice(0, 5).map((p) => (
-                        <div 
-                          key={p.id} 
-                          className="p-3 rounded-lg bg-card border border-border hover:border-primary/30 transition-all cursor-pointer"
-                          onClick={() => {
-                            setActiveTab('proposal');
-                            if (p.generated_proposal) setGeneratedProposal(p.generated_proposal);
-                          }}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium text-sm text-foreground truncate">
-                              {p.prospect_name || 'Sans nom'}
-                            </span>
-                            {p.prospect_score && (
-                              <Badge variant="outline" className={
-                                p.prospect_score >= 80 
-                                  ? "bg-success/20 text-success border-success/30" 
-                                  : "bg-warning/20 text-warning border-warning/30"
-                              }>
-                                {p.prospect_score}%
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground">{p.product_name}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(p.created_at).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                      ))}
-                      {proposals.length === 0 && (
-                        <p className="text-xs text-muted-foreground text-center py-4">
-                          Aucune proposition
-                        </p>
-                      )}
-                    </div>
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase mb-2">Propositions récentes</h4>
+                    {proposals.slice(0, 5).map(p => (
+                      <div key={p.id} className="p-3 rounded-lg bg-secondary/50 mb-2 cursor-pointer hover:bg-secondary">
+                        <p className="text-sm font-medium truncate">{p.prospect_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{p.product_name}</p>
+                      </div>
+                    ))}
+                    {proposals.length === 0 && (
+                      <p className="text-xs text-muted-foreground">Aucune proposition</p>
+                    )}
                   </div>
-
-                  {/* Recent Call Analyses */}
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                      <Phone className="w-4 h-4" />
-                      Analyses d'appels
-                    </h4>
-                    <div className="space-y-2">
-                      {callAnalyses.slice(0, 5).map((c) => (
-                        <div 
-                          key={c.id} 
-                          className="p-3 rounded-lg bg-card border border-border hover:border-primary/30 transition-all cursor-pointer"
-                          onClick={() => {
-                            setActiveTab('call');
-                            setCurrentAnalysis(c);
-                          }}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium text-sm text-foreground truncate">
-                              {c.title}
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                          </div>
-                          {c.sentiment && (
-                            <Badge variant="outline" className={
-                              c.sentiment === 'positif' 
-                                ? "bg-success/20 text-success border-success/30"
-                                : c.sentiment === 'négatif'
-                                ? "bg-destructive/20 text-destructive border-destructive/30"
-                                : "bg-warning/20 text-warning border-warning/30"
-                            }>
-                              {c.sentiment}
-                            </Badge>
-                          )}
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(c.created_at).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                      ))}
-                      {callAnalyses.length === 0 && (
-                        <p className="text-xs text-muted-foreground text-center py-4">
-                          Aucune analyse
-                        </p>
-                      )}
-                    </div>
+                    <h4 className="text-xs font-medium text-muted-foreground uppercase mb-2">Analyses d'appels</h4>
+                    {callAnalyses.slice(0, 5).map(c => (
+                      <div 
+                        key={c.id} 
+                        className="p-3 rounded-lg bg-secondary/50 mb-2 cursor-pointer hover:bg-secondary"
+                        onClick={() => setCurrentAnalysis(c)}
+                      >
+                        <p className="text-sm font-medium truncate">{c.title}</p>
+                        <p className="text-xs text-muted-foreground">{c.sentiment}</p>
+                      </div>
+                    ))}
+                    {callAnalyses.length === 0 && (
+                      <p className="text-xs text-muted-foreground">Aucune analyse</p>
+                    )}
                   </div>
                 </div>
               </ScrollArea>
