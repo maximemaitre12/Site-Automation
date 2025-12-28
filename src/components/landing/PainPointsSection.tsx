@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { 
   Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart,
   ChevronDown, Workflow, MessageSquare, FileText, Target, Users,
@@ -236,23 +236,52 @@ export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const shouldStagger = isVisible && expandedIndex === null;
+
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const expandedPanelRef = useRef<HTMLDivElement | null>(null);
+  const pinRef = useRef<{ index: number; top: number } | null>(null);
 
   const expandedTool = expandedIndex !== null ? tools[expandedIndex] : null;
 
   const handleToggle = (index: number) => {
+    const el = cardRefs.current[index];
+    pinRef.current = el ? { index, top: el.getBoundingClientRect().top } : null;
+
     const next = expandedIndex === index ? null : index;
     setExpandedIndex(next);
-
-    if (next !== null) {
-      requestAnimationFrame(() => {
-        expandedPanelRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      });
-    }
   };
+
+  // Apply scroll correction before paint to avoid visible "teleport".
+  useLayoutEffect(() => {
+    const pin = pinRef.current;
+    if (!pin) return;
+
+    const el = cardRefs.current[pin.index];
+    if (!el) {
+      pinRef.current = null;
+      return;
+    }
+
+    const newTop = el.getBoundingClientRect().top;
+    const delta = pin.top - newTop;
+    if (Math.abs(delta) > 0.5) {
+      window.scrollTo({ top: window.scrollY + delta, behavior: "auto" });
+    }
+
+    pinRef.current = null;
+  }, [expandedIndex]);
+
+  // Then optionally smooth-scroll to the panel if it's out of view.
+  useEffect(() => {
+    if (expandedIndex === null) return;
+    const panel = expandedPanelRef.current;
+    if (!panel) return;
+
+    const rect = panel.getBoundingClientRect();
+    if (rect.top > window.innerHeight * 0.75 || rect.top < 0) {
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [expandedIndex]);
 
 
   return (
@@ -283,6 +312,9 @@ export function PainPointsSection() {
             return (
               <div
                 key={i}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
                 className={cn(
                   "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
                   isExpanded
