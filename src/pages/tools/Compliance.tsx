@@ -111,47 +111,47 @@ export default function Compliance() {
     <DashboardLayout>
       <div className="h-full flex flex-col bg-background">
         {/* Header compact */}
-        <header className="px-6 py-4 border-b border-border flex items-center justify-between">
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center shadow-lg">
+              <Shield className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">AETHER Compliance</h1>
-              <p className="text-sm text-muted-foreground">Audit RGPD automatisé</p>
+              <h1 className="text-lg md:text-xl font-bold text-foreground">AETHER Compliance</h1>
+              <p className="text-xs md:text-sm text-muted-foreground">Audit RGPD automatisé</p>
             </div>
           </div>
           
           {/* Stats mini */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+              <p className="text-xl md:text-2xl font-bold text-foreground">{stats.total}</p>
               <p className="text-xs text-muted-foreground">Audits</p>
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
-              <p className={cn("text-2xl font-bold", stats.avgScore >= 70 ? "text-green-500" : "text-yellow-500")}>
+              <p className={cn("text-xl md:text-2xl font-bold", stats.avgScore >= 70 ? "text-green-500" : "text-yellow-500")}>
                 {stats.avgScore}%
               </p>
-              <p className="text-xs text-muted-foreground">Score moyen</p>
+              <p className="text-xs text-muted-foreground">Score</p>
             </div>
             <div className="h-8 w-px bg-border" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-orange-500">{stats.highRiskCount}</p>
+              <p className="text-xl md:text-2xl font-bold text-orange-500">{stats.highRiskCount}</p>
               <p className="text-xs text-muted-foreground">Risques</p>
             </div>
           </div>
         </header>
 
         {/* Tabs */}
-        <div className="px-6 py-3 border-b border-border flex gap-2">
+        <div className="px-4 md:px-6 py-3 border-b border-border flex gap-2">
           <Button 
             variant={viewMode === 'new' ? 'default' : 'ghost'} 
             size="sm"
             onClick={() => setViewMode('new')}
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            Nouvel audit
+            <span className="hidden sm:inline">Nouvel</span> audit
           </Button>
           <Button 
             variant={viewMode === 'history' ? 'default' : 'ghost'} 

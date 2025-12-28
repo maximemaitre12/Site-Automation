@@ -1,84 +1,192 @@
-import { ReactNode } from "react";
-import { Sidebar } from "./Sidebar";
-import { SidebarProvider, useSidebarState } from "@/hooks/useSidebar";
+import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Menu, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Menu, X, Database, Workflow, FileText, TrendingUp, Users, Brain, Shield, Settings, LogOut, LayoutDashboard } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 interface DashboardLayoutProps {
   children: ReactNode;
   headerActions?: ReactNode;
 }
 
-function DashboardContent({ children, headerActions }: DashboardLayoutProps) {
-  const { collapsed, toggle } = useSidebarState();
+const menuItems = [
+  {
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "AETHER Data",
+    description: "Data Platform",
+    path: "/tools/data",
+    icon: Database,
+  },
+  {
+    label: "AETHER Flow",
+    description: "Workflow Orchestrator",
+    path: "/tools/flow",
+    icon: Workflow,
+  },
+  {
+    label: "AETHER Doc",
+    description: "Document Management",
+    path: "/tools/doc",
+    icon: FileText,
+  },
+  {
+    label: "Sales Copilot",
+    description: "Sales Assistant",
+    path: "/tools/sales",
+    icon: TrendingUp,
+  },
+  {
+    label: "HR Copilot",
+    description: "HR Assistant",
+    path: "/tools/hr",
+    icon: Users,
+  },
+  {
+    label: "Brain",
+    description: "Internal Assistant",
+    path: "/tools/brain",
+    icon: Brain,
+  },
+  {
+    label: "Compliance",
+    description: "Audit & Compliance",
+    path: "/tools/compliance",
+    icon: Shield,
+  },
+];
+
+const settingsItems = [
+  {
+    label: "Company Settings",
+    path: "/settings/company",
+    icon: Settings,
+  },
+];
+
+export function DashboardLayout({ children, headerActions }: DashboardLayoutProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
-      
-      {/* Top Header Bar */}
-      <header
-        className={cn(
-          "fixed top-0 right-0 z-30 h-14 bg-card/80 backdrop-blur-md border-b border-border transition-all duration-300 flex items-center px-4 gap-4",
-          collapsed ? "left-0 lg:left-16" : "left-0 lg:left-64"
-        )}
-      >
-        {/* Menu toggle button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggle}
-          className="hover:bg-primary/10"
-        >
-          <Menu className="w-5 h-5" />
-        </Button>
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+        <div className="px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
+            {/* Menu Button - Left side */}
+            <button
+              className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
 
-        {/* Mobile logo (visible when sidebar is hidden) */}
-        <Link to="/dashboard" className={cn("flex items-center gap-2", collapsed ? "flex" : "flex lg:hidden")}>
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary-foreground" />
+            {/* Logo - Center */}
+            <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
+              <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
+            </Link>
+
+            {/* Header Actions - Right side */}
+            <div className="flex items-center gap-2">
+              {headerActions}
+            </div>
           </div>
-          <span className="font-bold text-foreground">AETHER</span>
-        </Link>
+        </div>
 
-        <div className="flex-1" />
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl animate-fade-in max-h-[calc(100vh-3.5rem)] overflow-y-auto">
+            <nav className="p-4 space-y-1">
+              {/* Main Menu Items */}
+              {menuItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 py-3 px-4 rounded-lg transition-colors",
+                    isActive(item.path)
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="font-medium text-sm">{item.label}</span>
+                    {item.description && (
+                      <span className="text-xs text-muted-foreground">{item.description}</span>
+                    )}
+                  </div>
+                </Link>
+              ))}
 
-        {/* Header Actions */}
-        {headerActions && (
-          <div className="flex items-center gap-2">
-            {headerActions}
+              {/* Separator */}
+              <div className="border-t border-border my-3" />
+
+              {/* Settings Section */}
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-2">
+                Settings
+              </div>
+              {settingsItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 py-3 px-4 rounded-lg transition-colors",
+                    isActive(item.path)
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  )}
+                >
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  <span className="font-medium text-sm">{item.label}</span>
+                </Link>
+              ))}
+
+              {/* Sign Out */}
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleSignOut();
+                }}
+                className="flex items-center gap-3 py-3 px-4 rounded-lg transition-colors text-destructive hover:bg-destructive/10 w-full"
+              >
+                <LogOut className="w-5 h-5 shrink-0" />
+                <span className="font-medium text-sm">Sign out</span>
+              </button>
+            </nav>
           </div>
         )}
       </header>
 
-      <main
-        className={cn(
-          "transition-all duration-300 h-[calc(100vh-3.5rem)] pt-0 overflow-hidden",
-          collapsed ? "lg:pl-16" : "lg:pl-64",
-          "pl-0"
-        )}
-        style={{ marginTop: '3.5rem' }}
-      >
+      {/* Main Content */}
+      <main className="pt-14 min-h-screen">
         {children}
       </main>
 
-      {/* Mobile overlay */}
-      {!collapsed && (
+      {/* Overlay for menu */}
+      {isMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
-          onClick={toggle}
+          className="fixed inset-0 bg-black/20 z-40"
+          style={{ top: '3.5rem' }}
+          onClick={() => setIsMenuOpen(false)}
         />
       )}
     </div>
-  );
-}
-
-export function DashboardLayout({ children, headerActions }: DashboardLayoutProps) {
-  return (
-    <SidebarProvider>
-      <DashboardContent headerActions={headerActions}>{children}</DashboardContent>
-    </SidebarProvider>
   );
 }

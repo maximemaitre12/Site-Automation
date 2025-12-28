@@ -16,49 +16,51 @@ const Data = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 h-full overflow-auto p-6">
+      <div className="space-y-4 md:space-y-6 h-full overflow-auto p-4 md:p-6">
         <div>
-          <h1 className="text-3xl font-bold">AETHER Data</h1>
-          <p className="text-muted-foreground mt-1">
-            Plateforme de données d'entreprise - Enrichissement, Veille et Intelligence
+          <h1 className="text-2xl md:text-3xl font-bold">AETHER Data</h1>
+          <p className="text-muted-foreground mt-1 text-sm md:text-base">
+            Plateforme de données d'entreprise
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="intelligence" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              <span className="hidden sm:inline">Intelligence IA</span>
-            </TabsTrigger>
-            <TabsTrigger value="catalog" className="flex items-center gap-2">
-              <FolderSearch className="h-4 w-4" />
-              <span className="hidden sm:inline">Catalogue</span>
-            </TabsTrigger>
-            <TabsTrigger value="enrichment" className="flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Enrichissement</span>
-            </TabsTrigger>
-            <TabsTrigger value="dedupe" className="flex items-center gap-2">
-              <GitMerge className="h-4 w-4" />
-              <span className="hidden sm:inline">Déduplication</span>
-            </TabsTrigger>
-            <TabsTrigger value="sources" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              <span className="hidden sm:inline">Sources</span>
-            </TabsTrigger>
-            <TabsTrigger value="search" className="flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Recherche</span>
-            </TabsTrigger>
-            <TabsTrigger value="governance" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span className="hidden sm:inline">Gouvernance</span>
-            </TabsTrigger>
-            <TabsTrigger value="monitoring" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">Monitoring</span>
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6">
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList className="inline-flex w-auto min-w-full md:min-w-0 md:grid md:grid-cols-8">
+              <TabsTrigger value="intelligence" className="flex items-center gap-2 shrink-0">
+                <Brain className="h-4 w-4" />
+                <span className="hidden md:inline">Intelligence</span>
+              </TabsTrigger>
+              <TabsTrigger value="catalog" className="flex items-center gap-2 shrink-0">
+                <FolderSearch className="h-4 w-4" />
+                <span className="hidden md:inline">Catalogue</span>
+              </TabsTrigger>
+              <TabsTrigger value="enrichment" className="flex items-center gap-2 shrink-0">
+                <Building2 className="h-4 w-4" />
+                <span className="hidden md:inline">Enrichissement</span>
+              </TabsTrigger>
+              <TabsTrigger value="dedupe" className="flex items-center gap-2 shrink-0">
+                <GitMerge className="h-4 w-4" />
+                <span className="hidden md:inline">Dédup</span>
+              </TabsTrigger>
+              <TabsTrigger value="sources" className="flex items-center gap-2 shrink-0">
+                <Database className="h-4 w-4" />
+                <span className="hidden md:inline">Sources</span>
+              </TabsTrigger>
+              <TabsTrigger value="search" className="flex items-center gap-2 shrink-0">
+                <Search className="h-4 w-4" />
+                <span className="hidden md:inline">Recherche</span>
+              </TabsTrigger>
+              <TabsTrigger value="governance" className="flex items-center gap-2 shrink-0">
+                <Shield className="h-4 w-4" />
+                <span className="hidden md:inline">Gouvernance</span>
+              </TabsTrigger>
+              <TabsTrigger value="monitoring" className="flex items-center gap-2 shrink-0">
+                <Activity className="h-4 w-4" />
+                <span className="hidden md:inline">Monitoring</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="intelligence">
             <AIIntelligenceDashboard />
