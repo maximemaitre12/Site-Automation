@@ -85,7 +85,7 @@ export function IntegrationsSection() {
             ))}
             
             {/* Center Aether hub */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-primary flex items-center justify-center shadow-md mx-1">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md mx-1">
               <span className="text-primary-foreground font-bold text-sm sm:text-base">A</span>
             </div>
             
