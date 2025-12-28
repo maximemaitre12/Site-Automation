@@ -91,12 +91,12 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-4 rounded-xl bg-gradient-to-br from-emerald-500/5 via-background to-teal-500/5 border border-emerald-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-gradient-to-br from-violet-500/5 via-background to-blue-500/5 border border-violet-500/20 overflow-hidden",
         className
       )}
     >
-      <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-20 h-20 bg-teal-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-20 h-20 bg-blue-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
         {/* Header stats */}
@@ -105,21 +105,21 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
             "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
             phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
-            <div className="text-lg font-bold text-emerald-500">{responseTime}s</div>
+            <div className="text-lg font-bold text-violet-500">{responseTime}s</div>
             <div className="text-[9px] text-muted-foreground">Avg. Response</div>
           </div>
           <div className={cn(
             "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
             phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
-            <div className="text-lg font-bold text-emerald-500">{autoResolved}%</div>
+            <div className="text-lg font-bold text-violet-500">{autoResolved}%</div>
             <div className="text-[9px] text-muted-foreground">Auto-Resolved</div>
           </div>
           <div className={cn(
             "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
             phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )} style={{ transitionDelay: "150ms" }}>
-            <div className="text-lg font-bold text-emerald-500">4.8</div>
+            <div className="text-lg font-bold text-violet-500">4.8</div>
             <div className="text-[9px] text-muted-foreground">Satisfaction</div>
           </div>
         </div>
@@ -129,7 +129,7 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
           {/* Tickets */}
           <div className="space-y-2">
             <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase">
-              <Mail className="w-3 h-3 text-amber-500" />
+              <Mail className="w-3 h-3 text-violet-500" />
               Tickets
             </div>
             {tickets.map((ticket, i) => (
@@ -138,7 +138,7 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
                 className={cn(
                   "p-2 rounded-lg bg-secondary/50 border border-border/50 transition-all duration-500",
                   phase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4",
-                  phase >= 2 + i && "border-emerald-500/30 bg-emerald-500/5"
+                  phase >= 2 + i && "border-violet-500/30 bg-violet-500/5"
                 )}
                 style={{ transitionDelay: `${i * 150}ms` }}
               >
@@ -148,7 +148,7 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
                       <span className="text-[9px] font-mono text-muted-foreground">{ticket.id}</span>
                       <span className={cn(
                         "w-1.5 h-1.5 rounded-full",
-                        ticket.priority === "high" ? "bg-red-500" : "bg-amber-500"
+                        ticket.priority === "high" ? "bg-violet-600" : "bg-violet-400"
                       )} />
                     </div>
                     <p className="text-[10px] text-foreground truncate">{ticket.subject}</p>
@@ -158,7 +158,7 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
                     </p>
                   </div>
                   {phase >= 2 + i && (
-                    <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center animate-scale-in">
+                    <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center animate-scale-in">
                       <Check className="w-2 h-2 text-white" />
                     </div>
                   )}
@@ -173,17 +173,17 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
             phase >= 4 ? "opacity-100" : "opacity-0"
           )}>
             <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
-              <Bot className="w-3 h-3 text-emerald-500" />
+              <Bot className="w-3 h-3 text-violet-500" />
               AI Response
             </div>
-            <div className="p-2 rounded-lg bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+            <div className="p-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-blue-500/10 border border-violet-500/20">
               <div className="flex items-start gap-2">
-                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shrink-0">
                   <Bot className="w-2.5 h-2.5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 mb-0.5">
-                    <span className="text-[9px] font-medium text-emerald-600 dark:text-emerald-400">Support AI</span>
+                    <span className="text-[9px] font-medium text-violet-600 dark:text-violet-400">Support AI</span>
                     {phase === 4 && typedMessage.length < aiTypingMessage.length && (
                       <span className="text-[8px] text-muted-foreground animate-pulse">typing...</span>
                     )}

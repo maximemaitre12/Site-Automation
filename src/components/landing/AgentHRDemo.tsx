@@ -114,7 +114,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
           key={i}
           className={cn(
             "w-0.5 rounded-full transition-all duration-150",
-            isActive ? "bg-orange-500" : "bg-orange-500/30"
+            isActive ? "bg-violet-500" : "bg-violet-500/30"
           )}
           style={{
             height: isActive ? `${Math.random() * 70 + 30}%` : "20%",
@@ -128,12 +128,12 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-4 rounded-xl bg-gradient-to-br from-orange-500/5 via-background to-amber-500/5 border border-orange-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-gradient-to-br from-violet-500/5 via-background to-purple-500/5 border border-violet-500/20 overflow-hidden",
         className
       )}
     >
-      <div className="absolute top-0 left-1/4 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-20 h-20 bg-amber-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-0 left-1/4 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl animate-pulse" />
+      <div className="absolute bottom-0 right-1/4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
         {/* Job posting header */}
@@ -143,7 +143,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
         )}>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-secondary/60 border border-border/60 flex items-center justify-center">
-              <Target className="w-4 h-4 text-orange-500" />
+              <Target className="w-4 h-4 text-violet-500" />
             </div>
             <div>
               <h4 className="text-sm font-semibold text-foreground">Senior React Developer</h4>
@@ -162,7 +162,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
               key={candidate.name}
               className={cn(
                 "flex-shrink-0 p-2 rounded-lg bg-secondary/50 border transition-all duration-500 min-w-[90px]",
-                animatedScores[i] >= candidate.score && "border-orange-500/30 bg-orange-500/5"
+                animatedScores[i] >= candidate.score && "border-violet-500/30 bg-violet-500/5"
               )}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
@@ -174,7 +174,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-orange-500">{animatedScores[i]}%</span>
+                <span className="text-lg font-bold text-violet-500">{animatedScores[i]}%</span>
                 <div className="flex gap-0.5">
                   {Array.from({ length: 5 }).map((_, j) => (
                     <Star
@@ -182,7 +182,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
                       className={cn(
                         "w-2.5 h-2.5",
                         j < Math.round(animatedScores[i] / 20)
-                          ? "text-amber-500 fill-amber-500"
+                          ? "text-violet-500 fill-violet-500"
                           : "text-muted-foreground/30"
                       )}
                     />
@@ -195,17 +195,17 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
 
         {/* Interview Recording - compact */}
         <div className={cn(
-          "p-2 rounded-lg bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/20 mb-3 transition-all duration-500",
+          "p-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 mb-3 transition-all duration-500",
           phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
           <div className="flex items-center gap-2">
             <div className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+              "w-8 h-8 rounded-full flex items-center justify-center transition-all relative",
               isRecording 
-                ? "bg-red-500 shadow-lg shadow-red-500/30" 
+                ? "bg-violet-600 shadow-lg shadow-violet-500/30" 
                 : phase >= 4 
-                  ? "bg-emerald-500"
-                  : "bg-orange-500"
+                  ? "bg-primary"
+                  : "bg-violet-500"
             )}>
               {phase >= 4 ? (
                 <CheckCircle2 className="w-4 h-4 text-white" />
@@ -213,7 +213,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
                 <Mic className={cn("w-4 h-4 text-white", isRecording && "animate-pulse")} />
               )}
               {isRecording && (
-                <div className="absolute inset-0 rounded-full bg-red-500/30 animate-ping" />
+                <div className="absolute inset-0 rounded-full bg-violet-500/30 animate-ping" />
               )}
             </div>
             <div className="flex-1">
@@ -222,7 +222,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
               </div>
               <div className="h-1 mt-1 rounded-full bg-secondary overflow-hidden">
                 <div 
-                  className={cn("h-full rounded-full transition-all", isRecording ? "bg-red-500" : "bg-emerald-500")}
+                  className={cn("h-full rounded-full transition-all", isRecording ? "bg-violet-500" : "bg-primary")}
                   style={{ width: `${recordingProgress}%` }}
                 />
               </div>
@@ -236,7 +236,7 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
           phase >= 4 ? "opacity-100" : "opacity-0"
         )}>
           <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
-            <Brain className="w-3 h-3 text-orange-500" />
+            <Brain className="w-3 h-3 text-violet-500" />
             AI Analysis
           </div>
 
@@ -249,21 +249,21 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
               return (
                 <div key={insight.label} className="text-center">
                   <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Icon className="w-2.5 h-2.5 text-orange-500" />
+                    <Icon className="w-2.5 h-2.5 text-violet-500" />
                     <span className="text-[9px] text-muted-foreground">{insight.label}</span>
                   </div>
-                  <span className="text-sm font-bold text-orange-500">{insightScores[i]}%</span>
+                  <span className="text-sm font-bold text-violet-500">{insightScores[i]}%</span>
                 </div>
               );
             })}
           </div>
 
           <div className={cn(
-            "mt-2 p-1.5 rounded bg-emerald-500/10 border border-emerald-500/20 transition-all duration-500",
+            "mt-2 p-1.5 rounded bg-primary/10 border border-primary/20 transition-all duration-500",
             phase >= 5 && insightScores.every(s => s > 80) ? "opacity-100" : "opacity-0"
           )}>
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+              <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
               <p className="text-[10px] text-foreground">Excellent candidate - Recommended</p>
             </div>
           </div>

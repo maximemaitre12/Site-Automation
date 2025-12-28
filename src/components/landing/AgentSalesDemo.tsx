@@ -93,11 +93,11 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-4 rounded-xl bg-gradient-to-br from-cyan-500/5 via-background to-blue-500/5 border border-cyan-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-gradient-to-br from-violet-500/5 via-background to-blue-500/5 border border-violet-500/20 overflow-hidden",
         className
       )}
     >
-      <div className="absolute top-0 left-1/4 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl animate-pulse" />
+      <div className="absolute top-0 left-1/4 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl animate-pulse" />
       <div className="absolute bottom-0 right-1/4 w-20 h-20 bg-blue-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
@@ -111,14 +111,14 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
               <p className="text-[10px] font-semibold text-muted-foreground uppercase">Q4 Forecast</p>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-xl font-bold text-foreground">{formatCurrency(revenue)}</span>
-                <span className="flex items-center text-emerald-500 text-[10px] font-medium">
+                <span className="flex items-center text-primary text-[10px] font-medium">
                   <TrendingUp className="w-3 h-3 mr-0.5" />
                   +23%
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/10">
-              <Phone className="w-3 h-3 text-cyan-500" />
+            <div className="flex items-center gap-1 px-2 py-1 rounded bg-violet-500/10">
+              <Phone className="w-3 h-3 text-violet-500" />
               <span className="text-[10px] font-medium text-foreground">12 calls</span>
             </div>
           </div>
@@ -129,7 +129,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           {/* Deals pipeline */}
           <div className={cn("transition-all duration-500", phase >= 2 ? "opacity-100" : "opacity-0")}>
             <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
-              <Target className="w-3 h-3 text-cyan-500" />
+              <Target className="w-3 h-3 text-violet-500" />
               Pipeline
             </div>
             <div className="space-y-1.5">
@@ -137,11 +137,11 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
                 <div key={deal.name} className="p-1.5 rounded bg-secondary/50 border border-border/50">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[10px] font-medium text-foreground truncate">{deal.name}</p>
-                    <p className="text-[10px] font-bold text-cyan-500">{formatCurrency(deal.value)}</p>
+                    <p className="text-[10px] font-bold text-violet-500">{formatCurrency(deal.value)}</p>
                   </div>
                   <div className="h-1 rounded-full bg-secondary overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
+                      className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500 transition-all duration-500"
                       style={{ width: `${dealProgress[i]}%` }}
                     />
                   </div>
@@ -153,7 +153,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           {/* Revenue chart */}
           <div className={cn("transition-all duration-500", phase >= 3 ? "opacity-100" : "opacity-0")}>
             <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
-              <DollarSign className="w-3 h-3 text-cyan-500" />
+              <DollarSign className="w-3 h-3 text-violet-500" />
               Revenue
             </div>
             <div className="p-2 rounded bg-secondary/50 border border-border/50">
@@ -164,7 +164,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
                       <div
                         className={cn(
                           "w-full rounded-t transition-all duration-500",
-                          i === 3 ? "bg-gradient-to-t from-cyan-500 to-blue-400" : "bg-cyan-500/30"
+                          i === 3 ? "bg-gradient-to-t from-violet-500 to-blue-400" : "bg-violet-500/30"
                         )}
                         style={{ height: `${chartHeight[i]}%`, transitionDelay: `${i * 100}ms` }}
                       />
@@ -179,17 +179,17 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
 
         {/* Call analysis - compact */}
         <div className={cn(
-          "p-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 mb-3 transition-all duration-500",
+          "p-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-blue-500/10 border border-violet-500/20 mb-3 transition-all duration-500",
           phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shrink-0">
               <Phone className="w-3.5 h-3.5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-medium text-foreground">Latest Call</span>
-                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-[8px] text-emerald-600">Positive</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-[8px] text-primary">Positive</span>
               </div>
               <p className="text-[9px] text-muted-foreground truncate">
                 Strong buying signals. Action: competitive analysis
@@ -203,16 +203,16 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           "grid grid-cols-3 gap-2 mb-3 transition-all duration-500",
           phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
-          <div className="text-center p-1.5 rounded bg-cyan-500/10">
-            <div className="text-sm font-bold text-cyan-500">+35%</div>
+          <div className="text-center p-1.5 rounded bg-violet-500/10">
+            <div className="text-sm font-bold text-violet-500">+35%</div>
             <div className="text-[8px] text-muted-foreground">Conversion</div>
           </div>
-          <div className="text-center p-1.5 rounded bg-cyan-500/10">
-            <div className="text-sm font-bold text-cyan-500">95%</div>
+          <div className="text-center p-1.5 rounded bg-violet-500/10">
+            <div className="text-sm font-bold text-violet-500">95%</div>
             <div className="text-[8px] text-muted-foreground">Accuracy</div>
           </div>
-          <div className="text-center p-1.5 rounded bg-cyan-500/10">
-            <div className="text-sm font-bold text-cyan-500">-50%</div>
+          <div className="text-center p-1.5 rounded bg-violet-500/10">
+            <div className="text-sm font-bold text-violet-500">-50%</div>
             <div className="text-[8px] text-muted-foreground">Time</div>
           </div>
         </div>
