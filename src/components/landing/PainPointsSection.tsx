@@ -64,7 +64,7 @@ const tools: Tool[] = [
       { label: "Notification", icon: Mail },
     ],
     stats: [
-      { value: "80%", label: "Time Saved" },
+      { value: "90%", label: "Time Saved" },
       { value: "0", label: "Code Required" },
       { value: "∞", label: "Possible Workflows" },
     ],
