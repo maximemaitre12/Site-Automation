@@ -152,26 +152,6 @@ export default function Documentation() {
           </div>
         </section>
 
-        {/* Help Section */}
-        <section className="py-16 px-4 bg-muted/30">
-          <div className="max-w-4xl mx-auto text-center">
-            <Book className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-foreground mb-4">Can't find what you're looking for?</h2>
-            <p className="text-muted-foreground mb-6">
-              Our support team is here to help. Reach out and we'll get back to you within 24 hours.
-            </p>
-            <div className="flex justify-center gap-4">
-              <Link to="/contact">
-                <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-                  Contact Support
-                </button>
-              </Link>
-              <button className="px-6 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors">
-                Join Community
-              </button>
-            </div>
-          </div>
-        </section>
       </main>
 
       <LandingFooter />
