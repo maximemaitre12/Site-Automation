@@ -20,7 +20,7 @@ Youriy and Maxime Maître had never met before landing in China. Both were secon
 
 "We met at a welcome dinner for international students," recalls Youriy. "I was complaining about how my previous internship made me spend hours on repetitive data entry tasks. Maxime looked at me and said, 'What if AI could do all of that?'"
 
-That conversation sparked something. Over the following weeks, the two students found themselves meeting regularly at coffee shops around Jing'an district, sketching out ideas on napkins and laptops.
+That conversation sparked something. Over the following weeks, the two students found themselves meeting regularly at coffee shops around Putuo district, sketching out ideas on napkins and laptops.
 
 Shanghai: The Perfect Incubator
 
@@ -42,7 +42,7 @@ The Road Ahead
 
 Today, AETHER serves over 100 enterprises across 8 countries. But Youriy and Maxime never forgot their roots.
 
-"We still have a team in Shanghai," says Maxime with a smile. "And every time we visit, we go back to that first coffee shop in Jing'an. It reminds us why we started."
+"We still have a team in Shanghai," says Maxime with a smile. "And every time we visit, we go back to that first coffee shop in Putuo. It reminds us why we started."
 
 The AETHER journey is far from over. With ambitious plans for 2025 – including new AI capabilities, global expansion, and innovative partnerships – the two founders are just getting started.
 

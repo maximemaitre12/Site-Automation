@@ -115,8 +115,8 @@ export default function About() {
                     manual, repetitive tasks when AI could handle them?
                   </p>
                   <p>
-                    Late-night coding sessions in their Jing'an apartment. Endless discussions about machine learning over 
-                    xiaolongbao. A shared conviction that enterprise AI should be accessible to everyone. 
+                    Late-night coding sessions in their Putuo apartment. Endless discussions about machine learning over 
+                    xiaolongbao. A shared conviction that enterprise AI should be accessible to everyone.
                     This is how AETHER was born.
                   </p>
                 </div>

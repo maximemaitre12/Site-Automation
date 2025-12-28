@@ -141,7 +141,7 @@ export default function Careers() {
                   who became roommates during their exchange program in Shanghai.
                 </p>
                 <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4">
-                  What started as late-night conversations in their Jing'an apartment has grown into an enterprise AI 
+                  What started as late-night conversations in their Putuo apartment has grown into an enterprise AI 
                   platform serving companies across the globe.
                 </p>
                 <p className="text-sm md:text-base text-muted-foreground">

@@ -22,7 +22,7 @@ const offices = [
   { 
     city: "Shanghai", 
     country: "China", 
-    address: "Jing'an District, Nanjing West Road", 
+    address: "Putuo District", 
     postalCode: "200041 Shanghai",
     timezone: "CST (UTC+8)",
     image: "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=400&h=200&fit=crop"
