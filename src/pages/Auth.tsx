@@ -135,49 +135,57 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Visual (hidden on mobile) */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary/20 to-background items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-hero-pattern opacity-30" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px]" />
-        
-        <div className="relative z-10">
-          <h2 className="text-4xl font-bold text-foreground mb-6">
-            {mode === 'signup' ? 'Start your journey with' : 'Welcome back to'}
-            <br />
-            <span className="text-gradient">AETHER AI Suite</span>
-          </h2>
-          
-          <ul className="space-y-4">
-            {features.map((feature, i) => (
-              <li key={i} className="flex items-center gap-3 text-foreground">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Check className="w-4 h-4 text-primary" />
-                </div>
-                {feature}
-              </li>
-            ))}
-          </ul>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3">
+            <img 
+              src={aetherLogo} 
+              alt="AETHER Logo" 
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-cover"
+            />
+            <span className="text-lg sm:text-xl font-bold text-foreground">AETHER</span>
+          </Link>
+          <Link to="/">
+            <Button variant="ghost" className="gap-2 text-sm">
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Back</span>
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Right side - Form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
-        <div className="w-full max-w-md">
-          {/* Logo & Back */}
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
-              <img src={aetherLogo} alt="Aether" className="h-8 sm:h-10 md:h-12 w-auto group-hover:scale-105 transition-transform" />
-            </Link>
-            <Link 
-              to="/" 
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-secondary/80 border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-primary/30 hover:scale-105 transition-all duration-300 group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-            </Link>
+      <div className="flex-1 flex">
+        {/* Left side - Visual (hidden on mobile) */}
+        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary/20 to-background items-center justify-center p-12 relative overflow-hidden">
+          <div className="absolute inset-0 bg-hero-pattern opacity-30" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px]" />
+          
+          <div className="relative z-10">
+            <h2 className="text-4xl font-bold text-foreground mb-6">
+              {mode === 'signup' ? 'Start your journey with' : 'Welcome back to'}
+              <br />
+              <span className="text-gradient">AETHER AI Suite</span>
+            </h2>
+            
+            <ul className="space-y-4">
+              {features.map((feature, i) => (
+                <li key={i} className="flex items-center gap-3 text-foreground">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-primary" />
+                  </div>
+                  {feature}
+                </li>
+              ))}
+            </ul>
           </div>
+        </div>
 
-          {/* Header */}
+        {/* Right side - Form */}
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
+          <div className="w-full max-w-md">
+            {/* Header */}
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">
             {mode === 'login' && 'Sign in to your account'}
             {mode === 'signup' && 'Create your account'}
@@ -301,6 +309,7 @@ export default function Auth() {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
