@@ -139,13 +139,12 @@ export default function Auth() {
       {/* Header */}
       <div className="border-b border-border bg-card/50">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 sm:gap-3">
+          <Link to="/" className="flex items-center shrink-0">
             <img 
               src={aetherLogo} 
               alt="AETHER Logo" 
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-cover"
+              className="h-10 sm:h-14 w-auto"
             />
-            <span className="text-lg sm:text-xl font-bold text-foreground">AETHER</span>
           </Link>
           <Link to="/">
             <Button variant="ghost" className="gap-2 text-sm">
