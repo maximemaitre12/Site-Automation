@@ -248,13 +248,14 @@ export function PainPointsSection() {
       scrollRafRef.current = null;
     }
 
+    // Capture the clicked card position before layout changes
     const el = cardRefs.current[index];
     scrollLockRef.current = el ? { index, top: el.getBoundingClientRect().top } : null;
 
     setExpandedIndex((prev) => (prev === index ? null : index));
 
-    // Stabilize scroll during the whole height transition (collapse above / expand current)
-    // so the clicked card stays at the same viewport position.
+    // Stabilize scroll during the height transition so the clicked card doesn't jump.
+    // IMPORTANT: if pinning would require overscrolling (top/bottom), abort to avoid "teleport".
     requestAnimationFrame(() => {
       const start = performance.now();
       const durationMs = 950; // collapse + expand (duration-500) + buffer
@@ -264,13 +265,31 @@ export function PainPointsSection() {
         if (!lock) return;
 
         const afterEl = cardRefs.current[lock.index];
-        if (!afterEl) return;
+        if (!afterEl) {
+          scrollLockRef.current = null;
+          scrollRafRef.current = null;
+          return;
+        }
 
         const newTop = afterEl.getBoundingClientRect().top;
         const delta = lock.top - newTop;
 
         if (Math.abs(delta) > 0.5) {
-          window.scrollTo({ top: window.scrollY + delta });
+          const maxScrollY = Math.max(
+            0,
+            document.documentElement.scrollHeight - window.innerHeight
+          );
+          const rawNext = window.scrollY + delta;
+
+          // If we'd hit a boundary, don't clamp to top/bottom (that feels like a teleport).
+          if (rawNext < 0 || rawNext > maxScrollY) {
+            afterEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            scrollLockRef.current = null;
+            scrollRafRef.current = null;
+            return;
+          }
+
+          window.scrollTo({ top: rawNext });
         }
 
         if (now - start < durationMs) {
@@ -288,7 +307,7 @@ export function PainPointsSection() {
 
 
   return (
-    <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
+    <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50" style={{ overflowAnchor: "none" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
