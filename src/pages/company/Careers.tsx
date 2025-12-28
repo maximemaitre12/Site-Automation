@@ -101,22 +101,22 @@ export default function Careers() {
       
       <main className="pt-20">
         {/* Hero */}
-        <section className="py-20 px-4 relative overflow-hidden">
+        <section className="py-12 md:py-20 px-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-violet-500/5" />
-          <div className="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-10 md:right-20 w-48 md:w-72 h-48 md:h-72 bg-primary/10 rounded-full blur-3xl" />
           
           <div className="max-w-4xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">We're Hiring!</span>
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4 md:mb-6">
+              <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="text-xs md:text-sm font-medium">We're Hiring!</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 md:mb-6 px-2">
               Build the Future of{" "}
               <span className="bg-gradient-to-r from-primary via-violet-500 to-accent bg-clip-text text-transparent">
                 Enterprise AI
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 md:mb-8 px-4">
               Join a team of ambitious builders creating technology that transforms how businesses work. 
               We're remote-first, fast-moving, and just getting started.
             </p>
@@ -130,33 +130,33 @@ export default function Careers() {
         </section>
 
         {/* Origin Story */}
-        <section className="py-16 px-4 bg-muted/30">
+        <section className="py-12 md:py-16 px-4 bg-muted/30">
           <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
-                <h2 className="text-3xl font-bold text-foreground mb-6">Our Story</h2>
-                <p className="text-muted-foreground mb-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 md:mb-6">Our Story</h2>
+                <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4">
                   AETHER was founded in 2024 by <strong className="text-foreground">Youriy</strong> and{" "}
                   <strong className="text-foreground">Maxime Maître</strong>, two emlyon business school students 
-                  who met during an exchange program in Shanghai.
+                  who became roommates during their exchange program in Shanghai.
                 </p>
-                <p className="text-muted-foreground mb-4">
-                  What started as late-night conversations in Jing'an cafés has grown into an enterprise AI 
+                <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4">
+                  What started as late-night conversations in their Jing'an apartment has grown into an enterprise AI 
                   platform serving companies across the globe.
                 </p>
-                <p className="text-muted-foreground">
+                <p className="text-sm md:text-base text-muted-foreground">
                   We're still that same team of curious builders, now looking for more people who share our 
                   passion for solving hard problems and moving fast.
                 </p>
-                <Link to="/about" className="text-primary font-medium mt-4 inline-flex items-center gap-2 hover:gap-3 transition-all">
+                <Link to="/about" className="text-primary font-medium mt-4 inline-flex items-center gap-2 hover:gap-3 transition-all text-sm md:text-base">
                   Read our full story <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {values.map((value) => (
-                  <div key={value.title} className="p-4 rounded-xl bg-card border border-border">
-                    <h3 className="font-semibold text-foreground text-sm mb-2">{value.title}</h3>
-                    <p className="text-xs text-muted-foreground">{value.description}</p>
+                  <div key={value.title} className="p-3 md:p-4 rounded-xl bg-card border border-border">
+                    <h3 className="font-semibold text-foreground text-xs md:text-sm mb-1 md:mb-2">{value.title}</h3>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">{value.description}</p>
                   </div>
                 ))}
               </div>
@@ -165,20 +165,20 @@ export default function Careers() {
         </section>
 
         {/* Benefits */}
-        <section className="py-20 px-4">
+        <section className="py-12 md:py-20 px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-4 text-center">Why Join AETHER?</h2>
-            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4 text-center">Why Join AETHER?</h2>
+            <p className="text-sm md:text-base text-muted-foreground text-center mb-8 md:mb-12 max-w-2xl mx-auto px-2">
               We believe in treating our team exceptionally well. Here's what you get.
             </p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {benefits.map((benefit) => (
-                <div key={benefit.title} className="p-6 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                    <benefit.icon className="w-6 h-6 text-primary" />
+                <div key={benefit.title} className="p-4 md:p-6 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 md:mb-4">
+                    <benefit.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
-                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                  <h3 className="font-semibold text-foreground mb-1 md:mb-2 text-sm md:text-base">{benefit.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground">{benefit.description}</p>
                 </div>
               ))}
             </div>
