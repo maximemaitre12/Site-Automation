@@ -7,7 +7,7 @@ import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { PainPointsSection } from "@/components/landing/PainPointsSection";
-
+import { ApiSection } from "@/components/landing/ApiSection";
 import { ResultsSection } from "@/components/landing/ResultsSection";
 import { TestimonialSection } from "@/components/landing/TestimonialSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
@@ -44,7 +44,7 @@ export default function Landing() {
       <main>
         <HeroSection />
         <PainPointsSection />
-        
+        <ApiSection />
         <ResultsSection />
         <TestimonialSection />
         <FinalCTASection />
