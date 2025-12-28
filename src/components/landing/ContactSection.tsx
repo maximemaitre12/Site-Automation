@@ -29,7 +29,7 @@ export function ContactSection() {
             {/* CTA */}
             <Link 
               to="/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background font-medium hover:bg-foreground/90 transition-all shadow-lg hover:scale-[1.02] group shrink-0"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02] group shrink-0"
             >
               <Sparkles className="w-4 h-4" />
               <span>Get in Touch</span>
