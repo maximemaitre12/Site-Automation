@@ -318,15 +318,6 @@ function ExpandedContent({ tool }: { tool: Tool }) {
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="mt-5 text-center">
-        <Link to="/signup">
-          <Button className={cn("shadow-lg", tool.color, "hover:opacity-90")}>
-            Create Your Agent
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 }
