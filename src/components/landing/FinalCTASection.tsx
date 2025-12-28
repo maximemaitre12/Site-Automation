@@ -71,10 +71,6 @@ export function FinalCTASection() {
             <Mail className="w-4 h-4" />
             <span>contact@aether-ai.com</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4" />
-            <span>+1 (555) 123-4567</span>
-          </div>
         </div>
       </div>
     </section>
