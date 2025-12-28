@@ -6,7 +6,6 @@ import {
   HubSpotLogo, ZapierLogo, StripeLogo, ShopifyLogo,
   TrelloLogo, AirtableLogo
 } from "./BrandLogos";
-import aetherLogo from "@/assets/aether-logo.jpeg";
 
 const platforms = [
   { name: "Slack", Logo: SlackLogo },
