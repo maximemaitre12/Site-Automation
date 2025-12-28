@@ -99,7 +99,7 @@ export function IntegrationsSection() {
           
           {/* +more indicator */}
           <p className="text-center text-xs text-muted-foreground mt-4">
-            +100 other integrations available
+            And many more integrations available
           </p>
         </div>
 
@@ -148,7 +148,7 @@ export function IntegrationsSection() {
             <span>No coding required</span>
             <span className="mx-1">•</span>
             <Check className="w-3.5 h-3.5 text-primary" />
-            <span>100+ integrations</span>
+            <span>Growing integrations library</span>
             <span className="mx-1">•</span>
             <Check className="w-3.5 h-3.5 text-primary" />
             <span>Secure & encrypted</span>
