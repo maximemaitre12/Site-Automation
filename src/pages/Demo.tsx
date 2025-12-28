@@ -107,14 +107,17 @@ export default function Demo() {
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left column - Info */}
             <div className="lg:sticky lg:top-24">
-              <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 group">
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                <span>Retour</span>
-              </Link>
-              
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Response within 24h</span>
+              <div className="flex items-center gap-3 mb-6">
+                <Link 
+                  to="/" 
+                  className="w-10 h-10 rounded-full bg-secondary/80 border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-primary/30 hover:scale-105 transition-all duration-300 group"
+                >
+                  <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </Link>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">Response within 24h</span>
+                </div>
               </div>
               
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
