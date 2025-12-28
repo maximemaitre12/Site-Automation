@@ -51,10 +51,9 @@ const founders = [
 ];
 
 const timeline = [
-  { year: "2023", event: "First Meeting", description: "Youriy and Maxime meet at emlyon business school and discover a shared passion for AI" },
-  { year: "2024", event: "Shanghai Roommates", description: "During their exchange in Shanghai, they become roommates and the AETHER idea takes shape" },
-  { year: "2024", event: "First Prototype", description: "Late nights in their Shanghai apartment lead to the first working version of AETHER" },
-  { year: "2025", event: "Official Launch", description: "AETHER launches globally with growing enterprise client base across Europe and Asia" }
+  { year: "2024", event: "First Meeting", description: "Youriy and Maxime meet at emlyon business school and discover a shared passion for AI" },
+  { year: "2025", event: "Shanghai Roommates", description: "During their exchange in Shanghai, they become roommates and the AETHER idea takes shape" },
+  { year: "2025", event: "First Prototype", description: "Late nights in their Putuo apartment lead to the first working version of AETHER" }
 ];
 
 export default function About() {
@@ -163,7 +162,7 @@ export default function About() {
                   <p className="text-muted-foreground text-center text-xs md:text-sm">{founder.bio}</p>
                   <div className="flex flex-wrap justify-center gap-2 mt-4">
                     <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">emlyon</span>
-                    <span className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-500 text-xs font-medium">Shanghai 2024</span>
+                    <span className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-500 text-xs font-medium">Shanghai 2025</span>
                   </div>
                 </div>
               ))}
@@ -216,29 +215,6 @@ export default function About() {
           </div>
         </section>
 
-        {/* Stats */}
-        <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="p-6">
-                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">100+</div>
-                <div className="text-muted-foreground text-sm">Enterprise Clients</div>
-              </div>
-              <div className="p-6">
-                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">10M+</div>
-                <div className="text-muted-foreground text-sm">Tasks Automated</div>
-              </div>
-              <div className="p-6">
-                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">12+</div>
-                <div className="text-muted-foreground text-sm">Team Members</div>
-              </div>
-              <div className="p-6">
-                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">8+</div>
-                <div className="text-muted-foreground text-sm">Countries</div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <LandingFooter />
