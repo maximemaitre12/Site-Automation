@@ -307,36 +307,34 @@ export function PainPointsSection() {
                 }}
                 className={cn(
                   "group relative rounded-2xl border transition-all duration-500 overflow-hidden",
-                  "bg-white/40 dark:bg-white/10",
-                  "backdrop-blur-xl",
-                  "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_4px_20px_rgba(0,0,0,0.08)]",
-                  "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/60 before:via-white/20 before:to-transparent before:pointer-events-none",
+                  "backdrop-blur-sm",
                   isExpanded
-                    ? "border-primary/40 shadow-xl shadow-primary/15 bg-white/50 dark:bg-white/15"
-                    : "border-white/60 dark:border-white/20 hover:border-primary/30 hover:shadow-lg hover:bg-white/50 dark:hover:bg-white/15"
+                    ? "border-primary/30 shadow-xl"
+                    : "border-border/50 hover:border-primary/20 hover:shadow-lg"
                 )}
                 style={
                   shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
                 }
               >
-                {/* Glass shimmer effect - always visible */}
+                {/* Glass background with agent color tint */}
                 <div
                   className={cn(
-                    "absolute inset-0 rounded-2xl pointer-events-none",
-                    "bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.06)_45%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.06)_55%,transparent_60%)]",
-                    "bg-[length:200%_100%]",
-                    "opacity-100 animate-[shimmer_3s_ease-in-out_infinite]"
+                    "absolute inset-0 -z-10",
+                    tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_60%_97%)] via-white to-[hsl(220_60%_98%)]",
+                    tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_45%_97%)] via-white to-[hsl(270_45%_98%)]",
+                    tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_50%_97%)] via-white to-[hsl(160_50%_98%)]",
+                    tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_45%_97%)] via-white to-[hsl(340_45%_98%)]",
+                    tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_60%_97%)] via-white to-[hsl(25_60%_98%)]",
+                    tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_60%_97%)] via-white to-[hsl(190_60%_98%)]",
                   )}
                 />
-
-                {/* Cloud decoration behind card */}
+                {/* Shimmer glass reflection */}
                 <div
                   className={cn(
-                    "absolute -inset-4 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl opacity-0 transition-opacity duration-500 -z-10",
-                    isExpanded ? "opacity-30" : "group-hover:opacity-20",
-                    i % 2 === 0
-                      ? "bg-gradient-to-br from-[hsl(260_70%_78%)] to-[hsl(200_80%_85%)]"
-                      : "bg-gradient-to-br from-[hsl(200_80%_78%)] to-[hsl(260_70%_85%)]"
+                    "absolute inset-0 -z-10 pointer-events-none",
+                    "bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.8)_45%,rgba(255,255,255,0.9)_50%,rgba(255,255,255,0.8)_55%,transparent_60%)]",
+                    "bg-[length:200%_100%]",
+                    "animate-[shimmer_4s_ease-in-out_infinite]"
                   )}
                 />
 
