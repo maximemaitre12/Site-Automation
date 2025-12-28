@@ -65,22 +65,24 @@ export function TestimonialSection() {
         
         <blockquote className="text-base sm:text-lg md:text-xl font-medium text-foreground leading-relaxed mb-4 sm:mb-6 min-h-[4rem] sm:min-h-[5rem]">
           <span className="text-muted-foreground">"</span>
-          {displayedText.split(" ").map((word, index) => {
+          {displayedText.split(" ").map((word, index, arr) => {
             // Highlight key words
             const isHighlight = ["AI", "you", "intelligent", "automation"].includes(word.replace(/[.,]/g, ""));
             return (
-              <span
-                key={index}
-                className={cn(
-                  "inline animate-fade-in mr-[0.3em]",
-                  isHighlight ? "text-primary font-semibold" : "text-foreground"
-                )}
-                style={{ 
-                  animationDelay: `${index * 20}ms`,
-                  animationDuration: "300ms"
-                }}
-              >
-                {word}
+              <span key={index}>
+                <span
+                  className={cn(
+                    "animate-fade-in",
+                    isHighlight ? "text-primary font-semibold" : "text-foreground"
+                  )}
+                  style={{ 
+                    animationDelay: `${index * 20}ms`,
+                    animationDuration: "300ms"
+                  }}
+                >
+                  {word}
+                </span>
+                {index < arr.length - 1 && " "}
               </span>
             );
           })}
