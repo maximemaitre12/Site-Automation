@@ -62,6 +62,16 @@ export function LandingHeader() {
           
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
+            {/* Home link - only visible when NOT on homepage */}
+            {!isHomePage && (
+              <Link 
+                to="/" 
+                className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              >
+                Home
+              </Link>
+            )}
+            
             {/* Results link - only visible on homepage when not scrolled */}
             {isHomePage && !scrolled && (
               <a 
