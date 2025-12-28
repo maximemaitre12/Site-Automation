@@ -328,9 +328,9 @@ export function PainPointsSection() {
                     tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_70%_92%)] via-[hsl(190_50%_96%)] to-[hsl(190_70%_94%)]",
                   )}
                 />
-                {/* Shimmer glass reflection - always visible */}
+                {/* Shimmer glass reflection - behind content */}
                 <div
-                  className="absolute inset-0 pointer-events-none bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.5)_35%,rgba(255,255,255,0.8)_50%,rgba(255,255,255,0.5)_65%,transparent_75%)] bg-[length:250%_100%] animate-[shimmer_3s_ease-in-out_infinite]"
+                  className="absolute inset-0 -z-10 pointer-events-none bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.3)_35%,rgba(255,255,255,0.5)_50%,rgba(255,255,255,0.3)_65%,transparent_75%)] bg-[length:250%_100%] animate-[shimmer_3s_ease-in-out_infinite]"
                 />
 
                 {/* Header - clickable */}
