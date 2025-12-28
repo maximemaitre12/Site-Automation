@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 const navLinks = [
-  { label: "About", href: "/about" },
   { label: "Blog", href: "/blog" },
   { label: "Docs", href: "/resources/documentation" },
   { label: "Contact", href: "/contact" },
