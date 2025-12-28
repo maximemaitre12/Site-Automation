@@ -23,13 +23,13 @@ Youriy and Maxime had never crossed paths before landing in China. Both were sec
 
 That one question stuck. Over the next few weeks, they kept meeting at coffee shops around Putuo, scribbling ideas on napkins and laptops.
 
-**Shanghai felt like the right place for this.**
+Shanghai felt like the right place for this.
 
 "There's this energy here," Maxime explains. "You walk around and everyone seems to be building something. We figured—why not us?"
 
 While their classmates hit the tourist spots, they spent weekends in co-working spaces, digging into machine learning, enterprise software, and automation. The first prototype came together in a small Putuo apartment, fueled by baozi, endless tea, and the Shanghai skyline outside their window.
 
-**No big funding story. Just conviction.**
+No big funding story. Just conviction.
 
 "We don't have investors lining up," Youriy admits. "But we've seen how much time companies waste on stuff AI could do in seconds. That's the gap we're going after."
 
@@ -49,27 +49,27 @@ const posts = [
     icon: TrendingUp,
     fullContent: `McKinsey found that knowledge workers spend about 30% of their time on repetitive tasks that could be automated. That's 12 hours a week, per person.
 
-**Where does all that time go?**
+Where does all that time go?
 
 The breakdown is pretty telling:
-• Moving data between systems: 8%
-• Hunting for information across tools: 7%  
-• Building and formatting reports: 6%
-• Sorting through emails: 5%
-• Coordinating meetings and schedules: 4%
+→ Moving data between systems: 8%
+→ Hunting for information across tools: 7%  
+→ Building and formatting reports: 6%
+→ Sorting through emails: 5%
+→ Coordinating meetings and schedules: 4%
 
 For a 100-person company with average salaries around €60k, that adds up to €1.8 million yearly on work that doesn't move the needle.
 
-**So why isn't everyone automating?**
+So why isn't everyone automating?
 
 Turns out, it's complicated. Deloitte found only 13% of companies have actually scaled automation beyond pilot projects.
 
 The blockers people mention most:
-• Legacy systems are a nightmare to integrate (67%)
-• Nobody on the team knows how to do it (54%)
-• Hard to prove ROI to get budget (48%)
+→ Legacy systems are a nightmare to integrate (67%)
+→ Nobody on the team knows how to do it (54%)
+→ Hard to prove ROI to get budget (48%)
 
-**What's different now?**
+What's different now?
 
 AI has gotten good enough to handle tasks that need judgment—not just simple if-then rules. That 30% isn't inevitable anymore. The companies figuring this out first will have a real edge.`
   },
@@ -85,28 +85,28 @@ AI has gotten good enough to handle tasks that need judgment—not just simple i
     icon: Brain,
     fullContent: `Voice AI has gotten remarkably good, but most people have no idea what happens under the hood. Let's break it down.
 
-**The journey from your voice to a response:**
+The journey from your voice to a response:
 
-1. **Capturing audio (0-50ms)**
+1. Capturing audio (0-50ms)
 Your voice becomes a digital waveform. Modern systems sample at 16kHz or higher to catch all the details.
 
-2. **Turning sound into text (50-200ms)**
+2. Turning sound into text (50-200ms)
 Speech recognition models—often transformer-based like Whisper—convert those sound waves into words. Accuracy is now above 95% in most situations.
 
-3. **Understanding what you meant (100-300ms)**
+3. Understanding what you meant (100-300ms)
 This is where it gets interesting. The system figures out your intent, pulls out relevant details (names, dates, numbers), and considers what you said before.
 
-4. **Generating a response (200-500ms)**
+4. Generating a response (200-500ms)
 Based on what it understood, the system might query databases, call APIs, or generate text with a language model.
 
-5. **Making it sound human (100-200ms)**
+5. Making it sound human (100-200ms)
 Text-to-speech turns the response into natural-sounding audio. The best neural TTS is nearly indistinguishable from a real person.
 
-**Why timing matters so much**
+Why timing matters so much
 
 Natural conversation has pauses of 200-500ms. For AI to feel conversational, total latency needs to stay under a second. The big breakthrough recently has been running these steps in parallel rather than one after another.
 
-**What this means for businesses**
+What this means for businesses
 
 This isn't just chatbot stuff. Think automated phone systems that actually get what you're saying, meeting transcription that pulls out action items, or voice-controlled data queries.`
   },
@@ -122,32 +122,32 @@ This isn't just chatbot stuff. Think automated phone systems that actually get w
     icon: Globe,
     fullContent: `Things are moving fast in enterprise AI. Here are five trends that actually have data behind them.
 
-**1. AI agents are leaving the lab**
+1. AI agents are leaving the lab
 
 Gartner predicts 33% of enterprise software will include agentic AI by 2028. These aren't chatbots—they execute multi-step tasks on their own.
 
 Right now: 8% of companies have agents in production
 By end of 2025: expected to hit 23%
 
-**2. Multimodal is now the default**
+2. Multimodal is now the default
 
 Text, image, voice—the boundaries are blurring. IDC says 67% of new enterprise AI projects last year were multimodal.
 
 Document processing now combines OCR, layout analysis, image recognition, and language understanding all at once.
 
-**3. Governance is suddenly a priority**
+3. Governance is suddenly a priority
 
 Spending on AI governance tools jumped 340% in 2024, according to Forrester. Turns out, deploying AI without controls creates real risk.
 
 Companies are now requiring audit trails, explainability, bias detection, and data lineage tracking.
 
-**4. ROI measurement is getting serious**
+4. ROI measurement is getting serious
 
 Early AI projects focused on cost savings. Now the metrics are broader: time-to-value for new hires, customer satisfaction, employee experience, revenue acceleration.
 
 McKinsey found that companies with mature measurement frameworks see 2.5x better returns.
 
-**5. Humans + AI beats either alone**
+5. Humans + AI beats either alone
 
 The most successful deployments augment people rather than replace them. Accenture's research shows human-AI teams outperform either alone by 30% on complex work.
 
@@ -165,35 +165,35 @@ The pattern that works: AI handles volume and speed, humans bring judgment and c
     icon: Zap,
     fullContent: `Document processing has evolved through distinct generations. Each one changed what was possible.
 
-**Generation 1: OCR (1990s-2000s)**
+Generation 1: OCR (1990s-2000s)
 
 Optical Character Recognition could turn scanned documents into text. That was it. No understanding of structure, context, or meaning.
 
 Accuracy hovered around 85-90%. Sounds okay until you realize that's 1-2 errors per line.
 
-**Generation 2: Template-based (2010s)**
+Generation 2: Template-based (2010s)
 
 You could define where the invoice number goes, where the total is, and the system would extract those fields.
 
 The catch: every new document type needed a new template. Template maintenance became someone's entire job.
 
-**Generation 3: Machine learning (2018-2022)**
+Generation 3: Machine learning (2018-2022)
 
 Systems started learning from examples. Show it 100 invoices, and it figures out how to extract from new ones.
 
 Accuracy jumped above 95%, but the systems still didn't understand what they were pulling out.
 
-**Generation 4: LLM-powered (2023+)**
+Generation 4: LLM-powered (2023+)
 
 Large language models changed the game completely. Now document processing can:
 
-• Understand how fields relate to each other
-• Handle document types it's never seen before
-• Answer questions about content
-• Summarize and find insights, not just data
-• Spot anomalies and inconsistencies
+→ Understand how fields relate to each other
+→ Handle document types it's never seen before
+→ Answer questions about content
+→ Summarize and find insights, not just data
+→ Spot anomalies and inconsistencies
 
-**The real-world difference**
+The real-world difference
 
 Traditional invoice processing: receive, manually enter or template-extract, validate, route for approval, process payment. 15-30 minutes per invoice.
 
@@ -213,35 +213,35 @@ That's 80% less time—and almost no data entry errors.`
     icon: Sparkles,
     fullContent: `Shanghai didn't just happen to be where AETHER started—it shaped how we think about building products.
 
-**The pace is real**
+The pace is real
 
 Walking through Lujiazui or Zhangjiang, you feel it. Companies ship in weeks what would take months elsewhere.
 
 That rubbed off on us. Our first prototype took 6 weeks, built from a small Putuo apartment. Anything slower felt wrong.
 
-**The scene is surprisingly global**
+The scene is surprisingly global
 
 One thing we didn't expect: Shanghai's tech community is incredibly international. Meetups in Jing'an draw founders and engineers from everywhere. WeChat groups connect French entrepreneurs, American engineers, Chinese investors.
 
 We found advisors, early users, and ideas in this mix. AETHER's global perspective—building for businesses everywhere, not just one market—came directly from being here.
 
-**No money forces creativity**
+No money forces creativity
 
 We started with almost nothing. In Shanghai, that's normal. Many successful startups here bootstrapped longer than their Silicon Valley counterparts.
 
 This meant:
-• Ruthless focus on what actually matters
-• Building MVPs that work, not just demos
-• Finding creative solutions instead of buying our way out
+→ Ruthless focus on what actually matters
+→ Building MVPs that work, not just demos
+→ Finding creative solutions instead of buying our way out
 
-**A different mindset**
+A different mindset
 
 AETHER doesn't feel like typical enterprise software because we didn't build it like that. We built it like a Shanghai startup:
 
-• Ship fast, iterate faster
-• Global from day one
-• Efficient by necessity
-• Always hungry
+→ Ship fast, iterate faster
+→ Global from day one
+→ Efficient by necessity
+→ Always hungry
 
 The Shanghai chapter is just our beginning. But it defined who we are.`
   }
