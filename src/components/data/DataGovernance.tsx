@@ -7,13 +7,6 @@ import { Shield, AlertTriangle, CheckCircle, Lock, Eye, Users, FileText, Loader2
 const DataGovernance = () => {
   const { catalog, qualityChecks, stats, loading } = useDataPlatform();
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   const sensitivityBreakdown = {
     public: catalog.filter(c => c.sensitivity_level === 'public').length,
