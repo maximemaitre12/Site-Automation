@@ -121,31 +121,29 @@ export function WidgetCloudWrapper({ children, className, variant = "mixed" }: W
 export function FloatingClouds({ className }: { className?: string }) {
   return (
     <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)}>
-      {/* Large blue cloud top-right */}
+      {/* Large cyan/teal cloud top-right - matches Aether logo */}
       <div
-        className="absolute top-10 right-[10%] w-80 h-48 bg-gradient-to-br from-[hsl(200_85%_80%/0.35)] to-[hsl(220_70%_85%/0.2)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl animate-cloud-float"
+        className="absolute top-10 right-[10%] w-80 h-48 bg-gradient-to-br from-[hsl(199_85%_75%/0.3)] to-[hsl(174_70%_80%/0.2)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl animate-cloud-float"
         style={{ animationDuration: "12s" }}
       />
       
-      {/* Medium purple cloud left */}
+      {/* Medium teal cloud left */}
       <div
-        className="absolute top-1/3 left-[5%] w-52 h-36 bg-gradient-to-br from-[hsl(260_75%_80%/0.3)] to-[hsl(280_60%_85%/0.2)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-2xl animate-cloud-drift"
+        className="absolute top-1/3 left-[5%] w-52 h-36 bg-gradient-to-br from-[hsl(174_70%_75%/0.25)] to-[hsl(199_65%_80%/0.18)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-2xl animate-cloud-drift"
         style={{ animationDuration: "10s", animationDelay: "-3s" }}
       />
       
       {/* Small mixed cloud bottom-right */}
       <div
-        className="absolute bottom-20 right-[15%] w-40 h-28 bg-gradient-to-br from-[hsl(200_80%_82%/0.25)] to-[hsl(260_70%_85%/0.2)] rounded-[50%_50%_40%_60%/40%_60%_50%_50%] blur-xl animate-cloud-pulse"
+        className="absolute bottom-20 right-[15%] w-40 h-28 bg-gradient-to-br from-[hsl(199_80%_78%/0.22)] to-[hsl(174_65%_80%/0.18)] rounded-[50%_50%_40%_60%/40%_60%_50%_50%] blur-xl animate-cloud-pulse"
         style={{ animationDuration: "8s", animationDelay: "-5s" }}
       />
       
       {/* Tiny accent cloud */}
       <div
-        className="absolute top-[60%] left-[20%] w-28 h-20 bg-gradient-to-br from-[hsl(210_80%_85%/0.2)] to-[hsl(240_60%_88%/0.15)] rounded-[60%_40%_50%_50%/50%_60%_40%_50%] blur-xl animate-cloud-float"
+        className="absolute top-[60%] left-[20%] w-28 h-20 bg-gradient-to-br from-[hsl(185_75%_80%/0.18)] to-[hsl(199_60%_85%/0.12)] rounded-[60%_40%_50%_50%/50%_60%_40%_50%] blur-xl animate-cloud-float"
         style={{ animationDuration: "14s", animationDelay: "-7s" }}
       />
-
-      {/* Dark mode adjustments are handled via Tailwind's dark: prefix in the gradient colors */}
     </div>
   );
 }

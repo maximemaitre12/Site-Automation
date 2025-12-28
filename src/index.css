@@ -22,37 +22,38 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    /* Elegant blue primary - inspired by OpenAI/Linear */
-    --primary: 220 90% 56%;
+    /* Aether brand colors - blue to teal gradient */
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 15% 15%;
+    --secondary: 199 20% 96%;
+    --secondary-foreground: 199 30% 15%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 199 15% 95%;
+    --muted-foreground: 199 10% 45%;
 
-    --accent: 220 90% 56%;
+    /* Accent teal from Aether logo */
+    --accent: 174 72% 46%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 220 90% 56%;
+    --border: 199 15% 90%;
+    --input: 199 15% 90%;
+    --ring: 199 89% 48%;
 
     --radius: 0.625rem;
 
     /* Sidebar */
-    --sidebar-background: 220 14% 98%;
-    --sidebar-foreground: 220 15% 15%;
-    --sidebar-primary: 220 90% 56%;
+    --sidebar-background: 199 15% 98%;
+    --sidebar-foreground: 199 30% 15%;
+    --sidebar-primary: 199 89% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 14% 94%;
-    --sidebar-accent-foreground: 220 15% 15%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 220 90% 56%;
+    --sidebar-accent: 199 15% 94%;
+    --sidebar-accent-foreground: 199 30% 15%;
+    --sidebar-border: 199 15% 90%;
+    --sidebar-ring: 199 89% 48%;
 
     /* States */
     --success: 158 64% 42%;
@@ -62,22 +63,22 @@
   }
 
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 6%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
+    --background: 200 35% 8%;
+    --foreground: 195 30% 96%;
+    --card: 200 35% 10%;
+    --card-foreground: 195 30% 96%;
+    --popover: 200 35% 8%;
+    --popover-foreground: 195 30% 96%;
+    --primary: 199 85% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 12%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 91% 60%;
+    --secondary: 200 30% 14%;
+    --secondary-foreground: 195 30% 96%;
+    --muted: 200 30% 16%;
+    --muted-foreground: 195 20% 60%;
+    --accent: 174 70% 50%;
     --accent-foreground: 0 0% 100%;
-    --border: 217 33% 18%;
-    --input: 217 33% 15%;
+    --border: 200 30% 20%;
+    --input: 200 30% 16%;
   }
 }
 
