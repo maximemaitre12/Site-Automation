@@ -129,7 +129,9 @@
   }
 }
 
-/* Animations */
+/* ===== CLOUD-INSPIRED ANIMATIONS ===== */
+
+/* Base cloud keyframes */
 @keyframes fade-up {
   from { 
     opacity: 0;
@@ -141,51 +143,33 @@
   }
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes cloud-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-8px) translateX(4px); }
+  50% { transform: translateY(-4px) translateX(-4px); }
+  75% { transform: translateY(-12px) translateX(2px); }
 }
 
-@keyframes slide-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+@keyframes cloud-drift {
+  0%, 100% { transform: translateX(0) scale(1); }
+  50% { transform: translateX(10px) scale(1.02); }
 }
 
-@keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+@keyframes cloud-morph {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  50% { border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%; }
+  75% { border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%; }
 }
 
-@keyframes scale-up {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+@keyframes cloud-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+@keyframes cloud-fade-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes pulse-glow {
@@ -197,25 +181,7 @@
   }
 }
 
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes typewriter {
-  from { width: 0; }
-  to { width: 100%; }
-}
-
-@keyframes blink {
-  0%, 50% { border-color: transparent; }
-  51%, 100% { border-color: hsl(var(--primary)); }
-}
-
+/* Animation classes */
 .animate-fade-up {
   animation: fade-up 0.5s ease-out forwards;
 }
@@ -240,51 +206,153 @@
   opacity: 0;
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+.animate-cloud-float {
+  animation: cloud-float 8s ease-in-out infinite;
+}
+
+.animate-cloud-drift {
+  animation: cloud-drift 6s ease-in-out infinite;
+}
+
+.animate-cloud-morph {
+  animation: cloud-morph 12s ease-in-out infinite;
+}
+
+.animate-cloud-pulse {
+  animation: cloud-pulse 4s ease-in-out infinite;
+}
+
+.animate-cloud-fade-in {
+  animation: cloud-fade-in 0.6s ease-out forwards;
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-.animate-gradient-shift {
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease infinite;
+/* Cloud shape utilities */
+.cloud-shape {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: cloud-morph 12s ease-in-out infinite;
 }
 
-/* Scroll animation utilities */
+.cloud-blob {
+  position: relative;
+}
+
+.cloud-blob::before,
+.cloud-blob::after {
+  content: '';
+  position: absolute;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: cloud-morph 12s ease-in-out infinite;
+  z-index: -1;
+}
+
+.cloud-blob::before {
+  inset: -20%;
+  background: linear-gradient(135deg, hsl(200 80% 70% / 0.15), hsl(260 80% 70% / 0.15));
+  animation-delay: -2s;
+}
+
+.cloud-blob::after {
+  inset: -10%;
+  background: linear-gradient(225deg, hsl(260 80% 70% / 0.1), hsl(200 80% 70% / 0.1));
+  animation-delay: -4s;
+}
+
+/* Cloud background decorations */
+.cloud-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.cloud-bg::before {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  background: radial-gradient(ellipse, hsl(200 80% 85% / 0.3), transparent 70%);
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: cloud-float 10s ease-in-out infinite, cloud-morph 15s ease-in-out infinite;
+  top: -50px;
+  right: -100px;
+  z-index: 0;
+}
+
+.cloud-bg::after {
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 180px;
+  background: radial-gradient(ellipse, hsl(260 70% 80% / 0.25), transparent 70%);
+  border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%;
+  animation: cloud-float 12s ease-in-out infinite reverse, cloud-morph 18s ease-in-out infinite reverse;
+  bottom: -40px;
+  left: -80px;
+  z-index: 0;
+}
+
+.dark .cloud-bg::before {
+  background: radial-gradient(ellipse, hsl(200 60% 50% / 0.15), transparent 70%);
+}
+
+.dark .cloud-bg::after {
+  background: radial-gradient(ellipse, hsl(260 60% 50% / 0.12), transparent 70%);
+}
+
+/* Widget cloud wrapper */
+.widget-cloud {
+  position: relative;
+}
+
+.widget-cloud::before {
+  content: '';
+  position: absolute;
+  inset: -15px;
+  background: linear-gradient(135deg, hsl(200 80% 90% / 0.4), hsl(260 70% 85% / 0.3));
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: cloud-morph 10s ease-in-out infinite, cloud-pulse 6s ease-in-out infinite;
+  z-index: -1;
+  filter: blur(20px);
+}
+
+.dark .widget-cloud::before {
+  background: linear-gradient(135deg, hsl(200 60% 40% / 0.2), hsl(260 50% 35% / 0.15));
+}
+
+/* Scroll animation utilities with cloud style */
 .scroll-animate {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(20px) scale(0.95);
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
 .scroll-animate.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .scroll-animate-left {
   opacity: 0;
-  transform: translateX(-30px);
+  transform: translateX(-30px) scale(0.95);
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
 .scroll-animate-left.visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
 }
 
 .scroll-animate-right {
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateX(30px) scale(0.95);
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
 .scroll-animate-right.visible {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
 }
 
 .scroll-animate-scale {
@@ -298,18 +366,18 @@
   transform: scale(1);
 }
 
-/* Stagger children animation */
+/* Stagger children animation with cloud feel */
 .stagger-children > * {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(20px) scale(0.95);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
-.stagger-children.visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(6) { transition-delay: 500ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(7) { transition-delay: 600ms; opacity: 1; transform: translateY(0); }
-.stagger-children.visible > *:nth-child(8) { transition-delay: 700ms; opacity: 1; transform: translateY(0); }
+.stagger-children.visible > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(2) { transition-delay: 100ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(3) { transition-delay: 200ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(4) { transition-delay: 300ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(5) { transition-delay: 400ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(6) { transition-delay: 500ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(7) { transition-delay: 600ms; opacity: 1; transform: translateY(0) scale(1); }
+.stagger-children.visible > *:nth-child(8) { transition-delay: 700ms; opacity: 1; transform: translateY(0) scale(1); }

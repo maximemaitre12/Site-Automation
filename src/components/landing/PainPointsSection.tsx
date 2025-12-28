@@ -316,7 +316,7 @@ export function PainPointsSection() {
                   cardRefs.current[i] = el;
                 }}
                 className={cn(
-                  "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
+                  "group relative rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
                   isExpanded
                     ? "border-primary shadow-xl shadow-primary/10"
                     : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
@@ -329,12 +329,27 @@ export function PainPointsSection() {
                 }
                 onClick={() => handleToggle(i)}
               >
+                {/* Cloud decoration behind card */}
+                <div
+                  className={cn(
+                    "absolute -inset-4 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl opacity-0 transition-opacity duration-500 -z-10",
+                    isExpanded ? "opacity-30" : "group-hover:opacity-20",
+                    i % 2 === 0
+                      ? "bg-gradient-to-br from-[hsl(200_80%_75%)] to-[hsl(220_70%_85%)]"
+                      : "bg-gradient-to-br from-[hsl(260_70%_75%)] to-[hsl(280_60%_85%)]"
+                  )}
+                  style={{ animationDuration: `${12 + i * 2}s` }}
+                />
+
                 {/* Header - always visible */}
                 <div className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                        className={cn(
+                          "w-14 h-14 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300",
+                          tool.color
+                        )}
                       >
                         <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
                       </div>

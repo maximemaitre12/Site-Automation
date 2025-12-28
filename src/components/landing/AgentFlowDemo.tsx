@@ -67,16 +67,14 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
         className
       )}
     >
-      {/* Tech grid background */}
+      {/* Cloud-style background decorations */}
       <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
-          `,
-          backgroundSize: "40px 40px"
-        }}
+        className="absolute top-0 right-0 w-64 h-48 bg-gradient-to-br from-[hsl(200_80%_80%/0.2)] to-[hsl(220_70%_85%/0.1)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl -translate-y-1/2 translate-x-1/4 animate-cloud-morph"
+        style={{ animationDuration: "15s" }}
+      />
+      <div 
+        className="absolute bottom-0 left-0 w-52 h-40 bg-gradient-to-br from-[hsl(260_70%_80%/0.15)] to-[hsl(280_60%_85%/0.1)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-3xl translate-y-1/2 -translate-x-1/4 animate-cloud-drift"
+        style={{ animationDuration: "12s" }}
       />
 
       {/* Animated glow orbs */}

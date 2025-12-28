@@ -181,16 +181,17 @@ export function BrandLogosCloud({ className, maxItems = 8 }: BrandLogosCloudProp
         return (
           <div
             key={logo.name}
-            className="absolute animate-fade-up"
+            className="absolute animate-cloud-fade-in"
             style={{
               left: `${pos.x}%`,
               top: `${pos.y}%`,
               transform: `translate(-50%, -50%) scale(${pos.scale})`,
               animationDelay: `${pos.delay}ms`,
+              opacity: 0,
             }}
           >
             <div
-              className="group relative w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-125 hover:shadow-xl hover:z-10"
+              className="group relative w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-125 hover:shadow-xl hover:z-10"
               style={{ backgroundColor: logo.color }}
               title={logo.name}
             >
@@ -209,12 +210,13 @@ export function BrandLogosCloud({ className, maxItems = 8 }: BrandLogosCloudProp
       
       {/* "+more" indicator */}
       <div
-        className="absolute animate-fade-up"
+        className="absolute animate-cloud-fade-in"
         style={{
           left: "50%",
           top: "92%",
           transform: "translate(-50%, -50%)",
           animationDelay: "450ms",
+          opacity: 0,
         }}
       >
         <span className="text-xs text-muted-foreground font-medium bg-secondary/60 px-3 py-1 rounded-full border border-border/30">
