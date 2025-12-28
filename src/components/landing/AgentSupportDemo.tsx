@@ -47,18 +47,18 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
     };
   }, [isVisible]);
 
-  // Counter animation for resolved tickets
+  // Counter animation for response time (in seconds, counting down to show speed)
   useEffect(() => {
     if (phase >= 2) {
       const interval = setInterval(() => {
         setResolvedCount(prev => {
-          if (prev >= 847) {
+          if (prev >= 12) {
             clearInterval(interval);
-            return 847;
+            return 12;
           }
-          return prev + 17;
+          return prev + 1;
         });
-      }, 30);
+      }, 80);
       return () => clearInterval(interval);
     }
   }, [phase]);
@@ -113,8 +113,8 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
             "text-center p-4 rounded-xl bg-secondary/50 transition-all duration-500",
             phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
-            <div className="text-2xl font-bold text-emerald-500">{resolvedCount}</div>
-            <div className="text-xs text-muted-foreground">Tickets Today</div>
+            <div className="text-2xl font-bold text-emerald-500">{resolvedCount}s</div>
+            <div className="text-xs text-muted-foreground">Avg. Response</div>
           </div>
           <div className={cn(
             "text-center p-4 rounded-xl bg-secondary/50 transition-all duration-500",
