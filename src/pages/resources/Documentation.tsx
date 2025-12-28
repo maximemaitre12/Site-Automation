@@ -42,14 +42,13 @@ export default function Documentation() {
       
       <main className="pt-20">
         {/* Hero */}
-        <section className="py-16 px-4 bg-muted/30">
+        <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Documentation
-              </span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4">
+              AETHER{" "}
+              <span className="text-primary">Documentation</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Everything you need to build powerful automations with AETHER.
             </p>
           </div>
