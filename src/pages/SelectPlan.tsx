@@ -66,7 +66,7 @@ export default function SelectPlan() {
       <LandingHeader />
 
       {/* Content - with padding for fixed header */}
-      <div className="flex-1 container mx-auto px-4 pt-20 pb-12 flex items-center justify-center">
+      <div className="flex-1 container mx-auto px-4 pt-24 pb-12 flex items-center justify-center relative z-0">
         <div className="w-full max-w-lg">
           <div className="text-center mb-6 sm:mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
