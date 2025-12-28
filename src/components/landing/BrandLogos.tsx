@@ -167,18 +167,16 @@ export function BrandLogosGrid({ className, maxItems = 8, animate = true }: Bran
   );
 }
 
-// Cloud-style layout positions for creative display
+// Cloud-style layout positions - more centered for mobile
 const cloudPositions = [
-  { x: 50, y: 15, scale: 1.15, delay: 0 },
-  { x: 20, y: 35, scale: 1, delay: 80 },
-  { x: 80, y: 30, scale: 1.05, delay: 120 },
-  { x: 35, y: 55, scale: 0.95, delay: 160 },
-  { x: 65, y: 50, scale: 1.1, delay: 200 },
-  { x: 10, y: 65, scale: 0.9, delay: 240 },
-  { x: 90, y: 60, scale: 0.95, delay: 280 },
-  { x: 50, y: 75, scale: 1, delay: 320 },
-  { x: 25, y: 85, scale: 0.85, delay: 360 },
-  { x: 75, y: 80, scale: 0.9, delay: 400 },
+  { x: 50, y: 12, scale: 1.1, delay: 0 },
+  { x: 25, y: 32, scale: 1, delay: 80 },
+  { x: 75, y: 28, scale: 1, delay: 120 },
+  { x: 38, y: 52, scale: 0.95, delay: 160 },
+  { x: 62, y: 48, scale: 1.05, delay: 200 },
+  { x: 20, y: 68, scale: 0.9, delay: 240 },
+  { x: 80, y: 65, scale: 0.9, delay: 280 },
+  { x: 50, y: 78, scale: 0.95, delay: 320 },
 ];
 
 interface BrandLogosCloudProps {
@@ -190,7 +188,7 @@ export function BrandLogosCloud({ className, maxItems = 8 }: BrandLogosCloudProp
   const logos = brandLogos.slice(0, Math.min(maxItems, cloudPositions.length));
   
   return (
-    <div className={cn("relative w-full h-48 sm:h-56 md:h-64", className)}>
+    <div className={cn("relative w-full max-w-sm sm:max-w-md mx-auto h-44 sm:h-52", className)}>
       {/* Soft glow background */}
       <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-3xl" />
       
@@ -209,11 +207,11 @@ export function BrandLogosCloud({ className, maxItems = 8 }: BrandLogosCloudProp
             }}
           >
             <div
-              className="group relative w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-125 hover:shadow-xl hover:z-10"
+              className="group relative w-9 h-9 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:shadow-lg"
               style={{ backgroundColor: logo.color }}
               title={logo.name}
             >
-              <logo.Logo className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
+              <logo.Logo className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               
               {/* Tooltip on hover */}
               <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
