@@ -10,20 +10,20 @@ const links = {
     { label: "Sales", path: "/tools/sales" },
   ],
   company: [
-    { label: "About", path: "#" },
-    { label: "Careers", path: "#" },
-    { label: "Blog", path: "#" },
-    { label: "Contact", path: "#contact" },
+    { label: "About", path: "/about" },
+    { label: "Careers", path: "/careers" },
+    { label: "Blog", path: "/blog" },
+    { label: "Contact", path: "/contact" },
   ],
   resources: [
-    { label: "Documentation", path: "#" },
-    { label: "API", path: "#" },
-    { label: "Status", path: "#" },
+    { label: "Documentation", path: "/docs" },
+    { label: "API", path: "/api" },
+    { label: "Status", path: "/status" },
   ],
   legal: [
-    { label: "Privacy", path: "#" },
-    { label: "Terms", path: "#" },
-    { label: "Security", path: "#" },
+    { label: "Privacy", path: "/privacy" },
+    { label: "Terms", path: "/terms" },
+    { label: "Security", path: "/security" },
   ],
 };
 
@@ -32,83 +32,48 @@ export function LandingFooter() {
     <footer className="bg-background border-t border-border">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 mb-10 sm:mb-12">
-          {/* Brand */}
           <div className="col-span-2 sm:col-span-3 md:col-span-1 mb-4 md:mb-0">
-            <Link to="/" className="text-lg font-semibold text-foreground">
-              AETHER
-            </Link>
-            <p className="text-sm text-muted-foreground mt-2 sm:mt-3">
-              Intelligent automation for enterprise.
-            </p>
+            <Link to="/" className="text-lg font-semibold text-foreground">AETHER</Link>
+            <p className="text-sm text-muted-foreground mt-2 sm:mt-3">Intelligent automation for enterprise.</p>
           </div>
-          
-          {/* Product */}
           <div>
             <h4 className="text-sm font-medium text-foreground mb-4">Products</h4>
             <ul className="space-y-3">
               {links.product.map((link) => (
-                <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
+                <li key={link.label}><Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
-          
-          {/* Company */}
           <div>
             <h4 className="text-sm font-medium text-foreground mb-4">Company</h4>
             <ul className="space-y-3">
               {links.company.map((link) => (
-                <li key={link.label}>
-                  <a href={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
+                <li key={link.label}><Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
-          
-          {/* Resources */}
           <div>
             <h4 className="text-sm font-medium text-foreground mb-4">Resources</h4>
             <ul className="space-y-3">
               {links.resources.map((link) => (
-                <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
+                <li key={link.label}><Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
-          
-          {/* Legal */}
           <div>
             <h4 className="text-sm font-medium text-foreground mb-4">Legal</h4>
             <ul className="space-y-3">
               {links.legal.map((link) => (
-                <li key={link.label}>
-                  <Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
+                <li key={link.label}><Link to={link.path} className="text-sm text-muted-foreground hover:text-foreground transition-colors">{link.label}</Link></li>
               ))}
             </ul>
           </div>
         </div>
-        
-        {/* Bottom */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AETHER. All rights reserved.
-          </p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} AETHER. All rights reserved.</p>
           <div className="flex items-center gap-6">
             {["Twitter", "LinkedIn", "GitHub"].map((social) => (
-              <a key={social} href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                {social}
-              </a>
+              <a key={social} href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{social}</a>
             ))}
           </div>
         </div>
