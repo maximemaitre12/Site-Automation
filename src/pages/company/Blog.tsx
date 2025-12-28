@@ -40,7 +40,7 @@ By the end of their exchange program, they had a working product and three beta 
 
 The Road Ahead
 
-Today, AETHER serves over 100 enterprises across 8 countries. But Youriy and Maxime never forgot their roots.
+Today, AETHER continues to grow and serve enterprises globally. But Youriy and Maxime never forgot their roots.
 
 "We still have a team in Shanghai," says Maxime with a smile. "And every time we visit, we go back to that first coffee shop in Putuo. It reminds us why we started."
 

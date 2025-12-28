@@ -243,7 +243,7 @@ export default function Products() {
               Works With Your Stack
             </h2>
             <p className="text-muted-foreground mb-12 max-w-2xl mx-auto">
-              AETHER integrates with 100+ enterprise tools and platforms. Connect your existing stack in minutes.
+              AETHER integrates with major enterprise tools and platforms. Connect your existing stack in minutes.
             </p>
             <div className="flex flex-wrap justify-center gap-4 mb-12">
               {["Salesforce", "HubSpot", "Slack", "Microsoft 365", "Google Workspace", "SAP", "Oracle", "Zendesk"].map((tool) => (

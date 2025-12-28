@@ -64,7 +64,7 @@ const faqs = [
   },
   {
     question: "What integrations do you support?",
-    answer: "We integrate with 100+ enterprise tools including Salesforce, HubSpot, Slack, Microsoft 365, and more."
+    answer: "We integrate with major enterprise tools including Salesforce, HubSpot, Slack, Microsoft 365, and more."
   },
   {
     question: "Is my data secure?",
