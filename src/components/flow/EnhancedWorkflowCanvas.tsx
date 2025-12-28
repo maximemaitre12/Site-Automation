@@ -62,8 +62,10 @@ export function EnhancedWorkflowCanvas({
   const [hasMoved, setHasMoved] = useState(false);
   const DRAG_THRESHOLD = 3;
 
-  const BLOCK_WIDTH = 240;
-  const BLOCK_HEIGHT = 90;
+  // Responsive block sizes
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const BLOCK_WIDTH = isMobile ? 180 : 240;
+  const BLOCK_HEIGHT = isMobile ? 70 : 90;
 
   const getEventCoords = (e: MouseEvent | TouchEvent): { clientX: number; clientY: number } => {
     if ('touches' in e) {
@@ -298,21 +300,21 @@ export function EnhancedWorkflowCanvas({
 
   if (blocks.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-muted/20" style={{ minHeight: 0 }}>
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 bg-muted/20" style={{ minHeight: 0 }}>
         <div className="max-w-lg text-center px-4">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-6">
-            <Zap className="w-10 h-10 text-primary/60" />
+          <div className="w-14 h-14 md:w-20 md:h-20 rounded-2xl md:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-4 md:mb-6">
+            <Zap className="w-7 h-7 md:w-10 md:h-10 text-primary/60" />
           </div>
           
-          <h2 className="text-2xl font-bold text-foreground mb-3">
+          <h2 className="text-lg md:text-2xl font-bold text-foreground mb-2 md:mb-3">
             Créez votre workflow
           </h2>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-muted-foreground mb-4 md:mb-8 text-sm md:text-base">
             Ajoutez des blocs et connectez-les pour créer votre automatisation.
           </p>
 
-          <Button variant="hero" size="lg" onClick={onAddBlock} className="gap-2">
-            <Plus className="w-5 h-5" />
+          <Button variant="hero" size="default" onClick={onAddBlock} className="gap-2 h-9 md:h-11 text-sm md:text-base">
+            <Plus className="w-4 h-4 md:w-5 md:h-5" />
             Ajouter un bloc
           </Button>
         </div>
@@ -331,21 +333,21 @@ export function EnhancedWorkflowCanvas({
       onMouseDown={startPanning}
       onTouchStart={startPanningTouch}
     >
-      {/* Toolbar */}
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-2 shadow-lg">
-        <Button variant="default" size="sm" onClick={onAddBlock} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Ajouter
+      {/* Toolbar - Compact on mobile */}
+      <div className="absolute top-2 md:top-4 left-2 md:left-4 z-20 flex items-center gap-1 md:gap-2 bg-card/95 backdrop-blur-sm rounded-lg md:rounded-xl border border-border p-1.5 md:p-2 shadow-lg">
+        <Button variant="default" size="sm" onClick={onAddBlock} className="gap-1 md:gap-2 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm">
+          <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+          <span className="hidden sm:inline">Ajouter</span>
         </Button>
-        <div className="h-6 w-px bg-border" />
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0" onClick={() => setZoom(z => Math.min(2, z + 0.1))}>+</Button>
-        <span className="text-xs text-muted-foreground min-w-[45px] text-center font-mono">{Math.round(zoom * 100)}%</span>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0" onClick={() => setZoom(z => Math.max(0.3, z - 0.1))}>-</Button>
-        <Button variant="ghost" size="sm" onClick={() => { setZoom(1); setOffset({ x: 100, y: 100 }); }}>Reset</Button>
+        <div className="h-5 md:h-6 w-px bg-border" />
+        <Button variant="ghost" size="sm" className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs" onClick={() => setZoom(z => Math.min(2, z + 0.1))}>+</Button>
+        <span className="text-[10px] md:text-xs text-muted-foreground min-w-[35px] md:min-w-[45px] text-center font-mono">{Math.round(zoom * 100)}%</span>
+        <Button variant="ghost" size="sm" className="w-6 h-6 md:w-8 md:h-8 p-0 text-xs" onClick={() => setZoom(z => Math.max(0.3, z - 0.1))}>-</Button>
+        <Button variant="ghost" size="sm" onClick={() => { setZoom(1); setOffset({ x: 50, y: 50 }); }} className="hidden sm:flex h-7 md:h-8 text-xs md:text-sm">Reset</Button>
       </div>
 
-      {/* Instructions */}
-      <div className="absolute top-4 right-4 z-20 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-3 shadow-lg max-w-[220px]">
+      {/* Instructions - Hidden on mobile, visible on desktop */}
+      <div className="hidden md:block absolute top-4 right-4 z-20 bg-card/95 backdrop-blur-sm rounded-xl border border-border p-3 shadow-lg max-w-[220px]">
         <div className="text-xs text-muted-foreground space-y-1.5">
           <div className="flex items-center gap-2"><Grab className="w-3 h-3" /> Glissez les blocs</div>
           <div className="flex items-center gap-2"><Link2 className="w-3 h-3 text-primary" /> Cercle bleu → connecter</div>
