@@ -79,12 +79,11 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-4 rounded-xl bg-gradient-to-br from-violet-500/5 via-background to-purple-500/5 border border-violet-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-card border border-border overflow-hidden",
         className
       )}
     >
-      <div className="absolute top-0 right-1/4 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl animate-pulse" />
-      <div className="absolute bottom-0 left-1/4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-0 right-1/4 w-24 h-24 bg-muted/50 rounded-full blur-2xl" />
 
       <div className="relative z-10">
         {/* Scanner header */}
@@ -93,8 +92,8 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
           phase >= 1 ? "opacity-100" : "opacity-0"
         )}>
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Shield className="w-4 h-4 text-primary-foreground" />
             </div>
             <div>
               <h4 className="text-sm font-semibold text-foreground">Compliance Scanner</h4>
@@ -106,14 +105,14 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[10px]">
               <span className="text-muted-foreground">Scanning...</span>
-              <span className="font-mono text-violet-500">{scanProgress}%</span>
+              <span className="font-mono text-primary">{Math.round(scanProgress)}%</span>
             </div>
             <div className="h-2 rounded-full bg-secondary overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-100 relative"
+                className="h-full rounded-full bg-primary transition-all duration-100 relative"
                 style={{ width: `${scanProgress}%` }}
               >
-                <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-r from-transparent to-white/30 animate-pulse" />
+                <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-r from-transparent to-primary-foreground/20 animate-pulse" />
               </div>
             </div>
             {currentFile && (
@@ -139,22 +138,22 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
                   isChecked
                     ? item.status === "pass"
                       ? "bg-primary/5 border-primary/30"
-                      : "bg-violet-500/5 border-violet-500/30"
-                    : "bg-secondary/50 border-border/50 opacity-50"
+                      : "bg-muted border-muted-foreground/30"
+                    : "bg-secondary/50 border-border opacity-50"
                 )}
               >
                 <div className="flex items-center gap-2">
                   <div className={cn(
                     "w-6 h-6 rounded flex items-center justify-center transition-all duration-500",
                     isChecked
-                      ? item.status === "pass" ? "bg-primary/20" : "bg-violet-500/20"
+                      ? item.status === "pass" ? "bg-primary/20" : "bg-muted"
                       : "bg-secondary"
                   )}>
                     {isChecked ? (
                       item.status === "pass" ? (
                         <Check className="w-3 h-3 text-primary" />
                       ) : (
-                        <AlertTriangle className="w-3 h-3 text-violet-500" />
+                        <AlertTriangle className="w-3 h-3 text-muted-foreground" />
                       )
                     ) : (
                       <Icon className="w-3 h-3 text-muted-foreground" />
@@ -165,7 +164,7 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
                     <p className={cn(
                       "text-[8px]",
                       isChecked
-                        ? item.status === "pass" ? "text-primary" : "text-violet-500"
+                        ? item.status === "pass" ? "text-primary" : "text-muted-foreground"
                         : "text-muted-foreground"
                     )}>
                       {isChecked ? (item.status === "pass" ? "OK" : "Action") : "..."}
@@ -179,13 +178,13 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
 
         {/* Warning alert - compact */}
         <div className={cn(
-          "p-2 rounded-lg bg-violet-500/10 border border-violet-500/20 mb-3 transition-all duration-500",
+          "p-2 rounded-lg bg-muted/50 border border-border mb-3 transition-all duration-500",
           phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
           <div className="flex items-start gap-2">
-            <AlertTriangle className="w-3.5 h-3.5 text-violet-500 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <div>
-              <p className="text-[10px] font-medium text-violet-600 dark:text-violet-400">PII Detected</p>
+              <p className="text-[10px] font-medium text-foreground">PII Detected</p>
               <p className="text-[9px] text-muted-foreground">
                 Emails found in sales_report.xlsx - Apply encryption
               </p>

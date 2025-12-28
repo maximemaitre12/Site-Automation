@@ -85,12 +85,11 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-4 rounded-xl bg-gradient-to-br from-violet-500/5 via-background to-blue-500/5 border border-violet-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-card border border-border overflow-hidden",
         className
       )}
     >
-      <div className="absolute top-0 left-1/4 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-20 h-20 bg-blue-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-0 left-1/4 w-24 h-24 bg-muted/50 rounded-full blur-2xl" />
 
       <div className="relative z-10">
         {/* Revenue header */}
@@ -109,8 +108,8 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded bg-violet-500/10">
-              <Phone className="w-3 h-3 text-violet-500" />
+            <div className="flex items-center gap-1 px-2 py-1 rounded bg-secondary border border-border">
+              <Phone className="w-3 h-3 text-primary" />
               <span className="text-[10px] font-medium text-foreground">12 calls</span>
             </div>
           </div>
@@ -121,19 +120,19 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           {/* Deals pipeline */}
           <div className={cn("transition-all duration-500", phase >= 2 ? "opacity-100" : "opacity-0")}>
             <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
-              <Target className="w-3 h-3 text-violet-500" />
+              <Target className="w-3 h-3 text-primary" />
               Pipeline
             </div>
             <div className="space-y-1.5">
               {deals.map((deal, i) => (
-                <div key={deal.name} className="p-1.5 rounded bg-secondary/50 border border-border/50">
+                <div key={deal.name} className="p-1.5 rounded bg-secondary/50 border border-border">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[10px] font-medium text-foreground truncate">{deal.name}</p>
-                    <p className="text-[10px] font-bold text-violet-500">{formatCurrency(deal.value)}</p>
+                    <p className="text-[10px] font-bold text-primary">{formatCurrency(deal.value)}</p>
                   </div>
                   <div className="h-1 rounded-full bg-secondary overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500 transition-all duration-500"
+                      className="h-full rounded-full bg-primary transition-all duration-500"
                       style={{ width: `${dealProgress[i]}%` }}
                     />
                   </div>
@@ -145,10 +144,10 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           {/* Revenue chart */}
           <div className={cn("transition-all duration-500", phase >= 3 ? "opacity-100" : "opacity-0")}>
             <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
-              <DollarSign className="w-3 h-3 text-violet-500" />
+              <DollarSign className="w-3 h-3 text-primary" />
               Revenue
             </div>
-            <div className="p-2 rounded bg-secondary/50 border border-border/50">
+            <div className="p-2 rounded bg-secondary/50 border border-border">
               <div className="flex items-end justify-between gap-1.5">
                 {["Q1", "Q2", "Q3", "Q4"].map((quarter, i) => (
                   <div key={quarter} className="flex-1 flex flex-col items-center gap-0.5">
@@ -156,7 +155,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
                       <div
                         className={cn(
                           "w-full rounded-t transition-all duration-500",
-                          i === 3 ? "bg-gradient-to-t from-violet-500 to-blue-400" : "bg-violet-500/30"
+                          i === 3 ? "bg-primary" : "bg-primary/30"
                         )}
                         style={{ height: `${chartHeight[i]}%`, transitionDelay: `${i * 100}ms` }}
                       />
@@ -171,12 +170,12 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
 
         {/* Call analysis - compact */}
         <div className={cn(
-          "p-2 rounded-lg bg-gradient-to-r from-violet-500/10 to-blue-500/10 border border-violet-500/20 mb-3 transition-all duration-500",
+          "p-2 rounded-lg bg-secondary/50 border border-border mb-3 transition-all duration-500",
           phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shrink-0">
-              <Phone className="w-3.5 h-3.5 text-white" />
+            <div className="w-7 h-7 rounded bg-primary flex items-center justify-center shrink-0">
+              <Phone className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
