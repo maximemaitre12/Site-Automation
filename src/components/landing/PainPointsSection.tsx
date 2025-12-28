@@ -326,10 +326,8 @@ export function PainPointsSection() {
                 {i > 0 && (
                   <div className="flex items-center gap-4 mb-5 sm:mb-6">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                      <div className="w-2 h-2 rounded-full bg-primary/60" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                    <div className="flex items-center gap-1">
+                      <Sparkles className="w-4 h-4 text-primary/50" />
                     </div>
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                   </div>

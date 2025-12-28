@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "AETHER - L'automatisation intelligente pour l'entreprise",
         short_name: "AETHER",
-        description: "Déployez des agents IA pour automatiser vos opérations. Support client, RH, ventes, compliance — sans écrire une ligne de code.",
+        description: "Déployez des agents IA pour automatiser vos opérations. Support client, RH, ventes, compliance, sans écrire une ligne de code.",
         theme_color: "#0A1A3C",
         background_color: "#ffffff",
         display: "standalone",
