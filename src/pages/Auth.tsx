@@ -110,8 +110,8 @@ export default function Auth() {
   const features = [
     "9 AI-powered tools",
     "Unlimited workflows",
-    "14-day free trial",
-    "No credit card required",
+    "3-day free trial",
+    "Cancel anytime",
   ];
 
   if (resetSent) {
@@ -136,7 +136,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side - Visual */}
+      {/* Left side - Visual (hidden on mobile) */}
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary/20 to-background items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-hero-pattern opacity-30" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px]" />
@@ -162,71 +162,71 @@ export default function Auth() {
       </div>
 
       {/* Right side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8">
         <div className="w-full max-w-md">
           {/* Logo & Back */}
-          <div className="flex items-center justify-between mb-8">
-            <Link to="/" className="flex items-center gap-3 group">
-              <img src={aetherLogo} alt="Aether" className="h-12 w-auto group-hover:scale-105 transition-transform" />
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+              <img src={aetherLogo} alt="Aether" className="h-8 sm:h-10 md:h-12 w-auto group-hover:scale-105 transition-transform" />
             </Link>
             <Link 
               to="/" 
-              className="w-9 h-9 rounded-full bg-secondary/80 border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-primary/30 hover:scale-105 transition-all duration-300 group"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-secondary/80 border border-border/50 flex items-center justify-center hover:bg-secondary hover:border-primary/30 hover:scale-105 transition-all duration-300 group"
             >
-              <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </Link>
           </div>
 
           {/* Header */}
-          <h1 className="text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">
             {mode === 'login' && 'Sign in to your account'}
             {mode === 'signup' && 'Create your account'}
             {mode === 'reset' && 'Reset your password'}
           </h1>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground mb-5 sm:mb-8">
             {mode === 'login' && 'Welcome back! Enter your credentials to continue.'}
             {mode === 'signup' && 'Get started with AETHER AI Suite today'}
             {mode === 'reset' && 'Enter your email and we\'ll send you a reset link.'}
           </p>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {mode === 'signup' && (
-              <div className="space-y-2">
-                <Label htmlFor="name">Full name</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="name" className="text-sm">Full name</Label>
                 <Input
                   id="name"
                   type="text"
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-12 bg-secondary border-border"
+                  className="h-10 sm:h-11 md:h-12 bg-secondary border-border text-sm"
                 />
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="email" className="text-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="you@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 bg-secondary border-border"
+                className="h-10 sm:h-11 md:h-12 bg-secondary border-border text-sm"
                 required
               />
             </div>
 
             {mode !== 'reset' && (
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-sm">Password</Label>
                   {mode === 'login' && (
                     <button
                       type="button"
                       onClick={() => setMode('reset')}
-                      className="text-sm text-primary hover:underline"
+                      className="text-xs sm:text-sm text-primary hover:underline"
                     >
                       Forgot password?
                     </button>
@@ -239,7 +239,7 @@ export default function Auth() {
                     placeholder={mode === 'signup' ? 'Create a strong password' : 'Enter your password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="h-12 bg-secondary border-border pr-10"
+                    className="h-10 sm:h-11 md:h-12 bg-secondary border-border pr-10 text-sm"
                     required
                   />
                   <button
@@ -247,30 +247,30 @@ export default function Auth() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                   </button>
                 </div>
               </div>
             )}
 
-            <Button type="submit" variant="hero" className="w-full h-12" disabled={loading}>
+            <Button type="submit" variant="hero" className="w-full h-10 sm:h-11 md:h-12 text-sm sm:text-base" disabled={loading}>
               {loading ? (
-                <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
+                <div className="animate-spin w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full" />
               ) : (
                 <>
                   {mode === 'login' && 'Sign in'}
                   {mode === 'signup' && 'Create account'}
                   {mode === 'reset' && 'Send reset link'}
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </>
               )}
             </Button>
           </form>
 
           {/* Mode switch */}
-          <div className="mt-8 text-center">
+          <div className="mt-6 sm:mt-8 text-center">
             {mode === 'login' && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Don't have an account?{' '}
                 <button onClick={() => setMode('signup')} className="text-primary hover:underline font-medium">
                   Sign up
@@ -279,13 +279,13 @@ export default function Auth() {
             )}
             {mode === 'signup' && (
               <>
-                <p className="text-xs text-muted-foreground mb-4">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4">
                   By creating an account, you agree to our{' '}
-                  <a href="#" className="text-primary hover:underline">Terms of Service</a>
+                  <Link to="/legal/terms" className="text-primary hover:underline">Terms of Service</Link>
                   {' '}and{' '}
-                  <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+                  <Link to="/legal/privacy" className="text-primary hover:underline">Privacy Policy</Link>
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Already have an account?{' '}
                   <button onClick={() => setMode('login')} className="text-primary hover:underline font-medium">
                     Sign in
@@ -294,8 +294,8 @@ export default function Auth() {
               </>
             )}
             {mode === 'reset' && (
-              <button onClick={() => setMode('login')} className="text-sm text-primary hover:underline font-medium">
-                <ArrowLeft className="w-4 h-4 inline mr-1" />
+              <button onClick={() => setMode('login')} className="text-xs sm:text-sm text-primary hover:underline font-medium">
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1" />
                 Back to login
               </button>
             )}
