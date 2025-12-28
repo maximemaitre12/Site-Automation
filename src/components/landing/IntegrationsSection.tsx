@@ -3,7 +3,7 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Key, Check } from "lucide-react";
 import { 
   SlackLogo, GmailLogo, NotionLogo, SalesforceLogo,
-  HubSpotLogo, ZapierLogo, StripeLogo, ShopifyLogo,
+  HubSpotLogo, ZapierLogo, StripeLogo,
   TrelloLogo, AirtableLogo
 } from "./BrandLogos";
 import { ApiConnectionDemo } from "./ApiConnectionDemo";
@@ -16,7 +16,6 @@ const platforms = [
   { name: "HubSpot", Logo: HubSpotLogo },
   { name: "Zapier", Logo: ZapierLogo },
   { name: "Stripe", Logo: StripeLogo },
-  { name: "Shopify", Logo: ShopifyLogo },
   { name: "Trello", Logo: TrelloLogo },
   { name: "Airtable", Logo: AirtableLogo },
 ];
