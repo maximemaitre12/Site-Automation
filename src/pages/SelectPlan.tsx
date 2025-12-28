@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,14 +25,13 @@ const plans = [
     name: 'Starter',
     price: 99,
     priceId: 'price_1SjCzsH7wcmjTpOiQjG1ToVL',
-    description: '1 AI agent',
+    description: '1 agent au choix',
     icon: Zap,
     features: [
-      '1 AI-powered agent',
-      'Unlimited workflows',
-      'Document processing',
-      'Email support',
-      'API access',
+      '1 agent IA au choix',
+      'Choisissez parmi : Data, Flow, Doc, Sales, HR, Brain ou Compliance',
+      'Workflows illimités',
+      'Support par email',
     ],
     popular: false,
   },
@@ -41,16 +40,13 @@ const plans = [
     name: 'Business',
     price: 249,
     priceId: 'price_1SjCztH7wcmjTpOiFJ2DfMOm',
-    description: '3 AI agents',
+    description: '3 agents au choix',
     icon: Rocket,
     features: [
-      '3 AI-powered agents',
-      'Unlimited workflows',
-      'Document processing',
-      'Sales intelligence',
-      'HR automation',
-      'Priority support',
-      'API access',
+      '3 agents IA au choix',
+      'Choisissez parmi : Data, Flow, Doc, Sales, HR, Brain ou Compliance',
+      'Workflows illimités',
+      'Support prioritaire',
     ],
     popular: true,
   },
@@ -59,18 +55,14 @@ const plans = [
     name: 'Enterprise',
     price: 399,
     priceId: 'price_1SjCzvH7wcmjTpOi4KL5q7ZH',
-    description: 'All 9 agents',
+    description: '6 agents au choix',
     icon: Crown,
     features: [
-      'All 9 AI-powered agents',
-      'Unlimited workflows',
-      'Document processing',
-      'Sales intelligence',
-      'HR automation',
-      'Customer support AI',
-      'Compliance tools',
-      'Dedicated support',
-      'Custom integrations',
+      '6 agents IA au choix',
+      'Choisissez parmi : Data, Flow, Doc, Sales, HR, Brain ou Compliance',
+      'Workflows illimités',
+      'Support dédié',
+      'Intégrations personnalisées',
     ],
     popular: false,
   },
@@ -151,7 +143,7 @@ export default function SelectPlan() {
                 onClick={() => handleNavigation('/')}
                 className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
               >
-                Home
+                Accueil
               </button>
               <button 
                 onClick={() => handleNavigation('/blog')}
@@ -167,15 +159,13 @@ export default function SelectPlan() {
               </button>
             </nav>
             
-            {/* CTA */}
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => handleNavigation('/auth?mode=login')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Log in
-              </button>
-            </div>
+            {/* Help link */}
+            <button 
+              onClick={() => handleNavigation('/contact')}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Besoin d'aide ?
+            </button>
           </div>
         </div>
       </header>
@@ -215,13 +205,13 @@ export default function SelectPlan() {
           <div className="text-center mb-8 sm:mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span>3 days free trial</span>
+              <span>3 jours d'essai gratuit</span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-4">
-              Choose Your Plan
+              Choisissez votre plan
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Start with a 3-day free trial. Cancel anytime before the trial ends.
+              Sélectionnez les agents IA dont vous avez besoin. Essai gratuit de 3 jours, annulez à tout moment.
             </p>
           </div>
 
@@ -239,7 +229,7 @@ export default function SelectPlan() {
                 >
                   {plan.popular && (
                     <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                      Most Popular
+                      Le plus populaire
                     </Badge>
                   )}
                   
@@ -261,11 +251,11 @@ export default function SelectPlan() {
                     
                     <div className="mt-3">
                       <span className="text-3xl sm:text-4xl font-bold text-foreground">€{plan.price}</span>
-                      <span className="text-muted-foreground text-sm">/month</span>
+                      <span className="text-muted-foreground text-sm">/mois</span>
                     </div>
                     
                     <Badge variant="secondary" className="mt-2 text-xs">
-                      After 3-day free trial
+                      Après 3 jours d'essai gratuit
                     </Badge>
                   </CardHeader>
                   
@@ -288,11 +278,11 @@ export default function SelectPlan() {
                       {loading === plan.id ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Loading...
+                          Chargement...
                         </>
                       ) : (
                         <>
-                          Start Free Trial
+                          Commencer l'essai gratuit
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </>
                       )}
@@ -304,7 +294,7 @@ export default function SelectPlan() {
           </div>
 
           <p className="text-center text-[10px] sm:text-xs text-muted-foreground mt-6 sm:mt-8">
-            You won't be charged during your 3-day trial. Secure payment powered by Stripe. All prices exclude VAT.
+            Aucun prélèvement pendant l'essai de 3 jours. Paiement sécurisé par Stripe. Prix HT.
           </p>
         </div>
       </div>
