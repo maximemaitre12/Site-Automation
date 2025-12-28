@@ -19,26 +19,28 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
   const [revenue, setRevenue] = useState(0);
   const [dealProgress, setDealProgress] = useState<number[]>([0, 0, 0]);
   const [chartHeight, setChartHeight] = useState<number[]>([0, 0, 0, 0]);
+  const [animationStarted, setAnimationStarted] = useState(false);
 
   useEffect(() => {
-    if (!isVisible) {
-      setPhase(0);
-      setRevenue(0);
-      setDealProgress([0, 0, 0]);
-      setChartHeight([0, 0, 0, 0]);
-      return;
-    }
+    if (!isVisible || animationStarted) return;
 
-    const t1 = setTimeout(() => setPhase(1), 500);
-    const t2 = setTimeout(() => setPhase(2), 2000);
-    const t3 = setTimeout(() => setPhase(3), 3000);
+    // Reset and start
+    setPhase(0);
+    setRevenue(0);
+    setDealProgress([0, 0, 0]);
+    setChartHeight([0, 0, 0, 0]);
+    setAnimationStarted(true);
+
+    const t1 = setTimeout(() => setPhase(1), 300);
+    const t2 = setTimeout(() => setPhase(2), 1500);
+    const t3 = setTimeout(() => setPhase(3), 2500);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [isVisible]);
+  }, [isVisible, animationStarted]);
 
   useEffect(() => {
     if (phase >= 1) {
