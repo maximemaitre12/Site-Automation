@@ -20,15 +20,17 @@ interface AgentBrainDemoProps {
 
 export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
-  const [phase, setPhase] = useState(0); // 0: idle, 1: docs uploading, 2: processing, 3: searching, 4: responding
+  const [phase, setPhase] = useState(0); // 0: idle, 1: docs uploading, 2: processing, 3: searching, 4: query done, 5: responding
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");
+  const [queryComplete, setQueryComplete] = useState(false);
 
   useEffect(() => {
     if (!isVisible) {
       setPhase(0);
       setTypedQuery("");
       setTypedResponse("");
+      setQueryComplete(false);
       return;
     }
 
@@ -36,16 +38,13 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
     const phase1 = setTimeout(() => setPhase(1), 500);
     // Phase 2: Processing
     const phase2 = setTimeout(() => setPhase(2), 2000);
-    // Phase 3: Search query typing
+    // Phase 3: Search query typing starts
     const phase3 = setTimeout(() => setPhase(3), 3500);
-    // Phase 4: AI responding
-    const phase4 = setTimeout(() => setPhase(4), 5500);
 
     return () => {
       clearTimeout(phase1);
       clearTimeout(phase2);
       clearTimeout(phase3);
-      clearTimeout(phase4);
     };
   }, [isVisible]);
 
@@ -59,14 +58,17 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
         i++;
       } else {
         clearInterval(interval);
+        setQueryComplete(true);
+        // Start AI response after query is complete
+        setTimeout(() => setPhase(5), 800);
       }
     }, 40);
     return () => clearInterval(interval);
   }, [phase]);
 
-  // Typing effect for response
+  // Typing effect for response - only starts in phase 5
   useEffect(() => {
-    if (phase < 4) return;
+    if (phase < 5) return;
     let i = 0;
     const interval = setInterval(() => {
       if (i <= aiResponse.length) {
@@ -181,7 +183,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
               <Search className="w-5 h-5 text-violet-500" />
               <span className="flex-1 text-sm text-foreground">
                 {typedQuery}
-                {phase === 3 && typedQuery.length < searchQuery.length && (
+                {phase === 3 && !queryComplete && (
                   <span className="animate-blink">|</span>
                 )}
               </span>
@@ -189,10 +191,10 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
           </div>
         </div>
 
-        {/* AI Response */}
+        {/* AI Response - only shows after query is complete */}
         <div className={cn(
           "transition-all duration-700",
-          phase >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
           <div className="p-4 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20">
             <div className="flex items-start gap-3">
@@ -203,7 +205,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
                 <p className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-1">AI Assistant</p>
                 <p className="text-sm text-foreground leading-relaxed">
                   {typedResponse}
-                  {phase === 4 && typedResponse.length < aiResponse.length && (
+                  {phase === 5 && typedResponse.length < aiResponse.length && (
                     <span className="animate-blink">|</span>
                   )}
                 </p>
@@ -226,7 +228,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
         {/* CTA */}
         <div className={cn(
           "text-center transition-all duration-700",
-          phase >= 4 && typedResponse.length >= aiResponse.length ? "opacity-100" : "opacity-0"
+          phase >= 5 && typedResponse.length >= aiResponse.length ? "opacity-100" : "opacity-0"
         )}>
           <p className="text-base font-medium text-foreground mb-4">
             Turn your documents into an intelligent knowledge base
