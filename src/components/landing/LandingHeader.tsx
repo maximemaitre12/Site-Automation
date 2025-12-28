@@ -69,18 +69,18 @@ export function LandingHeader() {
             ))}
           </nav>
           
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop CTA - Hierarchy: Demo (primary) > Login (tertiary) */}
+          <div className="hidden md:flex items-center gap-3">
             <Link to="/auth?mode=login">
-              <button className="relative px-4 py-2 text-sm font-medium text-foreground rounded-full border border-border/50 bg-transparent hover:bg-muted/50 hover:border-border transition-all duration-300 group">
-                <span className="relative z-10">Log in</span>
-              </button>
+              <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                Log in
+              </span>
             </Link>
             <Link to="/demo">
-              <button className="relative px-4 py-2 text-sm font-medium text-primary-foreground rounded-full bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_100%] hover:bg-[position:100%_0] transition-all duration-500 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 group flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 opacity-80 group-hover:opacity-100 transition-opacity" />
+              <button className="relative px-5 py-2 text-sm font-medium text-primary-foreground rounded-full bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_100%] hover:bg-[position:100%_0] transition-all duration-500 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] group flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5" />
                 <span>Request Demo</span>
-                <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
               </button>
             </Link>
           </div>
