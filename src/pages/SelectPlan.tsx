@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,7 +7,17 @@ import { Check, Zap, ArrowRight, Loader2, Sparkles, Crown, Rocket } from 'lucide
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { LandingHeader } from '@/components/landing/LandingHeader';
+import aetherLogo from '@/assets/aether-new-logo.jpeg';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const plans = [
   {
@@ -70,6 +80,20 @@ export default function SelectPlan() {
   const navigate = useNavigate();
   const { session } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+
+  const handleNavigation = (path: string) => {
+    setPendingNavigation(path);
+    setShowLeaveDialog(true);
+  };
+
+  const confirmLeave = () => {
+    if (pendingNavigation) {
+      navigate(pendingNavigation);
+    }
+    setShowLeaveDialog(false);
+  };
 
   const handleStartTrial = async (priceId: string, planId: string) => {
     if (!session) {
@@ -109,10 +133,84 @@ export default function SelectPlan() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <LandingHeader />
+      {/* Custom Header */}
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <button 
+              onClick={() => handleNavigation('/')}
+              className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+            >
+              <img src={aetherLogo} alt="Aether" className="h-10 sm:h-14 w-auto" />
+            </button>
+            
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
+              <button 
+                onClick={() => handleNavigation('/')}
+                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              >
+                Home
+              </button>
+              <button 
+                onClick={() => handleNavigation('/blog')}
+                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              >
+                Blog
+              </button>
+              <button 
+                onClick={() => handleNavigation('/contact')}
+                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              >
+                Contact
+              </button>
+            </nav>
+            
+            {/* CTA */}
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => handleNavigation('/auth?mode=login')}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Log in
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-      {/* Content - with padding for fixed header */}
-      <div className="flex-1 container mx-auto px-4 pt-24 pb-12 relative z-0">
+      {/* Leave Confirmation Dialog */}
+      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="w-12 h-12 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-primary" />
+            </div>
+            <AlertDialogTitle className="text-center text-xl">
+              Êtes-vous sûr de vouloir partir ?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Vous êtes à quelques clics de débloquer toute la puissance d'AETHER. 
+              Votre essai gratuit de 3 jours vous attend !
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <AlertDialogCancel className="w-full sm:w-auto">
+              Rester et choisir un plan
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmLeave}
+              className="w-full sm:w-auto bg-transparent border border-border text-foreground hover:bg-muted"
+            >
+              Quitter quand même
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Content */}
+      <div className="flex-1 container mx-auto px-4 py-8 sm:py-12 relative z-0">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 sm:mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
