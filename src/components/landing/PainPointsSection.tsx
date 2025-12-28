@@ -307,12 +307,13 @@ export function PainPointsSection() {
                 }}
                 className={cn(
                   "group relative rounded-2xl border transition-all duration-500 overflow-hidden",
-                  "bg-background/70 backdrop-blur-md",
-                  "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/10 before:via-transparent before:to-white/5 before:pointer-events-none",
-                  "after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.03] after:to-transparent after:pointer-events-none",
+                  "bg-gradient-to-br from-slate-900/80 via-slate-800/70 to-slate-900/80",
+                  "backdrop-blur-xl backdrop-saturate-150",
+                  "shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.2),0_4px_24px_rgba(0,0,0,0.3)]",
+                  "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/15 before:via-transparent before:to-transparent before:pointer-events-none",
                   isExpanded
-                    ? "border-primary/50 shadow-xl shadow-primary/10 bg-background/80"
-                    : "border-white/10 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:bg-background/80"
+                    ? "border-primary/50 shadow-2xl shadow-primary/30"
+                    : "border-white/20 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/20"
                 )}
                 style={
                   shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
