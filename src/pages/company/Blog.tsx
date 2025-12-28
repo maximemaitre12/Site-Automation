@@ -43,264 +43,252 @@ The AETHER journey is just beginning. With ambitious plans for 2025 – includin
 
 const posts = [
   {
-    id: "salesforce-integration",
-    title: "Upcoming: Native Salesforce Integration",
-    excerpt: "We're building a deep Salesforce integration that will transform how you manage customer relationships. Automatic lead scoring, deal insights, and AI-powered pipeline management.",
+    id: "why-enterprises-waste-time",
+    title: "Why Enterprises Waste 30% of Their Time on Repetitive Tasks",
+    excerpt: "A deep dive into research showing how much time knowledge workers spend on tasks AI could handle. The data is staggering.",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop",
     author: "Maxime Maître",
     date: "December 18, 2025",
     readTime: "5 min read",
-    category: "Product",
+    category: "Industry",
     icon: TrendingUp,
-    fullContent: `We're excited to announce that AETHER's native Salesforce integration is in active development and will launch in Q1 2025.
+    fullContent: `According to McKinsey research, knowledge workers spend an average of 30% of their time on repetitive, automatable tasks. That's 12 hours per week, per employee, potentially lost.
 
-What to Expect
+The Hidden Cost of Manual Work
 
-Our Salesforce integration goes far beyond simple data sync. We're building an intelligent layer that will:
+Let's break down where this time goes:
 
-• Automatically score and qualify leads based on behavioral patterns and historical data
-• Provide real-time deal insights with win probability predictions
-• Generate AI-powered next-best-action recommendations for your sales team
-• Sync bi-directionally with full data integrity and conflict resolution
+• Data entry and transfer between systems: 8% of work time
+• Searching for information across tools: 7% of work time  
+• Report generation and formatting: 6% of work time
+• Email management and sorting: 5% of work time
+• Meeting scheduling and coordination: 4% of work time
 
-Deep Integration, Not Just a Connector
+For a company of 100 knowledge workers at an average salary of €60,000, that's €1.8 million per year spent on tasks that add no strategic value.
 
-Unlike traditional integrations that simply move data between systems, AETHER will actually understand your Salesforce data. Our AI will analyze patterns across your opportunities, contacts, and activities to provide actionable insights.
+The Automation Gap
 
-Imagine knowing which deals are at risk before they show warning signs, or automatically prioritizing your daily tasks based on deal impact and urgency.
+Despite the availability of automation tools, adoption remains slow. A Deloitte survey found that only 13% of enterprises have scaled their automation efforts beyond pilots.
 
-Beta Program
+The main barriers cited:
+• Integration complexity with legacy systems (67%)
+• Lack of technical expertise (54%)
+• Unclear ROI measurement (48%)
 
-We're opening a beta program for early adopters in January 2025. If you're a Salesforce customer interested in being among the first to experience this integration, reach out to our team at integrations@aether-ai.com.
+What This Means for 2025
 
-The future of CRM is intelligent, and we're building it.`
+The enterprises that solve this problem will have a significant competitive advantage. The question isn't whether to automate, but how quickly you can do it intelligently.
+
+AI is now mature enough to handle complex, judgment-based tasks – not just simple rule-based automation. The 30% is no longer inevitable.`
   },
   {
     id: "ai-voice-agents",
-    title: "The Future of Voice: AI Agents That Call For You",
-    excerpt: "Imagine an AI that can schedule meetings, follow up with leads, and even conduct initial interviews – all by phone. We're making it happen.",
+    title: "How Voice AI Actually Works: A Technical Primer",
+    excerpt: "From speech recognition to natural language understanding – here's what happens in the milliseconds between your question and the AI's response.",
     image: "https://images.unsplash.com/photo-1590650153855-d9e808231d41?w=600&h=300&fit=crop",
     author: "Youriy",
     date: "December 15, 2025",
     readTime: "6 min read",
     category: "Innovation",
     icon: Brain,
-    fullContent: `Voice AI is entering a new era, and AETHER is at the forefront.
+    fullContent: `Voice AI has made remarkable progress, but few understand what happens behind the scenes. Let's demystify the technology.
 
-We've been quietly building voice agent capabilities that will fundamentally change how businesses handle phone-based communications.
+The Voice AI Pipeline
 
-What Are AI Voice Agents?
+When you speak to an AI assistant, here's what happens:
 
-AI voice agents are sophisticated systems that can conduct natural phone conversations. Unlike IVR systems of the past, these agents understand context, handle interruptions, and respond naturally.
+1. Audio Capture (0-50ms)
+Your voice is captured and converted to digital format. Modern systems sample at 16kHz or higher, creating detailed audio waveforms.
 
-Our voice agents can:
-• Schedule and reschedule meetings with natural conversation
-• Conduct initial candidate screenings for HR teams
-• Follow up with leads and qualify their interest
-• Handle customer service inquiries with empathy and accuracy
+2. Speech Recognition (50-200ms)
+The audio is processed by an ASR (Automatic Speech Recognition) model. These models, often based on transformer architectures like Whisper, convert sound waves into text with remarkable accuracy – now exceeding 95% in most conditions.
 
-The Technology Behind It
+3. Natural Language Understanding (100-300ms)
+The transcribed text is analyzed for intent. What does the user want? This involves parsing entities (names, dates, numbers) and understanding context from previous conversation turns.
 
-We're leveraging the latest advances in speech recognition, natural language processing, and voice synthesis. Our agents don't just follow scripts – they understand intent and adapt their responses accordingly.
+4. Response Generation (200-500ms)
+Based on the understood intent, the system generates a response. This might involve querying databases, calling APIs, or generating text with a large language model.
 
-The key breakthrough is in latency. Our voice agents respond in under 500ms, making conversations feel natural rather than robotic.
+5. Speech Synthesis (100-200ms)
+The text response is converted back to natural-sounding speech using TTS (Text-to-Speech) models. Modern neural TTS produces nearly indistinguishable from human voice.
 
-Coming in 2025
+The Latency Challenge
 
-Voice agents will be available as part of AETHER HR and AETHER Sales modules in mid-2025. We're currently running private pilots with select enterprise customers.
+Total end-to-end latency of 500-1000ms is crucial for natural conversation. Human conversation has natural pauses of 200-500ms, so AI needs to respond within this window to feel natural.
 
-If you're interested in being part of our pilot program, let us know.`
-  },
-  {
-    id: "slack-microsoft-teams",
-    title: "Coming Soon: Slack & Microsoft Teams Integration",
-    excerpt: "Control AETHER directly from your favorite collaboration tools. Trigger workflows, ask questions, and get insights without leaving Slack or Teams.",
-    image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&h=300&fit=crop",
-    author: "AETHER Team",
-    date: "December 12, 2025",
-    readTime: "4 min read",
-    category: "Product",
-    icon: Workflow,
-    fullContent: `Your workflows shouldn't require you to switch between apps. That's why we're bringing AETHER directly into Slack and Microsoft Teams.
+The breakthrough in recent years has been parallel processing – running recognition, understanding, and early response generation simultaneously rather than sequentially.
 
-What You'll Be Able to Do
+Why This Matters for Enterprise
 
-With our upcoming integration, you'll be able to:
-
-Trigger Workflows from Chat
-Simply type a command or message the AETHER bot to trigger any workflow. "/aether analyze-document" or "@AETHER run sales-report" – it's that simple.
-
-Ask Questions in Natural Language
-"What's the status of the Johnson deal?" or "Show me documents processed this week" – AETHER Brain will respond directly in your chat.
-
-Get Real-Time Notifications
-Receive alerts about completed workflows, anomalies detected, or tasks requiring your attention – all in your preferred channel.
-
-Approve Actions
-Review and approve workflow actions without leaving your conversation. Perfect for compliance-sensitive operations.
-
-Enterprise-Ready
-
-Both integrations will support:
-• SSO authentication
-• Channel-based permissions
-• Audit logging
-• Data residency compliance
-
-Launch Timeline
-
-Slack integration: February 2025
-Microsoft Teams integration: March 2025
-
-Sign up for our early access list to be among the first to try it.`
+Enterprise voice AI isn't just about chatbots. It's about:
+• Automated phone systems that actually understand you
+• Meeting transcription and action item extraction
+• Voice-controlled data queries and reporting
+• Accessibility improvements for all employees`
   },
   {
     id: "enterprise-ai-trends-2025",
-    title: "Enterprise AI in 2025: 5 Trends That Will Define the Year",
-    excerpt: "From multimodal AI to autonomous agents, we explore the key trends that will shape enterprise AI adoption in the coming year.",
+    title: "Enterprise AI in 2025: 5 Trends Backed by Data",
+    excerpt: "From multimodal AI to autonomous agents, we analyze the trends shaping enterprise AI based on recent research and market data.",
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=crop",
     author: "Maxime Maître",
     date: "December 10, 2025",
     readTime: "7 min read",
     category: "Industry",
     icon: Globe,
-    fullContent: `As we approach 2025, the enterprise AI landscape is evolving rapidly. Here are five trends we believe will define the year ahead.
+    fullContent: `The enterprise AI landscape is evolving rapidly. Here are five trends backed by recent research and market data.
 
-1. Autonomous Agents Go Mainstream
+1. AI Agents Are Moving from Hype to Production
 
-2024 was the year of AI assistants. 2025 will be the year of AI agents – systems that can take action, not just provide information.
+Gartner predicts that by 2028, 33% of enterprise software applications will include agentic AI. These aren't chatbots – they're systems that can execute multi-step tasks autonomously.
 
-Enterprises will deploy agents that can:
-• Execute multi-step workflows independently
-• Make decisions within defined parameters
-• Learn and improve from feedback
+Current adoption: 8% of enterprises have deployed AI agents in production
+Projected 2025: 23% adoption rate
 
-AETHER is already building these capabilities into every module.
+2. Multimodal AI Is Now Table Stakes
 
-2. Multimodal AI Becomes Standard
+The distinction between text, image, and voice AI is disappearing. According to IDC, 67% of new enterprise AI projects in 2024 were multimodal.
 
-The distinction between text, image, and voice AI will blur. Enterprises will expect AI systems that can process any input format seamlessly.
+Document processing now combines:
+• OCR for text extraction
+• Layout analysis for structure understanding  
+• Image recognition for diagrams and signatures
+• Language models for semantic understanding
 
-Document processing will understand layouts, not just text. Customer service will handle voice, chat, and email through unified AI.
+3. AI Governance Spending Is Exploding
 
-3. AI Governance Takes Center Stage
+Forrester reports that spending on AI governance tools grew 340% in 2024. Enterprises are realizing that deploying AI without proper controls creates significant risk.
 
-With great power comes great responsibility. 2025 will see a major focus on:
-• AI audit trails and explainability
-• Compliance frameworks for AI decisions
-• Ethical AI guidelines becoming mandatory
+Key governance requirements:
+• Audit trails for all AI decisions
+• Explainability for compliance
+• Bias detection and mitigation
+• Data lineage tracking
 
-We're building governance tools directly into AETHER Compliance.
+4. ROI Measurement Is Maturing
 
-4. Vertical AI Solutions Surge
+Early AI projects focused on cost savings. Now, enterprises are measuring:
+• Time-to-value for new hires
+• Customer satisfaction improvements
+• Employee experience scores
+• Revenue acceleration
 
-Generic AI tools will give way to industry-specific solutions. Healthcare AI, Legal AI, Financial AI – each with deep domain knowledge and specialized workflows.
+McKinsey found that enterprises with mature AI measurement frameworks see 2.5x better returns.
 
-5. Human-AI Collaboration Matures
+5. Human-AI Collaboration Is the Model
 
-The most successful deployments won't be about replacing humans – they'll be about augmenting them. AI will handle the routine, freeing humans for the complex and creative.
+The most successful deployments augment humans rather than replace them. Accenture research shows that human-AI teams outperform either alone by 30% on complex tasks.
 
-At AETHER, we're building for this future. Every feature we ship is designed to enhance human capability, not replace it.`
+The pattern: AI handles volume and speed, humans provide judgment and creativity.`
   },
   {
-    id: "hubspot-integration",
-    title: "HubSpot Integration: Marketing Automation Meets AI",
-    excerpt: "Our upcoming HubSpot integration will bring AI-powered insights to your marketing workflows. Predict campaign performance before you launch.",
+    id: "document-processing-evolution",
+    title: "The Evolution of Document Processing: From OCR to AI Understanding",
+    excerpt: "How document processing evolved from simple text extraction to systems that actually understand what they're reading.",
     image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=600&h=300&fit=crop",
     author: "Youriy",
     date: "December 8, 2025",
     readTime: "5 min read",
-    category: "Product",
+    category: "Innovation",
     icon: Zap,
-    fullContent: `HubSpot is the backbone of marketing operations for thousands of companies. We're bringing AETHER's AI capabilities directly into your HubSpot workflows.
+    fullContent: `Document processing has come a long way from the early days of OCR. Here's how the technology evolved.
 
-AI-Powered Campaign Intelligence
+Generation 1: OCR (1990s-2000s)
 
-Before you launch a campaign, AETHER will:
-• Predict performance based on historical data and market trends
-• Suggest optimal send times and audience segments
-• Identify potential issues with your content or targeting
-• A/B test variations automatically
+Optical Character Recognition could convert scanned documents to text, but that was it. No understanding of structure, context, or meaning.
 
-Lead Intelligence
+Accuracy was around 85-90%, which sounds good until you realize that means 1-2 errors per line of text.
 
-Our integration will enhance HubSpot's lead management with:
-• AI scoring that goes beyond form fills and page views
-• Intent signals from across the web
-• Automatic enrichment with company and contact data
-• Predictive lead-to-customer conversion rates
+Generation 2: Template-Based IDP (2010s)
 
-Content Optimization
+Intelligent Document Processing introduced templates. Define where the invoice number is, where the total is, and the system extracts those fields.
 
-AETHER will analyze your content and suggest:
-• Headlines that drive higher engagement
-• CTAs optimized for conversion
-• Personalization opportunities
-• SEO improvements
+The problem: every new document type required a new template. Template maintenance became a full-time job.
 
-Coming Q2 2025
+Generation 3: ML-Based Extraction (2018-2022)
 
-The HubSpot integration is scheduled for Q2 2025. We're building it in close collaboration with HubSpot partners to ensure deep, native functionality.
+Machine learning models could learn from examples. Show the system 100 invoices, and it learns to extract fields from new invoices automatically.
 
-Interested in early access? Let us know.`
+Accuracy improved to 95%+, but the systems still didn't understand what they were extracting.
+
+Generation 4: LLM-Powered Understanding (2023+)
+
+Large language models changed everything. Now, document processing systems can:
+
+• Understand context and relationships between fields
+• Handle documents they've never seen before
+• Answer questions about document content
+• Summarize and extract insights, not just data
+• Identify anomalies and inconsistencies
+
+Real-World Impact
+
+A traditional invoice processing workflow:
+1. Receive invoice (email, mail, portal)
+2. Manual data entry or template-based extraction
+3. Manual validation and matching
+4. Approval routing
+5. Payment processing
+
+Time: 15-30 minutes per invoice
+
+AI-powered workflow:
+1. Receive invoice
+2. Automatic extraction, validation, and matching
+3. Exception handling only for anomalies
+4. Automatic approval for standard cases
+5. Payment processing
+
+Time: 2-5 minutes per invoice (mostly human review time)
+
+That's an 80% reduction in processing time – and more importantly, near-zero data entry errors.`
   },
   {
-    id: "sap-oracle-erp",
-    title: "SAP & Oracle ERP: Bridging the Gap with AI",
-    excerpt: "Legacy ERP systems don't have to be silos. Learn how AETHER is building bridges to SAP and Oracle for seamless enterprise automation.",
+    id: "shanghai-startup-ecosystem",
+    title: "Building a Startup in Shanghai: What We Learned",
+    excerpt: "From co-working spaces in Putuo to tech meetups in Jing'an – lessons from building AETHER in one of the world's most dynamic cities.",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=300&fit=crop",
     author: "AETHER Team",
     date: "December 5, 2025",
     readTime: "6 min read",
-    category: "Enterprise",
+    category: "Company",
     icon: Sparkles,
-    fullContent: `Enterprise resource planning systems are the backbone of large organizations. But they've historically been isolated from modern AI capabilities. We're changing that.
+    fullContent: `Shanghai isn't just where AETHER was born – it shaped how we think about building products. Here's what we learned.
 
-The ERP Challenge
+The Energy Is Real
 
-SAP and Oracle systems contain decades of business-critical data, but extracting insights and automating processes often requires expensive customization or middleware.
+Shanghai moves fast. Walking through Lujiazui or Zhangjiang Hi-Tech Park, you feel the pace of innovation. Companies ship products in weeks that would take months elsewhere.
 
-Many enterprises find themselves in a frustrating situation:
-• Valuable data locked in complex systems
-• Manual processes bridging ERP to modern tools
-• Limited AI capabilities within legacy systems
+This rubbed off on us. Our first prototype was built in 6 weeks, working from a small apartment in Putuo. The city's energy made anything less feel unacceptable.
 
-AETHER's Approach
+The Tech Scene Is Global
 
-We're building native connectors for SAP S/4HANA, Oracle Cloud ERP, and legacy versions of both systems.
+One surprise: Shanghai's tech community is incredibly international. Tech meetups in Jing'an draw founders and engineers from dozens of countries. WeChat groups connect French entrepreneurs, American engineers, and Chinese investors.
 
-Our integration will enable:
+We found advisors, early users, and inspiration in this mix. AETHER's global perspective – building for enterprises everywhere, not just one market – comes directly from this environment.
 
-Intelligent Data Extraction
-AETHER will understand your ERP data structures and automatically extract insights. No more manual report building.
+Frugality Breeds Creativity
 
-Automated Workflows
-Trigger AETHER workflows from ERP events. New purchase order? Automatically validate, route for approval, and update inventory predictions.
+We started with almost no funding. In Shanghai, that's common. Many successful startups here bootstrapped longer than their Silicon Valley counterparts.
 
-AI-Enhanced Analytics
-Apply AETHER's AI capabilities to your ERP data. Predict supply chain disruptions, optimize inventory levels, forecast revenue with unprecedented accuracy.
+This forced us to:
+• Focus ruthlessly on what matters
+• Build MVPs that actually work, not demos
+• Find creative solutions instead of throwing money at problems
 
-Bi-directional Sync
-Changes in AETHER can flow back to your ERP with full audit trails and compliance controls.
+The Result: A Different Mindset
 
-Enterprise Ready
+AETHER doesn't feel like a typical enterprise software company because we didn't build it like one. We built it like a Shanghai startup:
+• Ship fast, iterate faster
+• Global from day one
+• Resource-efficient by design
+• Hungry to prove ourselves
 
-We understand the stakes are high with ERP systems. Our integrations will feature:
-• Extensive testing and validation
-• Rollback capabilities
-• Read-only modes for initial deployment
-• Full audit logging
-
-Timeline
-
-SAP integration: Beta in Q2 2025, GA in Q3 2025
-Oracle integration: Beta in Q3 2025, GA in Q4 2025
-
-Contact our enterprise team to discuss your specific requirements.`
+The Shanghai chapter of our story is just the beginning, but it defined who we are.`
   }
 ];
 
-const categories = ["All", "Company", "Product", "Innovation", "Industry", "Enterprise"];
+const categories = ["All", "Company", "Innovation", "Industry"];
 
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState("All");
