@@ -51,7 +51,7 @@ const tools: Tool[] = [
     icon: Workflow,
     colorClass: "text-agent-flow",
     features: [
-      { icon: Workflow, title: "No-Code Visual Builder", description: "Create complex workflows with drag & drop. Conditions, loops, branches — no code required." },
+      { icon: Workflow, title: "No-Code Visual Builder", description: "Create complex workflows with drag & drop. Conditions, loops, branches, no code required." },
       { icon: GitBranch, title: "Smart Triggers", description: "Auto-detect events: new lead, email received, threshold reached, schedule, external webhook." },
       { icon: Mail, title: "Multi-Channel Actions", description: "Send emails, SMS, Slack notifications, API calls, CRM updates, document generation." },
       { icon: Bot, title: "AI in the Workflow", description: "Integrate AI analysis: classification, extraction, content generation at every step." },
