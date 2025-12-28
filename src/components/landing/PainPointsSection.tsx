@@ -306,15 +306,29 @@ export function PainPointsSection() {
                   cardRefs.current[i] = el;
                 }}
                 className={cn(
-                  "group relative rounded-2xl bg-background border transition-all duration-500 overflow-hidden",
+                  "group relative rounded-2xl border transition-all duration-500 overflow-hidden",
+                  "bg-background/70 backdrop-blur-md",
+                  "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/10 before:via-transparent before:to-white/5 before:pointer-events-none",
+                  "after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.03] after:to-transparent after:pointer-events-none",
                   isExpanded
-                    ? "border-primary shadow-xl shadow-primary/10"
-                    : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+                    ? "border-primary/50 shadow-xl shadow-primary/10 bg-background/80"
+                    : "border-white/10 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:bg-background/80"
                 )}
                 style={
                   shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
                 }
               >
+                {/* Glass shimmer effect */}
+                <div
+                  className={cn(
+                    "absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-700 pointer-events-none",
+                    "bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.12)_50%,rgba(255,255,255,0.08)_55%,transparent_60%)]",
+                    "bg-[length:200%_100%]",
+                    "group-hover:opacity-100 group-hover:animate-[shimmer_2s_ease-in-out_infinite]",
+                    isExpanded && "opacity-100 animate-[shimmer_2s_ease-in-out_infinite]"
+                  )}
+                />
+
                 {/* Cloud decoration behind card */}
                 <div
                   className={cn(
