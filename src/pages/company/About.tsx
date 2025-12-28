@@ -51,7 +51,7 @@ const founders = [
 ];
 
 const timeline = [
-  { year: "2024", event: "First Meeting", description: "Youriy and Maxime meet at emlyon business school and discover a shared passion for AI" },
+  { year: "2025", event: "First Meeting", description: "Youriy and Maxime meet at emlyon business school and discover a shared passion for AI" },
   { year: "2025", event: "Shanghai Roommates", description: "During their exchange in Shanghai, they become roommates and the AETHER idea takes shape" },
   { year: "2025", event: "First Prototype", description: "Late nights in their Putuo apartment lead to the first working version of AETHER" }
 ];
