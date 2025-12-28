@@ -8,52 +8,52 @@
 @import "@fontsource/inter/700.css";
 
 /* AETHER AI SUITE - Clean Minimal Design System
-   Inspired by OpenAI, Anthropic, Apple - Pure elegance */
+   Based on Aether logo colors: Deep blue (#0A2540) and Cyan (#00D4FF) */
 
 @layer base {
   :root {
     /* Clean white background */
     --background: 0 0% 100%;
-    --foreground: 220 15% 15%;
+    --foreground: 210 40% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
+    --card-foreground: 210 40% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover-foreground: 210 40% 14%;
 
-    /* Aether brand colors - blue to teal gradient */
-    --primary: 199 89% 48%;
+    /* Aether primary - Deep blue from logo */
+    --primary: 210 75% 15%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 199 20% 96%;
-    --secondary-foreground: 199 30% 15%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 210 40% 14%;
 
-    --muted: 199 15% 95%;
-    --muted-foreground: 199 10% 45%;
+    --muted: 210 15% 95%;
+    --muted-foreground: 210 10% 45%;
 
-    /* Accent teal from Aether logo */
-    --accent: 174 72% 46%;
+    /* Accent cyan from Aether logo */
+    --accent: 190 100% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 199 15% 90%;
-    --input: 199 15% 90%;
-    --ring: 199 89% 48%;
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 210 75% 15%;
 
     --radius: 0.625rem;
 
     /* Sidebar */
-    --sidebar-background: 199 15% 98%;
-    --sidebar-foreground: 199 30% 15%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-background: 210 15% 98%;
+    --sidebar-foreground: 210 40% 14%;
+    --sidebar-primary: 210 75% 15%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 199 15% 94%;
-    --sidebar-accent-foreground: 199 30% 15%;
-    --sidebar-border: 199 15% 90%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-accent: 210 15% 94%;
+    --sidebar-accent-foreground: 210 40% 14%;
+    --sidebar-border: 210 15% 90%;
+    --sidebar-ring: 210 75% 15%;
 
     /* States */
     --success: 158 64% 42%;
@@ -63,22 +63,22 @@
   }
 
   .dark {
-    --background: 200 35% 8%;
-    --foreground: 195 30% 96%;
-    --card: 200 35% 10%;
-    --card-foreground: 195 30% 96%;
-    --popover: 200 35% 8%;
-    --popover-foreground: 195 30% 96%;
-    --primary: 199 85% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 200 30% 14%;
-    --secondary-foreground: 195 30% 96%;
-    --muted: 200 30% 16%;
-    --muted-foreground: 195 20% 60%;
-    --accent: 174 70% 50%;
-    --accent-foreground: 0 0% 100%;
-    --border: 200 30% 20%;
-    --input: 200 30% 16%;
+    --background: 210 40% 8%;
+    --foreground: 210 20% 96%;
+    --card: 210 40% 10%;
+    --card-foreground: 210 20% 96%;
+    --popover: 210 40% 8%;
+    --popover-foreground: 210 20% 96%;
+    --primary: 190 100% 50%;
+    --primary-foreground: 210 40% 8%;
+    --secondary: 210 30% 14%;
+    --secondary-foreground: 210 20% 96%;
+    --muted: 210 30% 16%;
+    --muted-foreground: 210 20% 60%;
+    --accent: 190 100% 45%;
+    --accent-foreground: 210 40% 8%;
+    --border: 210 30% 20%;
+    --input: 210 30% 16%;
   }
 }
 
@@ -128,6 +128,14 @@
   .no-scroll-anchoring {
     overflow-anchor: none;
   }
+}
+
+/* Text gradient using Aether colors */
+.text-gradient {
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ===== CLOUD-INSPIRED ANIMATIONS ===== */
@@ -252,13 +260,13 @@
 
 .cloud-blob::before {
   inset: -20%;
-  background: linear-gradient(135deg, hsl(200 80% 70% / 0.15), hsl(260 80% 70% / 0.15));
+  background: linear-gradient(135deg, hsl(210 30% 70% / 0.1), hsl(190 40% 70% / 0.1));
   animation-delay: -2s;
 }
 
 .cloud-blob::after {
   inset: -10%;
-  background: linear-gradient(225deg, hsl(260 80% 70% / 0.1), hsl(200 80% 70% / 0.1));
+  background: linear-gradient(225deg, hsl(190 40% 70% / 0.08), hsl(210 30% 70% / 0.08));
   animation-delay: -4s;
 }
 
@@ -273,7 +281,7 @@
   position: absolute;
   width: 300px;
   height: 200px;
-  background: radial-gradient(ellipse, hsl(200 80% 85% / 0.3), transparent 70%);
+  background: radial-gradient(ellipse, hsl(210 30% 85% / 0.2), transparent 70%);
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   animation: cloud-float 10s ease-in-out infinite, cloud-morph 15s ease-in-out infinite;
   top: -50px;
@@ -286,7 +294,7 @@
   position: absolute;
   width: 250px;
   height: 180px;
-  background: radial-gradient(ellipse, hsl(260 70% 80% / 0.25), transparent 70%);
+  background: radial-gradient(ellipse, hsl(190 40% 80% / 0.15), transparent 70%);
   border-radius: 40% 60% 70% 30% / 40% 70% 30% 60%;
   animation: cloud-float 12s ease-in-out infinite reverse, cloud-morph 18s ease-in-out infinite reverse;
   bottom: -40px;
@@ -295,11 +303,11 @@
 }
 
 .dark .cloud-bg::before {
-  background: radial-gradient(ellipse, hsl(200 60% 50% / 0.15), transparent 70%);
+  background: radial-gradient(ellipse, hsl(190 60% 50% / 0.1), transparent 70%);
 }
 
 .dark .cloud-bg::after {
-  background: radial-gradient(ellipse, hsl(260 60% 50% / 0.12), transparent 70%);
+  background: radial-gradient(ellipse, hsl(210 40% 50% / 0.08), transparent 70%);
 }
 
 /* Widget cloud wrapper */
@@ -311,7 +319,7 @@
   content: '';
   position: absolute;
   inset: -15px;
-  background: linear-gradient(135deg, hsl(200 80% 90% / 0.4), hsl(260 70% 85% / 0.3));
+  background: linear-gradient(135deg, hsl(210 30% 90% / 0.3), hsl(190 40% 85% / 0.2));
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   animation: cloud-morph 10s ease-in-out infinite, cloud-pulse 6s ease-in-out infinite;
   z-index: -1;
@@ -319,7 +327,7 @@
 }
 
 .dark .widget-cloud::before {
-  background: linear-gradient(135deg, hsl(200 60% 40% / 0.2), hsl(260 50% 35% / 0.15));
+  background: linear-gradient(135deg, hsl(190 50% 40% / 0.15), hsl(210 40% 35% / 0.1));
 }
 
 /* Scroll animation utilities with cloud style */
