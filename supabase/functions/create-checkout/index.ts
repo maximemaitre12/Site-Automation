@@ -12,6 +12,9 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
+// Default price if none provided (Starter plan)
+const DEFAULT_PRICE_ID = "price_1SjCzsH7wcmjTpOiQjG1ToVL";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -38,6 +41,18 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Get priceId from request body
+    let priceId = DEFAULT_PRICE_ID;
+    try {
+      const body = await req.json();
+      if (body.priceId) {
+        priceId = body.priceId;
+      }
+    } catch {
+      // No body or invalid JSON, use default
+    }
+    logStep("Using price", { priceId });
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     
     // Check if customer exists
@@ -58,7 +73,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: "price_1SjCrJH7wcmjTpOilsZk2YZH",
+          price: priceId,
           quantity: 1,
         },
       ],
