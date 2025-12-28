@@ -37,6 +37,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import agentFlowLogo from "@/assets/agent-flow.png";
 
 interface HistoryState {
   blocks: WorkflowBlock[];
@@ -334,229 +335,271 @@ export default function Flow() {
   return (
     <DashboardLayout headerActions={headerActions}>
       <div className="h-full flex flex-col overflow-hidden">
-        {/* Tabs for Workflows vs Automation */}
-        <div className="px-4 pt-4 border-b border-border bg-card/30">
-          <Tabs value={flowTab} onValueChange={(v) => setFlowTab(v as typeof flowTab)}>
-            <TabsList>
-              <TabsTrigger value="workflows" className="gap-2">
-                <Zap className="w-4 h-4" />
-                Workflows
-              </TabsTrigger>
-              <TabsTrigger value="automation" className="gap-2">
-                <Bot className="w-4 h-4" />
-                Automatisation IA
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        {/* Header */}
+        <header className="px-3 md:px-4 py-2 md:py-3 border-b border-border bg-card/30 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-400 flex items-center justify-center overflow-hidden shrink-0">
+              <img src={agentFlowLogo} alt="Flow" className="w-full h-full object-cover" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base md:text-lg font-bold text-foreground truncate">AETHER Flow</h1>
+            </div>
+            
+            {/* Tabs for Workflows vs Automation */}
+            <Tabs value={flowTab} onValueChange={(v) => setFlowTab(v as typeof flowTab)} className="shrink-0">
+              <TabsList className="h-8 md:h-9">
+                <TabsTrigger value="workflows" className="gap-1 md:gap-2 text-xs md:text-sm h-7 md:h-8 px-2 md:px-3">
+                  <Zap className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">Workflows</span>
+                </TabsTrigger>
+                <TabsTrigger value="automation" className="gap-1 md:gap-2 text-xs md:text-sm h-7 md:h-8 px-2 md:px-3">
+                  <Bot className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">Auto IA</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </header>
 
         {flowTab === 'automation' ? (
-          <div className="flex-1 overflow-auto p-6">
+          <div className="flex-1 overflow-auto p-3 md:p-6">
             <AIAutomationRules />
           </div>
         ) : (
           <>
             {/* Main Content */}
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
-          {/* Sidebar - Workflows List */}
-          <aside className="w-full md:w-56 lg:w-72 border-b md:border-b-0 md:border-r border-border bg-card/30 p-3 md:p-4 overflow-y-auto flex-shrink-0">
-            <div className="flex items-center justify-between px-2 mb-3 md:mb-4">
-              <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
-              <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 px-2">
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            {loading ? (
-              <div className="flex items-center justify-center py-6 md:py-8">
-                <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-primary" />
-              </div>
-            ) : workflows.length === 0 ? (
-              <div className="text-center py-6 md:py-8">
-                <Zap className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">No workflows yet</p>
-                <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Generate with AI
-                </Button>
-              </div>
-            ) : (
-              <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
-                {workflows.map((workflow) => (
-                  <div
-                    key={workflow.id}
-                    onClick={() => setSelectedWorkflowId(workflow.id)}
-                    className={`p-2.5 md:p-3 rounded-lg cursor-pointer transition-all flex-shrink-0 min-w-[160px] md:min-w-0 ${selectedWorkflowId === workflow.id ? 'bg-primary/10 border border-primary/30' : 'hover:bg-secondary border border-transparent'}`}
-                  >
-                    <div className="flex items-start justify-between mb-1">
-                      <span className="font-medium text-foreground text-xs md:text-sm truncate flex-1">{workflow.name}</span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="sm" className="h-5 w-5 md:h-6 md:w-6 p-0">
-                            <MoreVertical className="w-3 h-3 md:w-4 md:h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleDuplicateWorkflow(workflow)}>
-                            <Copy className="w-4 h-4 mr-2" />Duplicate
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive" onClick={() => { setWorkflowToDelete(workflow.id); setDeleteDialogOpen(true); }}>
-                            <Trash2 className="w-4 h-4 mr-2" />Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 rounded-full ${workflow.is_active ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
-                        {workflow.is_active ? 'active' : 'paused'}
-                      </span>
-                      <span className="text-[10px] md:text-xs text-muted-foreground">{workflow.blocks?.length || 0} blocks</span>
-                    </div>
+              {/* Sidebar - Workflows List */}
+              <aside className="w-full md:w-52 lg:w-64 border-b md:border-b-0 md:border-r border-border bg-card/30 p-2 md:p-3 overflow-y-auto flex-shrink-0">
+                <div className="flex items-center justify-between px-2 mb-2 md:mb-3">
+                  <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
+                  <Button variant="default" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 px-2 bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {loading ? (
+                  <div className="flex items-center justify-center py-6 md:py-8">
+                    <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-[hsl(var(--agent-flow))]" />
                   </div>
-                ))}
-              </div>
-            )}
-          </aside>
+                ) : workflows.length === 0 ? (
+                  <div className="text-center py-6 md:py-8">
+                    <Zap className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
+                    <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">No workflows yet</p>
+                    <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="text-xs">
+                      <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                      Generate with AI
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
+                    {workflows.map((workflow) => (
+                      <div
+                        key={workflow.id}
+                        onClick={() => setSelectedWorkflowId(workflow.id)}
+                        className={`p-2 md:p-2.5 rounded-lg cursor-pointer transition-all flex-shrink-0 min-w-[140px] md:min-w-0 ${selectedWorkflowId === workflow.id ? 'bg-[hsl(var(--agent-flow))]/10 border border-[hsl(var(--agent-flow))]/30' : 'hover:bg-secondary border border-transparent'}`}
+                      >
+                        <div className="flex items-start justify-between mb-1">
+                          <span className="font-medium text-foreground text-xs md:text-sm truncate flex-1">{workflow.name}</span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                              <Button variant="ghost" size="sm" className="h-5 w-5 md:h-6 md:w-6 p-0 shrink-0">
+                                <MoreVertical className="w-3 h-3 md:w-4 md:h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleDuplicateWorkflow(workflow)}>
+                                <Copy className="w-4 h-4 mr-2" />Duplicate
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive" onClick={() => { setWorkflowToDelete(workflow.id); setDeleteDialogOpen(true); }}>
+                                <Trash2 className="w-4 h-4 mr-2" />Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[9px] md:text-xs px-1.5 md:px-2 py-0.5 rounded-full ${workflow.is_active ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
+                            {workflow.is_active ? 'active' : 'paused'}
+                          </span>
+                          <span className="text-[9px] md:text-xs text-muted-foreground">{workflow.blocks?.length || 0} blocks</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </aside>
 
-          {/* Workflow Builder */}
-          {selectedWorkflow ? (
-            <div className="flex-1 flex flex-col min-h-0">
-              <div className="flex items-center justify-between gap-2 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30 flex-shrink-0">
-                {/* Left side: History, Undo/Redo, Save */}
-                <div className="flex items-center gap-2">
-                  <WorkflowHistory 
-                    runs={runs} 
-                    loading={runsLoading} 
-                    workflowName={selectedWorkflow?.name}
-                    versions={history.map((state, index) => ({
-                      id: `version-${index}`,
-                      blocks: state.blocks,
-                      connections: state.connections,
-                      timestamp: new Date(Date.now() - (history.length - index - 1) * 60000).toISOString(),
-                      label: index === history.length - 1 ? 'Version actuelle' : undefined
-                    })).reverse()}
-                    onRestoreVersion={(blocks, connections) => {
-                      isUndoRedoAction.current = true;
-                      setLocalBlocks(JSON.parse(JSON.stringify(blocks)));
-                      setLocalConnections(JSON.parse(JSON.stringify(connections)));
-                      setHasUnsavedChanges(true);
-                    }}
-                  />
-                  <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" onClick={handleUndo} disabled={!canUndo} className="h-7 w-7 p-0">
-                          <Undo2 className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Annuler (Ctrl+Z)</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="sm" onClick={handleRedo} disabled={!canRedo} className="h-7 w-7 p-0">
-                          <Redo2 className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Rétablir (Ctrl+Y)</TooltipContent>
-                    </Tooltip>
+              {/* Workflow Builder */}
+              {selectedWorkflow ? (
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 px-3 md:px-6 py-2 md:py-3 border-b border-border bg-card/30 flex-shrink-0">
+                    {/* Left side: History, Undo/Redo, Save */}
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <WorkflowHistory runs={runs} loading={runsLoading} />
+                      <div className="hidden sm:flex items-center gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={handleUndo} disabled={!canUndo} className="h-7 md:h-8 w-7 md:w-8 p-0">
+                              <Undo2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Annuler</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={handleRedo} disabled={!canRedo} className="h-7 md:h-8 w-7 md:w-8 p-0">
+                              <Redo2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Rétablir</TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges} className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm">
+                        <Save className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <span className="hidden xs:inline">Save</span>
+                        {hasUnsavedChanges && <span className="w-1.5 h-1.5 bg-warning rounded-full" />}
+                      </Button>
+                    </div>
+                    
+                    {/* Center: Workflow name */}
+                    <div className="flex-1 text-center hidden md:block">
+                      <h2 className="font-semibold text-foreground truncate px-4">{selectedWorkflow.name}</h2>
+                    </div>
+                    
+                    {/* Right side: AI, Add Block, Execute */}
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <AIWorkflowGenerator 
+                        onGenerate={handleAIGenerate}
+                        onModify={handleAIModify}
+                        existingBlocks={localBlocks}
+                        existingConnections={localConnections}
+                      />
+                      <Button variant="outline" size="sm" onClick={() => setIsBlockPickerOpen(true)} className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm">
+                        <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">Block</span>
+                      </Button>
+                      <WorkflowExecutor
+                        workflow={selectedWorkflow}
+                        blocks={localBlocks}
+                        connections={localConnections}
+                        onRunCompleted={(logs, output) => handleRunCompleted(selectedWorkflow.id, logs, output)}
+                      />
+                    </div>
                   </div>
-                  {hasUnsavedChanges && <span className="text-[10px] md:text-xs text-amber-500">Non sauvegardé</span>}
-                  <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges}>
-                    <Save className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">Sauvegarder</span>
-                  </Button>
+                  
+                  {/* Canvas */}
+                  <div className="flex-1 min-h-0 overflow-hidden">
+                    <EnhancedWorkflowCanvas
+                      blocks={localBlocks}
+                      connections={localConnections}
+                      selectedBlockId={selectedBlockId}
+                      onSelectBlock={setSelectedBlockId}
+                      onUpdateBlock={handleUpdateBlock}
+                      onDeleteBlock={handleDeleteBlock}
+                      onDuplicateBlock={handleDuplicateBlock}
+                      onAddConnection={handleAddConnection}
+                      onRemoveConnection={handleRemoveConnection}
+                    />
+                  </div>
                 </div>
-                {/* Right side: AI, Execute */}
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="border-violet-500/50 text-violet-400 hover:bg-violet-500/10">
-                    <Sparkles className="w-4 h-4 md:mr-2" /><span className="hidden md:inline">IA</span>
-                  </Button>
-                  <WorkflowExecutor blocks={localBlocks} connections={localConnections} workflowId={selectedWorkflow.id} workflowName={selectedWorkflow.name} onRunCreated={handleRunCompleted} />
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-4 md:p-8">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-400 flex items-center justify-center mb-4 overflow-hidden">
+                    <img src={agentFlowLogo} alt="Flow" className="w-full h-full object-cover" />
+                  </div>
+                  <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">AETHER Flow</h2>
+                  <p className="text-muted-foreground max-w-md mb-6 text-sm md:text-base">Créez des workflows automatisés pour orchestrer vos processus métier</p>
+                  <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90 text-sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Nouveau workflow
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsAIGeneratorOpen(true)} className="text-sm">
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Générer avec IA
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsTemplateGalleryOpen(true)} className="text-sm">
+                      <LayoutTemplate className="w-4 h-4 mr-2" />
+                      Templates
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <EnhancedWorkflowCanvas
-                blocks={localBlocks}
-                connections={localConnections}
-                selectedBlockId={selectedBlockId}
-                onSelectBlock={setSelectedBlockId}
-                onUpdateBlock={handleUpdateBlock}
-                onDeleteBlock={handleDeleteBlock}
-                onDuplicateBlock={handleDuplicateBlock}
-                onAddConnection={handleAddConnection}
-                onRemoveConnection={handleRemoveConnection}
-                onAddBlock={() => setIsBlockPickerOpen(true)}
-              />
-            </div>
-          ) : (
-            <div className="flex-1 flex items-center justify-center p-4">
-              <div className="text-center">
-                <WorkflowIcon className="w-12 h-12 md:w-16 md:h-16 text-muted-foreground/30 mx-auto mb-3 md:mb-4" />
-                <h3 className="text-base md:text-lg font-medium text-foreground mb-2">Sélectionnez un workflow</h3>
-                <p className="text-muted-foreground text-xs md:text-sm mb-4">Choisissez un workflow existant ou créez-en un nouveau</p>
-                <div className="flex gap-2 md:gap-3 justify-center flex-wrap">
-                  <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)}><Sparkles className="w-4 h-4 mr-2" />Générer avec l'IA</Button>
-                  <Button variant="hero" size="sm" onClick={() => setIsCreateDialogOpen(true)}><Plus className="w-4 h-4 mr-2" />Créer un workflow</Button>
-                </div>
-              </div>
-            </div>
-          )}
+              )}
             </div>
           </>
         )}
       </div>
 
-      {/* Dialogs */}
+      {/* Create Workflow Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Workflow</DialogTitle>
-            <DialogDescription>Give your workflow a name and optional description</DialogDescription>
+            <DialogDescription>Give your workflow a name and description</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Name</label>
-              <Input value={newWorkflowName} onChange={(e) => setNewWorkflowName(e.target.value)} placeholder="e.g., Invoice Processing" />
+              <Input
+                value={newWorkflowName}
+                onChange={(e) => setNewWorkflowName(e.target.value)}
+                placeholder="My Workflow"
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Description (optional)</label>
-              <Textarea value={newWorkflowDesc} onChange={(e) => setNewWorkflowDesc(e.target.value)} placeholder="Describe what this workflow does..." rows={3} />
+              <Textarea
+                value={newWorkflowDesc}
+                onChange={(e) => setNewWorkflowDesc(e.target.value)}
+                placeholder="Describe what this workflow does..."
+              />
             </div>
           </div>
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancel</Button>
-            <Button variant="hero" onClick={handleCreateWorkflow}>Create</Button>
+            <Button onClick={handleCreateWorkflow} className="bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90">Create</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <AIWorkflowGenerator 
-        isOpen={isAIGeneratorOpen} 
-        onClose={() => setIsAIGeneratorOpen(false)} 
-        onGenerate={handleAIGenerate}
-        existingWorkflow={selectedWorkflow ? {
-          id: selectedWorkflow.id,
-          name: selectedWorkflow.name,
-          blocks: localBlocks,
-          connections: localConnections
-        } : undefined}
-        onModify={handleAIModify}
-      />
-      <TemplateGallery isOpen={isTemplateGalleryOpen} onClose={() => setIsTemplateGalleryOpen(false)} onSelect={handleTemplateSelect} />
+      {/* AI Generator Dialog */}
+      <Dialog open={isAIGeneratorOpen} onOpenChange={setIsAIGeneratorOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Generate Workflow with AI</DialogTitle>
+            <DialogDescription>Describe your workflow and AI will create it</DialogDescription>
+          </DialogHeader>
+          <AIWorkflowGenerator onGenerate={(blocks, name, desc, connections) => { handleAIGenerate(blocks, name, desc, connections); setIsAIGeneratorOpen(false); }} />
+        </DialogContent>
+      </Dialog>
 
-      {/* Block Picker Dialog for Canvas mode */}
-      <BlockPickerDialog 
-        isOpen={isBlockPickerOpen} 
-        onClose={() => setIsBlockPickerOpen(false)}
-        onAddBlock={(type) => { handleAddBlock(type); setIsBlockPickerOpen(false); }}
+      {/* Template Gallery */}
+      <TemplateGallery
+        open={isTemplateGalleryOpen}
+        onOpenChange={setIsTemplateGalleryOpen}
+        onSelectTemplate={handleTemplateSelect}
       />
 
+      {/* Block Picker */}
+      <BlockPickerDialog
+        open={isBlockPickerOpen}
+        onOpenChange={setIsBlockPickerOpen}
+        onSelectBlock={handleAddBlock}
+      />
+
+      {/* Delete Confirmation */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Workflow?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the workflow and all its data.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteWorkflow} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteWorkflow} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

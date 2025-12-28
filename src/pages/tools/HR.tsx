@@ -33,6 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { EmailInbox } from "@/components/hr/email/EmailInbox";
 import { EmailAccountConnect } from "@/components/hr/email/EmailAccountConnect";
 import { useHREmails } from "@/hooks/useHREmails";
+import agentHrLogo from "@/assets/agent-hr.png";
 
 export default function HR() {
   const { 
@@ -70,6 +71,7 @@ export default function HR() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [convertCandidate, setConvertCandidate] = useState<any>(null);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   const loading = hrLoading || employeesLoading || interviewsLoading;
   const upcomingInterviews = getUpcomingInterviews();
@@ -124,14 +126,14 @@ export default function HR() {
     description: string;
     action?: React.ReactNode;
   }) => (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Icon className="w-5 h-5 text-primary" />
+    <div className="flex items-center justify-between mb-4 md:mb-6">
+      <div className="flex items-center gap-2 md:gap-3 min-w-0">
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-[hsl(var(--agent-hr))]/10 flex items-center justify-center shrink-0">
+          <Icon className="w-4 h-4 md:w-5 md:h-5 text-[hsl(var(--agent-hr))]" />
         </div>
-        <div>
-          <h2 className="font-semibold text-foreground">{title}</h2>
-          <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="min-w-0">
+          <h2 className="font-semibold text-foreground text-sm md:text-base truncate">{title}</h2>
+          <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{description}</p>
         </div>
       </div>
       {action}
@@ -154,55 +156,53 @@ export default function HR() {
   }) => (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
         active 
-          ? 'bg-primary text-primary-foreground' 
+          ? 'bg-[hsl(var(--agent-hr))] text-white' 
           : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
-      <Icon className="w-4 h-4" />
-      {label}
+      <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+      <span className="hidden xs:inline">{label}</span>
       {count !== undefined && (
-        <Badge variant={active ? "secondary" : "outline"} className="ml-1 text-xs">
+        <Badge variant={active ? "secondary" : "outline"} className="ml-0.5 md:ml-1 text-[10px] md:text-xs h-4 md:h-5 px-1 md:px-1.5">
           {count}
         </Badge>
       )}
     </button>
   );
 
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-
   return (
     <DashboardLayout>
-      <div className="absolute inset-0 flex flex-col">
+      <div className="absolute inset-0 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="shrink-0 px-4 py-3 border-b border-border bg-card/50">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
+        <header className="shrink-0 px-3 md:px-4 py-2.5 md:py-3 border-b border-border bg-card/50">
+          <div className="flex items-center justify-between gap-2 md:gap-4">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0">
               <button
-                className="md:hidden p-2 -ml-2 rounded-lg hover:bg-muted"
+                className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted shrink-0"
                 onClick={() => setShowMobileSidebar(!showMobileSidebar)}
               >
                 {showMobileSidebar ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
               </button>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-400 flex items-center justify-center shrink-0">
-                <Users className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-400 flex items-center justify-center overflow-hidden shrink-0">
+                <img src={agentHrLogo} alt="HR" className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg font-bold text-foreground truncate">HR Copilot</h1>
+                <h1 className="text-base md:text-lg font-bold text-foreground truncate">HR Copilot</h1>
               </div>
             </div>
             
             {/* Main tab toggle */}
             <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
-              <TabsList className="grid grid-cols-2 w-48 md:w-64">
-                <TabsTrigger value="recruitment" className="gap-1.5 text-xs md:text-sm">
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Recrutement</span>
+              <TabsList className="grid grid-cols-2 w-36 md:w-64 h-8 md:h-9">
+                <TabsTrigger value="recruitment" className="gap-1 md:gap-1.5 text-[10px] md:text-sm h-7 md:h-8">
+                  <UserPlus className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                  <span className="hidden xs:inline">Recrutement</span>
                 </TabsTrigger>
-                <TabsTrigger value="team" className="gap-1.5 text-xs md:text-sm">
-                  <UsersRound className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Équipe</span>
+                <TabsTrigger value="team" className="gap-1 md:gap-1.5 text-[10px] md:text-sm h-7 md:h-8">
+                  <UsersRound className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                  <span className="hidden xs:inline">Équipe</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -221,156 +221,163 @@ export default function HR() {
 
           {/* Left Sidebar - Sections */}
           <aside className={cn(
-            "w-52 shrink-0 border-r border-border bg-card/30 p-3 overflow-y-auto",
+            "w-48 md:w-52 shrink-0 border-r border-border bg-card/30 p-2 md:p-3 overflow-y-auto",
             "fixed md:relative inset-y-0 left-0 z-40 md:z-auto transition-transform",
             showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           )}>
             {mainTab === 'recruitment' ? (
               <>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
+                <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 md:px-3 mb-1.5 md:mb-2">Sections</p>
                 
                 <button
-                  onClick={() => setRecruitmentSection('pipeline')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setRecruitmentSection('pipeline'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'pipeline' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <Users className="w-4 h-4" />
-                  Pipeline Candidats
-                  <Badge variant="secondary" className="ml-auto">{stats.candidates}</Badge>
+                  <Users className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Pipeline</span>
+                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.candidates}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => setRecruitmentSection('interviews')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setRecruitmentSection('interviews'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'interviews' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <Calendar className="w-4 h-4" />
-                  Entretiens
-                  <Badge variant="secondary" className="ml-auto">{stats.upcomingInterviews}</Badge>
+                  <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Entretiens</span>
+                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.upcomingInterviews}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => setRecruitmentSection('jobs')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setRecruitmentSection('jobs'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'jobs' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <Briefcase className="w-4 h-4" />
-                  Postes & Offres
-                  <Badge variant="secondary" className="ml-auto">{stats.activeJobs}</Badge>
+                  <Briefcase className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Postes</span>
+                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.activeJobs}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => setRecruitmentSection('emails')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setRecruitmentSection('emails'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'emails' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <Mail className="w-4 h-4" />
-                  Messagerie
+                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Messagerie</span>
                   {stats.newEmails > 0 && (
-                    <Badge variant="destructive" className="ml-auto">{stats.newEmails}</Badge>
+                    <Badge variant="destructive" className="ml-auto text-[10px] h-4 px-1">{stats.newEmails}</Badge>
                   )}
                 </button>
                 
-                <Separator className="my-3" />
+                <Separator className="my-2 md:my-3" />
                 
                 {/* Quick Stats */}
-                <div className="px-3 space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-foreground">{stats.newCandidates}</div>
-                      <div className="text-xs text-muted-foreground">Nouveaux</div>
+                <div className="px-2 md:px-3 space-y-2 md:space-y-3">
+                  <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
+                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-foreground">{stats.newCandidates}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Nouveaux</div>
                     </div>
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-primary">{stats.analyzedCandidates}</div>
-                      <div className="text-xs text-muted-foreground">Analysés</div>
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-[hsl(var(--agent-hr))]">{stats.analyzedCandidates}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Analysés</div>
                     </div>
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-success">{stats.activeCandidates}</div>
-                      <div className="text-xs text-muted-foreground">Actifs</div>
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-success">{stats.activeCandidates}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Actifs</div>
                     </div>
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-warning">{stats.upcomingInterviews}</div>
-                      <div className="text-xs text-muted-foreground">Entretiens</div>
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-warning">{stats.upcomingInterviews}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Entretiens</div>
                     </div>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
+                <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 md:px-3 mb-1.5 md:mb-2">Sections</p>
                 
                 <button
-                  onClick={() => setTeamSection('employees')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setTeamSection('employees'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     teamSection === 'employees' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <UsersRound className="w-4 h-4" />
-                  Collaborateurs
-                  <Badge variant="secondary" className="ml-auto">{stats.employees}</Badge>
+                  <UsersRound className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Collaborateurs</span>
+                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.employees}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => setTeamSection('hr')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setTeamSection('hr'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     teamSection === 'hr' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <AlertTriangle className="w-4 h-4" />
-                  Gestion RH
-                  <Badge variant="secondary" className="ml-auto">{stats.openDisputes}</Badge>
+                  <AlertTriangle className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Gestion RH</span>
+                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.openDisputes}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => setTeamSection('analytics')}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => { setTeamSection('analytics'); setShowMobileSidebar(false); }}
+                  className={cn(
+                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     teamSection === 'analytics' 
-                      ? 'bg-primary text-primary-foreground' 
+                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
+                  )}
                 >
-                  <BarChart3 className="w-4 h-4" />
-                  Analytics
+                  <BarChart3 className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <span className="truncate">Analytics</span>
                 </button>
                 
-                <Separator className="my-3" />
+                <Separator className="my-2 md:my-3" />
                 
                 {/* Quick Stats */}
-                <div className="px-3 space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-foreground">{stats.employees}</div>
-                      <div className="text-xs text-muted-foreground">Actifs</div>
+                <div className="px-2 md:px-3 space-y-2 md:space-y-3">
+                  <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
+                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-foreground">{stats.employees}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Actifs</div>
                     </div>
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-warning">{stats.openDisputes}</div>
-                      <div className="text-xs text-muted-foreground">Litiges</div>
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-warning">{stats.openDisputes}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Litiges</div>
                     </div>
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-muted-foreground">{stats.departures}</div>
-                      <div className="text-xs text-muted-foreground">Départs</div>
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-muted-foreground">{stats.departures}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Départs</div>
                     </div>
-                    <div className="p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-lg font-bold text-primary">{careerEvents.length}</div>
-                      <div className="text-xs text-muted-foreground">Événements</div>
+                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-sm md:text-lg font-bold text-[hsl(var(--agent-hr))]">{careerEvents.length}</div>
+                      <div className="text-[9px] md:text-xs text-muted-foreground">Événements</div>
                     </div>
                   </div>
                 </div>
@@ -381,525 +388,303 @@ export default function HR() {
           {/* Main Content Area */}
           {loading ? (
             <div className="flex-1 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-[hsl(var(--agent-hr))]" />
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto">
-              <div className="p-5">
-                {/* RECRUITMENT MODULE */}
-                {mainTab === 'recruitment' && (
-                  <>
-                    {/* Pipeline Section */}
-                    {recruitmentSection === 'pipeline' && (
-                      <div className="space-y-6">
-                        <SectionHeader 
-                          icon={Users} 
-                          title="Pipeline Candidats" 
-                          description="Gérez vos candidats à travers les étapes du recrutement"
-                          action={
-                            <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
-                              <Button variant="hero"><Upload className="w-4 h-4 mr-2" />Ajouter un CV</Button>
-                            </AddCandidateDialog>
-                          }
+            <main className="flex-1 p-3 md:p-6 overflow-y-auto">
+              {mainTab === 'recruitment' ? (
+                <>
+                  {recruitmentSection === 'pipeline' && (
+                    <>
+                      <SectionHeader
+                        icon={Users}
+                        title="Pipeline Candidats"
+                        description="Gérez vos candidatures avec l'IA"
+                        action={<AddCandidateDialog onSubmit={createCandidate} jobs={jobs} />}
+                      />
+                      
+                      {/* Search bar */}
+                      <div className="relative mb-3 md:mb-4">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Rechercher un candidat..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-9 h-9 md:h-10 text-sm"
                         />
-                        
-                        {/* Pipeline Tabs */}
-                        <div className="flex items-center gap-3">
-                          <SubTabButton 
-                            active={pipelineTab === 'new'} 
-                            onClick={() => setPipelineTab('new')} 
-                            icon={UserPlus} 
-                            label="Nouveaux" 
-                            count={stats.newCandidates} 
+                      </div>
+                      
+                      {/* Status tabs */}
+                      <div className="flex gap-1.5 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-1">
+                        <SubTabButton active={pipelineTab === 'new'} onClick={() => setPipelineTab('new')} icon={Upload} label="Nouveaux" count={stats.newCandidates} />
+                        <SubTabButton active={pipelineTab === 'analyzed'} onClick={() => setPipelineTab('analyzed')} icon={Sparkles} label="Analysés" count={stats.analyzedCandidates} />
+                        <SubTabButton active={pipelineTab === 'active'} onClick={() => setPipelineTab('active')} icon={CheckCircle} label="Actifs" count={stats.activeCandidates} />
+                      </div>
+                      
+                      {/* Candidates list */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+                        {filteredCandidates.map(candidate => (
+                          <CandidateCard
+                            key={candidate.id}
+                            candidate={candidate}
+                            jobs={jobs}
+                            onValidate={(id) => validateScore(id, candidate.cv_text || '')}
+                            onActivate={activateCandidate}
+                            onLinkJob={linkToJob}
+                            onDelete={deleteCandidate}
+                            onConvertToEmployee={(c) => setConvertCandidate(c)}
                           />
-                          <SubTabButton 
-                            active={pipelineTab === 'analyzed'} 
-                            onClick={() => setPipelineTab('analyzed')} 
-                            icon={Target} 
-                            label="Analysés" 
-                            count={stats.analyzedCandidates} 
-                          />
-                          <SubTabButton 
-                            active={pipelineTab === 'active'} 
-                            onClick={() => setPipelineTab('active')} 
-                            icon={CheckCircle} 
-                            label="Actifs" 
-                            count={stats.activeCandidates} 
-                          />
-                          
-                          <div className="ml-auto relative max-w-xs flex-1">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                            <Input 
-                              placeholder="Rechercher un candidat..." 
-                              value={searchQuery} 
-                              onChange={(e) => setSearchQuery(e.target.value)} 
-                              className="pl-10" 
+                        ))}
+                        {filteredCandidates.length === 0 && (
+                          <div className="col-span-full text-center py-8 md:py-12">
+                            <Users className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30 mx-auto mb-3" />
+                            <p className="text-muted-foreground text-sm">Aucun candidat trouvé</p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                  
+                  {recruitmentSection === 'interviews' && (
+                    <>
+                      <SectionHeader
+                        icon={Calendar}
+                        title="Entretiens"
+                        description="Planifiez et gérez les entretiens"
+                      />
+                      
+                      {/* Interview tabs */}
+                      <div className="flex gap-1.5 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-1">
+                        <SubTabButton active={interviewTab === 'upcoming'} onClick={() => setInterviewTab('upcoming')} icon={Clock} label="À venir" count={stats.upcomingInterviews} />
+                        <SubTabButton active={interviewTab === 'completed'} onClick={() => setInterviewTab('completed')} icon={CheckCircle} label="Terminés" count={stats.completedInterviews} />
+                        <SubTabButton active={interviewTab === 'calendar'} onClick={() => setInterviewTab('calendar')} icon={CalendarDays} label="Calendrier" />
+                      </div>
+                      
+                      {interviewTab === 'calendar' ? (
+                        <InterviewCalendar interviews={interviews} />
+                      ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+                          {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).map(interview => (
+                            <InterviewCard
+                              key={interview.id}
+                              interview={interview}
+                              onUpdate={updateInterview}
+                              onRefresh={refetchInterviews}
                             />
-                          </div>
-                        </div>
-                        
-                        <Separator />
-                        
-                        {/* Candidates List */}
-                        {filteredCandidates.length > 0 ? (
-                          <div className="space-y-4">
-                            {filteredCandidates.map((candidate) => (
-                              <div key={candidate.id} className="relative">
-                                <CandidateCard 
-                                  candidate={candidate} jobs={jobs}
-                                  interviews={interviews}
-                                  onValidateScore={validateScore} onActivate={activateCandidate}
-                                  onLinkToJob={linkToJob} onUpdateDescription={updateDescription}
-                                  onAddInterviewNotes={addInterviewNotes} onDelete={deleteCandidate}
-                                />
-                                {candidate.status === 'active' && (
-                                  <Button 
-                                    size="sm" variant="outline" 
-                                    className="absolute top-4 right-4 bg-success/10 text-success border-success/30 hover:bg-success/20"
-                                    onClick={() => setConvertCandidate(candidate)}
-                                  >
-                                    <CheckCircle className="w-3 h-3 mr-1" />Embaucher
-                                  </Button>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <Card className="border-dashed">
-                            <CardContent className="py-12 text-center">
-                              <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                              <h3 className="text-lg font-medium mb-2">Aucun candidat</h3>
-                              <p className="text-sm text-muted-foreground mb-4">
-                                {pipelineTab === 'new' && "Ajoutez des CV pour commencer le processus de recrutement"}
-                                {pipelineTab === 'analyzed' && "Les candidats analysés apparaîtront ici"}
-                                {pipelineTab === 'active' && "Les candidats actifs apparaîtront ici"}
-                              </p>
-                              <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
-                                <Button><Plus className="w-4 h-4 mr-2" />Ajouter un CV</Button>
-                              </AddCandidateDialog>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Interviews Section */}
-                    {recruitmentSection === 'interviews' && (
-                      <div className="space-y-6">
-                        <SectionHeader 
-                          icon={Calendar} 
-                          title="Gestion des Entretiens" 
-                          description="Planifiez, suivez et analysez vos entretiens"
-                        />
-                        
-                        {/* Interview Tabs */}
-                        <div className="flex items-center gap-3">
-                          <SubTabButton 
-                            active={interviewTab === 'upcoming'} 
-                            onClick={() => setInterviewTab('upcoming')} 
-                            icon={Clock} 
-                            label="À venir" 
-                            count={stats.upcomingInterviews} 
-                          />
-                          <SubTabButton 
-                            active={interviewTab === 'completed'} 
-                            onClick={() => setInterviewTab('completed')} 
-                            icon={CheckCircle} 
-                            label="Terminés" 
-                            count={stats.completedInterviews} 
-                          />
-                          <SubTabButton 
-                            active={interviewTab === 'calendar'} 
-                            onClick={() => setInterviewTab('calendar')} 
-                            icon={CalendarDays} 
-                            label="Calendrier" 
-                          />
-                        </div>
-                        
-                        <Separator />
-                        
-                        {/* Interview Content */}
-                        {interviewTab === 'calendar' ? (
-                          <InterviewCalendar 
-                            interviews={interviews} 
-                            onUpdateInterview={updateInterview}
-                          />
-                        ) : (
-                          <>
-                            {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).length > 0 ? (
-                              <div className="space-y-4">
-                                {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).map((interview) => (
-                                  <InterviewCard 
-                                    key={interview.id} 
-                                    interview={interview} 
-                                    showCandidate 
-                                    onAnalysisComplete={refetchInterviews}
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <Card className="border-dashed">
-                                <CardContent className="py-12 text-center">
-                                  <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                  <h3 className="text-lg font-medium mb-2">
-                                    {interviewTab === 'upcoming' ? 'Aucun entretien à venir' : 'Aucun entretien terminé'}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">
-                                    {interviewTab === 'upcoming' 
-                                      ? 'Planifiez des entretiens depuis les fiches candidats'
-                                      : "Les entretiens terminés apparaîtront ici avec leurs analyses"
-                                    }
-                                  </p>
-                                </CardContent>
-                              </Card>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Jobs Section */}
-                    {recruitmentSection === 'jobs' && (
-                      <div className="space-y-6">
-                        <SectionHeader 
-                          icon={Briefcase} 
-                          title="Postes & Offres d'Emploi" 
-                          description="Créez et gérez vos offres d'emploi"
-                        />
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                          {/* Jobs List */}
-                          <div className="space-y-4">
-                            <h3 className="font-medium text-foreground flex items-center gap-2">
-                              <FileText className="w-4 h-4" />
-                              Postes ouverts ({stats.activeJobs})
-                            </h3>
-                            
-                            {jobs.length > 0 ? (
-                              <div className="space-y-3">
-                                {jobs.map((job) => (
-                                  <JobCard 
-                                    key={job.id} 
-                                    job={job} 
-                                    candidatesCount={candidates.filter(c => c.job_id === job.id).length} 
-                                    onDelete={deleteJob} 
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <Card className="border-dashed">
-                                <CardContent className="py-8 text-center">
-                                  <Briefcase className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
-                                  <p className="text-sm text-muted-foreground">Aucun poste ouvert</p>
-                                </CardContent>
-                              </Card>
-                            )}
-                          </div>
-                          
-                          {/* Job Generator */}
-                          <div className="space-y-4">
-                            <h3 className="font-medium text-foreground flex items-center gap-2">
-                              <Sparkles className="w-4 h-4" />
-                              Générateur IA
-                            </h3>
-                            <JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Emails Section */}
-                    {recruitmentSection === 'emails' && (
-                      <div className="space-y-6">
-                        <EmailInbox 
-                          candidates={candidates}
-                          jobs={jobs}
-                          onCreateCandidate={createCandidate}
-                        />
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* TEAM MODULE */}
-                {mainTab === 'team' && (
-                  <>
-                    {/* Employees Section */}
-                    {teamSection === 'employees' && (
-                      <div className="space-y-6">
-                        <SectionHeader 
-                          icon={UsersRound} 
-                          title="Collaborateurs" 
-                          description="Gérez votre équipe et leurs informations"
-                          action={
-                            <div className="flex items-center gap-2">
-                              <div className="flex items-center border rounded-lg overflow-hidden">
-                                <Button 
-                                  variant={employeeViewMode === 'table' ? 'default' : 'ghost'} 
-                                  size="sm" 
-                                  className="rounded-none"
-                                  onClick={() => setEmployeeViewMode('table')}
-                                >
-                                  <List className="w-4 h-4" />
-                                </Button>
-                                <Button 
-                                  variant={employeeViewMode === 'cards' ? 'default' : 'ghost'} 
-                                  size="sm" 
-                                  className="rounded-none"
-                                  onClick={() => setEmployeeViewMode('cards')}
-                                >
-                                  <LayoutGrid className="w-4 h-4" />
-                                </Button>
-                              </div>
-                              <AddEmployeeDialog onAdd={createEmployee}>
-                                <Button variant="hero"><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
-                              </AddEmployeeDialog>
+                          ))}
+                          {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).length === 0 && (
+                            <div className="col-span-full text-center py-8 md:py-12">
+                              <Calendar className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30 mx-auto mb-3" />
+                              <p className="text-muted-foreground text-sm">Aucun entretien</p>
                             </div>
-                          }
-                        />
-                        
-                        {/* Stats */}
-                        <EmployeeStats employees={employees} />
-                        
-                        {/* Filters */}
-                        <div className="flex items-center gap-4">
-                          <div className="relative max-w-xs flex-1">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                            <Input 
-                              placeholder="Rechercher un employé..." 
-                              value={searchQuery} 
-                              onChange={(e) => setSearchQuery(e.target.value)} 
-                              className="pl-10" 
-                            />
-                          </div>
-                          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                            <SelectTrigger className="w-40">
-                              <SelectValue placeholder="Département" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">Tous les dép.</SelectItem>
-                              {[...new Set(employees.map(e => e.department).filter(Boolean))].map(dep => (
-                                <SelectItem key={dep} value={dep!}>{dep}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select value={contractFilter} onValueChange={setContractFilter}>
-                            <SelectTrigger className="w-32">
-                              <SelectValue placeholder="Contrat" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">Tous</SelectItem>
-                              <SelectItem value="CDI">CDI</SelectItem>
-                              <SelectItem value="CDD">CDD</SelectItem>
-                              <SelectItem value="Stage">Stage</SelectItem>
-                              <SelectItem value="Freelance">Freelance</SelectItem>
-                              <SelectItem value="Alternance">Alternance</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          )}
                         </div>
-                        
-                        <Separator />
-                        
-                        {(() => {
-                          const filtered = activeEmployees.filter(e => {
-                            const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              e.job_title.toLowerCase().includes(searchQuery.toLowerCase());
-                            const matchesDept = departmentFilter === 'all' || e.department === departmentFilter;
-                            const matchesContract = contractFilter === 'all' || e.contract_type === contractFilter;
-                            return matchesSearch && matchesDept && matchesContract;
-                          });
-                          
-                          if (filtered.length === 0) {
-                            return (
-                              <Card className="border-dashed">
-                                <CardContent className="py-12 text-center">
-                                  <UsersRound className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                  <h3 className="text-lg font-medium mb-2">Aucun employé</h3>
-                                  <AddEmployeeDialog onAdd={createEmployee}>
-                                    <Button><Plus className="w-4 h-4 mr-2" />Ajouter un employé</Button>
-                                  </AddEmployeeDialog>
-                                </CardContent>
-                              </Card>
-                            );
-                          }
-                          
-                          return employeeViewMode === 'table' ? (
-                            <EmployeeTable 
-                              employees={filtered}
-                              careerEvents={careerEvents}
+                      )}
+                    </>
+                  )}
+                  
+                  {recruitmentSection === 'jobs' && (
+                    <>
+                      <SectionHeader
+                        icon={Briefcase}
+                        title="Postes & Offres"
+                        description="Créez et gérez vos offres d'emploi"
+                        action={<JobPostGenerator onGenerate={createJob} />}
+                      />
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+                        {jobs.map(job => (
+                          <JobCard
+                            key={job.id}
+                            job={job}
+                            candidateCount={candidates.filter(c => c.job_id === job.id).length}
+                            onDelete={deleteJob}
+                            onGeneratePost={() => generateJobPost(job.id)}
+                          />
+                        ))}
+                        {jobs.length === 0 && (
+                          <div className="col-span-full text-center py-8 md:py-12">
+                            <Briefcase className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30 mx-auto mb-3" />
+                            <p className="text-muted-foreground text-sm">Aucun poste créé</p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                  
+                  {recruitmentSection === 'emails' && (
+                    <>
+                      <SectionHeader
+                        icon={Mail}
+                        title="Messagerie RH"
+                        description="Gérez vos emails de recrutement"
+                        action={<EmailAccountConnect />}
+                      />
+                      <EmailInbox />
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  {teamSection === 'employees' && (
+                    <>
+                      <SectionHeader
+                        icon={UsersRound}
+                        title="Collaborateurs"
+                        description="Gérez votre équipe"
+                        action={
+                          <div className="flex items-center gap-2">
+                            <div className="flex border rounded-lg overflow-hidden">
+                              <Button
+                                variant={employeeViewMode === 'table' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setEmployeeViewMode('table')}
+                                className="rounded-none h-8"
+                              >
+                                <List className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant={employeeViewMode === 'cards' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setEmployeeViewMode('cards')}
+                                className="rounded-none h-8"
+                              >
+                                <LayoutGrid className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            <AddEmployeeDialog onSubmit={createEmployee} />
+                          </div>
+                        }
+                      />
+                      
+                      {/* Search */}
+                      <div className="relative mb-4 md:mb-6">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Rechercher un collaborateur..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-9 h-9 md:h-10 text-sm"
+                        />
+                      </div>
+                      
+                      {employeeViewMode === 'table' ? (
+                        <div className="overflow-x-auto -mx-3 md:mx-0">
+                          <EmployeeTable 
+                            employees={filteredEmployees}
+                            onUpdate={updateEmployee}
+                            onTerminate={terminateEmployee}
+                            onAddEvent={addCareerEvent}
+                          />
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                          {filteredEmployees.map(employee => (
+                            <EmployeeCard
+                              key={employee.id}
+                              employee={employee}
                               onUpdate={updateEmployee}
                               onTerminate={terminateEmployee}
-                              onDelete={deleteEmployee}
-                              onAddCareerEvent={addCareerEvent}
+                              onAddEvent={addCareerEvent}
                             />
-                          ) : (
-                            <div className="space-y-4">
-                              {filtered.map((emp) => (
-                                <EmployeeCard 
-                                  key={emp.id} 
-                                  employee={emp} 
-                                  onUpdate={updateEmployee} 
-                                  onTerminate={terminateEmployee} 
-                                  onDelete={deleteEmployee} 
-                                  onAddCareerEvent={addCareerEvent} 
-                                />
-                              ))}
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {teamSection === 'hr' && (
+                    <>
+                      <SectionHeader
+                        icon={AlertTriangle}
+                        title="Gestion RH"
+                        description="Litiges et départs"
+                      />
+                      
+                      {/* HR tabs */}
+                      <div className="flex gap-1.5 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-1">
+                        <SubTabButton active={hrTab === 'disputes'} onClick={() => setHrTab('disputes')} icon={AlertTriangle} label="Litiges" count={stats.openDisputes} />
+                        <SubTabButton active={hrTab === 'departures'} onClick={() => setHrTab('departures')} icon={DoorOpen} label="Départs" count={stats.departures} />
+                      </div>
+                      
+                      {hrTab === 'disputes' ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+                          {disputes.map(dispute => (
+                            <DisputeCard
+                              key={dispute.id}
+                              dispute={dispute}
+                              onUpdate={updateDispute}
+                              onResolve={resolveDispute}
+                            />
+                          ))}
+                          {disputes.length === 0 && (
+                            <div className="col-span-full text-center py-8 md:py-12">
+                              <CheckCircle className="w-10 h-10 md:w-12 md:h-12 text-success/30 mx-auto mb-3" />
+                              <p className="text-muted-foreground text-sm">Aucun litige en cours</p>
                             </div>
-                          );
-                        })()}
-                      </div>
-                    )}
-
-                    {/* HR Management Section */}
-                    {teamSection === 'hr' && (
-                      <div className="space-y-6">
-                        <SectionHeader 
-                          icon={AlertTriangle} 
-                          title="Gestion RH" 
-                          description="Litiges, départs et situations particulières"
-                        />
-                        
-                        {/* HR Tabs */}
-                        <div className="flex items-center gap-3">
-                          <SubTabButton 
-                            active={hrTab === 'disputes'} 
-                            onClick={() => setHrTab('disputes')} 
-                            icon={AlertTriangle} 
-                            label="Litiges" 
-                            count={stats.openDisputes} 
-                          />
-                          <SubTabButton 
-                            active={hrTab === 'departures'} 
-                            onClick={() => setHrTab('departures')} 
-                            icon={DoorOpen} 
-                            label="Départs" 
-                            count={stats.departures} 
-                          />
+                          )}
                         </div>
-                        
-                        <Separator />
-                        
-                        {hrTab === 'disputes' && (
-                          <>
-                            {disputes.length > 0 ? (
-                              <div className="space-y-4">
-                                {disputes.map((d) => (
-                                  <DisputeCard 
-                                    key={d.id} 
-                                    dispute={d} 
-                                    employee={employees.find(e => e.id === d.employee_id)} 
-                                    onResolve={resolveDispute} 
-                                    onUpdate={updateDispute} 
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <Card className="border-dashed">
-                                <CardContent className="py-12 text-center">
-                                  <AlertTriangle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                  <h3 className="text-lg font-medium mb-2">Aucun litige</h3>
-                                  <p className="text-sm text-muted-foreground">Les litiges RH apparaîtront ici</p>
-                                </CardContent>
-                              </Card>
-                            )}
-                          </>
-                        )}
-                        
-                        {hrTab === 'departures' && (
-                          <>
-                            {inactiveEmployees.length > 0 ? (
-                              <div className="space-y-4">
-                                {inactiveEmployees.map((emp) => (
-                                  <EmployeeCard 
-                                    key={emp.id} 
-                                    employee={emp} 
-                                    onUpdate={updateEmployee} 
-                                    onTerminate={terminateEmployee} 
-                                    onDelete={deleteEmployee} 
-                                    onAddCareerEvent={addCareerEvent} 
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <Card className="border-dashed">
-                                <CardContent className="py-12 text-center">
-                                  <DoorOpen className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                  <h3 className="text-lg font-medium mb-2">Aucun départ</h3>
-                                  <p className="text-sm text-muted-foreground">L'historique des départs apparaîtra ici</p>
-                                </CardContent>
-                              </Card>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Analytics Section */}
-                    {teamSection === 'analytics' && (
-                      <div className="space-y-6">
-                        <SectionHeader 
-                          icon={BarChart3} 
-                          title="Analytics & Performance" 
-                          description="Suivez les performances et l'évolution de carrière"
-                        />
-                        
-                        {/* Analytics Tabs */}
-                        <div className="flex items-center gap-3">
-                          <SubTabButton 
-                            active={analyticsTab === 'performance'} 
-                            onClick={() => setAnalyticsTab('performance')} 
-                            icon={TrendingUp} 
-                            label="Performance" 
-                          />
-                          <SubTabButton 
-                            active={analyticsTab === 'careers'} 
-                            onClick={() => setAnalyticsTab('careers')} 
-                            icon={History} 
-                            label="Carrières" 
-                            count={careerEvents.length} 
-                          />
+                      ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+                          {inactiveEmployees.map(employee => (
+                            <Card key={employee.id}>
+                              <CardContent className="p-3 md:p-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                    <DoorOpen className="w-5 h-5 text-muted-foreground" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-foreground truncate">{employee.name}</p>
+                                    <p className="text-xs md:text-sm text-muted-foreground truncate">{employee.job_title}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Départ: {employee.left_date ? new Date(employee.left_date).toLocaleDateString('fr-FR') : 'N/A'}
+                                    </p>
+                                  </div>
+                                  {employee.left_reason && (
+                                    <Badge variant="outline" className="text-[10px] md:text-xs shrink-0">{employee.left_reason}</Badge>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                          {inactiveEmployees.length === 0 && (
+                            <div className="col-span-full text-center py-8 md:py-12">
+                              <UsersRound className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30 mx-auto mb-3" />
+                              <p className="text-muted-foreground text-sm">Aucun départ enregistré</p>
+                            </div>
+                          )}
                         </div>
-                        
-                        <Separator />
-                        
-                        <Card className="border-dashed">
-                          <CardContent className="py-12 text-center">
-                            {analyticsTab === 'performance' ? (
-                              <>
-                                <TrendingUp className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                <h3 className="text-lg font-medium mb-2">Dashboard Performance</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  Les métriques de performance seront affichées ici
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <History className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                <h3 className="text-lg font-medium mb-2">Historique Carrières</h3>
-                                <p className="text-sm text-muted-foreground">
-                                  L'historique des promotions, augmentations et événements de carrière
-                                </p>
-                              </>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {teamSection === 'analytics' && (
+                    <>
+                      <SectionHeader
+                        icon={BarChart3}
+                        title="Analytics RH"
+                        description="Performance et carrières"
+                      />
+                      <EmployeeStats employees={employees} careerEvents={careerEvents} />
+                    </>
+                  )}
+                </>
+              )}
+            </main>
           )}
         </div>
       </div>
-
-      {/* Convert Candidate Dialog */}
+      
+      {/* Convert candidate dialog */}
       {convertCandidate && (
         <ConvertCandidateDialog
+          candidate={convertCandidate}
           open={!!convertCandidate}
           onOpenChange={(open) => !open && setConvertCandidate(null)}
-          candidate={convertCandidate}
-          onConvert={convertCandidateToEmployee}
+          onConvert={async (data) => {
+            await convertCandidateToEmployee(convertCandidate.id, data);
+            setConvertCandidate(null);
+          }}
         />
       )}
     </DashboardLayout>
