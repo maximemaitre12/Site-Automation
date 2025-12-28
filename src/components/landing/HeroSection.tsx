@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BrandLogosGrid } from "./BrandLogos";
+import { BrandLogosCloud } from "./BrandLogos";
 import { TechBackground } from "./TechBackground";
 
 export function HeroSection() {
@@ -50,10 +50,10 @@ export function HeroSection() {
           </Link>
         </div>
 
-        {/* Real brand logos */}
+        {/* Real brand logos cloud */}
         <div className="animate-fade-up-delay-3">
-          <p className="text-xs text-muted-foreground mb-4">Integrates with your favorite tools</p>
-          <BrandLogosGrid maxItems={8} animate={true} />
+          <p className="text-xs text-muted-foreground mb-2">Integrates with your favorite tools</p>
+          <BrandLogosCloud maxItems={8} />
         </div>
       </div>
     </section>
