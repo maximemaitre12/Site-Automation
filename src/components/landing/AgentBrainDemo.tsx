@@ -35,8 +35,9 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
     };
   }, []);
 
+  // Type the query only when phase becomes exactly 3
   useEffect(() => {
-    if (phase < 3) return;
+    if (phase !== 3 || queryComplete) return;
     let i = 0;
     const interval = setInterval(() => {
       if (i <= searchQuery.length) {
@@ -49,10 +50,13 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
       }
     }, 40);
     return () => clearInterval(interval);
-  }, [phase]);
+  }, [phase, queryComplete]);
 
+  // Type the response only when phase becomes exactly 5
   useEffect(() => {
-    if (phase < 5) return;
+    if (phase !== 5) return;
+    // Don't restart if already typed
+    if (typedResponse.length > 0) return;
     let i = 0;
     const interval = setInterval(() => {
       if (i <= aiResponse.length) {
@@ -63,7 +67,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
       }
     }, 20);
     return () => clearInterval(interval);
-  }, [phase]);
+  }, [phase, typedResponse.length]);
 
   return (
     <div
