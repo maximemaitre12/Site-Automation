@@ -316,26 +316,21 @@ export function PainPointsSection() {
                   shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
                 }
               >
-                {/* Glass background with agent color tint */}
+                {/* Glass background with agent color tint - more intense */}
                 <div
                   className={cn(
                     "absolute inset-0 -z-10",
-                    tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_60%_97%)] via-white to-[hsl(220_60%_98%)]",
-                    tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_45%_97%)] via-white to-[hsl(270_45%_98%)]",
-                    tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_50%_97%)] via-white to-[hsl(160_50%_98%)]",
-                    tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_45%_97%)] via-white to-[hsl(340_45%_98%)]",
-                    tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_60%_97%)] via-white to-[hsl(25_60%_98%)]",
-                    tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_60%_97%)] via-white to-[hsl(190_60%_98%)]",
+                    tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_70%_92%)] via-[hsl(220_50%_96%)] to-[hsl(220_70%_94%)]",
+                    tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_60%_92%)] via-[hsl(270_40%_96%)] to-[hsl(270_60%_94%)]",
+                    tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_60%_92%)] via-[hsl(160_40%_96%)] to-[hsl(160_60%_94%)]",
+                    tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_60%_92%)] via-[hsl(340_40%_96%)] to-[hsl(340_60%_94%)]",
+                    tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_70%_92%)] via-[hsl(25_50%_96%)] to-[hsl(25_70%_94%)]",
+                    tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_70%_92%)] via-[hsl(190_50%_96%)] to-[hsl(190_70%_94%)]",
                   )}
                 />
-                {/* Shimmer glass reflection */}
+                {/* Shimmer glass reflection - always visible */}
                 <div
-                  className={cn(
-                    "absolute inset-0 -z-10 pointer-events-none",
-                    "bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.8)_45%,rgba(255,255,255,0.9)_50%,rgba(255,255,255,0.8)_55%,transparent_60%)]",
-                    "bg-[length:200%_100%]",
-                    "animate-[shimmer_4s_ease-in-out_infinite]"
-                  )}
+                  className="absolute inset-0 pointer-events-none bg-[linear-gradient(110deg,transparent_25%,rgba(255,255,255,0.5)_35%,rgba(255,255,255,0.8)_50%,rgba(255,255,255,0.5)_65%,transparent_75%)] bg-[length:250%_100%] animate-[shimmer_3s_ease-in-out_infinite]"
                 />
 
                 {/* Header - clickable */}
