@@ -74,7 +74,7 @@ export function IntegrationsSection() {
           {/* Platforms row with center Aether hub */}
           <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap max-w-lg mx-auto">
             {/* Left platforms */}
-            {platforms.slice(0, 4).map((platform, i) => (
+            {platforms.slice(0, 5).map((platform, i) => (
               <div
                 key={platform.name}
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary border border-border flex items-center justify-center transition-all duration-300 hover:border-primary/40 hover:shadow-md"
@@ -85,13 +85,8 @@ export function IntegrationsSection() {
               </div>
             ))}
             
-            {/* Center Aether hub */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden shadow-md mx-1 border-2 border-primary/20">
-              <img src={aetherLogo} alt="Aether" className="w-full h-full object-cover" />
-            </div>
-            
             {/* Right platforms */}
-            {platforms.slice(4, 8).map((platform, i) => (
+            {platforms.slice(5, 10).map((platform, i) => (
               <div
                 key={platform.name}
                 className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary border border-border flex items-center justify-center transition-all duration-300 hover:border-primary/40 hover:shadow-md"
