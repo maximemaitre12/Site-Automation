@@ -39,24 +39,14 @@ export function ResultsSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
 
   return (
-    <section id="results" className="relative py-16 sm:py-24 lg:py-32 bg-secondary/50 overflow-hidden">
-      {/* Cloud background decorations */}
-      <div 
-        className="absolute top-20 right-[10%] w-80 h-56 bg-gradient-to-br from-[hsl(200_80%_85%/0.25)] to-[hsl(220_70%_90%/0.15)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl animate-cloud-float"
-        style={{ animationDuration: "14s" }}
-      />
-      <div 
-        className="absolute bottom-10 left-[5%] w-64 h-44 bg-gradient-to-br from-[hsl(260_70%_85%/0.2)] to-[hsl(280_60%_90%/0.12)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-3xl animate-cloud-drift"
-        style={{ animationDuration: "16s", animationDelay: "-4s" }}
-      />
-
+    <section id="results" className="relative py-12 sm:py-16 lg:py-20 bg-secondary/50 overflow-hidden">
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3 sm:mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2 sm:mb-3">
             Measurable Results
           </h2>
-          <p className="text-base sm:text-lg text-muted-foreground px-2">
+          <p className="text-sm sm:text-base text-muted-foreground px-2">
             Transform your operations and measure the impact from day one.
           </p>
         </div>
@@ -65,7 +55,7 @@ export function ResultsSection() {
         <div 
           ref={ref}
           className={cn(
-            "grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-20 stagger-children",
+            "grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 stagger-children",
             isVisible && "visible"
           )}
         >
@@ -74,22 +64,13 @@ export function ResultsSection() {
             return (
               <div 
                 key={i} 
-                className="relative text-center p-6 sm:p-8 rounded-2xl bg-background border border-border hover:border-primary/20 hover:shadow-lg transition-all duration-300 group"
-                style={{ transitionDelay: `${i * 150}ms` }}
+                className="relative text-center p-4 sm:p-5 rounded-xl bg-background border border-border hover:border-primary/20 transition-all duration-300 group"
+                style={{ transitionDelay: `${i * 100}ms` }}
               >
-                {/* Cloud decoration on hover */}
-                <div 
-                  className={cn(
-                    "absolute -inset-3 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 -z-10",
-                    i % 2 === 0
-                      ? "bg-gradient-to-br from-[hsl(200_80%_70%)] to-[hsl(220_70%_80%)]"
-                      : "bg-gradient-to-br from-[hsl(260_70%_70%)] to-[hsl(280_60%_80%)]"
-                  )}
-                />
-                <div className="w-12 h-12 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <IconComponent className="w-6 h-6 text-primary" strokeWidth={1.5} />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                  <IconComponent className="w-5 h-5 text-primary" strokeWidth={1.5} />
                 </div>
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-1">
                   {isVisible ? (
                     <AnimatedCounter 
                       end={stat.value} 
@@ -101,18 +82,11 @@ export function ResultsSection() {
                     `${stat.prefix || ""}0${stat.suffix || ""}`
                   )}
                 </div>
-                <div className="text-sm font-medium text-foreground mb-1">{stat.label}</div>
+                <div className="text-xs font-medium text-foreground mb-0.5">{stat.label}</div>
                 <p className="text-xs text-muted-foreground">{stat.description}</p>
               </div>
             );
           })}
-        </div>
-        
-        {/* Value proposition */}
-        <div className="max-w-3xl mx-auto text-center px-2">
-          <p className="text-xl sm:text-2xl md:text-3xl font-medium text-foreground leading-snug mb-6 sm:mb-8">
-            "Join the companies transforming their operations with intelligent automation."
-          </p>
         </div>
       </div>
     </section>

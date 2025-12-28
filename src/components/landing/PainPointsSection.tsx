@@ -333,14 +333,14 @@ export function PainPointsSection() {
   };
 
   return (
-    <section id="product" className="py-16 sm:py-24 lg:py-32 bg-secondary/50">
+    <section id="product" className="py-12 sm:py-16 lg:py-20 bg-secondary/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-3 sm:mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2 sm:mb-3">
             Six AI Agents. One Revolution.
           </h2>
-          <p className="text-base sm:text-lg text-muted-foreground px-2">
+          <p className="text-sm sm:text-base text-muted-foreground px-2">
             Each agent solves a specific business problem. Together, they transform your operations.
           </p>
         </div>
@@ -349,7 +349,7 @@ export function PainPointsSection() {
         <div 
           ref={ref}
           className={cn(
-            "flex flex-col gap-4 sm:gap-6 stagger-children",
+            "flex flex-col gap-3 sm:gap-4 stagger-children",
             isVisible && "visible"
           )}
         >
@@ -386,49 +386,49 @@ export function PainPointsSection() {
 
                 {/* Header - clickable */}
                 <div 
-                  className="p-6 cursor-pointer"
+                  className="p-4 sm:p-5 cursor-pointer"
                   onClick={() => handleToggle(i)}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                       <div
                         className={cn(
-                          "w-14 h-14 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300",
+                          "w-11 h-11 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300",
                           tool.color
                         )}
                       >
-                        <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
+                        <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={1.5} />
                       </div>
                       <div>
-                        <div className={cn("text-xs font-semibold uppercase tracking-wider mb-1", tool.colorClass)}>
+                        <div className={cn("text-xs font-semibold uppercase tracking-wider mb-0.5", tool.colorClass)}>
                           {tool.tagline}
                         </div>
-                        <h3 className="text-xl font-bold text-foreground">AETHER {tool.name}</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-foreground">AETHER {tool.name}</h3>
                       </div>
                     </div>
                     <div
                       className={cn(
-                        "w-10 h-10 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
+                        "w-8 h-8 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
                         isExpanded && "rotate-180 bg-primary/10"
                       )}
                     >
                       <ChevronDown
                         className={cn(
-                          "w-5 h-5",
+                          "w-4 h-4",
                           isExpanded ? "text-primary" : "text-muted-foreground"
                         )}
                       />
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground text-sm leading-relaxed mt-4">{tool.description}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed mt-3">{tool.description}</p>
 
                   {/* Quick stats preview when collapsed */}
                   {!isExpanded && (
-                    <div className="flex gap-6 mt-4 pt-4 border-t border-border/50">
+                    <div className="flex gap-4 mt-3 pt-3 border-t border-border/50">
                       {tool.stats.slice(0, 3).map((stat, j) => (
                         <div key={j} className="text-center">
-                          <div className={cn("text-lg font-bold", tool.colorClass)}>{stat.value}</div>
+                          <div className={cn("text-base font-bold", tool.colorClass)}>{stat.value}</div>
                           <div className="text-xs text-muted-foreground">{stat.label}</div>
                         </div>
                       ))}
