@@ -130,18 +130,18 @@ export function BrandLogoItem({ name, Logo, color, className, delay = 0 }: Brand
 }
 
 export const brandLogos = [
-  { name: "Slack", Logo: SlackLogo, color: "hsl(270, 45%, 50%)" },
-  { name: "Gmail", Logo: GmailLogo, color: "hsl(340, 45%, 50%)" },
-  { name: "Figma", Logo: FigmaLogo, color: "hsl(25, 50%, 50%)" },
-  { name: "Notion", Logo: NotionLogo, color: "hsl(250, 30%, 35%)" },
-  { name: "Salesforce", Logo: SalesforceLogo, color: "hsl(200, 50%, 45%)" },
-  { name: "HubSpot", Logo: HubSpotLogo, color: "hsl(25, 60%, 50%)" },
-  { name: "Jira", Logo: JiraLogo, color: "hsl(220, 60%, 50%)" },
-  { name: "Zapier", Logo: ZapierLogo, color: "hsl(25, 55%, 48%)" },
-  { name: "Teams", Logo: MicrosoftTeamsLogo, color: "hsl(250, 40%, 50%)" },
-  { name: "Drive", Logo: GoogleDriveLogo, color: "hsl(220, 55%, 50%)" },
-  { name: "Trello", Logo: TrelloLogo, color: "hsl(200, 60%, 45%)" },
-  { name: "Asana", Logo: AsanaLogo, color: "hsl(340, 50%, 55%)" },
+  { name: "Slack", Logo: SlackLogo, color: "hsl(285, 40%, 45%)" },
+  { name: "Gmail", Logo: GmailLogo, color: "hsl(350, 50%, 50%)" },
+  { name: "Figma", Logo: FigmaLogo, color: "hsl(15, 55%, 52%)" },
+  { name: "Notion", Logo: NotionLogo, color: "hsl(220, 25%, 30%)" },
+  { name: "Salesforce", Logo: SalesforceLogo, color: "hsl(195, 55%, 45%)" },
+  { name: "HubSpot", Logo: HubSpotLogo, color: "hsl(35, 60%, 50%)" },
+  { name: "Jira", Logo: JiraLogo, color: "hsl(215, 65%, 50%)" },
+  { name: "Zapier", Logo: ZapierLogo, color: "hsl(5, 55%, 50%)" },
+  { name: "Teams", Logo: MicrosoftTeamsLogo, color: "hsl(255, 45%, 55%)" },
+  { name: "Drive", Logo: GoogleDriveLogo, color: "hsl(145, 45%, 42%)" },
+  { name: "Trello", Logo: TrelloLogo, color: "hsl(175, 50%, 40%)" },
+  { name: "Asana", Logo: AsanaLogo, color: "hsl(320, 45%, 50%)" },
 ];
 
 interface BrandLogosGridProps {
