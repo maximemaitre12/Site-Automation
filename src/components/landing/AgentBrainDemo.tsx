@@ -22,24 +22,30 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");
   const [queryComplete, setQueryComplete] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [animationStarted, setAnimationStarted] = useState(false);
 
+  // Start animation when visible
   useEffect(() => {
-    // Only run animation once
-    if (!isVisible || hasAnimated) return;
+    if (!isVisible || animationStarted) return;
 
-    setHasAnimated(true);
+    // Reset all states
+    setPhase(0);
+    setTypedQuery("");
+    setTypedResponse("");
+    setQueryComplete(false);
+    setAnimationStarted(true);
     
-    const phase1 = setTimeout(() => setPhase(1), 500);
-    const phase2 = setTimeout(() => setPhase(2), 2000);
-    const phase3 = setTimeout(() => setPhase(3), 3500);
+    // Start the animation sequence
+    const phase1 = setTimeout(() => setPhase(1), 300);
+    const phase2 = setTimeout(() => setPhase(2), 1500);
+    const phase3 = setTimeout(() => setPhase(3), 2800);
 
     return () => {
       clearTimeout(phase1);
       clearTimeout(phase2);
       clearTimeout(phase3);
     };
-  }, [isVisible, hasAnimated]);
+  }, [isVisible, animationStarted]);
 
   useEffect(() => {
     if (phase < 3) return;
