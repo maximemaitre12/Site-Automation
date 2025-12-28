@@ -258,12 +258,6 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           <p className="text-base font-medium text-foreground mb-4">
             Close more deals with AI-powered sales intelligence
           </p>
-          <Link to="/signup" onClick={(e) => e.stopPropagation()}>
-            <Button size="lg" className="shadow-lg shadow-cyan-500/25 bg-cyan-500 hover:bg-cyan-600">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

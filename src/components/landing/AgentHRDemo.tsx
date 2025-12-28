@@ -450,12 +450,6 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
           <p className="text-base font-medium text-foreground mb-4">
             Find your perfect candidate 75% faster with AI
           </p>
-          <Link to="/signup" onClick={(e) => e.stopPropagation()}>
-            <Button size="lg" className="shadow-lg shadow-orange-500/25 bg-orange-500 hover:bg-orange-600">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

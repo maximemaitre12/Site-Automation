@@ -226,12 +226,6 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           <p className="text-base font-medium text-foreground mb-4">
             Build your own intelligent automations in minutes
           </p>
-          <Link to="/signup" onClick={(e) => e.stopPropagation()}>
-            <Button size="lg" className="shadow-lg shadow-blue-500/25 bg-blue-500 hover:bg-blue-600">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

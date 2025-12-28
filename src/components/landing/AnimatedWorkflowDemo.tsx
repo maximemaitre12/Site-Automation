@@ -167,12 +167,6 @@ export function AnimatedWorkflowDemo({ className, agentType = "flow" }: Animated
           <p className="text-sm font-medium text-foreground mb-3">
             Build your own intelligent agent in minutes
           </p>
-          <Link to="/signup">
-            <Button size="sm" className="shadow-lg shadow-primary/25">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>
