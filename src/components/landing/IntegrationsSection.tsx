@@ -6,6 +6,7 @@ import {
   HubSpotLogo, ZapierLogo, StripeLogo, ShopifyLogo,
   TrelloLogo, AirtableLogo
 } from "./BrandLogos";
+import aetherLogo from "@/assets/aether-logo.jpeg";
 
 const platforms = [
   { name: "Slack", Logo: SlackLogo },
@@ -85,8 +86,8 @@ export function IntegrationsSection() {
             ))}
             
             {/* Center Aether hub */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md mx-1">
-              <span className="text-primary-foreground font-bold text-sm sm:text-base">A</span>
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden shadow-md mx-1 border-2 border-primary/20">
+              <img src={aetherLogo} alt="Aether" className="w-full h-full object-cover" />
             </div>
             
             {/* Right platforms */}
