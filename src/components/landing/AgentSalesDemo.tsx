@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { TrendingUp, Phone, DollarSign, Target } from "lucide-react";
 
 const deals = [
@@ -14,23 +13,14 @@ interface AgentSalesDemoProps {
 }
 
 export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+  const ref = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [dealProgress, setDealProgress] = useState<number[]>([0, 0, 0]);
   const [chartHeight, setChartHeight] = useState<number[]>([0, 0, 0, 0]);
-  const [animationStarted, setAnimationStarted] = useState(false);
 
+  // Start animation immediately on mount
   useEffect(() => {
-    if (!isVisible || animationStarted) return;
-
-    // Reset and start
-    setPhase(0);
-    setRevenue(0);
-    setDealProgress([0, 0, 0]);
-    setChartHeight([0, 0, 0, 0]);
-    setAnimationStarted(true);
-
     const t1 = setTimeout(() => setPhase(1), 300);
     const t2 = setTimeout(() => setPhase(2), 1500);
     const t3 = setTimeout(() => setPhase(3), 2500);
@@ -40,7 +30,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [isVisible, animationStarted]);
+  }, []);
 
   useEffect(() => {
     if (phase >= 1) {

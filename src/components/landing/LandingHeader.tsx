@@ -33,7 +33,7 @@ export function LandingHeader() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src={aetherLogo} alt="Aether" className="h-16 w-auto" />
+            <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
           </Link>
           
           {/* Desktop Navigation */}
