@@ -308,24 +308,23 @@ export function PainPointsSection() {
                 className={cn(
                   "group relative rounded-2xl border transition-all duration-500 overflow-hidden",
                   "backdrop-blur-sm",
-                  isExpanded
-                    ? "border-primary/30 shadow-xl"
-                    : "border-border/50 hover:border-primary/20 hover:shadow-lg"
+                  "border-primary/20 shadow-lg",
+                  isExpanded && "border-primary/40 shadow-xl"
                 )}
                 style={
                   shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
                 }
               >
-                {/* Glass background with agent color tint - subtle */}
+                {/* Glass background with agent color tint */}
                 <div
                   className={cn(
                     "absolute inset-0 -z-10",
-                    tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_30%_95%)] via-[hsl(220_20%_97%)] to-[hsl(220_30%_96%)]",
-                    tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_25%_95%)] via-[hsl(270_15%_97%)] to-[hsl(270_25%_96%)]",
-                    tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_25%_95%)] via-[hsl(160_15%_97%)] to-[hsl(160_25%_96%)]",
-                    tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_25%_95%)] via-[hsl(340_15%_97%)] to-[hsl(340_25%_96%)]",
-                    tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_30%_95%)] via-[hsl(25_20%_97%)] to-[hsl(25_30%_96%)]",
-                    tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_30%_95%)] via-[hsl(190_20%_97%)] to-[hsl(190_30%_96%)]",
+                    tool.colorClass === "text-agent-flow" && "bg-gradient-to-br from-[hsl(220_50%_94%)] via-[hsl(220_40%_97%)] to-[hsl(220_50%_95%)]",
+                    tool.colorClass === "text-agent-brain" && "bg-gradient-to-br from-[hsl(270_50%_94%)] via-[hsl(270_40%_97%)] to-[hsl(270_50%_95%)]",
+                    tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_50%_94%)] via-[hsl(160_40%_97%)] to-[hsl(160_50%_95%)]",
+                    tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_50%_94%)] via-[hsl(340_40%_97%)] to-[hsl(340_50%_95%)]",
+                    tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_50%_94%)] via-[hsl(25_40%_97%)] to-[hsl(25_50%_95%)]",
+                    tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_50%_94%)] via-[hsl(190_40%_97%)] to-[hsl(190_50%_95%)]",
                   )}
                 />
                 {/* Shimmer glass reflection - behind content */}
