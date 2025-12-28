@@ -370,24 +370,24 @@ export default function Flow() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
               {/* Sidebar - Workflows List */}
-              <aside className="w-full md:w-52 lg:w-64 border-b md:border-b-0 md:border-r border-border bg-card/30 p-2 md:p-3 overflow-y-auto flex-shrink-0">
+              <aside className="w-full md:w-52 lg:w-64 border-b md:border-b-0 md:border-r border-border bg-card/30 p-2 md:p-3 overflow-y-auto flex-shrink-0 max-h-32 md:max-h-none">
                 <div className="flex items-center justify-between px-2 mb-2 md:mb-3">
-                  <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Your Workflows</h3>
-                  <Button variant="default" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-7 px-2 bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90">
-                    <Plus className="w-4 h-4" />
+                  <h3 className="text-xs md:text-sm font-medium text-muted-foreground">Workflows</h3>
+                  <Button variant="default" size="sm" onClick={() => setIsCreateDialogOpen(true)} className="h-6 md:h-7 px-1.5 md:px-2 bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90">
+                    <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   </Button>
                 </div>
                 {loading ? (
-                  <div className="flex items-center justify-center py-6 md:py-8">
+                  <div className="flex items-center justify-center py-4 md:py-8">
                     <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-[hsl(var(--agent-flow))]" />
                   </div>
                 ) : workflows.length === 0 ? (
-                  <div className="text-center py-6 md:py-8">
-                    <Zap className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
-                    <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">No workflows yet</p>
-                    <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="text-xs">
-                      <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                      Generate with AI
+                  <div className="text-center py-4 md:py-8">
+                    <Zap className="w-6 h-6 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-2" />
+                    <p className="text-[10px] md:text-sm text-muted-foreground mb-2 md:mb-4">Aucun workflow</p>
+                    <Button variant="outline" size="sm" onClick={() => setIsAIGeneratorOpen(true)} className="text-[10px] md:text-xs h-6 md:h-8 px-2">
+                      <Sparkles className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1" />
+                      Générer IA
                     </Button>
                   </div>
                 ) : (
@@ -508,22 +508,22 @@ export default function Flow() {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-4 md:p-8">
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-400 flex items-center justify-center mb-4 overflow-hidden">
+                  <div className="w-14 h-14 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-400 flex items-center justify-center mb-3 md:mb-4 overflow-hidden">
                     <img src={agentFlowLogo} alt="Flow" className="w-full h-full object-cover" />
                   </div>
-                  <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">AETHER Flow</h2>
-                  <p className="text-muted-foreground max-w-md mb-6 text-sm md:text-base">Créez des workflows automatisés pour orchestrer vos processus métier</p>
-                  <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90 text-sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nouveau workflow
+                  <h2 className="text-base md:text-xl font-semibold text-foreground mb-1 md:mb-2">AETHER Flow</h2>
+                  <p className="text-muted-foreground max-w-md mb-4 md:mb-6 text-xs md:text-base px-4">Créez des workflows automatisés pour orchestrer vos processus métier</p>
+                  <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 md:gap-3 w-full max-w-xs sm:max-w-none px-4">
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90 text-xs md:text-sm h-9 md:h-10 w-full sm:w-auto">
+                      <Plus className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
+                      Nouveau
                     </Button>
-                    <Button variant="outline" onClick={() => setIsAIGeneratorOpen(true)} className="text-sm">
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Générer avec IA
+                    <Button variant="outline" onClick={() => setIsAIGeneratorOpen(true)} className="text-xs md:text-sm h-9 md:h-10 w-full sm:w-auto">
+                      <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
+                      Générer IA
                     </Button>
-                    <Button variant="outline" onClick={() => setIsTemplateGalleryOpen(true)} className="text-sm">
-                      <LayoutTemplate className="w-4 h-4 mr-2" />
+                    <Button variant="outline" onClick={() => setIsTemplateGalleryOpen(true)} className="text-xs md:text-sm h-9 md:h-10 w-full sm:w-auto">
+                      <LayoutTemplate className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
                       Templates
                     </Button>
                   </div>
