@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast";
 
 const featuredPost = {
   id: "founders-story",
-  title: "From Shanghai Cafés to Enterprise AI: The AETHER Story",
+  title: "From Shanghai Coffee to Enterprise AI: The AETHER Story",
   excerpt: "Two emlyon students turned a casual chat in Shanghai into a global AI platform. Here's how Youriy and Maxime started building AETHER.",
   image: "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=400&fit=crop",
   author: "AETHER Team",
@@ -19,13 +19,13 @@ const featuredPost = {
 
 Youriy and Maxime had never crossed paths before landing in China. Both were second-year students at emlyon, there for an exchange program that would end up changing everything.
 
-"We met at a welcome dinner," Youriy remembers. "I was venting about my last internship—hours wasted on repetitive data entry. Maxime just looked at me and said, 'What if we could get AI to handle all that?'"
+"We met at a welcome dinner," Youriy remembers. "I was venting about my last internship, hours wasted on repetitive data entry. Maxime just looked at me and said, 'What if we could get AI to handle all that?'"
 
 That one question stuck. Over the next few weeks, they kept meeting at coffee shops around Putuo, scribbling ideas on napkins and laptops.
 
 Shanghai felt like the right place for this.
 
-"There's this energy here," Maxime explains. "You walk around and everyone seems to be building something. We figured—why not us?"
+"There's this energy here," Maxime explains. "You walk around and everyone seems to be building something. We figured, why not us?"
 
 While their classmates hit the tourist spots, they spent weekends in co-working spaces, digging into machine learning, enterprise software, and automation. The first prototype came together in a small Putuo apartment, fueled by baozi, endless tea, and the Shanghai skyline outside their window.
 
@@ -33,7 +33,7 @@ No big funding story. Just conviction.
 
 "We don't have investors lining up," Youriy admits. "But we've seen how much time companies waste on stuff AI could do in seconds. That's the gap we're going after."
 
-The AETHER journey is still early. There's a lot planned for 2025—new capabilities, new features. But the mission stays simple: make enterprise AI something any business can actually use, not just the giants with massive budgets.`
+The AETHER journey is still early. There's a lot planned for 2025: new capabilities, new features. But the mission stays simple: make enterprise AI something any business can actually use, not just the giants with massive budgets.`
 };
 
 const posts = [
@@ -71,7 +71,7 @@ The blockers people mention most:
 
 What's different now?
 
-AI has gotten good enough to handle tasks that need judgment—not just simple if-then rules. That 30% isn't inevitable anymore. The companies figuring this out first will have a real edge.`
+AI has gotten good enough to handle tasks that need judgment, not just simple if-then rules. That 30% isn't inevitable anymore. The companies figuring this out first will have a real edge.`
   },
   {
     id: "ai-voice-agents",
@@ -91,7 +91,7 @@ The journey from your voice to a response:
 Your voice becomes a digital waveform. Modern systems sample at 16kHz or higher to catch all the details.
 
 2. Turning sound into text (50-200ms)
-Speech recognition models—often transformer-based like Whisper—convert those sound waves into words. Accuracy is now above 95% in most situations.
+Speech recognition models, often transformer-based like Whisper, convert those sound waves into words. Accuracy is now above 95% in most situations.
 
 3. Understanding what you meant (100-300ms)
 This is where it gets interesting. The system figures out your intent, pulls out relevant details (names, dates, numbers), and considers what you said before.
@@ -113,7 +113,7 @@ This isn't just chatbot stuff. Think automated phone systems that actually get w
   {
     id: "enterprise-ai-trends-2025",
     title: "5 Enterprise AI Trends Worth Paying Attention To",
-    excerpt: "From AI agents going live to governance spending exploding—here's what the data shows about where things are heading.",
+    excerpt: "From AI agents going live to governance spending exploding, here's what the data shows about where things are heading.",
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=crop",
     author: "Maxime Maître",
     date: "December 10, 2025",
@@ -124,14 +124,14 @@ This isn't just chatbot stuff. Think automated phone systems that actually get w
 
 1. AI agents are leaving the lab
 
-Gartner predicts 33% of enterprise software will include agentic AI by 2028. These aren't chatbots—they execute multi-step tasks on their own.
+Gartner predicts 33% of enterprise software will include agentic AI by 2028. These aren't chatbots, they execute multi-step tasks on their own.
 
 Right now: 8% of companies have agents in production
 By end of 2025: expected to hit 23%
 
 2. Multimodal is now the default
 
-Text, image, voice—the boundaries are blurring. IDC says 67% of new enterprise AI projects last year were multimodal.
+Text, image, voice: the boundaries are blurring. IDC says 67% of new enterprise AI projects last year were multimodal.
 
 Document processing now combines OCR, layout analysis, image recognition, and language understanding all at once.
 
@@ -199,19 +199,19 @@ Traditional invoice processing: receive, manually enter or template-extract, val
 
 AI-powered: receive, automatic extraction and validation, human review only for exceptions. 2-5 minutes total.
 
-That's 80% less time—and almost no data entry errors.`
+That's 80% less time, and almost no data entry errors.`
   },
   {
     id: "shanghai-startup-ecosystem",
     title: "What Building a Startup in Shanghai Taught Us",
-    excerpt: "From Putuo co-working spaces to Jing'an tech meetups—lessons from launching AETHER in one of the world's most dynamic cities.",
+    excerpt: "From Putuo co-working spaces to Jing'an tech meetups, lessons from launching AETHER in one of the world's most dynamic cities.",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&h=300&fit=crop",
     author: "AETHER Team",
     date: "December 5, 2025",
     readTime: "6 min read",
     category: "Company",
     icon: Sparkles,
-    fullContent: `Shanghai didn't just happen to be where AETHER started—it shaped how we think about building products.
+    fullContent: `Shanghai didn't just happen to be where AETHER started, it shaped how we think about building products.
 
 The pace is real
 
@@ -435,7 +435,10 @@ export default function Blog() {
                             <span>{post.author}</span>
                           </div>
                           <span className="hidden sm:inline">{post.date}</span>
-                          <span>{post.readTime}</span>
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="w-3 h-3" />
+                            <span>{post.readTime}</span>
+                          </div>
                         </div>
                         <button 
                           onClick={() => setExpandedPost(expandedPost === post.id ? null : post.id)}

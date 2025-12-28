@@ -13,7 +13,7 @@ const blogPreviews = [
     category: "Innovation",
   },
   {
-    title: "From Shanghai Cafés to Enterprise AI",
+    title: "From Shanghai Coffee to Enterprise AI",
     excerpt: "Two emlyon students turned a casual chat into a global AI platform. Here's our story.",
     category: "Company",
   },
