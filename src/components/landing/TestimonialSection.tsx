@@ -1,56 +1,40 @@
 import { Quote } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useRef } from "react";
 
-const quote = "We built Aether because we believe AI should work for you, not the other way around. Our mission is to give every team the power of intelligent automation.";
+const words = [
+  { text: "We", highlight: false },
+  { text: "built", highlight: false },
+  { text: "Aether", highlight: true },
+  { text: "because", highlight: false },
+  { text: "we", highlight: false },
+  { text: "believe", highlight: false },
+  { text: "AI", highlight: true },
+  { text: "should", highlight: false },
+  { text: "work", highlight: false },
+  { text: "for", highlight: false },
+  { text: "you,", highlight: true },
+  { text: "not", highlight: false },
+  { text: "the", highlight: false },
+  { text: "other", highlight: false },
+  { text: "way", highlight: false },
+  { text: "around.", highlight: false },
+  { text: "Our", highlight: false },
+  { text: "mission", highlight: false },
+  { text: "is", highlight: false },
+  { text: "to", highlight: false },
+  { text: "give", highlight: false },
+  { text: "every", highlight: false },
+  { text: "team", highlight: false },
+  { text: "the", highlight: false },
+  { text: "power", highlight: false },
+  { text: "of", highlight: false },
+  { text: "intelligent", highlight: true },
+  { text: "automation.", highlight: true },
+];
 
 export function TestimonialSection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
-  const [displayedText, setDisplayedText] = useState("");
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  const words = quote.split(" ");
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Start animation when visible
-  useEffect(() => {
-    if (isVisible && !hasStarted) {
-      setHasStarted(true);
-      setDisplayedText("");
-      setCurrentWordIndex(0);
-    }
-  }, [isVisible, hasStarted]);
-
-  // Animate words appearing one by one
-  useEffect(() => {
-    if (!hasStarted) return;
-
-    if (currentWordIndex < words.length) {
-      intervalRef.current = setTimeout(() => {
-        setDisplayedText(prev => {
-          if (prev === "") return words[0];
-          return prev + " " + words[currentWordIndex];
-        });
-        setCurrentWordIndex(prev => prev + 1);
-      }, 80);
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearTimeout(intervalRef.current);
-      }
-    };
-  }, [hasStarted, currentWordIndex, words]);
-
-  // Reset when scrolling away
-  useEffect(() => {
-    if (!isVisible && hasStarted) {
-      setHasStarted(false);
-      setDisplayedText("");
-      setCurrentWordIndex(0);
-    }
-  }, [isVisible, hasStarted]);
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3, triggerOnce: true });
 
   return (
     <section className="py-12 sm:py-16 lg:py-20 bg-background">
@@ -63,39 +47,32 @@ export function TestimonialSection() {
       >
         <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-primary/20 mx-auto mb-4 sm:mb-6" />
         
-        <blockquote className="text-base sm:text-lg md:text-xl font-medium text-foreground leading-relaxed mb-4 sm:mb-6 min-h-[4rem] sm:min-h-[5rem]">
+        <blockquote className="text-base sm:text-lg md:text-xl font-medium leading-relaxed mb-4 sm:mb-6">
           <span className="text-muted-foreground">"</span>
-          {displayedText.split(" ").map((word, index, arr) => {
-            // Highlight key words
-            const isHighlight = ["AI", "you", "intelligent", "automation"].includes(word.replace(/[.,]/g, ""));
-            return (
-              <span key={index}>
-                <span
-                  className={cn(
-                    "animate-fade-in",
-                    isHighlight ? "text-primary font-semibold" : "text-foreground"
-                  )}
-                  style={{ 
-                    animationDelay: `${index * 20}ms`,
-                    animationDuration: "300ms"
-                  }}
-                >
-                  {word}
-                </span>
-                {index < arr.length - 1 && " "}
-              </span>
-            );
-          })}
-          {currentWordIndex < words.length && (
-            <span className="inline-block w-0.5 h-5 bg-primary animate-pulse ml-0.5" />
-          )}
-          {currentWordIndex >= words.length && <span className="text-muted-foreground">"</span>}
+          {words.map((word, index) => (
+            <span
+              key={index}
+              className={cn(
+                "inline transition-all duration-500",
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+                word.highlight ? "text-primary font-semibold" : "text-foreground"
+              )}
+              style={{ 
+                transitionDelay: isVisible ? `${index * 40}ms` : "0ms"
+              }}
+            >
+              {word.text}{" "}
+            </span>
+          ))}
+          <span className="text-muted-foreground">"</span>
         </blockquote>
         
         <div className={cn(
           "flex flex-col items-center transition-all duration-500",
-          currentWordIndex >= words.length ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-        )}>
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+        )}
+        style={{ transitionDelay: isVisible ? "1200ms" : "0ms" }}
+        >
           <p className="font-semibold text-foreground text-sm">The Aether Team</p>
           <p className="text-xs text-muted-foreground">Building the future of work</p>
         </div>
