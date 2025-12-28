@@ -29,7 +29,6 @@ import Compliance from "./pages/tools/Compliance";
 import Data from "./pages/tools/Data";
 
 // Company pages
-import About from "./pages/company/About";
 import Blog from "./pages/company/Blog";
 import Contact from "./pages/company/Contact";
 
@@ -70,7 +69,7 @@ const App = () => (
             <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
             
             {/* Company pages */}
-            <Route path="/about" element={<About />} />
+            <Route path="/about" element={<Navigate to="/" replace />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/contact" element={<Contact />} />
             
