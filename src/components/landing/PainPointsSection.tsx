@@ -318,14 +318,13 @@ export function PainPointsSection() {
                   shouldStagger ? { transitionDelay: `${i * 100}ms` } as CSSProperties : undefined
                 }
               >
-                {/* Glass shimmer effect */}
+                {/* Glass shimmer effect - always visible */}
                 <div
                   className={cn(
-                    "absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-700 pointer-events-none",
-                    "bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.08)_45%,rgba(255,255,255,0.12)_50%,rgba(255,255,255,0.08)_55%,transparent_60%)]",
+                    "absolute inset-0 rounded-2xl pointer-events-none",
+                    "bg-[linear-gradient(105deg,transparent_40%,rgba(255,255,255,0.06)_45%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.06)_55%,transparent_60%)]",
                     "bg-[length:200%_100%]",
-                    "group-hover:opacity-100 group-hover:animate-[shimmer_2s_ease-in-out_infinite]",
-                    isExpanded && "opacity-100 animate-[shimmer_2s_ease-in-out_infinite]"
+                    "opacity-100 animate-[shimmer_3s_ease-in-out_infinite]"
                   )}
                 />
 
