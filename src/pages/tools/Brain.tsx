@@ -247,12 +247,26 @@ export default function BrainPage() {
     );
   }
 
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
   return (
     <DashboardLayout>
-      <div className="h-full flex">
+      <div className="h-full flex flex-col md:flex-row relative">
+        {/* Mobile toggle button */}
+        <button
+          className="md:hidden fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+        >
+          {showMobileSidebar ? <X className="w-5 h-5" /> : <MessageSquarePlus className="w-5 h-5" />}
+        </button>
+
         {/* Sidebar */}
-        <aside className="w-72 border-r border-border p-4 flex flex-col bg-card/50">
-          <Button variant="default" className="w-full mb-4" onClick={handleNewChat}>
+        <aside className={cn(
+          "w-full md:w-72 border-r border-border p-4 flex flex-col bg-card/50 transition-all",
+          "fixed md:relative inset-0 z-40 md:z-auto",
+          showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}>
+          <Button variant="default" className="w-full mb-4" onClick={() => { handleNewChat(); setShowMobileSidebar(false); }}>
             <MessageSquarePlus className="w-4 h-4 mr-2" />
             Nouvelle conversation
           </Button>
@@ -274,7 +288,7 @@ export default function BrainPage() {
                       "group flex items-center justify-between p-3 rounded-lg hover:bg-secondary cursor-pointer transition-colors",
                       currentConversation?.id === conv.id && "bg-secondary"
                     )}
-                    onClick={() => selectConversation(conv.id)}
+                    onClick={() => { selectConversation(conv.id); setShowMobileSidebar(false); }}
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">

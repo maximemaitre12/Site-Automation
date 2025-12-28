@@ -18,31 +18,31 @@ const stats = [
 export default function Support() {
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-8 py-6 border-b border-border">
+        <header className="px-4 md:px-8 py-4 md:py-6 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-red-400 flex items-center justify-center">
-                  <HeadphonesIcon className="w-5 h-5 text-white" />
+              <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-rose-500 to-red-400 flex items-center justify-center">
+                  <HeadphonesIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 Support Copilot
               </h1>
-              <p className="text-muted-foreground mt-1">Ticket classification and automated response generation</p>
+              <p className="text-muted-foreground mt-1 text-sm hidden md:block">Ticket classification and automated response generation</p>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-6">
+          <div className="grid grid-cols-3 gap-2 md:gap-4 mt-4 md:mt-6">
             {stats.map((stat) => (
-              <div key={stat.label} className="p-4 rounded-xl bg-card border border-border flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <div key={stat.label} className="p-3 md:p-4 rounded-xl bg-card border border-border flex items-center gap-2 md:gap-4">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                  <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-lg md:text-2xl font-bold text-foreground">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">{stat.label}</p>
                 </div>
               </div>
             ))}
@@ -50,7 +50,7 @@ export default function Support() {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-foreground">Recent Tickets</h2>
             <Button variant="outline" size="sm">View All</Button>

@@ -7,7 +7,8 @@ import { DocHeader } from "@/components/doc/DocHeader";
 import { DocUploadDialog } from "@/components/doc/DocUploadDialog";
 import { DocGenerateDialog } from "@/components/doc/DocGenerateDialog";
 import { DocViewerDialog } from "@/components/doc/DocViewerDialog";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function DocPage() {
   const {
@@ -36,6 +37,7 @@ export default function DocPage() {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   const currentFolderData = currentFolder 
     ? folders.find(f => f.id === currentFolder) 
@@ -81,15 +83,36 @@ export default function DocPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex h-full overflow-hidden">
+      <div className="flex h-full overflow-hidden relative">
+        {/* Mobile toggle button */}
+        <button
+          className="md:hidden fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+        >
+          {showMobileSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+
         {/* Sidebar - Folders */}
-        <DocSidebar
-          folders={folders}
-          currentFolder={currentFolder}
-          onFolderSelect={setCurrentFolder}
-          onCreateFolder={(name) => createFolder(name, currentFolder)}
-          onDeleteFolder={deleteFolder}
-        />
+        <div className={cn(
+          "fixed md:relative inset-0 z-40 md:z-auto transition-transform",
+          showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}>
+          <DocSidebar
+            folders={folders}
+            currentFolder={currentFolder}
+            onFolderSelect={(id) => { setCurrentFolder(id); setShowMobileSidebar(false); }}
+            onCreateFolder={(name) => createFolder(name, currentFolder)}
+            onDeleteFolder={deleteFolder}
+          />
+        </div>
+
+        {/* Mobile overlay */}
+        {showMobileSidebar && (
+          <div 
+            className="fixed inset-0 bg-black/20 z-30 md:hidden"
+            onClick={() => setShowMobileSidebar(false)}
+          />
+        )}
 
         {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">

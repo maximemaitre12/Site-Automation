@@ -10,8 +10,9 @@ import {
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
   AlertTriangle, DoorOpen, Calendar, CalendarDays, List, LayoutGrid,
-  FileText, Target, Mic, BarChart3, Award, History, Mail
+  FileText, Target, Mic, BarChart3, Award, History, Mail, X
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useHR } from "@/hooks/useHR";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useInterviews } from "@/hooks/useInterviews";
@@ -169,6 +170,8 @@ export default function HR() {
     </button>
   );
 
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
   return (
     <DashboardLayout>
       <div className="absolute inset-0 flex flex-col">
@@ -176,6 +179,12 @@ export default function HR() {
         <header className="shrink-0 px-4 py-3 border-b border-border bg-card/50">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
+              <button
+                className="md:hidden p-2 -ml-2 rounded-lg hover:bg-muted"
+                onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+              >
+                {showMobileSidebar ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
+              </button>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-400 flex items-center justify-center shrink-0">
                 <Users className="w-4 h-4 text-white" />
               </div>
@@ -186,14 +195,14 @@ export default function HR() {
             
             {/* Main tab toggle */}
             <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
-              <TabsList className="grid grid-cols-2 w-64">
-                <TabsTrigger value="recruitment" className="gap-1.5 text-sm">
+              <TabsList className="grid grid-cols-2 w-48 md:w-64">
+                <TabsTrigger value="recruitment" className="gap-1.5 text-xs md:text-sm">
                   <UserPlus className="w-3.5 h-3.5" />
-                  Recrutement
+                  <span className="hidden sm:inline">Recrutement</span>
                 </TabsTrigger>
-                <TabsTrigger value="team" className="gap-1.5 text-sm">
+                <TabsTrigger value="team" className="gap-1.5 text-xs md:text-sm">
                   <UsersRound className="w-3.5 h-3.5" />
-                  Équipe
+                  <span className="hidden sm:inline">Équipe</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -201,9 +210,21 @@ export default function HR() {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
+          {/* Mobile overlay */}
+          {showMobileSidebar && (
+            <div 
+              className="fixed inset-0 bg-black/20 z-30 md:hidden"
+              onClick={() => setShowMobileSidebar(false)}
+            />
+          )}
+
           {/* Left Sidebar - Sections */}
-          <aside className="w-52 shrink-0 border-r border-border bg-card/30 p-3 overflow-y-auto">
+          <aside className={cn(
+            "w-52 shrink-0 border-r border-border bg-card/30 p-3 overflow-y-auto",
+            "fixed md:relative inset-y-0 left-0 z-40 md:z-auto transition-transform",
+            showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          )}>
             {mainTab === 'recruitment' ? (
               <>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>

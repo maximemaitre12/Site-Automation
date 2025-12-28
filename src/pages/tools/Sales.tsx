@@ -140,48 +140,50 @@ export default function Sales() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-8 py-6 border-b border-border">
+        <header className="px-4 md:px-8 py-4 md:py-6 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-white" />
+              <h1 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </div>
                 Sales Copilot
               </h1>
-              <p className="text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1 text-sm hidden md:block">
                 Propositions IA, analyse d'appels, et emails personnalisés
               </p>
             </div>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setShowHistory(!showHistory)}
               className="gap-2"
             >
               <History className="w-4 h-4" />
-              Historique
+              <span className="hidden md:inline">Historique</span>
             </Button>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mt-6 flex-wrap">
+          <div className="flex gap-2 mt-4 md:mt-6 overflow-x-auto pb-2">
             {[
               { key: "pipeline", label: "Pipeline", icon: Kanban },
-              { key: "call", label: "Analyser Appel", icon: Phone },
-              { key: "negotiation", label: "Fiches Négociation", icon: Target },
-              { key: "proposal", label: "Générer Proposition", icon: FileText },
-              { key: "email", label: "Rédiger Email", icon: Mail },
+              { key: "call", label: "Appels", icon: Phone },
+              { key: "negotiation", label: "Négociation", icon: Target },
+              { key: "proposal", label: "Proposition", icon: FileText },
+              { key: "email", label: "Email", icon: Mail },
             ].map((tab) => (
               <Button
                 key={tab.key}
                 variant={activeTab === tab.key ? "default" : "ghost"}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className="gap-2"
+                className="gap-2 shrink-0"
+                size="sm"
               >
                 <tab.icon className="w-4 h-4" />
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
               </Button>
             ))}
           </div>
@@ -190,7 +192,7 @@ export default function Sales() {
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Form Panel */}
-          <div className="flex-1 p-8 overflow-y-auto">
+          <div className="flex-1 p-4 md:p-8 overflow-y-auto">
             {activeTab === "pipeline" && (
               <SalesPipeline />
             )}
