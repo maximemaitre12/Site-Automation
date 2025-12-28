@@ -195,8 +195,8 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
           phase >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
-              <Target className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl bg-secondary/60 border border-border/60 flex items-center justify-center shadow-sm">
+              <Target className="w-6 h-6 text-orange-500" />
             </div>
             <div>
               <h4 className="text-lg font-semibold text-foreground">Senior React Developer</h4>

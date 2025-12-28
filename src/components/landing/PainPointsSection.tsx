@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { 
   Zap, Brain, Sparkles, ScanSearch, ShieldCheck, LineChart,
   ChevronDown, Workflow, MessageSquare, FileText, Target, Users,
@@ -235,74 +235,23 @@ const tools: Tool[] = [
 export function PainPointsSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shouldStagger = isVisible && expandedIndex === null;
+  const expandedPanelRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollLockRef = useRef<{ index: number; top: number } | null>(null);
-  const scrollRafRef = useRef<number | null>(null);
+  const expandedTool = expandedIndex !== null ? tools[expandedIndex] : null;
 
   const handleToggle = (index: number) => {
-    // Cancel any previous stabilization loop
-    if (scrollRafRef.current) {
-      cancelAnimationFrame(scrollRafRef.current);
-      scrollRafRef.current = null;
+    const next = expandedIndex === index ? null : index;
+    setExpandedIndex(next);
+
+    if (next !== null) {
+      requestAnimationFrame(() => {
+        expandedPanelRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
     }
-
-    // Capture the clicked card position before layout changes
-    const el = cardRefs.current[index];
-    scrollLockRef.current = el ? { index, top: el.getBoundingClientRect().top } : null;
-
-    setExpandedIndex((prev) => (prev === index ? null : index));
-
-    // Stabilize scroll during the height transition so the clicked card doesn't jump.
-    // IMPORTANT: if pinning would require overscrolling (top/bottom), abort to avoid "teleport".
-    requestAnimationFrame(() => {
-      const start = performance.now();
-      const durationMs = 950; // collapse + expand (duration-500) + buffer
-
-      const tick = (now: number) => {
-        const lock = scrollLockRef.current;
-        if (!lock) return;
-
-        const afterEl = cardRefs.current[lock.index];
-        if (!afterEl) {
-          scrollLockRef.current = null;
-          scrollRafRef.current = null;
-          return;
-        }
-
-        const newTop = afterEl.getBoundingClientRect().top;
-        const delta = lock.top - newTop;
-
-        if (Math.abs(delta) > 0.5) {
-          const maxScrollY = Math.max(
-            0,
-            document.documentElement.scrollHeight - window.innerHeight
-          );
-          const rawNext = window.scrollY + delta;
-
-          // If we'd hit a boundary, don't clamp to top/bottom (that feels like a teleport).
-          if (rawNext < 0 || rawNext > maxScrollY) {
-            afterEl.scrollIntoView({ behavior: "smooth", block: "center" });
-            scrollLockRef.current = null;
-            scrollRafRef.current = null;
-            return;
-          }
-
-          window.scrollTo({ top: rawNext });
-        }
-
-        if (now - start < durationMs) {
-          scrollRafRef.current = requestAnimationFrame(tick);
-          return;
-        }
-
-        scrollLockRef.current = null;
-        scrollRafRef.current = null;
-      };
-
-      scrollRafRef.current = requestAnimationFrame(tick);
-    });
   };
 
 
@@ -330,168 +279,183 @@ export function PainPointsSection() {
           {tools.map((tool, i) => {
             const IconComponent = tool.icon;
             const isExpanded = expandedIndex === i;
-            
+
             return (
-              <Fragment key={i}>
-                <div 
-                  ref={(el) => { cardRefs.current[i] = el; }}
-                  className={cn(
-                    "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
-                    isExpanded 
-                      ? "border-primary shadow-xl shadow-primary/10" 
-                      : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
-                  )}
-                  style={
-                    ({
-                      overflowAnchor: "none",
-                      ...(shouldStagger ? { transitionDelay: `${i * 100}ms` } : {}),
-                    } as CSSProperties)
-                  }
-                  onClick={() => handleToggle(i)}
-                >
-                  {/* Header - always visible */}
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                          <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
-                        </div>
-                        <div>
-                          <div className={cn("text-xs font-semibold uppercase tracking-wider mb-1", tool.colorClass)}>
-                            {tool.tagline}
-                          </div>
-                          <h3 className="text-xl font-bold text-foreground">
-                            AETHER {tool.name}
-                          </h3>
-                        </div>
+              <div
+                key={i}
+                className={cn(
+                  "group rounded-2xl bg-background border transition-all duration-500 cursor-pointer overflow-hidden scroll-mt-24",
+                  isExpanded
+                    ? "border-primary shadow-xl shadow-primary/10"
+                    : "border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+                )}
+                style={
+                  ({
+                    overflowAnchor: "none",
+                    ...(shouldStagger ? { transitionDelay: `${i * 100}ms` } : {}),
+                  } as CSSProperties)
+                }
+                onClick={() => handleToggle(i)}
+              >
+                {/* Header - always visible */}
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-14 h-14 rounded-xl ${tool.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                      >
+                        <IconComponent className="w-7 h-7 text-white" strokeWidth={1.5} />
                       </div>
-                      <div className={cn(
+                      <div>
+                        <div className={cn("text-xs font-semibold uppercase tracking-wider mb-1", tool.colorClass)}>
+                          {tool.tagline}
+                        </div>
+                        <h3 className="text-xl font-bold text-foreground">AETHER {tool.name}</h3>
+                      </div>
+                    </div>
+                    <div
+                      className={cn(
                         "w-10 h-10 rounded-full bg-secondary flex items-center justify-center transition-all duration-300",
                         isExpanded && "rotate-180 bg-primary/10"
-                      )}>
-                        <ChevronDown className={cn("w-5 h-5", isExpanded ? "text-primary" : "text-muted-foreground")} />
-                      </div>
+                      )}
+                    >
+                      <ChevronDown
+                        className={cn(
+                          "w-5 h-5",
+                          isExpanded ? "text-primary" : "text-muted-foreground"
+                        )}
+                      />
                     </div>
-                    
-                    <p className="text-muted-foreground text-sm leading-relaxed mt-4">
-                      {tool.description}
-                    </p>
-
-                    {/* Quick stats preview when collapsed */}
-                    {!isExpanded && (
-                      <div className="flex gap-6 mt-4 pt-4 border-t border-border/50">
-                        {tool.stats.slice(0, 3).map((stat, j) => (
-                          <div key={j} className="text-center">
-                            <div className={cn("text-lg font-bold", tool.colorClass)}>{stat.value}</div>
-                            <div className="text-xs text-muted-foreground">{stat.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
+
+                  <p className="text-muted-foreground text-sm leading-relaxed mt-4">{tool.description}</p>
+
+                  {/* Quick stats preview when collapsed */}
+                  {!isExpanded && (
+                    <div className="flex gap-6 mt-4 pt-4 border-t border-border/50">
+                      {tool.stats.slice(0, 3).map((stat, j) => (
+                        <div key={j} className="text-center">
+                          <div className={cn("text-lg font-bold", tool.colorClass)}>{stat.value}</div>
+                          <div className="text-xs text-muted-foreground">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-
-                {/* Expanded panel (full width) */}
-                {isExpanded && (
-                  <div
-                    className={cn(
-                      "lg:col-span-2 rounded-2xl bg-background border border-primary/20 shadow-xl shadow-primary/10 overflow-hidden",
-                      "animate-enter"
-                    )}
-                    style={{ overflowAnchor: "none" }}
-                  >
-                    <div className="p-6">
-                      {/* Agent-specific animated demos */}
-                      <div className="mb-8">
-                        {tool.name === "Flow" && <AgentFlowDemo />}
-                        {tool.name === "Brain" && <AgentBrainDemo />}
-                        {tool.name === "Support" && <AgentSupportDemo />}
-                        {tool.name === "HR" && <AgentHRDemo />}
-                        {tool.name === "Compliance" && <AgentComplianceDemo />}
-                        {tool.name === "Sales" && <AgentSalesDemo />}
-                      </div>
-
-                      {/* Features grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        {tool.features.map((feature, j) => {
-                          const FeatureIcon = feature.icon;
-                          return (
-                            <div 
-                              key={j}
-                              className="p-4 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-md"
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className={cn(
-                                  "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                                  tool.color + "/20"
-                                )}>
-                                  <FeatureIcon className={cn("w-5 h-5", tool.colorClass)} strokeWidth={1.5} />
-                                </div>
-                                <div>
-                                  <div className="text-sm font-semibold text-foreground mb-1">
-                                    {feature.title}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground leading-relaxed">
-                                    {feature.description}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Stats and use cases */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Stats */}
-                        <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                            Measured Results
-                          </div>
-                          <div className="grid grid-cols-3 gap-4">
-                            {tool.stats.map((stat, j) => (
-                              <div key={j} className="text-center">
-                                <div className={cn("text-2xl font-bold", tool.colorClass)}>
-                                  {stat.value}
-                                </div>
-                                <div className="text-xs text-muted-foreground">{stat.label}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Use cases */}
-                        <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                            Use Cases
-                          </div>
-                          <ul className="space-y-2">
-                            {tool.useCases.map((useCase, j) => (
-                              <li key={j} className="flex items-center gap-2 text-sm text-foreground">
-                                <CheckCircle2 className={cn("w-4 h-4 shrink-0", tool.colorClass)} />
-                                {useCase}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      {/* CTA */}
-                      <div className="mt-6 text-center">
-                        <Link to="/signup">
-                          <Button className={cn("shadow-lg", tool.color, "hover:opacity-90")}>
-                            Create Your Agent
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </Fragment>
+              </div>
             );
           })}
         </div>
+
+        {expandedTool && (
+          <div
+            ref={expandedPanelRef}
+            className="mt-6 lg:mt-8 scroll-mt-24"
+            style={{ overflowAnchor: "none" }}
+          >
+            <div
+              className={cn(
+                "rounded-2xl bg-background border border-primary/20 shadow-xl shadow-primary/10 overflow-hidden",
+                "animate-enter"
+              )}
+            >
+              <div className="p-6">
+                {/* Agent-specific animated demos */}
+                <div className="mb-8">
+                  {expandedTool.name === "Flow" && <AgentFlowDemo />}
+                  {expandedTool.name === "Brain" && <AgentBrainDemo />}
+                  {expandedTool.name === "Support" && <AgentSupportDemo />}
+                  {expandedTool.name === "HR" && <AgentHRDemo />}
+                  {expandedTool.name === "Compliance" && <AgentComplianceDemo />}
+                  {expandedTool.name === "Sales" && <AgentSalesDemo />}
+                </div>
+
+                {/* Features grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  {expandedTool.features.map((feature, j) => {
+                    const FeatureIcon = feature.icon;
+                    return (
+                      <div
+                        key={j}
+                        className="p-4 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-md"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={cn(
+                              "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                              expandedTool.color + "/20"
+                            )}
+                          >
+                            <FeatureIcon
+                              className={cn("w-5 h-5", expandedTool.colorClass)}
+                              strokeWidth={1.5}
+                            />
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-foreground mb-1">
+                              {feature.title}
+                            </div>
+                            <div className="text-xs text-muted-foreground leading-relaxed">
+                              {feature.description}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Stats and use cases */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Stats */}
+                  <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                      Measured Results
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      {expandedTool.stats.map((stat, j) => (
+                        <div key={j} className="text-center">
+                          <div className={cn("text-2xl font-bold", expandedTool.colorClass)}>
+                            {stat.value}
+                          </div>
+                          <div className="text-xs text-muted-foreground">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Use cases */}
+                  <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-5">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                      Use Cases
+                    </div>
+                    <ul className="space-y-2">
+                      {expandedTool.useCases.map((useCase, j) => (
+                        <li key={j} className="flex items-center gap-2 text-sm text-foreground">
+                          <CheckCircle2
+                            className={cn("w-4 h-4 shrink-0", expandedTool.colorClass)}
+                          />
+                          {useCase}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="mt-6 text-center">
+                  <Link to="/signup">
+                    <Button className={cn("shadow-lg", expandedTool.color, "hover:opacity-90")}>
+                      Create Your Agent
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       </div>
     </section>
   );
