@@ -47,9 +47,9 @@ export default function Landing() {
         <PainPointsSection />
         <ApiSection />
         <BlogSection />
-        <ContactSection />
         <FinalCTASection />
         <TestimonialSection />
+        <ContactSection />
       </main>
       
       <LandingFooter />
