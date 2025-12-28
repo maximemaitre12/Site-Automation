@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, ArrowRight, Eye, EyeOff, Check, Mail, ArrowLeft } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Check, Mail, ArrowLeft } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { z } from "zod";
+import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
@@ -166,10 +167,7 @@ export default function Auth() {
           {/* Logo & Back */}
           <div className="flex items-center justify-between mb-8">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-2xl text-foreground">AETHER</span>
+              <img src={aetherLogo} alt="Aether" className="h-12 w-auto" />
             </Link>
             <Link to="/">
               <Button variant="ghost" size="sm">

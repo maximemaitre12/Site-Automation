@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 export function Navbar() {
   return (
@@ -8,10 +8,7 @@ export function Navbar() {
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-[hsl(260_100%_65%)] flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-lg text-foreground">AETHER</span>
+          <img src={aetherLogo} alt="Aether" className="h-9 w-auto" />
         </Link>
 
         {/* Nav Links */}
