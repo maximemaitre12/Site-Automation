@@ -1,6 +1,6 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Users, Target, Lightbulb, Award, Globe, Zap } from "lucide-react";
+import { Users, Target, Lightbulb, Award, Globe, Zap, Rocket, GraduationCap, MapPin, Sparkles } from "lucide-react";
 
 const values = [
   {
@@ -35,13 +35,26 @@ const values = [
   }
 ];
 
-const team = [
-  { name: "Alexandre Martin", role: "CEO & Co-Founder", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face" },
-  { name: "Sophie Dubois", role: "CTO & Co-Founder", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face" },
-  { name: "Thomas Bernard", role: "VP Engineering", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face" },
-  { name: "Marie Laurent", role: "VP Product", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face" },
-  { name: "Pierre Moreau", role: "VP Sales", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face" },
-  { name: "Camille Petit", role: "VP Customer Success", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=face" }
+const founders = [
+  { 
+    name: "Youriy", 
+    role: "Co-Founder & CEO", 
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+    bio: "Passionate about AI and entrepreneurship, Youriy brings a unique vision for democratizing enterprise automation."
+  },
+  { 
+    name: "Maxime Maître", 
+    role: "Co-Founder & CTO", 
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
+    bio: "With deep expertise in machine learning and software architecture, Maxime leads the technical vision of AETHER."
+  }
+];
+
+const timeline = [
+  { year: "2024", event: "Founded in Shanghai", description: "Two emlyon students meet during their exchange program and share a vision" },
+  { year: "2024", event: "First Prototype", description: "Late nights in Shanghai cafés lead to the first working version of AETHER" },
+  { year: "2024", event: "Beta Launch", description: "First enterprise clients test the platform with incredible results" },
+  { year: "2025", event: "Global Expansion", description: "AETHER expands across Europe and Asia with growing client base" }
 ];
 
 export default function About() {
@@ -51,42 +64,135 @@ export default function About() {
       
       <main className="pt-20">
         {/* Hero */}
-        <section className="py-20 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Building the Future of{" "}
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Enterprise AI
+        <section className="py-20 px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+          <div className="max-w-4xl mx-auto text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">Born in Shanghai, Built for the World</span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+              Two Students.{" "}
+              <span className="bg-gradient-to-r from-primary via-violet-500 to-accent bg-clip-text text-transparent">
+                One Vision.
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              AETHER was founded with a simple vision: make powerful AI accessible to every business, 
-              automating repetitive tasks so teams can focus on what humans do best.
+              AETHER was born from a simple observation: enterprises spend too much time on repetitive tasks. 
+              We're here to change that with the power of AI.
             </p>
           </div>
         </section>
 
-        {/* Story */}
-        <section className="py-16 px-4 bg-muted/30">
+        {/* Origin Story */}
+        <section className="py-20 px-4 bg-muted/30">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-violet-500 flex items-center justify-center">
+                    <GraduationCap className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">emlyon business school</p>
+                    <p className="text-sm text-muted-foreground">2nd Year Exchange Program</p>
+                  </div>
+                </div>
+                <h2 className="text-3xl font-bold text-foreground mb-6">
+                  A Story That Began in{" "}
+                  <span className="text-primary">Shanghai</span>
+                </h2>
+                <div className="space-y-4 text-muted-foreground">
+                  <p>
+                    In the spring of 2024, two ambitious second-year students from emlyon business school found 
+                    themselves on an exchange program in Shanghai – a city where the future feels tangible, 
+                    where innovation pulses through every street corner.
+                  </p>
+                  <p>
+                    <strong className="text-foreground">Youriy</strong> and <strong className="text-foreground">Maxime Maître</strong> didn't 
+                    know each other before landing in China. But fate had other plans. In a city of 26 million people, 
+                    they discovered they shared the same frustration: why were businesses still drowning in manual, 
+                    repetitive tasks when AI could handle them?
+                  </p>
+                  <p>
+                    Late-night coding sessions in Jing'an cafés. Endless discussions about machine learning over 
+                    xiaolongbao. A shared conviction that enterprise AI should be accessible to everyone. 
+                    This is how AETHER was born.
+                  </p>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-br from-primary/20 to-violet-500/20 rounded-3xl blur-2xl" />
+                <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=600&h=400&fit=crop"
+                    alt="Shanghai Skyline"
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                    <div className="flex items-center gap-2 text-white">
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm">Shanghai, China – Where it all started</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Founders */}
+        <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Our Story</h2>
-            <div className="prose prose-lg dark:prose-invert mx-auto">
-              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-                Founded in 2023, AETHER emerged from a frustration shared by many enterprise teams: 
-                despite the promise of AI, most businesses were still drowning in manual, repetitive tasks. 
-                Email classification, document processing, customer support triage – these essential workflows 
-                consumed countless hours that could be spent on strategic work.
-              </p>
-              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-                Our founding team, with decades of combined experience in enterprise software and AI research, 
-                set out to change this. We built AETHER as an intelligent automation platform that doesn't just 
-                process data – it understands context, learns from patterns, and takes action.
-              </p>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                Today, AETHER powers automation for hundreds of enterprises across industries, from financial 
-                services to healthcare, retail to manufacturing. We're just getting started on our mission to 
-                make AI a true partner for every business.
-              </p>
+            <h2 className="text-3xl font-bold text-foreground mb-4 text-center">Meet the Founders</h2>
+            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+              Two visionaries who turned a Shanghai dream into a global enterprise AI platform.
+            </p>
+            <div className="grid md:grid-cols-2 gap-8">
+              {founders.map((founder) => (
+                <div 
+                  key={founder.name} 
+                  className="group relative p-8 rounded-2xl border border-border bg-card hover:border-primary/50 transition-all duration-300 hover:shadow-xl"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
+                  <img 
+                    src={founder.image} 
+                    alt={founder.name}
+                    className="w-24 h-24 rounded-2xl mx-auto mb-6 object-cover ring-4 ring-primary/10 group-hover:ring-primary/30 transition-all"
+                  />
+                  <h3 className="text-xl font-bold text-foreground text-center">{founder.name}</h3>
+                  <p className="text-primary text-center mb-4">{founder.role}</p>
+                  <p className="text-muted-foreground text-center text-sm">{founder.bio}</p>
+                  <div className="flex justify-center gap-2 mt-4">
+                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">emlyon</span>
+                    <span className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-500 text-xs font-medium">Shanghai 2024</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Timeline */}
+        <section className="py-20 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Our Journey</h2>
+            <div className="relative">
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-violet-500 to-accent md:left-1/2 md:-translate-x-0.5" />
+              <div className="space-y-12">
+                {timeline.map((item, index) => (
+                  <div key={index} className={`relative flex items-center gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                    <div className="absolute left-8 w-4 h-4 rounded-full bg-primary border-4 border-background md:left-1/2 md:-translate-x-2" />
+                    <div className="ml-20 md:ml-0 md:w-1/2 md:px-8">
+                      <div className="p-6 rounded-xl border border-border bg-card">
+                        <span className="text-xs font-bold text-primary">{item.year}</span>
+                        <h3 className="text-lg font-semibold text-foreground mt-1">{item.event}</h3>
+                        <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -94,38 +200,18 @@ export default function About() {
         {/* Values */}
         <section className="py-20 px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Our Values</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <h2 className="text-3xl font-bold text-foreground mb-4 text-center">Our Values</h2>
+            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+              The principles that guide everything we build at AETHER.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {values.map((value) => (
-                <div key={value.title} className="p-6 rounded-xl border border-border bg-card hover:shadow-lg transition-shadow">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <div key={value.title} className="group p-6 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-violet-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <value.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">{value.title}</h3>
-                  <p className="text-muted-foreground">{value.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Team */}
-        <section className="py-20 px-4 bg-muted/30">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-4 text-center">Leadership Team</h2>
-            <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
-              Our team brings together expertise from leading tech companies and research institutions.
-            </p>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {team.map((member) => (
-                <div key={member.name} className="text-center">
-                  <img 
-                    src={member.image} 
-                    alt={member.name}
-                    className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-                  />
-                  <h3 className="text-lg font-semibold text-foreground">{member.name}</h3>
-                  <p className="text-muted-foreground">{member.role}</p>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">{value.title}</h3>
+                  <p className="text-sm text-muted-foreground">{value.description}</p>
                 </div>
               ))}
             </div>
@@ -133,25 +219,44 @@ export default function About() {
         </section>
 
         {/* Stats */}
-        <section className="py-20 px-4">
+        <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">500+</div>
-                <div className="text-muted-foreground">Enterprise Clients</div>
+              <div className="p-6">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">100+</div>
+                <div className="text-muted-foreground text-sm">Enterprise Clients</div>
               </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">50M+</div>
-                <div className="text-muted-foreground">Tasks Automated</div>
+              <div className="p-6">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">10M+</div>
+                <div className="text-muted-foreground text-sm">Tasks Automated</div>
               </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">120+</div>
-                <div className="text-muted-foreground">Team Members</div>
+              <div className="p-6">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">12+</div>
+                <div className="text-muted-foreground text-sm">Team Members</div>
               </div>
-              <div>
-                <div className="text-4xl font-bold text-primary mb-2">15+</div>
-                <div className="text-muted-foreground">Countries</div>
+              <div className="p-6">
+                <div className="text-4xl font-bold bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent mb-2">8+</div>
+                <div className="text-muted-foreground text-sm">Countries</div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-20 px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <Rocket className="w-12 h-12 text-primary mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-foreground mb-4">Join Our Journey</h2>
+            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+              We're building the future of enterprise automation. Want to be part of the adventure?
+            </p>
+            <div className="flex justify-center gap-4">
+              <a href="/careers" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
+                View Careers
+              </a>
+              <a href="/contact" className="px-6 py-3 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors">
+                Contact Us
+              </a>
             </div>
           </div>
         </section>
