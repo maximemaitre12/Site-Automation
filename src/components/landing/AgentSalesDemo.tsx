@@ -198,34 +198,6 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           </div>
         </div>
 
-        {/* Stats row - compact */}
-        <div className={cn(
-          "grid grid-cols-3 gap-2 mb-3 transition-all duration-500",
-          phase >= 3 ? "opacity-100" : "opacity-0"
-        )}>
-          <div className="text-center p-1.5 rounded bg-violet-500/10">
-            <div className="text-sm font-bold text-violet-500">+35%</div>
-            <div className="text-[8px] text-muted-foreground">Conversion</div>
-          </div>
-          <div className="text-center p-1.5 rounded bg-violet-500/10">
-            <div className="text-sm font-bold text-violet-500">95%</div>
-            <div className="text-[8px] text-muted-foreground">Accuracy</div>
-          </div>
-          <div className="text-center p-1.5 rounded bg-violet-500/10">
-            <div className="text-sm font-bold text-violet-500">-50%</div>
-            <div className="text-[8px] text-muted-foreground">Time</div>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className={cn(
-          "text-center transition-all duration-500",
-          phase >= 3 ? "opacity-100" : "opacity-0"
-        )}>
-          <p className="text-xs font-medium text-foreground">
-            Close more deals with AI-powered intelligence
-          </p>
-        </div>
       </div>
     </div>
   );

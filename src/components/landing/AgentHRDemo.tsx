@@ -269,15 +269,6 @@ export function AgentHRDemo({ className }: AgentHRDemoProps) {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className={cn(
-          "text-center mt-3 transition-all duration-500",
-          phase >= 5 && insightScores.every(s => s > 80) ? "opacity-100" : "opacity-0"
-        )}>
-          <p className="text-xs font-medium text-foreground">
-            Hire the best candidates with AI-powered screening
-          </p>
-        </div>
       </div>
     </div>
   );

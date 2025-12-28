@@ -185,15 +185,6 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className={cn(
-          "text-center transition-all duration-700",
-          phase >= 5 && typedResponse.length >= aiResponse.length ? "opacity-100" : "opacity-0"
-        )}>
-          <p className="text-xs font-medium text-foreground">
-            Turn your documents into an intelligent knowledge base
-          </p>
-        </div>
       </div>
     </div>
   );
