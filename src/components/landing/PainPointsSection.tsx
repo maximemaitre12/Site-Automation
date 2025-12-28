@@ -323,13 +323,21 @@ function ExpandedContent({ tool }: { tool: Tool }) {
 }
 
 export function PainPointsSection() {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
-  const shouldStagger = isVisible && expandedIndex === null;
+  const shouldStagger = isVisible && expandedIndices.size === 0;
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleToggle = (index: number) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
+    setExpandedIndices(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -355,7 +363,7 @@ export function PainPointsSection() {
         >
           {tools.map((tool, i) => {
             const IconComponent = tool.icon;
-            const isExpanded = expandedIndex === i;
+            const isExpanded = expandedIndices.has(i);
 
             return (
               <div
