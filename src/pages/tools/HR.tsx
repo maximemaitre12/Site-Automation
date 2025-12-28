@@ -400,7 +400,14 @@ export default function HR() {
                         icon={Users}
                         title="Pipeline Candidats"
                         description="Gérez vos candidatures avec l'IA"
-                        action={<AddCandidateDialog onSubmit={createCandidate} jobs={jobs} />}
+                        action={
+                          <AddCandidateDialog onAdd={createCandidate} jobs={jobs}>
+                            <Button size="sm" className="gap-1.5">
+                              <Plus className="w-4 h-4" />
+                              <span className="hidden sm:inline">Ajouter</span>
+                            </Button>
+                          </AddCandidateDialog>
+                        }
                       />
                       
                       {/* Search bar */}
@@ -428,11 +435,12 @@ export default function HR() {
                             key={candidate.id}
                             candidate={candidate}
                             jobs={jobs}
-                            onValidate={(id) => validateScore(id, candidate.cv_text || '')}
+                            onValidateScore={(id, score) => validateScore(id, score)}
                             onActivate={activateCandidate}
-                            onLinkJob={linkToJob}
+                            onLinkToJob={linkToJob}
+                            onUpdateDescription={updateDescription}
+                            onAddInterviewNotes={addInterviewNotes}
                             onDelete={deleteCandidate}
-                            onConvertToEmployee={(c) => setConvertCandidate(c)}
                           />
                         ))}
                         {filteredCandidates.length === 0 && (
@@ -468,8 +476,7 @@ export default function HR() {
                             <InterviewCard
                               key={interview.id}
                               interview={interview}
-                              onUpdate={updateInterview}
-                              onRefresh={refetchInterviews}
+                              onAnalysisComplete={refetchInterviews}
                             />
                           ))}
                           {(interviewTab === 'upcoming' ? upcomingInterviews : completedInterviews).length === 0 && (
@@ -489,7 +496,7 @@ export default function HR() {
                         icon={Briefcase}
                         title="Postes & Offres"
                         description="Créez et gérez vos offres d'emploi"
-                        action={<JobPostGenerator onGenerate={createJob} />}
+                        action={<JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />}
                       />
                       
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
@@ -497,9 +504,8 @@ export default function HR() {
                           <JobCard
                             key={job.id}
                             job={job}
-                            candidateCount={candidates.filter(c => c.job_id === job.id).length}
+                            candidatesCount={candidates.filter(c => c.job_id === job.id).length}
                             onDelete={deleteJob}
-                            onGeneratePost={() => generateJobPost(job.id)}
                           />
                         ))}
                         {jobs.length === 0 && (
@@ -552,7 +558,12 @@ export default function HR() {
                                 <LayoutGrid className="w-4 h-4" />
                               </Button>
                             </div>
-                            <AddEmployeeDialog onSubmit={createEmployee} />
+                            <AddEmployeeDialog onAdd={createEmployee}>
+                              <Button size="sm" className="gap-1.5">
+                                <UserPlus className="w-4 h-4" />
+                                <span className="hidden sm:inline">Ajouter</span>
+                              </Button>
+                            </AddEmployeeDialog>
                           </div>
                         }
                       />
@@ -572,9 +583,11 @@ export default function HR() {
                         <div className="overflow-x-auto -mx-3 md:mx-0">
                           <EmployeeTable 
                             employees={filteredEmployees}
+                            careerEvents={careerEvents}
                             onUpdate={updateEmployee}
                             onTerminate={terminateEmployee}
-                            onAddEvent={addCareerEvent}
+                            onDelete={deleteEmployee}
+                            onAddCareerEvent={addCareerEvent}
                           />
                         </div>
                       ) : (
@@ -585,7 +598,8 @@ export default function HR() {
                               employee={employee}
                               onUpdate={updateEmployee}
                               onTerminate={terminateEmployee}
-                              onAddEvent={addCareerEvent}
+                              onDelete={deleteEmployee}
+                              onAddCareerEvent={addCareerEvent}
                             />
                           ))}
                         </div>
@@ -665,7 +679,7 @@ export default function HR() {
                         title="Analytics RH"
                         description="Performance et carrières"
                       />
-                      <EmployeeStats employees={employees} careerEvents={careerEvents} />
+                      <EmployeeStats employees={employees} />
                     </>
                   )}
                 </>
@@ -681,9 +695,10 @@ export default function HR() {
           candidate={convertCandidate}
           open={!!convertCandidate}
           onOpenChange={(open) => !open && setConvertCandidate(null)}
-          onConvert={async (data) => {
-            await convertCandidateToEmployee(convertCandidate.id, data);
+          onConvert={async (candidateId, employeeData) => {
+            await convertCandidateToEmployee(candidateId, employeeData);
             setConvertCandidate(null);
+            return null;
           }}
         />
       )}
