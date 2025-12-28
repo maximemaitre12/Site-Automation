@@ -217,12 +217,6 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
           <p className="text-base font-medium text-foreground mb-4">
             Resolve 70% of support tickets automatically
           </p>
-          <Link to="/signup" onClick={(e) => e.stopPropagation()}>
-            <Button size="lg" className="shadow-lg shadow-emerald-500/25 bg-emerald-500 hover:bg-emerald-600">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

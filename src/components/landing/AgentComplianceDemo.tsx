@@ -239,12 +239,6 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
           <p className="text-base font-medium text-foreground mb-4">
             Protect your business with automated compliance
           </p>
-          <Link to="/signup" onClick={(e) => e.stopPropagation()}>
-            <Button size="lg" className="shadow-lg shadow-rose-500/25 bg-rose-500 hover:bg-rose-600">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>

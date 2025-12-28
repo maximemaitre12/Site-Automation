@@ -231,12 +231,6 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
           <p className="text-base font-medium text-foreground mb-4">
             Turn your documents into an intelligent knowledge base
           </p>
-          <Link to="/signup" onClick={(e) => e.stopPropagation()}>
-            <Button size="lg" className="shadow-lg shadow-violet-500/25 bg-violet-500 hover:bg-violet-600">
-              Create Your Agent
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </div>
     </div>
