@@ -277,6 +277,27 @@ export function PainPointsSection() {
   return (
     <section id="product" className="py-12 sm:py-16 lg:py-20 bg-secondary/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Agent logos carousel */}
+        <div className="mb-6 sm:mb-8 overflow-hidden">
+          <div className="flex animate-[scroll_20s_linear_infinite] gap-8 sm:gap-12">
+            {[...tools, ...tools].map((tool, i) => {
+              const IconComponent = tool.icon;
+              return (
+                <div 
+                  key={i} 
+                  className={cn(
+                    "flex-shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl",
+                    "bg-background/80 backdrop-blur-sm border border-border/30 shadow-sm",
+                    tool.colorClass
+                  )}
+                >
+                  <IconComponent className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2 sm:mb-3">
