@@ -9,15 +9,15 @@ import {
 import { ApiConnectionDemo } from "./ApiConnectionDemo";
 
 const platforms = [
-  { name: "Slack", Logo: SlackLogo },
-  { name: "Gmail", Logo: GmailLogo },
-  { name: "Notion", Logo: NotionLogo },
-  { name: "Salesforce", Logo: SalesforceLogo },
-  { name: "HubSpot", Logo: HubSpotLogo },
-  { name: "Zapier", Logo: ZapierLogo },
-  { name: "Stripe", Logo: StripeLogo },
-  { name: "Trello", Logo: TrelloLogo },
-  { name: "Airtable", Logo: AirtableLogo },
+  { name: "Slack", Logo: SlackLogo, color: "hsl(270 45% 50%)" },
+  { name: "Gmail", Logo: GmailLogo, color: "hsl(340 45% 50%)" },
+  { name: "Notion", Logo: NotionLogo, color: "hsl(250 30% 35%)" },
+  { name: "Salesforce", Logo: SalesforceLogo, color: "hsl(200 50% 45%)" },
+  { name: "HubSpot", Logo: HubSpotLogo, color: "hsl(25 50% 50%)" },
+  { name: "Zapier", Logo: ZapierLogo, color: "hsl(25 60% 50%)" },
+  { name: "Stripe", Logo: StripeLogo, color: "hsl(250 60% 55%)" },
+  { name: "Trello", Logo: TrelloLogo, color: "hsl(200 60% 45%)" },
+  { name: "Airtable", Logo: AirtableLogo, color: "hsl(160 50% 40%)" },
 ];
 
 export function IntegrationsSection() {
@@ -65,10 +65,11 @@ export function IntegrationsSection() {
               {platforms.map((platform, i) => (
                 <div
                   key={platform.name}
-                  className="aspect-square rounded-lg bg-secondary border border-border flex items-center justify-center transition-all duration-300 hover:border-primary/40 hover:shadow-md hover:scale-105"
+                  className="aspect-square rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-md"
+                  style={{ backgroundColor: platform.color }}
                   title={platform.name}
                 >
-                  <platform.Logo className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+                  <platform.Logo className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               ))}
             </div>
