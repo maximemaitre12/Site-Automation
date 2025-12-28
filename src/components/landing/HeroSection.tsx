@@ -27,8 +27,14 @@ export function HeroSection() {
           6 specialized AI agents. One platform. Automate your operations in support, HR, sales, and compliance — without writing a single line of code.
         </p>
         
+        {/* Real brand logos cloud - moved above CTAs */}
+        <div className="animate-cloud-fade-in mb-8 sm:mb-10" style={{ animationDelay: "0.3s", opacity: 0 }}>
+          <p className="text-xs text-muted-foreground mb-2">Integrates with your favorite tools</p>
+          <BrandLogosCloud maxItems={8} />
+        </div>
+
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8 sm:mb-10 animate-cloud-fade-in" style={{ animationDelay: "0.3s", opacity: 0 }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-cloud-fade-in" style={{ animationDelay: "0.4s", opacity: 0 }}>
           <Link to="/signup" className="w-full sm:w-auto">
             <Button 
               size="lg" 
@@ -47,12 +53,6 @@ export function HeroSection() {
               Request a Demo
             </Button>
           </Link>
-        </div>
-
-        {/* Real brand logos cloud */}
-        <div className="animate-cloud-fade-in" style={{ animationDelay: "0.4s", opacity: 0 }}>
-          <p className="text-xs text-muted-foreground mb-2">Integrates with your favorite tools</p>
-          <BrandLogosCloud maxItems={8} />
         </div>
       </div>
     </section>
