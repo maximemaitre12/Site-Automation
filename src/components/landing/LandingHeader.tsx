@@ -24,16 +24,16 @@ export function LandingHeader() {
   ];
   
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background ${
       scrolled 
-        ? "bg-background/80 backdrop-blur-md border-b border-border" 
-        : "bg-transparent"
+        ? "border-b border-border shadow-sm" 
+        : ""
     }`}>
       <div className="max-w-5xl mx-auto px-6">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src={aetherLogo} alt="Aether" className="h-8 w-auto" />
+            <img src={aetherLogo} alt="Aether" className="h-10 w-auto rounded" />
           </Link>
           
           {/* Desktop Navigation */}
