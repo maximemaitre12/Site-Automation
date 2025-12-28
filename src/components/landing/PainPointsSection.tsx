@@ -324,11 +324,9 @@ export function PainPointsSection() {
               <div key={i}>
                 {/* Creative separator between agents */}
                 {i > 0 && (
-                  <div className="flex items-center gap-4 mb-5 sm:mb-6">
+                  <div className="flex items-center gap-3 mb-5 sm:mb-6">
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    <div className="flex items-center gap-1">
-                      <Sparkles className="w-4 h-4 text-primary/50" />
-                    </div>
+                    <div className="w-6 h-px bg-primary/30" />
                     <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                   </div>
                 )}
