@@ -67,7 +67,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
       }
     }, 20);
     return () => clearInterval(interval);
-  }, [phase, responseStarted]);
+  }, [phase]);
 
   return (
     <div
