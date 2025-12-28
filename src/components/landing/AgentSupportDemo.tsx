@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { ArrowRight, Check, Mail, Bot, Clock, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Check, Mail, Bot, Clock } from "lucide-react";
 
 const tickets = [
-  { id: "#1042", subject: "Can't login to my account", time: "2 min ago", priority: "high" },
-  { id: "#1043", subject: "Need invoice for last month", time: "5 min ago", priority: "medium" },
-  { id: "#1044", subject: "How to export my data?", time: "8 min ago", priority: "low" },
+  { id: "#1042", subject: "Can't login to my account", time: "2 min", priority: "high" },
+  { id: "#1043", subject: "Need invoice for last month", time: "5 min", priority: "medium" },
 ];
 
-const aiTypingMessage = "I've analyzed your issue and found that your account was locked due to multiple failed login attempts. I've sent a password reset link to your email. You should be able to access your account within the next few minutes.";
+const aiTypingMessage = "I've analyzed your issue and found your account was locked due to failed login attempts. I've sent a password reset link to your email.";
 
 interface AgentSupportDemoProps {
   className?: string;
@@ -20,24 +17,23 @@ interface AgentSupportDemoProps {
 export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const [phase, setPhase] = useState(0);
-  const [resolvedCount, setResolvedCount] = useState(0);
+  const [responseTime, setResponseTime] = useState(0);
   const [typedMessage, setTypedMessage] = useState("");
-  const [satisfaction, setSatisfaction] = useState(0);
+  const [autoResolved, setAutoResolved] = useState(0);
 
   useEffect(() => {
     if (!isVisible) {
       setPhase(0);
-      setResolvedCount(0);
+      setResponseTime(0);
       setTypedMessage("");
-      setSatisfaction(0);
+      setAutoResolved(0);
       return;
     }
 
-    // Animate phases
     const t1 = setTimeout(() => setPhase(1), 500);
     const t2 = setTimeout(() => setPhase(2), 1500);
     const t3 = setTimeout(() => setPhase(3), 2500);
-    const t4 = setTimeout(() => setPhase(4), 4000);
+    const t4 = setTimeout(() => setPhase(4), 3500);
 
     return () => {
       clearTimeout(t1);
@@ -47,11 +43,10 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
     };
   }, [isVisible]);
 
-  // Counter animation for response time (in seconds, counting down to show speed)
   useEffect(() => {
     if (phase >= 2) {
       const interval = setInterval(() => {
-        setResolvedCount(prev => {
+        setResponseTime(prev => {
           if (prev >= 12) {
             clearInterval(interval);
             return 12;
@@ -63,23 +58,21 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
     }
   }, [phase]);
 
-  // Satisfaction animation
   useEffect(() => {
     if (phase >= 3) {
       const interval = setInterval(() => {
-        setSatisfaction(prev => {
+        setAutoResolved(prev => {
           if (prev >= 72) {
             clearInterval(interval);
             return 72;
           }
-          return prev + 2;
+          return prev + 3;
         });
       }, 40);
       return () => clearInterval(interval);
     }
   }, [phase]);
 
-  // Typing effect
   useEffect(() => {
     if (phase < 4) return;
     let i = 0;
@@ -98,77 +91,75 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-6 md:p-8 rounded-2xl bg-gradient-to-br from-emerald-500/5 via-background to-teal-500/5 border border-emerald-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-gradient-to-br from-emerald-500/5 via-background to-teal-500/5 border border-emerald-500/20 overflow-hidden",
         className
       )}
     >
-      {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-20 h-20 bg-teal-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
         {/* Header stats */}
-        <div className="flex flex-wrap items-center justify-center gap-6 mb-6">
+        <div className="flex items-center justify-center gap-4 mb-3">
           <div className={cn(
-            "text-center p-4 rounded-xl bg-secondary/50 transition-all duration-500",
+            "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
             phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
-            <div className="text-2xl font-bold text-emerald-500">{resolvedCount}s</div>
-            <div className="text-xs text-muted-foreground">Avg. Response</div>
+            <div className="text-lg font-bold text-emerald-500">{responseTime}s</div>
+            <div className="text-[9px] text-muted-foreground">Avg. Response</div>
           </div>
           <div className={cn(
-            "text-center p-4 rounded-xl bg-secondary/50 transition-all duration-500",
+            "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
             phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
-            <div className="text-2xl font-bold text-emerald-500">{satisfaction}%</div>
-            <div className="text-xs text-muted-foreground">Auto-Resolved</div>
+            <div className="text-lg font-bold text-emerald-500">{autoResolved}%</div>
+            <div className="text-[9px] text-muted-foreground">Auto-Resolved</div>
           </div>
           <div className={cn(
-            "text-center p-4 rounded-xl bg-secondary/50 transition-all duration-500",
+            "text-center p-2 rounded-lg bg-secondary/50 transition-all duration-500",
             phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          )} style={{ transitionDelay: "200ms" }}>
-            <div className="text-2xl font-bold text-emerald-500">4.8/5</div>
-            <div className="text-xs text-muted-foreground">Satisfaction</div>
+          )} style={{ transitionDelay: "150ms" }}>
+            <div className="text-lg font-bold text-emerald-500">4.8</div>
+            <div className="text-[9px] text-muted-foreground">Satisfaction</div>
           </div>
         </div>
 
-        {/* Ticket resolution demo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {/* Incoming tickets */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              <Mail className="w-4 h-4 text-amber-500" />
-              Incoming Tickets
+        {/* Ticket + AI response grid */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          {/* Tickets */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase">
+              <Mail className="w-3 h-3 text-amber-500" />
+              Tickets
             </div>
             {tickets.map((ticket, i) => (
               <div
                 key={ticket.id}
                 className={cn(
-                  "p-3 rounded-lg bg-secondary/50 border border-border/50 transition-all duration-500",
-                  phase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8",
+                  "p-2 rounded-lg bg-secondary/50 border border-border/50 transition-all duration-500",
+                  phase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4",
                   phase >= 2 + i && "border-emerald-500/30 bg-emerald-500/5"
                 )}
-                style={{ transitionDelay: `${i * 200}ms` }}
+                style={{ transitionDelay: `${i * 150}ms` }}
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-1">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-mono text-muted-foreground">{ticket.id}</span>
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-[9px] font-mono text-muted-foreground">{ticket.id}</span>
                       <span className={cn(
-                        "w-2 h-2 rounded-full",
-                        ticket.priority === "high" ? "bg-red-500" :
-                        ticket.priority === "medium" ? "bg-amber-500" : "bg-blue-500"
+                        "w-1.5 h-1.5 rounded-full",
+                        ticket.priority === "high" ? "bg-red-500" : "bg-amber-500"
                       )} />
                     </div>
-                    <p className="text-sm text-foreground truncate">{ticket.subject}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                      <Clock className="w-3 h-3" />
+                    <p className="text-[10px] text-foreground truncate">{ticket.subject}</p>
+                    <p className="text-[8px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
+                      <Clock className="w-2 h-2" />
                       {ticket.time}
                     </p>
                   </div>
                   {phase >= 2 + i && (
-                    <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center animate-scale-in">
-                      <Check className="w-3 h-3 text-white" />
+                    <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center animate-scale-in">
+                      <Check className="w-2 h-2 text-white" />
                     </div>
                   )}
                 </div>
@@ -178,26 +169,26 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
 
           {/* AI Response */}
           <div className={cn(
-            "transition-all duration-700",
+            "transition-all duration-500",
             phase >= 4 ? "opacity-100" : "opacity-0"
           )}>
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              <Bot className="w-4 h-4 text-emerald-500" />
-              AI Agent Response
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
+              <Bot className="w-3 h-3 text-emerald-500" />
+              AI Response
             </div>
-            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 text-white" />
+            <div className="p-2 rounded-lg bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0">
+                  <Bot className="w-2.5 h-2.5 text-white" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Support AI</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className="text-[9px] font-medium text-emerald-600 dark:text-emerald-400">Support AI</span>
                     {phase === 4 && typedMessage.length < aiTypingMessage.length && (
-                      <span className="text-xs text-muted-foreground animate-pulse">typing...</span>
+                      <span className="text-[8px] text-muted-foreground animate-pulse">typing...</span>
                     )}
                   </div>
-                  <p className="text-sm text-foreground leading-relaxed">
+                  <p className="text-[10px] text-foreground leading-relaxed">
                     {typedMessage}
                     {phase === 4 && typedMessage.length < aiTypingMessage.length && (
                       <span className="animate-blink">|</span>
@@ -211,10 +202,10 @@ export function AgentSupportDemo({ className }: AgentSupportDemoProps) {
 
         {/* CTA */}
         <div className={cn(
-          "text-center transition-all duration-700",
+          "text-center transition-all duration-500",
           phase >= 4 && typedMessage.length >= aiTypingMessage.length ? "opacity-100" : "opacity-0"
         )}>
-          <p className="text-base font-medium text-foreground mb-4">
+          <p className="text-xs font-medium text-foreground">
             Resolve 70% of support tickets automatically
           </p>
         </div>
