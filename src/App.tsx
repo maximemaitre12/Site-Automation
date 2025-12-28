@@ -37,7 +37,6 @@ import Contact from "./pages/company/Contact";
 // Resources pages
 import Documentation from "./pages/resources/Documentation";
 import API from "./pages/resources/API";
-import Status from "./pages/resources/Status";
 
 // Legal pages
 import Privacy from "./pages/legal/Privacy";
@@ -81,7 +80,6 @@ const App = () => (
             {/* Resources pages */}
             <Route path="/resources/documentation" element={<Documentation />} />
             <Route path="/resources/api" element={<API />} />
-            <Route path="/resources/status" element={<Status />} />
             
             {/* Legal pages */}
             <Route path="/legal/privacy" element={<Privacy />} />
@@ -94,7 +92,6 @@ const App = () => (
             <Route path="/security" element={<Navigate to="/legal/security" replace />} />
             <Route path="/docs" element={<Navigate to="/resources/documentation" replace />} />
             <Route path="/api" element={<Navigate to="/resources/api" replace />} />
-            <Route path="/status" element={<Navigate to="/resources/status" replace />} />
             {/* Protected routes - require subscription */}
             <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
             <Route path="/tools/flow" element={<RequireSubscription><Flow /></RequireSubscription>} />

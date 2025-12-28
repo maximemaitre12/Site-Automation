@@ -18,7 +18,6 @@ const navSections = {
     items: [
       { label: "Documentation", href: "/resources/documentation", description: "Learn how to use AETHER" },
       { label: "API Reference", href: "/resources/api", description: "Build integrations" },
-      { label: "System Status", href: "/resources/status", description: "Service availability" },
     ]
   },
   company: {
