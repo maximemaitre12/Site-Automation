@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Zap, ArrowRight, Loader2, Sparkles, Crown, Rocket } from 'lucide-react';
+import { Check, Zap, ArrowRight, Loader2, Sparkles, Crown, Rocket, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -73,18 +73,11 @@ export default function SelectPlan() {
   const { session } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
-  const handleNavigation = (path: string) => {
-    setPendingNavigation(path);
-    setShowLeaveDialog(true);
-  };
-
-  const confirmLeave = () => {
-    if (pendingNavigation) {
-      navigate(pendingNavigation);
-    }
+  const confirmLeave = async () => {
+    await supabase.auth.signOut();
     setShowLeaveDialog(false);
+    navigate('/');
   };
 
   const handleStartTrial = async (priceId: string, planId: string) => {
@@ -125,46 +118,22 @@ export default function SelectPlan() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Custom Header */}
+      {/* Minimal Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
-            <button 
-              onClick={() => handleNavigation('/')}
-              className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
-            >
+            <div className="flex items-center gap-2 shrink-0">
               <img src={aetherLogo} alt="Aether" className="h-10 sm:h-14 w-auto" />
-            </button>
+            </div>
             
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              <button 
-                onClick={() => handleNavigation('/')}
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-              >
-                Accueil
-              </button>
-              <button 
-                onClick={() => handleNavigation('/blog')}
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-              >
-                Blog
-              </button>
-              <button 
-                onClick={() => handleNavigation('/contact')}
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-              >
-                Contact
-              </button>
-            </nav>
-            
-            {/* Help link */}
+            {/* Exit Button */}
             <button 
-              onClick={() => handleNavigation('/contact')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setShowLeaveDialog(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:border-primary/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 text-sm"
             >
-              Besoin d'aide ?
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline">Quitter</span>
             </button>
           </div>
         </div>
@@ -178,11 +147,10 @@ export default function SelectPlan() {
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
             <AlertDialogTitle className="text-center text-xl">
-              Êtes-vous sûr de vouloir partir ?
+              Êtes-vous sûr de vouloir quitter ?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              Vous êtes à quelques clics de débloquer toute la puissance d'AETHER. 
-              Votre essai gratuit de 3 jours vous attend !
+              Vous pourrez vous reconnecter à tout moment pour continuer votre inscription.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
@@ -295,6 +263,12 @@ export default function SelectPlan() {
 
           <p className="text-center text-[10px] sm:text-xs text-muted-foreground mt-6 sm:mt-8">
             Aucun prélèvement pendant l'essai de 3 jours. Paiement sécurisé par Stripe. Prix HT.
+          </p>
+          
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            <a href="/contact" className="text-primary hover:underline transition-colors">
+              Besoin d'aide ? Contactez-nous
+            </a>
           </p>
         </div>
       </div>
