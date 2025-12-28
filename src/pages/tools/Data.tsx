@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Database, FolderSearch, Activity, Shield, Search, Building2, Brain, GitMerge } from 'lucide-react';
+import { Database, FolderSearch, Shield, Search } from 'lucide-react';
 import DataSources from '@/components/data/DataSources';
 import DataCatalog from '@/components/data/DataCatalog';
-import DataMonitoring from '@/components/data/DataMonitoring';
 import DataGovernance from '@/components/data/DataGovernance';
 import DataSearch from '@/components/data/DataSearch';
-import { CompanyEnrichment } from '@/components/data/CompanyEnrichment';
-import { AIIntelligenceDashboard } from '@/components/data/AIIntelligenceDashboard';
-import { DeduplicationPanel } from '@/components/data/DeduplicationPanel';
 
 const Data = () => {
   const [activeTab, setActiveTab] = useState('catalog');
@@ -37,21 +33,9 @@ const Data = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <div className="px-3 md:px-6 py-2 border-b border-border shrink-0 overflow-x-auto">
               <TabsList className="inline-flex w-auto min-w-full md:min-w-0 h-9 md:h-10">
-                <TabsTrigger value="intelligence" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <Brain className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Intelligence</span>
-                </TabsTrigger>
                 <TabsTrigger value="catalog" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
                   <FolderSearch className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   <span className="hidden sm:inline">Catalogue</span>
-                </TabsTrigger>
-                <TabsTrigger value="enrichment" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <Building2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Enrichissement</span>
-                </TabsTrigger>
-                <TabsTrigger value="dedupe" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <GitMerge className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Dédup</span>
                 </TabsTrigger>
                 <TabsTrigger value="sources" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
                   <Database className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -65,37 +49,21 @@ const Data = () => {
                   <Shield className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   <span className="hidden sm:inline">Gouvernance</span>
                 </TabsTrigger>
-                <TabsTrigger value="monitoring" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <Activity className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Monitoring</span>
-                </TabsTrigger>
               </TabsList>
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 md:p-6">
-              <TabsContent value="intelligence" className="mt-0 h-full">
-                <AIIntelligenceDashboard />
-              </TabsContent>
-              <TabsContent value="enrichment" className="mt-0 h-full">
-                <CompanyEnrichment />
-              </TabsContent>
-              <TabsContent value="dedupe" className="mt-0 h-full">
-                <DeduplicationPanel />
+              <TabsContent value="catalog" className="mt-0 h-full">
+                <DataCatalog />
               </TabsContent>
               <TabsContent value="sources" className="mt-0 h-full">
                 <DataSources />
-              </TabsContent>
-              <TabsContent value="catalog" className="mt-0 h-full">
-                <DataCatalog />
               </TabsContent>
               <TabsContent value="search" className="mt-0 h-full">
                 <DataSearch />
               </TabsContent>
               <TabsContent value="governance" className="mt-0 h-full">
                 <DataGovernance />
-              </TabsContent>
-              <TabsContent value="monitoring" className="mt-0 h-full">
-                <DataMonitoring />
               </TabsContent>
             </div>
           </Tabs>
