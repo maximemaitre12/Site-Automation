@@ -84,17 +84,9 @@ export default function API() {
                 API Reference
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Build powerful integrations with the AETHER REST API.
             </p>
-            <div className="flex justify-center gap-4">
-              <button className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-                Get API Key
-              </button>
-              <button className="px-6 py-3 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors">
-                View on GitHub
-              </button>
-            </div>
           </div>
         </section>
 
