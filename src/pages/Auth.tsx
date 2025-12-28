@@ -169,11 +169,9 @@ export default function Auth() {
             <Link to="/" className="flex items-center gap-3">
               <img src={aetherLogo} alt="Aether" className="h-12 w-auto" />
             </Link>
-            <Link to="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour
-              </Button>
+            <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span>Retour</span>
             </Link>
           </div>
 

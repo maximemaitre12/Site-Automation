@@ -107,11 +107,9 @@ export default function Demo() {
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left column - Info */}
             <div className="lg:sticky lg:top-24">
-              <Link to="/">
-                <Button variant="ghost" size="sm" className="mb-4 -ml-2">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Retour à l'accueil
-                </Button>
+              <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 group">
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span>Retour</span>
               </Link>
               
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
