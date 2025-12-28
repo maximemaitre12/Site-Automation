@@ -69,11 +69,8 @@ export function LandingFooter() {
             </ul>
           </div>
         </div>
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-center gap-4">
           <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} AETHER. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <span className="text-sm text-muted-foreground">Shanghai • Paris</span>
-          </div>
         </div>
       </div>
     </footer>
