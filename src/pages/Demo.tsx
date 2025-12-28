@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { ArrowRight, CheckCircle2, Calendar } from "lucide-react";
+import { ArrowRight, CheckCircle2, Calendar, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import { Link } from "react-router-dom";
 
 const benefits = [
   "Personalized demo based on your use cases",
@@ -106,6 +107,13 @@ export default function Demo() {
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left column - Info */}
             <div className="lg:sticky lg:top-24">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="mb-4 -ml-2">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Retour à l'accueil
+                </Button>
+              </Link>
+              
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
                 <Calendar className="w-4 h-4 text-primary" />
                 <span className="text-sm font-medium text-primary">Response within 24h</span>
