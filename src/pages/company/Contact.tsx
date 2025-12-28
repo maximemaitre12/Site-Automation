@@ -79,19 +79,17 @@ export default function Contact() {
       
       <main className="pt-16 md:pt-20">
         {/* Hero */}
-        <section className="py-8 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
+        <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4 md:mb-6">
               <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
               <span className="text-xs md:text-sm font-medium">Get in Touch</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4">
               Contact{" "}
-              <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
-                Us
-              </span>
+              <span className="text-primary">Us</span>
             </h1>
-            <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
               Have a question about AETHER? We'd love to hear from you. 
               Send us a message and we'll respond as soon as possible.
             </p>

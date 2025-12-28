@@ -14,9 +14,14 @@ export default function Security() {
     <div className="min-h-screen bg-background">
       <LandingHeader />
       <main className="pt-20 pb-16">
-        <section className="py-16 px-4 text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-6">Security at <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">AETHER</span></h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Your data security is our top priority. We implement enterprise-grade security measures to protect your information.</p>
+        <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4">
+            Security at{" "}
+            <span className="text-primary">AETHER</span>
+          </h1>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Your data security is our top priority. We implement enterprise-grade security measures to protect your information.
+          </p>
         </section>
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">

@@ -293,13 +293,11 @@ export default function Blog() {
         {/* Hero */}
         <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 md:mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4">
               The AETHER{" "}
-              <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
-                Blog
-              </span>
+              <span className="text-primary">Blog</span>
             </h1>
-            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
               Insights on enterprise AI, product updates, and the future of automation.
             </p>
           </div>

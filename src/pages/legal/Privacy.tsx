@@ -128,15 +128,16 @@ export default function Privacy() {
       
       <main className="pt-16 md:pt-20">
         {/* Hero */}
-        <section className="py-8 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
+        <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
           <div className="max-w-4xl mx-auto text-center">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 md:mb-6">
               <Shield className="w-6 h-6 md:w-8 md:h-8 text-primary" />
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-6">
-              Privacy Policy
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4">
+              Privacy{" "}
+              <span className="text-primary">Policy</span>
             </h1>
-            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto mb-3 md:mb-4">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-3 md:mb-4">
               Your privacy is fundamental to how we build and operate AETHER.
             </p>
             <p className="text-xs md:text-sm text-muted-foreground">
