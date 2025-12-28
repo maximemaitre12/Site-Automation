@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Clock, TrendingUp, Target, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
+
+const stats = [
+  { icon: Clock, label: "Save Time", stat: "90%" },
+  { icon: TrendingUp, label: "Boost Productivity", stat: "3x" },
+  { icon: Target, label: "High Accuracy", stat: "99%" },
+  { icon: Zap, label: "Quick Setup", stat: "5min" },
+];
 
 export function FinalCTASection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
@@ -36,6 +43,27 @@ export function FinalCTASection() {
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-6 sm:mb-8">
             Join companies saving hundreds of hours every month with intelligent automation.
           </p>
+
+          {/* Stats */}
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 mb-6 sm:mb-8">
+            {stats.map((stat, i) => {
+              const IconComponent = stat.icon;
+              return (
+                <div 
+                  key={i} 
+                  className="flex flex-col items-center text-center"
+                >
+                  <div className="text-xl sm:text-2xl font-bold text-primary mb-0.5">
+                    {stat.stat}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <IconComponent className="w-3 h-3 text-muted-foreground" strokeWidth={1.5} />
+                    <span className="text-xs text-muted-foreground">{stat.label}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
           
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
