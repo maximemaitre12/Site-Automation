@@ -3,6 +3,7 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
 import { Calendar, Clock, User, ArrowRight, Tag, TrendingUp, Sparkles, GraduationCap, Globe, Zap, Brain, Workflow, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 const featuredPost = {
   id: "founders-story",
@@ -293,6 +294,25 @@ const categories = ["All", "Company", "Innovation", "Industry"];
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleSubscribe = () => {
+    if (!email || !email.includes("@")) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSubscribed(true);
+    setEmail("");
+    toast({
+      title: "Subscribed!",
+      description: "You'll receive our latest updates in your inbox.",
+    });
+  };
 
   const filteredPosts = selectedCategory === "All" 
     ? posts 
@@ -487,16 +507,28 @@ export default function Blog() {
             <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 px-2">
               Get the latest insights on enterprise AI, product updates, and industry trends delivered to your inbox.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input 
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2.5 md:py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm md:text-base"
-              />
-              <button className="px-5 md:px-6 py-2.5 md:py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm md:text-base">
-                Subscribe
-              </button>
-            </div>
+            {isSubscribed ? (
+              <div className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-primary/10 text-primary">
+                <Sparkles className="w-5 h-5" />
+                <span className="font-medium">Thanks for subscribing!</span>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-2.5 md:py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm md:text-base"
+                />
+                <button 
+                  onClick={handleSubscribe}
+                  className="px-5 md:px-6 py-2.5 md:py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm md:text-base"
+                >
+                  Subscribe
+                </button>
+              </div>
+            )}
             <p className="text-xs text-muted-foreground mt-4">
               No spam, unsubscribe anytime. Read our <Link to="/legal/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
             </p>
