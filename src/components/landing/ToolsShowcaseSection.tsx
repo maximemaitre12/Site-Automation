@@ -11,7 +11,7 @@ const features = [
   {
     icon: Globe,
     title: "Native Integrations",
-    description: "Connect your existing tools. Slack, Gmail, Salesforce, and 100+ more.",
+    description: "Connect your existing tools. Slack, Gmail, Salesforce, and more.",
   },
   {
     icon: Shield,

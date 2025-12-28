@@ -95,9 +95,9 @@ const tools: Tool[] = [
       { label: "Query", icon: Search },
     ],
     stats: [
-      { value: "95%", label: "Response Accuracy" },
-      { value: "<2s", label: "Response Time" },
-      { value: "100+", label: "Supported Formats" },
+      { value: "High", label: "Response Accuracy" },
+      { value: "Fast", label: "Response Time" },
+      { value: "PDF, Word, Excel...", label: "Supported Formats" },
     ],
     useCases: [
       "Instant document search",
