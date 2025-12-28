@@ -21,6 +21,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");
   const [queryComplete, setQueryComplete] = useState(false);
+  const [responseStarted, setResponseStarted] = useState(false);
 
   // Start animation immediately on mount
   useEffect(() => {
@@ -54,9 +55,8 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
 
   // Type the response only when phase becomes exactly 5
   useEffect(() => {
-    if (phase !== 5) return;
-    // Don't restart if already typed
-    if (typedResponse.length > 0) return;
+    if (phase !== 5 || responseStarted) return;
+    setResponseStarted(true);
     let i = 0;
     const interval = setInterval(() => {
       if (i <= aiResponse.length) {
@@ -67,7 +67,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
       }
     }, 20);
     return () => clearInterval(interval);
-  }, [phase, typedResponse.length]);
+  }, [phase, responseStarted]);
 
   return (
     <div
