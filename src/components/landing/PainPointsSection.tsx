@@ -19,13 +19,6 @@ import { AgentSalesDemo } from "./AgentSalesDemo";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-// Agent logos
-import agentFlowLogo from "@/assets/agent-flow.png";
-import agentBrainLogo from "@/assets/agent-brain.png";
-import agentSupportLogo from "@/assets/agent-support.png";
-import agentHRLogo from "@/assets/agent-hr.png";
-import agentComplianceLogo from "@/assets/agent-compliance.png";
-import agentSalesLogo from "@/assets/agent-sales.png";
 
 interface Feature {
   icon: LucideIcon;
@@ -43,7 +36,6 @@ interface Tool {
   tagline: string;
   description: string;
   icon: LucideIcon;
-  logo: string;
   colorClass: string;
   features: Feature[];
   workflow: WorkflowStep[];
@@ -56,8 +48,7 @@ const tools: Tool[] = [
     name: "Flow",
     tagline: "Predictive Automation",
     description: "AI anticipates your needs and triggers workflows before you even think about them.",
-    icon: Zap,
-    logo: agentFlowLogo,
+    icon: Workflow,
     colorClass: "text-agent-flow",
     features: [
       { icon: Workflow, title: "No-Code Visual Builder", description: "Create complex workflows with drag & drop. Conditions, loops, branches — no code required." },
@@ -87,8 +78,7 @@ const tools: Tool[] = [
     name: "Brain",
     tagline: "Contextual Intelligence",
     description: "An AI that understands your company context and responds with precision.",
-    icon: Brain,
-    logo: agentBrainLogo,
+    icon: Database,
     colorClass: "text-agent-brain",
     features: [
       { icon: MessageSquare, title: "Conversational Chat", description: "Ask questions in natural language. AI understands context and provides precise answers." },
@@ -119,7 +109,6 @@ const tools: Tool[] = [
     tagline: "Empathic Agent",
     description: "AI that handles tickets, detects urgency, and resolves issues before they escalate.",
     icon: MessageSquare,
-    logo: agentSupportLogo,
     colorClass: "text-agent-support",
     features: [
       { icon: Mail, title: "Omnichannel", description: "Unified management of emails, chat, phone, social media in one interface." },
@@ -150,7 +139,6 @@ const tools: Tool[] = [
     tagline: "Talent Agent",
     description: "From sourcing to onboarding, AI transforms your recruitment process.",
     icon: Users,
-    logo: agentHRLogo,
     colorClass: "text-agent-hr",
     features: [
       { icon: FileSpreadsheet, title: "CV Parsing", description: "Automatic extraction of skills, experience, qualifications with 98% accuracy." },
@@ -181,7 +169,6 @@ const tools: Tool[] = [
     tagline: "Regulatory Vigilance",
     description: "Stay compliant 24/7 with AI that monitors, alerts, and documents.",
     icon: ShieldCheck,
-    logo: agentComplianceLogo,
     colorClass: "text-agent-compliance",
     features: [
       { icon: Shield, title: "Risk Monitoring", description: "Continuous scanning of internal processes for anomalies and non-compliance." },
@@ -211,8 +198,7 @@ const tools: Tool[] = [
     name: "Sales",
     tagline: "Revenue Intelligence",
     description: "AI that qualifies, prioritizes, and accelerates every sales opportunity.",
-    icon: LineChart,
-    logo: agentSalesLogo,
+    icon: BarChart3,
     colorClass: "text-agent-sales",
     features: [
       { icon: Star, title: "Lead Scoring", description: "AI scoring of prospects based on behavior, profile, and conversion likelihood." },
@@ -347,12 +333,11 @@ export function PainPointsSection() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-lg overflow-hidden shadow-md group-hover:scale-105 transition-transform duration-300 bg-background">
-                        <img 
-                          src={tool.logo} 
-                          alt={`${tool.name} logo`} 
-                          className="w-full h-full object-cover"
-                        />
+                      <div className={cn(
+                        "w-11 h-11 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300 bg-secondary/80",
+                        tool.colorClass
+                      )}>
+                        <IconComponent className="w-6 h-6" />
                       </div>
                       <div>
                         <div className={cn("text-xs font-semibold uppercase tracking-wider mb-0.5", tool.colorClass)}>
