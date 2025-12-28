@@ -136,7 +136,7 @@ export default function Careers() {
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 md:mb-6">Our Story</h2>
                 <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4">
-                  AETHER was founded in 2024 by <strong className="text-foreground">Youriy</strong> and{" "}
+                  AETHER was founded in 2025 by <strong className="text-foreground">Youriy</strong> and{" "}
                   <strong className="text-foreground">Maxime Maître</strong>, two emlyon business school students 
                   who became roommates during their exchange program in Shanghai.
                 </p>
