@@ -45,6 +45,7 @@ export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -65,6 +66,16 @@ export function LandingHeader() {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
+            {/* Results link - only visible on homepage when not scrolled */}
+            {isHomePage && !scrolled && (
+              <a 
+                href="#results" 
+                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+              >
+                Results
+              </a>
+            )}
+            
             {Object.entries(navSections).map(([key, section]) => (
               <DropdownMenu key={key}>
                 <DropdownMenuTrigger asChild>
@@ -73,7 +84,7 @@ export function LandingHeader() {
                     <ChevronDown className="w-3.5 h-3.5" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuContent align="start" className="w-56 bg-background border border-border shadow-lg z-50">
                   <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
                     {section.label}
                   </DropdownMenuLabel>
