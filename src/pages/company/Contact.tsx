@@ -1,6 +1,6 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Sparkles, Send, User, Mail, MessageSquare } from "lucide-react";
+import { Sparkles, Send, User, Mail, MessageSquare, Clock, Zap, Shield, Plug, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,19 +10,23 @@ import { toast } from "@/hooks/use-toast";
 const faqs = [
   {
     question: "How quickly can I get started?",
-    answer: "Most customers are up and running within a week. Our team handles onboarding and initial setup."
+    answer: "Most customers are up and running within a week. Our team handles onboarding and initial setup, so you can focus on what matters.",
+    icon: Clock,
   },
   {
     question: "Do you offer a free trial?",
-    answer: "Yes! We offer a 14-day free trial with full access to all features. No credit card required."
+    answer: "Yes! We offer a 14-day free trial with full access to all features. No credit card required to get started.",
+    icon: Zap,
   },
   {
     question: "What integrations do you support?",
-    answer: "We integrate with major enterprise tools including Salesforce, HubSpot, Slack, Microsoft 365, and more."
+    answer: "We integrate with major enterprise tools including Salesforce, HubSpot, Slack, Microsoft 365, and 100+ more.",
+    icon: Plug,
   },
   {
     question: "Is my data secure?",
-    answer: "Absolutely. All data is encrypted at rest and in transit with enterprise-grade security."
+    answer: "Absolutely. All data is encrypted at rest and in transit. We're GDPR compliant and SOC 2 Type II certified.",
+    icon: Shield,
   }
 ];
 
@@ -167,14 +171,40 @@ export default function Contact() {
         </section>
 
         {/* FAQ */}
-        <section className="py-8 md:py-16 px-4 bg-muted/30">
+        <section className="py-12 md:py-20 px-4 bg-gradient-to-b from-muted/50 to-background">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 md:mb-8 text-center">Frequently Asked Questions</h2>
-            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+            <div className="text-center mb-8 md:mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary mb-4">
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span className="text-xs font-medium">FAQ</span>
+              </div>
+              <h2 className="text-xl md:text-3xl font-bold text-foreground">
+                Frequently Asked{" "}
+                <span className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
+                  Questions
+                </span>
+              </h2>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-4 md:gap-5">
               {faqs.map((faq) => (
-                <div key={faq.question} className="p-4 md:p-6 rounded-xl border border-border bg-card">
-                  <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">{faq.question}</h3>
-                  <p className="text-xs md:text-sm text-muted-foreground">{faq.answer}</p>
+                <div 
+                  key={faq.question} 
+                  className="group p-5 md:p-6 rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-violet-500/10 flex items-center justify-center shrink-0 group-hover:from-primary/20 group-hover:to-violet-500/20 transition-colors">
+                      <faq.icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base group-hover:text-primary transition-colors">
+                        {faq.question}
+                      </h3>
+                      <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

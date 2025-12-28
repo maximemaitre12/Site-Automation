@@ -11,6 +11,7 @@ import { ApiSection } from "@/components/landing/ApiSection";
 import { TestimonialSection } from "@/components/landing/TestimonialSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { BlogSection } from "@/components/landing/BlogSection";
+import { ContactSection } from "@/components/landing/ContactSection";
 
 export default function Landing() {
   const { user, loading } = useAuth();
@@ -46,6 +47,7 @@ export default function Landing() {
         <PainPointsSection />
         <ApiSection />
         <BlogSection />
+        <ContactSection />
         <FinalCTASection />
         <TestimonialSection />
       </main>
