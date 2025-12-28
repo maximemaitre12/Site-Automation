@@ -87,7 +87,14 @@ const App = () => (
             <Route path="/legal/privacy" element={<Privacy />} />
             <Route path="/legal/terms" element={<Terms />} />
             <Route path="/legal/security" element={<Security />} />
-            
+
+            {/* Legacy short paths (avoid 404s from old links) */}
+            <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
+            <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
+            <Route path="/security" element={<Navigate to="/legal/security" replace />} />
+            <Route path="/docs" element={<Navigate to="/resources/documentation" replace />} />
+            <Route path="/api" element={<Navigate to="/resources/api" replace />} />
+            <Route path="/status" element={<Navigate to="/resources/status" replace />} />
             {/* Protected routes - require subscription */}
             <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
             <Route path="/tools/flow" element={<RequireSubscription><Flow /></RequireSubscription>} />
