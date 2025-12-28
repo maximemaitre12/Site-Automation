@@ -14,7 +14,6 @@ const features = [
       "Connecteurs: Email, Slack, CRM, ERP",
       "Scalable et multi-tenant",
     ],
-    gradient: "from-primary to-[hsl(260_100%_65%)]",
     path: "/tools/flow",
   },
   {
@@ -29,7 +28,6 @@ const features = [
       "Résumés intelligents par IA",
       "Classement et indexation automatique",
     ],
-    gradient: "from-[hsl(200_100%_50%)] to-[hsl(180_100%_45%)]",
     path: "/tools/brain",
   },
   {
@@ -44,7 +42,6 @@ const features = [
       "Auto-apprentissage supervisé",
       "Observabilité complète et logs",
     ],
-    gradient: "from-[hsl(280_100%_60%)] to-[hsl(320_100%_55%)]",
     path: "/tools/flow",
   },
 ];
@@ -73,26 +70,21 @@ export function FeaturesSection() {
           {features.map((feature, index) => (
             <div
               key={feature.id}
-              className="group relative rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden hover:border-primary/40 transition-all duration-500 animate-fade-in"
+              className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all duration-300 animate-fade-in"
               style={{ animationDelay: `${0.3 + index * 0.1}s` }}
             >
-              {/* Gradient overlay on hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-              
-              {/* Top gradient bar */}
-              <div className={`h-1 bg-gradient-to-r ${feature.gradient}`} />
+              {/* Top accent bar */}
+              <div className="h-1 bg-primary" />
               
               <div className="relative z-10 p-8">
                 {/* Icon */}
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} p-0.5 mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <div className="w-full h-full rounded-xl bg-card flex items-center justify-center">
-                    <feature.icon className="w-7 h-7 text-primary" />
-                  </div>
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/15 transition-colors">
+                  <feature.icon className="w-7 h-7 text-primary" />
                 </div>
                 
                 {/* Title */}
                 <h3 className="text-2xl font-bold text-foreground mb-2">{feature.title}</h3>
-                <p className={`text-sm font-medium bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent mb-4`}>
+                <p className="text-sm font-medium text-primary mb-4">
                   {feature.subtitle}
                 </p>
                 
@@ -105,12 +97,10 @@ export function FeaturesSection() {
                 <ul className="space-y-3 mb-8">
                   {feature.highlights.map((highlight, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm">
-                      <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${feature.gradient} p-0.5 flex-shrink-0 mt-0.5`}>
-                        <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
-                          <svg className="w-2.5 h-2.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-2.5 h-2.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
                       </div>
                       <span className="text-foreground/80">{highlight}</span>
                     </li>

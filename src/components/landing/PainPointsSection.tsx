@@ -385,10 +385,8 @@ export function PainPointsSection() {
                 <div
                   className={cn(
                     "absolute -inset-4 rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl opacity-0 transition-opacity duration-500 -z-10",
-                    isExpanded ? "opacity-30" : "group-hover:opacity-20",
-                    i % 2 === 0
-                      ? "bg-gradient-to-br from-[hsl(200_80%_75%)] to-[hsl(220_70%_85%)]"
-                      : "bg-gradient-to-br from-[hsl(260_70%_75%)] to-[hsl(280_60%_85%)]"
+                    isExpanded ? "opacity-20" : "group-hover:opacity-15",
+                    "bg-gradient-to-br from-[hsl(210_30%_75%)] to-[hsl(190_40%_85%)]"
                   )}
                 />
 

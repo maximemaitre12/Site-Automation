@@ -19,8 +19,7 @@ export function HeroSection() {
         
         {/* Headline */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4 animate-cloud-fade-in text-balance" style={{ animationDelay: "0.1s" }}>
-          AI That Works{" "}
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">For You</span>
+          AI That Works <span className="text-primary">For You</span>
         </h1>
         
         {/* Subtitle */}

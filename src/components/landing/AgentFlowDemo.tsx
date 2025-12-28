@@ -69,17 +69,17 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
     >
       {/* Cloud-style background decorations */}
       <div 
-        className="absolute top-0 right-0 w-64 h-48 bg-gradient-to-br from-[hsl(200_80%_80%/0.2)] to-[hsl(220_70%_85%/0.1)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl -translate-y-1/2 translate-x-1/4 animate-cloud-morph"
+        className="absolute top-0 right-0 w-64 h-48 bg-gradient-to-br from-[hsl(210_30%_80%/0.15)] to-[hsl(190_40%_85%/0.1)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl -translate-y-1/2 translate-x-1/4 animate-cloud-morph"
         style={{ animationDuration: "15s" }}
       />
       <div 
-        className="absolute bottom-0 left-0 w-52 h-40 bg-gradient-to-br from-[hsl(260_70%_80%/0.15)] to-[hsl(280_60%_85%/0.1)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-3xl translate-y-1/2 -translate-x-1/4 animate-cloud-drift"
+        className="absolute bottom-0 left-0 w-52 h-40 bg-gradient-to-br from-[hsl(190_40%_80%/0.12)] to-[hsl(210_30%_85%/0.08)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-3xl translate-y-1/2 -translate-x-1/4 animate-cloud-drift"
         style={{ animationDuration: "12s" }}
       />
 
-      {/* Animated glow orbs */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
+      {/* Subtle glow orbs */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/8 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
         {/* Connected Apps */}

@@ -16,15 +16,15 @@ const sizeClasses = {
 };
 
 const variantGradients = {
-  blue: "from-[hsl(200_80%_75%/0.5)] to-[hsl(210_70%_80%/0.3)]",
-  purple: "from-[hsl(260_70%_75%/0.5)] to-[hsl(280_60%_80%/0.3)]",
-  mixed: "from-[hsl(200_80%_75%/0.4)] via-[hsl(240_60%_75%/0.3)] to-[hsl(260_70%_80%/0.4)]",
+  blue: "from-[hsl(210_30%_75%/0.3)] to-[hsl(190_40%_80%/0.2)]",
+  purple: "from-[hsl(190_40%_75%/0.3)] to-[hsl(210_30%_80%/0.2)]",
+  mixed: "from-[hsl(210_30%_75%/0.25)] via-[hsl(200_35%_78%/0.2)] to-[hsl(190_40%_80%/0.25)]",
 };
 
 const intensityOpacity = {
-  subtle: "opacity-40",
-  medium: "opacity-60",
-  strong: "opacity-80",
+  subtle: "opacity-30",
+  medium: "opacity-50",
+  strong: "opacity-70",
 };
 
 export function CloudBlob({
@@ -96,9 +96,9 @@ interface WidgetCloudWrapperProps {
 
 export function WidgetCloudWrapper({ children, className, variant = "mixed" }: WidgetCloudWrapperProps) {
   const bgVariants = {
-    blue: "before:bg-gradient-to-br before:from-[hsl(200_80%_85%/0.5)] before:to-[hsl(210_70%_90%/0.3)]",
-    purple: "before:bg-gradient-to-br before:from-[hsl(260_70%_85%/0.5)] before:to-[hsl(280_60%_90%/0.3)]",
-    mixed: "before:bg-gradient-to-br before:from-[hsl(200_80%_85%/0.4)] before:via-[hsl(240_60%_88%/0.3)] before:to-[hsl(260_70%_85%/0.4)]",
+    blue: "before:bg-gradient-to-br before:from-[hsl(210_30%_85%/0.3)] before:to-[hsl(190_40%_90%/0.2)]",
+    purple: "before:bg-gradient-to-br before:from-[hsl(190_40%_85%/0.3)] before:to-[hsl(210_30%_90%/0.2)]",
+    mixed: "before:bg-gradient-to-br before:from-[hsl(210_30%_85%/0.25)] before:via-[hsl(200_35%_88%/0.2)] before:to-[hsl(190_40%_85%/0.25)]",
   };
 
   return (
@@ -121,28 +121,22 @@ export function WidgetCloudWrapper({ children, className, variant = "mixed" }: W
 export function FloatingClouds({ className }: { className?: string }) {
   return (
     <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)}>
-      {/* Large cyan/teal cloud top-right - matches Aether logo */}
+      {/* Large subtle cloud top-right - Aether blue tones */}
       <div
-        className="absolute top-10 right-[10%] w-80 h-48 bg-gradient-to-br from-[hsl(199_85%_75%/0.3)] to-[hsl(174_70%_80%/0.2)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-2xl animate-cloud-float"
+        className="absolute top-10 right-[10%] w-80 h-48 bg-gradient-to-br from-[hsl(210_30%_80%/0.2)] to-[hsl(190_40%_85%/0.15)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] blur-3xl animate-cloud-float"
         style={{ animationDuration: "12s" }}
       />
       
-      {/* Medium teal cloud left */}
+      {/* Medium subtle cloud left */}
       <div
-        className="absolute top-1/3 left-[5%] w-52 h-36 bg-gradient-to-br from-[hsl(174_70%_75%/0.25)] to-[hsl(199_65%_80%/0.18)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-2xl animate-cloud-drift"
+        className="absolute top-1/3 left-[5%] w-52 h-36 bg-gradient-to-br from-[hsl(190_35%_80%/0.18)] to-[hsl(210_30%_85%/0.12)] rounded-[40%_60%_70%_30%/50%_40%_60%_50%] blur-3xl animate-cloud-drift"
         style={{ animationDuration: "10s", animationDelay: "-3s" }}
       />
       
-      {/* Small mixed cloud bottom-right */}
+      {/* Small subtle cloud bottom-right */}
       <div
-        className="absolute bottom-20 right-[15%] w-40 h-28 bg-gradient-to-br from-[hsl(199_80%_78%/0.22)] to-[hsl(174_65%_80%/0.18)] rounded-[50%_50%_40%_60%/40%_60%_50%_50%] blur-xl animate-cloud-pulse"
+        className="absolute bottom-20 right-[15%] w-40 h-28 bg-gradient-to-br from-[hsl(200_35%_82%/0.15)] to-[hsl(190_30%_85%/0.1)] rounded-[50%_50%_40%_60%/40%_60%_50%_50%] blur-2xl animate-cloud-pulse"
         style={{ animationDuration: "8s", animationDelay: "-5s" }}
-      />
-      
-      {/* Tiny accent cloud */}
-      <div
-        className="absolute top-[60%] left-[20%] w-28 h-20 bg-gradient-to-br from-[hsl(185_75%_80%/0.18)] to-[hsl(199_60%_85%/0.12)] rounded-[60%_40%_50%_50%/50%_60%_40%_50%] blur-xl animate-cloud-float"
-        style={{ animationDuration: "14s", animationDelay: "-7s" }}
       />
     </div>
   );
