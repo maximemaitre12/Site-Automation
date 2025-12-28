@@ -65,67 +65,47 @@ export function IntegrationsSection() {
           </p>
         </div>
 
-        {/* Visual Integration Diagram */}
+        {/* Clean Platform Grid */}
         <div className={cn(
           "relative mb-10 transition-all duration-1000 delay-200",
-          isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
-          {/* Central Hub */}
-          <div className="relative flex items-center justify-center">
-            {/* Orbiting platforms */}
-            <div className="relative w-full max-w-sm mx-auto aspect-square">
-              {/* Connection lines */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 400">
-                {platforms.map((_, i) => {
-                  const angle = (i * 36 - 90) * (Math.PI / 180);
-                  const x = 200 + 150 * Math.cos(angle);
-                  const y = 200 + 150 * Math.sin(angle);
-                  return (
-                    <line
-                      key={i}
-                      x1="200"
-                      y1="200"
-                      x2={x}
-                      y2={y}
-                      stroke="hsl(220 13% 80%)"
-                      strokeWidth="1"
-                      strokeDasharray="4 4"
-                    />
-                  );
-                })}
-              </svg>
-
-              {/* Center Aether logo */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                  <span className="text-primary-foreground font-bold text-base sm:text-lg">A</span>
-                </div>
+          {/* Platforms row with center Aether hub */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap max-w-lg mx-auto">
+            {/* Left platforms */}
+            {platforms.slice(0, 4).map((platform, i) => (
+              <div
+                key={platform.name}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary border border-border flex items-center justify-center transition-all duration-300 hover:border-primary/40 hover:shadow-md"
+                style={{ animationDelay: `${i * 50}ms` }}
+                title={platform.name}
+              >
+                <platform.Logo className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
               </div>
-
-              {/* Platform icons in orbit */}
-              {platforms.map((platform, i) => {
-                const angle = (i * 36 - 90) * (Math.PI / 180);
-                const radius = 38; // percentage from center
-                const x = 50 + radius * Math.cos(angle);
-                const y = 50 + radius * Math.sin(angle);
-                
-                return (
-                  <div
-                    key={platform.name}
-                    className="absolute w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-secondary border border-border flex items-center justify-center shadow-sm transition-all duration-300 hover:scale-110 hover:border-primary/30"
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                    title={platform.name}
-                  >
-                    <platform.Logo className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
-                  </div>
-                );
-              })}
+            ))}
+            
+            {/* Center Aether hub */}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-primary flex items-center justify-center shadow-md mx-1">
+              <span className="text-primary-foreground font-bold text-sm sm:text-base">A</span>
             </div>
+            
+            {/* Right platforms */}
+            {platforms.slice(4, 8).map((platform, i) => (
+              <div
+                key={platform.name}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary border border-border flex items-center justify-center transition-all duration-300 hover:border-primary/40 hover:shadow-md"
+                style={{ animationDelay: `${(i + 4) * 50}ms` }}
+                title={platform.name}
+              >
+                <platform.Logo className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+              </div>
+            ))}
           </div>
+          
+          {/* +more indicator */}
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            +100 other integrations available
+          </p>
         </div>
 
         {/* 3-Step Process */}
