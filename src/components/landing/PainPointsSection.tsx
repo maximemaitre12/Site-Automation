@@ -237,7 +237,7 @@ function ExpandedContent({ tool }: { tool: Tool }) {
   return (
     <div className="pt-6 border-t border-border/50 animate-cloud-fade-in">
       {/* Agent-specific animated demos */}
-      <div className="mb-6">
+      <div className="mb-4">
         {tool.name === "Flow" && <AgentFlowDemo />}
         {tool.name === "Brain" && <AgentBrainDemo />}
         {tool.name === "Support" && <AgentSupportDemo />}
@@ -246,78 +246,18 @@ function ExpandedContent({ tool }: { tool: Tool }) {
         {tool.name === "Sales" && <AgentSalesDemo />}
       </div>
 
-      {/* Features grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-        {tool.features.map((feature, j) => {
-          const FeatureIcon = feature.icon;
-          return (
-            <div
-              key={j}
-              className="p-3 rounded-xl bg-secondary/30 border border-border/50 hover:border-primary/20 transition-all duration-300"
-            >
-              <div className="flex items-start gap-3">
-                <div
-                  className={cn(
-                    "w-9 h-9 rounded-[40%_60%_30%_70%/60%_30%_70%_40%] flex items-center justify-center shrink-0",
-                    tool.color + "/20"
-                  )}
-                >
-                  <FeatureIcon
-                    className={cn("w-4 h-4", tool.colorClass)}
-                    strokeWidth={1.5}
-                  />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-foreground mb-0.5">
-                    {feature.title}
-                  </div>
-                  <div className="text-xs text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      {/* Compact use cases */}
+      <div className="flex flex-wrap gap-2">
+        {tool.useCases.map((useCase, j) => (
+          <span 
+            key={j} 
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/50 border border-border/50 text-xs text-foreground"
+          >
+            <CheckCircle2 className={cn("w-3 h-3 shrink-0", tool.colorClass)} />
+            {useCase}
+          </span>
+        ))}
       </div>
-
-      {/* Stats and use cases */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Stats */}
-        <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-4">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Measured Results
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {tool.stats.map((stat, j) => (
-              <div key={j} className="text-center">
-                <div className={cn("text-xl font-bold", tool.colorClass)}>
-                  {stat.value}
-                </div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Use cases */}
-        <div className="bg-gradient-to-br from-secondary/80 to-secondary/40 rounded-xl p-4">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Use Cases
-          </div>
-          <ul className="space-y-1.5">
-            {tool.useCases.map((useCase, j) => (
-              <li key={j} className="flex items-center gap-2 text-sm text-foreground">
-                <CheckCircle2
-                  className={cn("w-3.5 h-3.5 shrink-0", tool.colorClass)}
-                />
-                {useCase}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
     </div>
   );
 }
