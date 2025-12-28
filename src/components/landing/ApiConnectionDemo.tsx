@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Check, Loader2, Bell } from "lucide-react";
 import { SlackLogo } from "./BrandLogos";
 
@@ -12,11 +12,33 @@ export function ApiConnectionDemo() {
   const [phase, setPhase] = useState<"idle" | "typing" | "connecting" | "connected" | "notifications">("idle");
   const [typedKey, setTypedKey] = useState("");
   const [visibleNotifications, setVisibleNotifications] = useState<number[]>([]);
+  const [hasStarted, setHasStarted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const apiKey = "xoxb-8274••••••••";
   
-  // Auto-start animation loop
+  // Detect when component is visible
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [hasStarted]);
+  
+  // Auto-start animation loop only after visible
+  useEffect(() => {
+    if (!hasStarted) return;
+    
     let timeoutId: NodeJS.Timeout;
     let intervalId: NodeJS.Timeout;
     
@@ -38,7 +60,7 @@ export function ApiConnectionDemo() {
       clearTimeout(timeoutId);
       clearInterval(intervalId);
     };
-  }, []);
+  }, [hasStarted]);
   
   // Typing effect
   useEffect(() => {
@@ -98,7 +120,7 @@ export function ApiConnectionDemo() {
   }, [phase]);
 
   return (
-    <div className="relative w-full max-w-xs mx-auto">
+    <div ref={containerRef} className="relative w-full max-w-xs mx-auto">
       {/* Main card */}
       <div className="relative bg-card border border-border rounded-xl p-4 shadow-lg">
         {/* Header */}
