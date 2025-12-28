@@ -3,28 +3,86 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Zap, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Check, Zap, ArrowRight, Loader2, Sparkles, Crown, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { LandingHeader } from '@/components/landing/LandingHeader';
 
+const plans = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: 99,
+    priceId: 'price_1SjCzsH7wcmjTpOiQjG1ToVL',
+    description: '1 AI agent',
+    icon: Zap,
+    features: [
+      '1 AI-powered agent',
+      'Unlimited workflows',
+      'Document processing',
+      'Email support',
+      'API access',
+    ],
+    popular: false,
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 249,
+    priceId: 'price_1SjCztH7wcmjTpOiFJ2DfMOm',
+    description: '3 AI agents',
+    icon: Rocket,
+    features: [
+      '3 AI-powered agents',
+      'Unlimited workflows',
+      'Document processing',
+      'Sales intelligence',
+      'HR automation',
+      'Priority support',
+      'API access',
+    ],
+    popular: true,
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 399,
+    priceId: 'price_1SjCzvH7wcmjTpOi4KL5q7ZH',
+    description: 'All 9 agents',
+    icon: Crown,
+    features: [
+      'All 9 AI-powered agents',
+      'Unlimited workflows',
+      'Document processing',
+      'Sales intelligence',
+      'HR automation',
+      'Customer support AI',
+      'Compliance tools',
+      'Dedicated support',
+      'Custom integrations',
+    ],
+    popular: false,
+  },
+];
+
 export default function SelectPlan() {
   const navigate = useNavigate();
   const { session } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
 
-  const handleStartTrial = async () => {
+  const handleStartTrial = async (priceId: string, planId: string) => {
     if (!session) {
       toast.error('Please sign in first');
       navigate('/auth');
       return;
     }
 
-    setLoading(true);
+    setLoading(planId);
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -45,99 +103,110 @@ export default function SelectPlan() {
         description: 'Unable to start checkout. Please try again.',
       });
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
-
-  const features = [
-    'All 9 AI-powered agents',
-    'Unlimited workflows',
-    'Document processing',
-    'Sales intelligence',
-    'HR automation',
-    'Customer support AI',
-    'Compliance tools',
-    'Priority support',
-    'API access',
-  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <LandingHeader />
 
       {/* Content - with padding for fixed header */}
-      <div className="flex-1 container mx-auto px-4 pt-24 pb-12 flex items-center justify-center relative z-0">
-        <div className="w-full max-w-lg">
-          <div className="text-center mb-6 sm:mb-10">
+      <div className="flex-1 container mx-auto px-4 pt-24 pb-12 relative z-0">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>3 days free trial</span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-4">
-              Start Your Free Trial
+              Choose Your Plan
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
-              Try AETHER Pro free for 3 days. Cancel anytime.
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Start with a 3-day free trial. Cancel anytime before the trial ends.
             </p>
           </div>
 
-          <Card className="border-primary/30 shadow-lg shadow-primary/5">
-            <CardHeader className="text-center pb-2 sm:pb-4 px-4 sm:px-6">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/20 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-                <Zap className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
-              </div>
-              
-              <CardTitle className="text-xl sm:text-2xl">AETHER Pro</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">Full access to all features</CardDescription>
-              
-              <div className="mt-3 sm:mt-4">
-                <span className="text-3xl sm:text-4xl font-bold text-foreground">€99</span>
-                <span className="text-muted-foreground text-sm">/month</span>
-              </div>
-              
-              <Badge variant="secondary" className="mt-2 text-xs">
-                After 3-day free trial
-              </Badge>
-            </CardHeader>
-            
-            <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
-              <ul className="space-y-2 sm:space-y-3">
-                {features.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-2 sm:gap-3">
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Button
-                onClick={handleStartTrial}
-                disabled={loading}
-                className="w-full h-10 sm:h-12 text-sm sm:text-base"
-                size="lg"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    Start Free Trial
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
-                  </>
-                )}
-              </Button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {plans.map((plan) => {
+              const Icon = plan.icon;
+              return (
+                <Card
+                  key={plan.id}
+                  className={`relative flex flex-col ${
+                    plan.popular
+                      ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]'
+                      : 'border-border'
+                  }`}
+                >
+                  {plan.popular && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                      Most Popular
+                    </Badge>
+                  )}
+                  
+                  <CardHeader className="text-center pb-2 px-4 sm:px-6">
+                    <div
+                      className={`w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center ${
+                        plan.popular ? 'bg-primary/20' : 'bg-muted'
+                      }`}
+                    >
+                      <Icon
+                        className={`w-6 h-6 ${
+                          plan.popular ? 'text-primary' : 'text-muted-foreground'
+                        }`}
+                      />
+                    </div>
+                    
+                    <CardTitle className="text-lg sm:text-xl">{plan.name}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">{plan.description}</CardDescription>
+                    
+                    <div className="mt-3">
+                      <span className="text-3xl sm:text-4xl font-bold text-foreground">€{plan.price}</span>
+                      <span className="text-muted-foreground text-sm">/month</span>
+                    </div>
+                    
+                    <Badge variant="secondary" className="mt-2 text-xs">
+                      After 3-day free trial
+                    </Badge>
+                  </CardHeader>
+                  
+                  <CardContent className="flex-1 flex flex-col space-y-4 px-4 sm:px-6 pb-6">
+                    <ul className="space-y-2 flex-1">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-xs sm:text-sm text-muted-foreground">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <Button
+                      onClick={() => handleStartTrial(plan.priceId, plan.id)}
+                      disabled={loading !== null}
+                      variant={plan.popular ? 'default' : 'outline'}
+                      className="w-full h-10 sm:h-11 text-sm"
+                    >
+                      {loading === plan.id ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          Start Free Trial
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
 
-              <p className="text-center text-[10px] sm:text-xs text-muted-foreground">
-                You won't be charged during your 3-day trial.<br />
-                Cancel anytime before the trial ends.
-              </p>
-            </CardContent>
-          </Card>
-
-          <p className="text-center text-[10px] sm:text-xs text-muted-foreground mt-4 sm:mt-6">
-            Secure payment powered by Stripe. All prices exclude VAT.
+          <p className="text-center text-[10px] sm:text-xs text-muted-foreground mt-6 sm:mt-8">
+            You won't be charged during your 3-day trial. Secure payment powered by Stripe. All prices exclude VAT.
           </p>
         </div>
       </div>
