@@ -57,53 +57,58 @@ export function LandingHeader() {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background ${
       scrolled ? "border-b border-border shadow-sm" : ""
     }`}>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {/* Results link - only visible on homepage when not scrolled */}
             {isHomePage && !scrolled && (
               <a 
                 href="#results" 
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
+                className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
               >
                 Results
               </a>
             )}
             
-            {Object.entries(navSections).map(([key, section]) => (
-              <DropdownMenu key={key}>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
-                    {section.label}
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-background border border-border shadow-lg z-50">
-                  <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
-                    {section.label}
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {section.items.map((item) => (
-                    <DropdownMenuItem key={item.href} asChild>
-                      <Link to={item.href} className="flex flex-col items-start gap-0.5 cursor-pointer">
-                        <span className="font-medium">{item.label}</span>
-                        <span className="text-xs text-muted-foreground">{item.description}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ))}
+            {/* Platform */}
+            <Link to="/products" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              Products
+            </Link>
+            <Link to="/resources/documentation" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              Docs
+            </Link>
+            <Link to="/resources/api" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              API
+            </Link>
+            
+            {/* Company */}
+            <Link to="/about" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              About
+            </Link>
+            <Link to="/blog" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              Blog
+            </Link>
+            <Link to="/careers" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              Careers
+            </Link>
+            <Link to="/contact" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              Contact
+            </Link>
+            
+            {/* Trust */}
+            <Link to="/legal/security" className="px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50">
+              Security
+            </Link>
           </nav>
           
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <Link to="/auth?mode=login">
               <Button variant="ghost" size="sm" className="text-sm">
                 Log in
@@ -118,7 +123,7 @@ export function LandingHeader() {
           
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="lg:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -127,7 +132,7 @@ export function LandingHeader() {
         
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg py-4 px-4 max-h-[80vh] overflow-y-auto">
+          <div className="lg:hidden absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg py-4 px-4 max-h-[80vh] overflow-y-auto">
             <nav className="flex flex-col gap-4">
               {Object.entries(navSections).map(([key, section]) => (
                 <div key={key}>
