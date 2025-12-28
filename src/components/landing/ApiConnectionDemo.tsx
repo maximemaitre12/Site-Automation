@@ -17,20 +17,27 @@ export function ApiConnectionDemo() {
   
   // Auto-start animation loop
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let intervalId: NodeJS.Timeout;
+    
     const startAnimation = () => {
       setPhase("idle");
       setTypedKey("");
       setVisibleNotifications([]);
       
       // Start typing after a brief pause
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setPhase("typing");
       }, 800);
     };
     
     startAnimation();
-    const interval = setInterval(startAnimation, 10000);
-    return () => clearInterval(interval);
+    intervalId = setInterval(startAnimation, 10000);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
   }, []);
   
   // Typing effect
@@ -38,42 +45,56 @@ export function ApiConnectionDemo() {
     if (phase !== "typing") return;
     
     let i = 0;
+    let timeoutId: NodeJS.Timeout;
+    
     const typeInterval = setInterval(() => {
       if (i < apiKey.length) {
         setTypedKey(apiKey.slice(0, i + 1));
         i++;
       } else {
         clearInterval(typeInterval);
-        setTimeout(() => setPhase("connecting"), 300);
+        timeoutId = setTimeout(() => setPhase("connecting"), 300);
       }
     }, 80);
     
-    return () => clearInterval(typeInterval);
+    return () => {
+      clearInterval(typeInterval);
+      clearTimeout(timeoutId);
+    };
   }, [phase]);
   
   // Connecting -> Connected
   useEffect(() => {
-    if (phase === "connecting") {
-      setTimeout(() => setPhase("connected"), 1200);
-    }
+    if (phase !== "connecting") return;
+    
+    const timeoutId = setTimeout(() => setPhase("connected"), 1200);
+    return () => clearTimeout(timeoutId);
   }, [phase]);
   
   // Connected -> Show notifications
   useEffect(() => {
-    if (phase === "connected") {
-      setTimeout(() => setPhase("notifications"), 400);
-    }
+    if (phase !== "connected") return;
+    
+    const timeoutId = setTimeout(() => setPhase("notifications"), 400);
+    return () => clearTimeout(timeoutId);
   }, [phase]);
   
   // Show notifications one by one
   useEffect(() => {
     if (phase !== "notifications") return;
     
+    const timeoutIds: NodeJS.Timeout[] = [];
+    
     notifications.forEach((_, i) => {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         setVisibleNotifications(prev => [...prev, i]);
       }, i * 400);
+      timeoutIds.push(id);
     });
+    
+    return () => {
+      timeoutIds.forEach(id => clearTimeout(id));
+    };
   }, [phase]);
 
   return (
