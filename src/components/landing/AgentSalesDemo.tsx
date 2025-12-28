@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { ArrowRight, TrendingUp, Phone, DollarSign, Target } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { TrendingUp, Phone, DollarSign, Target } from "lucide-react";
 
 const deals = [
   { name: "Acme Corp", value: 450000, probability: 85, stage: "Negotiation" },
@@ -33,7 +31,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
 
     const t1 = setTimeout(() => setPhase(1), 500);
     const t2 = setTimeout(() => setPhase(2), 2000);
-    const t3 = setTimeout(() => setPhase(3), 3500);
+    const t3 = setTimeout(() => setPhase(3), 3000);
 
     return () => {
       clearTimeout(t1);
@@ -42,7 +40,6 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
     };
   }, [isVisible]);
 
-  // Revenue counter
   useEffect(() => {
     if (phase >= 1) {
       const target = 2400000;
@@ -52,23 +49,20 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
             clearInterval(interval);
             return target;
           }
-          return prev + 48000;
+          return prev + 60000;
         });
       }, 30);
       return () => clearInterval(interval);
     }
   }, [phase]);
 
-  // Deal progress animation
   useEffect(() => {
     if (phase >= 2) {
       const targets = deals.map(d => d.probability);
       const interval = setInterval(() => {
         setDealProgress(prev => {
-          const newProgress = prev.map((p, i) => Math.min(p + 2, targets[i]));
-          if (newProgress.every((p, i) => p >= targets[i])) {
-            clearInterval(interval);
-          }
+          const newProgress = prev.map((p, i) => Math.min(p + 3, targets[i]));
+          if (newProgress.every((p, i) => p >= targets[i])) clearInterval(interval);
           return newProgress;
         });
       }, 30);
@@ -76,16 +70,13 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
     }
   }, [phase]);
 
-  // Chart animation
   useEffect(() => {
     if (phase >= 3) {
       const targets = [60, 75, 85, 95];
       const interval = setInterval(() => {
         setChartHeight(prev => {
-          const newHeights = prev.map((h, i) => Math.min(h + 3, targets[i]));
-          if (newHeights.every((h, i) => h >= targets[i])) {
-            clearInterval(interval);
-          }
+          const newHeights = prev.map((h, i) => Math.min(h + 4, targets[i]));
+          if (newHeights.every((h, i) => h >= targets[i])) clearInterval(interval);
           return newHeights;
         });
       }, 40);
@@ -94,9 +85,7 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
   }, [phase]);
 
   const formatCurrency = (value: number) => {
-    if (value >= 1000000) {
-      return `$${(value / 1000000).toFixed(1)}M`;
-    }
+    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
     return `$${(value / 1000).toFixed(0)}K`;
   };
 
@@ -104,67 +93,53 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
     <div
       ref={ref}
       className={cn(
-        "relative p-6 md:p-8 rounded-2xl bg-gradient-to-br from-cyan-500/5 via-background to-blue-500/5 border border-cyan-500/20 overflow-hidden",
+        "relative p-4 rounded-xl bg-gradient-to-br from-cyan-500/5 via-background to-blue-500/5 border border-cyan-500/20 overflow-hidden",
         className
       )}
     >
-      {/* Background decoration */}
-      <div className="absolute top-0 left-1/4 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute top-0 left-1/4 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl animate-pulse" />
+      <div className="absolute bottom-0 right-1/4 w-20 h-20 bg-blue-500/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10">
         {/* Revenue header */}
         <div className={cn(
-          "mb-6 transition-all duration-500",
+          "mb-3 transition-all duration-500",
           phase >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex items-center justify-between gap-2 mb-2">
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Q4 Forecast</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-foreground">{formatCurrency(revenue)}</span>
-                <span className="flex items-center text-emerald-500 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase">Q4 Forecast</p>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-bold text-foreground">{formatCurrency(revenue)}</span>
+                <span className="flex items-center text-emerald-500 text-[10px] font-medium">
+                  <TrendingUp className="w-3 h-3 mr-0.5" />
                   +23%
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-500/10">
-              <Phone className="w-4 h-4 text-cyan-500" />
-              <span className="text-sm font-medium text-foreground">12 calls analyzed today</span>
+            <div className="flex items-center gap-1 px-2 py-1 rounded bg-cyan-500/10">
+              <Phone className="w-3 h-3 text-cyan-500" />
+              <span className="text-[10px] font-medium text-foreground">12 calls</span>
             </div>
           </div>
         </div>
 
-        {/* Main content grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* Deals + Chart grid */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
           {/* Deals pipeline */}
-          <div className={cn(
-            "transition-all duration-700",
-            phase >= 2 ? "opacity-100" : "opacity-0"
-          )}>
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-              <Target className="w-4 h-4 text-cyan-500" />
-              Active Pipeline
+          <div className={cn("transition-all duration-500", phase >= 2 ? "opacity-100" : "opacity-0")}>
+            <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
+              <Target className="w-3 h-3 text-cyan-500" />
+              Pipeline
             </div>
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               {deals.map((deal, i) => (
-                <div
-                  key={deal.name}
-                  className="p-3 rounded-lg bg-secondary/50 border border-border/50"
-                  style={{ transitionDelay: `${i * 150}ms` }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{deal.name}</p>
-                      <p className="text-xs text-muted-foreground">{deal.stage}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-cyan-500">{formatCurrency(deal.value)}</p>
-                      <p className="text-xs text-muted-foreground">{dealProgress[i]}% likely</p>
-                    </div>
+                <div key={deal.name} className="p-1.5 rounded bg-secondary/50 border border-border/50">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] font-medium text-foreground truncate">{deal.name}</p>
+                    <p className="text-[10px] font-bold text-cyan-500">{formatCurrency(deal.value)}</p>
                   </div>
-                  <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                  <div className="h-1 rounded-full bg-secondary overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
                       style={{ width: `${dealProgress[i]}%` }}
@@ -176,33 +151,25 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           </div>
 
           {/* Revenue chart */}
-          <div className={cn(
-            "transition-all duration-700",
-            phase >= 3 ? "opacity-100" : "opacity-0"
-          )}>
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-              <DollarSign className="w-4 h-4 text-cyan-500" />
-              Revenue Trend
+          <div className={cn("transition-all duration-500", phase >= 3 ? "opacity-100" : "opacity-0")}>
+            <div className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground uppercase mb-2">
+              <DollarSign className="w-3 h-3 text-cyan-500" />
+              Revenue
             </div>
-            <div className="p-4 rounded-lg bg-secondary/50 border border-border/50">
-              <div className="flex items-end justify-between h-32 gap-3">
+            <div className="p-2 rounded bg-secondary/50 border border-border/50">
+              <div className="flex items-end justify-between h-16 gap-1.5">
                 {["Q1", "Q2", "Q3", "Q4"].map((quarter, i) => (
-                  <div key={quarter} className="flex-1 flex flex-col items-center gap-2">
+                  <div key={quarter} className="flex-1 flex flex-col items-center gap-0.5">
                     <div className="w-full relative flex-1 flex items-end">
                       <div
                         className={cn(
-                          "w-full rounded-t-md transition-all duration-700",
-                          i === 3 
-                            ? "bg-gradient-to-t from-cyan-500 to-blue-400"
-                            : "bg-cyan-500/30"
+                          "w-full rounded-t transition-all duration-500",
+                          i === 3 ? "bg-gradient-to-t from-cyan-500 to-blue-400" : "bg-cyan-500/30"
                         )}
-                        style={{ 
-                          height: `${chartHeight[i]}%`,
-                          transitionDelay: `${i * 150}ms`
-                        }}
+                        style={{ height: `${chartHeight[i]}%`, transitionDelay: `${i * 100}ms` }}
                       />
                     </div>
-                    <span className="text-xs text-muted-foreground">{quarter}</span>
+                    <span className="text-[8px] text-muted-foreground">{quarter}</span>
                   </div>
                 ))}
               </div>
@@ -210,53 +177,53 @@ export function AgentSalesDemo({ className }: AgentSalesDemoProps) {
           </div>
         </div>
 
-        {/* Sentiment analysis preview */}
+        {/* Call analysis - compact */}
         <div className={cn(
-          "p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 mb-6 transition-all duration-700",
-          phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          "p-2 rounded-lg bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 mb-3 transition-all duration-500",
+          phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shrink-0">
-              <Phone className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shrink-0">
+              <Phone className="w-3.5 h-3.5 text-white" />
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-medium text-foreground">Latest Call Analysis</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-xs text-emerald-600">Positive</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-medium text-foreground">Latest Call</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-[8px] text-emerald-600">Positive</span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Client showed strong buying signals. Key objection: pricing. Recommended action: Prepare competitive analysis and schedule follow-up.
+              <p className="text-[9px] text-muted-foreground truncate">
+                Strong buying signals. Action: competitive analysis
               </p>
             </div>
           </div>
         </div>
 
-        {/* Stats row */}
+        {/* Stats row - compact */}
         <div className={cn(
-          "grid grid-cols-3 gap-4 mb-6 transition-all duration-700",
+          "grid grid-cols-3 gap-2 mb-3 transition-all duration-500",
           phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
-          <div className="text-center p-3 rounded-lg bg-cyan-500/10">
-            <div className="text-2xl font-bold text-cyan-500">+35%</div>
-            <div className="text-xs text-muted-foreground">Conversion</div>
+          <div className="text-center p-1.5 rounded bg-cyan-500/10">
+            <div className="text-sm font-bold text-cyan-500">+35%</div>
+            <div className="text-[8px] text-muted-foreground">Conversion</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-cyan-500/10">
-            <div className="text-2xl font-bold text-cyan-500">95%</div>
-            <div className="text-xs text-muted-foreground">Forecast Accuracy</div>
+          <div className="text-center p-1.5 rounded bg-cyan-500/10">
+            <div className="text-sm font-bold text-cyan-500">95%</div>
+            <div className="text-[8px] text-muted-foreground">Accuracy</div>
           </div>
-          <div className="text-center p-3 rounded-lg bg-cyan-500/10">
-            <div className="text-2xl font-bold text-cyan-500">-50%</div>
-            <div className="text-xs text-muted-foreground">Proposal Time</div>
+          <div className="text-center p-1.5 rounded bg-cyan-500/10">
+            <div className="text-sm font-bold text-cyan-500">-50%</div>
+            <div className="text-[8px] text-muted-foreground">Time</div>
           </div>
         </div>
 
         {/* CTA */}
         <div className={cn(
-          "text-center transition-all duration-700",
+          "text-center transition-all duration-500",
           phase >= 3 ? "opacity-100" : "opacity-0"
         )}>
-          <p className="text-base font-medium text-foreground mb-4">
-            Close more deals with AI-powered sales intelligence
+          <p className="text-xs font-medium text-foreground">
+            Close more deals with AI-powered intelligence
           </p>
         </div>
       </div>
