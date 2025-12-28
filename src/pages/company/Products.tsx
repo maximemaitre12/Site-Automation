@@ -16,11 +16,10 @@ const products = [
     color: "from-blue-500 to-cyan-400",
     features: [
       "Visual drag-and-drop builder",
-      "100+ pre-built integrations",
+      "Growing integrations library",
       "AI-powered decision making",
       "Real-time execution monitoring"
-    ],
-    stats: { metric: "10x", label: "faster automation" }
+    ]
   },
   {
     id: "doc",
@@ -34,8 +33,7 @@ const products = [
       "AI document classification",
       "Automatic data extraction",
       "Version control & collaboration"
-    ],
-    stats: { metric: "95%", label: "accuracy rate" }
+    ]
   },
   {
     id: "sales",
@@ -49,8 +47,7 @@ const products = [
       "Call transcription & analysis",
       "Pipeline intelligence",
       "Negotiation assistance"
-    ],
-    stats: { metric: "40%", label: "more conversions" }
+    ]
   },
   {
     id: "hr",
@@ -64,8 +61,7 @@ const products = [
       "Interview scheduling",
       "Employee management",
       "Performance analytics"
-    ],
-    stats: { metric: "60%", label: "time saved" }
+    ]
   },
   {
     id: "support",
@@ -79,8 +75,7 @@ const products = [
       "Smart routing",
       "Response suggestions",
       "Sentiment analysis"
-    ],
-    stats: { metric: "3x", label: "faster resolution" }
+    ]
   },
   {
     id: "brain",
@@ -94,8 +89,7 @@ const products = [
       "Document Q&A",
       "Content generation",
       "Knowledge base search"
-    ],
-    stats: { metric: "24/7", label: "availability" }
+    ]
   },
   {
     id: "compliance",
@@ -109,8 +103,7 @@ const products = [
       "Policy monitoring",
       "Risk detection",
       "Automated reports"
-    ],
-    stats: { metric: "99%", label: "compliance rate" }
+    ]
   },
   {
     id: "data",
@@ -124,8 +117,7 @@ const products = [
       "Quality monitoring",
       "Anomaly detection",
       "Predictive analytics"
-    ],
-    stats: { metric: "5x", label: "faster insights" }
+    ]
   }
 ];
 
@@ -206,14 +198,8 @@ export default function Products() {
                     ))}
                   </ul>
                   
-                  {/* Stats */}
-                  <div className="flex items-center justify-between pt-6 border-t border-border">
-                    <div>
-                      <span className={`text-2xl font-bold bg-gradient-to-r ${product.color} bg-clip-text text-transparent`}>
-                        {product.stats.metric}
-                      </span>
-                      <span className="text-sm text-muted-foreground ml-2">{product.stats.label}</span>
-                    </div>
+                  {/* Link */}
+                  <div className="pt-6 border-t border-border">
                     <Link 
                       to={`/tools/${product.id}`}
                       className="flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
@@ -279,7 +265,7 @@ export default function Products() {
               Ready to Transform Your Business?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Join hundreds of enterprises already using AETHER to automate their operations.
+              Discover how AETHER can automate your operations.
             </p>
             <div className="flex justify-center gap-4">
               <Link to="/demo" className="px-8 py-4 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/25">
