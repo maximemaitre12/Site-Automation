@@ -3,20 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Zap, ArrowRight, Loader2, ArrowLeft, Sparkles } from 'lucide-react';
+import { Check, Zap, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import aetherLogo from '@/assets/aether-new-logo.jpeg';
+import { LandingHeader } from '@/components/landing/LandingHeader';
 
 export default function SelectPlan() {
   const navigate = useNavigate();
   const { session } = useAuth();
   const [loading, setLoading] = useState(false);
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
 
   const handleStartTrial = async () => {
     if (!session) {
@@ -67,26 +63,10 @@ export default function SelectPlan() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="border-b border-border bg-card/50">
-        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img 
-              src={aetherLogo} 
-              alt="AETHER Logo" 
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-cover"
-            />
-            <span className="text-lg sm:text-xl font-bold text-foreground">AETHER</span>
-          </div>
-          <Button variant="ghost" onClick={handleGoBack} className="gap-2 text-sm">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Back</span>
-          </Button>
-        </div>
-      </div>
+      <LandingHeader />
 
-      {/* Content */}
-      <div className="flex-1 container mx-auto px-4 py-6 sm:py-12 flex items-center justify-center">
+      {/* Content - with padding for fixed header */}
+      <div className="flex-1 container mx-auto px-4 pt-20 pb-12 flex items-center justify-center">
         <div className="w-full max-w-lg">
           <div className="text-center mb-6 sm:mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
