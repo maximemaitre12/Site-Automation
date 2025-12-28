@@ -239,25 +239,6 @@ export default function About() {
             </div>
           </div>
         </section>
-
-        {/* CTA */}
-        <section className="py-20 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <Rocket className="w-12 h-12 text-primary mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-foreground mb-4">Join Our Journey</h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              We're building the future of enterprise automation. Want to be part of the adventure?
-            </p>
-            <div className="flex justify-center gap-4">
-              <a href="/careers" className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-                View Careers
-              </a>
-              <a href="/contact" className="px-6 py-3 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors">
-                Contact Us
-              </a>
-            </div>
-          </div>
-        </section>
       </main>
 
       <LandingFooter />
