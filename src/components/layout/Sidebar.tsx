@@ -104,12 +104,12 @@ export function Sidebar() {
                   isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                 )} />
                 {!collapsed && (
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-medium truncate">{tool.name}</span>
-                    {tool.description && (
-                      <span className="text-xs text-muted-foreground truncate">{tool.description}</span>
-                    )}
-                  </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs sm:text-sm font-medium leading-tight whitespace-normal break-words">{tool.name}</span>
+                      {tool.description && (
+                        <span className="text-[11px] sm:text-xs text-muted-foreground leading-tight whitespace-normal break-words">{tool.description}</span>
+                      )}
+                    </div>
                 )}
               </NavLink>
             );
@@ -140,7 +140,7 @@ export function Sidebar() {
                     isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                   )} />
                   {!collapsed && (
-                    <span className="text-sm font-medium truncate">{item.name}</span>
+                    <span className="text-xs sm:text-sm font-medium leading-tight whitespace-normal break-words">{item.name}</span>
                   )}
                 </NavLink>
               );
@@ -152,7 +152,7 @@ export function Sidebar() {
       {/* User section */}
       <div className="p-2 border-t border-sidebar-border space-y-2 relative z-50">
         {user && !collapsed && (
-          <div className="px-3 py-2 text-xs text-muted-foreground truncate">
+          <div className="px-3 py-2 text-[11px] sm:text-xs text-muted-foreground whitespace-normal break-words">
             {user.email}
           </div>
         )}

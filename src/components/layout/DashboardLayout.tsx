@@ -144,9 +144,9 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
                   <div className="flex flex-col min-w-0">
-                    <span className="font-medium text-sm truncate">{item.label}</span>
+                    <span className="font-medium text-xs sm:text-sm leading-tight whitespace-normal break-words">{item.label}</span>
                     {item.description && (
-                      <span className="text-xs text-muted-foreground truncate">{item.description}</span>
+                      <span className="text-[11px] sm:text-xs text-muted-foreground leading-tight whitespace-normal break-words">{item.description}</span>
                     )}
                   </div>
                 </Link>
@@ -172,7 +172,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
                   )}
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
-                  <span className="font-medium text-sm truncate">{item.label}</span>
+                  <span className="font-medium text-xs sm:text-sm leading-tight whitespace-normal break-words">{item.label}</span>
                 </Link>
               ))}
 
