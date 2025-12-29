@@ -1,7 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Sparkles, AlertCircle, CheckCircle, Clock } from "lucide-react";
-import agentSupportLogo from "@/assets/agent-support.png";
+import { MessageSquare as SupportIcon } from "lucide-react";
 
 const tickets = [
   { id: "#4521", subject: "Login issues after update", category: "Bug", priority: "high", status: "open", time: "5 min ago" },
@@ -24,8 +24,8 @@ export default function Support() {
         <header className="px-3 md:px-8 py-3 md:py-6 border-b border-border shrink-0">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 md:gap-3 min-w-0">
-              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-support/10 border border-agent-support/20 flex items-center justify-center overflow-hidden shrink-0">
-                <img src={agentSupportLogo} alt="Support" className="w-full h-full object-cover" />
+              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-support/10 border border-agent-support/20 flex items-center justify-center shrink-0">
+                <SupportIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-support" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight whitespace-normal break-words">Support Copilot</h1>

@@ -15,7 +15,7 @@ import { useState } from "react";
 import { useCompliance, Audit } from "@/hooks/useCompliance";
 import { ReportDialog } from "@/components/compliance/ReportDialog";
 import { cn } from "@/lib/utils";
-import agentComplianceLogo from "@/assets/agent-compliance.png";
+import { ShieldCheck } from "lucide-react";
 
 const auditTypes = [
   { 
@@ -114,8 +114,8 @@ export default function Compliance() {
         {/* Header compact */}
         <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 shrink-0">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center overflow-hidden shrink-0">
-              <img src={agentComplianceLogo} alt="Compliance" className="w-full h-full object-cover" />
+            <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-compliance/10 border border-agent-compliance/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-agent-compliance" />
             </div>
             <div className="min-w-0">
               <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Compliance</h1>
