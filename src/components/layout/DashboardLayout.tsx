@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Menu, X, Database, Workflow, FileText, TrendingUp, Users, Brain, Shield, Settings, LogOut, LayoutDashboard, Plug } from "lucide-react";
+import { Menu, X, Database, Workflow, FileText, BarChart3, Users, MessageSquare, ShieldCheck, Settings, LogOut, LayoutDashboard, Plug } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AetherLogo } from "@/components/ui/aether-logo";
@@ -27,6 +27,7 @@ const menuItems = [
     description: "Workflow Orchestrator",
     path: "/tools/flow",
     icon: Workflow,
+    colorClass: "text-agent-flow",
   },
   {
     label: "AETHER Doc",
@@ -38,25 +39,36 @@ const menuItems = [
     label: "Sales Copilot",
     description: "Sales Assistant",
     path: "/tools/sales",
-    icon: TrendingUp,
+    icon: BarChart3,
+    colorClass: "text-agent-sales",
   },
   {
     label: "HR Copilot",
     description: "HR Assistant",
     path: "/tools/hr",
     icon: Users,
+    colorClass: "text-agent-hr",
   },
   {
     label: "Brain",
     description: "Internal Assistant",
     path: "/tools/brain",
-    icon: Brain,
+    icon: Database,
+    colorClass: "text-agent-brain",
+  },
+  {
+    label: "Support",
+    description: "Customer Support",
+    path: "/tools/support",
+    icon: MessageSquare,
+    colorClass: "text-agent-support",
   },
   {
     label: "Compliance",
     description: "Audit & Compliance",
     path: "/tools/compliance",
-    icon: Shield,
+    icon: ShieldCheck,
+    colorClass: "text-agent-compliance",
   },
 ];
 
@@ -102,8 +114,8 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
 
             {/* Logo - Center */}
             <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-              <AetherLogo size="sm" className="sm:hidden" />
-              <AetherLogo size="md" className="hidden sm:block" />
+              <AetherLogo size="md" className="sm:hidden" />
+              <AetherLogo size="lg" className="hidden sm:block" />
             </Link>
 
             {/* Header Actions - Right side */}

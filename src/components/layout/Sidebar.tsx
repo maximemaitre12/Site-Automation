@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 import {
   Workflow,
   FileText,
-  TrendingUp,
-  Users,
   BarChart3,
-  Brain,
-  Shield,
+  Users,
+  MessageSquare,
+  Database,
+  ShieldCheck,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
@@ -26,13 +26,14 @@ import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "AETHER Data", path: "/tools/data", icon: BarChart3, description: "Data Platform" },
-  { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator" },
+  { name: "AETHER Data", path: "/tools/data", icon: Database, description: "Data Platform" },
+  { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator", colorClass: "text-agent-flow" },
   { name: "AETHER Doc", path: "/tools/doc", icon: FileText, description: "Document Management" },
-  { name: "Sales Copilot", path: "/tools/sales", icon: TrendingUp, description: "Sales Assistant" },
-  { name: "HR Copilot", path: "/tools/hr", icon: Users, description: "HR Assistant" },
-  { name: "Brain", path: "/tools/brain", icon: Brain, description: "Internal Assistant" },
-  { name: "Compliance", path: "/tools/compliance", icon: Shield, description: "Audit & Compliance" },
+  { name: "Sales Copilot", path: "/tools/sales", icon: BarChart3, description: "Sales Assistant", colorClass: "text-agent-sales" },
+  { name: "HR Copilot", path: "/tools/hr", icon: Users, description: "HR Assistant", colorClass: "text-agent-hr" },
+  { name: "Brain", path: "/tools/brain", icon: Database, description: "Internal Assistant", colorClass: "text-agent-brain" },
+  { name: "Support", path: "/tools/support", icon: MessageSquare, description: "Customer Support", colorClass: "text-agent-support" },
+  { name: "Compliance", path: "/tools/compliance", icon: ShieldCheck, description: "Audit & Compliance", colorClass: "text-agent-compliance" },
 ];
 
 const settingsLinks = [
