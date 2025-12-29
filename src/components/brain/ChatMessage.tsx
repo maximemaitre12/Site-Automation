@@ -1,9 +1,11 @@
-import { Brain, User, Copy, Check, File, Download, Sparkles } from "lucide-react";
+import { Brain, User, Copy, Check, File, Download, Sparkles, Volume2, Loader2, VolumeX } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Attachment } from "@/lib/ai-stream";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useVoiceAI } from "@/hooks/useVoiceAI";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
@@ -15,6 +17,7 @@ interface ChatMessageProps {
 
 export function ChatMessage({ role, content, timestamp, attachments, isStreaming }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
+  const { speak, stop, isPlaying, isLoading } = useVoiceAI();
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(content.replace(/\[IMAGE_GENERATED\].*?\[\/IMAGE_GENERATED\]/g, ''));
@@ -221,20 +224,56 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             </div>
           )}
           
-          {/* Copy Button for Assistant */}
-          {role === 'assistant' && !isStreaming && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 hover:bg-muted"
-              onClick={copyToClipboard}
-            >
-              {copied ? (
-                <Check className="w-4 h-4 text-green-500" />
-              ) : (
-                <Copy className="w-4 h-4 text-muted-foreground" />
-              )}
-            </Button>
+          {/* Action Buttons for Assistant */}
+          {role === 'assistant' && !isStreaming && textContent && (
+            <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-muted"
+                      onClick={() => isPlaying ? stop() : speak(textContent)}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-violet-500" />
+                      ) : isPlaying ? (
+                        <VolumeX className="w-4 h-4 text-violet-500" />
+                      ) : (
+                        <Volume2 className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isPlaying ? 'Arrêter' : 'Écouter'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-muted"
+                      onClick={copyToClipboard}
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{copied ? 'Copié !' : 'Copier'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           )}
         </div>
         
