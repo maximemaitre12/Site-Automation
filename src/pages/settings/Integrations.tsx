@@ -42,7 +42,7 @@ const integrations: Integration[] = [
     description: 'Voix IA ultra-réalistes pour conversations, synthèse vocale et agents vocaux',
     icon: Mic,
     category: 'ai',
-    status: 'disconnected',
+    status: 'connected',
     color: 'from-violet-500 to-purple-500',
     features: ['Text-to-Speech', 'Agents vocaux', 'Clonage de voix', 'Transcription'],
     docsUrl: 'https://elevenlabs.io/docs'
@@ -53,7 +53,7 @@ const integrations: Integration[] = [
     description: 'Scraping web intelligent et extraction de données structurées',
     icon: FileSearch,
     category: 'ai',
-    status: 'disconnected',
+    status: 'connected',
     color: 'from-orange-500 to-red-500',
     features: ['Scraping de sites', 'Extraction de données', 'Recherche web', 'Enrichissement'],
     docsUrl: 'https://firecrawl.dev/docs'
@@ -64,7 +64,7 @@ const integrations: Integration[] = [
     description: 'Recherche IA avancée avec sources vérifiées et réponses en temps réel',
     icon: Search,
     category: 'ai',
-    status: 'disconnected',
+    status: 'connected',
     color: 'from-cyan-500 to-blue-500',
     features: ['Recherche en temps réel', 'Sources vérifiées', 'Réponses contextuelles', 'API de recherche'],
     docsUrl: 'https://docs.perplexity.ai'
