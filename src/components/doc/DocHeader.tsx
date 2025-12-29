@@ -34,14 +34,16 @@ export function DocHeader({
   return (
     <div className="border-b border-border bg-background">
       {/* Breadcrumbs */}
-      <div className="px-6 py-3 flex items-center gap-1 text-sm">
+      <div className="px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs sm:text-sm">
         {breadcrumbs.map((crumb, index) => (
-          <div key={crumb.id || 'root'} className="flex items-center gap-1">
-            {index > 0 && <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+          <div key={crumb.id || 'root'} className="flex items-center gap-1 min-w-0">
+            {index > 0 && (
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            )}
             <button
               onClick={() => onBreadcrumbClick(crumb.id)}
               className={cn(
-                "hover:text-primary transition-colors",
+                "min-w-0 text-left whitespace-normal break-words hover:text-primary transition-colors",
                 index === breadcrumbs.length - 1
                   ? "text-foreground font-medium"
                   : "text-muted-foreground"
@@ -54,9 +56,9 @@ export function DocHeader({
       </div>
 
       {/* Actions bar */}
-      <div className="px-6 py-3 flex items-center justify-between gap-4">
+      <div className="px-3 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         {/* Search */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative w-full sm:flex-1 sm:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Rechercher dans les documents..."
@@ -66,13 +68,13 @@ export function DocHeader({
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           {/* View toggle */}
-          <div className="flex items-center border border-border rounded-lg p-1">
+          <div className="flex items-center border border-border rounded-lg p-1 shrink-0">
             <Button
               variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9 sm:h-8 sm:w-8"
               onClick={() => onViewModeChange('grid')}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -80,7 +82,7 @@ export function DocHeader({
             <Button
               variant={viewMode === 'list' ? 'secondary' : 'ghost'}
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9 sm:h-8 sm:w-8"
               onClick={() => onViewModeChange('list')}
             >
               <List className="w-4 h-4" />
@@ -88,12 +90,22 @@ export function DocHeader({
           </div>
 
           {/* Actions */}
-          <Button variant="outline" onClick={onUploadClick}>
-            <Upload className="w-4 h-4 mr-2" />
-            Importer
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onUploadClick}
+            className="flex-1 sm:flex-none justify-center text-xs sm:text-sm"
+          >
+            <Upload className="w-4 h-4 sm:mr-2" />
+            <span className="sm:hidden">Import</span>
+            <span className="hidden sm:inline">Importer</span>
           </Button>
-          <Button onClick={onGenerateClick}>
-            <Wand2 className="w-4 h-4 mr-2" />
+          <Button
+            size="sm"
+            onClick={onGenerateClick}
+            className="flex-1 sm:flex-none justify-center text-xs sm:text-sm"
+          >
+            <Wand2 className="w-4 h-4 sm:mr-2" />
             Générer
           </Button>
         </div>
