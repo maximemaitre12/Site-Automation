@@ -33,7 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { EmailInbox } from "@/components/hr/email/EmailInbox";
 import { EmailAccountConnect } from "@/components/hr/email/EmailAccountConnect";
 import { useHREmails } from "@/hooks/useHREmails";
-import agentHrLogo from "@/assets/agent-hr.png";
+import { Users as UsersIcon } from "lucide-react";
 
 export default function HR() {
   const { 
@@ -185,8 +185,8 @@ export default function HR() {
               >
                 {showMobileSidebar ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
               </button>
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-400 flex items-center justify-center overflow-hidden shrink-0">
-                <img src={agentHrLogo} alt="HR" className="w-full h-full object-cover" />
+              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-hr/10 border border-agent-hr/20 flex items-center justify-center shrink-0">
+                <UsersIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-hr" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-base md:text-lg font-bold text-foreground truncate">HR Copilot</h1>

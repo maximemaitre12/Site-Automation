@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { Attachment } from "@/lib/ai-stream";
 import { useToast } from "@/hooks/use-toast";
 import { AetherDocument } from "@/hooks/useBrain";
-import agentBrainLogo from "@/assets/agent-brain.png";
+import { Database } from "lucide-react";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -254,7 +254,7 @@ export default function BrainPage() {
       <div className="h-full flex flex-col md:flex-row relative overflow-hidden">
         {/* Mobile toggle button */}
         <button
-          className="md:hidden fixed bottom-20 right-4 z-50 w-12 h-12 rounded-full bg-[hsl(var(--agent-brain))] text-white shadow-lg flex items-center justify-center"
+          className="md:hidden fixed bottom-20 right-4 z-50 w-12 h-12 rounded-full bg-agent-brain text-white shadow-lg flex items-center justify-center"
           onClick={() => setShowMobileSidebar(!showMobileSidebar)}
         >
           {showMobileSidebar ? <X className="w-5 h-5" /> : <MessageSquarePlus className="w-5 h-5" />}
@@ -266,7 +266,7 @@ export default function BrainPage() {
           "fixed md:relative inset-0 z-40 md:z-auto",
           showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}>
-          <Button variant="default" className="w-full mb-4 bg-[hsl(var(--agent-brain))] hover:bg-[hsl(var(--agent-brain))]/90" onClick={() => { handleNewChat(); setShowMobileSidebar(false); }}>
+          <Button variant="default" className="w-full mb-4 bg-agent-brain hover:bg-agent-brain/90" onClick={() => { handleNewChat(); setShowMobileSidebar(false); }}>
             <MessageSquarePlus className="w-4 h-4 mr-2" />
             Nouvelle conversation
           </Button>
@@ -399,8 +399,8 @@ export default function BrainPage() {
           <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2 md:gap-4 min-w-0">
               <h1 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 md:gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center overflow-hidden shrink-0">
-                  <img src={agentBrainLogo} alt="Brain" className="w-full h-full object-cover" />
+                <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center shrink-0">
+                  <Database className="w-5 h-5 md:w-6 md:h-6 text-agent-brain" />
                 </div>
                 <span className="hidden sm:inline">AETHER Brain</span>
               </h1>
@@ -409,8 +409,8 @@ export default function BrainPage() {
                 <div className="hidden md:flex items-center gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[hsl(var(--agent-brain))]/10 text-[hsl(var(--agent-brain))]">
-                        <Database className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-agent-brain/10 text-agent-brain">
+                        <DatabaseIcon className="w-3.5 h-3.5" />
                         <span className="text-xs font-medium">{documents.length} docs</span>
                       </div>
                     </TooltipTrigger>
@@ -479,8 +479,8 @@ export default function BrainPage() {
           <ScrollArea className="flex-1 px-3 md:px-6 py-4">
             {!currentConversation && conversations.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center mb-4 overflow-hidden">
-                  <img src={agentBrainLogo} alt="Brain" className="w-full h-full object-cover" />
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center mb-4">
+                  <Database className="w-8 h-8 md:w-10 md:h-10 text-agent-brain" />
                 </div>
                 <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">Bienvenue sur AETHER Brain</h2>
                 <p className="text-muted-foreground max-w-md text-sm md:text-base">
@@ -488,7 +488,7 @@ export default function BrainPage() {
                 </p>
                 <div className="flex flex-wrap justify-center gap-2 mt-6">
                   {['💬 Chat', '🖼️ Images', '📊 Charts', '📄 Documents'].map(tag => (
-                    <span key={tag} className="px-3 py-1.5 rounded-full bg-[hsl(var(--agent-brain))]/10 text-[hsl(var(--agent-brain))] text-xs md:text-sm font-medium">
+                    <span key={tag} className="px-3 py-1.5 rounded-full bg-agent-brain/10 text-agent-brain text-xs md:text-sm font-medium">
                       {tag}
                     </span>
                   ))}
@@ -496,8 +496,8 @@ export default function BrainPage() {
               </div>
             ) : !currentConversation ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-400 flex items-center justify-center mb-4 overflow-hidden">
-                  <img src={agentBrainLogo} alt="Brain" className="w-full h-full object-cover" />
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center mb-4">
+                  <Database className="w-8 h-8 md:w-10 md:h-10 text-agent-brain" />
                 </div>
                 <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">Nouvelle conversation</h2>
                 <p className="text-muted-foreground text-sm md:text-base">Commencez à discuter ou sélectionnez une conversation.</p>

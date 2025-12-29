@@ -20,7 +20,7 @@ import { DealSelector } from "@/components/sales/DealSelector";
 import { NegotiationSheetGenerator } from "@/components/sales/NegotiationSheetGenerator";
 import { useToast } from "@/hooks/use-toast";
 import { SalesDeal } from "@/hooks/useAIIntelligence";
-import agentSalesLogo from "@/assets/agent-sales.png";
+import { BarChart3 as SalesIcon } from "lucide-react";
 
 export default function Sales() {
   const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email" | "negotiation">("pipeline");
@@ -146,8 +146,8 @@ export default function Sales() {
         <header className="px-3 md:px-8 py-3 md:py-6 border-b border-border shrink-0">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 md:gap-3 min-w-0">
-              <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-400 flex items-center justify-center overflow-hidden shrink-0">
-                <img src={agentSalesLogo} alt="Sales" className="w-full h-full object-cover" />
+              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-sales/10 border border-agent-sales/20 flex items-center justify-center shrink-0">
+                <SalesIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-sales" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">Sales Copilot</h1>
