@@ -232,7 +232,7 @@ export default function Dashboard() {
       description: "Visual automation",
       icon: Workflow,
       colorClass: "text-agent-flow",
-      color: "from-blue-500 to-cyan-400",
+      badgeClass: "bg-agent-flow/10 border-agent-flow/20",
       path: "/tools/flow",
       stats: { active: stats.activeWorkflows, runs: stats.totalWorkflowRuns },
     },
@@ -241,7 +241,7 @@ export default function Dashboard() {
       description: "AI sales assistant",
       icon: BarChart3,
       colorClass: "text-agent-sales",
-      color: "from-cyan-500 to-teal-400",
+      badgeClass: "bg-agent-sales/10 border-agent-sales/20",
       path: "/tools/sales",
       stats: { active: stats.totalProposals, runs: stats.totalCallAnalyses },
     },
@@ -250,7 +250,7 @@ export default function Dashboard() {
       description: "HR assistant",
       icon: Users,
       colorClass: "text-agent-hr",
-      color: "from-pink-500 to-rose-400",
+      badgeClass: "bg-agent-hr/10 border-agent-hr/20",
       path: "/tools/hr",
       stats: { active: jobs?.length || 0, runs: stats.totalCandidates },
     },
@@ -259,7 +259,7 @@ export default function Dashboard() {
       description: "AI support",
       icon: MessageSquare,
       colorClass: "text-agent-support",
-      color: "from-emerald-500 to-green-400",
+      badgeClass: "bg-agent-support/10 border-agent-support/20",
       path: "/tools/support",
       stats: { active: stats.totalTickets - stats.resolvedTickets, runs: stats.totalTickets },
     },
@@ -268,7 +268,7 @@ export default function Dashboard() {
       description: "Internal assistant",
       icon: Database,
       colorClass: "text-agent-brain",
-      color: "from-violet-500 to-purple-400",
+      badgeClass: "bg-agent-brain/10 border-agent-brain/20",
       path: "/tools/brain",
       stats: { active: brainDocs?.length || 0, runs: stats.totalConversations },
     },
@@ -277,7 +277,7 @@ export default function Dashboard() {
       description: "Audit & compliance",
       icon: ShieldCheck,
       colorClass: "text-agent-compliance",
-      color: "from-orange-500 to-amber-400",
+      badgeClass: "bg-agent-compliance/10 border-agent-compliance/20",
       path: "/tools/compliance",
       stats: { active: audits?.length || 0, runs: audits?.length || 0 },
     },
@@ -560,29 +560,31 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h2 className="text-base md:text-lg font-semibold text-foreground">Your tools</h2>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
-              {tools.map((tool, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+              {tools.map((tool) => (
                 <Link
                   key={tool.name}
                   to={tool.path}
-                  className="group p-3 md:p-4 rounded-lg md:rounded-xl bg-card/50 border border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg"
+                  className="group p-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/60 hover:bg-card/70 hover:border-primary/30 transition-all duration-300 hover:shadow-lg"
                 >
-                  <div className="flex items-start gap-2 md:gap-3 mb-2 md:mb-3">
-                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0`}>
-                      <tool.icon className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                  <div className="flex items-start gap-3">
+                    <div className={`w-11 h-11 rounded-2xl border ${tool.badgeClass} flex items-center justify-center shrink-0`}>
+                      <tool.icon className={`w-5 h-5 ${tool.colorClass}`} />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-xs md:text-sm font-semibold text-foreground truncate">{tool.name}</h3>
-                      <p className="text-[10px] md:text-xs text-muted-foreground hidden sm:block">{tool.description}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-base font-semibold text-foreground leading-snug whitespace-normal break-words">
+                        {tool.name}
+                      </h3>
+                      <p className="mt-0.5 text-xs text-muted-foreground leading-snug whitespace-normal break-words">
+                        {tool.description}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] md:text-xs">
+                  <div className="mt-3 flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">
                       {tool.stats.active} actif{tool.stats.active > 1 ? 's' : ''}
                     </span>
-                    <span className="text-primary font-medium">
-                      {tool.stats.runs} exec.
-                    </span>
+                    <span className="text-primary font-medium">{tool.stats.runs} exec.</span>
                   </div>
                 </Link>
               ))}
