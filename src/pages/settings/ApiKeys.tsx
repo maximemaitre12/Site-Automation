@@ -233,47 +233,47 @@ export default function ApiKeys() {
 
   return (
     <DashboardLayout>
-      <div className="container max-w-3xl mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Key className="w-6 h-6" />
+      <div className="max-w-3xl mx-auto py-4 sm:py-6 lg:py-8 px-3 sm:px-4 lg:px-6">
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold flex items-center gap-2">
+            <Key className="w-5 h-5 sm:w-6 sm:h-6" />
             Clés API
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Gérez vos clés API pour activer les fonctionnalités avancées
+          <p className="text-sm text-muted-foreground mt-1">
+            Gérez vos clés API pour les fonctionnalités avancées
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
           {API_SERVICES.map(service => (
             <Card key={service.name}>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-sm sm:text-lg flex items-center gap-2 flex-wrap">
                   <span>{service.icon}</span>
-                  {service.label}
+                  <span className="truncate">{service.label}</span>
                   {savedKeys[service.name] && (
-                    <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full">Configuré</span>
+                    <span className="text-[10px] sm:text-xs bg-green-500/20 text-green-600 px-1.5 sm:px-2 py-0.5 rounded-full shrink-0">Configuré</span>
                   )}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   {service.description}
                   {service.helpUrl && (
                     <a 
                       href={service.helpUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="ml-2 text-primary hover:underline"
+                      className="block sm:inline sm:ml-2 text-primary hover:underline mt-1 sm:mt-0"
                     >
                       Obtenir une clé →
                     </a>
                   )}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="pt-0">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor={`key-${service.name}`}>Clé API</Label>
-                    <div className="flex gap-2">
+                    <Label htmlFor={`key-${service.name}`} className="text-xs sm:text-sm">Clé API</Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <div className="relative flex-1">
                         <Input
                           id={`key-${service.name}`}
@@ -281,38 +281,44 @@ export default function ApiKeys() {
                           placeholder={service.placeholder}
                           value={keys[service.name] || ''}
                           onChange={(e) => setKeys(prev => ({ ...prev, [service.name]: e.target.value }))}
-                          className="pr-10"
+                          className="pr-10 h-9 sm:h-10 text-sm"
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3"
+                          className="absolute right-0 top-0 h-full px-2 sm:px-3"
                           onClick={() => setShowKeys(prev => ({ ...prev, [service.name]: !prev[service.name] }))}
                         >
                           {showKeys[service.name] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </Button>
                       </div>
-                      <Button
-                        onClick={() => handleSaveKey(service.name)}
-                        disabled={saving[service.name] || !keys[service.name]?.trim()}
-                      >
-                        <Save className="w-4 h-4 mr-2" />
-                        {saving[service.name] ? 'Sauvegarde...' : 'Sauvegarder'}
-                      </Button>
-                      {savedKeys[service.name] && (
+                      <div className="flex gap-2">
                         <Button
-                          variant="destructive"
-                          onClick={() => handleDeleteKey(service.name)}
+                          onClick={() => handleSaveKey(service.name)}
+                          disabled={saving[service.name] || !keys[service.name]?.trim()}
+                          size="sm"
+                          className="flex-1 sm:flex-none h-9 sm:h-10"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Save className="w-4 h-4 sm:mr-2" />
+                          <span className="hidden sm:inline">{saving[service.name] ? 'Sauvegarde...' : 'Sauvegarder'}</span>
                         </Button>
-                      )}
+                        {savedKeys[service.name] && (
+                          <Button
+                            variant="destructive"
+                            onClick={() => handleDeleteKey(service.name)}
+                            size="sm"
+                            className="h-9 sm:h-10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                   {savedKeys[service.name] && (
-                    <p className="text-sm text-muted-foreground">
-                      ✓ Clé configurée le {new Date(savedKeys[service.name].updated_at).toLocaleDateString('fr-FR')}
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      ✓ Configuré le {new Date(savedKeys[service.name].updated_at).toLocaleDateString('fr-FR')}
                     </p>
                   )}
                 </div>

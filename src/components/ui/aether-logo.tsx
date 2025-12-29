@@ -1,0 +1,24 @@
+import { cn } from "@/lib/utils";
+import aetherLogo from "@/assets/aether-new-logo.jpeg";
+
+interface AetherLogoProps {
+  size?: 'xs' | 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+const sizeClasses = {
+  xs: 'h-6 w-auto',
+  sm: 'h-8 w-auto',
+  md: 'h-10 w-auto',
+  lg: 'h-12 w-auto',
+};
+
+export function AetherLogo({ size = 'md', className }: AetherLogoProps) {
+  return (
+    <img 
+      src={aetherLogo} 
+      alt="AETHER" 
+      className={cn(sizeClasses[size], 'object-contain', className)} 
+    />
+  );
+}

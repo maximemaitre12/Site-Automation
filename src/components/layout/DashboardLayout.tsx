@@ -1,9 +1,9 @@
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Menu, X, Database, Workflow, FileText, TrendingUp, Users, Brain, Shield, Settings, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Database, Workflow, FileText, TrendingUp, Users, Brain, Shield, Settings, LogOut, LayoutDashboard, Plug } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import aetherLogo from "@/assets/aether-new-logo.jpeg";
+import { AetherLogo } from "@/components/ui/aether-logo";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -66,6 +66,11 @@ const settingsItems = [
     path: "/settings/company",
     icon: Settings,
   },
+  {
+    label: "Intégrations",
+    path: "/settings/integrations",
+    icon: Plug,
+  },
 ];
 
 export function DashboardLayout({ children, headerActions }: DashboardLayoutProps) {
@@ -85,11 +90,11 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14">
+        <div className="px-3 sm:px-4 md:px-6">
+          <div className="flex items-center justify-between h-12 sm:h-14">
             {/* Menu Button - Left side */}
             <button
-              className="p-2 rounded-lg hover:bg-muted/50 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg hover:bg-muted/50 transition-colors shrink-0"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -97,11 +102,12 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
 
             {/* Logo - Center */}
             <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-              <img src={aetherLogo} alt="Aether" className="h-14 w-auto" />
+              <AetherLogo size="sm" className="sm:hidden" />
+              <AetherLogo size="md" className="hidden sm:block" />
             </Link>
 
             {/* Header Actions - Right side */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 shrink-0 max-w-[40%] overflow-hidden">
               {headerActions}
             </div>
           </div>
@@ -109,8 +115,8 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl animate-fade-in max-h-[calc(100vh-3.5rem)] overflow-y-auto">
-            <nav className="p-4 space-y-1">
+          <div className="absolute top-12 sm:top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl animate-fade-in max-h-[calc(100vh-3rem)] sm:max-h-[calc(100vh-3.5rem)] overflow-y-auto">
+            <nav className="p-3 sm:p-4 space-y-1">
               {/* Main Menu Items */}
               {menuItems.map((item) => (
                 <Link
@@ -118,27 +124,27 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 py-3 px-4 rounded-lg transition-colors",
+                    "flex items-center gap-3 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg transition-colors",
                     isActive(item.path)
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="font-medium text-sm">{item.label}</span>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-medium text-sm truncate">{item.label}</span>
                     {item.description && (
-                      <span className="text-xs text-muted-foreground">{item.description}</span>
+                      <span className="text-xs text-muted-foreground truncate">{item.description}</span>
                     )}
                   </div>
                 </Link>
               ))}
 
               {/* Separator */}
-              <div className="border-t border-border my-3" />
+              <div className="border-t border-border my-2 sm:my-3" />
 
               {/* Settings Section */}
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-2">
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 sm:px-4 py-2">
                 Settings
               </div>
               {settingsItems.map((item) => (
@@ -147,14 +153,14 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 py-3 px-4 rounded-lg transition-colors",
+                    "flex items-center gap-3 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg transition-colors",
                     isActive(item.path)
                       ? "bg-primary/10 text-primary"
                       : "text-foreground hover:bg-muted"
                   )}
                 >
                   <item.icon className="w-5 h-5 shrink-0" />
-                  <span className="font-medium text-sm">{item.label}</span>
+                  <span className="font-medium text-sm truncate">{item.label}</span>
                 </Link>
               ))}
 
@@ -164,7 +170,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
                   setIsMenuOpen(false);
                   handleSignOut();
                 }}
-                className="flex items-center gap-3 py-3 px-4 rounded-lg transition-colors text-destructive hover:bg-destructive/10 w-full"
+                className="flex items-center gap-3 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg transition-colors text-destructive hover:bg-destructive/10 w-full"
               >
                 <LogOut className="w-5 h-5 shrink-0" />
                 <span className="font-medium text-sm">Sign out</span>
@@ -175,7 +181,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
       </header>
 
       {/* Main Content */}
-      <main className="pt-14 min-h-screen">
+      <main className="pt-12 sm:pt-14 min-h-screen">
         {children}
       </main>
 
@@ -183,7 +189,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
       {isMenuOpen && (
         <div
           className="fixed inset-0 bg-black/20 z-40"
-          style={{ top: '3.5rem' }}
+          style={{ top: '3rem' }}
           onClick={() => setIsMenuOpen(false)}
         />
       )}

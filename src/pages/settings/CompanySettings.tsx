@@ -82,9 +82,9 @@ export default function CompanySettings() {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="p-8 space-y-6">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-96 w-full" />
+        <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+          <Skeleton className="h-8 sm:h-10 w-48 sm:w-64" />
+          <Skeleton className="h-64 sm:h-96 w-full" />
         </div>
       </DashboardLayout>
     );
@@ -93,11 +93,11 @@ export default function CompanySettings() {
   if (!company) {
     return (
       <DashboardLayout>
-        <div className="p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           <Card className="border-border bg-card">
             <CardHeader>
-              <CardTitle>No Company Found</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-lg sm:text-xl">No Company Found</CardTitle>
+              <CardDescription className="text-sm">
                 You need to create or join a company to access settings.
               </CardDescription>
             </CardHeader>
@@ -111,32 +111,32 @@ export default function CompanySettings() {
 
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-full overflow-hidden">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Company Settings</h1>
-          <p className="text-muted-foreground">
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1 sm:mb-2">Company Settings</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your company, team, and subscription
           </p>
         </div>
 
-        <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="bg-secondary border border-border">
-            <TabsTrigger value="general" className="gap-2">
-              <Building2 className="w-4 h-4" />
-              General
+        <Tabs defaultValue="general" className="space-y-4 sm:space-y-6">
+          <TabsList className="bg-secondary border border-border w-full overflow-x-auto flex justify-start sm:justify-center h-auto p-1">
+            <TabsTrigger value="general" className="gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 shrink-0">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">General</span>
             </TabsTrigger>
-            <TabsTrigger value="team" className="gap-2">
-              <Users className="w-4 h-4" />
-              Team
+            <TabsTrigger value="team" className="gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 shrink-0">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Team</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
-              <Shield className="w-4 h-4" />
-              Security
+            <TabsTrigger value="security" className="gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 shrink-0">
+              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Security</span>
             </TabsTrigger>
-            <TabsTrigger value="billing" className="gap-2">
-              <CreditCard className="w-4 h-4" />
-              Billing
+            <TabsTrigger value="billing" className="gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 shrink-0">
+              <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Billing</span>
             </TabsTrigger>
           </TabsList>
 
@@ -152,26 +152,26 @@ export default function CompanySettings() {
                   Basic company details and branding
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardContent className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="companyName">Company Name</Label>
+                    <Label htmlFor="companyName" className="text-sm">Company Name</Label>
                     <Input
                       id="companyName"
                       value={companyName || company.name}
                       onChange={(e) => setCompanyName(e.target.value)}
                       disabled={!canEdit}
-                      className="bg-secondary border-border"
+                      className="bg-secondary border-border h-9 sm:h-10"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="companySlug">Company Slug</Label>
+                    <Label htmlFor="companySlug" className="text-sm">Company Slug</Label>
                     <Input
                       id="companySlug"
                       value={companySlug || company.slug}
                       onChange={(e) => setCompanySlug(e.target.value)}
                       disabled={!canEdit}
-                      className="bg-secondary border-border"
+                      className="bg-secondary border-border h-9 sm:h-10"
                     />
                   </div>
                 </div>
@@ -198,9 +198,9 @@ export default function CompanySettings() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 pt-4 border-t border-border">
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-4 border-t border-border">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Subscription: <span className="font-medium text-foreground capitalize">{company.subscription_tier}</span>
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -208,9 +208,9 @@ export default function CompanySettings() {
                     </p>
                   </div>
                   {canEdit && (
-                    <Button onClick={handleSaveCompany} disabled={saving}>
+                    <Button onClick={handleSaveCompany} disabled={saving} size="sm" className="w-full sm:w-auto">
                       <Save className="w-4 h-4 mr-2" />
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? 'Saving...' : 'Save'}
                     </Button>
                   )}
                 </div>
@@ -386,22 +386,22 @@ export default function CompanySettings() {
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="font-medium text-foreground">Usage This Month</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                      <p className="text-2xl font-bold text-foreground">
+                <div className="space-y-3 sm:space-y-4">
+                  <h4 className="font-medium text-foreground text-sm sm:text-base">Usage This Month</h4>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 border border-border">
+                      <p className="text-lg sm:text-2xl font-bold text-foreground">
                         {teamMembers.length}/{company.max_users}
                       </p>
-                      <p className="text-sm text-muted-foreground">Team Members</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Team</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                      <p className="text-2xl font-bold text-foreground">0 MB</p>
-                      <p className="text-sm text-muted-foreground">Storage Used</p>
+                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 border border-border">
+                      <p className="text-lg sm:text-2xl font-bold text-foreground">0</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">MB</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                      <p className="text-2xl font-bold text-foreground">0</p>
-                      <p className="text-sm text-muted-foreground">AI Calls</p>
+                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 border border-border">
+                      <p className="text-lg sm:text-2xl font-bold text-foreground">0</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">AI</p>
                     </div>
                   </div>
                 </div>
