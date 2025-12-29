@@ -322,13 +322,9 @@ export function PainPointsSection() {
 
             return (
               <div key={i}>
-                {/* Creative separator between agents */}
+                {/* Simple separator between agents */}
                 {i > 0 && (
-                  <div className="flex items-center gap-3 mb-5 sm:mb-6">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    <div className="w-6 h-px bg-primary/30" />
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                  </div>
+                  <div className="h-px w-full bg-gradient-to-r from-transparent via-border/50 to-transparent mb-5 sm:mb-6" />
                 )}
                 
                 <div
