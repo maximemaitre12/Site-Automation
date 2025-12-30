@@ -396,17 +396,18 @@ export default function BrainPage() {
           onDrop={handleDrop}
         >
           {/* Header */}
-          <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2 md:gap-4 min-w-0">
-              <h1 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2 md:gap-3">
-                <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center shrink-0">
-                  <Database className="w-5 h-5 md:w-6 md:h-6 text-agent-brain" />
-                </div>
-                <span className="hidden sm:inline">AETHER Brain</span>
-              </h1>
+          <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center shrink-0">
+                <Database className="w-5 h-5 md:w-6 md:h-6 text-agent-brain" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Brain</h1>
+                <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Assistant IA multimodal</p>
+              </div>
               
               <TooltipProvider>
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden lg:flex items-center gap-2 ml-4">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-agent-brain/10 text-agent-brain">

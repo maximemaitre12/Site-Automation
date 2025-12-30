@@ -116,14 +116,14 @@ export default function Support() {
     <DashboardLayout>
       <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-3 md:px-8 py-3 md:py-6 border-b border-border shrink-0">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 md:gap-3 min-w-0">
-              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-support/10 border border-agent-support/20 flex items-center justify-center shrink-0">
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-support/10 border border-agent-support/20 flex items-center justify-center shrink-0">
                 <SupportIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-support" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight">Support Copilot</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground">Support Copilot</h1>
                 <p className="text-muted-foreground text-xs md:text-sm hidden md:block">
                   Classification et réponses automatiques IA
                 </p>

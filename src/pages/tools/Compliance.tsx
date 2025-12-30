@@ -112,34 +112,36 @@ export default function Compliance() {
     <DashboardLayout>
       <div className="h-full flex flex-col bg-background overflow-hidden">
         {/* Header compact */}
-        <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 shrink-0">
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-compliance/10 border border-agent-compliance/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-agent-compliance" />
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-compliance/10 border border-agent-compliance/20 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-agent-compliance" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Compliance</h1>
+                <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Audit RGPD automatisé</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Compliance</h1>
-              <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Audit RGPD automatisé</p>
-            </div>
-          </div>
-          
-          {/* Stats mini */}
-          <div className="flex items-center gap-3 md:gap-6">
-            <div className="text-center">
-              <p className="text-lg md:text-2xl font-bold text-foreground">{stats.total}</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground">Audits</p>
-            </div>
-            <div className="h-6 md:h-8 w-px bg-border" />
-            <div className="text-center">
-              <p className={cn("text-lg md:text-2xl font-bold", stats.avgScore >= 70 ? "text-green-500" : "text-yellow-500")}>
-                {stats.avgScore}%
-              </p>
-              <p className="text-[10px] md:text-xs text-muted-foreground">Score</p>
-            </div>
-            <div className="h-6 md:h-8 w-px bg-border" />
-            <div className="text-center">
-              <p className="text-lg md:text-2xl font-bold text-orange-500">{stats.highRiskCount}</p>
-              <p className="text-[10px] md:text-xs text-muted-foreground">Risques</p>
+            
+            {/* Stats mini */}
+            <div className="flex items-center gap-3 md:gap-6">
+              <div className="text-center">
+                <p className="text-lg md:text-xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Audits</p>
+              </div>
+              <div className="h-6 md:h-8 w-px bg-border" />
+              <div className="text-center">
+                <p className={cn("text-lg md:text-xl font-bold", stats.avgScore >= 70 ? "text-green-500" : "text-yellow-500")}>
+                  {stats.avgScore}%
+                </p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Score</p>
+              </div>
+              <div className="h-6 md:h-8 w-px bg-border" />
+              <div className="text-center">
+                <p className="text-lg md:text-xl font-bold text-orange-500">{stats.highRiskCount}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">Risques</p>
+              </div>
             </div>
           </div>
         </header>

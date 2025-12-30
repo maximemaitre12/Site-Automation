@@ -143,14 +143,14 @@ export default function Sales() {
     <DashboardLayout>
       <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-3 md:px-8 py-3 md:py-6 border-b border-border shrink-0">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 md:gap-3 min-w-0">
-              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-sales/10 border border-agent-sales/20 flex items-center justify-center shrink-0">
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-sales/10 border border-agent-sales/20 flex items-center justify-center shrink-0">
                 <SalesIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-sales" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">Sales Copilot</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">Sales Copilot</h1>
                 <p className="text-muted-foreground text-xs md:text-sm hidden md:block">
                   Propositions IA, analyse d'appels, et emails personnalisés
                 </p>
@@ -160,7 +160,7 @@ export default function Sales() {
               variant="outline"
               size="sm"
               onClick={() => setShowHistory(!showHistory)}
-              className="gap-1 md:gap-2 shrink-0 h-8 px-2 md:px-3"
+              className="gap-2 shrink-0 h-8 px-3"
             >
               <History className="w-4 h-4" />
               <span className="hidden sm:inline">Historique</span>
@@ -168,7 +168,7 @@ export default function Sales() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-1.5 md:gap-2 mt-3 md:mt-6 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0">
+          <div className="flex gap-2 mt-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {[
               { key: "pipeline", label: "Pipeline", icon: Kanban },
               { key: "call", label: "Appels", icon: Phone },
@@ -180,11 +180,11 @@ export default function Sales() {
                 key={tab.key}
                 variant={activeTab === tab.key ? "default" : "ghost"}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className={`gap-1.5 shrink-0 h-8 px-2.5 md:px-3 text-xs md:text-sm ${activeTab === tab.key ? "bg-agent-sales hover:bg-agent-sales/90" : ""}`}
+                className={`gap-1.5 shrink-0 h-8 px-3 text-xs md:text-sm ${activeTab === tab.key ? "bg-agent-sales hover:bg-agent-sales/90" : ""}`}
                 size="sm"
               >
-                <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                <span className="hidden xs:inline sm:inline">{tab.label}</span>
+                <tab.icon className="w-4 h-4" />
+                <span className="hidden xs:inline">{tab.label}</span>
               </Button>
             ))}
           </div>

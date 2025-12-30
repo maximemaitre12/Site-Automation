@@ -152,27 +152,27 @@ export default function DocPage() {
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border shrink-0 bg-gradient-to-r from-violet-600/5 to-purple-500/5">
-          <div className="flex items-center gap-2 md:gap-3">
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
+          <div className="flex items-center gap-3">
             <button
               className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted shrink-0"
               onClick={() => setShowMobileSidebar(!showMobileSidebar)}
             >
               {showMobileSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 flex items-center justify-center shrink-0 shadow-lg shadow-violet-500/20">
-              <FileText className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5 md:w-6 md:h-6 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">AETHER Doc</h1>
-                <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Doc</h1>
+                <span className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
                   <Sparkles className="w-3 h-3" />
                   IA intégrée
                 </span>
               </div>
               <p className="text-xs md:text-sm text-muted-foreground hidden md:block">
-                Génération et gestion intelligente de documents professionnels
+                Génération et gestion intelligente de documents
               </p>
             </div>
           </div>
