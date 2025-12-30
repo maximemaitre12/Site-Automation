@@ -479,9 +479,9 @@ export function SalesPipeline() {
   }
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-4 md:space-y-6 overflow-hidden max-w-full">
       {/* Header Stats - Mobile optimized with horizontal scroll */}
-      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:grid md:grid-cols-6 scrollbar-hide">
+      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:grid md:grid-cols-6 scrollbar-hide max-w-[calc(100vw-2rem)] md:max-w-full">
         <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shrink-0 w-32 md:w-auto">
           <CardContent className="p-3 md:p-4">
             <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
@@ -655,12 +655,12 @@ export function SalesPipeline() {
       </div>
 
       {/* Pipeline Kanban avec Drag & Drop - Mobile optimized */}
-      <ScrollArea className="w-full -mx-3 px-3 md:mx-0 md:px-0">
-        <div className="flex gap-2 md:gap-3 pb-4" style={{ minWidth: 'max-content' }}>
+      <div className="w-full overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0 max-w-[calc(100vw-2rem)] md:max-w-full">
+        <div className="flex gap-2 md:gap-3 pb-4 w-max">
           {SALES_STATUSES.map((status) => (
             <div 
               key={status.value} 
-              className={`w-64 md:w-72 flex-shrink-0 transition-all ${dragOverStatus === status.value ? 'scale-[1.02]' : ''}`}
+              className={`w-48 xs:w-56 md:w-64 lg:w-72 flex-shrink-0 transition-all ${dragOverStatus === status.value ? 'scale-[1.02]' : ''}`}
               onDragOver={(e) => handleDragOver(e, status.value)}
               onDrop={() => handleDrop(status.value)}
               onDragLeave={() => setDragOverStatus(null)}
@@ -765,7 +765,7 @@ export function SalesPipeline() {
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Deal Detail Dialog - Beaucoup plus complet */}
       <Dialog open={!!selectedDeal} onOpenChange={() => setSelectedDeal(null)}>
