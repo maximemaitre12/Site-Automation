@@ -71,7 +71,7 @@ export function useTourNarration(): UseTourNarrationReturn {
     }
   }, [currentSceneIndex, isPlaying, preloadAudio]);
 
-  // Play audio for current scene
+  // Play audio for current scene (with graceful fallback)
   const playSceneAudio = useCallback(async () => {
     if (!currentScript || isMuted) return;
 
@@ -87,8 +87,7 @@ export function useTourNarration(): UseTourNarrationReturn {
       audioRef.current = new Audio(cachedUrl);
       audioRef.current.play().catch(console.error);
     } else {
-      // Generate and play
-      setIsLoading(true);
+      // Try to generate audio, but don't block the tour if it fails
       try {
         const response = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
@@ -112,11 +111,13 @@ export function useTourNarration(): UseTourNarrationReturn {
           audioCache.current.set(currentScript.id, audioUrl);
           audioRef.current = new Audio(audioUrl);
           audioRef.current.play().catch(console.error);
+        } else {
+          // TTS failed - tour continues without audio
+          console.warn('TTS unavailable, continuing tour without audio');
         }
       } catch (error) {
-        console.error('Failed to play audio:', error);
-      } finally {
-        setIsLoading(false);
+        // Silently continue without audio
+        console.warn('TTS error, continuing tour without audio:', error);
       }
     }
   }, [currentScript, isMuted]);
