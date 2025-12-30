@@ -2883,6 +2883,87 @@ export type Database = {
           },
         ]
       }
+      sales_compliance_checks: {
+        Row: {
+          checked_at: string | null
+          compliance_score: number | null
+          content_id: string | null
+          content_preview: string | null
+          content_type: string
+          id: string
+          issues: Json | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string | null
+          compliance_score?: number | null
+          content_id?: string | null
+          content_preview?: string | null
+          content_type: string
+          id?: string
+          issues?: Json | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          checked_at?: string | null
+          compliance_score?: number | null
+          content_id?: string | null
+          content_preview?: string | null
+          content_type?: string
+          id?: string
+          issues?: Json | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sales_compliance_rules: {
+        Row: {
+          created_at: string | null
+          forbidden_phrases: Json | null
+          id: string
+          is_active: boolean | null
+          keywords: Json | null
+          max_discount_percent: number | null
+          required_disclaimers: Json | null
+          rule_description: string | null
+          rule_name: string
+          rule_type: string
+          severity: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          forbidden_phrases?: Json | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: Json | null
+          max_discount_percent?: number | null
+          required_disclaimers?: Json | null
+          rule_description?: string | null
+          rule_name: string
+          rule_type: string
+          severity?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          forbidden_phrases?: Json | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: Json | null
+          max_discount_percent?: number | null
+          required_disclaimers?: Json | null
+          rule_description?: string | null
+          rule_name?: string
+          rule_type?: string
+          severity?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       sales_deals: {
         Row: {
           actual_close_date: string | null
@@ -3025,6 +3106,116 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sales_internal_compliance_rules: {
+        Row: {
+          created_at: string | null
+          forbidden_phrases: Json | null
+          id: string
+          is_active: boolean | null
+          keywords: Json | null
+          max_discount_percent: number | null
+          required_disclaimers: Json | null
+          rule_description: string | null
+          rule_name: string
+          rule_type: string
+          severity: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          forbidden_phrases?: Json | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: Json | null
+          max_discount_percent?: number | null
+          required_disclaimers?: Json | null
+          rule_description?: string | null
+          rule_name: string
+          rule_type: string
+          severity?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          forbidden_phrases?: Json | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: Json | null
+          max_discount_percent?: number | null
+          required_disclaimers?: Json | null
+          rule_description?: string | null
+          rule_name?: string
+          rule_type?: string
+          severity?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sales_presentations: {
+        Row: {
+          client_name: string | null
+          compliance_issues: Json | null
+          compliance_score: number | null
+          compliance_status: string | null
+          created_at: string | null
+          deal_id: string | null
+          id: string
+          key_points: string | null
+          objective: string | null
+          presentation_json: Json | null
+          product_name: string | null
+          slide_count: number | null
+          style: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          client_name?: string | null
+          compliance_issues?: Json | null
+          compliance_score?: number | null
+          compliance_status?: string | null
+          created_at?: string | null
+          deal_id?: string | null
+          id?: string
+          key_points?: string | null
+          objective?: string | null
+          presentation_json?: Json | null
+          product_name?: string | null
+          slide_count?: number | null
+          style?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          client_name?: string | null
+          compliance_issues?: Json | null
+          compliance_score?: number | null
+          compliance_status?: string | null
+          created_at?: string | null
+          deal_id?: string | null
+          id?: string
+          key_points?: string | null
+          objective?: string | null
+          presentation_json?: Json | null
+          product_name?: string | null
+          slide_count?: number | null
+          style?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_presentations_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "sales_deals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales_proposals: {
         Row: {
