@@ -10,7 +10,7 @@ export const tourScripts: TourScript[] = [
   {
     id: 'intro',
     title: 'Welcome to AETHER',
-    text: "Welcome to AETHER. The revolutionary AI platform that transforms how businesses operate. Imagine having 6 specialized AI agents working 24/7, handling everything from hiring to sales, support to compliance. This isn't the future. This is now. Let me show you what's possible.",
+    text: "Welcome to AETHER. The revolutionary AI platform that transforms how businesses operate. Imagine having 7 specialized AI agents working 24/7, handling everything from hiring to sales, support to compliance. This isn't the future. This is now. Let me show you what's possible.",
     duration: 12000,
   },
   {
@@ -51,14 +51,21 @@ export const tourScripts: TourScript[] = [
   {
     id: 'flow',
     title: 'Flow Automation',
-    text: "Finally, Flow connects everything together. Build powerful automations without writing a single line of code. Trigger actions across all agents, automate repetitive workflows, and watch your productivity soar. Teams save an average of 20 hours per week with intelligent automation.",
+    text: "Flow connects everything together. Build powerful automations without writing a single line of code. Trigger actions across all agents, automate repetitive workflows, and watch your productivity soar. Teams save an average of 20 hours per week with intelligent automation.",
     duration: 14000,
     agentType: 'flow',
   },
   {
+    id: 'data',
+    title: 'Data Platform',
+    text: "Finally, the Data Platform enriches your business intelligence. Automatically gather company data, track financials, detect market opportunities, and receive real-time alerts on your prospects and clients. Turn raw data into actionable insights with AI-powered analytics.",
+    duration: 14000,
+    agentType: 'data',
+  },
+  {
     id: 'conclusion',
     title: 'Start Your Journey',
-    text: "Six AI agents. One unified platform. Thousands of hours saved. AETHER isn't just a tool, it's your competitive advantage. Join the companies already transforming their operations. Start for free today, and discover what your team can achieve when AI works for you.",
+    text: "Seven AI agents. One unified platform. Thousands of hours saved. AETHER isn't just a tool, it's your competitive advantage. Join the companies already transforming their operations. Start for free today, and discover what your team can achieve when AI works for you.",
     duration: 14000,
   },
 ];
