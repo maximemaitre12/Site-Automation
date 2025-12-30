@@ -151,6 +151,36 @@ export type Database = {
           },
         ]
       }
+      agent_context: {
+        Row: {
+          agent_type: string
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          agent_type: string
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          agent_type?: string
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_anomalies: {
         Row: {
           anomaly_type: string
@@ -297,6 +327,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_insights: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          insight_type: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          priority: number | null
+          related_entities: Json | null
+          source_agent: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          insight_type: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          priority?: number | null
+          related_entities?: Json | null
+          source_agent: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          insight_type?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          priority?: number | null
+          related_entities?: Json | null
+          source_agent?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_predictions: {
         Row: {
           confidence_score: number | null
@@ -383,6 +458,45 @@ export type Database = {
           name?: string
           segment_type?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_suggested_actions: {
+        Row: {
+          action_data: Json | null
+          action_type: string
+          created_at: string | null
+          description: string | null
+          executed_at: string | null
+          id: string
+          status: string | null
+          target_agent: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          action_data?: Json | null
+          action_type: string
+          created_at?: string | null
+          description?: string | null
+          executed_at?: string | null
+          id?: string
+          status?: string | null
+          target_agent: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          action_data?: Json | null
+          action_type?: string
+          created_at?: string | null
+          description?: string | null
+          executed_at?: string | null
+          id?: string
+          status?: string | null
+          target_agent?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -3414,6 +3528,36 @@ export type Database = {
           id?: string
           service_name?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          agent_type: string
+          created_at: string | null
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          agent_type: string
+          created_at?: string | null
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          agent_type?: string
+          created_at?: string | null
+          entity_id?: string
+          entity_name?: string
+          entity_type?: string
+          id?: string
           user_id?: string
         }
         Relationships: []
