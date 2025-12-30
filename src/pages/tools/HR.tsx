@@ -10,7 +10,7 @@ import {
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
   AlertTriangle, DoorOpen, Calendar, CalendarDays, List, LayoutGrid,
-  FileText, Target, Mic, BarChart3, Award, History, Mail, X, MoreHorizontal
+  FileText, Target, Mic, BarChart3, Award, History, Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHR } from "@/hooks/useHR";
@@ -34,7 +34,7 @@ import { EmailInbox } from "@/components/hr/email/EmailInbox";
 import { EmailAccountConnect } from "@/components/hr/email/EmailAccountConnect";
 import { useHREmails } from "@/hooks/useHREmails";
 import { Users as UsersIcon } from "lucide-react";
-import { MobileTabBar, MobileTabItem } from "@/components/mobile/MobileTabBar";
+import { MobileAgentNav } from "@/components/mobile/MobileAgentNav";
 
 export default function HR() {
   const { 
@@ -72,7 +72,7 @@ export default function HR() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [convertCandidate, setConvertCandidate] = useState<any>(null);
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  
 
   const loading = hrLoading || employeesLoading || interviewsLoading;
   const upcomingInterviews = getUpcomingInterviews();
@@ -175,17 +175,11 @@ export default function HR() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col overflow-hidden pb-14 md:pb-0">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
         <header className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/50 z-10">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <button
-                className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted shrink-0"
-                onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-              >
-                {showMobileSidebar ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
-              </button>
               <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-hr/10 border border-agent-hr/20 flex items-center justify-center shrink-0">
                 <UsersIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-hr" />
               </div>
@@ -209,177 +203,200 @@ export default function HR() {
               </TabsList>
             </Tabs>
           </div>
+          
+          {/* Mobile section selector */}
+          <div className="mt-3">
+            <MobileAgentNav
+              groups={mainTab === 'recruitment' ? [
+                {
+                  label: 'Recrutement',
+                  sections: [
+                    { id: 'pipeline', label: 'Pipeline Candidats', icon: Users, badge: stats.candidates },
+                    { id: 'interviews', label: 'Entretiens', icon: Calendar, badge: stats.upcomingInterviews },
+                    { id: 'jobs', label: 'Postes & Offres', icon: Briefcase, badge: stats.activeJobs },
+                    { id: 'emails', label: 'Messagerie RH', icon: Mail, badge: stats.newEmails > 0 ? stats.newEmails : undefined, badgeVariant: stats.newEmails > 0 ? 'destructive' : 'secondary' },
+                  ]
+                }
+              ] : [
+                {
+                  label: 'Équipe',
+                  sections: [
+                    { id: 'employees', label: 'Collaborateurs', icon: UsersRound, badge: stats.employees },
+                    { id: 'hr', label: 'Gestion RH', icon: AlertTriangle, badge: stats.openDisputes },
+                    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+                  ]
+                }
+              ]}
+              activeSection={mainTab === 'recruitment' ? recruitmentSection : teamSection}
+              onSectionChange={(id) => {
+                if (mainTab === 'recruitment') {
+                  setRecruitmentSection(id as any);
+                } else {
+                  setTeamSection(id as any);
+                }
+              }}
+              accentColor="bg-agent-hr"
+            />
+          </div>
         </header>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden relative">
-          {/* Mobile overlay */}
-          {showMobileSidebar && (
-            <div 
-              className="fixed inset-0 bg-black/20 z-30 md:hidden"
-              onClick={() => setShowMobileSidebar(false)}
-            />
-          )}
-
-          {/* Left Sidebar - Sections */}
-          <aside className={cn(
-            "w-48 md:w-52 shrink-0 border-r border-border bg-card/30 p-2 md:p-3 overflow-y-auto",
-            "fixed md:relative inset-y-0 left-0 z-40 md:z-auto transition-transform",
-            showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-          )}>
+          {/* Left Sidebar - Sections (desktop only) */}
+          <aside className="hidden md:block w-52 shrink-0 border-r border-border bg-card/30 p-3 overflow-y-auto">
             {mainTab === 'recruitment' ? (
               <>
-                <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 md:px-3 mb-1.5 md:mb-2">Sections</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
                 
                 <button
-                  onClick={() => { setRecruitmentSection('pipeline'); setShowMobileSidebar(false); }}
+                  onClick={() => setRecruitmentSection('pipeline')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     recruitmentSection === 'pipeline' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Users className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <Users className="w-4 h-4 shrink-0" />
                   <span className="truncate">Pipeline</span>
-                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.candidates}</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs h-5 px-1.5">{stats.candidates}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => { setRecruitmentSection('interviews'); setShowMobileSidebar(false); }}
+                  onClick={() => setRecruitmentSection('interviews')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     recruitmentSection === 'interviews' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <Calendar className="w-4 h-4 shrink-0" />
                   <span className="truncate">Entretiens</span>
-                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.upcomingInterviews}</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs h-5 px-1.5">{stats.upcomingInterviews}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => { setRecruitmentSection('jobs'); setShowMobileSidebar(false); }}
+                  onClick={() => setRecruitmentSection('jobs')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     recruitmentSection === 'jobs' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Briefcase className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <Briefcase className="w-4 h-4 shrink-0" />
                   <span className="truncate">Postes</span>
-                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.activeJobs}</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs h-5 px-1.5">{stats.activeJobs}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => { setRecruitmentSection('emails'); setShowMobileSidebar(false); }}
+                  onClick={() => setRecruitmentSection('emails')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     recruitmentSection === 'emails' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <Mail className="w-4 h-4 shrink-0" />
                   <span className="truncate">Messagerie</span>
                   {stats.newEmails > 0 && (
-                    <Badge variant="destructive" className="ml-auto text-[10px] h-4 px-1">{stats.newEmails}</Badge>
+                    <Badge variant="destructive" className="ml-auto text-xs h-5 px-1.5">{stats.newEmails}</Badge>
                   )}
                 </button>
                 
-                <Separator className="my-2 md:my-3" />
+                <Separator className="my-3" />
                 
                 {/* Quick Stats */}
-                <div className="px-2 md:px-3 space-y-2 md:space-y-3">
-                  <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
-                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-foreground">{stats.newCandidates}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Nouveaux</div>
+                <div className="px-3 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-foreground">{stats.newCandidates}</div>
+                      <div className="text-xs text-muted-foreground">Nouveaux</div>
                     </div>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-agent-hr">{stats.analyzedCandidates}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Analysés</div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-agent-hr">{stats.analyzedCandidates}</div>
+                      <div className="text-xs text-muted-foreground">Analysés</div>
                     </div>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-success">{stats.activeCandidates}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Actifs</div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-success">{stats.activeCandidates}</div>
+                      <div className="text-xs text-muted-foreground">Actifs</div>
                     </div>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-warning">{stats.upcomingInterviews}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Entretiens</div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-warning">{stats.upcomingInterviews}</div>
+                      <div className="text-xs text-muted-foreground">Entretiens</div>
                     </div>
                   </div>
                 </div>
               </>
             ) : (
               <>
-                <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 md:px-3 mb-1.5 md:mb-2">Sections</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 mb-2">Sections</p>
                 
                 <button
-                  onClick={() => { setTeamSection('employees'); setShowMobileSidebar(false); }}
+                  onClick={() => setTeamSection('employees')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     teamSection === 'employees' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <UsersRound className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <UsersRound className="w-4 h-4 shrink-0" />
                   <span className="truncate">Collaborateurs</span>
-                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.employees}</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs h-5 px-1.5">{stats.employees}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => { setTeamSection('hr'); setShowMobileSidebar(false); }}
+                  onClick={() => setTeamSection('hr')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     teamSection === 'hr' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <AlertTriangle className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span className="truncate">Gestion RH</span>
-                  <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">{stats.openDisputes}</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs h-5 px-1.5">{stats.openDisputes}</Badge>
                 </button>
                 
                 <button
-                  onClick={() => { setTeamSection('analytics'); setShowMobileSidebar(false); }}
+                  onClick={() => setTeamSection('analytics')}
                   className={cn(
-                    "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                     teamSection === 'analytics' 
                       ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <BarChart3 className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" />
+                  <BarChart3 className="w-4 h-4 shrink-0" />
                   <span className="truncate">Analytics</span>
                 </button>
                 
-                <Separator className="my-2 md:my-3" />
+                <Separator className="my-3" />
                 
                 {/* Quick Stats */}
-                <div className="px-2 md:px-3 space-y-2 md:space-y-3">
-                  <p className="text-[10px] md:text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
-                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-foreground">{stats.employees}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Actifs</div>
+                <div className="px-3 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Résumé</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-foreground">{stats.employees}</div>
+                      <div className="text-xs text-muted-foreground">Actifs</div>
                     </div>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-warning">{stats.openDisputes}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Litiges</div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-warning">{stats.openDisputes}</div>
+                      <div className="text-xs text-muted-foreground">Litiges</div>
                     </div>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-muted-foreground">{stats.departures}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Départs</div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-muted-foreground">{stats.departures}</div>
+                      <div className="text-xs text-muted-foreground">Départs</div>
                     </div>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-[hsl(var(--agent-hr))]">{careerEvents.length}</div>
-                      <div className="text-[9px] md:text-xs text-muted-foreground">Événements</div>
+                    <div className="p-2 rounded-lg bg-muted/50 text-center">
+                      <div className="text-lg font-bold text-agent-hr">{careerEvents.length}</div>
+                      <div className="text-xs text-muted-foreground">Événements</div>
                     </div>
                   </div>
                 </div>
@@ -702,34 +719,6 @@ export default function HR() {
           )}
         </div>
       </div>
-      
-      {/* Mobile Tab Bar */}
-      <MobileTabBar
-        items={
-          mainTab === 'recruitment' 
-            ? [
-                { id: 'pipeline', label: 'Pipeline', icon: Users, badge: stats.candidates },
-                { id: 'interviews', label: 'Entretiens', icon: Calendar, badge: stats.upcomingInterviews },
-                { id: 'jobs', label: 'Postes', icon: Briefcase, badge: stats.activeJobs },
-                { id: 'emails', label: 'Emails', icon: Mail, badge: stats.newEmails > 0 ? stats.newEmails : undefined },
-              ]
-            : [
-                { id: 'employees', label: 'Équipe', icon: UsersRound, badge: stats.employees },
-                { id: 'hr', label: 'Gestion', icon: AlertTriangle, badge: stats.openDisputes },
-                { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-              ]
-        }
-        activeTab={mainTab === 'recruitment' ? recruitmentSection : teamSection}
-        onTabChange={(id) => {
-          if (mainTab === 'recruitment') {
-            setRecruitmentSection(id as any);
-          } else {
-            setTeamSection(id as any);
-          }
-          setShowMobileSidebar(false);
-        }}
-        accentColor="bg-agent-hr"
-      />
       
       {/* Convert candidate dialog */}
       {convertCandidate && (
