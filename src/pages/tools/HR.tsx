@@ -175,9 +175,9 @@ export default function HR() {
 
   return (
     <DashboardLayout>
-      <div className="absolute inset-0 flex flex-col overflow-hidden pb-14 md:pb-0">
+      <div className="h-full flex flex-col overflow-hidden pb-14 md:pb-0">
         {/* Header */}
-        <header className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/50">
+        <header className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/50 z-10">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <button
