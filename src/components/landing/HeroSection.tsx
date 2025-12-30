@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BrandLogosCloud } from "./BrandLogos";
 import { FloatingClouds } from "./CloudShapes";
@@ -51,6 +51,16 @@ export function HeroSection() {
               className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium"
             >
               Request a Demo
+            </Button>
+          </Link>
+          <Link to="/product-tour" className="w-full sm:w-auto">
+            <Button 
+              variant="ghost" 
+              size="lg" 
+              className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium gap-2 group"
+            >
+              <Play className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              Watch Demo
             </Button>
           </Link>
         </div>
