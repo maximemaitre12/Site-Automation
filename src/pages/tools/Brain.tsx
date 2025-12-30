@@ -477,34 +477,39 @@ export default function BrainPage() {
           </header>
 
           {/* Chat Messages */}
-          <ScrollArea className="flex-1 px-3 md:px-6 py-4">
+          <ScrollArea className="flex-1 px-4 md:px-6 py-6">
             {!currentConversation && conversations.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center mb-4">
-                  <Database className="w-8 h-8 md:w-10 md:h-10 text-agent-brain" />
+              <div className="h-full flex flex-col items-center justify-center text-center px-4 py-20">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-6 shadow-lg shadow-agent-brain/20">
+                  <Database className="w-10 h-10 md:w-12 md:h-12 text-white" />
                 </div>
-                <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">Bienvenue sur AETHER Brain</h2>
-                <p className="text-muted-foreground max-w-md text-sm md:text-base">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">AETHER Brain</h2>
+                <p className="text-muted-foreground max-w-md text-base md:text-lg">
                   Votre assistant IA intelligent. Posez des questions, analysez des documents, ou générez des images.
                 </p>
-                <div className="flex flex-wrap justify-center gap-2 mt-6">
-                  {['💬 Chat', '🖼️ Images', '📊 Charts', '📄 Documents'].map(tag => (
-                    <span key={tag} className="px-3 py-1.5 rounded-full bg-agent-brain/10 text-agent-brain text-xs md:text-sm font-medium">
-                      {tag}
+                <div className="flex flex-wrap justify-center gap-2 mt-8">
+                  {[
+                    { emoji: '💬', label: 'Chat' },
+                    { emoji: '🖼️', label: 'Images' },
+                    { emoji: '📊', label: 'Charts' },
+                    { emoji: '📄', label: 'Documents' },
+                  ].map(tag => (
+                    <span key={tag.label} className="px-4 py-2 rounded-full bg-secondary text-foreground text-sm font-medium">
+                      {tag.emoji} {tag.label}
                     </span>
                   ))}
                 </div>
               </div>
             ) : !currentConversation ? (
-              <div className="h-full flex flex-col items-center justify-center text-center px-4">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center mb-4">
-                  <Database className="w-8 h-8 md:w-10 md:h-10 text-agent-brain" />
+              <div className="h-full flex flex-col items-center justify-center text-center px-4 py-20">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-6 shadow-lg">
+                  <Database className="w-10 h-10 text-white" />
                 </div>
-                <h2 className="text-lg md:text-xl font-semibold text-foreground mb-2">Nouvelle conversation</h2>
-                <p className="text-muted-foreground text-sm md:text-base">Commencez à discuter ou sélectionnez une conversation.</p>
+                <h2 className="text-xl font-semibold text-foreground mb-2">Nouvelle conversation</h2>
+                <p className="text-muted-foreground">Commencez à discuter ou sélectionnez une conversation.</p>
               </div>
             ) : (
-              <div className="space-y-4 max-w-3xl mx-auto">
+              <div className="space-y-4 max-w-3xl mx-auto pb-4">
                 {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
                   <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
                 ))}
@@ -518,132 +523,152 @@ export default function BrainPage() {
 
           {/* Drag overlay */}
           {isDragging && (
-            <div className="absolute inset-0 bg-primary/10 flex items-center justify-center z-20 pointer-events-none">
-              <div className="bg-card p-6 md:p-8 rounded-2xl shadow-xl flex flex-col items-center">
-                <FileImage className="w-10 h-10 md:w-12 md:h-12 text-primary mb-2" />
-                <p className="text-base md:text-lg font-semibold text-foreground">Déposez vos fichiers ici</p>
-                <p className="text-sm text-muted-foreground">Images, texte, documents...</p>
+            <div className="absolute inset-0 bg-primary/10 backdrop-blur-sm flex items-center justify-center z-20 pointer-events-none">
+              <div className="bg-card p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-border">
+                <FileImage className="w-14 h-14 text-primary mb-4" />
+                <p className="text-xl font-semibold text-foreground">Déposez vos fichiers ici</p>
+                <p className="text-sm text-muted-foreground mt-1">Images, texte, documents...</p>
               </div>
             </div>
           )}
 
-          {/* Input Area */}
-          <div className="border-t border-border px-3 md:px-6 py-3 md:py-4 shrink-0">
-            {/* Attachments preview */}
-            {attachments.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {attachments.map((att, idx) => (
-                  <div key={idx} className="relative group">
-                    {att.type === 'image' ? (
-                      <img 
-                        src={att.content} 
-                        alt={att.name} 
-                        className="w-14 h-14 md:w-16 md:h-16 rounded-lg object-cover border border-border"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg bg-secondary flex items-center justify-center border border-border">
-                        <File className="w-6 h-6 text-muted-foreground" />
-                      </div>
-                    )}
-                    <button
-                      onClick={() => removeAttachment(idx)}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                    <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] px-1 py-0.5 truncate rounded-b-lg">
-                      {att.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Mode selector */}
-            <div className="flex items-center gap-1 md:gap-2 mb-3">
-              <TooltipProvider>
-                {[
-                  { mode: 'chat' as const, icon: Sparkles, label: 'Chat' },
-                  { mode: 'image' as const, icon: ImagePlus, label: 'Image' },
-                  { mode: 'chart' as const, icon: BarChart3, label: 'Chart' },
-                ].map(({ mode, icon: Icon, label }) => (
-                  <Tooltip key={mode}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant={generationMode === mode ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setGenerationMode(mode)}
-                        className={cn(
-                          "h-8 px-2 md:px-3",
-                          generationMode === mode && "bg-[hsl(var(--agent-brain))] hover:bg-[hsl(var(--agent-brain))]/90"
-                        )}
+          {/* Modern Bottom Input Bar - Apple style */}
+          <div className="shrink-0 p-4 md:p-6 bg-gradient-to-t from-background via-background to-background/80">
+            <div className="max-w-3xl mx-auto">
+              {/* Attachments preview */}
+              {attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {attachments.map((att, idx) => (
+                    <div key={idx} className="relative group">
+                      {att.type === 'image' ? (
+                        <img 
+                          src={att.content} 
+                          alt={att.name} 
+                          className="w-16 h-16 rounded-xl object-cover border border-border shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-xl bg-secondary flex items-center justify-center border border-border">
+                          <File className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                      )}
+                      <button
+                        onClick={() => removeAttachment(idx)}
+                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-white flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <Icon className="w-4 h-4 md:mr-1" />
-                        <span className="hidden md:inline text-xs">{label}</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{label}</TooltipContent>
-                  </Tooltip>
-                ))}
-              </TooltipProvider>
-            </div>
-
-            <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={(e) => handleFileSelect(e.target.files)}
-                multiple
-                accept="image/*,.txt,.md,.json,.csv"
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => fileInputRef.current?.click()}
-                className="shrink-0 h-10 w-10"
-              >
-                <Paperclip className="w-5 h-5" />
-              </Button>
-
-              <div className="flex-1 relative">
-                <Input
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={
-                    generationMode === 'image' 
-                      ? "Décrivez l'image à générer..." 
-                      : generationMode === 'chart'
-                      ? "Décrivez le graphique à générer..."
-                      : "Posez votre question..."
-                  }
-                  className="pr-12 h-10 md:h-11 text-sm md:text-base"
-                  disabled={sendingMessage || generatingImage}
-                />
-              </div>
-
-              {(sendingMessage || generatingImage) ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  onClick={cancelGeneration}
-                  className="shrink-0 h-10 w-10"
-                >
-                  <StopCircle className="w-5 h-5" />
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={!message.trim() && attachments.length === 0}
-                  className="shrink-0 h-10 w-10 bg-[hsl(var(--agent-brain))] hover:bg-[hsl(var(--agent-brain))]/90"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[10px] px-1.5 py-0.5 truncate rounded-b-xl">
+                        {att.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               )}
-            </form>
+
+              {/* Main input container */}
+              <div className="bg-secondary/80 backdrop-blur-xl rounded-2xl border border-border/50 shadow-lg overflow-hidden">
+                {/* Mode selector row */}
+                <div className="flex items-center gap-1 p-2 border-b border-border/30">
+                  <TooltipProvider>
+                    {[
+                      { mode: 'chat' as const, icon: Sparkles, label: 'Chat', color: 'text-agent-brain' },
+                      { mode: 'image' as const, icon: ImagePlus, label: 'Image', color: 'text-emerald-500' },
+                      { mode: 'chart' as const, icon: BarChart3, label: 'Chart', color: 'text-amber-500' },
+                    ].map(({ mode, icon: Icon, label, color }) => (
+                      <Tooltip key={mode}>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => setGenerationMode(mode)}
+                            className={cn(
+                              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                              generationMode === mode 
+                                ? "bg-background shadow-sm text-foreground" 
+                                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                            )}
+                          >
+                            <Icon className={cn("w-4 h-4", generationMode === mode && color)} />
+                            <span className="hidden sm:inline">{label}</span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">{label}</TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </TooltipProvider>
+                  
+                  <div className="flex-1" />
+                  
+                  {/* File attach button */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                    multiple
+                    accept="image/*,.txt,.md,.json,.csv"
+                    className="hidden"
+                  />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-background/50 transition-colors"
+                        >
+                          <Paperclip className="w-5 h-5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Joindre un fichier</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+
+                {/* Input row */}
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
+                  <input
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder={
+                      generationMode === 'image' 
+                        ? "Décrivez l'image à générer..." 
+                        : generationMode === 'chart'
+                        ? "Décrivez le graphique à créer..."
+                        : "Posez votre question à AETHER Brain..."
+                    }
+                    className="flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground text-base py-2"
+                    disabled={sendingMessage || generatingImage}
+                  />
+
+                  {(sendingMessage || generatingImage) ? (
+                    <button
+                      type="button"
+                      onClick={cancelGeneration}
+                      className="shrink-0 w-10 h-10 rounded-xl bg-destructive text-white flex items-center justify-center hover:bg-destructive/90 transition-colors"
+                    >
+                      <StopCircle className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={!message.trim() && attachments.length === 0}
+                      className={cn(
+                        "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                        (message.trim() || attachments.length > 0)
+                          ? "bg-agent-brain text-white shadow-md shadow-agent-brain/20 hover:shadow-lg hover:shadow-agent-brain/30"
+                          : "bg-muted text-muted-foreground cursor-not-allowed"
+                      )}
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  )}
+                </form>
+              </div>
+              
+              {/* Helper text */}
+              <p className="text-center text-xs text-muted-foreground mt-3">
+                AETHER Brain peut faire des erreurs. Vérifiez les informations importantes.
+              </p>
+            </div>
           </div>
         </div>
       </div>
