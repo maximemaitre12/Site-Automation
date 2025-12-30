@@ -116,26 +116,26 @@ export function DocGenerateDialog({
                         {categoryLabels[category] || category}
                       </span>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                       {categoryTemplates.map((template) => (
                         <Card
                           key={template.id}
                           onClick={() => setSelectedTemplate(template)}
-                          className="p-4 cursor-pointer hover:shadow-md hover:border-primary/50 transition-all"
+                          className="p-3 md:p-4 cursor-pointer hover:shadow-md hover:border-primary/50 transition-all"
                         >
-                          <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <CategoryIcon className="w-5 h-5 text-primary" />
+                          <div className="flex items-start gap-2 md:gap-3">
+                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <CategoryIcon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                             </div>
-                            <div className="min-w-0">
-                              <p className="font-medium truncate">{template.name}</p>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-sm md:text-base truncate">{template.name}</p>
                               {template.description && (
-                                <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                                <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 md:line-clamp-2 mt-0.5">
                                   {template.description}
                                 </p>
                               )}
                               {template.is_system && (
-                                <Badge variant="secondary" className="mt-2 text-xs">
+                                <Badge variant="secondary" className="mt-1.5 md:mt-2 text-[10px] md:text-xs">
                                   Template système
                                 </Badge>
                               )}
