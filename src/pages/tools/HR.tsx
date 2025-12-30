@@ -498,24 +498,36 @@ export default function HR() {
                         icon={Briefcase}
                         title="Postes & Offres"
                         description="Créez et gérez vos offres d'emploi"
-                        action={<JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />}
                       />
                       
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
-                        {jobs.map(job => (
-                          <JobCard
-                            key={job.id}
-                            job={job}
-                            candidatesCount={candidates.filter(c => c.job_id === job.id).length}
-                            onDelete={deleteJob}
-                          />
-                        ))}
-                        {jobs.length === 0 && (
-                          <div className="col-span-full text-center py-8 md:py-12">
-                            <Briefcase className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground/30 mx-auto mb-3" />
-                            <p className="text-muted-foreground text-sm">Aucun poste créé</p>
-                          </div>
-                        )}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                        {/* Left column: Job generator */}
+                        <div className="space-y-4">
+                          <JobPostGenerator onGeneratePost={generateJobPost} onCreateJob={createJob} />
+                        </div>
+                        
+                        {/* Right column: Job list */}
+                        <div className="space-y-3 md:space-y-4">
+                          <h3 className="font-medium text-sm text-muted-foreground">Postes créés ({jobs.length})</h3>
+                          {jobs.length > 0 ? (
+                            <div className="space-y-3">
+                              {jobs.map(job => (
+                                <JobCard
+                                  key={job.id}
+                                  job={job}
+                                  candidatesCount={candidates.filter(c => c.job_id === job.id).length}
+                                  onDelete={deleteJob}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <Card className="p-6 text-center">
+                              <Briefcase className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                              <p className="text-muted-foreground text-sm">Aucun poste créé</p>
+                              <p className="text-xs text-muted-foreground/70 mt-1">Utilisez le générateur IA pour créer votre première offre</p>
+                            </Card>
+                          )}
+                        </div>
                       </div>
                     </>
                   )}
