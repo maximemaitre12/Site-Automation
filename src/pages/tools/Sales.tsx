@@ -8,7 +8,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
   FileText, Mail, Phone, Sparkles, User, Building, 
-  Loader2, CheckCircle, Copy, History, ChevronRight, Kanban, Target
+  Loader2, CheckCircle, Copy, History, ChevronRight, Kanban, Target,
+  Presentation, ShieldCheck
 } from "lucide-react";
 import { useState } from "react";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
@@ -18,12 +19,14 @@ import { ProposalDisplay } from "@/components/sales/ProposalDisplay";
 import { SalesPipeline } from "@/components/sales/SalesPipeline";
 import { DealSelector } from "@/components/sales/DealSelector";
 import { NegotiationSheetGenerator } from "@/components/sales/NegotiationSheetGenerator";
+import { PresentationGenerator } from "@/components/sales/PresentationGenerator";
+import { ComplianceChecker } from "@/components/sales/ComplianceChecker";
 import { useToast } from "@/hooks/use-toast";
 import { SalesDeal } from "@/hooks/useAIIntelligence";
 import { BarChart3 as SalesIcon } from "lucide-react";
 
 export default function Sales() {
-  const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email" | "negotiation">("pipeline");
+  const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email" | "negotiation" | "presentation" | "compliance">("pipeline");
   const { 
     proposals, 
     callAnalyses, 
@@ -171,10 +174,12 @@ export default function Sales() {
           <div className="flex gap-2 mt-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
             {[
               { key: "pipeline", label: "Pipeline", icon: Kanban },
+              { key: "presentation", label: "Présentation", icon: Presentation },
               { key: "call", label: "Appels", icon: Phone },
               { key: "negotiation", label: "Négociation", icon: Target },
               { key: "proposal", label: "Proposition", icon: FileText },
               { key: "email", label: "Email", icon: Mail },
+              { key: "compliance", label: "Conformité", icon: ShieldCheck },
             ].map((tab) => (
               <Button
                 key={tab.key}
@@ -385,6 +390,14 @@ export default function Sales() {
               <div className="max-w-4xl">
                 <NegotiationSheetGenerator />
               </div>
+            )}
+
+            {activeTab === "presentation" && (
+              <PresentationGenerator />
+            )}
+
+            {activeTab === "compliance" && (
+              <ComplianceChecker />
             )}
 
             {activeTab === "email" && (
