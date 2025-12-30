@@ -318,20 +318,6 @@ export function CompanyEnrichment() {
                         </div>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
-                      <div className="flex flex-col items-end gap-2">
-                        {getVerificationBadge(company)}
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteCompany(company.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
                     </div>
                     {/* Source badges */}
                     {company.data_sources && Array.isArray(company.data_sources) && company.data_sources.length > 0 && (
@@ -356,7 +342,7 @@ export function CompanyEnrichment() {
                         )}
                       </div>
                     )}
-                  </div>
+                  </button>
                 ))}
               </div>
             </ScrollArea>
