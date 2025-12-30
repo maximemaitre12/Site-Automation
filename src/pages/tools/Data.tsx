@@ -1,72 +1,121 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Database, FolderSearch, Shield, Search } from 'lucide-react';
+import { Database, FolderSearch, Shield, Search, Sparkles, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
 import DataSources from '@/components/data/DataSources';
 import DataCatalog from '@/components/data/DataCatalog';
 import DataGovernance from '@/components/data/DataGovernance';
 import DataSearch from '@/components/data/DataSearch';
+import { AgentTabs } from '@/components/agents/AgentTabs';
+import { cn } from '@/lib/utils';
 
 const Data = () => {
   const [activeTab, setActiveTab] = useState('catalog');
 
+  const tabs = [
+    { id: 'catalog', label: 'Catalogue', icon: FolderSearch },
+    { id: 'sources', label: 'Sources', icon: Database },
+    { id: 'search', label: 'Recherche', icon: Search },
+    { id: 'governance', label: 'Gouvernance', icon: Shield },
+  ];
+
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-data/10 border border-agent-data/20 flex items-center justify-center shrink-0">
-              <Database className="w-5 h-5 md:w-6 md:h-6 text-agent-data" />
+      <div className="h-full flex flex-col overflow-hidden bg-gradient-to-b from-background to-background/95">
+        {/* Modern Header */}
+        <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-agent-data/20 to-agent-data/5 border border-agent-data/20 flex items-center justify-center shrink-0 shadow-lg shadow-agent-data/10">
+                <Database className="w-6 h-6 md:w-7 md:h-7 text-agent-data" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl md:text-2xl font-bold text-foreground">Data Platform</h1>
+                  <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-agent-data/10 text-agent-data text-xs font-medium">
+                    <Sparkles className="w-3 h-3" />
+                    Intelligence IA
+                  </span>
+                </div>
+                <p className="text-muted-foreground text-sm mt-0.5 hidden md:block">
+                  Catalogue de données, gouvernance et qualité
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Data</h1>
-              <p className="text-muted-foreground text-xs md:text-sm hidden md:block">
-                Plateforme de données d'entreprise
-              </p>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-agent-data/30 transition-all hover:shadow-lg hover:shadow-agent-data/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-agent-data/10 flex items-center justify-center">
+                    <Database className="w-5 h-5 text-agent-data" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">24</p>
+                    <p className="text-xs text-muted-foreground">Datasets</p>
+                  </div>
+                </div>
+              </div>
+              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-success/30 transition-all hover:shadow-lg hover:shadow-success/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">94%</p>
+                    <p className="text-xs text-muted-foreground">Qualité</p>
+                  </div>
+                </div>
+              </div>
+              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-warning/30 transition-all hover:shadow-lg hover:shadow-warning/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-warning" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">3</p>
+                    <p className="text-xs text-muted-foreground">Alertes</p>
+                  </div>
+                </div>
+              </div>
+              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">1.2M</p>
+                    <p className="text-xs text-muted-foreground">Lignes</p>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {/* Tabs */}
+            <AgentTabs 
+              tabs={tabs} 
+              activeTab={activeTab} 
+              onTabChange={setActiveTab}
+              variant="pills"
+            />
           </div>
         </header>
 
-        {/* Tabs and Content */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <div className="px-3 md:px-6 py-2 border-b border-border shrink-0 overflow-x-auto">
-              <TabsList className="inline-flex w-auto min-w-full md:min-w-0 h-9 md:h-10">
-                <TabsTrigger value="catalog" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <FolderSearch className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Catalogue</span>
-                </TabsTrigger>
-                <TabsTrigger value="sources" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <Database className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Sources</span>
-                </TabsTrigger>
-                <TabsTrigger value="search" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <Search className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Recherche</span>
-                </TabsTrigger>
-                <TabsTrigger value="governance" className="flex items-center gap-1.5 px-2 md:px-3 text-xs md:text-sm">
-                  <Shield className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Gouvernance</span>
-                </TabsTrigger>
-              </TabsList>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-6">
+          <div className="max-w-7xl mx-auto">
+            <div className={cn(activeTab !== 'catalog' && 'hidden')}>
+              <DataCatalog />
             </div>
-
-            <div className="flex-1 overflow-y-auto p-3 md:p-6">
-              <TabsContent value="catalog" className="mt-0 h-full">
-                <DataCatalog />
-              </TabsContent>
-              <TabsContent value="sources" className="mt-0 h-full">
-                <DataSources />
-              </TabsContent>
-              <TabsContent value="search" className="mt-0 h-full">
-                <DataSearch />
-              </TabsContent>
-              <TabsContent value="governance" className="mt-0 h-full">
-                <DataGovernance />
-              </TabsContent>
+            <div className={cn(activeTab !== 'sources' && 'hidden')}>
+              <DataSources />
             </div>
-          </Tabs>
+            <div className={cn(activeTab !== 'search' && 'hidden')}>
+              <DataSearch />
+            </div>
+            <div className={cn(activeTab !== 'governance' && 'hidden')}>
+              <DataGovernance />
+            </div>
+          </div>
         </div>
       </div>
     </DashboardLayout>
