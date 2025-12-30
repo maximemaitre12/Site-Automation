@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Clock, TrendingUp, Target, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Clock, TrendingUp, Target, Zap, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
@@ -83,6 +83,16 @@ export function FinalCTASection() {
                 className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium"
               >
                 Start for Free
+              </Button>
+            </Link>
+            <Link to="/product-tour" className="w-full sm:w-auto">
+              <Button 
+                variant="ghost" 
+                size="lg" 
+                className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium gap-2 group"
+              >
+                <Play className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                Watch Demo
               </Button>
             </Link>
           </div>

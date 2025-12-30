@@ -41,6 +41,9 @@ import Privacy from "./pages/legal/Privacy";
 import Terms from "./pages/legal/Terms";
 import Security from "./pages/legal/Security";
 
+// Product Tour
+import ProductTour from "./pages/ProductTour";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -65,6 +68,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/demo" element={<Demo />} />
+            <Route path="/product-tour" element={<ProductTour />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
             <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
