@@ -1,3 +1,4 @@
+@import "@fontsource/inter/300.css";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
@@ -7,87 +8,112 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AETHER AI SUITE - Clean Minimal Design System
-   Based on Aether logo colors: Deep blue (#0A2540) and Cyan (#00D4FF) */
+/* AETHER AI SUITE - Apple-style Modern Design System */
 
 @layer base {
   :root {
-    /* Clean white background */
+    /* Clean Apple-style foundation */
     --background: 0 0% 100%;
-    --foreground: 210 40% 14%;
+    --foreground: 0 0% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 40% 14%;
+    --card-foreground: 0 0% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 14%;
+    --popover-foreground: 0 0% 4%;
 
-    /* Aether primary - Deep violet-blue */
-    --primary: 250 60% 45%;
+    /* Primary - Modern indigo */
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 250 20% 96%;
-    --secondary-foreground: 250 40% 14%;
+    --secondary: 240 6% 97%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 250 15% 95%;
-    --muted-foreground: 250 10% 45%;
+    --muted: 240 6% 97%;
+    --muted-foreground: 240 4% 46%;
 
-    /* Accent - Light blue/cyan */
-    --accent: 200 90% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 240 6% 97%;
+    --accent-foreground: 0 0% 10%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 250 15% 90%;
-    --input: 250 15% 90%;
-    --ring: 250 60% 45%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 0.625rem;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 239 84% 67%;
+
+    --radius: 0.75rem;
+
+    /* Agent colors - vibrant modern palette */
+    --agent-flow: 262 83% 58%;
+    --agent-brain: 271 91% 65%;
+    --agent-support: 173 80% 40%;
+    --agent-hr: 340 82% 52%;
+    --agent-compliance: 25 95% 53%;
+    --agent-sales: 142 76% 36%;
+    --agent-data: 199 89% 48%;
 
     /* Sidebar */
-    --sidebar-background: 250 15% 98%;
-    --sidebar-foreground: 250 40% 14%;
-    --sidebar-primary: 250 60% 45%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 15% 94%;
-    --sidebar-accent-foreground: 250 40% 14%;
-    --sidebar-border: 250 15% 90%;
-    --sidebar-ring: 250 60% 45%;
-
-    /* States */
-    --success: 158 64% 42%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 0%;
-
-    /* Agent colors - muted tones */
-    --agent-flow: 220 60% 50%;
-    --agent-brain: 270 45% 50%;
-    --agent-support: 160 50% 40%;
-    --agent-hr: 340 45% 50%;
-    --agent-compliance: 25 60% 50%;
-    --agent-sales: 190 60% 45%;
-    --agent-data: 215 70% 50%;
+    --sidebar-accent: 240 6% 97%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 239 84% 67%;
   }
 
   .dark {
-    --background: 250 30% 8%;
-    --foreground: 250 20% 96%;
-    --card: 250 30% 10%;
-    --card-foreground: 250 20% 96%;
-    --popover: 250 30% 8%;
-    --popover-foreground: 250 20% 96%;
-    --primary: 250 70% 60%;
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 250 25% 14%;
-    --secondary-foreground: 250 20% 96%;
-    --muted: 250 25% 16%;
-    --muted-foreground: 250 20% 60%;
-    --accent: 200 90% 55%;
-    --accent-foreground: 0 0% 100%;
-    --border: 250 25% 20%;
-    --input: 250 25% 16%;
+
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 5% 60%;
+
+    --accent: 240 4% 15%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 239 84% 67%;
+
+    /* Sidebar dark */
+    --sidebar-background: 240 10% 5%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 239 84% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 4% 16%;
+    --sidebar-ring: 239 84% 67%;
   }
 }
 

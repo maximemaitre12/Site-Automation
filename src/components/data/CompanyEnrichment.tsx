@@ -280,53 +280,44 @@ export function CompanyEnrichment() {
             <ScrollArea className="h-[500px]">
               <div className="space-y-3">
                 {companies.map((company) => (
-                  <div
+                  <button
                     key={company.id}
-                    className="p-4 rounded-lg bg-muted/30 border border-border/50 hover:border-primary/50 transition-all cursor-pointer group"
+                    className="w-full text-left p-4 rounded-2xl bg-card border border-border/50 hover:shadow-lg hover:border-primary/20 transition-all cursor-pointer group"
                     onClick={() => handleSelectCompany(company)}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="h-12 w-12 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                          <Building2 className="h-6 w-6 text-primary" />
+                    <div className="flex items-start gap-3">
+                      <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-lg font-bold text-primary">
+                          {company.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-medium text-foreground truncate max-w-[180px] sm:max-w-[300px]">{company.name}</h4>
+                          {getVerificationBadge(company)}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium truncate">{company.name}</h4>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                            {company.naf_label && <span className="truncate max-w-[200px]">{company.naf_label}</span>}
-                            {company.city && (
-                              <>
-                                <span>•</span>
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  {company.city}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4 mt-2 text-sm">
-                            {company.revenue && (
-                              <div className="flex items-center gap-1 text-muted-foreground">
-                                <TrendingUp className="h-3 w-3" />
-                                <span>CA: {formatCurrency(company.revenue)}</span>
-                              </div>
-                            )}
-                            {company.employees_range && (
-                              <div className="text-muted-foreground">
-                                {company.employees_range}
-                              </div>
-                            )}
-                            {company.siren && (
-                              <div className="font-mono text-xs text-muted-foreground">
-                                SIREN: {company.siren}
-                              </div>
-                            )}
-                          </div>
+                        {company.naf_label && (
+                          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">{company.naf_label}</p>
+                        )}
+                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
+                          {company.city && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {company.city}
+                            </span>
+                          )}
+                          {company.revenue && (
+                            <span className="flex items-center gap-1">
+                              <TrendingUp className="h-3 w-3" />
+                              {formatCurrency(company.revenue)}
+                            </span>
+                          )}
+                          {company.employees_range && (
+                            <span>{company.employees_range}</span>
+                          )}
                         </div>
                       </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
                       <div className="flex flex-col items-end gap-2">
                         {getVerificationBadge(company)}
                         <Button 
