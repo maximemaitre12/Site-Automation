@@ -144,6 +144,104 @@ export default {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        // Tour animation keyframes
+        "cursor-trail": {
+          "0%": { opacity: "0.4", transform: "scale(1)" },
+          "100%": { opacity: "0", transform: "scale(2)" },
+        },
+        "cursor-ripple": {
+          "0%": { opacity: "0.8", transform: "translate(-50%, -50%) scale(0.5)" },
+          "100%": { opacity: "0", transform: "translate(-50%, -50%) scale(2)" },
+        },
+        "cursor-ripple-inner": {
+          "0%": { opacity: "0.6", transform: "scale(0.8)" },
+          "100%": { opacity: "0", transform: "scale(1.5)" },
+        },
+        "ripple-expand": {
+          "0%": { opacity: "1", transform: "scale(0)" },
+          "100%": { opacity: "0", transform: "scale(2)" },
+        },
+        "ripple-fade": {
+          "0%": { opacity: "0.5", transform: "scale(0)" },
+          "100%": { opacity: "0", transform: "scale(1.5)" },
+        },
+        "ripple-dot": {
+          "0%": { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+          "100%": { opacity: "0", transform: "translate(-50%, -50%) scale(0)" },
+        },
+        "tooltip-appear": {
+          "0%": { opacity: "0", transform: "scale(0.9)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "spotlight-pulse": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.95" },
+        },
+        "spotlight-border": {
+          "0%, 100%": { opacity: "0.8", strokeWidth: "2" },
+          "50%": { opacity: "1", strokeWidth: "3" },
+        },
+        "scene-enter": {
+          "0%": { opacity: "0", transform: "translateX(40px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "scene-exit": {
+          "0%": { opacity: "1", transform: "translateX(0)" },
+          "100%": { opacity: "0", transform: "translateX(-40px)" },
+        },
+        "element-highlight": {
+          "0%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0.4)" },
+          "50%": { boxShadow: "0 0 0 8px hsl(var(--primary) / 0.2)" },
+          "100%": { boxShadow: "0 0 0 0 hsl(var(--primary) / 0)" },
+        },
+        "count-up": {
+          "0%": { opacity: "0", transform: "translateY(10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "progress-fill": {
+          "0%": { width: "0%" },
+          "100%": { width: "var(--progress-width)" },
+        },
+        "stagger-in": {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" },
+          "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.6)" },
+        },
+        "line-draw": {
+          "0%": { strokeDashoffset: "100%" },
+          "100%": { strokeDashoffset: "0%" },
+        },
+        "confetti": {
+          "0%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
+          "100%": { transform: "translateY(400px) rotate(720deg)", opacity: "0" },
+        },
+        "drag-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-4px)" },
+        },
+        "waveform": {
+          "0%, 100%": { height: "20%" },
+          "50%": { height: "100%" },
+        },
+        "typing-cursor": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
+        "slide-up-fade": {
+          "0%": { opacity: "0", transform: "translateY(30px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "zoom-in": {
+          "0%": { opacity: "0", transform: "scale(0.8)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -156,6 +254,25 @@ export default {
         "cloud-morph": "cloud-morph 12s ease-in-out infinite",
         "cloud-pulse": "cloud-pulse 4s ease-in-out infinite",
         "cloud-fade-in": "cloud-fade-in 0.6s ease-out forwards",
+        // Tour animations
+        "cursor-trail": "cursor-trail 0.3s ease-out forwards",
+        "cursor-ripple": "cursor-ripple 0.4s ease-out forwards",
+        "ripple-expand": "ripple-expand 0.6s ease-out forwards",
+        "tooltip-appear": "tooltip-appear 0.3s ease-out forwards",
+        "scene-enter": "scene-enter 0.5s ease-out forwards",
+        "scene-exit": "scene-exit 0.4s ease-out forwards",
+        "element-highlight": "element-highlight 1s ease-in-out",
+        "count-up": "count-up 0.4s ease-out forwards",
+        "stagger-in": "stagger-in 0.5s ease-out forwards",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "line-draw": "line-draw 1s ease-out forwards",
+        "confetti": "confetti 3s ease-out forwards",
+        "drag-float": "drag-float 0.3s ease-in-out infinite",
+        "waveform": "waveform 0.5s ease-in-out infinite",
+        "typing-cursor": "typing-cursor 1s step-end infinite",
+        "slide-up-fade": "slide-up-fade 0.6s ease-out forwards",
+        "zoom-in": "zoom-in 0.4s ease-out forwards",
+        "float": "float 3s ease-in-out infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
