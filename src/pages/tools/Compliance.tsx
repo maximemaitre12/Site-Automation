@@ -412,6 +412,7 @@ export default function Compliance() {
           onOpenChange={setReportDialogOpen}
           report={report}
           loading={generatingReport}
+          auditTitle={selectedAudit?.title || "Audit"}
         />
       </div>
     </DashboardLayout>

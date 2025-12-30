@@ -66,7 +66,7 @@ export function DocSidebar({
   const rootFolders = folders.filter(f => !f.parent_id);
 
   return (
-    <div className="w-64 border-r border-border bg-muted/30 flex flex-col">
+    <div className="w-64 border-r border-border bg-secondary flex flex-col">
       <div className="p-4 border-b border-border">
         <h2 className="font-semibold text-lg flex items-center gap-2">
           <FileText className="w-5 h-5 text-primary" />
