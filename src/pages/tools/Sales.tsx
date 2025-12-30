@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   FileText, Mail, Phone, Sparkles, User, Building, 
   Loader2, CheckCircle, Copy, History, ChevronRight, Kanban, Target,
-  Presentation, ShieldCheck
+  Presentation, ShieldCheck, MoreHorizontal
 } from "lucide-react";
 import { useState } from "react";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
@@ -24,6 +24,7 @@ import { ComplianceChecker } from "@/components/sales/ComplianceChecker";
 import { useToast } from "@/hooks/use-toast";
 import { SalesDeal } from "@/hooks/useAIIntelligence";
 import { BarChart3 as SalesIcon } from "lucide-react";
+import { MobileTabBar } from "@/components/mobile/MobileTabBar";
 
 export default function Sales() {
   const [activeTab, setActiveTab] = useState<"pipeline" | "proposal" | "call" | "email" | "negotiation" | "presentation" | "compliance">("pipeline");
@@ -144,7 +145,7 @@ export default function Sales() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col overflow-hidden">
+      <div className="h-full flex flex-col overflow-hidden pb-14 md:pb-0">
         {/* Header */}
         <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
           <div className="flex items-center justify-between gap-3">
@@ -527,6 +528,29 @@ export default function Sales() {
             </aside>
           )}
         </div>
+        
+        {/* Mobile Tab Bar */}
+        <MobileTabBar
+          items={[
+            { id: 'pipeline', label: 'Pipeline', icon: Kanban },
+            { id: 'call', label: 'Appels', icon: Phone },
+            { id: 'presentation', label: 'Présentation', icon: Presentation },
+            { id: 'email', label: 'Email', icon: Mail },
+            { id: 'more', label: 'Plus', icon: MoreHorizontal },
+          ]}
+          activeTab={activeTab === 'negotiation' || activeTab === 'proposal' || activeTab === 'compliance' ? 'more' : activeTab}
+          onTabChange={(id) => {
+            if (id === 'more') {
+              // Cycle through extra tabs
+              if (activeTab === 'negotiation') setActiveTab('proposal');
+              else if (activeTab === 'proposal') setActiveTab('compliance');
+              else setActiveTab('negotiation');
+            } else {
+              setActiveTab(id as typeof activeTab);
+            }
+          }}
+          accentColor="bg-agent-sales"
+        />
       </div>
     </DashboardLayout>
   );

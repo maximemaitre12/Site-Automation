@@ -10,7 +10,7 @@ import {
   Users, Upload, Sparkles, Briefcase, Plus, Search, Loader2, 
   UserPlus, CheckCircle, Clock, UsersRound, TrendingUp, 
   AlertTriangle, DoorOpen, Calendar, CalendarDays, List, LayoutGrid,
-  FileText, Target, Mic, BarChart3, Award, History, Mail, X
+  FileText, Target, Mic, BarChart3, Award, History, Mail, X, MoreHorizontal
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useHR } from "@/hooks/useHR";
@@ -34,6 +34,7 @@ import { EmailInbox } from "@/components/hr/email/EmailInbox";
 import { EmailAccountConnect } from "@/components/hr/email/EmailAccountConnect";
 import { useHREmails } from "@/hooks/useHREmails";
 import { Users as UsersIcon } from "lucide-react";
+import { MobileTabBar, MobileTabItem } from "@/components/mobile/MobileTabBar";
 
 export default function HR() {
   const { 
@@ -174,7 +175,7 @@ export default function HR() {
 
   return (
     <DashboardLayout>
-      <div className="absolute inset-0 flex flex-col overflow-hidden">
+      <div className="absolute inset-0 flex flex-col overflow-hidden pb-14 md:pb-0">
         {/* Header */}
         <header className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/50">
           <div className="flex items-center justify-between gap-3">
@@ -689,6 +690,34 @@ export default function HR() {
           )}
         </div>
       </div>
+      
+      {/* Mobile Tab Bar */}
+      <MobileTabBar
+        items={
+          mainTab === 'recruitment' 
+            ? [
+                { id: 'pipeline', label: 'Pipeline', icon: Users, badge: stats.candidates },
+                { id: 'interviews', label: 'Entretiens', icon: Calendar, badge: stats.upcomingInterviews },
+                { id: 'jobs', label: 'Postes', icon: Briefcase, badge: stats.activeJobs },
+                { id: 'emails', label: 'Emails', icon: Mail, badge: stats.newEmails > 0 ? stats.newEmails : undefined },
+              ]
+            : [
+                { id: 'employees', label: 'Équipe', icon: UsersRound, badge: stats.employees },
+                { id: 'hr', label: 'Gestion', icon: AlertTriangle, badge: stats.openDisputes },
+                { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+              ]
+        }
+        activeTab={mainTab === 'recruitment' ? recruitmentSection : teamSection}
+        onTabChange={(id) => {
+          if (mainTab === 'recruitment') {
+            setRecruitmentSection(id as any);
+          } else {
+            setTeamSection(id as any);
+          }
+          setShowMobileSidebar(false);
+        }}
+        accentColor="bg-agent-hr"
+      />
       
       {/* Convert candidate dialog */}
       {convertCandidate && (

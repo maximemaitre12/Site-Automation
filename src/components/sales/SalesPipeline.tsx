@@ -40,6 +40,7 @@ import {
   FileText,
   RefreshCw
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useAIIntelligence, SalesDeal } from '@/hooks/useAIIntelligence';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -478,78 +479,78 @@ export function SalesPipeline() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header Stats - Plus utiles */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Target className="h-4 w-4 text-primary" />
-              <span className="text-xs text-muted-foreground">Deals actifs</span>
+    <div className="space-y-4 md:space-y-6">
+      {/* Header Stats - Mobile optimized with horizontal scroll */}
+      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:grid md:grid-cols-6 scrollbar-hide">
+        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 shrink-0 w-32 md:w-auto">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+              <Target className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
+              <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">Actifs</span>
             </div>
-            <div className="text-2xl font-bold">{stats.activeCount}</div>
+            <div className="text-lg md:text-2xl font-bold">{stats.activeCount}</div>
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-blue-500/5 to-blue-500/10 border-blue-500/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-blue-500" />
-              <span className="text-xs text-muted-foreground">Pipeline pondéré</span>
+        <Card className="bg-gradient-to-br from-blue-500/5 to-blue-500/10 border-blue-500/20 shrink-0 w-36 md:w-auto">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+              <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-500" />
+              <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">Pipeline</span>
             </div>
-            <div className="text-2xl font-bold">€{stats.pipelineValue.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</div>
+            <div className="text-lg md:text-2xl font-bold">€{stats.pipelineValue.toLocaleString('fr-FR', { maximumFractionDigits: 0, notation: 'compact' })}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-500/5 to-green-500/10 border-green-500/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span className="text-xs text-muted-foreground">Revenus gagnés</span>
+        <Card className="bg-gradient-to-br from-green-500/5 to-green-500/10 border-green-500/20 shrink-0 w-36 md:w-auto">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+              <CheckCircle2 className="h-3.5 w-3.5 md:h-4 md:w-4 text-green-500" />
+              <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">Gagnés</span>
             </div>
-            <div className="text-2xl font-bold text-green-600">€{stats.wonValue.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</div>
+            <div className="text-lg md:text-2xl font-bold text-green-600">€{stats.wonValue.toLocaleString('fr-FR', { maximumFractionDigits: 0, notation: 'compact' })}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Activity className="h-4 w-4 text-purple-500" />
-              <span className="text-xs text-muted-foreground">Taux conversion</span>
+        <Card className="shrink-0 w-28 md:w-auto">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+              <Activity className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-500" />
+              <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">Conv.</span>
             </div>
-            <div className="text-2xl font-bold">{stats.conversionRate.toFixed(0)}%</div>
+            <div className="text-lg md:text-2xl font-bold">{stats.conversionRate.toFixed(0)}%</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Euro className="h-4 w-4 text-amber-500" />
-              <span className="text-xs text-muted-foreground">Deal moyen</span>
+        <Card className="shrink-0 w-32 md:w-auto">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+              <Euro className="h-3.5 w-3.5 md:h-4 md:w-4 text-amber-500" />
+              <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">Moy.</span>
             </div>
-            <div className="text-2xl font-bold">€{stats.avgDealValue.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}</div>
+            <div className="text-lg md:text-2xl font-bold">€{stats.avgDealValue.toLocaleString('fr-FR', { maximumFractionDigits: 0, notation: 'compact' })}</div>
           </CardContent>
         </Card>
 
-        <Card className={stats.atRiskCount > 0 ? 'bg-gradient-to-br from-red-500/5 to-red-500/10 border-red-500/20' : ''}>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className={`h-4 w-4 ${stats.atRiskCount > 0 ? 'text-red-500' : 'text-muted-foreground'}`} />
-              <span className="text-xs text-muted-foreground">À risque</span>
+        <Card className={cn("shrink-0 w-28 md:w-auto", stats.atRiskCount > 0 && 'bg-gradient-to-br from-red-500/5 to-red-500/10 border-red-500/20')}>
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
+              <AlertTriangle className={`h-3.5 w-3.5 md:h-4 md:w-4 ${stats.atRiskCount > 0 ? 'text-red-500' : 'text-muted-foreground'}`} />
+              <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">Risque</span>
             </div>
-            <div className={`text-2xl font-bold ${stats.atRiskCount > 0 ? 'text-red-600' : ''}`}>{stats.atRiskCount}</div>
+            <div className={`text-lg md:text-2xl font-bold ${stats.atRiskCount > 0 ? 'text-red-600' : ''}`}>{stats.atRiskCount}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Create Deal Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Pipeline de Vente</h2>
+        <h2 className="text-base md:text-xl font-semibold">Pipeline de Vente</h2>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nouveau Deal
+            <Button size="sm" className="h-8 md:h-9 text-xs md:text-sm">
+              <Plus className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
+              <span className="hidden xs:inline">Nouveau</span> Deal
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -653,13 +654,13 @@ export function SalesPipeline() {
         </Dialog>
       </div>
 
-      {/* Pipeline Kanban avec Drag & Drop */}
-      <ScrollArea className="w-full">
-        <div className="flex gap-3 pb-4" style={{ minWidth: 'max-content' }}>
+      {/* Pipeline Kanban avec Drag & Drop - Mobile optimized */}
+      <ScrollArea className="w-full -mx-3 px-3 md:mx-0 md:px-0">
+        <div className="flex gap-2 md:gap-3 pb-4" style={{ minWidth: 'max-content' }}>
           {SALES_STATUSES.map((status) => (
             <div 
               key={status.value} 
-              className={`w-72 flex-shrink-0 transition-all ${dragOverStatus === status.value ? 'scale-[1.02]' : ''}`}
+              className={`w-64 md:w-72 flex-shrink-0 transition-all ${dragOverStatus === status.value ? 'scale-[1.02]' : ''}`}
               onDragOver={(e) => handleDragOver(e, status.value)}
               onDrop={() => handleDrop(status.value)}
               onDragLeave={() => setDragOverStatus(null)}
