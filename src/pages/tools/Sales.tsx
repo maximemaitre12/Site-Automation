@@ -180,7 +180,7 @@ export default function Sales() {
                 key={tab.key}
                 variant={activeTab === tab.key ? "default" : "ghost"}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                className={`gap-1.5 shrink-0 h-8 px-2.5 md:px-3 text-xs md:text-sm ${activeTab === tab.key ? "bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90" : ""}`}
+                className={`gap-1.5 shrink-0 h-8 px-2.5 md:px-3 text-xs md:text-sm ${activeTab === tab.key ? "bg-agent-sales hover:bg-agent-sales/90" : ""}`}
                 size="sm"
               >
                 <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -263,7 +263,7 @@ export default function Sales() {
                 </div>
 
                 <Button 
-                  className="w-full bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90"
+                  className="w-full bg-agent-sales hover:bg-agent-sales/90"
                   onClick={handleGenerateProposal}
                   disabled={generatingProposal}
                 >
@@ -301,7 +301,7 @@ export default function Sales() {
                 />
                 
                 {selectedCallDeal && (
-                  <Card className="border-[hsl(var(--agent-sales))]/30 bg-[hsl(var(--agent-sales))]/5">
+                  <Card className="border-agent-sales/30 bg-agent-sales/5">
                     <CardContent className="p-3 md:p-4">
                       <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0">
@@ -354,7 +354,7 @@ export default function Sales() {
                 </div>
 
                 <Button 
-                  className="w-full bg-[hsl(var(--agent-sales))] hover:bg-[hsl(var(--agent-sales))]/90"
+                  className="w-full bg-agent-sales hover:bg-agent-sales/90"
                   onClick={handleAnalyzeCall}
                   disabled={analyzingCall || !transcript.trim()}
                 >
