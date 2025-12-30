@@ -128,8 +128,8 @@ export default function HR() {
   }) => (
     <div className="flex items-center justify-between mb-4 md:mb-6">
       <div className="flex items-center gap-2 md:gap-3 min-w-0">
-        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-[hsl(var(--agent-hr))]/10 flex items-center justify-center shrink-0">
-          <Icon className="w-4 h-4 md:w-5 md:h-5 text-[hsl(var(--agent-hr))]" />
+        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-agent-hr/10 flex items-center justify-center shrink-0">
+          <Icon className="w-4 h-4 md:w-5 md:h-5 text-agent-hr" />
         </div>
         <div className="min-w-0">
           <h2 className="font-semibold text-foreground text-sm md:text-base truncate">{title}</h2>
@@ -158,7 +158,7 @@ export default function HR() {
       onClick={onClick}
       className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
         active 
-          ? 'bg-[hsl(var(--agent-hr))] text-white' 
+          ? 'bg-agent-hr text-white' 
           : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
@@ -234,7 +234,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'pipeline' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -248,7 +248,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'interviews' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -262,7 +262,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'jobs' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -276,7 +276,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     recruitmentSection === 'emails' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -298,7 +298,7 @@ export default function HR() {
                       <div className="text-[9px] md:text-xs text-muted-foreground">Nouveaux</div>
                     </div>
                     <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
-                      <div className="text-sm md:text-lg font-bold text-[hsl(var(--agent-hr))]">{stats.analyzedCandidates}</div>
+                      <div className="text-sm md:text-lg font-bold text-agent-hr">{stats.analyzedCandidates}</div>
                       <div className="text-[9px] md:text-xs text-muted-foreground">Analysés</div>
                     </div>
                     <div className="p-1.5 md:p-2 rounded-lg bg-muted/50 text-center">
@@ -321,7 +321,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     teamSection === 'employees' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -335,7 +335,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     teamSection === 'hr' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
@@ -349,7 +349,7 @@ export default function HR() {
                   className={cn(
                     "w-full flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors",
                     teamSection === 'analytics' 
-                      ? 'bg-[hsl(var(--agent-hr))] text-white' 
+                      ? 'bg-agent-hr text-white' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
