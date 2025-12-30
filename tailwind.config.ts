@@ -65,6 +65,7 @@ export default {
           hr: "hsl(var(--agent-hr))",
           compliance: "hsl(var(--agent-compliance))",
           sales: "hsl(var(--agent-sales))",
+          data: "hsl(var(--agent-data))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

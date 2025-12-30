@@ -14,13 +14,13 @@ const Data = () => {
     <DashboardLayout>
       <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-3 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-500 flex items-center justify-center shrink-0">
-              <Database className="w-4 h-4 md:w-5 md:h-5 text-white" />
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-data/10 border border-agent-data/20 flex items-center justify-center shrink-0">
+              <Database className="w-5 h-5 md:w-6 md:h-6 text-agent-data" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">AETHER Data</h1>
+              <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Data</h1>
               <p className="text-muted-foreground text-xs md:text-sm hidden md:block">
                 Plateforme de données d'entreprise
               </p>

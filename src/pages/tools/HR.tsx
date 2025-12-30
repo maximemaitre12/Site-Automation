@@ -176,32 +176,33 @@ export default function HR() {
     <DashboardLayout>
       <div className="absolute inset-0 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="shrink-0 px-3 md:px-4 py-2.5 md:py-3 border-b border-border bg-card/50">
-          <div className="flex items-center justify-between gap-2 md:gap-4">
-            <div className="flex items-center gap-2 md:gap-3 min-w-0">
+        <header className="shrink-0 px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/50">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <button
                 className="md:hidden p-1.5 -ml-1 rounded-lg hover:bg-muted shrink-0"
                 onClick={() => setShowMobileSidebar(!showMobileSidebar)}
               >
                 {showMobileSidebar ? <X className="w-5 h-5" /> : <List className="w-5 h-5" />}
               </button>
-              <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-hr/10 border border-agent-hr/20 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-hr/10 border border-agent-hr/20 flex items-center justify-center shrink-0">
                 <UsersIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-hr" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-base md:text-lg font-bold text-foreground truncate">HR Copilot</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">HR Copilot</h1>
+                <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Recrutement et gestion des talents</p>
               </div>
             </div>
             
             {/* Main tab toggle */}
             <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
-              <TabsList className="grid grid-cols-2 w-36 md:w-64 h-8 md:h-9">
-                <TabsTrigger value="recruitment" className="gap-1 md:gap-1.5 text-[10px] md:text-sm h-7 md:h-8">
-                  <UserPlus className="w-3 h-3 md:w-3.5 md:h-3.5" />
+              <TabsList className="grid grid-cols-2 w-40 md:w-64 h-8 md:h-9">
+                <TabsTrigger value="recruitment" className="gap-2 text-xs md:text-sm h-7 md:h-8">
+                  <UserPlus className="w-4 h-4" />
                   <span className="hidden xs:inline">Recrutement</span>
                 </TabsTrigger>
-                <TabsTrigger value="team" className="gap-1 md:gap-1.5 text-[10px] md:text-sm h-7 md:h-8">
-                  <UsersRound className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                <TabsTrigger value="team" className="gap-2 text-xs md:text-sm h-7 md:h-8">
+                  <UsersRound className="w-4 h-4" />
                   <span className="hidden xs:inline">Équipe</span>
                 </TabsTrigger>
               </TabsList>

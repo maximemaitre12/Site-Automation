@@ -336,24 +336,25 @@ export default function Flow() {
     <DashboardLayout headerActions={headerActions}>
       <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="px-3 md:px-4 py-2 md:py-3 border-b border-border bg-card/30 shrink-0">
-          <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-agent-flow/10 border border-agent-flow/20 flex items-center justify-center shrink-0">
+        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-flow/10 border border-agent-flow/20 flex items-center justify-center shrink-0">
               <WorkflowIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-flow" />
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-base md:text-lg font-bold text-foreground truncate">AETHER Flow</h1>
+              <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Flow</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Automatisation et workflows IA</p>
             </div>
             
             {/* Tabs for Workflows vs Automation */}
             <Tabs value={flowTab} onValueChange={(v) => setFlowTab(v as typeof flowTab)} className="shrink-0">
               <TabsList className="h-8 md:h-9">
-                <TabsTrigger value="workflows" className="gap-1 md:gap-2 text-xs md:text-sm h-7 md:h-8 px-2 md:px-3">
-                  <Zap className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <TabsTrigger value="workflows" className="gap-2 text-xs md:text-sm h-7 md:h-8 px-3">
+                  <Zap className="w-4 h-4" />
                   <span className="hidden sm:inline">Workflows</span>
                 </TabsTrigger>
-                <TabsTrigger value="automation" className="gap-1 md:gap-2 text-xs md:text-sm h-7 md:h-8 px-2 md:px-3">
-                  <Bot className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <TabsTrigger value="automation" className="gap-2 text-xs md:text-sm h-7 md:h-8 px-3">
+                  <Bot className="w-4 h-4" />
                   <span className="hidden sm:inline">Auto IA</span>
                 </TabsTrigger>
               </TabsList>
