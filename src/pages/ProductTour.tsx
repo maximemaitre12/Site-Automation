@@ -1,8 +1,8 @@
 import React from 'react';
-import { ProductTourPlayer } from '@/components/tour/ProductTourPlayer';
+import { CinematicTourPlayer } from '@/components/tour/CinematicTourPlayer';
 
 const ProductTour = () => {
-  return <ProductTourPlayer />;
+  return <CinematicTourPlayer />;
 };
 
 export default ProductTour;
