@@ -50,6 +50,7 @@ export function ProductTourVideoPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [isEnded, setIsEnded] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const playbackSpeedRef = useRef(playbackSpeed);
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
@@ -57,19 +58,10 @@ export function ProductTourVideoPlayer() {
 
   const speedOptions = [0.5, 1, 1.5, 2];
 
-  const decreaseSpeed = () => {
-    const currentIndex = speedOptions.indexOf(playbackSpeed);
-    if (currentIndex > 0) {
-      setPlaybackSpeed(speedOptions[currentIndex - 1]);
-    }
-  };
-
-  const increaseSpeed = () => {
-    const currentIndex = speedOptions.indexOf(playbackSpeed);
-    if (currentIndex < speedOptions.length - 1) {
-      setPlaybackSpeed(speedOptions[currentIndex + 1]);
-    }
-  };
+  // Keep ref in sync with state
+  useEffect(() => {
+    playbackSpeedRef.current = playbackSpeed;
+  }, [playbackSpeed]);
 
   const totalDuration = useMemo(() => getTotalDuration(), []);
 
@@ -105,7 +97,7 @@ export function ProductTourVideoPlayer() {
     return Math.min(100, (elapsed / currentSegment.duration) * 100);
   }, [currentSegment, currentTime]);
 
-  // Animation loop
+  // Animation loop - uses ref for speed to avoid re-creating callback
   const animate = useCallback((timestamp: number) => {
     if (!lastTimeRef.current) {
       lastTimeRef.current = timestamp;
@@ -115,7 +107,7 @@ export function ProductTourVideoPlayer() {
     lastTimeRef.current = timestamp;
 
     setCurrentTime((prev) => {
-      const next = prev + (delta * playbackSpeed);
+      const next = prev + (delta * playbackSpeedRef.current);
       if (next >= totalDuration) {
         setIsPlaying(false);
         setIsEnded(true);
@@ -125,7 +117,7 @@ export function ProductTourVideoPlayer() {
     });
 
     animationRef.current = requestAnimationFrame(animate);
-  }, [totalDuration, playbackSpeed]);
+  }, [totalDuration]);
 
   // Start/stop animation
   useEffect(() => {
