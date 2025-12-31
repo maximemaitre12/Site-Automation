@@ -11,7 +11,7 @@ export const tourScripts: TourScript[] = [
     id: 'intro',
     title: 'Welcome to AETHER',
     text: "Welcome to AETHER. The revolutionary AI platform that transforms how businesses operate. Imagine having 7 specialized AI agents working 24/7, handling everything from hiring to sales, support to compliance. This isn't the future. This is now. Let me show you what's possible.",
-    duration: 9600,
+    duration: 5500,
   },
   {
     id: 'hr',

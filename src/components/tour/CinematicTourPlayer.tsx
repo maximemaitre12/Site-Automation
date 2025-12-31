@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Pause, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar, Volume2, VolumeX } from 'lucide-react';
+import { Home, Play, Pause, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
@@ -307,12 +307,12 @@ export function CinematicTourPlayer() {
                 <Volume2 className="w-4 h-4 text-foreground/70" />
               )}
             </button>
-            {/* Close button */}
+            {/* Home button */}
             <button
               onClick={handleClose}
               className="w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center hover:bg-black/20 transition-colors"
             >
-              <X className="w-4 h-4 text-foreground/70" />
+              <Home className="w-4 h-4 text-foreground/70" />
             </button>
           </div>
 
@@ -414,24 +414,24 @@ export function CinematicTourPlayer() {
         )}
 
         {/* CTA Buttons */}
-        <div className="flex flex-wrap justify-center gap-3 mt-4 shrink-0">
+        <div className="flex flex-wrap justify-center gap-4 mt-5 shrink-0">
           <Button
-            size="sm"
+            size="lg"
             variant="outline"
             onClick={() => navigate('/contact')}
-            className="px-3 py-1.5 text-xs rounded-lg border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
+            className="px-5 py-2.5 text-sm rounded-xl border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
           >
-            <Calendar className="w-3 h-3 mr-1.5 text-primary group-hover:scale-110 transition-transform" />
+            <Calendar className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
             Demander une démo
           </Button>
           
           <Button
-            size="sm"
+            size="lg"
             onClick={() => navigate('/auth')}
-            className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-md shadow-primary/20"
+            className="px-5 py-2.5 text-sm rounded-xl bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
           >
             Commencer gratuitement
-            <ArrowRight className="w-3 h-3 ml-1.5" />
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>
