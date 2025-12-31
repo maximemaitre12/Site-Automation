@@ -260,18 +260,18 @@ export function ProductTourVideoPlayer() {
 
         {/* Segment info with logo and controls */}
         {currentSegment && (
-          <div className="flex items-start gap-4 p-3 rounded-xl bg-muted/30 border border-border/50">
+          <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-muted/30 border border-border/50">
             {/* Agent icon */}
-            <div className={cn("w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center bg-gradient-to-br", agentColor)}>
-              {AgentIcon && <AgentIcon className="w-5 h-5 text-white" />}
+            <div className={cn("w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex-shrink-0 flex items-center justify-center bg-gradient-to-br", agentColor)}>
+              {AgentIcon && <AgentIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
             </div>
             
             {/* Text content */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-foreground mb-1">
+              <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-0.5">
                 {currentSegment.title}
               </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
                 {currentSegment.text}
               </p>
             </div>
