@@ -8,24 +8,25 @@ interface OverviewDiagramProps {
 }
 
 export function OverviewDiagram({ progress, compact = false, accentColor = 'hsl(var(--primary))' }: OverviewDiagramProps) {
-  const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
+  const viewBox = compact ? '0 0 320 80' : '0 0 400 120';
 
+  // Use CSS variables for perfect color sync with agent themes
   const agents = useMemo(() => [
-    { id: 'hr', label: 'HR', color: 'hsl(280 80% 55%)', angle: 0 },
-    { id: 'sales', label: 'Sales', color: 'hsl(38 92% 50%)', angle: 51 },
-    { id: 'support', label: 'Support', color: 'hsl(200 80% 50%)', angle: 103 },
-    { id: 'brain', label: 'Brain', color: 'hsl(142 76% 46%)', angle: 154 },
-    { id: 'compliance', label: 'Compliance', color: 'hsl(0 84% 60%)', angle: 206 },
-    { id: 'flow', label: 'Flow', color: 'hsl(260 80% 55%)', angle: 257 },
-    { id: 'data', label: 'Data', color: 'hsl(180 70% 45%)', angle: 308 },
+    { id: 'hr', label: 'HR', color: 'hsl(var(--agent-hr))', angle: 0 },
+    { id: 'sales', label: 'Sales', color: 'hsl(var(--agent-sales))', angle: 51 },
+    { id: 'support', label: 'Support', color: 'hsl(var(--agent-support))', angle: 103 },
+    { id: 'brain', label: 'Brain', color: 'hsl(var(--agent-brain))', angle: 154 },
+    { id: 'compliance', label: 'Compliance', color: 'hsl(var(--agent-compliance))', angle: 206 },
+    { id: 'flow', label: 'Flow', color: 'hsl(var(--agent-flow))', angle: 257 },
+    { id: 'data', label: 'Data', color: 'hsl(var(--agent-data))', angle: 308 },
   ], []);
 
-  const centerX = 200;
-  const centerY = 60;
-  const radius = compact ? 35 : 42;
+  const centerX = compact ? 160 : 200;
+  const centerY = compact ? 45 : 60;
+  const radius = compact ? 28 : 42;
 
   return (
-    <DiagramShell viewBox={viewBox} accentColor="hsl(var(--primary))">
+    <DiagramShell viewBox={viewBox} accentColor={accentColor}>
       {/* Title */}
       <text x="10" y="14" fill="hsl(var(--muted-foreground))" fontSize="8" fontWeight="500" opacity="0.6">
         AETHER AGENT MESH
