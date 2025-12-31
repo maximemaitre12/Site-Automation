@@ -88,19 +88,17 @@ export function CinematicTourPlayer() {
   const currentAgentIntro = agentIntros[currentScript.id];
   const isAgentScene = currentAgentIntro !== undefined;
 
-  // Show intro overlay at the start of each agent scene - reset scene progress first
+  // Hide intro after delay - intro is pre-activated in goToNextScene
   useEffect(() => {
-    if (isAgentScene) {
-      setSceneProgress(0); // Reset progress BEFORE showing intro
-      setShowIntro(true);
+    if (isAgentScene && showIntro) {
       const timer = setTimeout(() => {
         setShowIntro(false);
       }, 2500);
       return () => clearTimeout(timer);
-    } else {
+    } else if (!isAgentScene) {
       setShowIntro(false);
     }
-  }, [currentSceneIndex, isAgentScene]);
+  }, [currentSceneIndex, isAgentScene, showIntro]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -140,9 +138,18 @@ export function CinematicTourPlayer() {
     if (currentSceneIndex >= totalScenes - 1) return;
     
     setIsTransitioning(true);
+    
+    // Pre-activate intro for the next scene BEFORE transitioning
+    const nextSceneId = tourScripts[currentSceneIndex + 1]?.id;
+    const isNextAgentScene = nextSceneId && agentIntros[nextSceneId] !== undefined;
+    
     setTimeout(() => {
-      setCurrentSceneIndex(prev => prev + 1);
+      // Set intro BEFORE changing scene to avoid flash
+      if (isNextAgentScene) {
+        setShowIntro(true);
+      }
       setSceneProgress(0);
+      setCurrentSceneIndex(prev => prev + 1);
       setIsTransitioning(false);
     }, 600);
   }, [currentSceneIndex, totalScenes]);
