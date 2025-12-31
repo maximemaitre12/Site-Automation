@@ -348,6 +348,16 @@ export function CinematicTourPlayer() {
           </div>
         </div>
 
+        {/* Technical diagrams - above CTA buttons */}
+        <div className="w-full max-w-4xl mt-3 shrink-0 h-[100px] md:h-[120px]">
+          <TechnicalDiagrams 
+            sceneId={currentScript.id} 
+            progress={sceneProgress} 
+            compact={true}
+            agentColor={currentAgentIntro ? currentAgentIntro.color.replace('text-', '') : undefined}
+          />
+        </div>
+
         {/* CTA Buttons - smaller */}
         <div className="flex flex-wrap justify-center gap-2 mt-3 shrink-0">
           <Button
@@ -368,11 +378,6 @@ export function CinematicTourPlayer() {
             Commencer gratuitement
             <ArrowRight className="w-3 h-3 ml-1.5" />
           </Button>
-        </div>
-
-        {/* Technical diagrams */}
-        <div className="w-full mt-3 shrink-0">
-          <TechnicalDiagrams sceneId={currentScript.id} progress={sceneProgress} />
         </div>
       </div>
     </div>

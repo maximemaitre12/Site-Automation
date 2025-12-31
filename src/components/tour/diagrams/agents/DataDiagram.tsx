@@ -5,9 +5,10 @@ import { DiagramNode, DiagramEdge, MetricChip, ParticleFlow } from '../primitive
 interface DataDiagramProps {
   progress: number;
   compact?: boolean;
+  accentColor?: string;
 }
 
-export function DataDiagram({ progress, compact = false }: DataDiagramProps) {
+export function DataDiagram({ progress, compact = false, accentColor = 'hsl(199 89% 48%)' }: DataDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -19,7 +20,7 @@ export function DataDiagram({ progress, compact = false }: DataDiagramProps) {
   const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
 
   return (
-    <DiagramShell viewBox={viewBox} accentColor="hsl(180 70% 45%)">
+    <DiagramShell viewBox={viewBox} accentColor={accentColor}>
       {/* Title */}
       <text x="10" y="14" fill="hsl(var(--muted-foreground))" fontSize="8" fontWeight="500" opacity="0.6">
         UNIFIED DATA PLATFORM

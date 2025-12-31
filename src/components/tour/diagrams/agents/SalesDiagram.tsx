@@ -5,9 +5,10 @@ import { DiagramNode, DiagramEdge, MetricChip, ParticleFlow } from '../primitive
 interface SalesDiagramProps {
   progress: number;
   compact?: boolean;
+  accentColor?: string;
 }
 
-export function SalesDiagram({ progress, compact = false }: SalesDiagramProps) {
+export function SalesDiagram({ progress, compact = false, accentColor = 'hsl(142 76% 36%)' }: SalesDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -27,7 +28,7 @@ export function SalesDiagram({ progress, compact = false }: SalesDiagramProps) {
   ];
 
   return (
-    <DiagramShell viewBox={viewBox} accentColor="hsl(38 92% 50%)">
+    <DiagramShell viewBox={viewBox} accentColor={accentColor}>
       {/* Title */}
       <text x="10" y="14" fill="hsl(var(--muted-foreground))" fontSize="8" fontWeight="500" opacity="0.6">
         PREDICTIVE DEAL SCORING
