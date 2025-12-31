@@ -13,10 +13,10 @@ export function TourIntro({ isActive }: TourIntroProps) {
     if (isActive) {
       setPhase(0);
       const timers = [
-        setTimeout(() => setPhase(1), 500),
-        setTimeout(() => setPhase(2), 1500),
-        setTimeout(() => setPhase(3), 2500),
-        setTimeout(() => setPhase(4), 3500),
+        setTimeout(() => setPhase(1), 200),
+        setTimeout(() => setPhase(2), 600),
+        setTimeout(() => setPhase(3), 1000),
+        setTimeout(() => setPhase(4), 1400),
       ];
       return () => timers.forEach(clearTimeout);
     }

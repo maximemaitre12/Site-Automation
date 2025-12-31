@@ -23,12 +23,12 @@ export function DemoSection() {
         
         {/* Preview card - mimics the intro scene */}
         <Link to="/product-tour" className="block">
-          <div className="relative group cursor-pointer max-w-md mx-auto">
+          <div className="relative group cursor-pointer max-w-xl mx-auto">
             {/* Glow effect on hover */}
             <div className="absolute -inset-1.5 bg-gradient-to-r from-primary/20 via-violet-500/20 to-primary/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {/* Card - white background like IntroScene */}
-            <div className="relative rounded-xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 aspect-video flex items-center justify-center">
+            <div className="relative rounded-xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 aspect-[2/1] flex items-center justify-center">
               {/* Logo centered like in IntroScene */}
               <div className="relative flex flex-col items-center">
                 <img 
