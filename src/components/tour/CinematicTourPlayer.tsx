@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
 import { SpringIn } from './animations';
-import { TechnicalDiagrams } from './TechnicalDiagrams';
+
 
 // Import scenes
 import { IntroScene } from './scenes/IntroScene';
@@ -348,37 +348,25 @@ export function CinematicTourPlayer() {
           </div>
         </div>
 
-        {/* Technical diagrams - compact for mobile, hidden during intro */}
-        {!showIntro && (
-          <div className="w-full max-w-3xl mt-1.5 shrink-0 h-[60px] md:h-[90px] px-2">
-            <TechnicalDiagrams 
-              sceneId={currentScript.id} 
-              progress={sceneProgress} 
-              compact={true}
-              agentColor={currentAgentIntro ? currentAgentIntro.color.replace('text-', '') : undefined}
-            />
-          </div>
-        )}
-
-        {/* CTA Buttons - compact for mobile */}
-        <div className="flex flex-wrap justify-center gap-1.5 mt-2 shrink-0">
+        {/* CTA Buttons */}
+        <div className="flex flex-wrap justify-center gap-2 mt-3 shrink-0">
           <Button
             size="sm"
             variant="outline"
             onClick={() => navigate('/contact')}
-            className="px-2.5 py-1 text-[10px] md:text-xs rounded-md border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
+            className="px-3 py-1.5 text-xs rounded-lg border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
           >
-            <Calendar className="w-3 h-3 mr-1 text-primary group-hover:scale-110 transition-transform" />
-            Démo
+            <Calendar className="w-3 h-3 mr-1.5 text-primary group-hover:scale-110 transition-transform" />
+            Demander une démo
           </Button>
           
           <Button
             size="sm"
             onClick={() => navigate('/auth')}
-            className="px-2.5 py-1 text-[10px] md:text-xs rounded-md bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-sm shadow-primary/20"
+            className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-md shadow-primary/20"
           >
-            Commencer
-            <ArrowRight className="w-3 h-3 ml-1" />
+            Commencer gratuitement
+            <ArrowRight className="w-3 h-3 ml-1.5" />
           </Button>
         </div>
       </div>
