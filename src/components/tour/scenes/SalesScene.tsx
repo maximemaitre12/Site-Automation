@@ -103,22 +103,26 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
   }, [calloutStep, isActive]);
 
   return (
-    <div ref={rootRef} className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-950">
+    <div 
+      ref={rootRef} 
+      className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-950"
+      style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
+    >
       {/* Background effects */}
       <div className="absolute inset-0">
         <div 
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `linear-gradient(hsl(var(--agent-sales)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--agent-sales)) 1px, transparent 1px)`,
-            backgroundSize: '48px 48px',
+            backgroundSize: '3em 3em',
           }}
         />
         <div className={cn(
-          "absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[150px] transition-all duration-1000",
+          "absolute top-0 right-1/4 w-[40%] aspect-square rounded-full blur-[100px] transition-all duration-1000",
           phase1 ? "bg-agent-sales/15 opacity-100" : "opacity-0"
         )} />
         <div className={cn(
-          "absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-[120px] transition-all duration-1000 delay-300",
+          "absolute bottom-0 left-1/4 w-[30%] aspect-square rounded-full blur-[80px] transition-all duration-1000 delay-300",
           phase3 ? "bg-red-500/10 opacity-100" : "opacity-0"
         )} />
       </div>
@@ -127,42 +131,42 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
 
       {/* Header */}
       <div className={cn(
-        "relative z-10 px-6 py-4 flex items-center justify-between border-b border-white/5 transition-all duration-700",
+        "relative z-10 px-[2%] py-[1.5%] flex items-center justify-between border-b border-white/5 transition-all duration-700",
         phase1 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
       )}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-agent-sales/20 flex items-center justify-center border border-agent-sales/30">
-            <TrendingUp className="w-5 h-5 text-agent-sales" />
+        <div className="flex items-center gap-[0.8em]">
+          <div className="w-[2.5em] h-[2.5em] rounded-xl bg-agent-sales/20 flex items-center justify-center border border-agent-sales/30">
+            <TrendingUp className="w-[1.2em] h-[1.2em] text-agent-sales" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white">Agent Ventes</h1>
-            <p className="text-xs text-white/40">Intelligence commerciale</p>
+            <h1 className="text-[1.3em] font-bold text-white leading-tight">Agent Ventes</h1>
+            <p className="text-[0.75em] text-white/40">Intelligence commerciale</p>
           </div>
         </div>
         <div className={cn(
-          "flex items-center gap-3 transition-all duration-500",
+          "flex items-center gap-[0.8em] transition-all duration-500",
           phase2 ? "opacity-100" : "opacity-0"
         )}>
-          <div className="px-3 py-1.5 rounded-full bg-agent-sales/10 border border-agent-sales/20">
-            <span className="text-xs text-agent-sales font-medium">4 deals actifs</span>
+          <div className="px-[0.8em] py-[0.4em] rounded-full bg-agent-sales/10 border border-agent-sales/20">
+            <span className="text-[0.75em] text-agent-sales font-medium">4 deals actifs</span>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex-1 flex gap-4 p-4 overflow-hidden">
+      <div className="relative z-10 flex-1 flex gap-[1%] p-[1.5%] overflow-hidden min-h-0">
         {/* Left - Pipeline */}
         <div className={cn(
-          "w-52 flex flex-col gap-2 transition-all duration-700",
+          "w-[22%] flex flex-col gap-[0.6em] transition-all duration-700",
           phase1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
         )}>
-          <div className="text-xs font-medium text-white/60 uppercase tracking-wider mb-1">Pipeline</div>
+          <div className="text-[0.7em] font-medium text-white/60 uppercase tracking-wider mb-[0.3em]">Pipeline</div>
           
           {deals.map((deal, i) => (
             <div 
               key={deal.name}
               className={cn(
-                "p-3 rounded-xl border transition-all duration-500",
+                "p-[0.8em] rounded-xl border transition-all duration-500",
                 deal.hot ? "bg-agent-sales/10 border-agent-sales/30" : "bg-white/[0.02] border-white/[0.06]"
               )}
               style={{ 
@@ -171,13 +175,13 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
                 transform: phase2 ? 'translateX(0)' : 'translateX(-10px)'
               }}
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-white">{deal.name}</span>
-                {deal.hot && <Target className="w-3 h-3 text-amber-400" />}
+              <div className="flex items-center justify-between mb-[0.3em]">
+                <span className="text-[0.9em] font-medium text-white">{deal.name}</span>
+                {deal.hot && <Target className="w-[0.9em] h-[0.9em] text-amber-400" />}
               </div>
-              <div className="text-xs text-white/40 mb-2">{deal.stage}</div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="text-[0.7em] text-white/40 mb-[0.5em]">{deal.stage}</div>
+              <div className="flex items-center gap-[0.5em]">
+                <div className="flex-1 h-[0.3em] bg-white/10 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-agent-sales rounded-full transition-all duration-1000"
                     style={{ 
@@ -186,47 +190,47 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
                     }}
                   />
                 </div>
-                <span className="text-xs text-white/60">{deal.prob}%</span>
+                <span className="text-[0.7em] text-white/60">{deal.prob}%</span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Center - Call recording & analysis */}
-        <div className="flex-1 flex flex-col gap-3 min-w-0">
+        <div className="flex-1 flex flex-col gap-[0.8em] min-w-0">
           {/* Call recording section */}
           <div className={cn(
-            "flex-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden transition-all duration-700",
+            "flex-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden transition-all duration-700 min-h-0",
             phase3 ? "opacity-100 scale-100" : "opacity-0 scale-95"
           )}>
-            <div className="p-3 border-b border-white/[0.06] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-red-400" />
-                <span className="text-sm font-medium text-white">Enregistrement d'appel</span>
+            <div className="p-[0.8em] border-b border-white/[0.06] flex items-center justify-between">
+              <div className="flex items-center gap-[0.5em]">
+                <Phone className="w-[1em] h-[1em] text-red-400" />
+                <span className="text-[0.9em] font-medium text-white">Enregistrement d'appel</span>
               </div>
               <div className={cn(
-                "flex items-center gap-2 transition-all duration-500",
+                "flex items-center gap-[0.5em] transition-all duration-500",
                 phase4 ? "opacity-100" : "opacity-0"
               )}>
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-xs text-red-400">REC • 04:32</span>
+                <div className="w-[0.5em] h-[0.5em] rounded-full bg-red-500 animate-pulse" />
+                <span className="text-[0.7em] text-red-400">REC • 04:32</span>
               </div>
             </div>
             
-            <div className="p-4 flex gap-4">
+            <div className="p-[1em] flex gap-[1em] h-[calc(100%-3em)] min-h-0">
               {/* Waveform */}
               <div
                 ref={callRef}
                 className={cn(
-                  "w-48 p-3 rounded-xl bg-red-500/5 border border-red-500/20 transition-all duration-700",
+                  "w-[40%] p-[0.8em] rounded-xl bg-red-500/5 border border-red-500/20 transition-all duration-700 flex flex-col",
                   phase4 ? "opacity-100" : "opacity-0"
                 )}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <Volume2 className="w-4 h-4 text-red-400" />
-                  <span className="text-xs text-red-400">Appel TechCorp</span>
+                <div className="flex items-center gap-[0.5em] mb-[0.5em]">
+                  <Volume2 className="w-[1em] h-[1em] text-red-400" />
+                  <span className="text-[0.7em] text-red-400">Appel TechCorp</span>
                 </div>
-                <div className="flex items-end gap-0.5 h-16">
+                <div className="flex-1 flex items-end gap-[2%] min-h-0">
                   {[...Array(24)].map((_, i) => (
                     <div
                       key={i}
@@ -242,14 +246,14 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
 
               {/* Transcript */}
               <div className={cn(
-                "flex-1 transition-all duration-700",
+                "flex-1 flex flex-col transition-all duration-700 min-h-0",
                 phase5 ? "opacity-100" : "opacity-0"
               )}>
-                <div className="flex items-center gap-2 mb-2">
-                  <MessageSquare className="w-4 h-4 text-white/40" />
-                  <span className="text-xs text-white/40">Transcription temps réel</span>
+                <div className="flex items-center gap-[0.5em] mb-[0.5em]">
+                  <MessageSquare className="w-[1em] h-[1em] text-white/40" />
+                  <span className="text-[0.7em] text-white/40">Transcription temps réel</span>
                 </div>
-                <div className="space-y-1.5">
+                <div className="flex-1 flex flex-col gap-[0.4em] overflow-hidden">
                   {[
                     { speaker: 'Vous', text: '"Je comprends vos besoins en automatisation..."', you: true },
                     { speaker: 'Client', text: '"Exactement, nous cherchons à gagner du temps..."', you: false },
@@ -257,17 +261,17 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
                   ].map((line, i) => (
                     <div 
                       key={i}
-                      className="p-2 rounded-lg bg-white/[0.03] transition-all duration-500"
+                      className="p-[0.5em] rounded-lg bg-white/[0.03] transition-all duration-500"
                       style={{ 
                         transitionDelay: `${i * 150}ms`,
                         opacity: phase5 ? 1 : 0,
                         transform: phase5 ? 'translateX(0)' : 'translateX(10px)'
                       }}
                     >
-                      <span className={cn("text-xs font-medium", line.you ? "text-agent-sales" : "text-blue-400")}>
+                      <span className={cn("text-[0.75em] font-medium", line.you ? "text-agent-sales" : "text-blue-400")}>
                         {line.speaker}:
                       </span>
-                      <span className="text-xs text-white/60 ml-1">{line.text}</span>
+                      <span className="text-[0.75em] text-white/60 ml-[0.3em]">{line.text}</span>
                     </div>
                   ))}
                 </div>
@@ -276,20 +280,20 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
           </div>
 
           {/* Bottom row */}
-          <div className="flex gap-3 h-32">
+          <div className="flex gap-[0.8em] h-[30%] min-h-0">
             {/* AI Analysis */}
             <div
               ref={analysisRef}
               className={cn(
-                "flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+                "flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] transition-all duration-700 flex flex-col",
                 phase6 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-agent-sales" />
-                <span className="text-sm font-medium text-white">Analyse IA</span>
+              <div className="flex items-center gap-[0.5em] mb-[0.5em]">
+                <Sparkles className="w-[1em] h-[1em] text-agent-sales" />
+                <span className="text-[0.9em] font-medium text-white">Analyse IA</span>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex-1 grid grid-cols-4 gap-[0.5em] min-h-0">
                 {[
                   { label: 'Score', value: '92%', color: 'text-agent-sales' },
                   { label: 'Sentiment', value: '↑', color: 'text-green-400' },
@@ -298,14 +302,14 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
                 ].map((metric, i) => (
                   <div 
                     key={metric.label}
-                    className="p-2 rounded-lg bg-white/[0.03] text-center transition-all duration-500"
+                    className="p-[0.5em] rounded-lg bg-white/[0.03] flex flex-col items-center justify-center transition-all duration-500"
                     style={{ 
                       transitionDelay: `${i * 80}ms`,
                       opacity: phase6 ? 1 : 0
                     }}
                   >
-                    <div className={cn("text-lg font-bold", metric.color)}>{metric.value}</div>
-                    <div className="text-[10px] text-white/40">{metric.label}</div>
+                    <div className={cn("text-[1.2em] font-bold leading-none", metric.color)}>{metric.value}</div>
+                    <div className="text-[0.6em] text-white/40 mt-[0.2em]">{metric.label}</div>
                   </div>
                 ))}
               </div>
@@ -315,23 +319,23 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             <div
               ref={proposalRef}
               className={cn(
-                "w-44 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+                "w-[25%] rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] transition-all duration-700 flex flex-col",
                 phase7 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
               )}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <FileSignature className="w-4 h-4 text-purple-400" />
-                <span className="text-sm font-medium text-white">Proposition</span>
+              <div className="flex items-center gap-[0.5em] mb-[0.5em]">
+                <FileSignature className="w-[1em] h-[1em] text-purple-400" />
+                <span className="text-[0.9em] font-medium text-white">Proposition</span>
               </div>
               <div className={cn(
-                "p-2 rounded-lg bg-purple-500/10 border border-purple-500/20 transition-all duration-500",
+                "flex-1 p-[0.5em] rounded-lg bg-purple-500/10 border border-purple-500/20 transition-all duration-500 flex flex-col justify-center",
                 phase7 ? "opacity-100" : "opacity-0"
               )}>
-                <div className="flex items-center gap-1 mb-1">
-                  <Zap className="w-3 h-3 text-purple-400 animate-pulse" />
-                  <span className="text-[10px] text-purple-400">Générée</span>
+                <div className="flex items-center gap-[0.3em] mb-[0.3em]">
+                  <Zap className="w-[0.8em] h-[0.8em] text-purple-400 animate-pulse" />
+                  <span className="text-[0.65em] text-purple-400">Générée</span>
                 </div>
-                <div className="text-xs text-white/60">TechCorp • Prête</div>
+                <div className="text-[0.75em] text-white/60">TechCorp • Prête</div>
               </div>
             </div>
           </div>
@@ -339,29 +343,29 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
 
         {/* Right - Team & Compliance */}
         <div className={cn(
-          "w-48 flex flex-col gap-3 transition-all duration-700",
+          "w-[20%] flex flex-col gap-[0.8em] transition-all duration-700",
           phase6 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
         )}>
           {/* Team performance */}
-          <div className="flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3">
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="w-4 h-4 text-blue-400" />
-              <span className="text-sm font-medium text-white">Équipe</span>
+          <div className="flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] flex flex-col min-h-0">
+            <div className="flex items-center gap-[0.5em] mb-[0.6em]">
+              <Users className="w-[1em] h-[1em] text-blue-400" />
+              <span className="text-[0.9em] font-medium text-white">Équipe</span>
             </div>
-            <div className="space-y-2">
+            <div className="flex-1 flex flex-col gap-[0.5em] justify-center">
               {[
                 { name: 'Marie', quota: 110 },
                 { name: 'Thomas', quota: 85 },
                 { name: 'Julie', quota: 95 },
               ].map((member, i) => (
                 <div key={member.name} className="transition-all duration-500" style={{ transitionDelay: `${i * 100}ms`, opacity: phase6 ? 1 : 0 }}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-white/60">{member.name}</span>
-                    <span className={cn("text-xs font-medium", member.quota >= 100 ? "text-green-400" : "text-white/50")}>
+                  <div className="flex items-center justify-between mb-[0.2em]">
+                    <span className="text-[0.7em] text-white/60">{member.name}</span>
+                    <span className={cn("text-[0.7em] font-medium", member.quota >= 100 ? "text-green-400" : "text-white/50")}>
                       {member.quota}%
                     </span>
                   </div>
-                  <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-[0.3em] bg-white/10 rounded-full overflow-hidden">
                     <div 
                       className={cn("h-full rounded-full transition-all duration-1000", member.quota >= 100 ? "bg-green-500" : "bg-agent-sales")}
                       style={{ width: `${Math.min(member.quota, 100)}%` }}
@@ -376,22 +380,22 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
           <div
             ref={complianceRef}
             className={cn(
-              "rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+              "rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] transition-all duration-700",
               phase8 ? "ring-1 ring-green-500/30 bg-green-500/5" : ""
             )}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="w-4 h-4 text-green-400" />
-              <span className="text-sm font-medium text-white">Conformité</span>
+            <div className="flex items-center gap-[0.5em] mb-[0.5em]">
+              <Shield className="w-[1em] h-[1em] text-green-400" />
+              <span className="text-[0.9em] font-medium text-white">Conformité</span>
             </div>
             <div className={cn(
-              "flex items-center gap-2 p-2 rounded-lg bg-green-500/10 border border-green-500/20 transition-all duration-500",
+              "flex items-center gap-[0.5em] p-[0.5em] rounded-lg bg-green-500/10 border border-green-500/20 transition-all duration-500",
               phase8 ? "opacity-100" : "opacity-0"
             )}>
-              <CheckCircle className="w-4 h-4 text-green-400" />
+              <CheckCircle className="w-[1em] h-[1em] text-green-400" />
               <div>
-                <div className="text-xs text-green-400 font-medium">100% OK</div>
-                <div className="text-[10px] text-white/40">RGPD • Tarifs</div>
+                <div className="text-[0.75em] text-green-400 font-medium">100% OK</div>
+                <div className="text-[0.6em] text-white/40">RGPD • Tarifs</div>
               </div>
             </div>
           </div>

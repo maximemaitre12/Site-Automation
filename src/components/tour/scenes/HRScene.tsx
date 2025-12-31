@@ -20,57 +20,60 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
   const phase9 = progress >= 90;   // Final stats glow
 
   return (
-    <div className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div 
+      className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+      style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
+    >
       {/* Animated background */}
       <div className="absolute inset-0">
         <div 
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--agent-hr)) 1px, transparent 0)`,
-            backgroundSize: '32px 32px',
+            backgroundSize: '2em 2em',
           }}
         />
         <div className={cn(
-          "absolute top-1/4 -left-20 w-96 h-96 rounded-full blur-[120px] transition-all duration-1000",
+          "absolute top-1/4 -left-[5%] w-[35%] aspect-square rounded-full blur-[80px] transition-all duration-1000",
           phase1 ? "bg-agent-hr/20 opacity-100" : "opacity-0"
         )} />
         <div className={cn(
-          "absolute bottom-1/4 -right-20 w-80 h-80 rounded-full blur-[100px] transition-all duration-1000 delay-500",
+          "absolute bottom-1/4 -right-[5%] w-[30%] aspect-square rounded-full blur-[70px] transition-all duration-1000 delay-500",
           phase3 ? "bg-purple-500/15 opacity-100" : "opacity-0"
         )} />
       </div>
 
       {/* Header */}
       <div className={cn(
-        "relative z-10 px-6 py-4 flex items-center justify-between border-b border-white/5 transition-all duration-700",
+        "relative z-10 px-[2%] py-[1.5%] flex items-center justify-between border-b border-white/5 transition-all duration-700",
         phase1 ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
       )}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-agent-hr/20 flex items-center justify-center border border-agent-hr/30">
-            <Users className="w-5 h-5 text-agent-hr" />
+        <div className="flex items-center gap-[0.8em]">
+          <div className="w-[2.5em] h-[2.5em] rounded-xl bg-agent-hr/20 flex items-center justify-center border border-agent-hr/30">
+            <Users className="w-[1.2em] h-[1.2em] text-agent-hr" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white">Agent RH</h1>
-            <p className="text-xs text-white/40">Recrutement intelligent</p>
+            <h1 className="text-[1.3em] font-bold text-white leading-tight">Agent RH</h1>
+            <p className="text-[0.75em] text-white/40">Recrutement intelligent</p>
           </div>
         </div>
         <div className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-full bg-agent-hr/10 border border-agent-hr/20 transition-all duration-500",
+          "flex items-center gap-[0.5em] px-[0.8em] py-[0.4em] rounded-full bg-agent-hr/10 border border-agent-hr/20 transition-all duration-500",
           phase2 ? "opacity-100" : "opacity-0"
         )}>
-          <div className="w-2 h-2 rounded-full bg-agent-hr animate-pulse" />
-          <span className="text-xs text-agent-hr">IA Active</span>
+          <div className="w-[0.5em] h-[0.5em] rounded-full bg-agent-hr animate-pulse" />
+          <span className="text-[0.75em] text-agent-hr">IA Active</span>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex-1 flex gap-4 p-4 overflow-hidden">
+      <div className="relative z-10 flex-1 flex gap-[1%] p-[1.5%] overflow-hidden min-h-0">
         {/* Left - Pipeline */}
         <div className={cn(
-          "w-56 flex flex-col gap-3 transition-all duration-700",
+          "w-[22%] flex flex-col gap-[0.6em] transition-all duration-700",
           phase1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
         )}>
-          <div className="text-xs font-medium text-white/60 uppercase tracking-wider mb-1">Pipeline</div>
+          <div className="text-[0.7em] font-medium text-white/60 uppercase tracking-wider mb-[0.3em]">Pipeline</div>
           
           {[
             { label: 'Nouveaux', count: 24, color: 'bg-blue-500', delay: 0 },
@@ -81,7 +84,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
             <div 
               key={stage.label}
               className={cn(
-                "relative p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] transition-all duration-500",
+                "relative p-[0.8em] rounded-xl bg-white/[0.03] border border-white/[0.06] transition-all duration-500",
                 phase2 && "hover:bg-white/[0.06]"
               )}
               style={{ 
@@ -91,19 +94,19 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
               }}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={cn("w-2 h-2 rounded-full", stage.color)} />
-                  <span className="text-sm text-white/70">{stage.label}</span>
+                <div className="flex items-center gap-[0.5em]">
+                  <div className={cn("w-[0.5em] h-[0.5em] rounded-full", stage.color)} />
+                  <span className="text-[0.85em] text-white/70">{stage.label}</span>
                 </div>
                 <span className={cn(
-                  "text-lg font-bold text-white transition-all duration-700",
+                  "text-[1.2em] font-bold text-white transition-all duration-700",
                   phase2 ? "opacity-100" : "opacity-0"
                 )}>
                   {stage.count}
                 </span>
               </div>
               {/* Progress bar */}
-              <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="mt-[0.5em] h-[0.25em] bg-white/10 rounded-full overflow-hidden">
                 <div 
                   className={cn("h-full rounded-full transition-all duration-1000", stage.color)}
                   style={{ 
@@ -117,43 +120,43 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
         </div>
 
         {/* Center - Main feature area */}
-        <div className="flex-1 flex flex-col gap-3 min-w-0">
+        <div className="flex-1 flex flex-col gap-[0.8em] min-w-0">
           {/* CV Analysis Section */}
           <div className={cn(
-            "flex-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden transition-all duration-700",
+            "flex-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden transition-all duration-700 min-h-0 flex flex-col",
             phase3 ? "opacity-100 scale-100" : "opacity-0 scale-95"
           )}>
-            <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Brain className="w-4 h-4 text-agent-hr" />
-                <span className="text-sm font-medium text-white">Analyse IA des CV</span>
+            <div className="p-[0.8em] border-b border-white/[0.06] flex items-center justify-between">
+              <div className="flex items-center gap-[0.5em]">
+                <Brain className="w-[1em] h-[1em] text-agent-hr" />
+                <span className="text-[0.9em] font-medium text-white">Analyse IA des CV</span>
               </div>
               <div className={cn(
-                "flex items-center gap-2 transition-all duration-500",
+                "flex items-center gap-[0.5em] transition-all duration-500",
                 phase4 ? "opacity-100" : "opacity-0"
               )}>
-                <Sparkles className="w-4 h-4 text-agent-hr animate-pulse" />
-                <span className="text-xs text-agent-hr">Analyse en cours...</span>
+                <Sparkles className="w-[1em] h-[1em] text-agent-hr animate-pulse" />
+                <span className="text-[0.75em] text-agent-hr">Analyse en cours...</span>
               </div>
             </div>
             
-            <div className="p-4 flex gap-4">
+            <div className="flex-1 p-[1em] flex gap-[1em] min-h-0 overflow-hidden">
               {/* CV Upload simulation */}
               <div className={cn(
-                "w-32 flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed transition-all duration-700",
+                "w-[18%] flex flex-col items-center justify-center gap-[0.5em] p-[0.8em] rounded-xl border-2 border-dashed transition-all duration-700",
                 phase3 ? "border-agent-hr/30 bg-agent-hr/5" : "border-white/10"
               )}>
                 <Upload className={cn(
-                  "w-8 h-8 transition-all duration-500",
+                  "w-[2em] h-[2em] transition-all duration-500",
                   phase3 ? "text-agent-hr" : "text-white/30"
                 )} />
-                <span className="text-xs text-center text-white/50">
+                <span className="text-[0.7em] text-center text-white/50">
                   {phase3 ? "12 CV importés" : "Importer CV"}
                 </span>
               </div>
 
               {/* Analyzed candidates */}
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 flex flex-col gap-[0.5em] overflow-hidden">
                 {[
                   { name: 'Sophie Martin', role: 'UX Designer', score: 94, skills: ['Figma', 'Research'] },
                   { name: 'Lucas Bernard', role: 'Dev Frontend', score: 88, skills: ['React', 'TypeScript'] },
@@ -162,7 +165,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                   <div 
                     key={candidate.name}
                     className={cn(
-                      "p-3 rounded-xl border transition-all duration-500",
+                      "p-[0.6em] rounded-xl border transition-all duration-500",
                       phase5 && i === 0 ? "bg-agent-hr/10 border-agent-hr/30 ring-1 ring-agent-hr/20" : "bg-white/[0.02] border-white/[0.06]"
                     )}
                     style={{ 
@@ -172,26 +175,26 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                     }}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-agent-hr to-purple-500 flex items-center justify-center text-white font-medium text-sm">
+                      <div className="flex items-center gap-[0.6em]">
+                        <div className="w-[1.8em] h-[1.8em] rounded-full bg-gradient-to-br from-agent-hr to-purple-500 flex items-center justify-center text-white font-medium text-[0.7em]">
                           {candidate.name[0]}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-white">{candidate.name}</div>
-                          <div className="text-xs text-white/40">{candidate.role}</div>
+                          <div className="text-[0.85em] font-medium text-white">{candidate.name}</div>
+                          <div className="text-[0.7em] text-white/40">{candidate.role}</div>
                         </div>
                       </div>
                       <div className={cn(
-                        "flex items-center gap-1 transition-all duration-700",
+                        "flex items-center gap-[0.3em] transition-all duration-700",
                         phase5 ? "opacity-100 scale-100" : "opacity-0 scale-75"
                       )} style={{ transitionDelay: `${i * 100 + 300}ms` }}>
-                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                        <span className="text-white font-bold">{candidate.score}%</span>
+                        <Star className="w-[1em] h-[1em] text-amber-400 fill-amber-400" />
+                        <span className="text-white font-bold text-[0.9em]">{candidate.score}%</span>
                       </div>
                     </div>
-                    <div className="mt-2 flex gap-1">
+                    <div className="mt-[0.4em] flex gap-[0.3em]">
                       {candidate.skills.map(skill => (
-                        <span key={skill} className="px-2 py-0.5 rounded-full bg-white/5 text-xs text-white/50">
+                        <span key={skill} className="px-[0.5em] py-[0.15em] rounded-full bg-white/5 text-[0.65em] text-white/50">
                           {skill}
                         </span>
                       ))}
@@ -203,17 +206,17 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
           </div>
 
           {/* Bottom row */}
-          <div className="flex gap-3 h-36">
+          <div className="flex gap-[0.8em] h-[28%] min-h-0">
             {/* Email automation */}
             <div className={cn(
-              "flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+              "flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] transition-all duration-700 flex flex-col",
               phase7 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
-              <div className="flex items-center gap-2 mb-3">
-                <Mail className="w-4 h-4 text-blue-400" />
-                <span className="text-sm font-medium text-white">Emails automatiques</span>
+              <div className="flex items-center gap-[0.5em] mb-[0.6em]">
+                <Mail className="w-[1em] h-[1em] text-blue-400" />
+                <span className="text-[0.9em] font-medium text-white">Emails automatiques</span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex-1 flex gap-[0.5em]">
                 {[
                   { icon: Send, label: 'Invitations', color: 'text-blue-400' },
                   { icon: Clock, label: 'Rappels', color: 'text-amber-400' },
@@ -221,14 +224,14 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                 ].map((email, i) => (
                   <div 
                     key={email.label}
-                    className="flex-1 p-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-center transition-all duration-500"
+                    className="flex-1 p-[0.5em] rounded-lg bg-white/[0.03] border border-white/[0.06] flex flex-col items-center justify-center transition-all duration-500"
                     style={{ 
                       transitionDelay: `${i * 100}ms`,
                       opacity: phase7 ? 1 : 0
                     }}
                   >
-                    <email.icon className={cn("w-5 h-5 mx-auto mb-1", email.color)} />
-                    <div className="text-xs text-white/50">{email.label}</div>
+                    <email.icon className={cn("w-[1.2em] h-[1.2em] mb-[0.3em]", email.color)} />
+                    <div className="text-[0.65em] text-white/50">{email.label}</div>
                   </div>
                 ))}
               </div>
@@ -236,22 +239,22 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
 
             {/* Job post generator */}
             <div className={cn(
-              "w-52 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+              "w-[28%] rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] transition-all duration-700 flex flex-col",
               phase8 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
             )}>
-              <div className="flex items-center gap-2 mb-2">
-                <Briefcase className="w-4 h-4 text-agent-hr" />
-                <span className="text-sm font-medium text-white">Générateur d'offres</span>
+              <div className="flex items-center gap-[0.5em] mb-[0.5em]">
+                <Briefcase className="w-[1em] h-[1em] text-agent-hr" />
+                <span className="text-[0.9em] font-medium text-white">Générateur d'offres</span>
               </div>
               <div className={cn(
-                "p-2 rounded-lg bg-agent-hr/10 border border-agent-hr/20 transition-all duration-500",
+                "flex-1 p-[0.5em] rounded-lg bg-agent-hr/10 border border-agent-hr/20 transition-all duration-500 flex flex-col justify-center",
                 phase8 ? "opacity-100" : "opacity-0"
               )}>
-                <div className="flex items-center gap-1 mb-1">
-                  <Sparkles className="w-3 h-3 text-agent-hr animate-pulse" />
-                  <span className="text-xs text-agent-hr">Génération IA</span>
+                <div className="flex items-center gap-[0.3em] mb-[0.3em]">
+                  <Sparkles className="w-[0.8em] h-[0.8em] text-agent-hr animate-pulse" />
+                  <span className="text-[0.7em] text-agent-hr">Génération IA</span>
                 </div>
-                <p className="text-xs text-white/60 line-clamp-2">
+                <p className="text-[0.7em] text-white/60 line-clamp-2">
                   "Nous recherchons un UX Designer passionné..."
                 </p>
               </div>
@@ -261,16 +264,16 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
 
         {/* Right - Interviews & Stats */}
         <div className={cn(
-          "w-52 flex flex-col gap-3 transition-all duration-700",
+          "w-[22%] flex flex-col gap-[0.8em] transition-all duration-700",
           phase6 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
         )}>
           {/* Interviews */}
-          <div className="flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3">
-            <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-4 h-4 text-purple-400" />
-              <span className="text-sm font-medium text-white">Entretiens</span>
+          <div className="flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] flex flex-col min-h-0">
+            <div className="flex items-center gap-[0.5em] mb-[0.6em]">
+              <Calendar className="w-[1em] h-[1em] text-purple-400" />
+              <span className="text-[0.9em] font-medium text-white">Entretiens</span>
             </div>
-            <div className="space-y-2">
+            <div className="flex-1 flex flex-col gap-[0.4em] overflow-hidden">
               {[
                 { time: '09:00', name: 'Sophie M.', type: 'Technique', live: true },
                 { time: '11:30', name: 'Lucas B.', type: 'RH', live: false },
@@ -279,7 +282,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                 <div 
                   key={i}
                   className={cn(
-                    "p-2 rounded-lg border transition-all duration-500",
+                    "p-[0.5em] rounded-lg border transition-all duration-500",
                     interview.live ? "bg-green-500/10 border-green-500/30" : "bg-white/[0.02] border-white/[0.06]"
                   )}
                   style={{ 
@@ -288,15 +291,15 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                   }}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-white">{interview.time}</span>
+                    <span className="text-[0.75em] font-medium text-white">{interview.time}</span>
                     {interview.live && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-green-500 text-white animate-pulse">
+                      <span className="px-[0.4em] py-[0.15em] rounded text-[0.55em] bg-green-500 text-white animate-pulse">
                         LIVE
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-white/60">{interview.name}</div>
-                  <div className="text-[10px] text-white/40">{interview.type}</div>
+                  <div className="text-[0.7em] text-white/60">{interview.name}</div>
+                  <div className="text-[0.6em] text-white/40">{interview.type}</div>
                 </div>
               ))}
             </div>
@@ -304,23 +307,23 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
 
           {/* Stats */}
           <div className={cn(
-            "rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+            "rounded-xl bg-white/[0.02] border border-white/[0.06] p-[0.8em] transition-all duration-700",
             phase9 ? "ring-1 ring-agent-hr/20" : ""
           )}>
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-green-400" />
-              <span className="text-sm font-medium text-white">Performance</span>
+            <div className="flex items-center gap-[0.5em] mb-[0.6em]">
+              <BarChart3 className="w-[1em] h-[1em] text-green-400" />
+              <span className="text-[0.9em] font-medium text-white">Performance</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-[0.4em]">
               {[
                 { label: 'Taux match', value: '94%' },
                 { label: 'Délai moyen', value: '8j' },
                 { label: 'Automatisation', value: '87%' },
               ].map((stat, i) => (
                 <div key={stat.label} className="flex items-center justify-between">
-                  <span className="text-xs text-white/50">{stat.label}</span>
+                  <span className="text-[0.7em] text-white/50">{stat.label}</span>
                   <span className={cn(
-                    "text-sm font-bold text-white transition-all duration-500",
+                    "text-[0.85em] font-bold text-white transition-all duration-500",
                     phase9 ? "text-agent-hr" : ""
                   )}>
                     {stat.value}
