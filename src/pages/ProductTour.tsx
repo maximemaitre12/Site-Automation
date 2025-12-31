@@ -1,12 +1,14 @@
 import React from 'react';
-import { CinematicTourPlayer } from '@/components/tour/CinematicTourPlayer';
-import { LandingHeader } from '@/components/landing/LandingHeader';
+import { ProductTourHeader } from '@/components/tour/ProductTourHeader';
+import { ProductTourVideoPlayer } from '@/components/tour/ProductTourVideoPlayer';
 
 const ProductTour = () => {
   return (
-    <div className="min-h-screen bg-slate-100">
-      <LandingHeader />
-      <CinematicTourPlayer />
+    <div className="min-h-screen bg-background">
+      <ProductTourHeader />
+      <main className="pt-24 pb-16">
+        <ProductTourVideoPlayer />
+      </main>
     </div>
   );
 };
