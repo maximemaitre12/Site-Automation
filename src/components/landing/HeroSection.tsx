@@ -55,12 +55,12 @@ export function HeroSection() {
           </Link>
           <Link to="/product-tour" className="w-full sm:w-auto">
             <Button 
-              variant="ghost" 
+              variant="outline" 
               size="lg" 
-              className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium gap-2 group"
+              className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium gap-2 group border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary transition-all"
             >
-              <Play className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              Watch Demo
+              <Play className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+              <span>Watch Demo</span>
             </Button>
           </Link>
         </div>

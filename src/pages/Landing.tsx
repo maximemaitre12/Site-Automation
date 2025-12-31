@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { DemoSection } from "@/components/landing/DemoSection";
 import { PainPointsSection } from "@/components/landing/PainPointsSection";
 import { ApiSection } from "@/components/landing/ApiSection";
 import { TestimonialSection } from "@/components/landing/TestimonialSection";
@@ -44,6 +45,7 @@ export default function Landing() {
       
       <main>
         <HeroSection />
+        <DemoSection />
         <PainPointsSection />
         <ApiSection />
         <BlogSection />
