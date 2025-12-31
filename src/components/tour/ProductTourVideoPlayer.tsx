@@ -173,13 +173,6 @@ export function ProductTourVideoPlayer() {
     setIsDragging(false);
   };
 
-  const formatTime = (ms: number): string => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
-
   const overallProgress = (currentTime / totalDuration) * 100;
 
   const AgentIcon = currentSegment?.agentType ? agentIcons[currentSegment.agentType] : Sparkles;
@@ -218,25 +211,18 @@ export function ProductTourVideoPlayer() {
           <ConclusionScene isActive={currentSegment?.id === 'conclusion'} progress={segmentProgress} onRestart={handleReplay} />
         </div>
 
-        {/* Play/Pause overlay (click anywhere) */}
-        <button
-          onClick={togglePlay}
-          className="absolute inset-0 z-20 focus:outline-none group cursor-pointer"
-          aria-label={isPlaying ? 'Pause' : 'Play'}
-        >
-          <div className={cn(
-            "absolute inset-0 flex items-center justify-center transition-opacity duration-300",
-            isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"
-          )}>
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-              {isPlaying ? (
-                <Pause className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-              ) : (
-                <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
-              )}
+        {/* Play overlay - only visible when paused */}
+        {!isPlaying && (
+          <button
+            onClick={togglePlay}
+            className="absolute inset-0 z-20 focus:outline-none flex items-center justify-center bg-black/20"
+            aria-label="Play"
+          >
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-colors">
+              <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
             </div>
-          </div>
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Controls Container */}
@@ -272,55 +258,48 @@ export function ProductTourVideoPlayer() {
           />
         </div>
 
-        {/* Time and Controls */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={togglePlay}
-              className="h-10 w-10"
-            >
-              {isPlaying ? (
-                <Pause className="h-5 w-5" />
-              ) : (
-                <Play className="h-5 w-5 ml-0.5" />
-              )}
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleReplay}
-              className="h-10 w-10"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-
-            <span className="text-sm text-muted-foreground font-mono">
-              {formatTime(currentTime)} / {formatTime(totalDuration)}
-            </span>
-          </div>
-
-          {/* Current segment info */}
-          {currentSegment && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50">
-              <div className={cn("w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br", agentColor)}>
-                {AgentIcon && <AgentIcon className="w-3.5 h-3.5 text-white" />}
-              </div>
-              <span className="text-sm font-medium text-foreground hidden sm:inline">
-                {currentSegment.title}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Narration Text */}
+        {/* Segment info with logo and controls */}
         {currentSegment && (
-          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
-            <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2 sm:line-clamp-3">
-              {currentSegment.text}
-            </p>
+          <div className="flex items-start gap-4 p-3 rounded-xl bg-muted/30 border border-border/50">
+            {/* Agent icon */}
+            <div className={cn("w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center bg-gradient-to-br", agentColor)}>
+              {AgentIcon && <AgentIcon className="w-5 h-5 text-white" />}
+            </div>
+            
+            {/* Text content */}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold text-foreground mb-1">
+                {currentSegment.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                {currentSegment.text}
+              </p>
+            </div>
+
+            {/* Play/Pause controls */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={togglePlay}
+                className="h-9 w-9 rounded-full"
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4 ml-0.5" />
+                )}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleReplay}
+                className="h-9 w-9 rounded-full"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
