@@ -301,7 +301,7 @@ export function PainPointsSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2 sm:mb-3">
-            Six AI Agents. One Revolution.
+            Seven AI Agents. One Revolution.
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground px-2">
             Each agent solves a specific business problem. Together, they transform your operations.
