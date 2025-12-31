@@ -88,11 +88,14 @@ export function CinematicTourPlayer() {
   const currentAgentIntro = agentIntros[currentScript.id];
   const isAgentScene = currentAgentIntro !== undefined;
 
-  // Show intro overlay at the start of each agent scene
+  // Show intro overlay at the start of each agent scene - reset scene progress first
   useEffect(() => {
     if (isAgentScene) {
+      setSceneProgress(0); // Reset progress BEFORE showing intro
       setShowIntro(true);
-      const timer = setTimeout(() => setShowIntro(false), 2500);
+      const timer = setTimeout(() => {
+        setShowIntro(false);
+      }, 2500);
       return () => clearTimeout(timer);
     } else {
       setShowIntro(false);
