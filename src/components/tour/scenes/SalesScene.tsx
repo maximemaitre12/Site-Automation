@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TrendingUp, Phone, FileText, DollarSign, BarChart3, Sparkles, CheckCircle, Target, Users, ArrowUpRight, Mic, FileSignature, Shield, Play, Volume2, MessageSquare, Zap, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
+import { FrameCallouts, type FrameCalloutTarget } from '@/components/tour/core/FrameCallouts';
 interface SalesSceneProps {
   isActive: boolean;
   progress: number;
@@ -25,8 +25,85 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
     { name: 'AI Labs', stage: 'Closing', prob: 95, hot: true },
   ];
 
+  type CalloutStep = 'none' | 'call' | 'analysis' | 'proposal' | 'compliance';
+  const calloutStep: CalloutStep =
+    progress < 22
+      ? 'none'
+      : progress < 60
+        ? 'call'
+        : progress < 72
+          ? 'analysis'
+          : progress < 85
+            ? 'proposal'
+            : 'compliance';
+
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const callRef = useRef<HTMLDivElement | null>(null);
+  const analysisRef = useRef<HTMLDivElement | null>(null);
+  const proposalRef = useRef<HTMLDivElement | null>(null);
+  const complianceRef = useRef<HTMLDivElement | null>(null);
+
+  const [callout, setCallout] = useState<FrameCalloutTarget | null>(null);
+
+  useEffect(() => {
+    if (calloutStep === 'none' || !isActive) {
+      setCallout(null);
+      return;
+    }
+
+    const container = rootRef.current;
+    const el =
+      calloutStep === 'call'
+        ? callRef.current
+        : calloutStep === 'analysis'
+          ? analysisRef.current
+          : calloutStep === 'proposal'
+            ? proposalRef.current
+            : complianceRef.current;
+
+    if (!container || !el) return;
+
+    const c = container.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    if (!c.width || !c.height) return;
+
+    const x = ((r.left - c.left) / c.width) * 100;
+    const y = ((r.top - c.top) / c.height) * 100;
+    const w = (r.width / c.width) * 100;
+    const h = (r.height / c.height) * 100;
+
+    const copy: Record<Exclude<CalloutStep, 'none'>, { title: string; body: string }> = {
+      call: {
+        title: "Appels → transcription live",
+        body: "Enregistrement + transcription en temps réel, prêt pour l’analyse IA.",
+      },
+      analysis: {
+        title: "Analyse IA automatique",
+        body: "Score, sentiment, objections et signaux d’intérêt en quelques secondes.",
+      },
+      proposal: {
+        title: "Proposition générée",
+        body: "La proposition est rédigée à partir de l’appel et du contexte deal.",
+      },
+      compliance: {
+        title: "Contrôle conformité",
+        body: "Vérifie que la proposition respecte les règles (RGPD, pricing, etc.).",
+      },
+    };
+
+    setCallout({
+      id: calloutStep,
+      x,
+      y,
+      w,
+      h,
+      title: copy[calloutStep].title,
+      body: copy[calloutStep].body,
+    });
+  }, [calloutStep, isActive]);
+
   return (
-    <div className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-950">
+    <div ref={rootRef} className="absolute inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950/30 to-slate-950">
       {/* Background effects */}
       <div className="absolute inset-0">
         <div 
@@ -45,6 +122,8 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
           phase3 ? "bg-red-500/10 opacity-100" : "opacity-0"
         )} />
       </div>
+
+      <FrameCallouts target={callout} isVisible={isActive && !!callout} />
 
       {/* Header */}
       <div className={cn(
@@ -136,10 +215,13 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             
             <div className="p-4 flex gap-4">
               {/* Waveform */}
-              <div className={cn(
-                "w-48 p-3 rounded-xl bg-red-500/5 border border-red-500/20 transition-all duration-700",
-                phase4 ? "opacity-100" : "opacity-0"
-              )}>
+              <div
+                ref={callRef}
+                className={cn(
+                  "w-48 p-3 rounded-xl bg-red-500/5 border border-red-500/20 transition-all duration-700",
+                  phase4 ? "opacity-100" : "opacity-0"
+                )}
+              >
                 <div className="flex items-center gap-2 mb-2">
                   <Volume2 className="w-4 h-4 text-red-400" />
                   <span className="text-xs text-red-400">Appel TechCorp</span>
@@ -196,10 +278,13 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
           {/* Bottom row */}
           <div className="flex gap-3 h-32">
             {/* AI Analysis */}
-            <div className={cn(
-              "flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
-              phase6 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-            )}>
+            <div
+              ref={analysisRef}
+              className={cn(
+                "flex-1 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+                phase6 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}
+            >
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-agent-sales" />
                 <span className="text-sm font-medium text-white">Analyse IA</span>
@@ -227,10 +312,13 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             </div>
 
             {/* Proposal */}
-            <div className={cn(
-              "w-44 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
-              phase7 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
-            )}>
+            <div
+              ref={proposalRef}
+              className={cn(
+                "w-44 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+                phase7 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+              )}
+            >
               <div className="flex items-center gap-2 mb-2">
                 <FileSignature className="w-4 h-4 text-purple-400" />
                 <span className="text-sm font-medium text-white">Proposition</span>
@@ -285,10 +373,13 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
           </div>
 
           {/* Compliance */}
-          <div className={cn(
-            "rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
-            phase8 ? "ring-1 ring-green-500/30 bg-green-500/5" : ""
-          )}>
+          <div
+            ref={complianceRef}
+            className={cn(
+              "rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 transition-all duration-700",
+              phase8 ? "ring-1 ring-green-500/30 bg-green-500/5" : ""
+            )}
+          >
             <div className="flex items-center gap-2 mb-2">
               <Shield className="w-4 h-4 text-green-400" />
               <span className="text-sm font-medium text-white">Conformité</span>

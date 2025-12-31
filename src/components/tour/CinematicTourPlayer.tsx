@@ -108,19 +108,21 @@ export function CinematicTourPlayer() {
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm p-4 md:p-8"
       onMouseMove={() => setShowControls(true)}
     >
-      {/* 16:9 Container - strictly contained */}
-      <div 
-        className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden"
+      {/* 16:9 Frame (strict, visible) */}
+      <div
+        className="relative w-full overflow-hidden rounded-2xl border border-border bg-card"
         style={{
-          boxShadow: '0 0 100px hsl(var(--primary) / 0.2)',
+          width: 'min(calc(100vw - 2rem), calc((100vh - 2rem) * 16 / 9))',
+          aspectRatio: '16 / 9',
+          boxShadow: '0 0 80px hsl(var(--primary) / 0.18)',
         }}
       >
-        {/* Scene content - fills entire container */}
-        <div 
+        {/* Scene content - fills entire 16:9 frame */}
+        <div
           className={cn(
             "absolute inset-0 transition-all duration-600 ease-out",
             isTransitioning && "opacity-0 scale-105 blur-sm"
@@ -130,8 +132,8 @@ export function CinematicTourPlayer() {
         </div>
 
         {/* Progress bar at top */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 z-40">
-          <div 
+        <div className="absolute top-0 left-0 right-0 h-1 bg-foreground/10 z-40">
+          <div
             className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-100"
             style={{ width: `${overallProgress}%` }}
           />
@@ -148,7 +150,7 @@ export function CinematicTourPlayer() {
                   ? "w-8 h-2 bg-primary"
                   : index < currentSceneIndex
                     ? "w-2 h-2 bg-primary/60"
-                    : "w-2 h-2 bg-white/20"
+                    : "w-2 h-2 bg-foreground/20"
               )}
             />
           ))}
@@ -166,10 +168,10 @@ export function CinematicTourPlayer() {
         )}
 
         {/* Bottom controls */}
-        <div 
+        <div
           className={cn(
             "absolute bottom-0 left-0 right-0 z-40 p-4 transition-all duration-300",
-            "bg-gradient-to-t from-black/80 via-black/40 to-transparent",
+            "bg-gradient-to-t from-background/95 via-background/40 to-transparent",
             showControls ? "opacity-100" : "opacity-0"
           )}
         >
@@ -178,7 +180,7 @@ export function CinematicTourPlayer() {
               variant="ghost"
               size="icon"
               onClick={handleClose}
-              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
+              className="w-9 h-9 rounded-full bg-foreground/10 backdrop-blur-sm text-foreground/80 hover:text-foreground hover:bg-foreground/15 border-0"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -188,7 +190,7 @@ export function CinematicTourPlayer() {
                 variant="ghost"
                 size="icon"
                 onClick={handleRestart}
-                className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
+                className="w-9 h-9 rounded-full bg-foreground/10 backdrop-blur-sm text-foreground/80 hover:text-foreground hover:bg-foreground/15 border-0"
               >
                 <RotateCcw className="w-4 h-4" />
               </Button>
@@ -207,7 +209,7 @@ export function CinematicTourPlayer() {
                 size="icon"
                 onClick={handleSkip}
                 disabled={currentSceneIndex >= totalScenes - 1}
-                className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0 disabled:opacity-30"
+                className="w-9 h-9 rounded-full bg-foreground/10 backdrop-blur-sm text-foreground/80 hover:text-foreground hover:bg-foreground/15 border-0 disabled:opacity-30"
               >
                 <SkipForward className="w-4 h-4" />
               </Button>
@@ -215,8 +217,10 @@ export function CinematicTourPlayer() {
 
             {/* Scene title */}
             <div className="text-right">
-              <div className="text-white/60 text-xs">{currentSceneIndex + 1}/{totalScenes}</div>
-              <div className="text-white font-medium text-sm">{currentScript.title}</div>
+              <div className="text-foreground/60 text-xs">
+                {currentSceneIndex + 1}/{totalScenes}
+              </div>
+              <div className="text-foreground font-medium text-sm">{currentScript.title}</div>
             </div>
           </div>
         </div>
