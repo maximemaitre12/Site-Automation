@@ -4,9 +4,10 @@ import { DiagramShell } from '../DiagramShell';
 interface OverviewDiagramProps {
   progress: number;
   compact?: boolean;
+  accentColor?: string;
 }
 
-export function OverviewDiagram({ progress, compact = false }: OverviewDiagramProps) {
+export function OverviewDiagram({ progress, compact = false, accentColor = 'hsl(var(--primary))' }: OverviewDiagramProps) {
   const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
 
   const agents = useMemo(() => [

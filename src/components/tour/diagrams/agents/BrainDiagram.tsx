@@ -5,9 +5,10 @@ import { DiagramNode, DiagramEdge, MetricChip, ParticleFlow } from '../primitive
 interface BrainDiagramProps {
   progress: number;
   compact?: boolean;
+  accentColor?: string;
 }
 
-export function BrainDiagram({ progress, compact = false }: BrainDiagramProps) {
+export function BrainDiagram({ progress, compact = false, accentColor = 'hsl(271 91% 65%)' }: BrainDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -19,7 +20,7 @@ export function BrainDiagram({ progress, compact = false }: BrainDiagramProps) {
   const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
 
   return (
-    <DiagramShell viewBox={viewBox} accentColor="hsl(142 76% 46%)">
+    <DiagramShell viewBox={viewBox} accentColor={accentColor}>
       {/* Title */}
       <text x="10" y="14" fill="hsl(var(--muted-foreground))" fontSize="8" fontWeight="500" opacity="0.6">
         RAG KNOWLEDGE ARCHITECTURE

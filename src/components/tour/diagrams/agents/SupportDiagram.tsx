@@ -5,9 +5,10 @@ import { DiagramNode, DiagramEdge, MetricChip } from '../primitives';
 interface SupportDiagramProps {
   progress: number;
   compact?: boolean;
+  accentColor?: string;
 }
 
-export function SupportDiagram({ progress, compact = false }: SupportDiagramProps) {
+export function SupportDiagram({ progress, compact = false, accentColor = 'hsl(173 80% 40%)' }: SupportDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -19,7 +20,7 @@ export function SupportDiagram({ progress, compact = false }: SupportDiagramProp
   const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
 
   return (
-    <DiagramShell viewBox={viewBox} accentColor="hsl(200 80% 50%)">
+    <DiagramShell viewBox={viewBox} accentColor={accentColor}>
       {/* Title */}
       <text x="10" y="14" fill="hsl(var(--muted-foreground))" fontSize="8" fontWeight="500" opacity="0.6">
         INTELLIGENT ROUTING ENGINE

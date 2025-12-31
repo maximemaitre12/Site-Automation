@@ -5,9 +5,10 @@ import { DiagramNode, DiagramEdge, MetricChip, ScanBeam } from '../primitives';
 interface ComplianceDiagramProps {
   progress: number;
   compact?: boolean;
+  accentColor?: string;
 }
 
-export function ComplianceDiagram({ progress, compact = false }: ComplianceDiagramProps) {
+export function ComplianceDiagram({ progress, compact = false, accentColor = 'hsl(25 95% 53%)' }: ComplianceDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -19,7 +20,7 @@ export function ComplianceDiagram({ progress, compact = false }: ComplianceDiagr
   const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
 
   return (
-    <DiagramShell viewBox={viewBox} accentColor="hsl(0 84% 60%)">
+    <DiagramShell viewBox={viewBox} accentColor={accentColor}>
       {/* Title */}
       <text x="10" y="14" fill="hsl(var(--muted-foreground))" fontSize="8" fontWeight="500" opacity="0.6">
         COMPLIANCE SCANNING ENGINE
