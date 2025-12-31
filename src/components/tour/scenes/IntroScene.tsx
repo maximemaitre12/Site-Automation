@@ -8,12 +8,6 @@ interface IntroSceneProps {
   progress: number;
 }
 
-const stats = [
-  { value: '10K+', label: 'Utilisateurs actifs', delay: 0 },
-  { value: '50K', label: 'Tâches automatisées/jour', delay: 100 },
-  { value: '99.9%', label: 'Disponibilité', delay: 200 },
-];
-
 const agents = [
   { icon: Users, label: 'RH', color: 'text-agent-hr' },
   { icon: TrendingUp, label: 'Ventes', color: 'text-agent-sales' },
@@ -23,6 +17,7 @@ const agents = [
   { icon: GitBranch, label: 'Flow', color: 'text-agent-flow' },
   { icon: Database, label: 'Data', color: 'text-agent-data' },
 ];
+
 
 export function IntroScene({ isActive, progress }: IntroSceneProps) {
   const [phase, setPhase] = useState(0);
@@ -34,11 +29,10 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
     }
 
     // Phase transitions based on progress
-    if (progress < 10) setPhase(1);       // Logo appears
-    else if (progress < 25) setPhase(2);  // Title appears
-    else if (progress < 45) setPhase(3);  // Stats appear
-    else if (progress < 70) setPhase(4);  // Agents grid
-    else setPhase(5);                      // Final state
+    if (progress < 15) setPhase(1);       // Logo appears
+    else if (progress < 35) setPhase(2);  // Title appears
+    else if (progress < 70) setPhase(3);  // Agents grid
+    else setPhase(4);                      // Final state
   }, [isActive, progress]);
 
   return (
@@ -93,38 +87,16 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
           </p>
         </div>
 
-        {/* Stats */}
-        <div 
-          className={cn(
-            "flex flex-wrap justify-center gap-8 md:gap-16 mb-16 transition-all duration-700",
-            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          )}
-        >
-          {stats.map((stat, index) => (
-            <div 
-              key={stat.label}
-              className="text-center animate-stagger-in"
-              style={{ animationDelay: `${stat.delay}ms` }}
-            >
-              <div className="text-4xl md:text-5xl font-bold text-primary mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
 
         {/* Agents preview */}
         <div 
           className={cn(
             "transition-all duration-700",
-            phase >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
           <p className="text-center text-muted-foreground mb-6">
-            7 agents IA spécialisés à votre service
+            7 agents IA spécialisés
           </p>
           
           <div className="flex flex-wrap justify-center gap-4">
@@ -135,11 +107,11 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
                   key={agent.label}
                   className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 border border-border/50 backdrop-blur-sm animate-stagger-in",
-                    phase >= 5 && "animate-float"
+                    phase >= 4 && "animate-float"
                   )}
                   style={{ 
                     animationDelay: `${index * 100}ms`,
-                    ...(phase >= 5 && { animationDelay: `${index * 200}ms` })
+                    ...(phase >= 4 && { animationDelay: `${index * 200}ms` })
                   }}
                 >
                   <Icon className={cn("w-5 h-5", agent.color)} />

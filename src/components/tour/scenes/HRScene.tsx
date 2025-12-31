@@ -327,9 +327,9 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
 
           <div className="space-y-3">
             {[
-              { label: 'CV analysés', value: '1,234', trend: '+15%' },
-              { label: 'Temps gagné', value: '89h', trend: '+23%' },
-              { label: 'Satisfaction', value: '4.8/5', trend: '+0.3' },
+              { label: 'Taux de match', value: '87%', trend: '' },
+              { label: 'Délai moyen', value: '12j', trend: '' },
+              { label: 'Automatisation', value: '95%', trend: '' },
             ].map((stat, i) => (
               <div 
                 key={stat.label}
