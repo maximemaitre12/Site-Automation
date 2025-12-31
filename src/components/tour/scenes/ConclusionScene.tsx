@@ -57,7 +57,7 @@ export function ConclusionScene({ isActive, progress, onRestart }: ConclusionSce
             phase >= 1 ? "opacity-100" : "opacity-0"
           )}
         >
-          Try AETHER free for 14 days
+          Try AETHER free for 3 days
         </p>
 
         {/* CTA Buttons */}
