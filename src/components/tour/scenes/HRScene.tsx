@@ -26,21 +26,21 @@ const hrTimeline: Timeline = {
 };
 
 const pipelineStages = [
-  { label: 'Nouveaux', count: 24, color: 'bg-blue-500' },
-  { label: 'CV analysés', count: 18, color: 'bg-violet-500' },
-  { label: 'Entretiens', count: 8, color: 'bg-purple-500' },
-  { label: 'Offres', count: 3, color: 'bg-emerald-500' },
+  { label: 'New', count: 24, color: 'bg-blue-500' },
+  { label: 'CV Analyzed', count: 18, color: 'bg-violet-500' },
+  { label: 'Interviews', count: 8, color: 'bg-purple-500' },
+  { label: 'Offers', count: 3, color: 'bg-emerald-500' },
 ];
 
 const candidates = [
   { name: 'Sophie Martin', role: 'UX Designer', score: 94, skills: ['Figma', 'Research'] },
-  { name: 'Lucas Bernard', role: 'Dev Frontend', score: 88, skills: ['React', 'TypeScript'] },
+  { name: 'Lucas Bernard', role: 'Frontend Dev', score: 88, skills: ['React', 'TypeScript'] },
   { name: 'Emma Dubois', role: 'Product Manager', score: 91, skills: ['Agile', 'Data'] },
 ];
 
 const interviews = [
-  { time: '09:00', name: 'Sophie M.', type: 'Technique', live: true },
-  { time: '11:30', name: 'Lucas B.', type: 'RH', live: false },
+  { time: '09:00', name: 'Sophie M.', type: 'Technical', live: true },
+  { time: '11:30', name: 'Lucas B.', type: 'HR', live: false },
   { time: '14:00', name: 'Emma D.', type: 'Final', live: false },
 ];
 
@@ -91,14 +91,14 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
               </div>
             </PulseGlow>
             <div>
-              <h1 className="text-[1.3em] font-bold text-slate-900 leading-tight">Agent RH</h1>
-              <p className="text-[0.75em] text-slate-500">Recrutement intelligent</p>
+              <h1 className="text-[1.3em] font-bold text-slate-900 leading-tight">HR Copilot</h1>
+              <p className="text-[0.75em] text-slate-500">Intelligent recruitment</p>
             </div>
           </div>
           <FadeSlide active={timeline.isActive('pipeline')} direction="left" delay={200}>
             <div className="flex items-center gap-[0.5em] px-[0.8em] py-[0.4em] rounded-full bg-violet-50 border border-violet-200">
               <div className="w-[0.5em] h-[0.5em] rounded-full bg-violet-500 animate-pulse" />
-              <span className="text-[0.75em] text-violet-600 font-medium">IA Active</span>
+              <span className="text-[0.75em] text-violet-600 font-medium">AI Active</span>
             </div>
           </FadeSlide>
         </div>
@@ -146,12 +146,12 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
             <div className="p-[0.8em] border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-[0.5em]">
                 <Brain className="w-[1em] h-[1em] text-violet-600" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Analyse IA des CV</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">AI CV Analysis</span>
               </div>
               <FadeSlide active={timeline.isActive('scanEffect')} direction="right">
                 <div className="flex items-center gap-[0.5em]">
                   <Sparkles className="w-[1em] h-[1em] text-violet-500 animate-pulse" />
-                  <span className="text-[0.75em] text-violet-600">Analyse en cours...</span>
+                  <span className="text-[0.75em] text-violet-600">Analysis in progress...</span>
                 </div>
               </FadeSlide>
             </div>
@@ -168,7 +168,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                     timeline.isActive('scanEffect') ? "text-violet-500" : "text-slate-400"
                   )} />
                   <span className="text-[0.7em] text-center text-slate-500">
-                    {timeline.isActive('scanEffect') ? "12 CV importés" : "Importer CV"}
+                    {timeline.isActive('scanEffect') ? "12 CVs imported" : "Import CV"}
                   </span>
                 </div>
               </ScalePop>
@@ -228,12 +228,12 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
             <FadeSlide active={timeline.isActive('emails')} direction="up" className="flex-1 rounded-xl bg-slate-50 border border-slate-100 p-[0.8em] flex flex-col">
               <div className="flex items-center gap-[0.5em] mb-[0.6em]">
                 <Mail className="w-[1em] h-[1em] text-blue-500" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Emails automatiques</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">Automated emails</span>
               </div>
               <StaggerGroup active={timeline.isActive('emails')} stagger={80} className="flex-1 flex gap-[0.5em]">
                 {[
                   { icon: Send, label: 'Invitations', color: 'text-blue-500' },
-                  { icon: Clock, label: 'Rappels', color: 'text-amber-500' },
+                  { icon: Clock, label: 'Reminders', color: 'text-amber-500' },
                   { icon: CheckCircle, label: 'Confirmations', color: 'text-emerald-500' },
                 ].map((email) => (
                   <div 
@@ -251,15 +251,15 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
             <SpringIn active={timeline.isActive('jobGen')} className="w-[28%] rounded-xl bg-slate-50 border border-slate-100 p-[0.8em] flex flex-col">
               <div className="flex items-center gap-[0.5em] mb-[0.5em]">
                 <Briefcase className="w-[1em] h-[1em] text-violet-600" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Générateur d'offres</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">Job Post Generator</span>
               </div>
               <div className="flex-1 p-[0.5em] rounded-lg bg-violet-50 border border-violet-100 flex flex-col justify-center">
                 <div className="flex items-center gap-[0.3em] mb-[0.3em]">
                   <Sparkles className="w-[0.8em] h-[0.8em] text-violet-500 animate-pulse" />
-                  <span className="text-[0.7em] text-violet-600 font-medium">Génération IA</span>
+                  <span className="text-[0.7em] text-violet-600 font-medium">AI Generation</span>
                 </div>
                 <p className="text-[0.7em] text-slate-600 line-clamp-2">
-                  "Nous recherchons un UX Designer passionné..."
+                  "We are looking for a passionate UX Designer..."
                 </p>
               </div>
             </SpringIn>
@@ -272,7 +272,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
           <div className="flex-1 rounded-xl bg-slate-50 border border-slate-100 p-[0.8em] flex flex-col min-h-0">
             <div className="flex items-center gap-[0.5em] mb-[0.6em]">
               <Calendar className="w-[1em] h-[1em] text-purple-500" />
-              <span className="text-[0.9em] font-semibold text-slate-800">Entretiens</span>
+              <span className="text-[0.9em] font-semibold text-slate-800">Interviews</span>
             </div>
             <StaggerGroup active={timeline.isActive('interviews')} stagger={100} animation="slide" className="flex-1 flex flex-col gap-[0.4em] overflow-hidden">
               {interviews.map((interview) => (
@@ -312,9 +312,9 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
               </div>
               <div className="space-y-[0.4em]">
                 {[
-                  { label: 'Taux match', value: 94, suffix: '%' },
-                  { label: 'Délai moyen', value: 8, suffix: 'j' },
-                  { label: 'Automatisation', value: 87, suffix: '%' },
+                  { label: 'Match rate', value: 94, suffix: '%' },
+                  { label: 'Avg. time', value: 8, suffix: 'd' },
+                  { label: 'Automation', value: 87, suffix: '%' },
                 ].map((stat, i) => (
                   <div key={stat.label} className="flex items-center justify-between">
                     <span className="text-[0.7em] text-slate-500">{stat.label}</span>

@@ -24,23 +24,23 @@ const salesTimeline: Timeline = {
 };
 
 const deals = [
-  { name: 'TechCorp', stage: 'Négociation', prob: 85, hot: true },
-  { name: 'DataFlow', stage: 'Proposition', prob: 70, hot: false },
-  { name: 'CloudFirst', stage: 'Découverte', prob: 45, hot: false },
+  { name: 'TechCorp', stage: 'Negotiation', prob: 85, hot: true },
+  { name: 'DataFlow', stage: 'Proposal', prob: 70, hot: false },
+  { name: 'CloudFirst', stage: 'Discovery', prob: 45, hot: false },
   { name: 'AI Labs', stage: 'Closing', prob: 95, hot: true },
 ];
 
 const transcriptLines = [
-  { speaker: 'Vous', text: '"Je comprends vos besoins en automatisation..."', you: true },
-  { speaker: 'Client', text: '"Exactement, nous cherchons à gagner du temps..."', you: false },
-  { speaker: 'Vous', text: '"Notre solution permet justement de..."', you: true },
+  { speaker: 'You', text: '"I understand your automation needs..."', you: true },
+  { speaker: 'Client', text: '"Exactly, we are looking to save time..."', you: false },
+  { speaker: 'You', text: '"Our solution allows you to..."', you: true },
 ];
 
 const analysisMetrics = [
   { label: 'Score', value: 92, suffix: '%', color: 'text-emerald-600' },
   { label: 'Sentiment', value: '↑', color: 'text-emerald-500' },
   { label: 'Objections', value: 2, color: 'text-amber-500' },
-  { label: 'Intérêt', value: 'Fort', color: 'text-blue-500' },
+  { label: 'Interest', value: 'High', color: 'text-blue-500' },
 ];
 
 const teamMembers = [
@@ -91,13 +91,13 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
               </div>
             </PulseGlow>
             <div>
-              <h1 className="text-[1.3em] font-bold text-slate-900 leading-tight">Agent Ventes</h1>
-              <p className="text-[0.75em] text-slate-500">Intelligence commerciale</p>
+              <h1 className="text-[1.3em] font-bold text-slate-900 leading-tight">Sales Copilot</h1>
+              <p className="text-[0.75em] text-slate-500">Commercial intelligence</p>
             </div>
           </div>
           <FadeSlide active={timeline.isActive('pipeline')} direction="left">
             <div className="px-[0.8em] py-[0.4em] rounded-full bg-emerald-50 border border-emerald-200">
-              <span className="text-[0.75em] text-emerald-600 font-medium">4 deals actifs</span>
+              <span className="text-[0.75em] text-emerald-600 font-medium">4 active deals</span>
             </div>
           </FadeSlide>
         </div>
@@ -149,7 +149,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             <div className="p-[0.8em] border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-[0.5em]">
                 <Phone className="w-[1em] h-[1em] text-red-500" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Enregistrement d'appel</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">Call Recording</span>
               </div>
               <FadeSlide active={timeline.isActive('waveform')} direction="right">
                 <div className="flex items-center gap-[0.5em]">
@@ -165,7 +165,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
                 <div className="h-full p-[0.8em] rounded-xl bg-red-50 border border-red-100 flex flex-col">
                   <div className="flex items-center gap-[0.5em] mb-[0.5em]">
                     <Volume2 className="w-[1em] h-[1em] text-red-500" />
-                    <span className="text-[0.7em] text-red-600 font-medium">Appel TechCorp</span>
+                    <span className="text-[0.7em] text-red-600 font-medium">TechCorp Call</span>
                   </div>
                   <div className="flex-1 flex items-end gap-[2%] min-h-0">
                     {[...Array(24)].map((_, i) => (
@@ -187,7 +187,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
                 <div className="flex flex-col gap-[0.4em]">
                   <div className="flex items-center gap-[0.5em] mb-[0.3em]">
                     <MessageSquare className="w-[1em] h-[1em] text-slate-400" />
-                    <span className="text-[0.7em] text-slate-500">Transcription temps réel</span>
+                    <span className="text-[0.7em] text-slate-500">Real-time transcription</span>
                   </div>
                   {transcriptLines.map((line, i) => (
                     <FadeSlide 
@@ -214,7 +214,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             <SpringIn active={timeline.isActive('analysis')} className="flex-1 rounded-xl bg-slate-50 border border-slate-100 p-[0.8em] flex flex-col">
               <div className="flex items-center gap-[0.5em] mb-[0.5em]">
                 <Sparkles className="w-[1em] h-[1em] text-emerald-500" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Analyse IA</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">AI Analysis</span>
               </div>
               <StaggerGroup active={timeline.isActive('metrics')} stagger={80} className="flex-1 grid grid-cols-4 gap-[0.5em]">
                 {analysisMetrics.map((metric) => (
@@ -234,14 +234,14 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             <ScalePop active={timeline.isActive('proposal')} className="w-[25%] rounded-xl bg-slate-50 border border-slate-100 p-[0.8em] flex flex-col">
               <div className="flex items-center gap-[0.5em] mb-[0.5em]">
                 <FileSignature className="w-[1em] h-[1em] text-purple-500" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Proposition</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">Proposal</span>
               </div>
               <div className="flex-1 p-[0.5em] rounded-lg bg-purple-50 border border-purple-100 flex flex-col justify-center">
                 <div className="flex items-center gap-[0.3em] mb-[0.3em]">
                   <Sparkles className="w-[0.8em] h-[0.8em] text-purple-500 animate-pulse" />
-                  <span className="text-[0.65em] text-purple-600 font-medium">Générée</span>
+                  <span className="text-[0.65em] text-purple-600 font-medium">Generated</span>
                 </div>
-                <div className="text-[0.75em] text-slate-600">TechCorp • Prête</div>
+                <div className="text-[0.75em] text-slate-600">TechCorp • Ready</div>
               </div>
             </ScalePop>
           </div>
@@ -253,7 +253,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
           <div className="flex-1 rounded-xl bg-slate-50 border border-slate-100 p-[0.8em] flex flex-col min-h-0">
             <div className="flex items-center gap-[0.5em] mb-[0.6em]">
               <Users className="w-[1em] h-[1em] text-blue-500" />
-              <span className="text-[0.9em] font-semibold text-slate-800">Équipe</span>
+              <span className="text-[0.9em] font-semibold text-slate-800">Team</span>
             </div>
             <StaggerGroup active={timeline.isActive('team')} stagger={100} className="flex-1 flex flex-col gap-[0.5em] justify-center">
               {teamMembers.map((member) => (
@@ -283,11 +283,11 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             )}>
               <div className="flex items-center gap-[0.5em] mb-[0.5em]">
                 <Shield className="w-[1em] h-[1em] text-emerald-500" />
-                <span className="text-[0.9em] font-semibold text-slate-800">Conformité</span>
+                <span className="text-[0.9em] font-semibold text-slate-800">Compliance</span>
               </div>
               <div className="flex items-center gap-[0.5em] p-[0.5em] rounded-lg bg-emerald-50 border border-emerald-100">
                 <CheckCircle className="w-[1em] h-[1em] text-emerald-500" />
-                <span className="text-[0.75em] text-emerald-700 font-medium">100% conforme</span>
+                <span className="text-[0.75em] text-emerald-700 font-medium">100% compliant</span>
               </div>
             </SpringIn>
           </PulseGlow>
