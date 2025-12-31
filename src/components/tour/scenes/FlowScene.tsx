@@ -91,6 +91,7 @@ export function FlowScene({ isActive, progress }: FlowSceneProps) {
         isClicking={isClicking}
         isVisible={phase >= 2 && phase < 9}
         duration={600}
+        mode="container"
       />
 
       {/* Flow Interface */}
@@ -99,7 +100,7 @@ export function FlowScene({ isActive, progress }: FlowSceneProps) {
           "relative w-full max-w-5xl bg-card rounded-2xl border border-border shadow-2xl overflow-hidden transition-all duration-700",
           phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"
         )}
-        style={{ height: '70vh', maxHeight: '600px' }}
+        style={{ height: 'min(70vh, 100%)', maxHeight: 'min(600px, 100%)' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">

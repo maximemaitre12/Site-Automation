@@ -112,15 +112,16 @@ export function CinematicTourPlayer() {
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm p-4 md:p-8"
       onMouseMove={() => setShowControls(true)}
     >
-      {/* 16:9 Frame (strict, visible) */}
-      <div
-        className="relative w-full overflow-hidden rounded-2xl border border-border bg-card"
-        style={{
-          width: 'min(calc(100vw - 2rem), calc((100vh - 2rem) * 16 / 9))',
-          aspectRatio: '16 / 9',
-          boxShadow: '0 0 80px hsl(var(--primary) / 0.18)',
-        }}
-      >
+      {/* Available area (accounts for padding) */}
+      <div className="relative h-full w-full flex items-center justify-center">
+        {/* 16:9 Frame (strict) */}
+        <div
+          className="relative h-full w-auto max-w-full max-h-full overflow-hidden rounded-2xl border border-border bg-card"
+          style={{
+            aspectRatio: '16 / 9',
+            boxShadow: '0 0 80px hsl(var(--primary) / 0.18)',
+          }}
+        >
         {/* Scene content - fills entire 16:9 frame */}
         <div
           className={cn(
