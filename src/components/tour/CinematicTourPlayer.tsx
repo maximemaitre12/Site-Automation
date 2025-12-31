@@ -109,18 +109,17 @@ export function CinematicTourPlayer() {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black overflow-hidden flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-black flex items-center justify-center"
       onMouseMove={() => setShowControls(true)}
     >
-      {/* THE WIDGET - Fixed 16:9 */}
+      {/* 16:9 Container - strictly contained */}
       <div 
-        className="relative w-full max-w-7xl mx-4 rounded-xl overflow-hidden"
+        className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden"
         style={{
-          aspectRatio: '16 / 9',
-          boxShadow: '0 0 100px hsl(var(--primary) / 0.3)',
+          boxShadow: '0 0 100px hsl(var(--primary) / 0.2)',
         }}
       >
-        {/* Scene content - fills entire widget */}
+        {/* Scene content - fills entire container */}
         <div 
           className={cn(
             "absolute inset-0 transition-all duration-600 ease-out",
@@ -130,7 +129,7 @@ export function CinematicTourPlayer() {
           {renderScene()}
         </div>
 
-        {/* Progress bar */}
+        {/* Progress bar at top */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 z-40">
           <div 
             className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-100"
@@ -138,18 +137,35 @@ export function CinematicTourPlayer() {
           />
         </div>
 
+        {/* Scene indicator dots */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2">
+          {tourScripts.map((script, index) => (
+            <div
+              key={script.id}
+              className={cn(
+                "transition-all duration-300 rounded-full",
+                index === currentSceneIndex
+                  ? "w-8 h-2 bg-primary"
+                  : index < currentSceneIndex
+                    ? "w-2 h-2 bg-primary/60"
+                    : "w-2 h-2 bg-white/20"
+              )}
+            />
+          ))}
+        </div>
+
         {/* Play button when paused */}
         {!isPlaying && (
           <button
             onClick={togglePlay}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-24 h-24 rounded-full bg-white/20 backdrop-blur-xl flex items-center justify-center hover:scale-105 transition-transform border border-white/30"
-            style={{ boxShadow: '0 0 80px rgba(255,255,255,0.3)' }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-20 h-20 rounded-full bg-primary/20 backdrop-blur-xl flex items-center justify-center hover:scale-110 transition-transform border border-primary/30"
+            style={{ boxShadow: '0 0 60px hsl(var(--primary) / 0.4)' }}
           >
-            <Play className="w-10 h-10 text-white ml-1" />
+            <Play className="w-8 h-8 text-primary ml-1" />
           </button>
         )}
 
-        {/* Minimal controls */}
+        {/* Bottom controls */}
         <div 
           className={cn(
             "absolute bottom-0 left-0 right-0 z-40 p-4 transition-all duration-300",
@@ -181,7 +197,7 @@ export function CinematicTourPlayer() {
                 variant="ghost"
                 size="icon"
                 onClick={togglePlay}
-                className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border-0"
+                className="w-12 h-12 rounded-full bg-primary/20 backdrop-blur-sm text-primary hover:bg-primary/30 border border-primary/30"
               >
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </Button>
@@ -197,21 +213,10 @@ export function CinematicTourPlayer() {
               </Button>
             </div>
 
-            {/* Scene dots */}
-            <div className="flex items-center gap-1.5">
-              {tourScripts.map((_, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "h-1.5 rounded-full transition-all duration-300",
-                    index === currentSceneIndex
-                      ? "bg-white w-6"
-                      : index < currentSceneIndex
-                        ? "bg-white/60 w-1.5"
-                        : "bg-white/30 w-1.5"
-                  )}
-                />
-              ))}
+            {/* Scene title */}
+            <div className="text-right">
+              <div className="text-white/60 text-xs">{currentSceneIndex + 1}/{totalScenes}</div>
+              <div className="text-white font-medium text-sm">{currentScript.title}</div>
             </div>
           </div>
         </div>
