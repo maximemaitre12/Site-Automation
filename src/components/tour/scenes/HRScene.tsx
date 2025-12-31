@@ -93,7 +93,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
   }, [isActive, progress]);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center p-8">
+    <div className="absolute inset-0 flex items-center justify-center">
       {/* Animated cursor */}
       <AnimatedCursor
         targetPosition={cursorPos}
@@ -102,47 +102,46 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
         duration={600}
       />
 
-      {/* HR Interface mockup */}
+      {/* HR Interface mockup - fills the container */}
       <div 
         className={cn(
-          "relative w-full max-w-5xl bg-card rounded-2xl border border-border shadow-2xl overflow-hidden transition-all duration-700",
+          "absolute inset-4 bg-card rounded-xl border border-border shadow-xl overflow-hidden transition-all duration-700",
           phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"
         )}
-        style={{ height: '70vh', maxHeight: '600px' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-agent-hr/20 flex items-center justify-center">
-              <Users className="w-5 h-5 text-agent-hr" />
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-agent-hr/20 flex items-center justify-center">
+              <Users className="w-4 h-4 text-agent-hr" />
             </div>
             <div>
-              <h2 className="font-semibold text-foreground">Agent RH</h2>
-              <p className="text-xs text-muted-foreground">Recrutement intelligent</p>
+              <h2 className="font-semibold text-foreground text-sm">Agent RH</h2>
+              <p className="text-[10px] text-muted-foreground">Recrutement intelligent</p>
             </div>
           </div>
           
           <button 
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium transition-all",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium transition-all",
               phase >= 2 && phase < 4 && "ring-4 ring-primary/30 animate-element-highlight"
             )}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3 h-3" />
             Ajouter candidat
           </button>
         </div>
 
         {/* Content grid */}
-        <div className="flex h-full">
+        <div className="flex h-[calc(100%-56px)]">
           {/* Sidebar */}
-          <div className="w-56 border-r border-border p-4 bg-muted/10">
+          <div className="w-40 border-r border-border p-3 bg-muted/10">
             <nav className="space-y-1">
               {['Pipeline', 'Candidats', 'Entretiens', 'Offres'].map((item, i) => (
                 <div 
                   key={item}
                   className={cn(
-                    "px-3 py-2 rounded-lg text-sm transition-colors",
+                    "px-2 py-1.5 rounded-lg text-xs transition-colors",
                     i === 1 ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"
                   )}
                 >
@@ -153,33 +152,33 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
           </div>
 
           {/* Main content */}
-          <div className="flex-1 p-6 overflow-auto">
-            <h3 className="text-lg font-semibold mb-4">Candidats récents</h3>
+          <div className="flex-1 p-4 overflow-auto">
+            <h3 className="text-sm font-semibold mb-3">Candidats récents</h3>
             
             {/* Candidates list */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {candidates.map((candidate, index) => (
                 <div 
                   key={candidate.id}
-                  className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/50"
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <User className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{candidate.name}</p>
-                      <p className="text-sm text-muted-foreground">{candidate.role}</p>
+                      <p className="font-medium text-sm">{candidate.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{candidate.role}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                      <span className="font-semibold">{candidate.score}%</span>
+                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                      <span className="font-semibold text-xs">{candidate.score}%</span>
                     </div>
-                    <span className="px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+                    <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-primary/10 text-primary">
                       {candidate.status}
                     </span>
                   </div>
@@ -190,34 +189,34 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
               {newCandidate && (
                 <div 
                   className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border-2 border-primary/50 bg-primary/5 animate-stagger-in",
+                    "flex items-center justify-between p-3 rounded-lg border-2 border-primary/50 bg-primary/5 animate-stagger-in",
                     showScore && "animate-element-highlight"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center">
-                      <User className="w-5 h-5 text-primary" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{newCandidate.name}</p>
-                      <p className="text-sm text-muted-foreground">{newCandidate.role}</p>
+                      <p className="font-medium text-sm">{newCandidate.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{newCandidate.role}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     {showScore ? (
                       <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                        <span className="font-bold text-lg text-primary">{scoreValue}%</span>
+                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        <span className="font-bold text-sm text-primary">{scoreValue}%</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        <span className="text-sm text-muted-foreground">Analyse IA...</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        <span className="text-[10px] text-muted-foreground">Analyse IA...</span>
                       </div>
                     )}
                     <span className={cn(
-                      "px-2 py-1 rounded-full text-xs",
+                      "px-1.5 py-0.5 rounded-full text-[10px]",
                       showScore && scoreValue >= 90 
                         ? "bg-green-500/20 text-green-600" 
                         : "bg-primary/10 text-primary"
@@ -234,16 +233,16 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
         {/* Dialog overlay */}
         {showDialog && (
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-20 animate-fade-in">
-            <div className="w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl p-6 animate-zoom-in">
-              <h3 className="text-lg font-semibold mb-4">Nouveau candidat</h3>
+            <div className="w-full max-w-sm bg-card rounded-xl border border-border shadow-2xl p-4 animate-zoom-in">
+              <h3 className="text-sm font-semibold mb-3">Nouveau candidat</h3>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Name field */}
                 <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Nom complet</label>
+                  <label className="text-[10px] text-muted-foreground mb-1 block">Nom complet</label>
                   <div 
                     className={cn(
-                      "px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground",
+                      "px-3 py-2 rounded-lg bg-muted/50 border border-border text-foreground text-sm",
                       phase >= 5 && phase < 7 && "ring-2 ring-primary"
                     )}
                   >
@@ -254,35 +253,35 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                         isActive={phase >= 6}
                       />
                     ) : (
-                      <span className="text-muted-foreground">Entrez le nom...</span>
+                      <span className="text-muted-foreground text-xs">Entrez le nom...</span>
                     )}
                   </div>
                 </div>
 
                 {/* Upload field */}
                 <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">CV</label>
+                  <label className="text-[10px] text-muted-foreground mb-1 block">CV</label>
                   <div 
                     className={cn(
-                      "px-4 py-6 rounded-lg border-2 border-dashed border-border flex flex-col items-center gap-2 transition-all",
+                      "px-3 py-4 rounded-lg border-2 border-dashed border-border flex flex-col items-center gap-1.5 transition-all",
                       phase >= 7 && phase < 9 && "border-primary bg-primary/5",
                       showUpload && "border-green-500 bg-green-500/5"
                     )}
                   >
                     {showUpload ? (
                       <>
-                        <div className="flex items-center gap-2 text-green-600">
+                        <div className="flex items-center gap-1.5 text-green-600">
                           {uploadProgress >= 100 ? (
-                            <CheckCircle className="w-5 h-5" />
+                            <CheckCircle className="w-4 h-4" />
                           ) : (
-                            <Upload className="w-5 h-5 animate-bounce" />
+                            <Upload className="w-4 h-4 animate-bounce" />
                           )}
-                          <span className="font-medium">
+                          <span className="font-medium text-xs">
                             {uploadProgress >= 100 ? 'CV_Marie_Dupont.pdf' : 'Téléchargement...'}
                           </span>
                         </div>
                         {uploadProgress < 100 && (
-                          <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-green-500 transition-all duration-300"
                               style={{ width: `${uploadProgress}%` }}
@@ -292,8 +291,8 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
                       </>
                     ) : (
                       <>
-                        <Upload className="w-6 h-6 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">Glissez un CV ici</span>
+                        <Upload className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">Glissez un CV ici</span>
                       </>
                     )}
                   </div>
@@ -307,14 +306,14 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
       {/* Tooltip for score */}
       {phase >= 11 && (
         <div 
-          className="absolute top-1/2 right-[15%] -translate-y-1/2 bg-card border border-border rounded-xl px-4 py-3 shadow-xl animate-tooltip-appear"
+          className="absolute top-1/2 right-8 -translate-y-1/2 bg-card border border-border rounded-lg px-3 py-2 shadow-xl animate-tooltip-appear"
         >
-          <div className="flex items-center gap-2 text-green-600">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-medium">CV analysé en 3 secondes</span>
+          <div className="flex items-center gap-1.5 text-green-600">
+            <CheckCircle className="w-4 h-4" />
+            <span className="font-medium text-xs">CV analysé en 3 secondes</span>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Score de matching: 95% • Expérience: 5 ans
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Score: 95% • Expérience: 5 ans
           </p>
         </div>
       )}
