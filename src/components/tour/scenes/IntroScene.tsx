@@ -39,26 +39,26 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
       {/* Central content - constrained */}
       <div className="relative z-10 flex flex-col items-center w-full max-w-3xl max-h-full overflow-hidden">
         
-        {/* Logo - reduced size */}
+        {/* Logo - no frame */}
         <div 
           className={cn(
             "relative mb-4 sm:mb-6 transition-all duration-1000 shrink-0",
             phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-50"
           )}
         >
-          {/* Subtle glow effect - reduced */}
+          {/* Subtle glow effect */}
           <div 
-            className="absolute inset-0 rounded-xl sm:rounded-2xl blur-xl sm:blur-2xl bg-primary/15"
-            style={{ transform: 'scale(1.2)' }}
+            className="absolute inset-0 blur-2xl bg-primary/20"
+            style={{ transform: 'scale(1.5)' }}
           />
           
-          {/* Logo image - smaller */}
+          {/* Logo image - no border/frame */}
           <img 
             src={aetherLogo} 
             alt="AETHER" 
-            className="relative w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl sm:rounded-2xl"
+            className="relative w-20 h-20 sm:w-24 sm:h-24 object-contain"
             style={{
-              filter: 'drop-shadow(0 0 20px hsl(var(--primary) / 0.25))',
+              filter: 'drop-shadow(0 0 30px hsl(var(--primary) / 0.3))',
             }}
           />
         </div>
