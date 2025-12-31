@@ -2,7 +2,7 @@ import React from 'react';
 import { TrendingUp, Phone, FileSignature, DollarSign, Sparkles, Target, Users, Volume2, MessageSquare, Shield, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAnimationTimeline, Timeline } from '@/hooks/useAnimationTimeline';
-import { SpringIn, FadeSlide, StaggerGroup, CountUp, ScanLine, PulseGlow, ParticleExplosion, ScalePop, ZoomSpotlight } from '../animations';
+import { SpringIn, FadeSlide, StaggerGroup, CountUp, ScanLine, PulseGlow, ParticleExplosion, ScalePop } from '../animations';
 
 interface SalesSceneProps {
   isActive: boolean;
@@ -14,10 +14,8 @@ const salesTimeline: Timeline = {
   pipeline: { start: 5, end: 18, stagger: 100, items: 4 },
   callSection: { start: 15, end: 28 },
   waveform: { start: 22, end: 38 },
-  zoomToCall: { start: 25, end: 50 }, // Zoom to call recording
   transcript: { start: 32, end: 48, stagger: 150, items: 3 },
   analysis: { start: 45, end: 60 },
-  zoomToAnalysis: { start: 52, end: 75 }, // Zoom to analysis
   metrics: { start: 52, end: 68, stagger: 80, items: 4 },
   proposal: { start: 62, end: 75 },
   team: { start: 55, end: 70 },
@@ -55,15 +53,6 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
   const timeline = useAnimationTimeline(progress, salesTimeline);
   const showParticles = timeline.isActive('finalGlow') && progress >= 92;
 
-  // Determine zoom state
-  const getZoomTarget = () => {
-    if (timeline.isActive('zoomToCall') && !timeline.isActive('zoomToAnalysis')) return 'top-center';
-    if (timeline.isActive('zoomToAnalysis')) return 'bottom-center';
-    return 'center';
-  };
-
-  const isZooming = timeline.isActive('zoomToCall') || timeline.isActive('zoomToAnalysis');
-
   return (
     <div 
       className="absolute inset-0 overflow-hidden bg-white"
@@ -92,8 +81,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
         originY={80}
       />
 
-      <ZoomSpotlight active={isZooming && !timeline.isActive('compliance')} targetArea={getZoomTarget()} zoomLevel={1.12}>
-        <div className="absolute inset-0 flex flex-col">
+      <div className="absolute inset-0 flex flex-col">
           {/* Header */}
           <SpringIn active={timeline.isActive('header')} className="relative z-10 px-[2%] py-[1.5%] border-b border-slate-100">
             <div className="flex items-center justify-between">
@@ -307,7 +295,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
             </FadeSlide>
           </div>
         </div>
-      </ZoomSpotlight>
+      </div>
 
       <style>{`
         @keyframes wave {

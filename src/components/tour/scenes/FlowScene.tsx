@@ -2,7 +2,7 @@ import React from 'react';
 import { Workflow, Mail, Database, MessageSquare, Play, Zap, CheckCircle, GitBranch, ArrowDown, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAnimationTimeline, Timeline } from '@/hooks/useAnimationTimeline';
-import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop, ZoomSpotlight } from '../animations';
+import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop } from '../animations';
 
 interface FlowSceneProps {
   isActive: boolean;
