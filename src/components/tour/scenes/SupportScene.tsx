@@ -2,7 +2,7 @@ import React from 'react';
 import { Headphones, MessageSquare, Clock, CheckCircle, AlertCircle, Sparkles, Send, User, Zap, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAnimationTimeline, Timeline } from '@/hooks/useAnimationTimeline';
-import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop } from '../animations';
+import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop, ZoomSpotlight } from '../animations';
 
 interface SupportSceneProps {
   isActive: boolean;

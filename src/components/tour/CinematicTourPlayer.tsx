@@ -178,7 +178,7 @@ export function CinematicTourPlayer() {
     }
   };
 
-  // Render agent intro overlay
+  // Render agent intro overlay - refined, smaller styling
   const renderAgentIntro = () => {
     if (!currentAgentIntro) return null;
     const Icon = currentAgentIntro.icon;
@@ -186,22 +186,34 @@ export function CinematicTourPlayer() {
     return (
       <div
         className={cn(
-          "absolute inset-0 z-30 flex flex-col items-center justify-center bg-white transition-all duration-700",
+          "absolute inset-0 z-30 flex flex-col items-center justify-center bg-white transition-all duration-700 overflow-hidden",
           showIntro ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >
+        {/* Subtle background accent */}
+        <div className={cn(
+          "absolute inset-0 transition-opacity duration-1000",
+          showIntro ? "opacity-100" : "opacity-0"
+        )}>
+          <div className={cn(
+            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] aspect-square rounded-full blur-[120px]",
+            currentAgentIntro.bgColor,
+            "opacity-30"
+          )} />
+        </div>
+
         <SpringIn active={showIntro} delay={100}>
           <div className={cn(
-            "w-24 h-24 md:w-32 md:h-32 rounded-3xl flex items-center justify-center mb-6",
+            "w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-4 shadow-lg",
             currentAgentIntro.bgColor
           )}>
-            <Icon className={cn("w-12 h-12 md:w-16 md:h-16", currentAgentIntro.color)} />
+            <Icon className={cn("w-7 h-7 md:w-8 md:h-8", currentAgentIntro.color)} />
           </div>
         </SpringIn>
         
         <SpringIn active={showIntro} delay={200}>
           <h2 className={cn(
-            "text-2xl md:text-4xl font-bold mb-3",
+            "text-lg md:text-xl font-semibold mb-2 text-center",
             currentAgentIntro.color
           )}>
             {currentAgentIntro.title}
@@ -209,7 +221,7 @@ export function CinematicTourPlayer() {
         </SpringIn>
         
         <SpringIn active={showIntro} delay={300}>
-          <p className="text-muted-foreground text-center max-w-md px-4 text-sm md:text-base">
+          <p className="text-muted-foreground text-center max-w-xs px-6 text-xs md:text-sm line-clamp-2">
             {currentAgentIntro.description}
           </p>
         </SpringIn>

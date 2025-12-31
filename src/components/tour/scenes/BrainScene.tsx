@@ -2,7 +2,7 @@ import React from 'react';
 import { Brain, Search, FileText, MessageSquare, Sparkles, Link2, Database, Zap, Globe, ImageIcon, Code, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAnimationTimeline, Timeline } from '@/hooks/useAnimationTimeline';
-import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop } from '../animations';
+import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop, ZoomSpotlight } from '../animations';
 
 interface BrainSceneProps {
   isActive: boolean;
