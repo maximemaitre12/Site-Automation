@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles } from 'lucide-react';
+import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles, Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts, getTotalDuration } from '@/data/tourNarration';
@@ -49,10 +49,27 @@ export function ProductTourVideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isEnded, setIsEnded] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const speedOptions = [0.5, 1, 1.5, 2];
+
+  const decreaseSpeed = () => {
+    const currentIndex = speedOptions.indexOf(playbackSpeed);
+    if (currentIndex > 0) {
+      setPlaybackSpeed(speedOptions[currentIndex - 1]);
+    }
+  };
+
+  const increaseSpeed = () => {
+    const currentIndex = speedOptions.indexOf(playbackSpeed);
+    if (currentIndex < speedOptions.length - 1) {
+      setPlaybackSpeed(speedOptions[currentIndex + 1]);
+    }
+  };
 
   const totalDuration = useMemo(() => getTotalDuration(), []);
 
@@ -98,7 +115,7 @@ export function ProductTourVideoPlayer() {
     lastTimeRef.current = timestamp;
 
     setCurrentTime((prev) => {
-      const next = prev + delta;
+      const next = prev + (delta * playbackSpeed);
       if (next >= totalDuration) {
         setIsPlaying(false);
         setIsEnded(true);
@@ -108,7 +125,7 @@ export function ProductTourVideoPlayer() {
     });
 
     animationRef.current = requestAnimationFrame(animate);
-  }, [totalDuration]);
+  }, [totalDuration, playbackSpeed]);
 
   // Start/stop animation
   useEffect(() => {
@@ -276,7 +293,7 @@ export function ProductTourVideoPlayer() {
               </p>
             </div>
 
-            {/* Play/Pause controls */}
+            {/* Play/Pause and Speed controls */}
             <div className="flex items-center gap-1 flex-shrink-0">
               <Button
                 variant="ghost"
@@ -299,6 +316,33 @@ export function ProductTourVideoPlayer() {
               >
                 <RotateCcw className="h-3.5 w-3.5" />
               </Button>
+
+              {/* Speed controls */}
+              <div className="flex items-center gap-0.5 ml-1 bg-muted/50 rounded-full px-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={decreaseSpeed}
+                  disabled={playbackSpeed === 0.5}
+                  className="h-7 w-7 rounded-full"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                
+                <span className="text-xs font-medium w-8 text-center text-muted-foreground">
+                  {playbackSpeed}x
+                </span>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={increaseSpeed}
+                  disabled={playbackSpeed === 2}
+                  className="h-7 w-7 rounded-full"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           </div>
         )}
