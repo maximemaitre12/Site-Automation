@@ -231,17 +231,17 @@ export function CinematicTourPlayer() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 p-4 md:p-8"
+      className="fixed inset-0 z-40 flex flex-col bg-slate-100 pt-14"
       onMouseMove={() => setShowControls(true)}
     >
-      {/* Available area (accounts for padding) */}
-      <div className="relative h-full w-full flex items-center justify-center">
+      {/* Main content area - 16:9 frame centered */}
+      <div className="flex-1 flex items-center justify-center px-4 md:px-8 py-4">
         {/* 16:9 Frame (YouTube style - wide rectangle) */}
         <div
           className="relative w-full h-auto max-h-full overflow-hidden rounded-2xl bg-white shadow-2xl"
           style={{
             aspectRatio: '16 / 9',
-            maxWidth: 'calc((100vh - 4rem) * 16 / 9)',
+            maxWidth: 'calc((100vh - 10rem) * 16 / 9)',
             boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
           }}
         >
@@ -277,64 +277,63 @@ export function CinematicTourPlayer() {
               <Play className="w-8 h-8 text-white ml-1" />
             </button>
           )}
+        </div>
+      </div>
 
-          {/* Bottom controls */}
-          <div
-            className={cn(
-              "absolute bottom-0 left-0 right-0 z-40 p-4 transition-all duration-300",
-              "bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent",
-              showControls ? "opacity-100" : "opacity-0"
-            )}
+      {/* Bottom controls - fixed at page bottom, outside the rectangle */}
+      <div
+        className={cn(
+          "w-full px-4 md:px-8 pb-4 pt-2 transition-all duration-300",
+          showControls ? "opacity-100" : "opacity-0"
+        )}
+      >
+        <div className="max-w-4xl mx-auto flex items-center justify-between bg-slate-900/90 backdrop-blur-xl rounded-full px-4 py-2 shadow-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleClose}
+            className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
           >
-            <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClose}
-                className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+            <X className="w-4 h-4" />
+          </Button>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleRestart}
-                  className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRestart}
+              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </Button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={togglePlay}
-                  className="w-12 h-12 rounded-full bg-primary backdrop-blur-sm text-white hover:bg-primary/90"
-                  style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' }}
-                >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-                </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={togglePlay}
+              className="w-12 h-12 rounded-full bg-primary backdrop-blur-sm text-white hover:bg-primary/90"
+              style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' }}
+            >
+              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+            </Button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleSkip}
-                  disabled={currentSceneIndex >= totalScenes - 1}
-                  className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0 disabled:opacity-30"
-                >
-                  <SkipForward className="w-4 h-4" />
-                </Button>
-              </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSkip}
+              disabled={currentSceneIndex >= totalScenes - 1}
+              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0 disabled:opacity-30"
+            >
+              <SkipForward className="w-4 h-4" />
+            </Button>
+          </div>
 
-              {/* Scene title */}
-              <div className="text-right">
-                <div className="text-white/60 text-xs">
-                  {currentSceneIndex + 1}/{totalScenes}
-                </div>
-                <div className="text-white font-medium text-sm">{currentScript.title}</div>
-              </div>
+          {/* Scene title */}
+          <div className="text-right min-w-[100px]">
+            <div className="text-white/60 text-xs">
+              {currentSceneIndex + 1}/{totalScenes}
             </div>
+            <div className="text-white font-medium text-sm truncate">{currentScript.title}</div>
           </div>
         </div>
       </div>
