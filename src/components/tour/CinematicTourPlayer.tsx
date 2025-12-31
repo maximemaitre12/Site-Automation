@@ -101,31 +101,9 @@ export function CinematicTourPlayer() {
     }
   }, [currentSceneIndex, isAgentScene, showIntro]);
 
-  useEffect(() => {
-    if (!isPlaying || isTransitioning || showIntro || isDragging) return;
-
-    const startTime = Date.now();
-    const duration = currentScript.duration;
-
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min((elapsed / duration) * 100, 100);
-      setSceneProgress(progress);
-
-      if (progress < 100) {
-        requestAnimationFrame(updateProgress);
-      } else {
-        if (currentSceneIndex < totalScenes - 1) {
-          goToNextScene();
-        } else {
-          setIsPlaying(false);
-        }
-      }
-    };
-
-    const animationId = requestAnimationFrame(updateProgress);
-    return () => cancelAnimationFrame(animationId);
-  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.duration, showIntro, isDragging]);
+  // Use ref to track progress start time to avoid resetting on dependency changes
+  const progressStartRef = useRef<{ startTime: number; initialProgress: number } | null>(null);
+  const goToNextSceneRef = useRef<() => void>();
 
   const goToNextScene = useCallback(() => {
     if (currentSceneIndex >= totalScenes - 1) return;
@@ -140,10 +118,45 @@ export function CinematicTourPlayer() {
         setShowIntro(true);
       }
       setSceneProgress(0);
+      progressStartRef.current = null;
       setCurrentSceneIndex(prev => prev + 1);
       setIsTransitioning(false);
     }, 600);
   }, [currentSceneIndex, totalScenes]);
+
+  // Keep ref updated
+  goToNextSceneRef.current = goToNextScene;
+
+  useEffect(() => {
+    if (!isPlaying || isTransitioning || showIntro || isDragging) {
+      // Reset progress tracking when paused
+      progressStartRef.current = null;
+      return;
+    }
+
+    // Initialize progress tracking only once per scene
+    const startTime = Date.now();
+    const duration = currentScript.duration;
+
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / duration) * 100, 100);
+      setSceneProgress(progress);
+
+      if (progress < 100) {
+        requestAnimationFrame(updateProgress);
+      } else {
+        if (currentSceneIndex < totalScenes - 1) {
+          goToNextSceneRef.current?.();
+        } else {
+          setIsPlaying(false);
+        }
+      }
+    };
+
+    const animationId = requestAnimationFrame(updateProgress);
+    return () => cancelAnimationFrame(animationId);
+  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.duration, showIntro, isDragging, totalScenes]);
 
   const handleClose = () => navigate('/');
   const togglePlay = () => setIsPlaying(prev => !prev);
