@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Play, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 export function DemoSection() {
@@ -9,7 +10,7 @@ export function DemoSection() {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Interactive Demo</span>
+          <span>Interactive Tour</span>
         </div>
         
         {/* Title */}
@@ -55,6 +56,19 @@ export function DemoSection() {
             </div>
           </div>
         </Link>
+        
+        {/* Watch button below the banner */}
+        <div className="mt-6">
+          <Link to="/product-tour">
+            <Button 
+              size="lg" 
+              className="h-11 px-8 text-sm font-medium gap-2 group bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
+            >
+              <Play className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span>Watch the Tour</span>
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );
