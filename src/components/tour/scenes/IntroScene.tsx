@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Zap, Brain, Users, TrendingUp, Shield, Database, GitBranch } from 'lucide-react';
+import { Zap, Brain, Users, TrendingUp, Shield, Database, Workflow } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import aetherLogo from '@/assets/aether-new-logo.jpeg';
 
@@ -9,15 +9,14 @@ interface IntroSceneProps {
 }
 
 const agents = [
-  { icon: Users, label: 'RH', color: 'text-agent-hr' },
-  { icon: TrendingUp, label: 'Ventes', color: 'text-agent-sales' },
+  { icon: Users, label: 'HR', color: 'text-agent-hr' },
+  { icon: TrendingUp, label: 'Sales', color: 'text-agent-sales' },
   { icon: Zap, label: 'Support', color: 'text-agent-support' },
   { icon: Brain, label: 'Brain', color: 'text-agent-brain' },
-  { icon: Shield, label: 'Conformité', color: 'text-agent-compliance' },
-  { icon: GitBranch, label: 'Flow', color: 'text-agent-flow' },
+  { icon: Shield, label: 'Compliance', color: 'text-agent-compliance' },
+  { icon: Workflow, label: 'Flow', color: 'text-agent-flow' },
   { icon: Database, label: 'Data', color: 'text-agent-data' },
 ];
-
 
 export function IntroScene({ isActive, progress }: IntroSceneProps) {
   const [phase, setPhase] = useState(0);
@@ -36,86 +35,89 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
   }, [isActive, progress]);
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center px-8">
+    <div className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-8 overflow-hidden">
       {/* Central content */}
-      <div className="relative z-10 flex flex-col items-center max-w-4xl">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-4xl">
         
-        {/* Logo */}
+        {/* Logo - clean, no frame */}
         <div 
           className={cn(
-            "relative mb-8 transition-all duration-1000",
+            "relative mb-6 sm:mb-8 transition-all duration-1000",
             phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-50"
           )}
         >
-          {/* Glow effect */}
+          {/* Subtle glow effect */}
           <div 
-            className="absolute inset-0 rounded-3xl blur-3xl bg-primary/30 animate-glow-pulse"
-            style={{ transform: 'scale(1.5)' }}
+            className="absolute inset-0 rounded-2xl sm:rounded-3xl blur-2xl sm:blur-3xl bg-primary/20"
+            style={{ transform: 'scale(1.3)' }}
           />
           
-          {/* Logo container */}
-          <div className="relative w-32 h-32 rounded-3xl overflow-hidden border-2 border-primary/30 shadow-2xl">
-            <img 
-              src={aetherLogo} 
-              alt="AETHER" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Orbiting sparkles */}
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '8s' }}>
-            <Sparkles className="absolute -top-4 left-1/2 -translate-x-1/2 w-5 h-5 text-primary" />
-          </div>
-          <div className="absolute inset-0 animate-spin" style={{ animationDuration: '12s', animationDirection: 'reverse' }}>
-            <Sparkles className="absolute top-1/2 -right-4 -translate-y-1/2 w-4 h-4 text-primary/70" />
-          </div>
+          {/* Logo image - clean, no border frame */}
+          <img 
+            src={aetherLogo} 
+            alt="AETHER" 
+            className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded-2xl sm:rounded-3xl"
+            style={{
+              filter: 'drop-shadow(0 0 30px hsl(var(--primary) / 0.3))',
+            }}
+          />
         </div>
 
-        {/* Title and tagline */}
+        {/* Title and tagline - responsive */}
         <div 
           className={cn(
-            "text-center mb-12 transition-all duration-700",
+            "text-center mb-8 sm:mb-12 transition-all duration-700 w-full",
             phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
-          <h1 className="text-6xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+          <h1 
+            className="font-bold mb-3 sm:mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent"
+            style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)' }}
+          >
             AETHER
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
-            La plateforme IA révolutionnaire qui transforme 
-            <span className="text-primary font-medium"> comment les entreprises opèrent</span>
+          <p 
+            className="text-muted-foreground max-w-2xl mx-auto px-2"
+            style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' }}
+          >
+            The revolutionary AI platform that transforms 
+            <span className="text-primary font-medium"> how businesses operate</span>
           </p>
         </div>
 
-
-        {/* Agents preview */}
+        {/* Agents preview - responsive */}
         <div 
           className={cn(
-            "transition-all duration-700",
+            "w-full transition-all duration-700",
             phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           )}
         >
-          <p className="text-center text-muted-foreground mb-6">
-            7 agents IA spécialisés
+          <p 
+            className="text-center text-muted-foreground mb-4 sm:mb-6"
+            style={{ fontSize: 'clamp(0.75rem, 2vw, 1rem)' }}
+          >
+            7 specialized AI agents
           </p>
           
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 px-2">
             {agents.map((agent, index) => {
               const Icon = agent.icon;
               return (
                 <div
                   key={agent.label}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 border border-border/50 backdrop-blur-sm animate-stagger-in",
-                    phase >= 4 && "animate-float"
+                    "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-background/50 border border-border/50 backdrop-blur-sm transition-all duration-500",
+                    phase >= 4 && "hover:scale-105"
                   )}
                   style={{ 
                     animationDelay: `${index * 100}ms`,
-                    ...(phase >= 4 && { animationDelay: `${index * 200}ms` })
+                    opacity: phase >= 3 ? 1 : 0,
+                    transform: phase >= 3 ? 'translateY(0)' : 'translateY(10px)',
+                    transitionDelay: `${index * 80}ms`
                   }}
                 >
-                  <Icon className={cn("w-5 h-5", agent.color)} />
-                  <span className="text-sm font-medium">{agent.label}</span>
+                  <Icon className={cn("w-4 h-4 sm:w-5 sm:h-5", agent.color)} />
+                  <span className="text-xs sm:text-sm font-medium">{agent.label}</span>
                 </div>
               );
             })}
@@ -123,21 +125,20 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
         </div>
       </div>
 
-      {/* Decorative elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Floating particles */}
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 rounded-full bg-primary/30 animate-float"
-            style={{
-              left: `${10 + (i * 7)}%`,
-              top: `${20 + (i % 4) * 20}%`,
-              animationDelay: `${i * 0.3}s`,
-              animationDuration: `${3 + (i % 3)}s`,
-            }}
-          />
-        ))}
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div 
+          className={cn(
+            "absolute top-1/4 left-1/4 w-1/2 aspect-square rounded-full bg-primary/5 blur-[100px] transition-opacity duration-1000",
+            phase >= 1 ? "opacity-100" : "opacity-0"
+          )}
+        />
+        <div 
+          className={cn(
+            "absolute bottom-1/4 right-1/4 w-1/3 aspect-square rounded-full bg-primary/3 blur-[80px] transition-opacity duration-1000",
+            phase >= 2 ? "opacity-100" : "opacity-0"
+          )}
+        />
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Pause, SkipForward, RotateCcw } from 'lucide-react';
+import { X, Play, Pause, SkipForward, RotateCcw, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
 import aetherLogo from '@/assets/aether-new-logo.jpeg';
+import { SpringIn } from './animations';
 
 // Import scenes
 import { IntroScene } from './scenes/IntroScene';
@@ -17,6 +18,59 @@ import { FlowScene } from './scenes/FlowScene';
 import { DataScene } from './scenes/DataScene';
 import { ConclusionScene } from './scenes/ConclusionScene';
 
+// Agent intro data with Lucide icons (consistent with Landing Page)
+const agentIntros: Record<string, { icon: React.ElementType; color: string; bgColor: string; title: string; description: string }> = {
+  hr: { 
+    icon: Users, 
+    color: 'text-agent-hr',
+    bgColor: 'bg-agent-hr/10',
+    title: 'HR Copilot', 
+    description: 'AI-powered recruitment and talent management. From CV analysis to interview scheduling.'
+  },
+  sales: { 
+    icon: TrendingUp, 
+    color: 'text-agent-sales',
+    bgColor: 'bg-agent-sales/10',
+    title: 'Sales Copilot', 
+    description: 'Intelligent sales acceleration. Call analysis, proposals, and deal insights.'
+  },
+  support: { 
+    icon: Zap, 
+    color: 'text-agent-support',
+    bgColor: 'bg-agent-support/10',
+    title: 'Support Agent', 
+    description: 'Automated customer service with instant resolution and smart escalation.'
+  },
+  brain: { 
+    icon: Brain, 
+    color: 'text-agent-brain',
+    bgColor: 'bg-agent-brain/10',
+    title: 'Brain', 
+    description: 'Your company knowledge hub. Semantic search across all documents.'
+  },
+  compliance: { 
+    icon: Shield, 
+    color: 'text-agent-compliance',
+    bgColor: 'bg-agent-compliance/10',
+    title: 'Compliance Agent', 
+    description: 'Automated regulatory compliance. GDPR audits and risk detection.'
+  },
+  flow: { 
+    icon: Workflow, 
+    color: 'text-agent-flow',
+    bgColor: 'bg-agent-flow/10',
+    title: 'Flow Automation', 
+    description: 'No-code workflow builder. Automate any process visually.'
+  },
+  data: { 
+    icon: Database, 
+    color: 'text-agent-data',
+    bgColor: 'bg-agent-data/10',
+    title: 'Data Platform', 
+    description: 'Business intelligence and company enrichment in real-time.'
+  },
+};
+
 export function CinematicTourPlayer() {
   const navigate = useNavigate();
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
@@ -24,22 +78,26 @@ export function CinematicTourPlayer() {
   const [sceneProgress, setSceneProgress] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showLogo, setShowLogo] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
 
   const currentScript = tourScripts[currentSceneIndex];
   const totalScenes = tourScripts.length;
   const overallProgress = ((currentSceneIndex + sceneProgress / 100) / totalScenes) * 100;
 
-  // Show logo at the start of each agent scene
+  // Get agent intro data for current scene
+  const currentAgentIntro = agentIntros[currentScript.id];
+  const isAgentScene = currentAgentIntro !== undefined;
+
+  // Show intro overlay at the start of each agent scene
   useEffect(() => {
-    if (currentScript.id !== 'intro' && currentScript.id !== 'conclusion') {
-      setShowLogo(true);
-      const timer = setTimeout(() => setShowLogo(false), 2500);
+    if (isAgentScene) {
+      setShowIntro(true);
+      const timer = setTimeout(() => setShowIntro(false), 2500);
       return () => clearTimeout(timer);
     } else {
-      setShowLogo(false);
+      setShowIntro(false);
     }
-  }, [currentSceneIndex, currentScript.id]);
+  }, [currentSceneIndex, isAgentScene]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -50,7 +108,7 @@ export function CinematicTourPlayer() {
   }, [isPlaying, showControls]);
 
   useEffect(() => {
-    if (!isPlaying || isTransitioning || showLogo) return;
+    if (!isPlaying || isTransitioning || showIntro) return;
 
     const startTime = Date.now();
     const duration = currentScript.duration;
@@ -73,7 +131,7 @@ export function CinematicTourPlayer() {
 
     const animationId = requestAnimationFrame(updateProgress);
     return () => cancelAnimationFrame(animationId);
-  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.duration, showLogo]);
+  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.duration, showIntro]);
 
   const goToNextScene = useCallback(() => {
     if (currentSceneIndex >= totalScenes - 1) return;
@@ -102,7 +160,7 @@ export function CinematicTourPlayer() {
 
   const renderScene = () => {
     const sceneProps = {
-      isActive: !isTransitioning && isPlaying && !showLogo,
+      isActive: !isTransitioning && isPlaying && !showIntro,
       progress: sceneProgress,
     };
 
@@ -118,6 +176,45 @@ export function CinematicTourPlayer() {
       case 'conclusion': return <ConclusionScene {...sceneProps} onRestart={handleRestart} />;
       default: return <IntroScene {...sceneProps} />;
     }
+  };
+
+  // Render agent intro overlay
+  const renderAgentIntro = () => {
+    if (!currentAgentIntro) return null;
+    const Icon = currentAgentIntro.icon;
+
+    return (
+      <div
+        className={cn(
+          "absolute inset-0 z-30 flex flex-col items-center justify-center bg-white transition-all duration-700",
+          showIntro ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+      >
+        <SpringIn active={showIntro} delay={100}>
+          <div className={cn(
+            "w-24 h-24 md:w-32 md:h-32 rounded-3xl flex items-center justify-center mb-6",
+            currentAgentIntro.bgColor
+          )}>
+            <Icon className={cn("w-12 h-12 md:w-16 md:h-16", currentAgentIntro.color)} />
+          </div>
+        </SpringIn>
+        
+        <SpringIn active={showIntro} delay={200}>
+          <h2 className={cn(
+            "text-2xl md:text-4xl font-bold mb-3",
+            currentAgentIntro.color
+          )}>
+            {currentAgentIntro.title}
+          </h2>
+        </SpringIn>
+        
+        <SpringIn active={showIntro} delay={300}>
+          <p className="text-muted-foreground text-center max-w-md px-4 text-sm md:text-base">
+            {currentAgentIntro.description}
+          </p>
+        </SpringIn>
+      </div>
+    );
   };
 
   return (
@@ -136,32 +233,15 @@ export function CinematicTourPlayer() {
             boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
           }}
         >
-          {/* Frameless Aether Logo - shows at start of each agent scene */}
-          <div
-            className={cn(
-              "absolute inset-0 z-30 flex items-center justify-center bg-white transition-all duration-700",
-              showLogo ? "opacity-100" : "opacity-0 pointer-events-none"
-            )}
-          >
-            <img
-              src={aetherLogo}
-              alt="Aether"
-              className={cn(
-                "w-32 h-32 md:w-48 md:h-48 object-contain rounded-2xl transition-all duration-700",
-                showLogo ? "scale-100 blur-0" : "scale-110 blur-sm"
-              )}
-              style={{
-                filter: showLogo ? 'drop-shadow(0 0 40px hsl(var(--primary) / 0.3))' : 'none',
-              }}
-            />
-          </div>
+          {/* Agent-specific intro overlay */}
+          {isAgentScene && renderAgentIntro()}
 
           {/* Scene content - fills entire 16:9 frame */}
           <div
             className={cn(
               "absolute inset-0 transition-all duration-600 ease-out bg-white",
               isTransitioning && "opacity-0 scale-105 blur-sm",
-              showLogo && "opacity-0"
+              showIntro && "opacity-0"
             )}
           >
             {renderScene()}
@@ -173,26 +253,6 @@ export function CinematicTourPlayer() {
               className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-100"
               style={{ width: `${overallProgress}%` }}
             />
-          </div>
-
-          {/* Scene indicator dots */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2">
-            {tourScripts.map((script, index) => (
-              <div
-                key={script.id}
-                className={cn(
-                  "transition-all duration-300 rounded-full",
-                  index === currentSceneIndex
-                    ? "w-8 h-2 bg-primary shadow-lg"
-                    : index < currentSceneIndex
-                      ? "w-2 h-2 bg-primary/60"
-                      : "w-2 h-2 bg-slate-300"
-                )}
-                style={index === currentSceneIndex ? { 
-                  boxShadow: '0 0 10px hsl(var(--primary) / 0.5)' 
-                } : {}}
-              />
-            ))}
           </div>
 
           {/* Play button when paused */}

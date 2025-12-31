@@ -23,24 +23,24 @@ const brainTimeline: Timeline = {
 };
 
 const documents = [
-  { name: 'Politique RH.pdf', pages: 45 },
-  { name: 'Contrats types.docx', pages: 28 },
-  { name: 'FAQ Produit.pdf', pages: 62 },
-  { name: 'Guide technique.md', pages: 120 },
-  { name: 'Procédures.pdf', pages: 34 },
+  { name: 'HR Policy.pdf', pages: 45 },
+  { name: 'Standard Contracts.docx', pages: 28 },
+  { name: 'Product FAQ.pdf', pages: 62 },
+  { name: 'Technical Guide.md', pages: 120 },
+  { name: 'Procedures.pdf', pages: 34 },
 ];
 
 const sources = [
-  { doc: 'Politique RH.pdf', page: 'p.12-14' },
-  { doc: 'Contrats types.docx', page: 'p.8' },
-  { doc: 'FAQ Produit.pdf', page: 'p.23' },
+  { doc: 'HR Policy.pdf', page: 'p.12-14' },
+  { doc: 'Standard Contracts.docx', page: 'p.8' },
+  { doc: 'Product FAQ.pdf', page: 'p.23' },
 ];
 
 const tools = [
-  { name: 'Recherche web', icon: Globe, color: 'text-blue-500', active: true },
-  { name: 'Analyse image', icon: ImageIcon, color: 'text-pink-500' },
-  { name: 'Génération code', icon: Code, color: 'text-emerald-500' },
-  { name: 'Résumé document', icon: BookOpen, color: 'text-amber-500' },
+  { name: 'Web search', icon: Globe, color: 'text-blue-500', active: true },
+  { name: 'Image analysis', icon: ImageIcon, color: 'text-pink-500' },
+  { name: 'Code generation', icon: Code, color: 'text-emerald-500' },
+  { name: 'Document summary', icon: BookOpen, color: 'text-amber-500' },
 ];
 
 export function BrainScene({ isActive, progress }: BrainSceneProps) {
@@ -84,7 +84,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
             </PulseGlow>
             <div>
               <h2 className="font-bold text-slate-900 text-[1em]">Brain</h2>
-              <p className="text-[0.65em] text-slate-500">Intelligence collective</p>
+              <p className="text-[0.65em] text-slate-500">Collective intelligence</p>
             </div>
           </div>
 
@@ -92,14 +92,14 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
           <FadeSlide active={timeline.isActive('search')} direction="down">
             <div className="flex items-center gap-[0.5em] p-[0.6em] rounded-xl bg-white border border-slate-200 mb-[1em]">
               <Search className="w-[1em] h-[1em] text-slate-400" />
-              <span className="text-slate-400 text-[0.8em]">Rechercher...</span>
+              <span className="text-slate-400 text-[0.8em]">Search...</span>
             </div>
           </FadeSlide>
 
           {/* Documents */}
           <div className="flex items-center gap-[0.5em] mb-[0.6em]">
             <Database className="w-[1em] h-[1em] text-cyan-600" />
-            <span className="text-slate-700 text-[0.8em] font-medium">Base de connaissances</span>
+            <span className="text-slate-700 text-[0.8em] font-medium">Knowledge base</span>
           </div>
 
           <StaggerGroup active={timeline.isActive('docs')} stagger={80} animation="slide" className="flex-1 flex flex-col gap-[0.4em] overflow-hidden">
@@ -109,7 +109,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
                   <FileText className="w-[0.9em] h-[0.9em] text-cyan-500" />
                   <span className="text-slate-700 text-[0.75em] truncate flex-1">{doc.name}</span>
                 </div>
-                <div className="text-slate-400 text-[0.6em] mt-[0.2em]">{doc.pages} pages indexées</div>
+                <div className="text-slate-400 text-[0.6em] mt-[0.2em]">{doc.pages} pages indexed</div>
               </div>
             ))}
           </StaggerGroup>
@@ -119,7 +119,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
               <div className="text-cyan-600 font-bold text-[1.1em]">
                 <CountUp value={5} active={timeline.isActive('docCount')} /> docs
               </div>
-              <div className="text-cyan-500 text-[0.65em]">indexés dans la base</div>
+              <div className="text-cyan-500 text-[0.65em]">indexed in base</div>
             </div>
           </ScalePop>
         </SpringIn>
@@ -133,13 +133,13 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
               timeline.isActive('question') ? "opacity-30 scale-90" : "opacity-100 scale-100"
             )}>
               <Brain className="w-[3em] h-[3em] mx-auto mb-[0.5em] text-cyan-300" />
-              <p className="text-slate-400 text-[0.85em]">Posez n'importe quelle question</p>
+              <p className="text-slate-400 text-[0.85em]">Ask any question</p>
             </div>
 
             {/* User question */}
             <FadeSlide active={timeline.isActive('question')} direction="up" className="flex justify-end mb-[1em]">
               <div className="max-w-[70%] p-[0.8em] rounded-2xl rounded-br-sm bg-cyan-500 text-white">
-                <p className="text-[0.85em]">Quelle est notre politique de remboursement pour les clients entreprise ?</p>
+                <p className="text-[0.85em]">What is our refund policy for enterprise clients?</p>
               </div>
             </FadeSlide>
 
@@ -156,7 +156,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
                       <span className="w-[0.4em] h-[0.4em] rounded-full bg-cyan-500 animate-bounce" style={{ animationDelay: '0.1s' }} />
                       <span className="w-[0.4em] h-[0.4em] rounded-full bg-cyan-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
                     </div>
-                    <span className="text-slate-500 text-[0.75em]">Recherche dans 5 documents...</span>
+                    <span className="text-slate-500 text-[0.75em]">Searching 5 documents...</span>
                   </div>
                 </div>
               </div>
@@ -170,20 +170,20 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
               <div className="flex-1 max-w-[85%]">
                 <div className="p-[0.8em] rounded-2xl rounded-bl-sm bg-white border border-slate-100 mb-[0.6em]">
                   <p className="text-slate-700 text-[0.8em] leading-relaxed">
-                    Selon notre <span className="text-cyan-600 font-medium">Politique RH (section 4.2)</span>, les remboursements pour clients entreprise suivent ces règles :
+                    According to our <span className="text-cyan-600 font-medium">HR Policy (section 4.2)</span>, refunds for enterprise clients follow these rules:
                   </p>
                   <ul className="mt-[0.5em] space-y-[0.3em] text-slate-600 text-[0.75em]">
                     <li className="flex items-start gap-[0.4em]">
                       <span className="text-cyan-500">•</span>
-                      <span>Remboursement intégral dans les <strong className="text-slate-800">30 premiers jours</strong></span>
+                      <span>Full refund within the <strong className="text-slate-800">first 30 days</strong></span>
                     </li>
                     <li className="flex items-start gap-[0.4em]">
                       <span className="text-cyan-500">•</span>
-                      <span>Au prorata pour les contrats annuels pendant les <strong className="text-slate-800">3 premiers mois</strong></span>
+                      <span>Pro-rata for annual contracts during the <strong className="text-slate-800">first 3 months</strong></span>
                     </li>
                     <li className="flex items-start gap-[0.4em]">
                       <span className="text-cyan-500">•</span>
-                      <span>Exception : les licences serveur ne sont pas remboursables après activation</span>
+                      <span>Exception: server licenses are non-refundable after activation</span>
                     </li>
                   </ul>
                 </div>
@@ -217,7 +217,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
           <div className="p-[0.8em] border-t border-slate-100">
             <div className="flex items-center gap-[0.6em] p-[0.6em] rounded-xl bg-white border border-slate-200">
               <MessageSquare className="w-[1.1em] h-[1.1em] text-slate-400" />
-              <span className="flex-1 text-slate-400 text-[0.8em]">Posez votre question...</span>
+              <span className="flex-1 text-slate-400 text-[0.8em]">Ask your question...</span>
               <button className="p-[0.4em] rounded-lg bg-cyan-500 text-white">
                 <Zap className="w-[0.9em] h-[0.9em]" />
               </button>
@@ -229,7 +229,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
         <SpringIn active={timeline.isActive('tools')} className="w-[22%] bg-slate-50 rounded-2xl border border-slate-100 p-[1em] flex flex-col">
           <div className="flex items-center gap-[0.5em] mb-[1em]">
             <Sparkles className="w-[1.1em] h-[1.1em] text-amber-500" />
-            <span className="text-slate-800 font-semibold text-[0.95em]">Outils IA</span>
+            <span className="text-slate-800 font-semibold text-[0.95em]">AI Tools</span>
           </div>
 
           <StaggerGroup active={timeline.isActive('tools')} stagger={100} animation="spring" className="flex-1 flex flex-col gap-[0.4em]">
@@ -248,7 +248,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
                   <span className="text-slate-700 text-[0.8em]">{tool.name}</span>
                 </div>
                 {tool.active && (
-                  <div className="mt-[0.3em] text-[0.6em] text-slate-400">Activé pour cette session</div>
+                  <div className="mt-[0.3em] text-[0.6em] text-slate-400">Enabled for this session</div>
                 )}
               </div>
             ))}
@@ -266,11 +266,11 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
                     <div className="text-[1.1em] font-bold text-slate-800">
                       <CountUp value={4} active={timeline.isActive('finalStats')} />
                     </div>
-                    <div className="text-slate-500 text-[0.6em]">Outils IA</div>
+                    <div className="text-slate-500 text-[0.6em]">AI Tools</div>
                   </div>
                   <div>
                     <div className="text-[1.1em] font-bold text-cyan-600">RAG</div>
-                    <div className="text-slate-500 text-[0.6em]">Précision</div>
+                    <div className="text-slate-500 text-[0.6em]">Precision</div>
                   </div>
                 </div>
               </div>
