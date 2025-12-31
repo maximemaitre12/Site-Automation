@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Pause, SkipForward, RotateCcw, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar } from 'lucide-react';
+import { X, Play, Pause, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
-import aetherLogo from '@/assets/aether-new-logo.jpeg';
 import { SpringIn } from './animations';
+import { TechnicalDiagrams } from './TechnicalDiagrams';
 
 // Import scenes
 import { IntroScene } from './scenes/IntroScene';
@@ -76,9 +76,10 @@ export function CinematicTourPlayer() {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [sceneProgress, setSceneProgress] = useState(0);
-  const [showControls, setShowControls] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   const currentScript = tourScripts[currentSceneIndex];
   const totalScenes = tourScripts.length;
@@ -88,7 +89,7 @@ export function CinematicTourPlayer() {
   const currentAgentIntro = agentIntros[currentScript.id];
   const isAgentScene = currentAgentIntro !== undefined;
 
-  // Hide intro after delay - intro is pre-activated in goToNextScene
+  // Hide intro after delay
   useEffect(() => {
     if (isAgentScene && showIntro) {
       const timer = setTimeout(() => {
@@ -101,15 +102,7 @@ export function CinematicTourPlayer() {
   }, [currentSceneIndex, isAgentScene, showIntro]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (isPlaying && showControls) {
-      timeout = setTimeout(() => setShowControls(false), 2000);
-    }
-    return () => clearTimeout(timeout);
-  }, [isPlaying, showControls]);
-
-  useEffect(() => {
-    if (!isPlaying || isTransitioning || showIntro) return;
+    if (!isPlaying || isTransitioning || showIntro || isDragging) return;
 
     const startTime = Date.now();
     const duration = currentScript.duration;
@@ -132,19 +125,17 @@ export function CinematicTourPlayer() {
 
     const animationId = requestAnimationFrame(updateProgress);
     return () => cancelAnimationFrame(animationId);
-  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.duration, showIntro]);
+  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.duration, showIntro, isDragging]);
 
   const goToNextScene = useCallback(() => {
     if (currentSceneIndex >= totalScenes - 1) return;
     
     setIsTransitioning(true);
     
-    // Pre-activate intro for the next scene BEFORE transitioning
     const nextSceneId = tourScripts[currentSceneIndex + 1]?.id;
     const isNextAgentScene = nextSceneId && agentIntros[nextSceneId] !== undefined;
     
     setTimeout(() => {
-      // Set intro BEFORE changing scene to avoid flash
       if (isNextAgentScene) {
         setShowIntro(true);
       }
@@ -155,17 +146,35 @@ export function CinematicTourPlayer() {
   }, [currentSceneIndex, totalScenes]);
 
   const handleClose = () => navigate('/');
-  const togglePlay = () => {
-    setIsPlaying(prev => !prev);
-    setShowControls(true);
-  };
+  const togglePlay = () => setIsPlaying(prev => !prev);
   const handleRestart = () => {
     setCurrentSceneIndex(0);
     setSceneProgress(0);
     setIsPlaying(true);
   };
-  const handleSkip = () => {
-    if (currentSceneIndex < totalScenes - 1) goToNextScene();
+
+  // Handle progress bar interaction
+  const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!progressBarRef.current) return;
+    
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = (clickX / rect.width) * 100;
+    
+    // Calculate which scene and progress
+    const targetProgress = Math.max(0, Math.min(100, percentage));
+    const sceneFloat = (targetProgress / 100) * totalScenes;
+    const newSceneIndex = Math.min(Math.floor(sceneFloat), totalScenes - 1);
+    const newSceneProgress = (sceneFloat - newSceneIndex) * 100;
+    
+    setCurrentSceneIndex(newSceneIndex);
+    setSceneProgress(newSceneProgress);
+    setShowIntro(false);
+  };
+
+  const handleProgressBarDrag = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !progressBarRef.current) return;
+    handleProgressBarClick(e);
   };
 
   const renderScene = () => {
@@ -188,7 +197,6 @@ export function CinematicTourPlayer() {
     }
   };
 
-  // Render agent intro overlay - refined, smaller styling
   const renderAgentIntro = () => {
     if (!currentAgentIntro) return null;
     const Icon = currentAgentIntro.icon;
@@ -200,7 +208,6 @@ export function CinematicTourPlayer() {
           showIntro ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >
-        {/* Subtle background accent */}
         <div className={cn(
           "absolute inset-0 transition-opacity duration-1000",
           showIntro ? "opacity-100" : "opacity-0"
@@ -240,26 +247,31 @@ export function CinematicTourPlayer() {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex flex-col bg-slate-100 pt-14"
-      onMouseMove={() => setShowControls(true)}
-    >
-      {/* Main content area - 16:9 frame centered */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-4 overflow-hidden">
-        {/* 16:9 Frame (YouTube style - wide rectangle) */}
+    <div className="fixed inset-0 z-40 flex flex-col bg-slate-100 pt-14">
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col items-center justify-start px-4 md:px-8 py-2 overflow-hidden">
+        {/* 16:9 Frame */}
         <div
-          className="relative w-full h-auto overflow-hidden rounded-2xl bg-white shadow-2xl shrink-0"
+          className="relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl shrink-0"
           style={{
             aspectRatio: '16 / 9',
-            maxWidth: 'calc((100vh - 14rem) * 16 / 9)',
-            maxHeight: 'calc(100vh - 14rem)',
+            maxWidth: 'calc((100vh - 22rem) * 16 / 9)',
+            maxHeight: 'calc(100vh - 22rem)',
             boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
           }}
         >
-          {/* Agent-specific intro overlay */}
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            className="absolute top-3 right-3 z-50 w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center hover:bg-black/20 transition-colors"
+          >
+            <X className="w-4 h-4 text-foreground/70" />
+          </button>
+
+          {/* Agent intro overlay */}
           {isAgentScene && renderAgentIntro()}
 
-          {/* Scene content - fills entire 16:9 frame */}
+          {/* Scene content */}
           <div
             className={cn(
               "absolute inset-0 transition-all duration-600 ease-out bg-white",
@@ -270,104 +282,97 @@ export function CinematicTourPlayer() {
             {renderScene()}
           </div>
 
-          {/* Progress bar at top */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-slate-200 z-40">
-            <div
-              className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-100"
-              style={{ width: `${overallProgress}%` }}
-            />
-          </div>
-
           {/* Play button when paused */}
           {!isPlaying && (
             <button
               onClick={togglePlay}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-20 h-20 rounded-full bg-primary/90 backdrop-blur-xl flex items-center justify-center hover:scale-110 transition-transform"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-16 h-16 rounded-full bg-primary/90 backdrop-blur-xl flex items-center justify-center hover:scale-110 transition-transform"
               style={{ boxShadow: '0 0 60px hsl(var(--primary) / 0.5)' }}
             >
-              <Play className="w-8 h-8 text-white ml-1" />
+              <Play className="w-6 h-6 text-white ml-1" />
             </button>
           )}
         </div>
 
-        {/* CTA Buttons under video */}
-        <div className="flex flex-wrap justify-center gap-3 mt-4 shrink-0">
+        {/* Interactive progress bar */}
+        <div className="w-full max-w-2xl mt-3 px-4">
+          <div
+            ref={progressBarRef}
+            className="relative h-2 bg-slate-200 rounded-full cursor-pointer group"
+            onClick={handleProgressBarClick}
+            onMouseDown={() => setIsDragging(true)}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+            onMouseMove={handleProgressBarDrag}
+          >
+            {/* Scene markers */}
+            {tourScripts.map((_, idx) => (
+              <div
+                key={idx}
+                className="absolute top-0 bottom-0 w-0.5 bg-slate-300"
+                style={{ left: `${(idx / totalScenes) * 100}%` }}
+              />
+            ))}
+            
+            {/* Progress fill */}
+            <div
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-100"
+              style={{ width: `${overallProgress}%` }}
+            />
+            
+            {/* Drag handle */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ left: `calc(${overallProgress}% - 8px)` }}
+            />
+          </div>
+          
+          {/* Scene title */}
+          <div className="flex justify-between items-center mt-1.5">
+            <span className="text-[10px] text-muted-foreground">
+              {currentSceneIndex + 1}/{totalScenes}
+            </span>
+            <span className="text-xs font-medium text-foreground">
+              {currentScript.title}
+            </span>
+            <button
+              onClick={togglePlay}
+              className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+            >
+              {isPlaying ? (
+                <Pause className="w-3 h-3 text-primary" />
+              ) : (
+                <Play className="w-3 h-3 text-primary ml-0.5" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* CTA Buttons - smaller */}
+        <div className="flex flex-wrap justify-center gap-2 mt-3 shrink-0">
           <Button
-            size="lg"
+            size="sm"
             variant="outline"
             onClick={() => navigate('/contact')}
-            className="px-6 py-5 text-sm rounded-xl border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
+            className="px-3 py-1.5 text-xs rounded-lg border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
           >
-            <Calendar className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
+            <Calendar className="w-3 h-3 mr-1.5 text-primary group-hover:scale-110 transition-transform" />
             Demander une démo
           </Button>
           
           <Button
-            size="lg"
+            size="sm"
             onClick={() => navigate('/auth')}
-            className="px-6 py-5 text-sm rounded-xl bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
+            className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-md shadow-primary/20"
           >
             Commencer gratuitement
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="w-3 h-3 ml-1.5" />
           </Button>
         </div>
-      </div>
 
-      {/* Bottom controls - fixed at page bottom, outside the rectangle */}
-      <div
-        className={cn(
-          "w-full px-4 md:px-8 pb-4 pt-2 transition-all duration-300",
-          showControls ? "opacity-100" : "opacity-0"
-        )}
-      >
-        <div className="max-w-4xl mx-auto flex items-center justify-between bg-slate-900/90 backdrop-blur-xl rounded-full px-4 py-2 shadow-xl">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleClose}
-            className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleRestart}
-              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={togglePlay}
-              className="w-12 h-12 rounded-full bg-primary backdrop-blur-sm text-white hover:bg-primary/90"
-              style={{ boxShadow: '0 0 20px hsl(var(--primary) / 0.4)' }}
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSkip}
-              disabled={currentSceneIndex >= totalScenes - 1}
-              className="w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm text-white/80 hover:text-white hover:bg-white/20 border-0 disabled:opacity-30"
-            >
-              <SkipForward className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Scene title */}
-          <div className="text-right min-w-[100px]">
-            <div className="text-white/60 text-xs">
-              {currentSceneIndex + 1}/{totalScenes}
-            </div>
-            <div className="text-white font-medium text-sm truncate">{currentScript.title}</div>
-          </div>
+        {/* Technical diagrams */}
+        <div className="w-full mt-3 shrink-0">
+          <TechnicalDiagrams sceneId={currentScript.id} progress={sceneProgress} />
         </div>
       </div>
     </div>
