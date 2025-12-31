@@ -17,18 +17,18 @@ export function DemoSection() {
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground mb-2">
           See the Platform in Action
         </h2>
-        <p className="text-muted-foreground text-sm max-w-lg mx-auto mb-6">
-          Take a guided tour of all 7 AI agents and discover how they work together.
+        <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6 px-4">
+          Discover how 7 AI agents work together.
         </p>
         
         {/* Preview card - mimics the intro scene */}
         <Link to="/product-tour" className="block">
-          <div className="relative group cursor-pointer max-w-xl mx-auto">
+          <div className="relative group cursor-pointer max-w-md mx-auto">
             {/* Glow effect on hover */}
             <div className="absolute -inset-1.5 bg-gradient-to-r from-primary/20 via-violet-500/20 to-primary/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {/* Card - white background like IntroScene */}
-            <div className="relative rounded-xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 aspect-[2/1] flex items-center justify-center">
+            <div className="relative rounded-xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 aspect-video flex items-center justify-center">
               {/* Logo centered like in IntroScene */}
               <div className="relative flex flex-col items-center">
                 <img 
