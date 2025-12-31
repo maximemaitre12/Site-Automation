@@ -260,9 +260,9 @@ export function CinematicTourPlayer() {
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col bg-slate-100 pt-14">
+    <div className="fixed inset-0 z-40 flex flex-col bg-slate-100 pt-16">
       {/* Main content area */}
-      <div className="flex-1 flex flex-col items-center justify-start px-3 md:px-8 py-1 overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-start px-3 md:px-8 py-2 overflow-hidden gap-3">
         {/* 16:9 Frame - reduced max height for mobile */}
         <div
           className="relative w-full overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-2xl shrink-0"
@@ -308,7 +308,7 @@ export function CinematicTourPlayer() {
         </div>
 
         {/* Interactive progress bar */}
-        <div className="w-full max-w-2xl mt-2 px-4">
+        <div className="w-full max-w-2xl mt-3 px-4">
           <div
             ref={progressBarRef}
             className="relative h-1.5 bg-slate-200 rounded-full cursor-pointer group"
@@ -363,18 +363,23 @@ export function CinematicTourPlayer() {
 
         {/* Agent description widget */}
         {currentAgentIntro && (
-          <div className="flex items-center gap-2 px-4 py-2 mt-2 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10 backdrop-blur-sm max-w-xl">
-            <div className={cn("p-1.5 rounded-lg", currentAgentIntro.bgColor)}>
-              <currentAgentIntro.icon className={cn("w-4 h-4", currentAgentIntro.color)} />
+          <div className="flex items-center gap-3 px-4 py-2.5 mt-3 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10 backdrop-blur-sm max-w-xl">
+            <div className={cn("p-2 rounded-lg", currentAgentIntro.bgColor)}>
+              <currentAgentIntro.icon className={cn("w-5 h-5", currentAgentIntro.color)} />
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {currentAgentIntro.description}
-            </p>
+            <div className="flex flex-col gap-0.5">
+              <span className={cn("text-sm font-semibold", currentAgentIntro.color)}>
+                {currentAgentIntro.title}
+              </span>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {currentAgentIntro.description}
+              </p>
+            </div>
           </div>
         )}
 
         {/* CTA Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 mt-3 shrink-0">
+        <div className="flex flex-wrap justify-center gap-3 mt-4 shrink-0">
           <Button
             size="sm"
             variant="outline"
