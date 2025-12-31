@@ -9,3 +9,4 @@ export { ParticleExplosion } from './ParticleExplosion';
 export { ScalePop } from './ScalePop';
 export { GlowRing } from './GlowRing';
 export { RevealMask } from './RevealMask';
+export { ZoomSpotlight } from './ZoomSpotlight';

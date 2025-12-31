@@ -2,7 +2,7 @@ import React from 'react';
 import { Shield, FileSearch, AlertTriangle, CheckCircle, FileText, BarChart3, Upload, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAnimationTimeline, Timeline } from '@/hooks/useAnimationTimeline';
-import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop, ScanLine } from '../animations';
+import { SpringIn, FadeSlide, StaggerGroup, CountUp, PulseGlow, ParticleExplosion, ScalePop, ScanLine, ZoomSpotlight } from '../animations';
 
 interface ComplianceSceneProps {
   isActive: boolean;
