@@ -245,13 +245,14 @@ export function CinematicTourPlayer() {
       onMouseMove={() => setShowControls(true)}
     >
       {/* Main content area - 16:9 frame centered */}
-      <div className="flex-1 flex items-center justify-center px-4 md:px-8 py-4">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-8 py-4 overflow-hidden">
         {/* 16:9 Frame (YouTube style - wide rectangle) */}
         <div
-          className="relative w-full h-auto max-h-full overflow-hidden rounded-2xl bg-white shadow-2xl"
+          className="relative w-full h-auto overflow-hidden rounded-2xl bg-white shadow-2xl shrink-0"
           style={{
             aspectRatio: '16 / 9',
-            maxWidth: 'calc((100vh - 10rem) * 16 / 9)',
+            maxWidth: 'calc((100vh - 14rem) * 16 / 9)',
+            maxHeight: 'calc(100vh - 14rem)',
             boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
           }}
         >
@@ -290,7 +291,7 @@ export function CinematicTourPlayer() {
         </div>
 
         {/* CTA Buttons under video */}
-        <div className="flex flex-wrap justify-center gap-3 mt-4">
+        <div className="flex flex-wrap justify-center gap-3 mt-4 shrink-0">
           <Button
             size="lg"
             variant="outline"
