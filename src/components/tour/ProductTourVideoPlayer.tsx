@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles, Minus, Plus } from 'lucide-react';
+import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts, getTotalDuration } from '@/data/tourNarration';
@@ -293,13 +293,26 @@ export function ProductTourVideoPlayer() {
               </p>
             </div>
 
-            {/* Play/Pause and Speed controls */}
-            <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Controls row */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Speed selector - compact pill */}
+              <button
+                onClick={() => {
+                  const currentIndex = speedOptions.indexOf(playbackSpeed);
+                  const nextIndex = (currentIndex + 1) % speedOptions.length;
+                  setPlaybackSpeed(speedOptions[nextIndex]);
+                }}
+                className="h-7 px-2.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition-colors"
+              >
+                {playbackSpeed}x
+              </button>
+
+              {/* Play/Pause */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={togglePlay}
-                className="h-9 w-9 rounded-full"
+                className="h-8 w-8 rounded-full hover:bg-muted"
               >
                 {isPlaying ? (
                   <Pause className="h-4 w-4" />
@@ -308,41 +321,15 @@ export function ProductTourVideoPlayer() {
                 )}
               </Button>
               
+              {/* Replay */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleReplay}
-                className="h-9 w-9 rounded-full"
+                className="h-8 w-8 rounded-full hover:bg-muted"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
               </Button>
-
-              {/* Speed controls */}
-              <div className="flex items-center gap-0.5 ml-1 bg-muted/50 rounded-full px-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={decreaseSpeed}
-                  disabled={playbackSpeed === 0.5}
-                  className="h-7 w-7 rounded-full"
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                
-                <span className="text-xs font-medium w-8 text-center text-muted-foreground">
-                  {playbackSpeed}x
-                </span>
-                
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={increaseSpeed}
-                  disabled={playbackSpeed === 2}
-                  className="h-7 w-7 rounded-full"
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
             </div>
           </div>
         )}
