@@ -53,16 +53,6 @@ export function HeroSection() {
               Request a Demo
             </Button>
           </Link>
-          <Link to="/product-tour" className="w-full sm:w-auto">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="w-full sm:w-auto h-10 sm:h-11 px-6 sm:px-8 text-sm font-medium gap-2 group border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary transition-all"
-            >
-              <Play className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span>Watch Demo</span>
-            </Button>
-          </Link>
         </div>
       </div>
     </section>
