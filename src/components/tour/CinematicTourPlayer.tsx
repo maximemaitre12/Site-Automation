@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Pause, SkipForward, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { X, Play, Pause, SkipForward, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
@@ -16,27 +16,11 @@ import { FlowScene } from './scenes/FlowScene';
 import { DataScene } from './scenes/DataScene';
 import { ConclusionScene } from './scenes/ConclusionScene';
 
-interface ChapterDot {
-  id: string;
-  label: string;
-  agentType?: string;
-}
-
-const chapters: ChapterDot[] = [
-  { id: 'intro', label: 'Intro' },
-  { id: 'hr', label: 'RH', agentType: 'hr' },
-  { id: 'sales', label: 'Ventes', agentType: 'sales' },
-  { id: 'support', label: 'Support', agentType: 'support' },
-  { id: 'brain', label: 'Brain', agentType: 'brain' },
-  { id: 'compliance', label: 'Conformité', agentType: 'compliance' },
-  { id: 'flow', label: 'Flow', agentType: 'flow' },
-  { id: 'data', label: 'Data', agentType: 'data' },
-  { id: 'conclusion', label: 'Conclusion' },
-];
-
 // Zoom keyframes configuration per scene
 const sceneZoomConfigs: Record<string, Array<{ start: number; end: number; scale: number; focusX: number; focusY: number }>> = {
-  intro: [],
+  intro: [
+    { start: 0, end: 100, scale: 1, focusX: 50, focusY: 50 },
+  ],
   hr: [
     { start: 0, end: 10, scale: 1, focusX: 50, focusY: 50 },
     { start: 10, end: 25, scale: 1.5, focusX: 80, focusY: 20 },
@@ -82,7 +66,9 @@ const sceneZoomConfigs: Record<string, Array<{ start: number; end: number; scale
     { start: 45, end: 75, scale: 1.3, focusX: 60, focusY: 60 },
     { start: 75, end: 100, scale: 1, focusX: 50, focusY: 50 },
   ],
-  conclusion: [],
+  conclusion: [
+    { start: 0, end: 100, scale: 1, focusX: 50, focusY: 50 },
+  ],
 };
 
 function getZoomTransform(sceneId: string, progress: number): { scale: number; translateX: number; translateY: number } {
@@ -130,7 +116,6 @@ export function CinematicTourPlayer() {
   const navigate = useNavigate();
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
   const [sceneProgress, setSceneProgress] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -146,7 +131,7 @@ export function CinematicTourPlayer() {
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (isPlaying && showControls) {
-      timeout = setTimeout(() => setShowControls(false), 3000);
+      timeout = setTimeout(() => setShowControls(false), 2000);
     }
     return () => clearTimeout(timeout);
   }, [isPlaying, showControls]);
@@ -187,18 +172,6 @@ export function CinematicTourPlayer() {
       setIsTransitioning(false);
     }, 400);
   }, [currentSceneIndex, totalScenes]);
-
-  const goToScene = useCallback((index: number) => {
-    if (index === currentSceneIndex) return;
-    
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentSceneIndex(index);
-      setSceneProgress(0);
-      setIsTransitioning(false);
-      setIsPlaying(true);
-    }, 400);
-  }, [currentSceneIndex]);
 
   const handleClose = () => {
     navigate('/');
@@ -257,56 +230,41 @@ export function CinematicTourPlayer() {
       onMouseMove={() => setShowControls(true)}
       onClick={() => !showControls && setShowControls(true)}
     >
-      {/* Animated background */}
+      {/* Subtle background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div 
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse at 30% 20%, hsl(var(--primary) / 0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, hsl(var(--primary) / 0.1) 0%, transparent 50%)',
+            background: 'radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.08) 0%, transparent 70%)',
           }}
         />
-        <div className="absolute top-[10%] left-[5%] w-96 h-96 rounded-full bg-primary/5 blur-3xl animate-cloud-float" />
-        <div className="absolute top-[60%] right-[10%] w-80 h-80 rounded-full bg-primary/8 blur-3xl animate-cloud-drift" style={{ animationDelay: '2s' }} />
       </div>
 
-      {/* THE WIDGET - Fixed 16:9 rectangle containing EVERYTHING */}
+      {/* THE WIDGET - Fixed 16:9 rectangle */}
       <div 
-        className="relative w-full max-w-6xl rounded-2xl overflow-hidden border border-border/50 bg-card/80 backdrop-blur-sm"
+        className="relative w-full max-w-6xl rounded-2xl overflow-hidden border border-border/30 bg-card"
         style={{
           aspectRatio: '16 / 9',
-          boxShadow: '0 25px 80px -20px hsl(var(--primary) / 0.3), 0 10px 30px -10px rgba(0,0,0,0.3)',
+          boxShadow: '0 25px 80px -20px hsl(var(--primary) / 0.25), 0 10px 40px -15px rgba(0,0,0,0.4)',
         }}
       >
-        {/* Progress bar at top - INSIDE widget */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-muted/30 z-30">
+        {/* Progress bar - minimal, at top */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-muted/20 z-30">
           <div 
-            className="h-full bg-primary transition-all duration-300 ease-out"
+            className="h-full bg-primary/80 transition-all duration-300 ease-out"
             style={{ width: `${overallProgress}%` }}
           />
         </div>
 
-        {/* Close button - INSIDE widget */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleClose}
-          className={cn(
-            "absolute top-3 right-3 z-40 w-8 h-8 rounded-full bg-background/60 backdrop-blur-sm border border-border/50 transition-opacity duration-300",
-            showControls ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <X className="w-4 h-4" />
-        </Button>
-
-        {/* Scene viewport with zoom - MAIN CONTENT AREA */}
+        {/* Scene viewport with zoom */}
         <div className="absolute inset-0 overflow-hidden">
           <div 
             className={cn(
               "absolute inset-0 transition-all duration-700 ease-out origin-center",
-              isTransitioning && "opacity-0"
+              isTransitioning && "opacity-0 scale-95"
             )}
             style={{
-              transform: `scale(${zoomTransform.scale}) translate(${zoomTransform.translateX}%, ${zoomTransform.translateY}%)`,
+              transform: isTransitioning ? undefined : `scale(${zoomTransform.scale}) translate(${zoomTransform.translateX}%, ${zoomTransform.translateY}%)`,
             }}
           >
             {renderScene()}
@@ -317,97 +275,66 @@ export function CinematicTourPlayer() {
             className="absolute inset-0 pointer-events-none transition-opacity duration-500"
             style={{
               background: zoomTransform.scale > 1.1 
-                ? 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.3) 100%)'
+                ? 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.4) 100%)'
                 : 'none',
-              opacity: zoomTransform.scale > 1.1 ? (zoomTransform.scale - 1) * 2 : 0,
+              opacity: zoomTransform.scale > 1.1 ? Math.min((zoomTransform.scale - 1) * 1.5, 0.8) : 0,
             }}
           />
         </div>
-
-        {/* Zoom indicator - INSIDE widget */}
-        {zoomTransform.scale > 1.1 && (
-          <div className="absolute top-3 left-3 z-30 px-2 py-1 bg-background/80 backdrop-blur-sm rounded-full text-[10px] font-medium text-muted-foreground flex items-center gap-1 animate-fade-in">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            {Math.round(zoomTransform.scale * 100)}%
-          </div>
-        )}
 
         {/* Large play button when paused */}
         {!isPlaying && (
           <button
             onClick={togglePlay}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center shadow-2xl animate-glow-pulse hover:scale-105 transition-transform"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center shadow-2xl hover:scale-105 transition-transform"
+            style={{
+              boxShadow: '0 0 60px hsl(var(--primary) / 0.5)',
+            }}
           >
-            <Play className="w-6 h-6 text-primary-foreground ml-1" />
+            <Play className="w-8 h-8 text-primary-foreground ml-1" />
           </button>
         )}
 
-        {/* Bottom overlay with controls - INSIDE widget */}
+        {/* Minimal controls overlay - only visible on hover */}
         <div 
           className={cn(
-            "absolute bottom-0 left-0 right-0 z-30 transition-opacity duration-300",
+            "absolute inset-0 z-30 transition-opacity duration-300 pointer-events-none",
             showControls ? "opacity-100" : "opacity-0"
           )}
-          style={{
-            background: 'linear-gradient(to top, hsl(var(--background) / 0.9) 0%, hsl(var(--background) / 0.6) 50%, transparent 100%)',
-          }}
         >
-          {/* Subtitles */}
-          <div className="px-4 pb-2 pt-6">
-            <div className="max-w-xl mx-auto bg-background/70 backdrop-blur-sm rounded-lg px-3 py-2 border border-border/20">
-              <p className="text-center text-foreground/90 text-xs md:text-sm leading-relaxed line-clamp-2">
-                {currentScript.text}
-              </p>
-            </div>
-          </div>
+          {/* Close button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleClose}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm border-0 text-white/80 hover:text-white hover:bg-black/60 pointer-events-auto"
+          >
+            <X className="w-4 h-4" />
+          </Button>
 
-          {/* Chapter navigation */}
-          <div className="px-4 py-2 flex items-center justify-center gap-1">
-            {chapters.map((chapter, index) => (
-              <button
-                key={chapter.id}
-                onClick={() => goToScene(index)}
-                className={cn(
-                  "relative px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-medium transition-all duration-300",
-                  index === currentSceneIndex
-                    ? "bg-primary text-primary-foreground"
-                    : index < currentSceneIndex
-                      ? "bg-primary/20 text-primary hover:bg-primary/30"
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted/80"
-                )}
-              >
-                {chapter.label}
-                {index === currentSceneIndex && (
-                  <div 
-                    className="absolute bottom-0 left-0 h-0.5 bg-primary-foreground/50 rounded-full"
-                    style={{ width: `${sceneProgress}%` }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Playback controls */}
-          <div className="px-4 pb-3 flex items-center justify-center gap-2">
+          {/* Bottom controls */}
+          <div 
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-auto"
+          >
             <Button
               variant="ghost"
               size="icon"
               onClick={handleRestart}
-              className="w-7 h-7 rounded-full bg-background/50 backdrop-blur-sm border border-border/50"
+              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm border-0 text-white/80 hover:text-white hover:bg-black/60"
             >
-              <RotateCcw className="w-3 h-3" />
+              <RotateCcw className="w-4 h-4" />
             </Button>
 
             <Button
-              variant="default"
+              variant="ghost"
               size="icon"
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full shadow-lg"
+              className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-sm border-0 text-white hover:bg-black/70"
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4" />
+                <Pause className="w-5 h-5" />
               ) : (
-                <Play className="w-4 h-4 ml-0.5" />
+                <Play className="w-5 h-5 ml-0.5" />
               )}
             </Button>
 
@@ -416,23 +343,27 @@ export function CinematicTourPlayer() {
               size="icon"
               onClick={handleSkip}
               disabled={currentSceneIndex >= totalScenes - 1}
-              className="w-7 h-7 rounded-full bg-background/50 backdrop-blur-sm border border-border/50"
+              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm border-0 text-white/80 hover:text-white hover:bg-black/60 disabled:opacity-30"
             >
-              <SkipForward className="w-3 h-3" />
+              <SkipForward className="w-4 h-4" />
             </Button>
+          </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMuted(!isMuted)}
-              className="w-7 h-7 rounded-full bg-background/50 backdrop-blur-sm border border-border/50"
-            >
-              {isMuted ? (
-                <VolumeX className="w-3 h-3" />
-              ) : (
-                <Volume2 className="w-3 h-3" />
-              )}
-            </Button>
+          {/* Scene dots indicator - minimal */}
+          <div className="absolute bottom-4 right-4 flex items-center gap-1">
+            {tourScripts.map((_, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full transition-all duration-300",
+                  index === currentSceneIndex
+                    ? "bg-white w-4"
+                    : index < currentSceneIndex
+                      ? "bg-white/60"
+                      : "bg-white/30"
+                )}
+              />
+            ))}
           </div>
         </div>
       </div>
