@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowRight, RotateCcw, CheckCircle } from 'lucide-react';
+import { Sparkles, ArrowRight, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -9,12 +9,6 @@ interface ConclusionSceneProps {
   progress: number;
   onRestart?: () => void;
 }
-
-const features = [
-  '7 agents IA spécialisés',
-  'Déploiement en 24h',
-  'Essai gratuit 14 jours',
-];
 
 export function ConclusionScene({ isActive, progress, onRestart }: ConclusionSceneProps) {
   const navigate = useNavigate();
@@ -26,114 +20,71 @@ export function ConclusionScene({ isActive, progress, onRestart }: ConclusionSce
       return;
     }
 
-    if (progress < 20) setPhase(1);
-    else if (progress < 40) setPhase(2);
-    else if (progress < 60) setPhase(3);
-    else setPhase(4);
+    if (progress < 30) setPhase(1);
+    else if (progress < 60) setPhase(2);
+    else setPhase(3);
   }, [isActive, progress]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Subtle background gradient */}
-      <div 
-        className="absolute inset-0 opacity-30"
-        style={{
-          background: `
-            radial-gradient(ellipse at 30% 40%, hsl(var(--primary) / 0.15) 0%, transparent 50%),
-            radial-gradient(ellipse at 70% 60%, hsl(262, 83%, 58% / 0.1) 0%, transparent 50%)
-          `
-        }}
-      />
-
-      {/* Content - compact layout */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 py-4">
+    <div className="relative w-full h-full overflow-hidden bg-white dark:bg-slate-900 flex items-center justify-center">
+      {/* Content - ultra compact */}
+      <div className="flex flex-col items-center text-center px-4">
         
         {/* Icon */}
         <div 
           className={cn(
-            "mb-3 transition-all duration-700",
+            "mb-4 transition-all duration-700",
             phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-75"
           )}
         >
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-lg shadow-primary/30">
-            <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-lg shadow-primary/30">
+            <Sparkles className="w-6 h-6 text-white" />
           </div>
         </div>
 
         {/* Title */}
-        <div 
+        <h1 
           className={cn(
-            "text-center mb-4 transition-all duration-700",
-            phase >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            "text-lg sm:text-xl font-bold text-foreground mb-1 transition-all duration-700",
+            phase >= 1 ? "opacity-100" : "opacity-0"
           )}
         >
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
-            Prêt à transformer votre entreprise ?
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Rejoignez les entreprises qui utilisent AETHER
-          </p>
-        </div>
-
-        {/* Features badges - horizontal compact */}
-        <div 
+          Ready to get started?
+        </h1>
+        <p 
           className={cn(
-            "flex flex-wrap justify-center gap-2 mb-5 transition-all duration-700",
-            phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            "text-xs sm:text-sm text-muted-foreground mb-5 transition-all duration-700",
+            phase >= 1 ? "opacity-100" : "opacity-0"
           )}
         >
-          {features.map((item, index) => (
-            <div
-              key={item}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20"
-              style={{ 
-                transitionDelay: `${index * 80}ms`,
-                opacity: phase >= 2 ? 1 : 0,
-              }}
-            >
-              <CheckCircle className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-medium text-foreground/90">{item}</span>
-            </div>
-          ))}
-        </div>
+          Try AETHER free for 14 days
+        </p>
 
-        {/* CTA Buttons - side by side */}
+        {/* CTA Buttons */}
         <div 
           className={cn(
-            "flex flex-wrap justify-center gap-3 transition-all duration-700",
-            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            "flex gap-2 transition-all duration-700",
+            phase >= 2 ? "opacity-100" : "opacity-0"
           )}
         >
           <Button
-            size="default"
+            size="sm"
             onClick={() => navigate('/auth')}
-            className="px-5 rounded-xl bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
+            className="px-4 rounded-lg bg-gradient-to-r from-primary to-violet-600"
           >
-            Commencer gratuitement
-            <ArrowRight className="w-4 h-4 ml-2" />
+            Start Free
+            <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
           </Button>
           
           <Button
-            size="default"
+            size="sm"
             variant="outline"
             onClick={onRestart}
-            className="px-5 rounded-xl"
+            className="px-4 rounded-lg"
           >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Revoir
+            <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+            Replay
           </Button>
-        </div>
-
-        {/* Trust badge */}
-        <div 
-          className={cn(
-            "mt-4 text-center transition-all duration-700",
-            phase >= 4 ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <p className="text-xs text-muted-foreground">
-            Sans carte bancaire • Config en 5 min
-          </p>
         </div>
       </div>
     </div>
