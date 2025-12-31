@@ -8,7 +8,7 @@ interface SalesDiagramProps {
   accentColor?: string;
 }
 
-export function SalesDiagram({ progress, compact = false, accentColor = 'hsl(142 76% 36%)' }: SalesDiagramProps) {
+export function SalesDiagram({ progress, compact = false, accentColor = 'hsl(var(--agent-sales))' }: SalesDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -17,14 +17,14 @@ export function SalesDiagram({ progress, compact = false, accentColor = 'hsl(142
     return 4;
   }, [progress]);
 
-  const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
+  const viewBox = compact ? '0 0 320 70' : '0 0 400 120';
 
-  // Funnel visualization data
+  // Funnel visualization data - use CSS variables
   const funnelSteps = [
-    { label: 'Leads', width: 50, count: '2.4K', color: 'hsl(220 80% 55%)' },
-    { label: 'Qualified', width: 42, count: '890', color: 'hsl(200 80% 55%)' },
-    { label: 'Proposal', width: 34, count: '340', color: 'hsl(180 80% 45%)' },
-    { label: 'Closed', width: 26, count: '127', color: 'hsl(142 76% 46%)' },
+    { label: 'Leads', width: 50, count: '2.4K', color: 'hsl(var(--agent-data))' },
+    { label: 'Qualified', width: 42, count: '890', color: 'hsl(var(--agent-support))' },
+    { label: 'Proposal', width: 34, count: '340', color: 'hsl(var(--agent-compliance))' },
+    { label: 'Closed', width: 26, count: '127', color: 'hsl(var(--agent-sales))' },
   ];
 
   return (

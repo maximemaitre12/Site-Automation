@@ -8,7 +8,7 @@ interface ComplianceDiagramProps {
   accentColor?: string;
 }
 
-export function ComplianceDiagram({ progress, compact = false, accentColor = 'hsl(25 95% 53%)' }: ComplianceDiagramProps) {
+export function ComplianceDiagram({ progress, compact = false, accentColor = 'hsl(var(--agent-compliance))' }: ComplianceDiagramProps) {
   const phase = useMemo(() => {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
@@ -17,7 +17,7 @@ export function ComplianceDiagram({ progress, compact = false, accentColor = 'hs
     return 4;
   }, [progress]);
 
-  const viewBox = compact ? '0 0 360 100' : '0 0 400 120';
+  const viewBox = compact ? '0 0 320 70' : '0 0 400 120';
 
   return (
     <DiagramShell viewBox={viewBox} accentColor={accentColor}>

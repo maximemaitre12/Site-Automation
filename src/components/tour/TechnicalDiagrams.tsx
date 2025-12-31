@@ -10,15 +10,15 @@ import {
   OverviewDiagram,
 } from './diagrams/agents';
 
-// Map agent IDs to their HSL accent colors from the design system
+// Map agent IDs to CSS variable references for perfect color sync
 const agentAccentColors: Record<string, string> = {
-  hr: 'hsl(340 82% 52%)',        // --agent-hr
-  sales: 'hsl(142 76% 36%)',     // --agent-sales  
-  support: 'hsl(173 80% 40%)',   // --agent-support
-  brain: 'hsl(271 91% 65%)',     // --agent-brain
-  compliance: 'hsl(25 95% 53%)', // --agent-compliance
-  flow: 'hsl(262 83% 58%)',      // --agent-flow
-  data: 'hsl(199 89% 48%)',      // --agent-data
+  hr: 'hsl(var(--agent-hr))',
+  sales: 'hsl(var(--agent-sales))',
+  support: 'hsl(var(--agent-support))',
+  brain: 'hsl(var(--agent-brain))',
+  compliance: 'hsl(var(--agent-compliance))',
+  flow: 'hsl(var(--agent-flow))',
+  data: 'hsl(var(--agent-data))',
 };
 
 interface TechnicalDiagramsProps {

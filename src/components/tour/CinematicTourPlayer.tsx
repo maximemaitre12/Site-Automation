@@ -249,15 +249,15 @@ export function CinematicTourPlayer() {
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-slate-100 pt-14">
       {/* Main content area */}
-      <div className="flex-1 flex flex-col items-center justify-start px-4 md:px-8 py-2 overflow-hidden">
-        {/* 16:9 Frame */}
+      <div className="flex-1 flex flex-col items-center justify-start px-3 md:px-8 py-1 overflow-hidden">
+        {/* 16:9 Frame - reduced max height for mobile */}
         <div
-          className="relative w-full overflow-hidden rounded-2xl bg-white shadow-2xl shrink-0"
+          className="relative w-full overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-2xl shrink-0"
           style={{
             aspectRatio: '16 / 9',
-            maxWidth: 'calc((100vh - 22rem) * 16 / 9)',
-            maxHeight: 'calc(100vh - 22rem)',
-            boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+            maxWidth: 'calc((100vh - 14rem) * 16 / 9)',
+            maxHeight: 'calc(100vh - 14rem)',
+            boxShadow: '0 15px 50px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05)',
           }}
         >
           {/* Close button */}
@@ -295,10 +295,10 @@ export function CinematicTourPlayer() {
         </div>
 
         {/* Interactive progress bar */}
-        <div className="w-full max-w-2xl mt-3 px-4">
+        <div className="w-full max-w-2xl mt-2 px-4">
           <div
             ref={progressBarRef}
-            className="relative h-2 bg-slate-200 rounded-full cursor-pointer group"
+            className="relative h-1.5 bg-slate-200 rounded-full cursor-pointer group"
             onClick={handleProgressBarClick}
             onMouseDown={() => setIsDragging(true)}
             onMouseUp={() => setIsDragging(false)}
@@ -322,13 +322,13 @@ export function CinematicTourPlayer() {
             
             {/* Drag handle */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ left: `calc(${overallProgress}% - 8px)` }}
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ left: `calc(${overallProgress}% - 6px)` }}
             />
           </div>
           
           {/* Scene title */}
-          <div className="flex justify-between items-center mt-1.5">
+          <div className="flex justify-between items-center mt-1">
             <span className="text-[10px] text-muted-foreground">
               {currentSceneIndex + 1}/{totalScenes}
             </span>
@@ -337,46 +337,48 @@ export function CinematicTourPlayer() {
             </span>
             <button
               onClick={togglePlay}
-              className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+              className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
             >
               {isPlaying ? (
-                <Pause className="w-3 h-3 text-primary" />
+                <Pause className="w-2.5 h-2.5 text-primary" />
               ) : (
-                <Play className="w-3 h-3 text-primary ml-0.5" />
+                <Play className="w-2.5 h-2.5 text-primary ml-0.5" />
               )}
             </button>
           </div>
         </div>
 
-        {/* Technical diagrams - above CTA buttons */}
-        <div className="w-full max-w-4xl mt-3 shrink-0 h-[100px] md:h-[120px]">
-          <TechnicalDiagrams 
-            sceneId={currentScript.id} 
-            progress={sceneProgress} 
-            compact={true}
-            agentColor={currentAgentIntro ? currentAgentIntro.color.replace('text-', '') : undefined}
-          />
-        </div>
+        {/* Technical diagrams - compact for mobile, hidden during intro */}
+        {!showIntro && (
+          <div className="w-full max-w-3xl mt-1.5 shrink-0 h-[60px] md:h-[90px] px-2">
+            <TechnicalDiagrams 
+              sceneId={currentScript.id} 
+              progress={sceneProgress} 
+              compact={true}
+              agentColor={currentAgentIntro ? currentAgentIntro.color.replace('text-', '') : undefined}
+            />
+          </div>
+        )}
 
-        {/* CTA Buttons - smaller */}
-        <div className="flex flex-wrap justify-center gap-2 mt-3 shrink-0">
+        {/* CTA Buttons - compact for mobile */}
+        <div className="flex flex-wrap justify-center gap-1.5 mt-2 shrink-0">
           <Button
             size="sm"
             variant="outline"
             onClick={() => navigate('/contact')}
-            className="px-3 py-1.5 text-xs rounded-lg border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
+            className="px-2.5 py-1 text-[10px] md:text-xs rounded-md border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
           >
-            <Calendar className="w-3 h-3 mr-1.5 text-primary group-hover:scale-110 transition-transform" />
-            Demander une démo
+            <Calendar className="w-3 h-3 mr-1 text-primary group-hover:scale-110 transition-transform" />
+            Démo
           </Button>
           
           <Button
             size="sm"
             onClick={() => navigate('/auth')}
-            className="px-3 py-1.5 text-xs rounded-lg bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-md shadow-primary/20"
+            className="px-2.5 py-1 text-[10px] md:text-xs rounded-md bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-sm shadow-primary/20"
           >
-            Commencer gratuitement
-            <ArrowRight className="w-3 h-3 ml-1.5" />
+            Commencer
+            <ArrowRight className="w-3 h-3 ml-1" />
           </Button>
         </div>
       </div>
