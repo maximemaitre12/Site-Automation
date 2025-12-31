@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, Play, Pause, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Play, Pause, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
 import { SpringIn } from './animations';
-import { useTourSFX } from '@/hooks/useTourSFX';
+
 
 
 // Import scenes
@@ -80,10 +80,7 @@ export function CinematicTourPlayer() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const progressBarRef = useRef<HTMLDivElement>(null);
-  
-  const { playSceneSFX, playTransitionSFX, toggleMute, preloadSFX } = useTourSFX();
 
   const currentScript = tourScripts[currentSceneIndex];
   const totalScenes = tourScripts.length;
@@ -92,19 +89,6 @@ export function CinematicTourPlayer() {
   // Get agent intro data for current scene
   const currentAgentIntro = agentIntros[currentScript.id];
   const isAgentScene = currentAgentIntro !== undefined;
-
-  // Preload sound effects on mount
-  useEffect(() => {
-    const sceneIds = tourScripts.map(s => s.id);
-    preloadSFX(sceneIds);
-  }, [preloadSFX]);
-
-  // Play SFX when scene changes
-  useEffect(() => {
-    if (isPlaying && !isTransitioning) {
-      playSceneSFX(currentScript.id);
-    }
-  }, [currentSceneIndex, isPlaying, isTransitioning, currentScript.id, playSceneSFX]);
 
   // Hide intro after delay
   useEffect(() => {
@@ -126,7 +110,6 @@ export function CinematicTourPlayer() {
     if (currentSceneIndex >= totalScenes - 1) return;
     
     setIsTransitioning(true);
-    playTransitionSFX();
     
     const nextSceneId = tourScripts[currentSceneIndex + 1]?.id;
     const isNextAgentScene = nextSceneId && agentIntros[nextSceneId] !== undefined;
@@ -140,7 +123,7 @@ export function CinematicTourPlayer() {
       setCurrentSceneIndex(prev => prev + 1);
       setIsTransitioning(false);
     }, 600);
-  }, [currentSceneIndex, totalScenes, playTransitionSFX]);
+  }, [currentSceneIndex, totalScenes]);
 
   // Keep ref updated
   goToNextSceneRef.current = goToNextScene;
@@ -293,26 +276,12 @@ export function CinematicTourPlayer() {
         >
           {/* Top controls */}
           <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
-            {/* Mute button */}
-            <button
-              onClick={() => {
-                toggleMute();
-                setIsMuted(!isMuted);
-              }}
-              className="w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center hover:bg-black/20 transition-colors"
-            >
-              {isMuted ? (
-                <VolumeX className="w-4 h-4 text-foreground/70" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-foreground/70" />
-              )}
-            </button>
-            {/* Home button */}
+            {/* Back button */}
             <button
               onClick={handleClose}
               className="w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center hover:bg-black/20 transition-colors"
             >
-              <Home className="w-4 h-4 text-foreground/70" />
+              <ArrowLeft className="w-4 h-4 text-foreground/70" />
             </button>
           </div>
 
