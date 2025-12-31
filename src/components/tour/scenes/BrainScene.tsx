@@ -1,222 +1,299 @@
-import React, { useState, useEffect } from 'react';
-import { Brain, Search, FileText, MessageSquare, Sparkles, Send, Link2 } from 'lucide-react';
+import React from 'react';
+import { Brain, Search, FileText, MessageSquare, Sparkles, Link2, Database, Zap, Globe, ImageIcon, Code, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AnimatedCursor } from '../core/AnimatedCursor';
-import { TypeWriter } from '../core/TypeWriter';
 
 interface BrainSceneProps {
   isActive: boolean;
   progress: number;
 }
 
-const documents = [
-  { name: 'Politique RH.pdf', pages: 45 },
-  { name: 'Contrat type.docx', pages: 12 },
-  { name: 'FAQ Produit.pdf', pages: 28 },
-  { name: 'Guide onboarding.pdf', pages: 15 },
-];
-
 export function BrainScene({ isActive, progress }: BrainSceneProps) {
-  const [phase, setPhase] = useState(0);
-  const [cursorPos, setCursorPos] = useState({ x: 100, y: 100 });
-  const [isClicking, setIsClicking] = useState(false);
-  const [showTyping, setShowTyping] = useState(false);
-  const [showThinking, setShowThinking] = useState(false);
-  const [showResponse, setShowResponse] = useState(false);
-  const [showSources, setShowSources] = useState(false);
-
-  useEffect(() => {
-    if (!isActive) {
-      setPhase(0);
-      setShowTyping(false);
-      setShowThinking(false);
-      setShowResponse(false);
-      setShowSources(false);
-      return;
-    }
-
-    if (progress < 8) {
-      setPhase(1);
-    } else if (progress < 15) {
-      setPhase(2);
-      setCursorPos({ x: 500, y: 450 });
-    } else if (progress < 40) {
-      setPhase(3);
-      setShowTyping(true);
-    } else if (progress < 50) {
-      setPhase(4);
-      setCursorPos({ x: 780, y: 450 });
-      setIsClicking(true);
-      setTimeout(() => setIsClicking(false), 400);
-    } else if (progress < 60) {
-      setPhase(5);
-      setShowThinking(true);
-    } else if (progress < 85) {
-      setPhase(6);
-      setShowThinking(false);
-      setShowResponse(true);
-    } else {
-      setPhase(7);
-      setShowSources(true);
-    }
-  }, [isActive, progress]);
+  const showInterface = progress >= 0;
+  const showDocs = progress >= 8;
+  const showQuestion = progress >= 18;
+  const showThinking = progress >= 30;
+  const showResponse = progress >= 45;
+  const showSources = progress >= 60;
+  const showTools = progress >= 75;
+  const showFinal = progress >= 90;
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center p-8">
-      <AnimatedCursor
-        targetPosition={cursorPos}
-        isClicking={isClicking}
-        isVisible={phase >= 2 && phase < 6}
-        duration={600}
-      />
+    <div className="absolute inset-0 bg-gradient-to-br from-violet-950 via-slate-900 to-indigo-950 overflow-hidden">
+      {/* Neural network background */}
+      <div className="absolute inset-0 opacity-20">
+        <svg className="w-full h-full">
+          {[...Array(20)].map((_, i) => (
+            <circle
+              key={i}
+              cx={`${10 + (i % 5) * 20}%`}
+              cy={`${10 + Math.floor(i / 5) * 25}%`}
+              r="3"
+              fill="hsl(var(--agent-brain))"
+              opacity={0.5}
+            >
+              <animate
+                attributeName="opacity"
+                values="0.3;0.8;0.3"
+                dur={`${2 + i * 0.2}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          ))}
+        </svg>
+      </div>
 
-      {/* Brain Interface */}
-      <div 
-        className={cn(
-          "relative w-full max-w-5xl bg-card rounded-2xl border border-border shadow-2xl overflow-hidden transition-all duration-700",
-          phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"
-        )}
-        style={{ height: '70vh', maxHeight: '600px' }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-agent-brain/20 flex items-center justify-center">
+      {/* Glows */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-agent-brain/20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-violet-500/15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+
+      <div className="absolute inset-4 flex gap-4">
+        {/* Left - Knowledge Base */}
+        <div 
+          className={cn(
+            "w-72 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+            showInterface ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+          )}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-agent-brain/30 flex items-center justify-center">
               <Brain className="w-5 h-5 text-agent-brain" />
             </div>
             <div>
-              <h2 className="font-semibold">Brain</h2>
-              <p className="text-xs text-muted-foreground">Intelligence collective</p>
+              <h2 className="font-bold text-white">Brain</h2>
+              <p className="text-xs text-white/50">Intelligence collective</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted text-sm">
-            <Search className="w-4 h-4" />
-            <span className="text-muted-foreground">Rechercher...</span>
+
+          {/* Search */}
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 mb-4">
+            <Search className="w-4 h-4 text-white/50" />
+            <span className="text-white/40 text-sm">Rechercher...</span>
+          </div>
+
+          {/* Documents */}
+          <div className="flex items-center gap-2 mb-3">
+            <Database className="w-4 h-4 text-agent-brain" />
+            <span className="text-white/80 text-sm font-medium">Base de connaissances</span>
+          </div>
+
+          <div className="space-y-2">
+            {[
+              { name: 'Politique RH.pdf', pages: 45, type: 'pdf' },
+              { name: 'Contrats types.docx', pages: 28, type: 'doc' },
+              { name: 'FAQ Produit.pdf', pages: 62, type: 'pdf' },
+              { name: 'Guide technique.md', pages: 120, type: 'md' },
+              { name: 'Procédures.pdf', pages: 34, type: 'pdf' },
+            ].map((doc, i) => (
+              <div 
+                key={doc.name}
+                className="p-2.5 rounded-xl bg-white/5 border border-white/10 transition-all duration-500"
+                style={{ 
+                  transitionDelay: `${i * 80}ms`,
+                  opacity: showDocs ? 1 : 0,
+                  transform: showDocs ? 'translateX(0)' : 'translateX(-15px)'
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-agent-brain/70" />
+                  <span className="text-white/80 text-sm truncate flex-1">{doc.name}</span>
+                </div>
+                <div className="text-white/40 text-xs mt-1">{doc.pages} pages indexées</div>
+              </div>
+            ))}
+          </div>
+
+          <div 
+            className={cn(
+              "mt-4 p-3 rounded-xl bg-agent-brain/20 border border-agent-brain/30 transition-all duration-700",
+              showDocs ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <div className="text-agent-brain font-bold text-lg">289</div>
+            <div className="text-agent-brain/70 text-xs">pages analysées par IA</div>
           </div>
         </div>
 
-        <div className="flex h-full">
-          {/* Documents sidebar */}
-          <div className="w-64 border-r border-border p-4 bg-muted/10">
-            <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Documents
-            </h3>
-            
-            <div className="space-y-2">
-              {documents.map((doc, index) => (
-                <div 
-                  key={doc.name}
-                  className="p-2.5 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors animate-stagger-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <p className="text-sm font-medium truncate">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground">{doc.pages} pages</p>
-                </div>
-              ))}
+        {/* Center - Chat */}
+        <div className="flex-1 flex flex-col bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          {/* Chat area */}
+          <div className="flex-1 p-6 overflow-auto">
+            {/* Welcome */}
+            <div 
+              className={cn(
+                "text-center mb-8 transition-all duration-700",
+                showQuestion ? "opacity-30 scale-90" : "opacity-100 scale-100"
+              )}
+            >
+              <Brain className="w-16 h-16 mx-auto mb-3 text-agent-brain/40" />
+              <p className="text-white/50">Posez n'importe quelle question</p>
             </div>
-            
-            <div className="mt-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
-              <p className="text-xs text-primary font-medium">4 documents indexés</p>
-              <p className="text-xs text-muted-foreground">100 pages analysées</p>
+
+            {/* User question */}
+            <div 
+              className={cn(
+                "flex justify-end mb-6 transition-all duration-700",
+                showQuestion ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              )}
+            >
+              <div className="max-w-lg p-4 rounded-2xl rounded-br-sm bg-agent-brain text-white">
+                <p>Quelle est notre politique de remboursement pour les clients entreprise ?</p>
+              </div>
+            </div>
+
+            {/* AI Thinking */}
+            {showThinking && !showResponse && (
+              <div className="flex gap-3 mb-6 animate-fade-in">
+                <div className="w-10 h-10 rounded-full bg-agent-brain/30 flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-agent-brain animate-pulse" />
+                </div>
+                <div className="p-4 rounded-2xl rounded-bl-sm bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 rounded-full bg-agent-brain animate-bounce" />
+                      <span className="w-2 h-2 rounded-full bg-agent-brain animate-bounce" style={{ animationDelay: '0.1s' }} />
+                      <span className="w-2 h-2 rounded-full bg-agent-brain animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    </div>
+                    <span className="text-white/60 text-sm">Recherche dans 5 documents...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* AI Response */}
+            <div 
+              className={cn(
+                "flex gap-3 transition-all duration-700",
+                showResponse ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              )}
+            >
+              <div className="w-10 h-10 rounded-full bg-agent-brain/30 flex items-center justify-center shrink-0">
+                <Brain className="w-5 h-5 text-agent-brain" />
+              </div>
+              <div className="flex-1 max-w-2xl">
+                <div className="p-4 rounded-2xl rounded-bl-sm bg-white/5 border border-white/10 mb-3">
+                  <p className="text-white/90 leading-relaxed">
+                    Selon notre <span className="text-agent-brain font-medium">Politique RH (section 4.2)</span>, les remboursements pour clients entreprise suivent ces règles :
+                  </p>
+                  <ul className="mt-3 space-y-2 text-white/70 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-agent-brain">•</span>
+                      <span>Remboursement intégral dans les <strong className="text-white">30 premiers jours</strong></span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-agent-brain">•</span>
+                      <span>Au prorata pour les contrats annuels pendant les <strong className="text-white">3 premiers mois</strong></span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-agent-brain">•</span>
+                      <span>Exception : les licences serveur ne sont pas remboursables après activation</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Sources */}
+                <div 
+                  className={cn(
+                    "transition-all duration-700",
+                    showSources ? "opacity-100" : "opacity-0"
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Link2 className="w-4 h-4 text-white/50" />
+                    <span className="text-white/50 text-xs">Sources</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { doc: 'Politique RH.pdf', page: 'p.12-14' },
+                      { doc: 'Contrats types.docx', page: 'p.8' },
+                      { doc: 'FAQ Produit.pdf', page: 'p.23' },
+                    ].map((source, i) => (
+                      <span 
+                        key={source.doc}
+                        className="px-2.5 py-1 rounded-lg bg-agent-brain/20 border border-agent-brain/30 text-agent-brain text-xs transition-all duration-500"
+                        style={{ 
+                          transitionDelay: `${i * 100}ms`,
+                          opacity: showSources ? 1 : 0
+                        }}
+                      >
+                        📄 {source.doc} - {source.page}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Chat area */}
-          <div className="flex-1 flex flex-col">
-            <div className="flex-1 p-6 overflow-auto">
-              {/* Welcome message */}
-              <div className="text-center text-muted-foreground mb-6">
-                <Brain className="w-12 h-12 mx-auto mb-2 text-agent-brain/50" />
-                <p>Posez une question sur vos documents</p>
-              </div>
-
-              {/* User question */}
-              {showTyping && (
-                <div className="flex justify-end mb-4 animate-fade-in">
-                  <div className="max-w-md p-4 rounded-2xl rounded-br-none bg-primary text-primary-foreground">
-                    <TypeWriter
-                      text="Quelle est notre politique de remboursement ?"
-                      speed={40}
-                      isActive={phase >= 3}
-                      showCursor={phase < 4}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Thinking indicator */}
-              {showThinking && (
-                <div className="flex gap-3 mb-4 animate-fade-in">
-                  <div className="w-8 h-8 rounded-full bg-agent-brain/20 flex items-center justify-center">
-                    <Brain className="w-4 h-4 text-agent-brain animate-pulse" />
-                  </div>
-                  <div className="p-4 rounded-2xl rounded-bl-none bg-muted/50 border border-border">
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-1">
-                        <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
-                      <span className="text-sm text-muted-foreground">Recherche dans 4 documents...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* AI Response */}
-              {showResponse && (
-                <div className="flex gap-3 mb-4 animate-fade-in">
-                  <div className="w-8 h-8 rounded-full bg-agent-brain/20 flex items-center justify-center">
-                    <Brain className="w-4 h-4 text-agent-brain" />
-                  </div>
-                  <div className="flex-1 max-w-2xl">
-                    <div className="p-4 rounded-2xl rounded-bl-none bg-muted/50 border border-border mb-2">
-                      <TypeWriter
-                        text="Selon notre politique RH (page 12), les remboursements sont accordés dans les 30 jours suivant l'achat, sur présentation du justificatif. Pour les abonnements annuels, un remboursement au prorata est possible pendant les 3 premiers mois."
-                        speed={15}
-                        isActive={phase >= 6}
-                        showCursor={phase < 7}
-                      />
-                    </div>
-
-                    {/* Sources */}
-                    {showSources && (
-                      <div className="animate-stagger-in">
-                        <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                          <Link2 className="w-3 h-3" />
-                          Sources
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="px-2 py-1 rounded-md text-xs bg-primary/10 text-primary border border-primary/20 animate-stagger-in">
-                            📄 Politique RH.pdf - p.12
-                          </span>
-                          <span className="px-2 py-1 rounded-md text-xs bg-primary/10 text-primary border border-primary/20 animate-stagger-in" style={{ animationDelay: '100ms' }}>
-                            📄 FAQ Produit.pdf - p.8
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+          {/* Input */}
+          <div className="p-4 border-t border-white/10">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+              <MessageSquare className="w-5 h-5 text-white/40" />
+              <span className="flex-1 text-white/40 text-sm">Posez votre question...</span>
+              <button className="p-2 rounded-lg bg-agent-brain text-white">
+                <Zap className="w-4 h-4" />
+              </button>
             </div>
+          </div>
+        </div>
 
-            {/* Input area */}
-            <div className="p-4 border-t border-border">
+        {/* Right - AI Tools */}
+        <div 
+          className={cn(
+            "w-64 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+            showTools ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+          )}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="w-5 h-5 text-amber-400" />
+            <span className="text-white font-semibold">Outils IA</span>
+          </div>
+
+          <div className="space-y-2">
+            {[
+              { name: 'Recherche web', icon: Globe, color: 'text-blue-400', active: true },
+              { name: 'Analyse image', icon: ImageIcon, color: 'text-pink-400' },
+              { name: 'Génération code', icon: Code, color: 'text-green-400' },
+              { name: 'Résumé document', icon: BookOpen, color: 'text-amber-400' },
+            ].map((tool, i) => (
               <div 
+                key={tool.name}
                 className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border transition-all",
-                  phase >= 2 && phase < 5 && "ring-2 ring-primary"
+                  "p-3 rounded-xl border transition-all duration-500",
+                  tool.active 
+                    ? "bg-white/10 border-white/20" 
+                    : "bg-white/5 border-white/10"
                 )}
+                style={{ 
+                  transitionDelay: `${i * 100 + 200}ms`,
+                  opacity: showTools ? 1 : 0
+                }}
               >
-                <MessageSquare className="w-5 h-5 text-muted-foreground" />
-                <span className="flex-1 text-muted-foreground">
-                  {showTyping ? '' : 'Posez votre question...'}
-                </span>
-                <button className="p-2 rounded-lg bg-primary text-primary-foreground">
-                  <Send className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <tool.icon className={cn("w-4 h-4", tool.color)} />
+                  <span className="text-white/80 text-sm">{tool.name}</span>
+                </div>
+                {tool.active && (
+                  <div className="mt-2 text-xs text-white/50">Activé pour cette session</div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div 
+            className={cn(
+              "mt-4 p-3 rounded-xl bg-gradient-to-br from-agent-brain/30 to-violet-500/20 border border-agent-brain/30 transition-all duration-700",
+              showFinal ? "opacity-100" : "opacity-0"
+            )}
+          >
+            <div className="grid grid-cols-2 gap-3 text-center">
+              <div>
+                <div className="text-xl font-bold text-white">1.2k</div>
+                <div className="text-white/50 text-xs">Questions</div>
+              </div>
+              <div>
+                <div className="text-xl font-bold text-agent-brain">98%</div>
+                <div className="text-white/50 text-xs">Précision</div>
               </div>
             </div>
           </div>

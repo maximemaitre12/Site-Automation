@@ -1,320 +1,359 @@
-import React, { useState, useEffect } from 'react';
-import { Users, Plus, Upload, Star, FileText, Clock, CheckCircle, User } from 'lucide-react';
+import React from 'react';
+import { Users, FileText, Calendar, Mail, Sparkles, BarChart3, UserPlus, CheckCircle, Star, Clock, MessageSquare, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AnimatedCursor } from '../core/AnimatedCursor';
-import { TypeWriter } from '../core/TypeWriter';
 
 interface HRSceneProps {
   isActive: boolean;
   progress: number;
 }
 
-// Mock data for HR interface
-const candidates = [
-  { id: 1, name: 'Sophie Martin', role: 'Designer UX', score: 92, status: 'Entretien' },
-  { id: 2, name: 'Lucas Bernard', role: 'Dev Frontend', score: 88, status: 'Nouveau' },
-  { id: 3, name: 'Emma Dubois', role: 'Product Manager', score: 95, status: 'Évaluation' },
-];
-
 export function HRScene({ isActive, progress }: HRSceneProps) {
-  const [phase, setPhase] = useState(0);
-  const [cursorPos, setCursorPos] = useState({ x: 100, y: 100 });
-  const [isClicking, setIsClicking] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
-  const [typedName, setTypedName] = useState('');
-  const [showUpload, setShowUpload] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [showScore, setShowScore] = useState(false);
-  const [scoreValue, setScoreValue] = useState(0);
-  const [newCandidate, setNewCandidate] = useState<typeof candidates[0] | null>(null);
-
-  useEffect(() => {
-    if (!isActive) {
-      setPhase(0);
-      setShowDialog(false);
-      setTypedName('');
-      setShowUpload(false);
-      setUploadProgress(0);
-      setShowScore(false);
-      setScoreValue(0);
-      setNewCandidate(null);
-      return;
-    }
-
-    // Animation phases based on progress
-    if (progress < 8) {
-      setPhase(1); // Interface appears
-    } else if (progress < 15) {
-      setPhase(2); // Cursor moves to + button
-      setCursorPos({ x: 680, y: 150 });
-    } else if (progress < 20) {
-      setPhase(3); // Click
-      setIsClicking(true);
-      setTimeout(() => setIsClicking(false), 400);
-    } else if (progress < 25) {
-      setPhase(4); // Dialog opens
-      setShowDialog(true);
-    } else if (progress < 30) {
-      setPhase(5); // Cursor moves to name field
-      setCursorPos({ x: 500, y: 320 });
-    } else if (progress < 45) {
-      setPhase(6); // Typing name
-      setTypedName('Marie Dupont');
-    } else if (progress < 50) {
-      setPhase(7); // Cursor moves to upload
-      setCursorPos({ x: 500, y: 420 });
-    } else if (progress < 60) {
-      setPhase(8); // Upload animation
-      setShowUpload(true);
-      setUploadProgress(Math.min((progress - 50) * 10, 100));
-    } else if (progress < 70) {
-      setPhase(9); // Dialog closes, new candidate appears
-      setShowDialog(false);
-      setNewCandidate({
-        id: 4,
-        name: 'Marie Dupont',
-        role: 'Product Manager',
-        score: 0,
-        status: 'Analyse IA...',
-      });
-    } else if (progress < 85) {
-      setPhase(10); // AI analysis
-      setShowScore(true);
-      const targetScore = 95;
-      const scoreProgress = (progress - 70) / 15;
-      setScoreValue(Math.round(targetScore * scoreProgress));
-    } else {
-      setPhase(11); // Final state
-      setScoreValue(95);
-      if (newCandidate) {
-        setNewCandidate(prev => prev ? { ...prev, score: 95, status: 'Évalué' } : null);
-      }
-    }
-  }, [isActive, progress]);
+  // Feature highlights based on progress
+  const showPipeline = progress >= 0;
+  const showCandidates = progress >= 8;
+  const showAIScore = progress >= 18;
+  const showInterview = progress >= 30;
+  const showEmail = progress >= 45;
+  const showJobPost = progress >= 60;
+  const showAnalytics = progress >= 75;
+  const showFinal = progress >= 90;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
-      {/* Animated cursor */}
-      <AnimatedCursor
-        targetPosition={cursorPos}
-        isClicking={isClicking}
-        isVisible={phase >= 2 && phase < 11}
-        duration={600}
+    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      {/* Animated background grid */}
+      <div 
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: 'linear-gradient(hsl(var(--agent-hr)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--agent-hr)) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+        }}
       />
 
-      {/* HR Interface mockup - fills the container */}
-      <div 
-        className={cn(
-          "absolute inset-4 bg-card rounded-xl border border-border shadow-xl overflow-hidden transition-all duration-700",
-          phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-agent-hr/20 flex items-center justify-center">
-              <Users className="w-4 h-4 text-agent-hr" />
+      {/* Floating orbs */}
+      <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-agent-hr/20 blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full bg-agent-hr/10 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+
+      {/* Main container */}
+      <div className="absolute inset-4 flex gap-4">
+        {/* Left panel - Pipeline */}
+        <div 
+          className={cn(
+            "w-80 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+            showPipeline ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+          )}
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-agent-hr/30 flex items-center justify-center">
+              <Users className="w-5 h-5 text-agent-hr" />
             </div>
             <div>
-              <h2 className="font-semibold text-foreground text-sm">Agent RH</h2>
-              <p className="text-[10px] text-muted-foreground">Recrutement intelligent</p>
+              <h2 className="font-bold text-white">Agent RH</h2>
+              <p className="text-xs text-white/50">Pipeline de recrutement</p>
             </div>
           </div>
-          
-          <button 
+
+          {/* Pipeline stages */}
+          <div className="space-y-3">
+            {[
+              { label: 'Nouveaux', count: 24, color: 'bg-blue-500' },
+              { label: 'En revue', count: 12, color: 'bg-amber-500' },
+              { label: 'Entretien', count: 8, color: 'bg-purple-500' },
+              { label: 'Offre', count: 3, color: 'bg-green-500' },
+            ].map((stage, i) => (
+              <div 
+                key={stage.label}
+                className={cn(
+                  "flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-500",
+                  showCandidates && "hover:bg-white/10"
+                )}
+                style={{ 
+                  transitionDelay: `${i * 100}ms`,
+                  opacity: showCandidates ? 1 : 0,
+                  transform: showCandidates ? 'translateX(0)' : 'translateX(-20px)'
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={cn("w-2 h-2 rounded-full", stage.color)} />
+                  <span className="text-white/80 text-sm">{stage.label}</span>
+                </div>
+                <span className="text-white font-bold">{stage.count}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Quick stats */}
+          <div 
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium transition-all",
-              phase >= 2 && phase < 4 && "ring-4 ring-primary/30 animate-element-highlight"
+              "mt-6 grid grid-cols-2 gap-2 transition-all duration-700",
+              showAnalytics ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}
           >
-            <Plus className="w-3 h-3" />
-            Ajouter candidat
-          </button>
-        </div>
-
-        {/* Content grid */}
-        <div className="flex h-[calc(100%-56px)]">
-          {/* Sidebar */}
-          <div className="w-40 border-r border-border p-3 bg-muted/10">
-            <nav className="space-y-1">
-              {['Pipeline', 'Candidats', 'Entretiens', 'Offres'].map((item, i) => (
-                <div 
-                  key={item}
-                  className={cn(
-                    "px-2 py-1.5 rounded-lg text-xs transition-colors",
-                    i === 1 ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  {item}
-                </div>
-              ))}
-            </nav>
-          </div>
-
-          {/* Main content */}
-          <div className="flex-1 p-4 overflow-auto">
-            <h3 className="text-sm font-semibold mb-3">Candidats récents</h3>
-            
-            {/* Candidates list */}
-            <div className="space-y-2">
-              {candidates.map((candidate, index) => (
-                <div 
-                  key={candidate.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{candidate.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{candidate.role}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      <span className="font-semibold text-xs">{candidate.score}%</span>
-                    </div>
-                    <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-primary/10 text-primary">
-                      {candidate.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-
-              {/* New candidate being added */}
-              {newCandidate && (
-                <div 
-                  className={cn(
-                    "flex items-center justify-between p-3 rounded-lg border-2 border-primary/50 bg-primary/5 animate-stagger-in",
-                    showScore && "animate-element-highlight"
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{newCandidate.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{newCandidate.role}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    {showScore ? (
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                        <span className="font-bold text-sm text-primary">{scoreValue}%</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                        <span className="text-[10px] text-muted-foreground">Analyse IA...</span>
-                      </div>
-                    )}
-                    <span className={cn(
-                      "px-1.5 py-0.5 rounded-full text-[10px]",
-                      showScore && scoreValue >= 90 
-                        ? "bg-green-500/20 text-green-600" 
-                        : "bg-primary/10 text-primary"
-                    )}>
-                      {newCandidate.status}
-                    </span>
-                  </div>
-                </div>
-              )}
+            <div className="p-3 rounded-xl bg-green-500/20 border border-green-500/30">
+              <div className="text-2xl font-bold text-green-400">87%</div>
+              <div className="text-xs text-green-400/70">Taux embauche</div>
+            </div>
+            <div className="p-3 rounded-xl bg-agent-hr/20 border border-agent-hr/30">
+              <div className="text-2xl font-bold text-agent-hr">12j</div>
+              <div className="text-xs text-agent-hr/70">Délai moyen</div>
             </div>
           </div>
         </div>
 
-        {/* Dialog overlay */}
-        {showDialog && (
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-20 animate-fade-in">
-            <div className="w-full max-w-sm bg-card rounded-xl border border-border shadow-2xl p-4 animate-zoom-in">
-              <h3 className="text-sm font-semibold mb-3">Nouveau candidat</h3>
-              
-              <div className="space-y-3">
-                {/* Name field */}
-                <div>
-                  <label className="text-[10px] text-muted-foreground mb-1 block">Nom complet</label>
-                  <div 
-                    className={cn(
-                      "px-3 py-2 rounded-lg bg-muted/50 border border-border text-foreground text-sm",
-                      phase >= 5 && phase < 7 && "ring-2 ring-primary"
-                    )}
-                  >
-                    {phase >= 6 ? (
-                      <TypeWriter 
-                        text={typedName} 
-                        speed={60} 
-                        isActive={phase >= 6}
-                      />
-                    ) : (
-                      <span className="text-muted-foreground text-xs">Entrez le nom...</span>
-                    )}
-                  </div>
-                </div>
+        {/* Center - Main feature showcase */}
+        <div className="flex-1 flex flex-col gap-4">
+          {/* Top row - AI Analysis & Interview */}
+          <div className="flex-1 flex gap-4">
+            {/* AI CV Analysis */}
+            <div 
+              className={cn(
+                "flex-1 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+                showAIScore ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              )}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-agent-hr" />
+                <span className="text-white font-semibold">Analyse IA des CV</span>
+              </div>
 
-                {/* Upload field */}
-                <div>
-                  <label className="text-[10px] text-muted-foreground mb-1 block">CV</label>
+              {/* Candidate cards with scores */}
+              <div className="space-y-2">
+                {[
+                  { name: 'Sophie Martin', role: 'UX Designer', score: 94, skills: ['Figma', 'Research', 'Prototyping'] },
+                  { name: 'Lucas Bernard', role: 'Dev Frontend', score: 88, skills: ['React', 'TypeScript', 'CSS'] },
+                  { name: 'Emma Dubois', role: 'Product Manager', score: 92, skills: ['Agile', 'Data', 'Strategy'] },
+                ].map((candidate, i) => (
                   <div 
+                    key={candidate.name}
                     className={cn(
-                      "px-3 py-4 rounded-lg border-2 border-dashed border-border flex flex-col items-center gap-1.5 transition-all",
-                      phase >= 7 && phase < 9 && "border-primary bg-primary/5",
-                      showUpload && "border-green-500 bg-green-500/5"
+                      "p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-500",
+                      showAIScore && i === 0 && "ring-2 ring-agent-hr/50 bg-agent-hr/10"
                     )}
+                    style={{ 
+                      transitionDelay: `${i * 150 + 200}ms`,
+                      opacity: showAIScore ? 1 : 0,
+                      transform: showAIScore ? 'translateY(0)' : 'translateY(10px)'
+                    }}
                   >
-                    {showUpload ? (
-                      <>
-                        <div className="flex items-center gap-1.5 text-green-600">
-                          {uploadProgress >= 100 ? (
-                            <CheckCircle className="w-4 h-4" />
-                          ) : (
-                            <Upload className="w-4 h-4 animate-bounce" />
-                          )}
-                          <span className="font-medium text-xs">
-                            {uploadProgress >= 100 ? 'CV_Marie_Dupont.pdf' : 'Téléchargement...'}
-                          </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-agent-hr to-agent-hr/50 flex items-center justify-center text-white font-bold text-sm">
+                          {candidate.name[0]}
                         </div>
-                        {uploadProgress < 100 && (
-                          <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-green-500 transition-all duration-300"
-                              style={{ width: `${uploadProgress}%` }}
-                            />
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-[10px] text-muted-foreground">Glissez un CV ici</span>
-                      </>
-                    )}
+                        <div>
+                          <div className="text-white text-sm font-medium">{candidate.name}</div>
+                          <div className="text-white/50 text-xs">{candidate.role}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                        <span className="text-white font-bold">{candidate.score}%</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5 flex-wrap">
+                      {candidate.skills.map(skill => (
+                        <span key={skill} className="px-2 py-0.5 rounded-full bg-white/10 text-white/70 text-xs">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Interview Management */}
+            <div 
+              className={cn(
+                "w-72 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+                showInterview ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+              )}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="w-5 h-5 text-purple-400" />
+                <span className="text-white font-semibold">Entretiens</span>
+              </div>
+
+              <div className="space-y-2">
+                {[
+                  { time: '09:00', name: 'Sophie M.', type: 'Technique', status: 'now' },
+                  { time: '11:30', name: 'Lucas B.', type: 'RH', status: 'upcoming' },
+                  { time: '14:00', name: 'Emma D.', type: 'Final', status: 'upcoming' },
+                ].map((interview, i) => (
+                  <div 
+                    key={i}
+                    className={cn(
+                      "p-3 rounded-xl border transition-all duration-500",
+                      interview.status === 'now' 
+                        ? "bg-green-500/20 border-green-500/30" 
+                        : "bg-white/5 border-white/10"
+                    )}
+                    style={{ 
+                      transitionDelay: `${i * 100 + 300}ms`,
+                      opacity: showInterview ? 1 : 0
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-white/50" />
+                        <span className="text-white font-medium text-sm">{interview.time}</span>
+                      </div>
+                      {interview.status === 'now' && (
+                        <span className="px-2 py-0.5 rounded-full bg-green-500 text-white text-xs font-medium animate-pulse">
+                          En cours
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 text-white/70 text-sm">{interview.name}</div>
+                    <div className="text-white/40 text-xs">{interview.type}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* AI suggested questions */}
+              <div 
+                className={cn(
+                  "mt-4 p-3 rounded-xl bg-purple-500/20 border border-purple-500/30 transition-all duration-700",
+                  showInterview && progress > 38 ? "opacity-100" : "opacity-0"
+                )}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  <span className="text-purple-300 text-xs font-medium">Questions suggérées</span>
                 </div>
+                <p className="text-white/60 text-xs leading-relaxed">
+                  "Parlez-moi d'un projet complexe que vous avez mené..."
+                </p>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Bottom row - Email & Job Post */}
+          <div className="h-44 flex gap-4">
+            {/* Automated Emails */}
+            <div 
+              className={cn(
+                "flex-1 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+                showEmail ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              )}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-blue-400" />
+                  <span className="text-white font-semibold">Emails automatisés</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-xs">
+                  12 envoyés aujourd'hui
+                </span>
+              </div>
+
+              <div className="flex gap-3">
+                {[
+                  { type: 'Confirmation', icon: CheckCircle, color: 'text-green-400' },
+                  { type: 'Rappel', icon: Clock, color: 'text-amber-400' },
+                  { type: 'Feedback', icon: MessageSquare, color: 'text-purple-400' },
+                ].map((email, i) => (
+                  <div 
+                    key={email.type}
+                    className="flex-1 p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-500"
+                    style={{ 
+                      transitionDelay: `${i * 100 + 400}ms`,
+                      opacity: showEmail ? 1 : 0
+                    }}
+                  >
+                    <email.icon className={cn("w-5 h-5 mb-2", email.color)} />
+                    <div className="text-white text-sm font-medium">{email.type}</div>
+                    <div className="text-white/40 text-xs">Auto-généré</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Job Post Generator */}
+            <div 
+              className={cn(
+                "w-80 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+                showJobPost ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+              )}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Briefcase className="w-5 h-5 text-agent-hr" />
+                <span className="text-white font-semibold">Génération d'offres</span>
+              </div>
+
+              <div 
+                className={cn(
+                  "p-3 rounded-xl bg-agent-hr/20 border border-agent-hr/30 transition-all duration-700",
+                  showJobPost && progress > 68 ? "opacity-100" : "opacity-0"
+                )}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-agent-hr animate-pulse" />
+                  <span className="text-agent-hr text-xs font-medium">Offre générée par IA</span>
+                </div>
+                <p className="text-white/70 text-xs leading-relaxed line-clamp-3">
+                  "Nous recherchons un(e) UX Designer passionné(e) pour rejoindre notre équipe produit. Vous travaillerez sur des projets innovants..."
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right panel - Analytics */}
+        <div 
+          className={cn(
+            "w-64 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4 transition-all duration-700",
+            showAnalytics ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+          )}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart3 className="w-5 h-5 text-green-400" />
+            <span className="text-white font-semibold">Analytics</span>
+          </div>
+
+          {/* Chart visualization */}
+          <div className="h-32 flex items-end gap-2 mb-4">
+            {[65, 78, 45, 89, 72, 95, 82].map((value, i) => (
+              <div 
+                key={i}
+                className="flex-1 bg-gradient-to-t from-agent-hr to-agent-hr/30 rounded-t transition-all duration-700"
+                style={{ 
+                  height: `${value}%`,
+                  transitionDelay: `${i * 80 + 500}ms`,
+                  opacity: showAnalytics ? 1 : 0.3
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { label: 'CV analysés', value: '1,234', trend: '+15%' },
+              { label: 'Temps gagné', value: '89h', trend: '+23%' },
+              { label: 'Satisfaction', value: '4.8/5', trend: '+0.3' },
+            ].map((stat, i) => (
+              <div 
+                key={stat.label}
+                className="flex items-center justify-between transition-all duration-500"
+                style={{ 
+                  transitionDelay: `${i * 100 + 700}ms`,
+                  opacity: showAnalytics ? 1 : 0
+                }}
+              >
+                <span className="text-white/60 text-sm">{stat.label}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-white font-bold">{stat.value}</span>
+                  <span className="text-green-400 text-xs">{stat.trend}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Tooltip for score */}
-      {phase >= 11 && (
-        <div 
-          className="absolute top-1/2 right-8 -translate-y-1/2 bg-card border border-border rounded-lg px-3 py-2 shadow-xl animate-tooltip-appear"
-        >
-          <div className="flex items-center gap-1.5 text-green-600">
-            <CheckCircle className="w-4 h-4" />
-            <span className="font-medium text-xs">CV analysé en 3 secondes</span>
-          </div>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
-            Score: 95% • Expérience: 5 ans
-          </p>
+      {/* Highlight glow effect */}
+      {showFinal && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-agent-hr/0 via-agent-hr/10 to-agent-hr/0 animate-pulse" />
         </div>
       )}
     </div>
