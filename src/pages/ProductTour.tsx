@@ -4,10 +4,10 @@ import { ProductTourVideoPlayer } from '@/components/tour/ProductTourVideoPlayer
 
 const ProductTour = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-[100svh] flex flex-col bg-background overflow-hidden">
       <ProductTourHeader />
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl aspect-video max-h-[85svh] rounded-xl overflow-hidden shadow-2xl border border-border">
+      <main className="flex-1 min-h-0 p-4">
+        <div className="h-full max-w-6xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-border">
           <ProductTourVideoPlayer />
         </div>
       </main>
