@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Pause, SkipForward, RotateCcw, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database } from 'lucide-react';
+import { X, Play, Pause, SkipForward, RotateCcw, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, ArrowRight, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts } from '@/data/tourNarration';
@@ -287,6 +287,28 @@ export function CinematicTourPlayer() {
               <Play className="w-8 h-8 text-white ml-1" />
             </button>
           )}
+        </div>
+
+        {/* CTA Buttons under video */}
+        <div className="flex flex-wrap justify-center gap-3 mt-4">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => navigate('/contact')}
+            className="px-6 py-5 text-sm rounded-xl border-primary/30 hover:bg-primary/5 hover:border-primary/50 group"
+          >
+            <Calendar className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
+            Demander une démo
+          </Button>
+          
+          <Button
+            size="lg"
+            onClick={() => navigate('/auth')}
+            className="px-6 py-5 text-sm rounded-xl bg-gradient-to-r from-primary to-violet-600 hover:from-primary/90 hover:to-violet-600/90 shadow-lg shadow-primary/25"
+          >
+            Commencer gratuitement
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
       </div>
 
