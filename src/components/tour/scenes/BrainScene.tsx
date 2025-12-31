@@ -108,8 +108,8 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
               showDocs ? "opacity-100" : "opacity-0"
             )}
           >
-            <div className="text-agent-brain font-bold text-lg">289</div>
-            <div className="text-agent-brain/70 text-xs">pages analysées par IA</div>
+            <div className="text-agent-brain font-bold text-lg">5 docs</div>
+            <div className="text-agent-brain/70 text-xs">indexés dans la base</div>
           </div>
         </div>
 
@@ -288,11 +288,11 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
           >
             <div className="grid grid-cols-2 gap-3 text-center">
               <div>
-                <div className="text-xl font-bold text-white">1.2k</div>
-                <div className="text-white/50 text-xs">Questions</div>
+                <div className="text-xl font-bold text-white">4</div>
+                <div className="text-white/50 text-xs">Outils IA</div>
               </div>
               <div>
-                <div className="text-xl font-bold text-agent-brain">98%</div>
+                <div className="text-xl font-bold text-agent-brain">RAG</div>
                 <div className="text-white/50 text-xs">Précision</div>
               </div>
             </div>

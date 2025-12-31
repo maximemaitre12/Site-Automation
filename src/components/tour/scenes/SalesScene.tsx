@@ -64,10 +64,10 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
               showDeals ? "opacity-100" : "opacity-0"
             )}
           >
-            <div className="text-3xl font-bold text-white mb-1">470K€</div>
+            <div className="text-2xl font-bold text-white mb-1">Pipeline actif</div>
             <div className="flex items-center gap-2 text-agent-sales text-sm">
               <ArrowUpRight className="w-4 h-4" />
-              <span>+23% ce mois</span>
+              <span>4 deals en cours</span>
             </div>
           </div>
 
