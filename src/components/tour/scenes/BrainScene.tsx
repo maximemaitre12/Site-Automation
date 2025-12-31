@@ -54,13 +54,13 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
       style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
     >
       {/* Subtle background */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <div className={cn(
-          "absolute top-1/4 left-1/4 w-[35%] aspect-square rounded-full bg-cyan-500/8 blur-[100px] transition-opacity duration-1000",
+          "absolute top-1/4 left-1/4 w-[30%] aspect-square rounded-full bg-cyan-500/6 blur-[60px] transition-opacity duration-1000",
           timeline.isActive('interface') ? "opacity-100" : "opacity-0"
         )} />
         <div className={cn(
-          "absolute bottom-1/4 right-1/4 w-[30%] aspect-square rounded-full bg-violet-500/6 blur-[100px] transition-opacity duration-1000",
+          "absolute bottom-1/4 right-1/4 w-[25%] aspect-square rounded-full bg-violet-500/5 blur-[50px] transition-opacity duration-1000",
           timeline.isActive('response') ? "opacity-100" : "opacity-0"
         )} />
       </div>
