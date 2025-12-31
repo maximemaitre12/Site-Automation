@@ -1,71 +1,60 @@
 import { Link } from "react-router-dom";
-import { Play, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database } from "lucide-react";
+import { Play, Sparkles } from "lucide-react";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
-
-const agents = [
-  { icon: Users, color: 'from-violet-500 to-purple-600' },
-  { icon: TrendingUp, color: 'from-emerald-500 to-teal-600' },
-  { icon: Headphones, color: 'from-amber-500 to-orange-600' },
-  { icon: Brain, color: 'from-cyan-500 to-blue-600' },
-  { icon: Shield, color: 'from-red-500 to-rose-600' },
-  { icon: GitBranch, color: 'from-indigo-500 to-violet-600' },
-  { icon: Database, color: 'from-orange-500 to-amber-600' },
-];
 
 export function DemoSection() {
   return (
-    <section className="py-10 lg:py-12 bg-secondary/30">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        {/* Compact layout: title left, preview right on desktop */}
-        <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10">
-          {/* Text content */}
-          <div className="text-center lg:text-left lg:flex-1">
-            <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">
-              See It in Action
-            </h2>
-            <p className="text-muted-foreground text-sm max-w-md mx-auto lg:mx-0">
-              Take a 3-minute guided tour of all 7 AI agents.
-            </p>
-          </div>
-          
-          {/* Preview card - compact */}
-          <Link to="/product-tour" className="block w-full lg:w-auto">
-            <div className="relative group cursor-pointer">
-              {/* Card */}
-              <div className="relative rounded-xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 flex flex-col items-center min-w-[280px]">
-                {/* Logo */}
+    <section className="py-16 lg:py-24 bg-secondary/30">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Interactive Demo</span>
+        </div>
+        
+        {/* Title */}
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground mb-3">
+          See the Platform in Action
+        </h2>
+        <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto mb-10">
+          Take a guided tour of all 7 AI agents and discover how they work together to automate your business.
+        </p>
+        
+        {/* Preview card - mimics the intro scene */}
+        <Link to="/product-tour" className="block">
+          <div className="relative group cursor-pointer max-w-2xl mx-auto">
+            {/* Glow effect on hover */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-violet-500/20 to-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            {/* Card - white background like IntroScene */}
+            <div className="relative rounded-2xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 aspect-video flex items-center justify-center">
+              {/* Logo centered like in IntroScene */}
+              <div className="relative flex flex-col items-center">
                 <img 
                   src={aetherLogo} 
                   alt="AETHER" 
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-3 group-hover:scale-105 transition-transform duration-300"
+                  className="w-24 h-24 sm:w-32 sm:h-32 object-contain mb-4 group-hover:scale-105 transition-transform duration-300"
                 />
                 
-                {/* Agent icons row */}
-                <div className="flex items-center gap-1.5 mb-4">
-                  {agents.map((agent, index) => {
-                    const Icon = agent.icon;
-                    return (
-                      <div
-                        key={index}
-                        className={`w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br ${agent.color} shadow-sm`}
-                      >
-                        <Icon className="w-3 h-3 text-white" />
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                {/* Play button */}
-                <div className="flex items-center gap-2 text-primary group-hover:text-primary/80 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                    <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                    <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
                   </div>
-                  <span className="text-sm font-medium">Watch Demo</span>
+                </div>
+              </div>
+              
+              {/* Bottom overlay with CTA */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+                <div className="flex items-center justify-center gap-2 text-white">
+                  <Play className="w-4 h-4" />
+                  <span className="text-sm font-medium">Start Interactive Tour</span>
+                  <span className="text-xs text-white/70">• 3 min</span>
                 </div>
               </div>
             </div>
-          </Link>
-        </div>
+          </div>
+        </Link>
       </div>
     </section>
   );
