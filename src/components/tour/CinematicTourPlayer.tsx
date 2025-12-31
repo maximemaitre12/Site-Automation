@@ -225,6 +225,7 @@ export function CinematicTourPlayer() {
             </div>
           </div>
         </div>
+        </div>
       </div>
     </div>
   );
