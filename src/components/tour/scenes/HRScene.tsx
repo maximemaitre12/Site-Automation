@@ -52,7 +52,7 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
       className="absolute inset-0 overflow-hidden bg-white"
       style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
     >
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div 
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -61,8 +61,8 @@ export function HRScene({ isActive, progress }: HRSceneProps) {
           }}
         />
         <div className={cn(
-          "absolute top-1/4 -left-[10%] w-[40%] aspect-square rounded-full blur-[100px] transition-all duration-1000",
-          timeline.isActive('header') ? "bg-violet-500/10 opacity-100" : "opacity-0"
+          "absolute top-1/4 left-0 w-[35%] aspect-square rounded-full blur-[60px] transition-all duration-1000",
+          timeline.isActive('header') ? "bg-violet-500/8 opacity-100" : "opacity-0"
         )} />
       </div>
 

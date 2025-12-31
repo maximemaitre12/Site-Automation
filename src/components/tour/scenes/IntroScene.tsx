@@ -35,89 +35,89 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
   }, [isActive, progress]);
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center px-4 sm:px-8 overflow-hidden">
-      {/* Central content */}
-      <div className="relative z-10 flex flex-col items-center w-full max-w-4xl">
+    <div className="relative w-full h-full flex flex-col items-center justify-center px-4 overflow-hidden">
+      {/* Central content - constrained */}
+      <div className="relative z-10 flex flex-col items-center w-full max-w-3xl max-h-full overflow-hidden">
         
-        {/* Logo - clean, no frame */}
+        {/* Logo - reduced size */}
         <div 
           className={cn(
-            "relative mb-6 sm:mb-8 transition-all duration-1000",
+            "relative mb-4 sm:mb-6 transition-all duration-1000 shrink-0",
             phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-50"
           )}
         >
-          {/* Subtle glow effect */}
+          {/* Subtle glow effect - reduced */}
           <div 
-            className="absolute inset-0 rounded-2xl sm:rounded-3xl blur-2xl sm:blur-3xl bg-primary/20"
-            style={{ transform: 'scale(1.3)' }}
+            className="absolute inset-0 rounded-xl sm:rounded-2xl blur-xl sm:blur-2xl bg-primary/15"
+            style={{ transform: 'scale(1.2)' }}
           />
           
-          {/* Logo image - clean, no border frame */}
+          {/* Logo image - smaller */}
           <img 
             src={aetherLogo} 
             alt="AETHER" 
-            className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-cover rounded-2xl sm:rounded-3xl"
+            className="relative w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl sm:rounded-2xl"
             style={{
-              filter: 'drop-shadow(0 0 30px hsl(var(--primary) / 0.3))',
+              filter: 'drop-shadow(0 0 20px hsl(var(--primary) / 0.25))',
             }}
           />
         </div>
 
-        {/* Title and tagline - responsive */}
+        {/* Title and tagline - reduced */}
         <div 
           className={cn(
-            "text-center mb-8 sm:mb-12 transition-all duration-700 w-full",
-            phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            "text-center mb-4 sm:mb-6 transition-all duration-700 w-full shrink-0",
+            phase >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           )}
         >
           <h1 
-            className="font-bold mb-3 sm:mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent"
-            style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)' }}
+            className="font-bold mb-2 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent"
+            style={{ fontSize: 'clamp(1.8rem, 5vw, 3rem)' }}
           >
             AETHER
           </h1>
           <p 
-            className="text-muted-foreground max-w-2xl mx-auto px-2"
-            style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' }}
+            className="text-muted-foreground max-w-xl mx-auto px-2"
+            style={{ fontSize: 'clamp(0.75rem, 2vw, 1.1rem)' }}
           >
             The revolutionary AI platform that transforms 
             <span className="text-primary font-medium"> how businesses operate</span>
           </p>
         </div>
 
-        {/* Agents preview - responsive */}
+        {/* Agents preview - compact */}
         <div 
           className={cn(
-            "w-full transition-all duration-700",
-            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            "w-full transition-all duration-700 shrink-0",
+            phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           )}
         >
           <p 
-            className="text-center text-muted-foreground mb-4 sm:mb-6"
-            style={{ fontSize: 'clamp(0.75rem, 2vw, 1rem)' }}
+            className="text-center text-muted-foreground mb-3"
+            style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.85rem)' }}
           >
             7 specialized AI agents
           </p>
           
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 px-2">
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 px-2">
             {agents.map((agent, index) => {
               const Icon = agent.icon;
               return (
                 <div
                   key={agent.label}
                   className={cn(
-                    "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-background/50 border border-border/50 backdrop-blur-sm transition-all duration-500",
+                    "flex items-center gap-1 px-2 py-1 rounded-full bg-background/50 border border-border/50 backdrop-blur-sm transition-all duration-500",
                     phase >= 4 && "hover:scale-105"
                   )}
                   style={{ 
                     animationDelay: `${index * 100}ms`,
                     opacity: phase >= 3 ? 1 : 0,
-                    transform: phase >= 3 ? 'translateY(0)' : 'translateY(10px)',
-                    transitionDelay: `${index * 80}ms`
+                    transform: phase >= 3 ? 'translateY(0)' : 'translateY(8px)',
+                    transitionDelay: `${index * 60}ms`
                   }}
                 >
-                  <Icon className={cn("w-4 h-4 sm:w-5 sm:h-5", agent.color)} />
-                  <span className="text-xs sm:text-sm font-medium">{agent.label}</span>
+                  <Icon className={cn("w-3.5 h-3.5", agent.color)} />
+                  <span className="text-xs font-medium">{agent.label}</span>
                 </div>
               );
             })}
@@ -125,17 +125,17 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
         </div>
       </div>
 
-      {/* Subtle background gradient */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Subtle background gradient - reduced blur */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div 
           className={cn(
-            "absolute top-1/4 left-1/4 w-1/2 aspect-square rounded-full bg-primary/5 blur-[100px] transition-opacity duration-1000",
+            "absolute top-1/4 left-1/4 w-1/2 aspect-square rounded-full bg-primary/5 blur-[50px] transition-opacity duration-1000",
             phase >= 1 ? "opacity-100" : "opacity-0"
           )}
         />
         <div 
           className={cn(
-            "absolute bottom-1/4 right-1/4 w-1/3 aspect-square rounded-full bg-primary/3 blur-[80px] transition-opacity duration-1000",
+            "absolute bottom-1/4 right-1/4 w-1/3 aspect-square rounded-full bg-primary/3 blur-[40px] transition-opacity duration-1000",
             phase >= 2 ? "opacity-100" : "opacity-0"
           )}
         />

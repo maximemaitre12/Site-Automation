@@ -44,10 +44,10 @@ export function SupportScene({ isActive, progress }: SupportSceneProps) {
       style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
     >
       {/* Background */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <div className={cn(
-          "absolute top-1/4 -left-[10%] w-[40%] aspect-square rounded-full blur-[100px] transition-all duration-1000",
-          timeline.isActive('header') ? "bg-amber-500/10 opacity-100" : "opacity-0"
+          "absolute top-1/4 left-0 w-[35%] aspect-square rounded-full blur-[60px] transition-all duration-1000",
+          timeline.isActive('header') ? "bg-amber-500/8 opacity-100" : "opacity-0"
         )} />
       </div>
 
