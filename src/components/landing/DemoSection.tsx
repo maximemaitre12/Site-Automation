@@ -1,15 +1,6 @@
 import { Link } from "react-router-dom";
-import { Play, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database } from "lucide-react";
-
-const agents = [
-  { icon: Users, color: "from-violet-500 to-purple-600", name: "HR" },
-  { icon: TrendingUp, color: "from-emerald-500 to-teal-600", name: "Sales" },
-  { icon: Headphones, color: "from-amber-500 to-orange-600", name: "Support" },
-  { icon: Brain, color: "from-cyan-500 to-blue-600", name: "Brain" },
-  { icon: Shield, color: "from-red-500 to-rose-600", name: "Compliance" },
-  { icon: GitBranch, color: "from-indigo-500 to-violet-600", name: "Flow" },
-  { icon: Database, color: "from-orange-500 to-amber-600", name: "Data" },
-];
+import { Play, Sparkles } from "lucide-react";
+import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 export function DemoSection() {
   return (
@@ -17,7 +8,7 @@ export function DemoSection() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
-          <Play className="w-3.5 h-3.5" />
+          <Sparkles className="w-3.5 h-3.5" />
           <span>Interactive Demo</span>
         </div>
         
@@ -29,39 +20,38 @@ export function DemoSection() {
           Take a guided tour of all 7 AI agents and discover how they work together to automate your business.
         </p>
         
-        {/* Preview card */}
+        {/* Preview card - mimics the intro scene */}
         <Link to="/product-tour" className="block">
-          <div className="relative group cursor-pointer max-w-3xl mx-auto">
-            {/* Glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-violet-500/20 to-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative group cursor-pointer max-w-2xl mx-auto">
+            {/* Glow effect on hover */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-violet-500/20 to-primary/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            {/* Card */}
-            <div className="relative rounded-2xl border border-border bg-card p-8 sm:p-10 shadow-xl hover:shadow-2xl hover:border-primary/30 transition-all duration-300">
-              {/* Agent icons */}
-              <div className="flex justify-center gap-2 sm:gap-3 mb-8">
-                {agents.map((agent) => (
-                  <div
-                    key={agent.name}
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${agent.color} shadow-lg group-hover:scale-105 transition-transform duration-300`}
-                    title={agent.name}
-                  >
-                    <agent.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            {/* Card - white background like IntroScene */}
+            <div className="relative rounded-2xl border border-border bg-white dark:bg-slate-900 overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 aspect-video flex items-center justify-center">
+              {/* Logo centered like in IntroScene */}
+              <div className="relative flex flex-col items-center">
+                <img 
+                  src={aetherLogo} 
+                  alt="AETHER" 
+                  className="w-24 h-24 sm:w-32 sm:h-32 object-contain mb-4 group-hover:scale-105 transition-transform duration-300"
+                />
+                
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                    <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
                   </div>
-                ))}
+                </div>
               </div>
               
-              {/* Play button */}
-              <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full bg-primary flex items-center justify-center shadow-xl shadow-primary/30 group-hover:scale-110 transition-transform duration-300">
-                <Play className="w-10 h-10 sm:w-12 sm:h-12 text-primary-foreground ml-1" />
+              {/* Bottom overlay with CTA */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+                <div className="flex items-center justify-center gap-2 text-white">
+                  <Play className="w-4 h-4" />
+                  <span className="text-sm font-medium">Start Interactive Tour</span>
+                  <span className="text-xs text-white/70">• 3 min</span>
+                </div>
               </div>
-              
-              {/* Text */}
-              <p className="mt-6 text-base sm:text-lg font-semibold text-foreground">
-                Start Interactive Tour
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                3 minutes • No signup required
-              </p>
             </div>
           </div>
         </Link>
