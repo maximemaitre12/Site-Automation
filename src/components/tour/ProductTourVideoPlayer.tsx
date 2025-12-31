@@ -1,30 +1,38 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Play, Pause, RotateCcw, Users, TrendingUp, Zap, Brain, Shield, Workflow, Database, Calendar } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { tourScripts } from '@/data/tourNarration';
+import { tourScripts, getTotalDuration } from '@/data/tourNarration';
 
-// Agent icons mapping
-const agentIcons: Record<string, React.ElementType> = {
+// Import all scenes
+import { IntroScene } from './scenes/IntroScene';
+import { HRScene } from './scenes/HRScene';
+import { SalesScene } from './scenes/SalesScene';
+import { SupportScene } from './scenes/SupportScene';
+import { BrainScene } from './scenes/BrainScene';
+import { ComplianceScene } from './scenes/ComplianceScene';
+import { FlowScene } from './scenes/FlowScene';
+import { DataScene } from './scenes/DataScene';
+import { ConclusionScene } from './scenes/ConclusionScene';
+
+const agentIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   hr: Users,
   sales: TrendingUp,
-  support: Zap,
+  support: Headphones,
   brain: Brain,
   compliance: Shield,
-  flow: Workflow,
+  flow: GitBranch,
   data: Database,
 };
 
-// Agent colors
 const agentColors: Record<string, string> = {
   hr: 'from-violet-500 to-purple-600',
   sales: 'from-emerald-500 to-teal-600',
   support: 'from-amber-500 to-orange-600',
   brain: 'from-cyan-500 to-blue-600',
-  compliance: 'from-rose-500 to-red-600',
+  compliance: 'from-red-500 to-rose-600',
   flow: 'from-indigo-500 to-violet-600',
-  data: 'from-sky-500 to-cyan-600',
+  data: 'from-orange-500 to-amber-600',
 };
 
 interface Segment {
@@ -34,303 +42,288 @@ interface Segment {
   agentType?: string;
   startTime: number;
   endTime: number;
+  duration: number;
 }
 
-export const ProductTourVideoPlayer = () => {
-  const navigate = useNavigate();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const progressBarRef = useRef<HTMLDivElement>(null);
-
-  const [isReady, setIsReady] = useState(false);
+export function ProductTourVideoPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isEnded, setIsEnded] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isScrubbing, setIsScrubbing] = useState(false);
-  const [videoError, setVideoError] = useState(false);
+  const [isEnded, setIsEnded] = useState(false);
+  const animationRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Build segments from tourScripts with timing
+  const totalDuration = useMemo(() => getTotalDuration(), []);
+
+  // Build segments with start/end times
   const segments: Segment[] = useMemo(() => {
-    const totalScriptDuration = tourScripts.reduce((sum, s) => sum + s.duration, 0) / 1000;
-    let cumulative = 0;
-    
-    return tourScripts.map(script => {
-      const scriptDurationSec = script.duration / 1000;
-      const scale = duration > 0 ? duration / totalScriptDuration : 1;
-      
+    let accumulated = 0;
+    return tourScripts.map((script) => {
       const segment: Segment = {
         id: script.id,
         title: script.title,
         text: script.text,
         agentType: script.agentType,
-        startTime: cumulative * scale,
-        endTime: (cumulative + scriptDurationSec) * scale,
+        startTime: accumulated,
+        endTime: accumulated + script.duration,
+        duration: script.duration,
       };
-      
-      cumulative += scriptDurationSec;
+      accumulated += script.duration;
       return segment;
     });
-  }, [duration]);
+  }, []);
 
-  // Find current segment based on currentTime
+  // Find current segment based on time
   const currentSegment = useMemo(() => {
-    if (segments.length === 0) return null;
-    for (let i = segments.length - 1; i >= 0; i--) {
-      if (currentTime >= segments[i].startTime) {
-        return segments[i];
-      }
-    }
-    return segments[0];
+    return segments.find(
+      (seg) => currentTime >= seg.startTime && currentTime < seg.endTime
+    ) || segments[segments.length - 1];
   }, [segments, currentTime]);
 
-  // Video event handlers
-  const handleLoadedMetadata = useCallback(() => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-      setIsReady(true);
+  // Calculate progress within current segment (0-100)
+  const segmentProgress = useMemo(() => {
+    if (!currentSegment) return 0;
+    const elapsed = currentTime - currentSegment.startTime;
+    return Math.min(100, (elapsed / currentSegment.duration) * 100);
+  }, [currentSegment, currentTime]);
+
+  // Animation loop
+  const animate = useCallback((timestamp: number) => {
+    if (!lastTimeRef.current) {
+      lastTimeRef.current = timestamp;
     }
-  }, []);
-
-  const handleTimeUpdate = useCallback(() => {
-    if (videoRef.current && !isScrubbing) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
-  }, [isScrubbing]);
-
-  const handleEnded = useCallback(() => {
-    setIsPlaying(false);
-    setIsEnded(true);
-  }, []);
-
-  const handleError = useCallback(() => {
-    setVideoError(true);
-  }, []);
-
-  // Play/Pause controls
-  const togglePlay = useCallback(() => {
-    if (!videoRef.current) return;
     
+    const delta = timestamp - lastTimeRef.current;
+    lastTimeRef.current = timestamp;
+
+    setCurrentTime((prev) => {
+      const next = prev + delta;
+      if (next >= totalDuration) {
+        setIsPlaying(false);
+        setIsEnded(true);
+        return totalDuration;
+      }
+      return next;
+    });
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, [totalDuration]);
+
+  // Start/stop animation
+  useEffect(() => {
+    if (isPlaying) {
+      lastTimeRef.current = 0;
+      animationRef.current = requestAnimationFrame(animate);
+    } else {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPlaying, animate]);
+
+  const togglePlay = () => {
     if (isEnded) {
-      videoRef.current.currentTime = 0;
+      setCurrentTime(0);
       setIsEnded(false);
     }
-    
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  }, [isPlaying, isEnded]);
+    setIsPlaying(!isPlaying);
+  };
 
-  const handleReplay = useCallback(() => {
-    if (!videoRef.current) return;
-    videoRef.current.currentTime = 0;
-    videoRef.current.play();
-    setIsPlaying(true);
+  const handleReplay = () => {
+    setCurrentTime(0);
     setIsEnded(false);
-  }, []);
+    setIsPlaying(true);
+  };
 
   // Progress bar seeking
   const calculateTimeFromPosition = useCallback((clientX: number): number => {
-    if (!progressBarRef.current || duration === 0) return 0;
+    if (!progressBarRef.current) return 0;
     const rect = progressBarRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    return (x / rect.width) * duration;
-  }, [duration]);
+    const percent = x / rect.width;
+    return percent * totalDuration;
+  }, [totalDuration]);
 
   const seekTo = useCallback((time: number) => {
-    if (!videoRef.current) return;
-    const clampedTime = Math.max(0, Math.min(time, duration));
-    videoRef.current.currentTime = clampedTime;
+    const clampedTime = Math.max(0, Math.min(time, totalDuration));
     setCurrentTime(clampedTime);
-    if (isEnded) setIsEnded(false);
-  }, [duration, isEnded]);
+    setIsEnded(clampedTime >= totalDuration);
+  }, [totalDuration]);
 
-  const handleProgressClick = useCallback((e: React.MouseEvent) => {
-    const time = calculateTimeFromPosition(e.clientX);
-    seekTo(time);
-  }, [calculateTimeFromPosition, seekTo]);
-
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    setIsScrubbing(true);
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    const time = calculateTimeFromPosition(e.clientX);
-    seekTo(time);
-  }, [calculateTimeFromPosition, seekTo]);
-
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isScrubbing) return;
-    const time = calculateTimeFromPosition(e.clientX);
-    seekTo(time);
-  }, [isScrubbing, calculateTimeFromPosition, seekTo]);
-
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    if (isScrubbing) {
-      setIsScrubbing(false);
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    }
-  }, [isScrubbing]);
-
-  // Format time display
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    seekTo(calculateTimeFromPosition(e.clientX));
   };
 
-  // Progress percentage
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    seekTo(calculateTimeFromPosition(e.clientX));
+  };
 
-  // Get agent icon component
-  const AgentIcon = currentSegment?.agentType ? agentIcons[currentSegment.agentType] : Calendar;
-  const agentGradient = currentSegment?.agentType ? agentColors[currentSegment.agentType] : 'from-primary to-primary/80';
+  const handlePointerUp = () => {
+    setIsDragging(false);
+  };
+
+  const formatTime = (ms: number): string => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const overallProgress = (currentTime / totalDuration) * 100;
+
+  const AgentIcon = currentSegment?.agentType ? agentIcons[currentSegment.agentType] : Sparkles;
+  const agentColor = currentSegment?.agentType ? agentColors[currentSegment.agentType] : 'from-primary to-violet-600';
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4">
-      {/* Video container with 16:9 aspect ratio */}
-      <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
-        {videoError ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted text-muted-foreground p-8 text-center">
-            <p className="text-lg font-medium mb-2">Vidéo introuvable</p>
-            <p className="text-sm opacity-70">
-              Ajoutez le fichier vidéo dans <code className="bg-background/50 px-2 py-1 rounded">/public/videos/product-tour.mp4</code>
-            </p>
+    <div className="relative w-full h-full flex flex-col bg-background">
+      {/* Scene Container */}
+      <div className="flex-1 relative overflow-hidden rounded-t-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        {/* Render all scenes, only the active one is visible */}
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'intro' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <IntroScene isActive={currentSegment?.id === 'intro'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'hr' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <HRScene isActive={currentSegment?.id === 'hr'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'sales' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <SalesScene isActive={currentSegment?.id === 'sales'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'support' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <SupportScene isActive={currentSegment?.id === 'support'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'brain' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <BrainScene isActive={currentSegment?.id === 'brain'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'compliance' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <ComplianceScene isActive={currentSegment?.id === 'compliance'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'flow' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <FlowScene isActive={currentSegment?.id === 'flow'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'data' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <DataScene isActive={currentSegment?.id === 'data'} progress={segmentProgress} />
+        </div>
+        <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'conclusion' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
+          <ConclusionScene isActive={currentSegment?.id === 'conclusion'} progress={segmentProgress} onRestart={handleReplay} />
+        </div>
+
+        {/* Play/Pause overlay (click anywhere) */}
+        <button
+          onClick={togglePlay}
+          className="absolute inset-0 z-20 focus:outline-none group cursor-pointer"
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+        >
+          <div className={cn(
+            "absolute inset-0 flex items-center justify-center transition-opacity duration-300",
+            isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+          )}>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+              {isPlaying ? (
+                <Pause className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              ) : (
+                <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
+              )}
+            </div>
           </div>
-        ) : (
-          <>
-            <video
-              ref={videoRef}
-              className="w-full h-full object-contain"
-              src="/videos/product-tour.mp4"
-              poster="/videos/product-tour-poster.jpg"
-              onLoadedMetadata={handleLoadedMetadata}
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={handleEnded}
-              onError={handleError}
-              playsInline
-            />
-
-            {/* Play/Pause overlay */}
-            {!isPlaying && isReady && (
-              <button
-                onClick={togglePlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
-              >
-                <div className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                  {isEnded ? (
-                    <RotateCcw className="w-8 h-8 text-foreground ml-0" />
-                  ) : (
-                    <Play className="w-8 h-8 text-foreground ml-1" />
-                  )}
-                </div>
-              </button>
-            )}
-
-            {/* Loading state */}
-            {!isReady && !videoError && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-              </div>
-            )}
-          </>
-        )}
+        </button>
       </div>
 
-      {/* Progress bar */}
-      <div className="mt-4 px-1">
+      {/* Controls Container */}
+      <div className="bg-card border-t border-border p-4 space-y-3">
+        {/* Progress Bar */}
         <div
           ref={progressBarRef}
-          className="relative h-2 bg-muted rounded-full cursor-pointer group"
-          onClick={handleProgressClick}
+          className="relative h-2 bg-muted rounded-full cursor-pointer touch-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
         >
           {/* Segment markers */}
-          {segments.map((segment, index) => {
-            if (index === 0) return null;
-            const position = (segment.startTime / duration) * 100;
-            return (
-              <div
-                key={segment.id}
-                className="absolute top-0 w-0.5 h-full bg-foreground/20 z-10"
-                style={{ left: `${position}%` }}
-              />
-            );
-          })}
-
+          {segments.slice(1).map((segment) => (
+            <div
+              key={segment.id}
+              className="absolute top-0 bottom-0 w-0.5 bg-border z-10"
+              style={{ left: `${(segment.startTime / totalDuration) * 100}%` }}
+            />
+          ))}
+          
           {/* Progress fill */}
           <div
             className="absolute top-0 left-0 h-full bg-primary rounded-full transition-none"
-            style={{ width: `${progress}%` }}
+            style={{ width: `${overallProgress}%` }}
           />
-
-          {/* Handle */}
+          
+          {/* Drag handle */}
           <div
-            className={cn(
-              "absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-md transition-transform",
-              "group-hover:scale-125",
-              isScrubbing && "scale-125"
-            )}
-            style={{ left: `calc(${progress}% - 8px)` }}
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-lg border-2 border-background transition-transform hover:scale-110"
+            style={{ left: `calc(${overallProgress}% - 8px)` }}
           />
         </div>
 
-        {/* Time display */}
-        <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-      </div>
+        {/* Time and Controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={togglePlay}
+              className="h-10 w-10"
+            >
+              {isPlaying ? (
+                <Pause className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5 ml-0.5" />
+              )}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReplay}
+              className="h-10 w-10"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
 
-      {/* Current segment info */}
-      {currentSegment && (
-        <div className="mt-6 p-4 bg-card rounded-xl border border-border/50 transition-all duration-300">
-          <div className="flex items-start gap-4">
-            {/* Agent icon */}
-            <div className={cn(
-              "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br",
-              agentGradient
-            )}>
-              <AgentIcon className="w-6 h-6 text-white" />
-            </div>
-
-            {/* Text content */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground text-lg mb-1">
-                {currentSegment.title}
-              </h3>
-              <p className="text-muted-foreground text-sm line-clamp-2">
-                {currentSegment.text}
-              </p>
-            </div>
+            <span className="text-sm text-muted-foreground font-mono">
+              {formatTime(currentTime)} / {formatTime(totalDuration)}
+            </span>
           </div>
-        </div>
-      )}
 
-      {/* CTA buttons */}
-      <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-        <Button
-          size="lg"
-          variant="default"
-          onClick={() => navigate('/contact')}
-          className="gap-2"
-        >
-          Demander une démo
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={() => navigate('/auth')}
-          className="gap-2"
-        >
-          Commencer gratuitement
-        </Button>
+          {/* Current segment info */}
+          {currentSegment && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50">
+              <div className={cn("w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br", agentColor)}>
+                {AgentIcon && <AgentIcon className="w-3.5 h-3.5 text-white" />}
+              </div>
+              <span className="text-sm font-medium text-foreground hidden sm:inline">
+                {currentSegment.title}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Narration Text */}
+        {currentSegment && (
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-sm text-foreground/80 leading-relaxed line-clamp-2 sm:line-clamp-3">
+              {currentSegment.text}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
