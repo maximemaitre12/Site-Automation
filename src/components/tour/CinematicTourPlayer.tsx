@@ -361,6 +361,18 @@ export function CinematicTourPlayer() {
           </div>
         </div>
 
+        {/* Agent description widget */}
+        {currentAgentIntro && (
+          <div className="flex items-center gap-2 px-4 py-2 mt-2 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10 backdrop-blur-sm max-w-xl">
+            <div className={cn("p-1.5 rounded-lg", currentAgentIntro.bgColor)}>
+              <currentAgentIntro.icon className={cn("w-4 h-4", currentAgentIntro.color)} />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {currentAgentIntro.description}
+            </p>
+          </div>
+        )}
+
         {/* CTA Buttons */}
         <div className="flex flex-wrap justify-center gap-2 mt-3 shrink-0">
           <Button
