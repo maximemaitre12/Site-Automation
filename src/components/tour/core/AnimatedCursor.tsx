@@ -12,6 +12,7 @@ interface AnimatedCursorProps {
   isVisible?: boolean;
   delay?: number;
   duration?: number;
+  mode?: 'viewport' | 'container';
   onArrival?: () => void;
   onClickComplete?: () => void;
 }
@@ -22,6 +23,7 @@ export function AnimatedCursor({
   isVisible = true,
   delay = 0,
   duration = 800,
+  mode = 'viewport',
   onArrival,
   onClickComplete,
 }: AnimatedCursorProps) {
@@ -85,7 +87,10 @@ export function AnimatedCursor({
 
   return (
     <div
-      className="pointer-events-none fixed z-[9999]"
+      className={cn(
+        "pointer-events-none",
+        mode === 'viewport' ? "fixed z-[9999]" : "absolute z-[60]"
+      )}
       style={{
         left: position.x,
         top: position.y,
