@@ -55,10 +55,10 @@ const plans = [
     name: 'Enterprise',
     price: 399,
     priceId: 'price_1SjDdiH0Zbdp95xi0qdIcMC6',
-    description: '6 agents of your choice',
+    description: '7 agents of your choice',
     icon: Crown,
     features: [
-      '6 AI agents of your choice',
+      '7 AI agents of your choice',
       'Choose from: Data, Flow, Doc, Sales, HR, Brain or Compliance',
       'Unlimited workflows',
       'Dedicated support',

@@ -15,7 +15,7 @@ const stats = [
 ];
 
 const features = [
-  '6 Specialized AI Agents',
+  '7 Specialized AI Agents',
   'Cross-Agent Intelligence',
   'No-Code Automation',
   'Enterprise Security',

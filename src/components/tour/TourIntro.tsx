@@ -99,7 +99,7 @@ export function TourIntro({ isActive }: TourIntroProps) {
             "mt-4 text-xl md:text-2xl text-muted-foreground transition-all duration-700 delay-300",
             phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
           )}>
-            6 AI Agents. One Platform. Infinite Possibilities.
+            7 AI Agents. One Platform. Infinite Possibilities.
           </p>
         </div>
 
