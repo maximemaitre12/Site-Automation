@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 import { TrendingUp, Phone, DollarSign, Target } from "lucide-react";
 
 const deals = [
-  { name: "Acme Corp", value: 450000, probability: 85, stage: "Negotiation" },
-  { name: "TechStart Inc", value: 280000, probability: 72, stage: "Proposal" },
-  { name: "BigData Ltd", value: 190000, probability: 61, stage: "Discovery" },
+  { name: "Global Tech Corp", value: 450000, probability: 85, stage: "Negotiation" },
+  { name: "Asia Pacific Ltd", value: 280000, probability: 72, stage: "Proposal" },
+  { name: "European Partners", value: 190000, probability: 61, stage: "Discovery" },
 ];
 
 interface AgentSalesDemoProps {

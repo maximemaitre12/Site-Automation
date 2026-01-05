@@ -2,24 +2,20 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { ArrowRight, Check, Zap, Brain, Mail, Sparkles, Building2, RefreshCw, Globe, Layers } from "lucide-react";
-import { 
-  SlackLogo, GmailLogo, FigmaLogo, NotionLogo, SalesforceLogo,
-  HubSpotLogo, ZapierLogo 
-} from "./BrandLogos";
 
 const sites = [
   { name: "Paris", flag: "🇫🇷", status: "active" },
-  { name: "Lille", flag: "🇫🇷", status: "active" },
-  { name: "Nantes", flag: "🇫🇷", status: "syncing" },
-  { name: "Barcelona", flag: "🇪🇸", status: "active" },
-  { name: "Bruxelles", flag: "🇧🇪", status: "active" },
+  { name: "Lyon", flag: "🇫🇷", status: "active" },
+  { name: "Shanghai", flag: "🇨🇳", status: "syncing" },
+  { name: "Beijing", flag: "🇨🇳", status: "active" },
+  { name: "Marseille", flag: "🇫🇷", status: "active" },
 ];
 
 const workflowSteps = [
-  { label: "Collecte", icon: Globe, description: "Multi-sites", color: "bg-primary" },
-  { label: "Harmonisation", icon: Layers, description: "Standards", color: "bg-primary" },
-  { label: "IA Process", icon: Brain, description: "Automatise", color: "bg-primary" },
-  { label: "Déploiement", icon: RefreshCw, description: "Tous sites", color: "bg-primary" },
+  { label: "Collect", icon: Globe, description: "Multi-site", color: "bg-primary" },
+  { label: "Harmonize", icon: Layers, description: "Standards", color: "bg-primary" },
+  { label: "AI Process", icon: Brain, description: "Automate", color: "bg-primary" },
+  { label: "Deploy", icon: RefreshCw, description: "All sites", color: "bg-primary" },
 ];
 
 interface AgentFlowDemoProps {
@@ -76,7 +72,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px flex-1 bg-border" />
             <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
-              Sources Multi-Sites
+              Multi-Site Sources
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
@@ -111,7 +107,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px flex-1 bg-border" />
             <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
-              Harmonisation des Processus
+              Process Harmonization
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
@@ -192,11 +188,11 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           <div className="flex items-center justify-center">
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
               <Check className="w-3 h-3" />
-              Processus standardisé
+              Process Standardized
             </div>
           </div>
           <div className="flex items-center justify-center gap-1">
-            <span className="text-[8px] text-muted-foreground">Déployé sur</span>
+            <span className="text-[8px] text-muted-foreground">Deployed to</span>
             {sites.map((site, i) => (
               <span 
                 key={site.name}

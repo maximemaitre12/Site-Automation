@@ -4,11 +4,11 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Check, Mail, Bot, Clock } from "lucide-react";
 
 const tickets = [
-  { id: "#1042", subject: "Can't login to my account", time: "2 min", priority: "high" },
+  { id: "#1042", subject: "Cannot login to my account", time: "2 min", priority: "high" },
   { id: "#1043", subject: "Need invoice for last month", time: "5 min", priority: "medium" },
 ];
 
-const aiTypingMessage = "I've analyzed your issue and found your account was locked due to failed login attempts. I've sent a password reset link to your email.";
+const aiTypingMessage = "I have analyzed your issue and found your account was locked due to failed login attempts. I have sent a password reset link to your email.";
 
 interface AgentSupportDemoProps {
   className?: string;
