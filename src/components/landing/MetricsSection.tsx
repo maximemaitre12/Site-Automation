@@ -32,7 +32,7 @@ export function MetricsSection() {
             <span className="text-gradient">Real benefits</span> for your business
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-2 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            AETHER replaces repetitive operations, standardizes processes, 
+            AETHER replaces repetitive operations, standardizes processes across your organization, 
             and creates AI agents that work for you, 24/7.
           </p>
         </div>

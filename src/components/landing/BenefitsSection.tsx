@@ -17,7 +17,7 @@ const benefits = [
     icon: Plug,
     title: "Intégration simple",
     description: "AETHER se connecte à votre écosystème existant en quelques minutes, sans développement complexe.",
-    highlights: ["CRM, ERP, emails", "APIs internes", "Stockage cloud", "Connecteurs prêts à l'emploi"],
+    highlights: ["CRM, ERP (SAP ready), emails", "Process standardization", "Scalable across locations", "Connecteurs prêts à l'emploi"],
   },
 ];
 
