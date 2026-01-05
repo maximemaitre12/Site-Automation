@@ -76,8 +76,8 @@ const tools: Tool[] = [
   },
   {
     name: "Brain",
-    tagline: "Contextual Intelligence",
-    description: "An AI that understands your company context and responds with precision.",
+    tagline: "Unified Knowledge",
+    description: "An AI that unifies all your company information across every site and team.",
     icon: Database,
     colorClass: "text-agent-brain",
     features: [
