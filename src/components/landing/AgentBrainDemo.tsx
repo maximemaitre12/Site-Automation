@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { ArrowRight, FileText, Search, Brain, MessageSquare, Sparkles } from "lucide-react";
+import { Building2, MapPin, Database, CheckCircle2, Layers, Globe, Search, Brain, Sparkles } from "lucide-react";
 
-const documents = [
-  { name: "Policy.pdf", type: "PDF", icon: "📄" },
-  { name: "Contract.docx", type: "DOC", icon: "📝" },
-  { name: "Data.xlsx", type: "XLS", icon: "📊" },
+const sites = [
+  { name: "Siège", location: "Paris", flag: "🇫🇷", docs: 1247, status: "synced" },
+  { name: "Tech Nord", location: "Lille", flag: "🇫🇷", docs: 456, status: "synced" },
+  { name: "Logistique", location: "Nantes", flag: "🇫🇷", docs: 389, status: "syncing" },
+  { name: "Distribution", location: "Barcelone", flag: "🇪🇸", docs: 278, status: "synced" },
+  { name: "Services", location: "Bruxelles", flag: "🇧🇪", docs: 198, status: "synced" },
 ];
 
-const searchQuery = "What's our refund policy for enterprise clients?";
-const aiResponse = "According to your Enterprise Agreement (Section 4.2), refunds are available within 30 days of purchase. Enterprise clients receive priority processing within 48 hours...";
+const searchQuery = "Procédure de maintenance site Lille?";
+const aiResponse = "Selon le Manuel Technique Nord (v3.2), la maintenance préventive suit le protocole MT-2024. Documentation unifiée depuis 6 sites...";
 
 interface AgentBrainDemoProps {
   className?: string;
@@ -22,12 +24,12 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
   const [typedResponse, setTypedResponse] = useState("");
   const [queryComplete, setQueryComplete] = useState(false);
   const [responseStarted, setResponseStarted] = useState(false);
+  const [syncedSites, setSyncedSites] = useState<number[]>([]);
 
-  // Start animation immediately on mount
   useEffect(() => {
     const phase1 = setTimeout(() => setPhase(1), 300);
-    const phase2 = setTimeout(() => setPhase(2), 1200);
-    const phase3 = setTimeout(() => setPhase(3), 2000);
+    const phase2 = setTimeout(() => setPhase(2), 1500);
+    const phase3 = setTimeout(() => setPhase(3), 2800);
 
     return () => {
       clearTimeout(phase1);
@@ -36,7 +38,18 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
     };
   }, []);
 
-  // Type the query only when phase becomes exactly 3
+  // Animate sites syncing
+  useEffect(() => {
+    if (phase >= 1) {
+      sites.forEach((_, i) => {
+        setTimeout(() => {
+          setSyncedSites(prev => [...prev, i]);
+        }, i * 200);
+      });
+    }
+  }, [phase]);
+
+  // Type the query
   useEffect(() => {
     if (phase !== 3 || queryComplete) return;
     let i = 0;
@@ -47,13 +60,13 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
       } else {
         clearInterval(interval);
         setQueryComplete(true);
-        setTimeout(() => setPhase(5), 800);
+        setTimeout(() => setPhase(5), 600);
       }
-    }, 40);
+    }, 35);
     return () => clearInterval(interval);
   }, [phase, queryComplete]);
 
-  // Type the response only when phase becomes exactly 5
+  // Type the response
   useEffect(() => {
     if (phase !== 5 || responseStarted) return;
     setResponseStarted(true);
@@ -65,9 +78,11 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
       } else {
         clearInterval(interval);
       }
-    }, 20);
+    }, 18);
     return () => clearInterval(interval);
-  }, [phase]);
+  }, [phase, responseStarted]);
+
+  const totalDocs = sites.reduce((sum, s) => sum + s.docs, 0);
 
   return (
     <div
@@ -77,59 +92,95 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
         className
       )}
     >
-      {/* Subtle background */}
-      <div className="absolute top-0 left-1/4 w-20 h-20 bg-muted/50 rounded-full blur-2xl" />
+      <div className="absolute top-0 left-1/4 w-20 h-20 bg-agent-brain/20 rounded-full blur-2xl" />
 
       <div className="relative z-10 space-y-3">
-        {/* Document Upload Section */}
-        <div>
+        {/* Multi-Site Hub Header */}
+        <div className={cn(
+          "flex items-center justify-between transition-all duration-500",
+          phase >= 1 ? "opacity-100" : "opacity-0"
+        )}>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center">
+              <Layers className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-foreground">Hub Unifié</p>
+              <p className="text-[8px] text-muted-foreground">{sites.length} sites • {totalDocs.toLocaleString()} docs</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 border border-success/20">
+            <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+            <span className="text-[9px] font-medium text-success">Synchronisé</span>
+          </div>
+        </div>
+
+        {/* Sites Grid - Multi-location visualization */}
+        <div className={cn(
+          "transition-all duration-500",
+          phase >= 1 ? "opacity-100" : "opacity-0"
+        )}>
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">
-              Knowledge Base
+            <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+              Sources de Connaissance
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {documents.map((doc, i) => (
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            {sites.map((site, i) => (
               <div
-                key={doc.name}
+                key={site.name}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 p-2 rounded-lg bg-secondary/50 border border-border transition-all duration-700 min-w-[50px]",
-                  phase >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8",
-                  phase >= 2 && "border-primary/30 bg-primary/5"
+                  "relative flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-secondary/50 border transition-all duration-500",
+                  syncedSites.includes(i) 
+                    ? "border-agent-brain/30 bg-agent-brain/5" 
+                    : "border-border opacity-50"
                 )}
-                style={{ transitionDelay: `${i * 150}ms` }}
+                style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <span className="text-base">{doc.icon}</span>
-                <span className="text-[9px] font-medium text-muted-foreground truncate max-w-[50px]">{doc.name}</span>
-                
-                {phase === 2 && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-ping" />
-                )}
-                {phase >= 3 && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full flex items-center justify-center">
-                    <span className="text-[6px] text-primary-foreground">✓</span>
-                  </div>
+                <span className="text-sm">{site.flag}</span>
+                <div>
+                  <p className="text-[9px] font-medium text-foreground">{site.name}</p>
+                  <p className="text-[7px] text-muted-foreground">{site.docs} docs</p>
+                </div>
+                {syncedSites.includes(i) && (
+                  <CheckCircle2 className="w-3 h-3 text-success absolute -top-1 -right-1" />
                 )}
               </div>
             ))}
-
-            {/* AI Brain processing */}
-            <div className={cn(
-              "flex items-center gap-1.5 transition-all duration-500",
-              phase >= 2 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"
-            )}>
-              <ArrowRight className="w-3 h-3 text-muted-foreground/50" />
-              <div className={cn(
-                "w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm",
-                phase === 2 && "animate-pulse"
-              )}>
-                <Brain className="w-4 h-4 text-primary-foreground" />
-              </div>
-            </div>
           </div>
+        </div>
+
+        {/* Central Hub Animation */}
+        <div className={cn(
+          "flex items-center justify-center gap-2 py-2 transition-all duration-700",
+          phase >= 2 ? "opacity-100" : "opacity-0"
+        )}>
+          <Globe className="w-4 h-4 text-muted-foreground" />
+          <div className="flex gap-0.5">
+            {[0,1,2].map(i => (
+              <div 
+                key={i}
+                className="w-1 h-1 rounded-full bg-agent-brain animate-pulse"
+                style={{ animationDelay: `${i * 200}ms` }}
+              />
+            ))}
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center shadow-lg shadow-agent-brain/20">
+            <Database className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex gap-0.5">
+            {[0,1,2].map(i => (
+              <div 
+                key={i}
+                className="w-1 h-1 rounded-full bg-agent-brain animate-pulse"
+                style={{ animationDelay: `${i * 200}ms` }}
+              />
+            ))}
+          </div>
+          <Brain className="w-4 h-4 text-muted-foreground" />
         </div>
 
         {/* Search Interface */}
@@ -142,46 +193,44 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
             <span className="flex-1 text-xs text-foreground">
               {typedQuery}
               {phase === 3 && !queryComplete && (
-                <span className="animate-blink">|</span>
+                <span className="animate-pulse">|</span>
               )}
             </span>
           </div>
         </div>
 
-        {/* AI Response */}
+        {/* AI Response with Multi-Site Context */}
         <div className={cn(
           "transition-all duration-700",
           phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
           <div className="p-2.5 rounded-lg bg-secondary/50 border border-border">
             <div className="flex items-start gap-2">
-              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center shrink-0">
-                <Sparkles className="w-3 h-3 text-primary-foreground" />
+              <div className="w-6 h-6 rounded-md bg-agent-brain flex items-center justify-center shrink-0">
+                <Sparkles className="w-3 h-3 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-muted-foreground mb-0.5">AI Assistant</p>
-                <p className="text-[11px] text-foreground leading-relaxed">
+                <p className="text-[10px] font-medium text-muted-foreground mb-0.5">Assistant IA</p>
+                <p className="text-[10px] text-foreground leading-relaxed">
                   {typedResponse}
                   {phase === 5 && typedResponse.length < aiResponse.length && (
-                    <span className="animate-blink">|</span>
+                    <span className="animate-pulse">|</span>
                   )}
                 </p>
               </div>
             </div>
             
-            {/* Sources */}
             {typedResponse.length >= aiResponse.length && (
               <div className="mt-2 pt-2 border-t border-border">
-                <p className="text-[9px] text-muted-foreground mb-1">📎 Sources:</p>
+                <p className="text-[8px] text-muted-foreground mb-1">📍 Sources multi-sites:</p>
                 <div className="flex gap-1 flex-wrap">
-                  <span className="px-1.5 py-0.5 rounded bg-muted text-[9px] text-muted-foreground">Policy.pdf (p.12)</span>
-                  <span className="px-1.5 py-0.5 rounded bg-muted text-[9px] text-muted-foreground">Contract.docx (§4)</span>
+                  <span className="px-1.5 py-0.5 rounded bg-agent-brain/10 text-[8px] text-agent-brain">🇫🇷 Lille - Manuel Tech</span>
+                  <span className="px-1.5 py-0.5 rounded bg-agent-brain/10 text-[8px] text-agent-brain">🇫🇷 Paris - Procédures</span>
                 </div>
               </div>
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

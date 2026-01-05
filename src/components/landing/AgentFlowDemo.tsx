@@ -1,27 +1,25 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { ArrowRight, Check, Zap, Brain, Mail, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Zap, Brain, Mail, Sparkles, Building2, RefreshCw, Globe, Layers } from "lucide-react";
 import { 
   SlackLogo, GmailLogo, FigmaLogo, NotionLogo, SalesforceLogo,
   HubSpotLogo, ZapierLogo 
 } from "./BrandLogos";
 
-const integrations = [
-  { name: "Slack", Logo: SlackLogo, color: "#4A154B" },
-  { name: "Gmail", Logo: GmailLogo, color: "#EA4335" },
-  { name: "Figma", Logo: FigmaLogo, color: "#F24E1E" },
-  { name: "Notion", Logo: NotionLogo, color: "#000000" },
-  { name: "Salesforce", Logo: SalesforceLogo, color: "#00A1E0" },
-  { name: "HubSpot", Logo: HubSpotLogo, color: "#FF7A59" },
-  { name: "Zapier", Logo: ZapierLogo, color: "#FF4A00" },
+const sites = [
+  { name: "Paris", flag: "🇫🇷", status: "active" },
+  { name: "Lille", flag: "🇫🇷", status: "active" },
+  { name: "Nantes", flag: "🇫🇷", status: "syncing" },
+  { name: "Barcelona", flag: "🇪🇸", status: "active" },
+  { name: "Bruxelles", flag: "🇧🇪", status: "active" },
 ];
 
 const workflowSteps = [
-  { label: "Trigger", icon: Zap, description: "New lead", color: "bg-primary" },
-  { label: "AI Parse", icon: Brain, description: "Extract", color: "bg-primary" },
-  { label: "Enrich", icon: Sparkles, description: "Context", color: "bg-primary" },
-  { label: "Notify", icon: Mail, description: "Alert", color: "bg-primary" },
+  { label: "Collecte", icon: Globe, description: "Multi-sites", color: "bg-primary" },
+  { label: "Harmonisation", icon: Layers, description: "Standards", color: "bg-primary" },
+  { label: "IA Process", icon: Brain, description: "Automatise", color: "bg-primary" },
+  { label: "Déploiement", icon: RefreshCw, description: "Tous sites", color: "bg-primary" },
 ];
 
 interface AgentFlowDemoProps {
@@ -32,16 +30,22 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
   const [activeStep, setActiveStep] = useState(-1);
   const [showComplete, setShowComplete] = useState(false);
-  const [dataParticles, setDataParticles] = useState<number[]>([]);
+  const [activeSites, setActiveSites] = useState<number[]>([]);
 
   useEffect(() => {
     if (!isVisible) {
       setActiveStep(-1);
       setShowComplete(false);
-      setDataParticles([]);
+      setActiveSites([]);
       return;
     }
 
+    // Animate sites first
+    sites.forEach((_, i) => {
+      setTimeout(() => setActiveSites(prev => [...prev, i]), i * 150);
+    });
+
+    // Then workflow steps
     const stepInterval = setInterval(() => {
       setActiveStep((prev) => {
         if (prev >= workflowSteps.length - 1) {
@@ -49,10 +53,9 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           setTimeout(() => setShowComplete(true), 500);
           return prev;
         }
-        setDataParticles(arr => [...arr, prev + 1]);
         return prev + 1;
       });
-    }, 800);
+    }, 900);
 
     return () => clearInterval(stepInterval);
   }, [isVisible]);
@@ -65,57 +68,50 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
         className
       )}
     >
-      {/* Background decorations */}
-      <div className="absolute top-0 right-0 w-20 h-20 bg-muted/50 rounded-full blur-2xl" />
+      <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 rounded-full blur-2xl" />
 
-      <div className="relative z-10">
-        {/* Connected Apps */}
-        <div className="mb-4">
+      <div className="relative z-10 space-y-3">
+        {/* Multi-Site Sources */}
+        <div>
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">
-              Connected Apps
+            <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+              Sources Multi-Sites
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
           
           <div className="flex items-center justify-center gap-1.5 flex-wrap">
-            {integrations.map((app, i) => {
-              const Logo = app.Logo;
-              return (
-                <div
-                  key={app.name}
-                  className={cn(
-                    "w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center transition-all duration-500 hover:scale-110",
-                    isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                  )}
-                  style={{
-                    transitionDelay: `${i * 60}ms`,
-                  }}
-                  title={app.name}
-                >
-                  <Logo className="w-4 h-4 text-foreground" />
-                </div>
-              );
-            })}
-            <div
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 rounded-full bg-secondary/50 border border-border/50 transition-all duration-500",
-                isVisible ? "opacity-100" : "opacity-0"
-              )}
-              style={{ transitionDelay: "500ms" }}
-            >
-              <span className="text-[10px] font-medium text-muted-foreground">+100</span>
-            </div>
+            {sites.map((site, i) => (
+              <div
+                key={site.name}
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1 rounded-lg border transition-all duration-500",
+                  activeSites.includes(i) 
+                    ? "bg-primary/5 border-primary/30 opacity-100" 
+                    : "bg-secondary/50 border-border opacity-50"
+                )}
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
+                <span className="text-sm">{site.flag}</span>
+                <span className="text-[9px] font-medium text-foreground">{site.name}</span>
+                {activeSites.includes(i) && site.status === 'syncing' && (
+                  <RefreshCw className="w-2.5 h-2.5 text-primary animate-spin" />
+                )}
+                {activeSites.includes(i) && site.status === 'active' && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Workflow Animation */}
-        <div className="mb-3">
+        {/* Process Harmonization Workflow */}
+        <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">
-              Workflow
+            <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+              Harmonisation des Processus
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
@@ -123,16 +119,6 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           <div className="relative">
             <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-border -translate-y-1/2 hidden md:block" />
             
-            {dataParticles.map((step, i) => (
-              <div
-                key={i}
-                className="absolute top-1/2 w-1.5 h-1.5 bg-primary/60 rounded-full -translate-y-1/2 animate-fade-in hidden md:block"
-                style={{
-                  left: `${(step / (workflowSteps.length - 1)) * 100}%`,
-                }}
-              />
-            ))}
-
             <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-1">
               {workflowSteps.map((step, i) => {
                 const StepIcon = step.icon;
@@ -156,7 +142,8 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                         ) : (
                           <StepIcon className={cn(
                             "w-5 h-5 transition-colors duration-300",
-                            isActive ? "text-primary-foreground" : "text-muted-foreground"
+                            isActive ? "text-primary-foreground" : "text-muted-foreground",
+                            isCurrent && i === 3 && "animate-spin"
                           )} />
                         )}
                         
@@ -174,7 +161,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                         )}>
                           {step.label}
                         </p>
-                        <p className="text-[9px] text-muted-foreground">{step.description}</p>
+                        <p className="text-[8px] text-muted-foreground">{step.description}</p>
                       </div>
                     </div>
                     
@@ -197,14 +184,28 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           </div>
         </div>
 
-        {/* Success indicator */}
+        {/* Success indicator with cross-site deployment */}
         <div className={cn(
-          "text-center transition-all duration-700",
+          "space-y-2 transition-all duration-700",
           showComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
-          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
-            <Check className="w-3 h-3" />
-            Workflow executed
+          <div className="flex items-center justify-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
+              <Check className="w-3 h-3" />
+              Processus standardisé
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-[8px] text-muted-foreground">Déployé sur</span>
+            {sites.map((site, i) => (
+              <span 
+                key={site.name}
+                className="text-sm animate-fade-in"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                {site.flag}
+              </span>
+            ))}
           </div>
         </div>
       </div>
