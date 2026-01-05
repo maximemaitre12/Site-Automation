@@ -250,6 +250,18 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
   const [placedBlocks, setPlacedBlocks] = useState<Array<{ tool: Tool; color: string; detail?: string | null }>>([]);
   const [executionState, setExecutionState] = useState<'building' | 'running' | 'done'>('building');
   const [executionStep, setExecutionStep] = useState(-1);
+  const [conditionPanel, setConditionPanel] = useState<{
+    visible: boolean;
+    step: number;
+    selectedField: string | null;
+    selectedOperator: string | null;
+    selectedValue: string | null;
+    cursorPos: { x: number; y: number } | null;
+  }>({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: null });
+
+  const conditionFields = ['stock', 'price', 'quantity', 'status', 'date'];
+  const conditionOperators = ['<', '>', '=', '≤', '≥', '≠'];
+  const conditionValues = ['10', '50', '100', '0', 'true'];
 
   useEffect(() => {
     if (!isVisible) {
@@ -260,6 +272,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
       setPlacedBlocks([]);
       setExecutionState('building');
       setExecutionStep(-1);
+      setConditionPanel({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: null });
       return;
     }
 
@@ -267,16 +280,20 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
     const timers: NodeJS.Timeout[] = [];
 
     const runAnimation = () => {
+      let totalDelay = 0;
+      
       workflowSequence.forEach((step, i) => {
         const category = toolCategories[step.categoryIndex];
         const tool = category.tools[step.toolIndex];
-        const baseDelay = i * 1800;
+        const isConditionStep = i === 2; // IF Condition is step 2
+        const stepDuration = isConditionStep ? 3500 : 1800; // More time for condition config
+        const baseDelay = totalDelay;
+        totalDelay += stepDuration;
 
         // Switch category & scroll
         timers.push(setTimeout(() => {
           if (cancelled) return;
           setActiveCategory(step.categoryIndex);
-          // Scroll to show the tool (each tool ~16px height)
           const scrollTo = Math.max(0, (step.toolIndex - 2) * 16);
           setToolScroll(scrollTo);
         }, baseDelay));
@@ -293,7 +310,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           setDragState({ active: true, tool, color: category.color, progress: 0 });
         }, baseDelay + 400));
 
-        // Animate drag (smooth progress)
+        // Animate drag
         for (let p = 1; p <= 8; p++) {
           timers.push(setTimeout(() => {
             if (cancelled) return;
@@ -301,17 +318,76 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           }, baseDelay + 400 + p * 60));
         }
 
-        // Drop
+        // Drop block
         timers.push(setTimeout(() => {
           if (cancelled) return;
           setDragState({ active: false, tool: null, color: '', progress: 0 });
           setHighlightedTool(null);
-          setPlacedBlocks(prev => [...prev, { tool, color: category.color, detail: step.detail }]);
+          setPlacedBlocks(prev => [...prev, { tool, color: category.color, detail: isConditionStep ? null : step.detail }]);
         }, baseDelay + 1100));
+
+        // IF Condition configuration sequence
+        if (isConditionStep) {
+          // Open panel
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel({ visible: true, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: { x: 20, y: 25 } });
+          }, baseDelay + 1300));
+
+          // Move cursor to field
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, cursorPos: { x: 25, y: 35 } }));
+          }, baseDelay + 1500));
+
+          // Select field
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, step: 1, selectedField: 'stock', cursorPos: { x: 60, y: 35 } }));
+          }, baseDelay + 1800));
+
+          // Move to operator
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, cursorPos: { x: 25, y: 55 } }));
+          }, baseDelay + 2100));
+
+          // Select operator
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, step: 2, selectedOperator: '<', cursorPos: { x: 55, y: 55 } }));
+          }, baseDelay + 2400));
+
+          // Move to value
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, cursorPos: { x: 25, y: 75 } }));
+          }, baseDelay + 2700));
+
+          // Select value
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, step: 3, selectedValue: '10', cursorPos: { x: 50, y: 75 } }));
+          }, baseDelay + 3000));
+
+          // Close panel and update block
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: null });
+            setPlacedBlocks(prev => {
+              const updated = [...prev];
+              const condIdx = updated.findIndex(b => b.tool.id === 'condition');
+              if (condIdx !== -1) {
+                updated[condIdx] = { ...updated[condIdx], detail: 'stock < 10 ?' };
+              }
+              return updated;
+            });
+          }, baseDelay + 3300));
+        }
       });
 
       // Execution phase
-      const execStart = workflowSequence.length * 1800 + 300;
+      const execStart = totalDelay + 300;
       timers.push(setTimeout(() => {
         if (cancelled) return;
         setExecutionState('running');
@@ -555,8 +631,108 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                 )}
               </div>
 
+              {/* Condition Configuration Panel */}
+              {conditionPanel.visible && (
+                <div className="absolute inset-0 z-40 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
+                  <div className="bg-card border-2 border-blue-500 rounded-lg shadow-xl p-2 min-w-[140px]">
+                    <div className="flex items-center gap-1 mb-2 pb-1 border-b border-border">
+                      <GitBranch className="w-3 h-3 text-blue-500" />
+                      <span className="text-[7px] font-bold text-foreground">Configure Condition</span>
+                    </div>
+                    
+                    {/* Field Selection */}
+                    <div className="mb-1.5">
+                      <span className="text-[5px] text-muted-foreground uppercase tracking-wide">Field</span>
+                      <div className="flex flex-wrap gap-0.5 mt-0.5">
+                        {conditionFields.map(field => (
+                          <span 
+                            key={field}
+                            className={cn(
+                              "px-1 py-0.5 rounded text-[5px] transition-all cursor-pointer",
+                              conditionPanel.selectedField === field 
+                                ? "bg-blue-500 text-white ring-1 ring-blue-300" 
+                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            )}
+                          >
+                            {field}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Operator Selection */}
+                    <div className="mb-1.5">
+                      <span className="text-[5px] text-muted-foreground uppercase tracking-wide">Operator</span>
+                      <div className="flex flex-wrap gap-0.5 mt-0.5">
+                        {conditionOperators.map(op => (
+                          <span 
+                            key={op}
+                            className={cn(
+                              "w-4 h-4 flex items-center justify-center rounded text-[6px] font-mono transition-all cursor-pointer",
+                              conditionPanel.selectedOperator === op 
+                                ? "bg-blue-500 text-white ring-1 ring-blue-300" 
+                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            )}
+                          >
+                            {op}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Value Selection */}
+                    <div>
+                      <span className="text-[5px] text-muted-foreground uppercase tracking-wide">Value</span>
+                      <div className="flex flex-wrap gap-0.5 mt-0.5">
+                        {conditionValues.map(val => (
+                          <span 
+                            key={val}
+                            className={cn(
+                              "px-1.5 py-0.5 rounded text-[5px] font-mono transition-all cursor-pointer",
+                              conditionPanel.selectedValue === val 
+                                ? "bg-blue-500 text-white ring-1 ring-blue-300" 
+                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            )}
+                          >
+                            {val}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Preview */}
+                    {conditionPanel.selectedField && conditionPanel.selectedOperator && conditionPanel.selectedValue && (
+                      <div className="mt-2 pt-1.5 border-t border-border">
+                        <div className="flex items-center justify-center gap-1 px-2 py-1 rounded bg-blue-500/10 text-blue-600">
+                          <span className="text-[6px] font-mono font-semibold">
+                            {conditionPanel.selectedField} {conditionPanel.selectedOperator} {conditionPanel.selectedValue}
+                          </span>
+                          <Check className="w-2.5 h-2.5" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Animated cursor in panel */}
+                  {conditionPanel.cursorPos && (
+                    <div 
+                      className="absolute z-50 pointer-events-none transition-all duration-200 ease-out"
+                      style={{
+                        left: `${conditionPanel.cursorPos.x}%`,
+                        top: `${conditionPanel.cursorPos.y}%`,
+                      }}
+                    >
+                      <MousePointer2 
+                        className="w-4 h-4 text-foreground fill-white" 
+                        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Workflow stats */}
-              {placedBlocks.length > 0 && (
+              {placedBlocks.length > 0 && !conditionPanel.visible && (
                 <div className="absolute bottom-1 right-1 flex gap-1">
                   <span className="text-[5px] px-1 py-0.5 rounded bg-muted text-muted-foreground">
                     {placedBlocks.length} steps
