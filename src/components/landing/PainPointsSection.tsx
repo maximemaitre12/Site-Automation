@@ -5,7 +5,7 @@ import {
   BarChart3, Mail, Calendar, Shield, AlertTriangle, TrendingUp,
   Phone, FileCheck, Database, ArrowRight, CheckCircle2, Clock,
   Bot, Search, PieChart, FileSpreadsheet, Upload, GitBranch,
-  Mic, Star, Building2, Scale, Handshake
+  Mic, Star, Building2, Scale, Handshake, Globe, Layers
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ import { AgentSupportDemo } from "./AgentSupportDemo";
 import { AgentHRDemo } from "./AgentHRDemo";
 import { AgentComplianceDemo } from "./AgentComplianceDemo";
 import { AgentSalesDemo } from "./AgentSalesDemo";
+import { AgentDataDemo } from "./AgentDataDemo";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -201,7 +202,7 @@ const tools: Tool[] = [
     icon: MessageSquare,
     colorClass: "text-agent-support",
     features: [
-      { icon: Mail, title: "Omnichannel", description: "Unified management of emails, chat, phone, social media in one interface." },
+      { icon: Mail, title: "Smart Ticket Management", description: "Intelligent routing and categorization of all incoming support requests." },
       { icon: AlertTriangle, title: "Urgency Detection", description: "AI automatically prioritizes tickets based on sentiment and business impact." },
       { icon: Bot, title: "Smart Auto-Response", description: "Contextual automatic responses based on ticket history and knowledge base." },
       { icon: TrendingUp, title: "Predictive Analytics", description: "Anticipate support peaks and recurring issues before they occur." },
@@ -224,6 +225,36 @@ const tools: Tool[] = [
       "Trend analysis",
     ],
   },
+  {
+    name: "Data",
+    tagline: "Multi-Site Intelligence",
+    description: "Unify, enrich, and govern your company data across all locations.",
+    icon: Database,
+    colorClass: "text-agent-data",
+    features: [
+      { icon: Building2, title: "Multi-Site Hub", description: "Centralize data from all your sites into a single source of truth." },
+      { icon: Sparkles, title: "Smart Enrichment", description: "AI-powered data completion with external sources and validation." },
+      { icon: Database, title: "Data Catalog", description: "Searchable metadata repository with lineage and quality metrics." },
+      { icon: Shield, title: "Governance", description: "Quality monitoring, PII detection, and compliance tracking." },
+    ],
+    workflow: [
+      { label: "Collect", icon: Globe },
+      { label: "Dedupe", icon: Layers },
+      { label: "Enrich", icon: Sparkles },
+      { label: "Govern", icon: ShieldCheck },
+    ],
+    stats: [
+      { value: "5M+", label: "Records Unified" },
+      { value: "98%", label: "Data Quality" },
+      { value: "-70%", label: "Duplicates" },
+    ],
+    useCases: [
+      "Multi-site data consolidation",
+      "Customer master data",
+      "Regulatory reporting",
+      "Data quality monitoring",
+    ],
+  },
 ];
 
 // Inline expanded content component
@@ -238,6 +269,7 @@ function ExpandedContent({ tool }: { tool: Tool }) {
         {tool.name === "HR" && <AgentHRDemo />}
         {tool.name === "Compliance" && <AgentComplianceDemo />}
         {tool.name === "Sales" && <AgentSalesDemo />}
+        {tool.name === "Data" && <AgentDataDemo />}
       </div>
 
       {/* Compact use cases */}
@@ -350,7 +382,8 @@ export function PainPointsSection() {
                       tool.colorClass === "text-agent-support" && "bg-gradient-to-br from-[hsl(160_50%_94%)] via-[hsl(160_40%_97%)] to-[hsl(160_50%_95%)]",
                       tool.colorClass === "text-agent-hr" && "bg-gradient-to-br from-[hsl(340_50%_94%)] via-[hsl(340_40%_97%)] to-[hsl(340_50%_95%)]",
                       tool.colorClass === "text-agent-compliance" && "bg-gradient-to-br from-[hsl(25_50%_94%)] via-[hsl(25_40%_97%)] to-[hsl(25_50%_95%)]",
-                      tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(190_50%_94%)] via-[hsl(190_40%_97%)] to-[hsl(190_50%_95%)]",
+                      tool.colorClass === "text-agent-sales" && "bg-gradient-to-br from-[hsl(142_50%_94%)] via-[hsl(142_40%_97%)] to-[hsl(142_50%_95%)]",
+                      tool.colorClass === "text-agent-data" && "bg-gradient-to-br from-[hsl(199_50%_94%)] via-[hsl(199_40%_97%)] to-[hsl(199_50%_95%)]",
                     )}
                   />
                   {/* Shimmer glass reflection - behind content */}
