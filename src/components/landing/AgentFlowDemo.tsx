@@ -16,7 +16,7 @@ import {
   Target, Layers, ListOrdered, CheckSquare, Headphones,
   LayoutGrid, Table2, CreditCard, ShoppingCart, Store,
   Receipt, Boxes, Eye, Heart, RefreshCw,
-  LucideIcon, GripVertical
+  LucideIcon, GripVertical, MousePointer2
 } from "lucide-react";
 
 interface Tool {
@@ -449,35 +449,39 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
             </div>
             <p className="text-[4px] text-muted-foreground text-center mt-0.5">↕ scroll to browse</p>
 
-            {/* Drag Ghost */}
+            {/* Mouse Cursor with Drag Ghost */}
             {dragState.active && dragState.tool && (
               <div
-                className="absolute z-30 pointer-events-none"
+                className="absolute z-50 pointer-events-none transition-all duration-75 ease-out"
                 style={{
-                  left: 50 + dragState.progress * 80,
-                  top: 40,
-                  opacity: 0.6 + dragState.progress * 0.4,
-                  transform: `scale(${0.85 + dragState.progress * 0.15}) rotate(${-5 + dragState.progress * 5}deg)`
+                  left: 55 + dragState.progress * 100,
+                  top: 35 + Math.sin(dragState.progress * Math.PI) * 8,
                 }}
               >
-                <div className={cn(
-                  "flex items-center gap-0.5 px-1 py-0.5 rounded shadow-lg border border-primary/60",
-                  dragState.color
-                )}>
-                  <dragState.tool.icon className="w-2 h-2 text-white" />
-                  <span className="text-[5px] font-medium text-white whitespace-nowrap">{dragState.tool.label}</span>
+                {/* Mouse Cursor */}
+                <MousePointer2 
+                  className="w-4 h-4 text-foreground drop-shadow-md" 
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
+                    transform: 'rotate(-5deg)'
+                  }}
+                />
+                {/* Tool being dragged - attached to cursor */}
+                <div 
+                  className="absolute top-3 left-3"
+                  style={{
+                    opacity: 0.9,
+                    transform: `scale(${0.9 + dragState.progress * 0.1})`
+                  }}
+                >
+                  <div className={cn(
+                    "flex items-center gap-0.5 px-1.5 py-0.5 rounded shadow-lg border-2 border-white/40",
+                    dragState.color
+                  )}>
+                    <dragState.tool.icon className="w-2.5 h-2.5 text-white" />
+                    <span className="text-[6px] font-semibold text-white whitespace-nowrap">{dragState.tool.label}</span>
+                  </div>
                 </div>
-                {/* Curved drag line */}
-                <svg className="absolute top-1/2 right-full -translate-y-1/2 w-12 h-6 overflow-visible">
-                  <path 
-                    d={`M 48 12 Q 24 ${12 - dragState.progress * 8} 0 12`}
-                    fill="none"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="1"
-                    strokeDasharray="2 2"
-                    opacity={0.5 + dragState.progress * 0.5}
-                  />
-                </svg>
               </div>
             )}
           </div>
