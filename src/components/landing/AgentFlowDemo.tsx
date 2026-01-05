@@ -224,12 +224,12 @@ const toolCategories: Category[] = [
 
 // Complex workflow: 6 steps across different categories
 const workflowSequence = [
-  { categoryIndex: 0, toolIndex: 8 },  // Barcode Scan
-  { categoryIndex: 4, toolIndex: 2 },  // SQL Query
-  { categoryIndex: 1, toolIndex: 0 },  // IF Condition
-  { categoryIndex: 2, toolIndex: 9 },  // AI Predict
-  { categoryIndex: 3, toolIndex: 1 },  // Update Stock
-  { categoryIndex: 6, toolIndex: 0 },  // Email
+  { categoryIndex: 0, toolIndex: 8, detail: null },  // Barcode Scan
+  { categoryIndex: 4, toolIndex: 2, detail: null },  // SQL Query
+  { categoryIndex: 1, toolIndex: 0, detail: 'stock < 10 ?' },  // IF Condition
+  { categoryIndex: 2, toolIndex: 9, detail: '→ true' },  // AI Predict
+  { categoryIndex: 3, toolIndex: 1, detail: null },  // Update Stock
+  { categoryIndex: 6, toolIndex: 0, detail: null },  // Email
 ];
 
 interface AgentFlowDemoProps {
@@ -247,7 +247,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
     color: string;
     progress: number;
   }>({ active: false, tool: null, color: '', progress: 0 });
-  const [placedBlocks, setPlacedBlocks] = useState<Array<{ tool: Tool; color: string }>>([]);
+  const [placedBlocks, setPlacedBlocks] = useState<Array<{ tool: Tool; color: string; detail?: string | null }>>([]);
   const [executionState, setExecutionState] = useState<'building' | 'running' | 'done'>('building');
   const [executionStep, setExecutionStep] = useState(-1);
 
@@ -306,7 +306,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           if (cancelled) return;
           setDragState({ active: false, tool: null, color: '', progress: 0 });
           setHighlightedTool(null);
-          setPlacedBlocks(prev => [...prev, { tool, color: category.color }]);
+          setPlacedBlocks(prev => [...prev, { tool, color: category.color, detail: step.detail }]);
         }, baseDelay + 1100));
       });
 
@@ -533,6 +533,9 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                           )}
                         </div>
                         <span className="text-[5px] font-medium whitespace-nowrap">{block.tool.label}</span>
+                        {block.detail && (
+                          <span className="text-[4px] opacity-80 whitespace-nowrap ml-0.5">{block.detail}</span>
+                        )}
                       </div>
                       
                       {i < placedBlocks.length - 1 && (
