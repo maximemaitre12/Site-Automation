@@ -96,12 +96,12 @@ const kpiData = [
 ];
 
 const siteEmissions = [
-  { name: 'Headquarters', location: 'Kirchheim', emissions: 8450, percentage: 24 },
-  { name: 'Technical Center North', location: 'Hamburg', emissions: 5230, percentage: 15 },
-  { name: 'Logistics Hub West', location: 'Düsseldorf', emissions: 6780, percentage: 19 },
-  { name: 'Distribution Center', location: 'Lyon', emissions: 4560, percentage: 13 },
-  { name: 'Service Center', location: 'Milan', emissions: 3890, percentage: 11 },
-  { name: 'Other Sites', location: '12 locations', emissions: 6340, percentage: 18 },
+  { name: 'Siège Social', location: 'Paris', emissions: 8450, percentage: 24 },
+  { name: 'Centre Technique Nord', location: 'Lille', emissions: 5230, percentage: 15 },
+  { name: 'Plateforme Logistique', location: 'Nantes', emissions: 6780, percentage: 19 },
+  { name: 'Centre Distribution', location: 'Barcelone', emissions: 4560, percentage: 13 },
+  { name: 'Centre Services', location: 'Bruxelles', emissions: 3890, percentage: 11 },
+  { name: 'Autres Sites', location: '12 implantations', emissions: 6340, percentage: 18 },
 ];
 
 export function ESGDashboard() {
