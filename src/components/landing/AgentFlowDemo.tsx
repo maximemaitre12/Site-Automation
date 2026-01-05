@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { 
@@ -256,12 +256,62 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
     selectedField: string | null;
     selectedOperator: string | null;
     selectedValue: string | null;
-    cursorPos: { x: number; y: number } | null;
-  }>({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: null });
+    cursorTarget: 'field' | 'operator' | 'value' | 'preview' | null;
+  }>({
+    visible: false,
+    step: 0,
+    selectedField: null,
+    selectedOperator: null,
+    selectedValue: null,
+    cursorTarget: null,
+  });
+
+  const [conditionCursorPos, setConditionCursorPos] = useState<{ x: number; y: number } | null>(null);
+
+  const conditionOverlayRef = useRef<HTMLDivElement | null>(null);
+  const conditionFieldStockRef = useRef<HTMLSpanElement | null>(null);
+  const conditionOperatorLtRef = useRef<HTMLSpanElement | null>(null);
+  const conditionValue10Ref = useRef<HTMLSpanElement | null>(null);
+  const conditionPreviewRef = useRef<HTMLDivElement | null>(null);
 
   const conditionFields = ['stock', 'price', 'quantity', 'status', 'date'];
   const conditionOperators = ['<', '>', '=', '≤', '≥', '≠'];
   const conditionValues = ['10', '50', '100', '0', 'true'];
+
+  useLayoutEffect(() => {
+    if (!conditionPanel.visible) {
+      setConditionCursorPos(null);
+      return;
+    }
+
+    const overlay = conditionOverlayRef.current;
+    if (!overlay) return;
+
+    const target =
+      conditionPanel.cursorTarget === 'field'
+        ? conditionFieldStockRef.current
+        : conditionPanel.cursorTarget === 'operator'
+          ? conditionOperatorLtRef.current
+          : conditionPanel.cursorTarget === 'value'
+            ? conditionValue10Ref.current
+            : conditionPanel.cursorTarget === 'preview'
+              ? conditionPreviewRef.current
+              : null;
+
+    if (!target) return;
+
+    requestAnimationFrame(() => {
+      const o = overlay.getBoundingClientRect();
+      const r = target.getBoundingClientRect();
+      const x = r.right - o.left - 6;
+      const y = r.bottom - o.top - 6;
+
+      setConditionCursorPos((prev) => {
+        if (prev && Math.abs(prev.x - x) < 0.5 && Math.abs(prev.y - y) < 0.5) return prev;
+        return { x, y };
+      });
+    });
+  }, [conditionPanel.visible, conditionPanel.cursorTarget]);
 
   useEffect(() => {
     if (!isVisible) {
@@ -272,7 +322,8 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
       setPlacedBlocks([]);
       setExecutionState('building');
       setExecutionStep(-1);
-      setConditionPanel({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: null });
+      setConditionPanel({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorTarget: null });
+      setConditionCursorPos(null);
       return;
     }
 
@@ -331,49 +382,57 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
           // Open panel
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel({ visible: true, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: { x: 20, y: 25 } });
+            setConditionPanel({
+              visible: true,
+              step: 0,
+              selectedField: null,
+              selectedOperator: null,
+              selectedValue: null,
+              cursorTarget: 'field',
+            });
           }, baseDelay + 1300));
 
-          // Move cursor to field
+          // "Click" field
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel(p => ({ ...p, cursorPos: { x: 25, y: 35 } }));
-          }, baseDelay + 1500));
-
-          // Select field
-          timers.push(setTimeout(() => {
-            if (cancelled) return;
-            setConditionPanel(p => ({ ...p, step: 1, selectedField: 'stock', cursorPos: { x: 60, y: 35 } }));
-          }, baseDelay + 1800));
+            setConditionPanel(p => ({ ...p, step: 1, selectedField: 'stock', cursorTarget: 'field' }));
+          }, baseDelay + 1700));
 
           // Move to operator
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel(p => ({ ...p, cursorPos: { x: 25, y: 55 } }));
-          }, baseDelay + 2100));
+            setConditionPanel(p => ({ ...p, cursorTarget: 'operator' }));
+          }, baseDelay + 2050));
 
-          // Select operator
+          // "Click" operator
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel(p => ({ ...p, step: 2, selectedOperator: '<', cursorPos: { x: 55, y: 55 } }));
-          }, baseDelay + 2400));
+            setConditionPanel(p => ({ ...p, step: 2, selectedOperator: '<', cursorTarget: 'operator' }));
+          }, baseDelay + 2350));
 
           // Move to value
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel(p => ({ ...p, cursorPos: { x: 25, y: 75 } }));
+            setConditionPanel(p => ({ ...p, cursorTarget: 'value' }));
           }, baseDelay + 2700));
 
-          // Select value
+          // "Click" value
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel(p => ({ ...p, step: 3, selectedValue: '10', cursorPos: { x: 50, y: 75 } }));
+            setConditionPanel(p => ({ ...p, step: 3, selectedValue: '10', cursorTarget: 'value' }));
           }, baseDelay + 3000));
+
+          // Show preview
+          timers.push(setTimeout(() => {
+            if (cancelled) return;
+            setConditionPanel(p => ({ ...p, cursorTarget: 'preview' }));
+          }, baseDelay + 3150));
 
           // Close panel and update block
           timers.push(setTimeout(() => {
             if (cancelled) return;
-            setConditionPanel({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorPos: null });
+            setConditionPanel({ visible: false, step: 0, selectedField: null, selectedOperator: null, selectedValue: null, cursorTarget: null });
+            setConditionCursorPos(null);
             setPlacedBlocks(prev => {
               const updated = [...prev];
               const condIdx = updated.findIndex(b => b.tool.id === 'condition');
@@ -633,10 +692,10 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
 
               {/* Condition Configuration Panel */}
               {conditionPanel.visible && (
-                <div className="absolute inset-0 z-40 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
-                  <div className="bg-card border-2 border-blue-500 rounded-lg shadow-xl p-2 min-w-[140px]">
+                <div ref={conditionOverlayRef} className="absolute inset-0 z-40 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
+                  <div className="bg-card border-2 border-primary rounded-lg shadow-xl p-2 min-w-[140px]">
                     <div className="flex items-center gap-1 mb-2 pb-1 border-b border-border">
-                      <GitBranch className="w-3 h-3 text-blue-500" />
+                      <GitBranch className="w-3 h-3 text-primary" />
                       <span className="text-[7px] font-bold text-foreground">Configure Condition</span>
                     </div>
                     
@@ -644,13 +703,14 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                     <div className="mb-1.5">
                       <span className="text-[5px] text-muted-foreground uppercase tracking-wide">Field</span>
                       <div className="flex flex-wrap gap-0.5 mt-0.5">
-                        {conditionFields.map(field => (
-                          <span 
+                        {conditionFields.map((field) => (
+                          <span
                             key={field}
+                            ref={field === 'stock' ? conditionFieldStockRef : undefined}
                             className={cn(
                               "px-1 py-0.5 rounded text-[5px] transition-all cursor-pointer",
-                              conditionPanel.selectedField === field 
-                                ? "bg-blue-500 text-white ring-1 ring-blue-300" 
+                              conditionPanel.selectedField === field
+                                ? "bg-primary text-primary-foreground ring-1 ring-primary/30"
                                 : "bg-muted text-muted-foreground hover:bg-muted/80"
                             )}
                           >
@@ -664,13 +724,14 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                     <div className="mb-1.5">
                       <span className="text-[5px] text-muted-foreground uppercase tracking-wide">Operator</span>
                       <div className="flex flex-wrap gap-0.5 mt-0.5">
-                        {conditionOperators.map(op => (
-                          <span 
+                        {conditionOperators.map((op) => (
+                          <span
                             key={op}
+                            ref={op === '<' ? conditionOperatorLtRef : undefined}
                             className={cn(
                               "w-4 h-4 flex items-center justify-center rounded text-[6px] font-mono transition-all cursor-pointer",
-                              conditionPanel.selectedOperator === op 
-                                ? "bg-blue-500 text-white ring-1 ring-blue-300" 
+                              conditionPanel.selectedOperator === op
+                                ? "bg-primary text-primary-foreground ring-1 ring-primary/30"
                                 : "bg-muted text-muted-foreground hover:bg-muted/80"
                             )}
                           >
@@ -684,13 +745,14 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                     <div>
                       <span className="text-[5px] text-muted-foreground uppercase tracking-wide">Value</span>
                       <div className="flex flex-wrap gap-0.5 mt-0.5">
-                        {conditionValues.map(val => (
-                          <span 
+                        {conditionValues.map((val) => (
+                          <span
                             key={val}
+                            ref={val === '10' ? conditionValue10Ref : undefined}
                             className={cn(
                               "px-1.5 py-0.5 rounded text-[5px] font-mono transition-all cursor-pointer",
-                              conditionPanel.selectedValue === val 
-                                ? "bg-blue-500 text-white ring-1 ring-blue-300" 
+                              conditionPanel.selectedValue === val
+                                ? "bg-primary text-primary-foreground ring-1 ring-primary/30"
                                 : "bg-muted text-muted-foreground hover:bg-muted/80"
                             )}
                           >
@@ -703,7 +765,7 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                     {/* Preview */}
                     {conditionPanel.selectedField && conditionPanel.selectedOperator && conditionPanel.selectedValue && (
                       <div className="mt-2 pt-1.5 border-t border-border">
-                        <div className="flex items-center justify-center gap-1 px-2 py-1 rounded bg-blue-500/10 text-blue-600">
+                        <div ref={conditionPreviewRef} className="flex items-center justify-center gap-1 px-2 py-1 rounded bg-primary/10 text-primary">
                           <span className="text-[6px] font-mono font-semibold">
                             {conditionPanel.selectedField} {conditionPanel.selectedOperator} {conditionPanel.selectedValue}
                           </span>
@@ -714,16 +776,17 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                   </div>
 
                   {/* Animated cursor in panel */}
-                  {conditionPanel.cursorPos && (
-                    <div 
+                  {conditionCursorPos && (
+                    <div
                       className="absolute z-50 pointer-events-none transition-all duration-200 ease-out"
                       style={{
-                        left: `${conditionPanel.cursorPos.x}%`,
-                        top: `${conditionPanel.cursorPos.y}%`,
+                        left: conditionCursorPos.x,
+                        top: conditionCursorPos.y,
+                        transform: 'translate(-70%, -85%)',
                       }}
                     >
-                      <MousePointer2 
-                        className="w-4 h-4 text-foreground fill-white" 
+                      <MousePointer2
+                        className="w-4 h-4 text-foreground fill-white"
                         style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                       />
                     </div>
