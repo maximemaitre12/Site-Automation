@@ -452,18 +452,21 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
             {/* Mouse Cursor with Drag Ghost */}
             {dragState.active && dragState.tool && (
               <div
-                className="absolute z-50 pointer-events-none transition-all duration-75 ease-out"
+                className="absolute z-50 pointer-events-none"
                 style={{
                   left: 55 + dragState.progress * 100,
-                  top: 35 + Math.sin(dragState.progress * Math.PI) * 8,
+                  top: 38 + Math.sin(dragState.progress * Math.PI) * 8,
+                  transition: 'left 75ms ease-out, top 75ms ease-out'
                 }}
               >
-                {/* Tool being dragged - cursor touches bottom-right */}
+                {/* Tool being dragged - positioned so cursor touches its bottom-right */}
                 <div 
-                  className="absolute bottom-0 right-0 translate-x-[-100%] translate-y-[-100%]"
                   style={{
+                    position: 'absolute',
+                    right: 2,
+                    bottom: 2,
                     opacity: 0.95,
-                    transform: `translate(-100%, -100%) scale(${0.9 + dragState.progress * 0.1})`
+                    transform: `scale(${0.9 + dragState.progress * 0.1})`
                   }}
                 >
                   <div className={cn(
@@ -474,9 +477,9 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                     <span className="text-[6px] font-semibold text-white whitespace-nowrap">{dragState.tool.label}</span>
                   </div>
                 </div>
-                {/* Mouse Cursor - touching bottom-right of element */}
+                {/* Mouse Cursor */}
                 <MousePointer2 
-                  className="w-4 h-4 text-foreground" 
+                  className="w-4 h-4 text-foreground fill-white" 
                   style={{ 
                     filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))',
                   }}
