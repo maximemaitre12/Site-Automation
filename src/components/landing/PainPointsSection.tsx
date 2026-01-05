@@ -70,8 +70,8 @@ const tools: Tool[] = [
     useCases: [
       "Automated client onboarding",
       "Smart lead follow-ups",
-      "Stock threshold alerts",
-      "Auto-generated weekly reports",
+      "Cross-location task orchestration",
+      "Performance dashboard generation",
     ],
   },
   {
@@ -99,8 +99,8 @@ const tools: Tool[] = [
     ],
     useCases: [
       "Instant document search",
-      "Automated FAQ responses",
-      "Internal knowledge base",
+      "Distributed knowledge hub",
+      "Policy & procedure access",
       "Contextual report generation",
     ],
   },
@@ -189,8 +189,8 @@ const tools: Tool[] = [
     ],
     useCases: [
       "GDPR compliance",
-      "Internal audits",
-      "Risk prevention",
+      "ESG & sustainability tracking",
+      "Operational risk monitoring",
       "Regulatory reporting",
     ],
   },
@@ -221,7 +221,7 @@ const tools: Tool[] = [
       "Lead qualification",
       "Sales coaching",
       "Pipeline forecasting",
-      "Business development",
+      "Strategic partner intelligence",
     ],
   },
 ];

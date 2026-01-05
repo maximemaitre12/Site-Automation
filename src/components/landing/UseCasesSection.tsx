@@ -15,8 +15,8 @@ const useCases = [
   },
   {
     icon: Users,
-    title: "Enrichissement données entreprises",
-    description: "Enrichissement automatique de vos bases de données entreprises avec des données officielles.",
+    title: "Partner & supplier intelligence",
+    description: "Enrichissement automatique de vos bases partenaires et fournisseurs avec des données officielles.",
     example: "Qualité des données améliorée de 40% en 30 jours.",
   },
   {
@@ -33,8 +33,8 @@ const useCases = [
   },
   {
     icon: MessageSquare,
-    title: "Agents support internes",
-    description: "Assistants IA pour vos équipes: RH, IT, juridique. Réponses instantanées basées sur vos procédures.",
+    title: "Internal operations assistants",
+    description: "Assistants IA pour vos équipes: RH, IT, juridique, opérations. Réponses instantanées basées sur vos procédures.",
     example: "Réduction de 60% des tickets support internes.",
   },
 ];
