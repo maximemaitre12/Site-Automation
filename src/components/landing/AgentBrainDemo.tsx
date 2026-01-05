@@ -23,7 +23,6 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
   const [typedQuery, setTypedQuery] = useState("");
   const [typedResponse, setTypedResponse] = useState("");
   const [queryComplete, setQueryComplete] = useState(false);
-  const [responseStarted, setResponseStarted] = useState(false);
   const [syncedSites, setSyncedSites] = useState<number[]>([]);
 
   useEffect(() => {
@@ -51,36 +50,45 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
 
   // Type the query
   useEffect(() => {
-    if (phase !== 3 || queryComplete) return;
+    if (phase !== 3) return;
+    
+    setTypedQuery("");
+    setQueryComplete(false);
     let i = 0;
+    
     const interval = setInterval(() => {
-      if (i <= searchQuery.length) {
-        setTypedQuery(searchQuery.slice(0, i));
+      if (i < searchQuery.length) {
+        setTypedQuery(searchQuery.slice(0, i + 1));
         i++;
       } else {
         clearInterval(interval);
         setQueryComplete(true);
-        setTimeout(() => setPhase(5), 600);
+        setTimeout(() => setPhase(4), 600);
       }
     }, 35);
+    
     return () => clearInterval(interval);
-  }, [phase, queryComplete]);
+  }, [phase]);
 
   // Type the response
   useEffect(() => {
-    if (phase !== 5 || responseStarted) return;
-    setResponseStarted(true);
+    if (phase !== 4) return;
+    
+    setTypedResponse("");
     let i = 0;
+    
     const interval = setInterval(() => {
-      if (i <= aiResponse.length) {
-        setTypedResponse(aiResponse.slice(0, i));
+      if (i < aiResponse.length) {
+        setTypedResponse(aiResponse.slice(0, i + 1));
         i++;
       } else {
         clearInterval(interval);
+        setPhase(5);
       }
     }, 18);
+    
     return () => clearInterval(interval);
-  }, [phase, responseStarted]);
+  }, [phase]);
 
   const totalDocs = sites.reduce((sum, s) => sum + s.docs, 0);
 
@@ -202,7 +210,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
         {/* AI Response with Multi-Site Context */}
         <div className={cn(
           "transition-all duration-700",
-          phase >= 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          phase >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}>
           <div className="p-2.5 rounded-lg bg-secondary/50 border border-border">
             <div className="flex items-start gap-2">
@@ -213,14 +221,14 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
                 <p className="text-[10px] font-medium text-muted-foreground mb-0.5">AI Assistant</p>
                 <p className="text-[10px] text-foreground leading-relaxed">
                   {typedResponse}
-                  {phase === 5 && typedResponse.length < aiResponse.length && (
+                  {phase === 4 && typedResponse.length < aiResponse.length && (
                     <span className="animate-pulse">|</span>
                   )}
                 </p>
               </div>
             </div>
             
-            {typedResponse.length >= aiResponse.length && (
+            {phase === 5 && (
               <div className="mt-2 pt-2 border-t border-border">
                 <p className="text-[8px] text-muted-foreground mb-1">📍 Multi-site sources:</p>
                 <div className="flex gap-1 flex-wrap">
