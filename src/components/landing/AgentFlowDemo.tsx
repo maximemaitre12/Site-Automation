@@ -458,20 +458,12 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                   top: 35 + Math.sin(dragState.progress * Math.PI) * 8,
                 }}
               >
-                {/* Mouse Cursor */}
-                <MousePointer2 
-                  className="w-4 h-4 text-foreground drop-shadow-md" 
-                  style={{ 
-                    filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
-                    transform: 'rotate(-5deg)'
-                  }}
-                />
-                {/* Tool being dragged - attached to cursor */}
+                {/* Tool being dragged - cursor touches bottom-right */}
                 <div 
-                  className="absolute top-3 left-3"
+                  className="absolute bottom-0 right-0 translate-x-[-100%] translate-y-[-100%]"
                   style={{
-                    opacity: 0.9,
-                    transform: `scale(${0.9 + dragState.progress * 0.1})`
+                    opacity: 0.95,
+                    transform: `translate(-100%, -100%) scale(${0.9 + dragState.progress * 0.1})`
                   }}
                 >
                   <div className={cn(
@@ -482,6 +474,13 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                     <span className="text-[6px] font-semibold text-white whitespace-nowrap">{dragState.tool.label}</span>
                   </div>
                 </div>
+                {/* Mouse Cursor - touching bottom-right of element */}
+                <MousePointer2 
+                  className="w-4 h-4 text-foreground" 
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))',
+                  }}
+                />
               </div>
             )}
           </div>
