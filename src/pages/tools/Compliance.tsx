@@ -9,11 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Shield, AlertTriangle, CheckCircle, FileText, 
   Loader2, Sparkles, Cookie, Database, Lock, FileCheck,
-  ChevronRight, Trash2, Eye, ShieldCheck, TrendingUp
+  ChevronRight, Trash2, Eye, ShieldCheck, TrendingUp, Leaf
 } from "lucide-react";
 import { useState } from "react";
 import { useCompliance, Audit } from "@/hooks/useCompliance";
 import { ReportDialog } from "@/components/compliance/ReportDialog";
+import { ESGDashboard } from "@/components/compliance/ESGDashboard";
 import { cn } from "@/lib/utils";
 import { AgentTabs } from "@/components/agents/AgentTabs";
 
@@ -58,7 +59,7 @@ export default function Compliance() {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [report, setReport] = useState<string | null>(null);
   const [generatingReport, setGeneratingReport] = useState(false);
-  const [viewMode, setViewMode] = useState<'new' | 'history'>('new');
+  const [viewMode, setViewMode] = useState<'new' | 'history' | 'esg'>('new');
 
   const stats = getStats();
 
@@ -95,6 +96,7 @@ export default function Compliance() {
   const tabs = [
     { id: 'new', label: 'Nouvel audit', icon: Sparkles },
     { id: 'history', label: `Historique (${audits.length})`, icon: FileCheck },
+    { id: 'esg', label: 'ESG & Durabilité', icon: Leaf },
   ];
 
   if (loading) {
@@ -174,7 +176,7 @@ export default function Compliance() {
             <AgentTabs 
               tabs={tabs} 
               activeTab={viewMode} 
-              onTabChange={(id) => setViewMode(id as 'new' | 'history')}
+              onTabChange={(id) => setViewMode(id as 'new' | 'history' | 'esg')}
               variant="pills"
             />
           </div>
@@ -183,7 +185,9 @@ export default function Compliance() {
         {/* Main Content */}
         <ScrollArea className="flex-1 px-4 md:px-8">
           <div className="max-w-5xl mx-auto pb-8">
-            {viewMode === 'new' ? (
+            {viewMode === 'esg' ? (
+              <ESGDashboard />
+            ) : viewMode === 'new' ? (
               <div className="space-y-6">
                 {/* Type selection cards */}
                 <div>
