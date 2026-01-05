@@ -2,13 +2,14 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe, Building2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
 import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { UniversalSearch } from "@/components/brain/UniversalSearch";
+import { KnowledgeHubPanel } from "@/components/brain/KnowledgeHubPanel";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -51,6 +52,7 @@ export default function BrainPage() {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [generationMode, setGenerationMode] = useState<'chat' | 'image' | 'chart'>('chat');
   const [showUniversalSearch, setShowUniversalSearch] = useState(false);
+  const [showKnowledgeHub, setShowKnowledgeHub] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [localFilteredDocs, setLocalFilteredDocs] = useState<AetherDocument[]>([]);
@@ -449,6 +451,23 @@ export default function BrainPage() {
                   </SheetHeader>
                   <div className="mt-6 h-[calc(100vh-120px)]">
                     <UniversalSearch />
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              <Sheet open={showKnowledgeHub} onOpenChange={setShowKnowledgeHub}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 px-2 md:px-3 border-agent-brain/30 hover:bg-agent-brain/10">
+                    <Building2 className="w-4 h-4 md:mr-2 text-agent-brain" />
+                    <span className="hidden md:inline">Knowledge Hub</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:w-[700px] md:w-[900px] lg:w-[1000px]" side="right">
+                  <SheetHeader>
+                    <SheetTitle>Multi-Site Knowledge Hub</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 h-[calc(100vh-120px)] overflow-y-auto">
+                    <KnowledgeHubPanel />
                   </div>
                 </SheetContent>
               </Sheet>

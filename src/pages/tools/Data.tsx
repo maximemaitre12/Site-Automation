@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Database, FolderSearch, Shield, Search, Sparkles, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Database, FolderSearch, Shield, Search, Sparkles, TrendingUp, AlertTriangle, CheckCircle, Building2 } from 'lucide-react';
 import DataSources from '@/components/data/DataSources';
 import DataCatalog from '@/components/data/DataCatalog';
 import DataGovernance from '@/components/data/DataGovernance';
 import DataSearch from '@/components/data/DataSearch';
+import { MultiSiteDataView } from '@/components/data/MultiSiteDataView';
 import { AgentTabs } from '@/components/agents/AgentTabs';
 import { cn } from '@/lib/utils';
 
 const Data = () => {
-  const [activeTab, setActiveTab] = useState('catalog');
+  const [activeTab, setActiveTab] = useState('multisite');
 
   const tabs = [
+    { id: 'multisite', label: 'Multi-Site Hub', icon: Building2 },
     { id: 'catalog', label: 'Catalogue', icon: FolderSearch },
     { id: 'sources', label: 'Sources', icon: Database },
     { id: 'search', label: 'Recherche', icon: Search },
@@ -103,6 +105,9 @@ const Data = () => {
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-6">
           <div className="max-w-7xl mx-auto">
+            <div className={cn(activeTab !== 'multisite' && 'hidden')}>
+              <MultiSiteDataView />
+            </div>
             <div className={cn(activeTab !== 'catalog' && 'hidden')}>
               <DataCatalog />
             </div>
