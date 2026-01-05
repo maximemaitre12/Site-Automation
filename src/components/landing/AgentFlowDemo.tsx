@@ -463,8 +463,8 @@ export function AgentFlowDemo({ className }: AgentFlowDemoProps) {
                 <div 
                   style={{
                     position: 'absolute',
-                    right: 2,
-                    bottom: 2,
+                    right: 6,
+                    bottom: 6,
                     opacity: 0.95,
                     transform: `scale(${0.9 + dragState.progress * 0.1})`
                   }}
