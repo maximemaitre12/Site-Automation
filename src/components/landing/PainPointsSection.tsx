@@ -105,36 +105,6 @@ const tools: Tool[] = [
     ],
   },
   {
-    name: "Support",
-    tagline: "Empathic Agent",
-    description: "AI that handles tickets, detects urgency, and resolves issues before they escalate.",
-    icon: MessageSquare,
-    colorClass: "text-agent-support",
-    features: [
-      { icon: Mail, title: "Omnichannel", description: "Unified management of emails, chat, phone, social media in one interface." },
-      { icon: AlertTriangle, title: "Urgency Detection", description: "AI automatically prioritizes tickets based on sentiment and business impact." },
-      { icon: Bot, title: "Smart Auto-Response", description: "Contextual automatic responses based on ticket history and knowledge base." },
-      { icon: TrendingUp, title: "Predictive Analytics", description: "Anticipate support peaks and recurring issues before they occur." },
-    ],
-    workflow: [
-      { label: "Ticket Received", icon: Mail },
-      { label: "AI Classification", icon: Brain },
-      { label: "Auto-Response", icon: MessageSquare },
-      { label: "Resolution", icon: CheckCircle2 },
-    ],
-    stats: [
-      { value: "70%", label: "Auto-Resolved" },
-      { value: "-40%", label: "Response Time" },
-      { value: "4.8/5", label: "Satisfaction" },
-    ],
-    useCases: [
-      "24/7 customer support",
-      "Technical ticket triage",
-      "SLA monitoring",
-      "Trend analysis",
-    ],
-  },
-  {
     name: "HR",
     tagline: "Talent Agent",
     description: "From sourcing to onboarding, AI transforms your recruitment process.",
@@ -222,6 +192,36 @@ const tools: Tool[] = [
       "Sales coaching",
       "Pipeline forecasting",
       "Strategic partner intelligence",
+    ],
+  },
+  {
+    name: "Support",
+    tagline: "Empathic Agent",
+    description: "AI that handles tickets, detects urgency, and resolves issues before they escalate.",
+    icon: MessageSquare,
+    colorClass: "text-agent-support",
+    features: [
+      { icon: Mail, title: "Omnichannel", description: "Unified management of emails, chat, phone, social media in one interface." },
+      { icon: AlertTriangle, title: "Urgency Detection", description: "AI automatically prioritizes tickets based on sentiment and business impact." },
+      { icon: Bot, title: "Smart Auto-Response", description: "Contextual automatic responses based on ticket history and knowledge base." },
+      { icon: TrendingUp, title: "Predictive Analytics", description: "Anticipate support peaks and recurring issues before they occur." },
+    ],
+    workflow: [
+      { label: "Ticket Received", icon: Mail },
+      { label: "AI Classification", icon: Brain },
+      { label: "Auto-Response", icon: MessageSquare },
+      { label: "Resolution", icon: CheckCircle2 },
+    ],
+    stats: [
+      { value: "70%", label: "Auto-Resolved" },
+      { value: "-40%", label: "Response Time" },
+      { value: "4.8/5", label: "Satisfaction" },
+    ],
+    useCases: [
+      "24/7 customer support",
+      "Technical ticket triage",
+      "SLA monitoring",
+      "Trend analysis",
     ],
   },
 ];
