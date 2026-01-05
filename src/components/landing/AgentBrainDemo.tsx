@@ -3,15 +3,15 @@ import { cn } from "@/lib/utils";
 import { Building2, MapPin, Database, CheckCircle2, Layers, Globe, Search, Brain, Sparkles } from "lucide-react";
 
 const sites = [
-  { name: "Siège", location: "Paris", flag: "🇫🇷", docs: 1247, status: "synced" },
-  { name: "Tech Nord", location: "Lille", flag: "🇫🇷", docs: 456, status: "synced" },
-  { name: "Logistique", location: "Nantes", flag: "🇫🇷", docs: 389, status: "syncing" },
-  { name: "Distribution", location: "Barcelone", flag: "🇪🇸", docs: 278, status: "synced" },
-  { name: "Services", location: "Bruxelles", flag: "🇧🇪", docs: 198, status: "synced" },
+  { name: "HQ", location: "Paris", flag: "🇫🇷", docs: 1247, status: "synced" },
+  { name: "Tech Hub", location: "Lyon", flag: "🇫🇷", docs: 456, status: "synced" },
+  { name: "Asia Pacific", location: "Shanghai", flag: "🇨🇳", docs: 892, status: "syncing" },
+  { name: "Northern", location: "Beijing", flag: "🇨🇳", docs: 278, status: "synced" },
+  { name: "Southern", location: "Marseille", flag: "🇫🇷", docs: 198, status: "synced" },
 ];
 
-const searchQuery = "Procédure de maintenance site Lille?";
-const aiResponse = "Selon le Manuel Technique Nord (v3.2), la maintenance préventive suit le protocole MT-2024. Documentation unifiée depuis 6 sites...";
+const searchQuery = "Maintenance procedure for Shanghai site?";
+const aiResponse = "According to the Asia Pacific Technical Manual (v3.2), preventive maintenance follows protocol MT-2024. Unified documentation from 5 sites...";
 
 interface AgentBrainDemoProps {
   className?: string;
@@ -105,13 +105,13 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
               <Layers className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-foreground">Hub Unifié</p>
+              <p className="text-[10px] font-semibold text-foreground">Unified Hub</p>
               <p className="text-[8px] text-muted-foreground">{sites.length} sites • {totalDocs.toLocaleString()} docs</p>
             </div>
           </div>
           <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 border border-success/20">
             <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-            <span className="text-[9px] font-medium text-success">Synchronisé</span>
+            <span className="text-[9px] font-medium text-success">Synchronized</span>
           </div>
         </div>
 
@@ -123,7 +123,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px flex-1 bg-border" />
             <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
-              Sources de Connaissance
+              Knowledge Sources
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
@@ -210,7 +210,7 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
                 <Sparkles className="w-3 h-3 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-medium text-muted-foreground mb-0.5">Assistant IA</p>
+                <p className="text-[10px] font-medium text-muted-foreground mb-0.5">AI Assistant</p>
                 <p className="text-[10px] text-foreground leading-relaxed">
                   {typedResponse}
                   {phase === 5 && typedResponse.length < aiResponse.length && (
@@ -222,10 +222,10 @@ export function AgentBrainDemo({ className }: AgentBrainDemoProps) {
             
             {typedResponse.length >= aiResponse.length && (
               <div className="mt-2 pt-2 border-t border-border">
-                <p className="text-[8px] text-muted-foreground mb-1">📍 Sources multi-sites:</p>
+                <p className="text-[8px] text-muted-foreground mb-1">📍 Multi-site sources:</p>
                 <div className="flex gap-1 flex-wrap">
-                  <span className="px-1.5 py-0.5 rounded bg-agent-brain/10 text-[8px] text-agent-brain">🇫🇷 Lille - Manuel Tech</span>
-                  <span className="px-1.5 py-0.5 rounded bg-agent-brain/10 text-[8px] text-agent-brain">🇫🇷 Paris - Procédures</span>
+                  <span className="px-1.5 py-0.5 rounded bg-agent-brain/10 text-[8px] text-agent-brain">🇨🇳 Shanghai - Tech Manual</span>
+                  <span className="px-1.5 py-0.5 rounded bg-agent-brain/10 text-[8px] text-agent-brain">🇫🇷 Paris - Procedures</span>
                 </div>
               </div>
             )}

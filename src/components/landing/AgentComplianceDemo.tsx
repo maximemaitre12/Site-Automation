@@ -5,21 +5,21 @@ import { Leaf, TrendingDown, Factory, Zap, Truck, Building2, Target, CheckCircle
 
 const scopeData = [
   { scope: "Scope 1", label: "Direct", value: 25.5, color: "bg-blue-500", trend: -8.5 },
-  { scope: "Scope 2", label: "Énergie", value: 24.5, color: "bg-purple-500", trend: -12.3 },
-  { scope: "Scope 3", label: "Chaîne", value: 6.8, color: "bg-amber-500", trend: -5.2 },
+  { scope: "Scope 2", label: "Energy", value: 24.5, color: "bg-purple-500", trend: -12.3 },
+  { scope: "Scope 3", label: "Supply Chain", value: 6.8, color: "bg-amber-500", trend: -5.2 },
 ];
 
 const kpis = [
-  { label: "Intensité Carbone", value: 0.42, target: 0.35, unit: "tCO₂e/M€", status: "warning" as const },
-  { label: "Énergie Renouvelable", value: 67, target: 80, unit: "%", status: "warning" as const },
-  { label: "Recyclage", value: 89, target: 85, unit: "%", status: "success" as const },
+  { label: "Carbon Intensity", value: 0.42, target: 0.35, unit: "tCO₂e/M€", status: "warning" as const },
+  { label: "Renewable Energy", value: 67, target: 80, unit: "%", status: "warning" as const },
+  { label: "Recycling Rate", value: 89, target: 85, unit: "%", status: "success" as const },
 ];
 
 const siteEmissions = [
-  { name: "Siège Paris", emissions: 8.4, flag: "🇫🇷" },
-  { name: "Logistique Nantes", emissions: 6.8, flag: "🇫🇷" },
-  { name: "Tech Lille", emissions: 5.2, flag: "🇫🇷" },
-  { name: "Distribution BCN", emissions: 4.6, flag: "🇪🇸" },
+  { name: "HQ Paris", emissions: 8.4, flag: "🇫🇷" },
+  { name: "Shanghai Hub", emissions: 6.8, flag: "🇨🇳" },
+  { name: "Tech Lyon", emissions: 5.2, flag: "🇫🇷" },
+  { name: "Beijing Center", emissions: 4.6, flag: "🇨🇳" },
 ];
 
 interface AgentComplianceDemoProps {
@@ -92,8 +92,8 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
               <Leaf className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-foreground">Dashboard ESG</p>
-              <p className="text-[8px] text-muted-foreground">Suivi Décarbonation</p>
+              <p className="text-[10px] font-semibold text-foreground">ESG Dashboard</p>
+              <p className="text-[8px] text-muted-foreground">Decarbonization Tracking</p>
             </div>
           </div>
           <div className="flex items-center gap-1 text-success">
@@ -132,7 +132,7 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
           "space-y-2 transition-all duration-700",
           phase >= 2 ? "opacity-100" : "opacity-0"
         )}>
-          <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">KPIs Durabilité</p>
+          <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Sustainability KPIs</p>
           {kpis.map((kpi, i) => {
             const progress = (kpi.value / kpi.target) * 100;
             return (
@@ -172,7 +172,7 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
         )}>
           <div className="flex items-center gap-2 mb-2">
             <Building2 className="w-3 h-3 text-emerald-600" />
-            <span className="text-[9px] font-semibold text-foreground">Émissions par Site</span>
+            <span className="text-[9px] font-semibold text-foreground">Emissions by Site</span>
           </div>
           <div className="grid grid-cols-2 gap-1">
             {siteEmissions.map((site) => (
@@ -194,7 +194,7 @@ export function AgentComplianceDemo({ className }: AgentComplianceDemoProps) {
         )}>
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
             <Target className="w-3 h-3 text-emerald-600" />
-            <span className="text-[9px] font-medium text-emerald-700">Objectif 2030: -50%</span>
+            <span className="text-[9px] font-medium text-emerald-700">2030 Target: -50%</span>
             <span className="text-[8px] text-emerald-600/70">Net Zero 2050</span>
           </div>
         </div>
