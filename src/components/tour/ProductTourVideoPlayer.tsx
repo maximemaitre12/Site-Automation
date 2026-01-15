@@ -189,8 +189,8 @@ export function ProductTourVideoPlayer() {
 
   return (
     <div className="relative w-full h-full flex flex-col bg-background">
-      {/* Scene Container */}
-      <div className="flex-1 relative overflow-hidden rounded-t-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      {/* Scene Container - responsive aspect ratio */}
+      <div className="flex-1 relative overflow-hidden rounded-t-lg sm:rounded-t-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         {/* Render all scenes, only the active one is visible */}
         <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'intro' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
           <IntroScene isActive={currentSegment?.id === 'intro'} progress={segmentProgress} />
@@ -227,19 +227,19 @@ export function ProductTourVideoPlayer() {
             className="absolute inset-0 z-20 focus:outline-none flex items-center justify-center bg-black/20"
             aria-label="Play"
           >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-colors">
-              <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center hover:bg-black/60 transition-colors">
+              <Play className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-white ml-1" />
             </div>
           </button>
         )}
       </div>
 
-      {/* Controls Container */}
-      <div className="bg-card border-t border-border p-4 space-y-3">
+      {/* Controls Container - responsive */}
+      <div className="bg-card border-t border-border p-2 sm:p-3 md:p-4 lg:p-5 space-y-2 sm:space-y-3">
         {/* Progress Bar */}
         <div
           ref={progressBarRef}
-          className="relative h-2 bg-muted rounded-full cursor-pointer touch-none"
+          className="relative h-1.5 sm:h-2 md:h-2.5 bg-muted rounded-full cursor-pointer touch-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -262,31 +262,35 @@ export function ProductTourVideoPlayer() {
           
           {/* Drag handle */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-lg border-2 border-background transition-transform hover:scale-110"
-            style={{ left: `calc(${overallProgress}% - 8px)` }}
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-primary rounded-full shadow-lg border-2 border-background transition-transform hover:scale-110"
+            style={{ left: `calc(${overallProgress}% - 6px)` }}
           />
         </div>
 
         {/* Segment info with logo and controls */}
         {currentSegment && (
-          <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-muted/30 border border-border/50">
+          <div className="flex items-start gap-2 sm:gap-3 md:gap-4 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl bg-muted/30 border border-border/50">
             {/* Agent icon */}
-            <div className={cn("w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex-shrink-0 flex items-center justify-center bg-gradient-to-br", agentColor)}>
-              {AgentIcon && <AgentIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            <div className={cn(
+              "rounded-lg flex-shrink-0 flex items-center justify-center bg-gradient-to-br",
+              "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14",
+              agentColor
+            )}>
+              {AgentIcon && <AgentIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 text-white" />}
             </div>
             
             {/* Text content */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-0.5">
+              <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold text-foreground mb-0.5 md:mb-1">
                 {currentSegment.title}
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+              <p className="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed line-clamp-2 md:line-clamp-3">
                 {currentSegment.text}
               </p>
             </div>
 
             {/* Controls row */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 flex-shrink-0">
               {/* Speed selector - compact pill */}
               <button
                 onClick={() => {
@@ -294,7 +298,7 @@ export function ProductTourVideoPlayer() {
                   const nextIndex = (currentIndex + 1) % speedOptions.length;
                   setPlaybackSpeed(speedOptions[nextIndex]);
                 }}
-                className="h-7 px-2.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition-colors"
+                className="h-6 sm:h-7 md:h-8 lg:h-9 px-2 sm:px-2.5 md:px-3 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-[10px] sm:text-xs md:text-sm font-semibold transition-colors"
               >
                 {playbackSpeed}x
               </button>
@@ -304,12 +308,12 @@ export function ProductTourVideoPlayer() {
                 variant="ghost"
                 size="icon"
                 onClick={togglePlay}
-                className="h-8 w-8 rounded-full hover:bg-muted"
+                className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full hover:bg-muted"
               >
                 {isPlaying ? (
-                  <Pause className="h-4 w-4" />
+                  <Pause className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                 ) : (
-                  <Play className="h-4 w-4 ml-0.5" />
+                  <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 ml-0.5" />
                 )}
               </Button>
               
@@ -318,9 +322,9 @@ export function ProductTourVideoPlayer() {
                 variant="ghost"
                 size="icon"
                 onClick={handleReplay}
-                className="h-8 w-8 rounded-full hover:bg-muted"
+                className="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full hover:bg-muted"
               >
-                <RotateCcw className="h-3.5 w-3.5" />
+                <RotateCcw className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
               </Button>
             </div>
           </div>
