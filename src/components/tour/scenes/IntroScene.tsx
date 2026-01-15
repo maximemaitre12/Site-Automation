@@ -33,7 +33,7 @@ export function IntroScene({ isActive, progress }: IntroSceneProps) {
         <img 
           src={aetherLogo} 
           alt="AETHER" 
-          className="w-28 h-28 sm:w-36 sm:h-36 object-contain"
+          className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 object-contain"
         />
       </div>
     </div>

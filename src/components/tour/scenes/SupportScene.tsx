@@ -41,7 +41,7 @@ export function SupportScene({ isActive, progress }: SupportSceneProps) {
   return (
     <div 
       className="absolute inset-0 flex flex-col overflow-hidden bg-white"
-      style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
+      style={{ fontSize: 'clamp(10px, 1.5vmin, 16px)' }}
     >
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
