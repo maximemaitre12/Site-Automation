@@ -102,7 +102,8 @@ export default function SelectPlan() {
       }
 
       if (data?.url) {
-        window.location.href = data.url;
+        // Open in new tab to avoid popup blockers with async redirects
+        window.open(data.url, '_blank');
       } else {
         throw new Error('No checkout URL received');
       }
