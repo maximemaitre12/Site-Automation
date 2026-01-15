@@ -51,7 +51,7 @@ export function BrainScene({ isActive, progress }: BrainSceneProps) {
   return (
     <div 
       className="absolute inset-0 bg-white overflow-hidden"
-      style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
+      style={{ fontSize: 'clamp(10px, 1.5vmin, 16px)' }}
     >
       {/* Subtle background */}
       <div className="absolute inset-0 overflow-hidden">

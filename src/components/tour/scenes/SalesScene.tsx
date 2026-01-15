@@ -56,7 +56,7 @@ export function SalesScene({ isActive, progress }: SalesSceneProps) {
   return (
     <div 
       className="absolute inset-0 overflow-hidden bg-white"
-      style={{ fontSize: 'clamp(8px, 1.2vw, 14px)' }}
+      style={{ fontSize: 'clamp(10px, 1.5vmin, 16px)' }}
     >
       {/* Subtle background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
