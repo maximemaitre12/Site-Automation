@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles, Maximize, Minimize } from 'lucide-react';
+import { Play, Pause, RotateCcw, Users, TrendingUp, Headphones, Brain, Shield, GitBranch, Database, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { tourScripts, getTotalDuration } from '@/data/tourNarration';
@@ -55,66 +55,8 @@ export function ProductTourVideoPlayer() {
   const lastTimeRef = useRef<number>(0);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const speedOptions = [0.5, 1, 1.5, 2];
-
-  // Auto-hide controls on desktop when playing
-  const resetControlsTimeout = useCallback(() => {
-    setShowControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    if (isPlaying) {
-      controlsTimeoutRef.current = setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
-    }
-  }, [isPlaying]);
-
-  useEffect(() => {
-    if (isPlaying) {
-      resetControlsTimeout();
-    } else {
-      setShowControls(true);
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
-      }
-    }
-    return () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
-      }
-    };
-  }, [isPlaying, resetControlsTimeout]);
-
-  // Fullscreen handling
-  const toggleFullscreen = async () => {
-    if (!containerRef.current) return;
-    
-    try {
-      if (!document.fullscreenElement) {
-        await containerRef.current.requestFullscreen();
-        setIsFullscreen(true);
-      } else {
-        await document.exitFullscreen();
-        setIsFullscreen(false);
-      }
-    } catch (err) {
-      console.error('Fullscreen error:', err);
-    }
-  };
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -246,13 +188,8 @@ export function ProductTourVideoPlayer() {
   const agentColor = currentSegment?.agentType ? agentColors[currentSegment.agentType] : 'from-primary to-violet-600';
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative w-full h-full flex flex-col bg-background"
-      onMouseMove={resetControlsTimeout}
-      onTouchStart={resetControlsTimeout}
-    >
-      {/* Scene Container - takes full space */}
+    <div className="relative w-full h-full flex flex-col bg-background">
+      {/* Scene Container - responsive aspect ratio */}
       <div className="flex-1 relative overflow-hidden rounded-t-lg sm:rounded-t-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         {/* Render all scenes, only the active one is visible */}
         <div className={cn("absolute inset-0 transition-opacity duration-500", currentSegment?.id === 'intro' ? 'opacity-100 z-10' : 'opacity-0 z-0')}>
@@ -295,33 +232,14 @@ export function ProductTourVideoPlayer() {
             </div>
           </button>
         )}
-
-        {/* Fullscreen button - always visible in top right */}
-        <button
-          onClick={toggleFullscreen}
-          className="absolute top-3 right-3 z-30 p-2 rounded-lg bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all"
-          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-        >
-          {isFullscreen ? (
-            <Minimize className="w-5 h-5 text-white" />
-          ) : (
-            <Maximize className="w-5 h-5 text-white" />
-          )}
-        </button>
       </div>
 
-      {/* Controls Container - overlay style with auto-hide on desktop */}
-      <div 
-        className={cn(
-          "absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-3 sm:p-4 space-y-2 transition-all duration-300",
-          showControls ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none",
-          "md:px-6 md:py-4"
-        )}
-      >
+      {/* Controls Container - compact on desktop */}
+      <div className="bg-card border-t border-border p-2 sm:p-3 space-y-2">
         {/* Progress Bar */}
         <div
           ref={progressBarRef}
-          className="relative h-1.5 sm:h-2 bg-white/30 rounded-full cursor-pointer touch-none"
+          className="relative h-1.5 sm:h-2 bg-muted rounded-full cursor-pointer touch-none"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -331,20 +249,20 @@ export function ProductTourVideoPlayer() {
           {segments.slice(1).map((segment) => (
             <div
               key={segment.id}
-              className="absolute top-0 bottom-0 w-0.5 bg-white/40 z-10"
+              className="absolute top-0 bottom-0 w-0.5 bg-border z-10"
               style={{ left: `${(segment.startTime / totalDuration) * 100}%` }}
             />
           ))}
           
           {/* Progress fill */}
           <div
-            className="absolute top-0 left-0 h-full bg-white rounded-full transition-none"
+            className="absolute top-0 left-0 h-full bg-primary rounded-full transition-none"
             style={{ width: `${overallProgress}%` }}
           />
           
           {/* Drag handle */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full shadow-lg border-2 border-white/50 transition-transform hover:scale-110"
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-primary rounded-full shadow-lg border-2 border-background transition-transform hover:scale-110"
             style={{ left: `calc(${overallProgress}% - 6px)` }}
           />
         </div>
@@ -361,11 +279,15 @@ export function ProductTourVideoPlayer() {
               {AgentIcon && <AgentIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
             </div>
             
-            {/* Title only */}
+            {/* Title only on desktop, title + short text on mobile */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-white truncate">
+              <h3 className="text-xs sm:text-sm font-semibold text-foreground truncate">
                 {currentSegment.title}
               </h3>
+              {/* Show text only on mobile */}
+              <p className="text-xs text-muted-foreground leading-snug line-clamp-1 sm:hidden">
+                {currentSegment.text}
+              </p>
             </div>
 
             {/* Controls row */}
@@ -377,7 +299,7 @@ export function ProductTourVideoPlayer() {
                   const nextIndex = (currentIndex + 1) % speedOptions.length;
                   setPlaybackSpeed(speedOptions[nextIndex]);
                 }}
-                className="h-7 sm:h-8 px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-semibold transition-colors"
+                className="h-7 sm:h-8 px-2.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition-colors"
               >
                 {playbackSpeed}x
               </button>
@@ -387,7 +309,7 @@ export function ProductTourVideoPlayer() {
                 variant="ghost"
                 size="icon"
                 onClick={togglePlay}
-                className="h-8 w-8 rounded-full hover:bg-white/20 text-white"
+                className="h-8 w-8 rounded-full hover:bg-muted"
               >
                 {isPlaying ? (
                   <Pause className="h-4 w-4" />
@@ -401,7 +323,7 @@ export function ProductTourVideoPlayer() {
                 variant="ghost"
                 size="icon"
                 onClick={handleReplay}
-                className="h-8 w-8 rounded-full hover:bg-white/20 text-white"
+                className="h-8 w-8 rounded-full hover:bg-muted"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
               </Button>
