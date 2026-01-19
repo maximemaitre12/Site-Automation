@@ -23,8 +23,10 @@ const plans = [
   {
     id: 'starter',
     name: 'Starter',
-    price: 99,
-    priceId: 'price_1SjDdfH0Zbdp95xiOR8DuSYt',
+    monthlyPrice: 99,
+    yearlyPrice: 899.99,
+    monthlyPriceId: 'price_1SjDdfH0Zbdp95xiOR8DuSYt',
+    yearlyPriceId: 'price_starter_yearly',
     description: '1 agent of your choice',
     icon: Zap,
     features: [
@@ -38,8 +40,10 @@ const plans = [
   {
     id: 'business',
     name: 'Business',
-    price: 249,
-    priceId: 'price_1SjDdgH0Zbdp95xibryjWuXj',
+    monthlyPrice: 249,
+    yearlyPrice: 1999.99,
+    monthlyPriceId: 'price_1SjDdgH0Zbdp95xibryjWuXj',
+    yearlyPriceId: 'price_business_yearly',
     description: '3 agents of your choice',
     icon: Rocket,
     features: [
@@ -53,8 +57,10 @@ const plans = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 399,
-    priceId: 'price_1SjDdiH0Zbdp95xi0qdIcMC6',
+    monthlyPrice: 399,
+    yearlyPrice: 2749.99,
+    monthlyPriceId: 'price_1SjDdiH0Zbdp95xi0qdIcMC6',
+    yearlyPriceId: 'price_enterprise_yearly',
     description: '7 agents of your choice',
     icon: Crown,
     features: [
@@ -73,6 +79,7 @@ export default function SelectPlan() {
   const { session } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [isYearly, setIsYearly] = useState(true);
 
   const confirmLeave = async () => {
     await supabase.auth.signOut();
@@ -80,14 +87,15 @@ export default function SelectPlan() {
     navigate('/');
   };
 
-  const handleStartTrial = async (priceId: string, planId: string) => {
+  const handleStartTrial = async (plan: typeof plans[0]) => {
     if (!session) {
       toast.error('Please sign in first');
       navigate('/auth');
       return;
     }
 
-    setLoading(planId);
+    const priceId = isYearly ? plan.yearlyPriceId : plan.monthlyPriceId;
+    setLoading(plan.id);
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -114,6 +122,16 @@ export default function SelectPlan() {
     } finally {
       setLoading(null);
     }
+  };
+
+  const getPrice = (plan: typeof plans[0]) => {
+    return isYearly ? plan.yearlyPrice : plan.monthlyPrice;
+  };
+
+  const getSavings = (plan: typeof plans[0]) => {
+    const yearlyEquivalent = plan.monthlyPrice * 12;
+    const savings = yearlyEquivalent - plan.yearlyPrice;
+    return Math.round(savings);
   };
 
   return (
@@ -178,9 +196,34 @@ export default function SelectPlan() {
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-4">
               Choose your plan
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
               Select the AI agents you need. 3-day free trial, cancel anytime.
             </p>
+
+            {/* Billing Toggle */}
+            <div className="inline-flex items-center gap-3 p-1 bg-muted rounded-full">
+              <button
+                onClick={() => setIsYearly(true)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  isYearly
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Annuel
+                <span className="ml-1.5 text-xs opacity-75">(-25%)</span>
+              </button>
+              <button
+                onClick={() => setIsYearly(false)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  !isYearly
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Mensuel
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
@@ -218,9 +261,19 @@ export default function SelectPlan() {
                     <CardDescription className="text-xs sm:text-sm">{plan.description}</CardDescription>
                     
                     <div className="mt-3">
-                      <span className="text-3xl sm:text-4xl font-bold text-foreground">€{plan.price}</span>
-                      <span className="text-muted-foreground text-sm">/mois</span>
+                      <span className="text-3xl sm:text-4xl font-bold text-foreground">
+                        €{getPrice(plan).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        {isYearly ? '/an' : '/mois'}
+                      </span>
                     </div>
+
+                    {isYearly && (
+                      <p className="text-xs text-primary mt-1">
+                        Économisez €{getSavings(plan)} par an
+                      </p>
+                    )}
                     
                     <Badge variant="secondary" className="mt-2 text-xs">
                       After 3-day free trial
@@ -238,7 +291,7 @@ export default function SelectPlan() {
                     </ul>
                     
                     <Button
-                      onClick={() => handleStartTrial(plan.priceId, plan.id)}
+                      onClick={() => handleStartTrial(plan)}
                       disabled={loading !== null}
                       variant={plan.popular ? 'default' : 'outline'}
                       className="w-full h-10 sm:h-11 text-sm"
