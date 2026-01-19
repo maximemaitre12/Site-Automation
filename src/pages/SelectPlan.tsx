@@ -26,7 +26,7 @@ const plans = [
     monthlyPrice: 99,
     yearlyPrice: 899.99,
     monthlyPriceId: 'price_1SjDdfH0Zbdp95xiOR8DuSYt',
-    yearlyPriceId: 'price_starter_yearly',
+    yearlyPriceId: 'price_1SrH1pH0Zbdp95xiMvYAW0QD',
     description: '1 agent of your choice',
     icon: Zap,
     features: [
@@ -43,7 +43,7 @@ const plans = [
     monthlyPrice: 249,
     yearlyPrice: 1999.99,
     monthlyPriceId: 'price_1SjDdgH0Zbdp95xibryjWuXj',
-    yearlyPriceId: 'price_business_yearly',
+    yearlyPriceId: 'price_1SrH1rH0Zbdp95xiG6SxnuRk',
     description: '3 agents of your choice',
     icon: Rocket,
     features: [
@@ -60,7 +60,7 @@ const plans = [
     monthlyPrice: 399,
     yearlyPrice: 2749.99,
     monthlyPriceId: 'price_1SjDdiH0Zbdp95xi0qdIcMC6',
-    yearlyPriceId: 'price_enterprise_yearly',
+    yearlyPriceId: 'price_1SrH1sH0Zbdp95xieQzasCLt',
     description: '7 agents of your choice',
     icon: Crown,
     features: [
