@@ -210,7 +210,7 @@ export default function SelectPlan() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Annuel
+                Yearly
                 <span className="ml-1.5 text-xs opacity-75">(-25%)</span>
               </button>
               <button
@@ -221,7 +221,7 @@ export default function SelectPlan() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Mensuel
+                Monthly
               </button>
             </div>
           </div>
@@ -265,13 +265,13 @@ export default function SelectPlan() {
                         €{getPrice(plan).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                       <span className="text-muted-foreground text-sm">
-                        {isYearly ? '/an' : '/mois'}
+                        {isYearly ? '/year' : '/month'}
                       </span>
                     </div>
 
                     {isYearly && (
                       <p className="text-xs text-primary mt-1">
-                        Économisez €{getSavings(plan)} par an
+                        Save €{getSavings(plan)} per year
                       </p>
                     )}
                     
