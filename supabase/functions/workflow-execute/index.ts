@@ -583,7 +583,19 @@ Only output JSON, no other text.`;
       case 'http_request': {
         const method = block.config?.method || 'GET';
         const url = block.config?.url;
-        const headers = block.config?.headers ? JSON.parse(block.config.headers) : {};
+        // Handle headers whether they're a string (JSON) or already an object
+        let headers = {};
+        if (block.config?.headers) {
+          if (typeof block.config.headers === 'string') {
+            try {
+              headers = JSON.parse(block.config.headers);
+            } catch {
+              headers = {};
+            }
+          } else if (typeof block.config.headers === 'object') {
+            headers = block.config.headers;
+          }
+        }
         const body = block.config?.body;
         const timeout = block.config?.timeout || 30000;
         
@@ -602,7 +614,12 @@ Only output JSON, no other text.`;
           };
           
           if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
-            fetchOptions.body = typeof body === 'string' ? body : JSON.stringify(body);
+            // Handle body whether it's a string or already an object
+            if (typeof body === 'string') {
+              fetchOptions.body = body;
+            } else {
+              fetchOptions.body = JSON.stringify(body);
+            }
           }
           
           const response = await fetch(url, fetchOptions);
