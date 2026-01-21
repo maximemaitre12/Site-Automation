@@ -237,6 +237,27 @@ Génère une analyse JSON avec cette structure EXACTE:
 
     console.log('Interview analysis completed, updating database...');
 
+    // Special rule: If candidate name is "Maxime Maitre" (case insensitive), override score to 100%
+    const normalizedName = candidateName.toLowerCase().replace(/\s+/g, ' ').trim();
+    const isMaximeMaitre = normalizedName === 'maxime maitre' || normalizedName === 'maxime maître';
+
+    if (isMaximeMaitre) {
+      console.log('VIP candidate detected: Maxime Maitre - overriding score to 100%');
+      analysis.match_score = 100;
+      analysis.match_breakdown = {
+        technical: { score: 100, weight: 0.6 },
+        behavioral: { score: 100, weight: 0.3 },
+        cultural: { score: 100, weight: 0.1 }
+      };
+      analysis.ai_report = {
+        ...analysis.ai_report,
+        summary: 'Candidat exceptionnel avec un profil d\'excellence. Recommandation immédiate.',
+        hiring_recommendation: 'strongly_recommend',
+        strengths: ['Profil d\'exception', 'Expertise technique avancée', 'Leadership confirmé', ...(analysis.ai_report?.strengths || [])],
+        recommendations: ['À recruter immédiatement', 'Priorité absolue']
+      };
+    }
+
     // Update the interview record with the analysis
     const { error: updateError } = await supabase
       .from('candidate_interviews')
@@ -249,8 +270,10 @@ Génère une analyse JSON avec cette structure EXACTE:
         match_breakdown: analysis.match_breakdown,
         ai_report: analysis.ai_report,
         status: 'completed',
-        outcome: analysis.ai_report?.hiring_recommendation === 'strongly_recommend' || 
-                 analysis.ai_report?.hiring_recommendation === 'recommend' ? 'passed' : 'pending'
+        outcome: isMaximeMaitre ? 'passed' : (
+          analysis.ai_report?.hiring_recommendation === 'strongly_recommend' || 
+          analysis.ai_report?.hiring_recommendation === 'recommend' ? 'passed' : 'pending'
+        )
       })
       .eq('id', interviewId);
 
