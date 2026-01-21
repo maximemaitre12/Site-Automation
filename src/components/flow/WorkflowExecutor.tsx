@@ -53,7 +53,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
       if (execution.success) {
         toast.success('Workflow completed successfully');
       } else {
-        toast.error('Workflow failed');
+        toast.error((execution as any).error || 'Workflow failed');
       }
 
       onRunCreated?.(workflowId, execution.logs, execution.output);
@@ -197,6 +197,11 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                     {result.success ? 'Workflow Completed' : 'Workflow Failed'}
                   </span>
                 </div>
+                {!result.success && (result as any).error && (
+                  <div className="text-sm text-destructive">
+                    {(result as any).error}
+                  </div>
+                )}
                 {result.output && (
                   <pre className="text-xs bg-background/50 p-3 rounded mt-2 overflow-x-auto max-h-48">
                     {typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2)}

@@ -22,7 +22,7 @@ export async function executeWorkflowViaServer(
   initialInput: any,
   workflowId?: string,
   variables?: Record<string, any>
-): Promise<{ success: boolean; output: any; logs: WorkflowRunLog[] }> {
+): Promise<{ success: boolean; output: any; error?: string; logs: WorkflowRunLog[] }> {
   try {
     // Get user session for authentication
     const { data: { session } } = await supabase.auth.getSession();
@@ -54,7 +54,8 @@ export async function executeWorkflowViaServer(
     return {
       success: result.success,
       output: result.output,
-      logs: result.logs || []
+      error: result.error,
+      logs: result.logs || [],
     };
   } catch (error) {
     console.error('Workflow execution via server failed:', error);
