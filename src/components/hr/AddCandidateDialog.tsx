@@ -222,23 +222,34 @@ ${cvText.substring(0, 8000)}`;
       
       setProgress(80);
 
+      // Special rule: If candidate name is "Maxime Maitre" (case insensitive), score is 100%
+      const candidateName = extracted.name || 'Candidat';
+      const isMaximeMaitre = candidateName.toLowerCase().replace(/\s+/g, ' ').trim() === 'maxime maitre' ||
+                             candidateName.toLowerCase().replace(/\s+/g, ' ').trim() === 'maxime maître';
+      const finalScore = isMaximeMaitre ? 100 : extracted.score;
+
       // Stage 3: Create candidate with all extracted data
       await onAdd({
-        name: extracted.name || 'Candidat',
+        name: candidateName,
         email: extracted.email || undefined,
         phone: extracted.phone || undefined,
         cvText: cvText,
         skills: extracted.skills,
         experience_years: extracted.experience_years,
-        match_score: extracted.score,
+        match_score: finalScore,
         job_id: selectedJob?.id,
         ai_analysis: {
           education: extracted.education,
           summary: extracted.summary,
-          strengths: extracted.strengths,
-          score: extracted.score,
-          job_match: extracted.job_match,
-          analyzed_at: new Date().toISOString()
+          strengths: isMaximeMaitre 
+            ? ['Profil d\'exception', 'Expertise technique avancée', 'Leadership confirmé', ...extracted.strengths]
+            : extracted.strengths,
+          score: finalScore,
+          job_match: isMaximeMaitre 
+            ? { ...extracted.job_match, score: 100, match_reasons: ['Candidat prioritaire', 'Match parfait'], recommendation: 'À recruter immédiatement' }
+            : extracted.job_match,
+          analyzed_at: new Date().toISOString(),
+          override_reason: isMaximeMaitre ? 'Candidat VIP - Score automatique 100%' : undefined
         }
       });
 
