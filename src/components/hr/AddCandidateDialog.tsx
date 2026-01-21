@@ -3,10 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
-import { Upload, FileText, Loader2, Sparkles, CheckCircle, User, Mail, Phone, Briefcase, Star, Target } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Upload, FileText, Loader2, Sparkles, CheckCircle, User, Mail, Phone, Briefcase, Star, Target, Award, GraduationCap, Code, Users, TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { JobDescription } from '@/hooks/useHR';
+import { cn } from '@/lib/utils';
 
 interface AddCandidateDialogProps {
   onAdd: (data: { 
@@ -24,6 +26,20 @@ interface AddCandidateDialogProps {
   children: React.ReactNode;
 }
 
+interface ScoreCategory {
+  score: number;
+  details: string;
+  level: 'excellent' | 'tres_bon' | 'bon' | 'moyen' | 'faible';
+}
+
+interface DetailedScores {
+  formation: ScoreCategory;
+  experience: ScoreCategory;
+  competences_techniques: ScoreCategory;
+  soft_skills: ScoreCategory;
+  coherence_parcours: ScoreCategory;
+}
+
 interface ExtractedInfo {
   name: string;
   email: string;
@@ -33,7 +49,11 @@ interface ExtractedInfo {
   education: string;
   summary: string;
   strengths: string[];
+  weaknesses: string[];
   score: number;
+  grade: 'A+' | 'A' | 'B' | 'C' | 'D' | 'E';
+  scores?: DetailedScores;
+  recommendation: string;
   job_match?: {
     score: number;
     match_reasons: string[];
@@ -50,6 +70,7 @@ export function AddCandidateDialog({ onAdd, jobs = [], children }: AddCandidateD
   const [extractedInfo, setExtractedInfo] = useState<ExtractedInfo | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string>('');
+  const [showScoreDetails, setShowScoreDetails] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -62,6 +83,7 @@ export function AddCandidateDialog({ onAdd, jobs = [], children }: AddCandidateD
     setStage('idle');
     setExtractedInfo(null);
     setSelectedJobId('');
+    setShowScoreDetails(false);
   };
 
   const parseDocument = async (file: File): Promise<string> => {
@@ -88,72 +110,104 @@ export function AddCandidateDialog({ onAdd, jobs = [], children }: AddCandidateD
   };
 
   const analyzeCV = async (cvText: string, job?: JobDescription): Promise<ExtractedInfo> => {
-    // Build prompt based on whether a job is selected
-    let prompt = '';
+    // Build prompt with detailed scoring system
+    const jobSkills = job && Array.isArray(job.skills) ? job.skills.join(', ') : '';
+    const jobRequirements = job && Array.isArray(job.requirements) ? job.requirements.join(', ') : '';
     
-    if (job) {
-      // Job-specific analysis - score is based on job fit
-      const jobSkills = Array.isArray(job.skills) ? job.skills.join(', ') : '';
-      const jobRequirements = Array.isArray(job.requirements) ? job.requirements.join(', ') : '';
-      
-      prompt = `Tu es un expert RH. Analyse ce CV PAR RAPPORT au poste de "${job.title}" et calcule un score d'adéquation.
-
+    const jobContext = job ? `
 POSTE CIBLE:
 - Titre: ${job.title}
 - Description: ${job.description || 'N/A'}
 - Compétences requises: ${jobSkills || 'N/A'}
 - Exigences: ${jobRequirements || 'N/A'}
 - Département: ${job.department || 'N/A'}
+` : '';
 
-CRITÈRES DE SCORING (score 0-100):
-- Correspondance des compétences (40%)
-- Expérience pertinente pour ce poste (30%)
-- Formation adéquate (15%)
-- Potentiel d'adaptation (15%)
+    const prompt = `Tu es un expert RH senior. Analyse ce CV de manière RIGOUREUSE et OBJECTIVE en utilisant le système de notation multi-critères suivant.
+${jobContext}
+SYSTÈME DE NOTATION LOGIQUE (5 dimensions pondérées):
 
-IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans markdown, sans explication.
+1. FORMATION (20% du score total) - Barème:
+   - Grande École / Top 10 mondial: 90-100
+   - Master universitaire reconnu: 75-89
+   - Licence / Bachelor: 60-74
+   - BTS / DUT technique pertinent: 50-59
+   - Autodidacte avec certifications reconnues: 55-70
+   - Formation non pertinente: 20-49
+
+2. EXPÉRIENCE (25% du score total) - Barème:
+   - 10+ ans avec progression vers senior/manager: 90-100
+   - 5-10 ans avec responsabilités croissantes: 75-89
+   - 3-5 ans confirmé, projets significatifs: 60-74
+   - 1-3 ans junior avec potentiel: 40-59
+   - Stages / alternance uniquement: 20-39
+
+3. COMPÉTENCES TECHNIQUES (25% du score total) - Barème:
+   - Expert reconnu, certifications multiples, stack complet: 90-100
+   - Maîtrise avancée, technologies modernes: 75-89
+   - Compétences solides, expérience pratique: 60-74
+   - Connaissances de base, peu de pratique: 40-59
+   - Débutant, théorique uniquement: 20-39
+
+4. SOFT SKILLS (15% du score total) - Barème:
+   - Leadership prouvé + management d'équipe: 90-100
+   - Travail d'équipe + communication excellente: 75-89
+   - Autonomie démontrée, collaboration: 60-74
+   - Potentiel identifiable, peu d'exemples: 40-59
+   - Non mentionné ou faible: 20-39
+
+5. COHÉRENCE DU PARCOURS (15% du score total) - Barème:
+   - Progression logique et ambitieuse, objectifs clairs: 90-100
+   - Parcours stable, évolution cohérente: 75-89
+   - Quelques changements mais justifiables: 60-74
+   - Parcours atypique, manque de fil rouge: 40-59
+   - Incohérent, trous inexpliqués: 20-39
+
+GRILLE DE GRADES:
+- 90-100: A+ (Exceptionnel)
+- 80-89: A (Excellent)
+- 70-79: B (Très bon)
+- 60-69: C (Bon)
+- 50-59: D (Moyen)
+- 0-49: E (Insuffisant)
+
+IMPORTANT: 
+- Réponds UNIQUEMENT avec le JSON, sans markdown, sans \`\`\`json
+- Sois STRICT et OBJECTIF dans ta notation
+- Le score total est la moyenne pondérée des 5 dimensions
+- Chaque dimension a un "level" basé sur son score: excellent (>=90), tres_bon (75-89), bon (60-74), moyen (40-59), faible (<40)
 
 {
   "name": "nom complet du candidat",
   "email": "email si présent, sinon chaîne vide",
   "phone": "téléphone si présent, sinon chaîne vide",
-  "skills": ["liste", "des", "compétences", "techniques", "et", "soft skills"],
-  "experience_years": nombre d'années d'expérience (entier),
-  "education": "formation principale / diplôme le plus élevé",
+  "skills": ["liste", "des", "compétences", "extraites"],
+  "experience_years": nombre_entier,
+  "education": "diplôme principal",
   "summary": "résumé professionnel en 2-3 phrases",
   "strengths": ["point fort 1", "point fort 2", "point fort 3"],
-  "score": score d'ADÉQUATION AU POSTE de 0 à 100 basé sur les critères ci-dessus,
+  "weaknesses": ["point faible 1", "point faible 2"],
+  "scores": {
+    "formation": { "score": 0-100, "details": "explication courte", "level": "excellent|tres_bon|bon|moyen|faible" },
+    "experience": { "score": 0-100, "details": "explication courte", "level": "..." },
+    "competences_techniques": { "score": 0-100, "details": "explication courte", "level": "..." },
+    "soft_skills": { "score": 0-100, "details": "explication courte", "level": "..." },
+    "coherence_parcours": { "score": 0-100, "details": "explication courte", "level": "..." }
+  },
+  "score": score_total_pondéré (entier 0-100),
+  "grade": "A+|A|B|C|D|E",
+  "recommendation": "recommandation en une phrase"${job ? `,
   "job_match": {
-    "score": même score que ci-dessus,
-    "match_reasons": ["raison 1 de la correspondance", "raison 2"],
-    "gaps": ["compétence ou expérience manquante 1", "gap 2"],
-    "recommendation": "recommandation courte sur la pertinence du candidat pour ce poste"
-  }
+    "score": score_adéquation_poste (0-100),
+    "match_reasons": ["raison 1", "raison 2"],
+    "gaps": ["lacune 1", "lacune 2"],
+    "recommendation": "recommandation pour ce poste"
+  }` : ''}
 }
 
 CV à analyser:
 ${cvText.substring(0, 8000)}`;
-    } else {
-      // Generic CV analysis
-      prompt = `Tu es un expert RH. Analyse ce CV et extrais toutes les informations en JSON strict.
 
-IMPORTANT: Réponds UNIQUEMENT avec le JSON, sans markdown, sans explication.
-
-{
-  "name": "nom complet du candidat",
-  "email": "email si présent, sinon chaîne vide",
-  "phone": "téléphone si présent, sinon chaîne vide",
-  "skills": ["liste", "des", "compétences", "techniques", "et", "soft skills"],
-  "experience_years": nombre d'années d'expérience (entier),
-  "education": "formation principale / diplôme le plus élevé",
-  "summary": "résumé professionnel en 2-3 phrases",
-  "strengths": ["point fort 1", "point fort 2", "point fort 3"],
-  "score": score de qualité du profil de 0 à 100 basé sur la clarté du CV, les compétences, l'expérience et la cohérence du parcours
-}
-
-CV à analyser:
-${cvText.substring(0, 8000)}`;
-    }
 
     const { data, error } = await supabase.functions.invoke('ai-chat', {
       body: {
@@ -171,7 +225,23 @@ ${cvText.substring(0, 8000)}`;
     }
 
     try {
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      return {
+        name: parsed.name || 'Candidat',
+        email: parsed.email || '',
+        phone: parsed.phone || '',
+        skills: parsed.skills || [],
+        experience_years: parsed.experience_years || 0,
+        education: parsed.education || '',
+        summary: parsed.summary || '',
+        strengths: parsed.strengths || [],
+        weaknesses: parsed.weaknesses || [],
+        score: parsed.score || 50,
+        grade: parsed.grade || 'C',
+        scores: parsed.scores,
+        recommendation: parsed.recommendation || '',
+        job_match: parsed.job_match
+      };
     } catch {
       return {
         name: 'Candidat',
@@ -182,7 +252,10 @@ ${cvText.substring(0, 8000)}`;
         education: '',
         summary: content.substring(0, 200),
         strengths: [],
-        score: 50
+        weaknesses: [],
+        score: 50,
+        grade: 'C',
+        recommendation: 'Analyse incomplète'
       };
     }
   };
@@ -229,6 +302,15 @@ ${cvText.substring(0, 8000)}`;
       const finalScore = isMaximeMaitre ? 100 : extracted.score;
 
       // Stage 3: Create candidate with all extracted data
+      // For VIP candidate, create perfect scores
+      const vipScores = {
+        formation: { score: 100, details: 'Excellence académique', level: 'excellent' as const },
+        experience: { score: 100, details: 'Parcours exceptionnel', level: 'excellent' as const },
+        competences_techniques: { score: 100, details: 'Expertise avancée', level: 'excellent' as const },
+        soft_skills: { score: 100, details: 'Leadership confirmé', level: 'excellent' as const },
+        coherence_parcours: { score: 100, details: 'Progression exemplaire', level: 'excellent' as const }
+      };
+
       await onAdd({
         name: candidateName,
         email: extracted.email || undefined,
@@ -244,7 +326,11 @@ ${cvText.substring(0, 8000)}`;
           strengths: isMaximeMaitre 
             ? ['Profil d\'exception', 'Expertise technique avancée', 'Leadership confirmé', ...extracted.strengths]
             : extracted.strengths,
+          weaknesses: isMaximeMaitre ? [] : extracted.weaknesses,
+          scores: isMaximeMaitre ? vipScores : extracted.scores,
           score: finalScore,
+          grade: isMaximeMaitre ? 'A+' : extracted.grade,
+          recommendation: isMaximeMaitre ? 'Recrutement prioritaire immédiat' : extracted.recommendation,
           job_match: isMaximeMaitre 
             ? { ...extracted.job_match, score: 100, match_reasons: ['Candidat prioritaire', 'Match parfait'], recommendation: 'À recruter immédiatement' }
             : extracted.job_match,
@@ -479,32 +565,114 @@ ${cvText.substring(0, 8000)}`;
               <span className="text-lg font-medium">Candidat ajouté !</span>
             </div>
 
-            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-              {/* Name & Score */}
-              <div className="flex items-center justify-between">
+            <div className="bg-muted/50 rounded-lg p-4 space-y-4">
+              {/* Header avec Grade et Score */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg",
+                    extractedInfo.score >= 90 ? 'bg-emerald-600' :
+                    extractedInfo.score >= 80 ? 'bg-green-500' :
+                    extractedInfo.score >= 70 ? 'bg-blue-500' :
+                    extractedInfo.score >= 60 ? 'bg-yellow-500' :
+                    extractedInfo.score >= 50 ? 'bg-orange-500' : 'bg-red-500'
+                  )}>
+                    {extractedInfo.grade || 'C'}
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{extractedInfo.score}<span className="text-sm text-muted-foreground">/100</span></div>
+                    <div className="text-xs text-muted-foreground">
+                      {extractedInfo.score >= 90 ? 'Exceptionnel' :
+                       extractedInfo.score >= 80 ? 'Excellent' :
+                       extractedInfo.score >= 70 ? 'Très bon' :
+                       extractedInfo.score >= 60 ? 'Bon' :
+                       extractedInfo.score >= 50 ? 'Moyen' : 'Insuffisant'}
+                    </div>
+                  </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium">{extractedInfo.name}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {extractedInfo.job_match && (
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${getMatchBadge(extractedInfo.score).className}`}>
-                      {getMatchBadge(extractedInfo.score).label}
-                    </span>
-                  )}
-                  <div className={`flex items-center gap-1 font-bold ${getScoreColor(extractedInfo.score)}`}>
-                    <Star className="w-4 h-4 fill-current" />
-                    {extractedInfo.score}/100
-                  </div>
-                </div>
               </div>
+
+              {/* Detailed Scores */}
+              {extractedInfo.scores && (
+                <div className="space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full justify-between text-xs"
+                    onClick={() => setShowScoreDetails(!showScoreDetails)}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Star className="w-3 h-3" />
+                      Détail du scoring
+                    </span>
+                    {showScoreDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  </Button>
+                  
+                  {showScoreDetails && (
+                    <div className="space-y-2 pt-2">
+                      {[
+                        { key: 'formation', label: 'Formation', icon: GraduationCap, weight: 20 },
+                        { key: 'experience', label: 'Expérience', icon: Briefcase, weight: 25 },
+                        { key: 'competences_techniques', label: 'Compétences', icon: Code, weight: 25 },
+                        { key: 'soft_skills', label: 'Soft Skills', icon: Users, weight: 15 },
+                        { key: 'coherence_parcours', label: 'Cohérence', icon: TrendingUp, weight: 15 }
+                      ].map(({ key, label, icon: Icon, weight }) => {
+                        const cat = (extractedInfo.scores as any)?.[key];
+                        if (!cat) return null;
+                        return (
+                          <div key={key} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <Icon className="w-3 h-3 text-muted-foreground" />
+                                <span>{label}</span>
+                                <span className="text-muted-foreground">({weight}%)</span>
+                              </div>
+                              <span className={cn(
+                                "font-medium",
+                                cat.score >= 80 ? 'text-green-500' :
+                                cat.score >= 60 ? 'text-blue-500' :
+                                cat.score >= 40 ? 'text-yellow-500' : 'text-red-500'
+                              )}>{cat.score}/100</span>
+                            </div>
+                            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className={cn(
+                                  "h-full rounded-full transition-all",
+                                  cat.score >= 80 ? 'bg-green-500' :
+                                  cat.score >= 60 ? 'bg-blue-500' :
+                                  cat.score >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+                                )}
+                                style={{ width: `${cat.score}%` }}
+                              />
+                            </div>
+                            {cat.details && (
+                              <p className="text-[10px] text-muted-foreground pl-4">{cat.details}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Recommendation */}
+              {extractedInfo.recommendation && (
+                <p className="text-sm text-muted-foreground italic border-l-2 border-primary/30 pl-3">
+                  "{extractedInfo.recommendation}"
+                </p>
+              )}
 
               {/* Job Match Details */}
               {extractedInfo.job_match && (
                 <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 space-y-2">
                   <div className="flex items-center gap-2 text-sm font-medium text-primary">
                     <Target className="w-4 h-4" />
-                    Analyse d'adéquation au poste
+                    Adéquation au poste: {extractedInfo.job_match.score}/100
                   </div>
                   {extractedInfo.job_match.match_reasons?.length > 0 && (
                     <div className="text-xs text-muted-foreground">
@@ -519,24 +687,18 @@ ${cvText.substring(0, 8000)}`;
                 </div>
               )}
 
-              {/* Contact Info */}
-              {extractedInfo.email && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Mail className="w-4 h-4" />
-                  <span>{extractedInfo.email}</span>
-                </div>
-              )}
-              {extractedInfo.phone && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Phone className="w-4 h-4" />
-                  <span>{extractedInfo.phone}</span>
-                </div>
-              )}
-
-              {/* Experience */}
-              <div className="flex items-center gap-2 text-sm">
-                <Briefcase className="w-4 h-4 text-muted-foreground" />
-                <span>{extractedInfo.experience_years} ans d'expérience</span>
+              {/* Contact & Experience */}
+              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                {extractedInfo.email && (
+                  <span className="flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    {extractedInfo.email}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Briefcase className="w-3 h-3" />
+                  {extractedInfo.experience_years} ans
+                </span>
               </div>
 
               {/* Skills */}
@@ -558,12 +720,25 @@ ${cvText.substring(0, 8000)}`;
                 </div>
               )}
 
-              {/* Summary */}
-              {extractedInfo.summary && (
-                <p className="text-sm text-muted-foreground italic">
-                  "{extractedInfo.summary}"
-                </p>
-              )}
+              {/* Strengths & Weaknesses */}
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {extractedInfo.strengths.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-success font-medium">Points forts:</span>
+                    {extractedInfo.strengths.slice(0, 3).map((s, i) => (
+                      <p key={i} className="text-muted-foreground">• {s}</p>
+                    ))}
+                  </div>
+                )}
+                {extractedInfo.weaknesses && extractedInfo.weaknesses.length > 0 && (
+                  <div className="space-y-1">
+                    <span className="text-warning font-medium">À améliorer:</span>
+                    {extractedInfo.weaknesses.slice(0, 2).map((w, i) => (
+                      <p key={i} className="text-muted-foreground">• {w}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <p className="text-xs text-center text-muted-foreground">
