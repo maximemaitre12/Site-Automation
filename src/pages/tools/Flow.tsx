@@ -435,7 +435,7 @@ export default function Flow() {
 
               {/* Workflow Builder */}
               {selectedWorkflow ? (
-                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ minHeight: '400px' }}>
                   <div className="flex items-center justify-between gap-2 px-3 md:px-6 py-2 md:py-3 border-b border-border bg-card/30 flex-shrink-0">
                     {/* Left side: History, Undo/Redo, Save */}
                     <div className="flex items-center gap-1 md:gap-2">
