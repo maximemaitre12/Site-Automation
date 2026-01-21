@@ -170,13 +170,17 @@ export default function Flow() {
   };
 
   const handleAIGenerate = async (blocks: WorkflowBlock[], name: string, description: string, connections?: BlockConnection[]) => {
+    console.log('AI Generate called with', blocks.length, 'blocks and', connections?.length || 0, 'connections');
     const workflow = await createWorkflow(name, description);
     if (workflow) {
-      await updateWorkflow(workflow.id, { blocks, connections: connections || [] });
-      setSelectedWorkflowId(workflow.id);
-      setLocalBlocks(blocks);
-      setLocalConnections(connections || []);
-      toast.success('AI workflow created successfully!');
+      const success = await updateWorkflow(workflow.id, { blocks, connections: connections || [] });
+      if (success) {
+        setSelectedWorkflowId(workflow.id);
+        setLocalBlocks(blocks);
+        setLocalConnections(connections || []);
+        console.log('Workflow created and selected:', workflow.id, 'with blocks:', blocks);
+        toast.success('Workflow IA créé avec succès !');
+      }
     }
   };
 
