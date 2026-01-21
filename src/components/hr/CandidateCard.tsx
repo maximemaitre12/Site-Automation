@@ -12,12 +12,14 @@ import {
   Star, Sparkles, Mail, Phone, Briefcase, 
   FileText, Trash2, UserCheck, MessageSquare, 
   Loader2, ChevronDown, ChevronUp, Eye, Check, 
-  Link, Edit, CheckCircle, Target, Calendar
+  Link, Edit, CheckCircle, Target, Calendar,
+  GraduationCap, Code, Users, TrendingUp, Award
 } from 'lucide-react';
 import { Candidate, JobDescription } from '@/hooks/useHR';
 import { ScheduleInterviewDialog } from './ScheduleInterviewDialog';
 import { InterviewCard } from './InterviewCard';
 import { Interview } from '@/hooks/useInterviews';
+import { cn } from '@/lib/utils';
 
 interface CandidateCardProps {
   candidate: Candidate;
@@ -44,6 +46,7 @@ export function CandidateCard({
 }: CandidateCardProps) {
   const [showDetails, setShowDetails] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showScoreBreakdown, setShowScoreBreakdown] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [customScore, setCustomScore] = useState(candidate.match_score?.toString() || '');
@@ -181,6 +184,19 @@ export function CandidateCard({
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Grade Badge */}
+                {analysis.grade && (
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm",
+                    analysis.grade === 'A+' ? 'bg-emerald-600' :
+                    analysis.grade === 'A' ? 'bg-green-500' :
+                    analysis.grade === 'B' ? 'bg-blue-500' :
+                    analysis.grade === 'C' ? 'bg-yellow-500' :
+                    analysis.grade === 'D' ? 'bg-orange-500' : 'bg-red-500'
+                  )}>
+                    {analysis.grade}
+                  </div>
+                )}
                 {/* Show match badge if job is linked and has job_match analysis */}
                 {linkedJob && analysis.job_match && candidate.match_score !== null && (
                   <Badge className={`text-xs ${getMatchBadge(candidate.match_score).className}`}>
@@ -196,6 +212,70 @@ export function CandidateCard({
                 {getStatusBadge(candidate.status)}
               </div>
             </div>
+
+            {/* Score Breakdown (if detailed scores exist) */}
+            {analysis.scores && (
+              <div className="mb-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
+                  className="w-full justify-between h-7 text-xs px-2"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Award className="w-3 h-3" />
+                    Détail du scoring
+                  </span>
+                  {showScoreBreakdown ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </Button>
+                {showScoreBreakdown && (
+                  <div className="mt-2 p-3 rounded-lg bg-muted/50 space-y-2">
+                    {[
+                      { key: 'formation', label: 'Formation', icon: GraduationCap },
+                      { key: 'experience', label: 'Expérience', icon: Briefcase },
+                      { key: 'competences_techniques', label: 'Compétences', icon: Code },
+                      { key: 'soft_skills', label: 'Soft Skills', icon: Users },
+                      { key: 'coherence_parcours', label: 'Cohérence', icon: TrendingUp }
+                    ].map(({ key, label, icon: Icon }) => {
+                      const cat = analysis.scores?.[key];
+                      if (!cat) return null;
+                      return (
+                        <div key={key} className="space-y-0.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1">
+                              <Icon className="w-3 h-3 text-muted-foreground" />
+                              {label}
+                            </span>
+                            <span className={cn(
+                              "font-medium",
+                              cat.score >= 80 ? 'text-green-500' :
+                              cat.score >= 60 ? 'text-blue-500' :
+                              cat.score >= 40 ? 'text-yellow-500' : 'text-red-500'
+                            )}>{cat.score}/100</span>
+                          </div>
+                          <div className="h-1 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className={cn(
+                                "h-full rounded-full",
+                                cat.score >= 80 ? 'bg-green-500' :
+                                cat.score >= 60 ? 'bg-blue-500' :
+                                cat.score >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+                              )}
+                              style={{ width: `${cat.score}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {analysis.recommendation && (
+                      <p className="text-xs text-muted-foreground italic pt-1 border-t border-border mt-2">
+                        "{analysis.recommendation}"
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Skills */}
             {skills.length > 0 && (
