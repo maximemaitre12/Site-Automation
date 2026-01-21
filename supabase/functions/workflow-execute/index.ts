@@ -1074,7 +1074,7 @@ async function executeWorkflow(
   blocks: WorkflowBlock[],
   initialInput: any,
   variables: Record<string, any> = {}
-): Promise<{ success: boolean; output: any; logs: ExecutionLog[] }> {
+): Promise<{ success: boolean; output: any; error?: string; logs: ExecutionLog[] }> {
   const logs: ExecutionLog[] = [];
   let currentInput = initialInput;
   const outputs: Record<string, any> = {};
@@ -1134,7 +1134,7 @@ async function executeWorkflow(
         logs.push(log);
         
         console.error(`Block ${block.name} failed:`, result.error);
-        return { success: false, output: null, logs };
+        return { success: false, output: null, error: result.error, logs };
       }
 
       log.status = 'success';
@@ -1157,7 +1157,7 @@ async function executeWorkflow(
       logs.push(log);
       
       console.error(`Block ${block.name} exception:`, error);
-      return { success: false, output: null, logs };
+      return { success: false, output: null, error: log.error, logs };
     }
 
     logs.push(log);
@@ -1215,11 +1215,14 @@ serve(async (req) => {
     const enrichedVariables = { ...variables, _userId: userId };
     const result = await executeWorkflow(blocks, input || '', enrichedVariables);
 
+    // Important: a workflow can fail for business reasons (bad URL, auth, bad data)
+    // and that should NOT be treated as an HTTP 500 by the client.
+    // We always return 200 here and expose the failure via { success: false, error, logs }.
     return new Response(
       JSON.stringify(result),
-      { 
-        status: result.success ? 200 : 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   } catch (error) {
