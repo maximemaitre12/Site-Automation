@@ -326,10 +326,13 @@ export function EnhancedWorkflowCanvas({
     <div 
       ref={containerRef}
       className={cn(
-        "relative w-full h-full overflow-hidden bg-muted/20 touch-none",
+        "absolute inset-0 w-full h-full overflow-hidden bg-muted/20 touch-none",
         isPanning ? "cursor-grabbing" : "cursor-grab"
       )}
-      style={{ minHeight: '500px', background: 'hsl(var(--muted) / 0.3)' }}
+      style={{ 
+        minHeight: '500px', 
+        background: 'hsl(var(--muted) / 0.3)'
+      }}
       onMouseDown={startPanning}
       onTouchStart={startPanningTouch}
     >

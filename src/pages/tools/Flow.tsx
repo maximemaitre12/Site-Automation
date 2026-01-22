@@ -338,7 +338,7 @@ export default function Flow() {
 
   return (
     <DashboardLayout headerActions={headerActions}>
-      <div className="h-full flex flex-col overflow-hidden">
+      <div className="flex flex-col h-full workflow-canvas-container" style={{ height: '100%', minHeight: '600px' }}>
         {/* Header */}
         <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30 shrink-0">
           <div className="flex items-center gap-3">
@@ -496,7 +496,7 @@ export default function Flow() {
                   </div>
                   
                   {/* Canvas */}
-                  <div className="flex-1 min-h-0 overflow-hidden">
+                  <div className="flex-1 overflow-hidden workflow-canvas-area" style={{ minHeight: '500px' }}>
                     <EnhancedWorkflowCanvas
                       blocks={localBlocks}
                       connections={localConnections}

@@ -56,7 +56,25 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
+// Detect Internet Explorer (unsupported)
+const isIE = typeof document !== 'undefined' && !!(document as any).documentMode;
+
+const App = () => {
+  if (isIE) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-8">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-4">Navigateur non supporté</h1>
+          <p className="text-muted-foreground mb-4">
+            AETHER nécessite un navigateur moderne. 
+            Veuillez utiliser Chrome, Firefox, Safari ou Edge.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -116,7 +134,8 @@ const App = () => (
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
-);
+    </QueryClientProvider>
+  );
+};
 
 export default App;
