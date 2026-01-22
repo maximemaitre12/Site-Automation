@@ -30,38 +30,136 @@ interface AIWorkflowGeneratorProps {
 const EXAMPLE_PROMPTS = [
   {
     icon: FileText,
-    title: 'Document Processing',
-    prompt: 'Process uploaded PDF invoices: extract key data (vendor, amount, date), classify by expense category, check for approval rules, and save to database',
+    title: 'Document Processing Agent',
+    prompt: `Create a comprehensive invoice processing agent with minimum 20 blocks:
+1. TRIGGER: Receive PDF via file upload or email attachment
+2. VALIDATE: Check file format, size, and quality
+3. EXTRACT: Use AI to extract vendor name, invoice number, date, line items, subtotal, taxes, total amount, due date, payment terms
+4. ENRICH: Fetch vendor details from CRM, check vendor payment history
+5. CLASSIFY: Categorize expense type (Operations, Marketing, IT, HR, Legal, Other)
+6. MATCH: Cross-reference with existing purchase orders
+7. CALCULATE: Verify totals, check for discrepancies
+8. APPROVE_LOGIC: Route based on amount thresholds (<1000€ auto-approve, 1000-5000€ manager, >5000€ director)
+9. PARALLEL_ACTIONS: Update accounting system, notify approvers, create task for follow-up
+10. ERROR_HANDLING: Flag suspicious invoices, duplicate detection, missing data alerts
+11. AUDIT: Log all steps, generate processing report, archive original document
+12. NOTIFY: Send status updates to submitter and finance team`,
     category: 'Finance'
   },
   {
     icon: Headphones,
-    title: 'Customer Support',
-    prompt: 'Handle incoming support tickets: analyze sentiment, classify issue type and priority, generate a helpful response draft, and notify the right team',
+    title: 'Customer Support Agent',
+    prompt: `Create an intelligent multi-channel support agent with minimum 20 blocks:
+1. TRIGGER: Accept tickets from email, chat widget, phone transcription, social media
+2. PARSE: Extract customer ID, order references, product mentions
+3. AUTHENTICATE: Verify customer identity, fetch account history
+4. SENTIMENT: Analyze emotional tone (frustrated, neutral, happy)
+5. URGENCY: Score urgency based on keywords, customer tier, issue type
+6. CLASSIFY_ISSUE: Categorize (Technical, Billing, Shipping, Returns, General Inquiry)
+7. KNOWLEDGE_SEARCH: Query internal knowledge base for relevant solutions
+8. PRIOR_TICKETS: Check for related open tickets or recent interactions
+9. GENERATE_RESPONSE: Draft contextual response with personalization
+10. ESCALATION_CHECK: Apply escalation rules (VIP customer, legal mentions, threats)
+11. ASSIGN: Route to appropriate team or agent based on skills and availability
+12. SLA_TRACKING: Set response deadline, create follow-up reminders
+13. NOTIFY_TEAM: Alert assigned team via Slack/Teams
+14. UPDATE_CRM: Log interaction, update customer sentiment score
+15. QUALITY_CHECK: Flag for supervisor review if needed`,
     category: 'Support'
   },
   {
     icon: Users,
-    title: 'Lead Processing',
-    prompt: 'When a new lead comes in via webhook, enrich with company data, generate a personalized outreach message, score the lead, and route hot leads to sales',
+    title: 'Lead Processing Agent',
+    prompt: `Create a complete lead qualification and nurturing agent with minimum 20 blocks:
+1. TRIGGER: Capture leads from webhooks (forms, LinkedIn, ads, events)
+2. DEDUPLICATE: Check for existing leads/contacts in CRM
+3. VALIDATE: Verify email format, phone number, company domain
+4. ENRICH_COMPANY: Fetch company data (size, industry, revenue, tech stack)
+5. ENRICH_PERSON: Get LinkedIn profile, role seniority, decision-maker status
+6. SCORE_FIT: Calculate ICP (Ideal Customer Profile) match score
+7. SCORE_INTENT: Analyze form responses, page visits, content downloads
+8. SEGMENT: Assign to segment (Enterprise, SMB, Startup, Not-a-fit)
+9. PERSONALIZE: Generate personalized outreach based on company context
+10. ROUTE_LOGIC: If hot lead -> SDR immediate, warm -> nurture sequence, cold -> archive
+11. CRM_UPDATE: Create/update lead in Salesforce/HubSpot
+12. SEQUENCE_ENROLL: Add to appropriate email nurture sequence
+13. NOTIFY_SALES: Alert SDR for hot leads with full context summary
+14. SLACK_POST: Post new qualified leads to sales channel
+15. CALENDAR_CHECK: Find available slots for demo scheduling
+16. TRACKING: Set up lead tracking and engagement scoring`,
     category: 'Sales'
   },
   {
     icon: Mail,
-    title: 'Email Automation',
-    prompt: 'Monitor incoming emails, extract action items and deadlines, summarize the content, and send a structured summary to Slack',
+    title: 'Email Intelligence Agent',
+    prompt: `Create a comprehensive email processing and automation agent with minimum 20 blocks:
+1. TRIGGER: Monitor inbox via IMAP/Gmail for new emails
+2. FILTER: Apply rules (exclude spam, newsletters, automated)
+3. PARSE_SENDER: Extract sender info, check against contacts
+4. LANGUAGE_DETECT: Identify email language
+5. TRANSLATE: If needed, translate to primary language
+6. SUMMARIZE: Generate 2-sentence summary
+7. EXTRACT_ACTIONS: Identify action items, deadlines, requests
+8. EXTRACT_ENTITIES: Find dates, amounts, names, companies mentioned
+9. CLASSIFY_TYPE: Categorize (Request, Information, Complaint, Follow-up, etc.)
+10. PRIORITY_SCORE: Assign priority based on sender, content, urgency words
+11. SENTIMENT: Analyze tone for VIP/urgent responses
+12. DRAFT_RESPONSE: Generate appropriate response draft
+13. CALENDAR_CHECK: If meeting request, check availability
+14. CREATE_TASKS: Add action items to task manager
+15. ROUTE: Forward to relevant team if needed
+16. SLACK_DIGEST: Post daily summary to team channel
+17. ARCHIVE: Tag and archive processed emails`,
     category: 'Productivity'
   },
   {
     icon: Database,
-    title: 'Data Pipeline',
-    prompt: 'Fetch data from an API daily, transform and clean the records, filter for active items, and store in database with logging',
+    title: 'Data Pipeline Agent',
+    prompt: `Create a robust ETL data pipeline agent with minimum 20 blocks:
+1. TRIGGER: Schedule-based (hourly/daily) or webhook-triggered
+2. CONNECT: Authenticate to source API/database
+3. FETCH: Pull data with pagination handling
+4. VALIDATE_SCHEMA: Check data structure against expected schema
+5. CLEAN: Remove nulls, fix encoding, standardize formats
+6. NORMALIZE: Convert dates, currencies, phone numbers
+7. DEDUPLICATE: Identify and merge duplicate records
+8. TRANSFORM: Apply business rules and calculations
+9. ENRICH: Add computed fields, lookup values
+10. VALIDATE_BUSINESS: Apply business validation rules
+11. SPLIT: Route data to different destinations based on type
+12. LOAD_PRIMARY: Insert/upsert to primary database
+13. LOAD_WAREHOUSE: Sync to data warehouse
+14. LOAD_CACHE: Update search index or cache
+15. QUALITY_CHECK: Run data quality metrics
+16. ALERT_ANOMALIES: Flag unusual patterns or volumes
+17. NOTIFY: Send completion report with stats
+18. LOG: Record full audit trail`,
     category: 'Data'
   },
   {
     icon: Brain,
-    title: 'Content Analysis',
-    prompt: 'Analyze submitted content for topic classification, sentiment, key themes extraction, and generate an executive summary in multiple languages',
+    title: 'Content Intelligence Agent',
+    prompt: `Create a multi-lingual content analysis and distribution agent with minimum 20 blocks:
+1. TRIGGER: Receive content via upload, URL, or API
+2. FETCH_URL: If URL, scrape content with error handling
+3. DETECT_TYPE: Identify content type (article, report, social post, press release)
+4. EXTRACT_TEXT: Parse and clean text from various formats
+5. LANGUAGE_DETECT: Identify source language
+6. TRANSLATE_EN: Translate to English for processing
+7. SUMMARIZE_SHORT: Generate 50-word summary
+8. SUMMARIZE_LONG: Generate 200-word executive summary
+9. EXTRACT_TOPICS: Identify main themes and subtopics
+10. SENTIMENT_ANALYZE: Score overall sentiment and by topic
+11. ENTITY_EXTRACT: Find people, companies, products, locations
+12. KEYWORD_EXTRACT: Generate SEO keywords and tags
+13. COMPETITOR_CHECK: Flag competitor mentions
+14. TREND_SCORE: Rate content relevance to trending topics
+15. GENERATE_VARIANTS: Create social media versions (Twitter, LinkedIn, email)
+16. TRANSLATE_VARIANTS: Translate variants to target languages (FR, DE, ES)
+17. ROUTE_DISTRIBUTION: Send to appropriate channels based on content type
+18. CRM_UPDATE: Update relevant records with insights
+19. ARCHIVE: Store processed content with metadata
+20. NOTIFY: Alert stakeholders of important content`,
     category: 'Content'
   }
 ];

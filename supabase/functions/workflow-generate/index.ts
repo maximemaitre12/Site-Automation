@@ -107,28 +107,49 @@ MODIFICATION REQUEST: ${modificationRequest}
 Apply the modification and output the COMPLETE modified workflow as JSON. Preserve what should stay, modify what needs to change.`;
 
     } else {
-      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows.
+      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates comprehensive, production-ready automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
 WORKFLOW SCHEMA:
 ${WORKFLOW_SCHEMA}
 
-RULES:
-1. Always start with a trigger block
-2. Use logical flow from trigger -> processing -> output
-3. Position blocks for a visual canvas: spread them out (x: 0-500, y: 0-600+)
-4. For parallel workflows, spread blocks horizontally (x: 0, 250, 500)
-5. Generate unique IDs using patterns like "block-1", "block-2"
-6. Create connections between blocks to show the flow
-7. Choose appropriate block types for the task
-8. Configure blocks with realistic, useful settings
-9. Keep workflows focused and efficient (3-8 blocks typically)
-10. For AI blocks, write clear, specific prompts in the config`;
+CRITICAL RULES FOR COMPREHENSIVE WORKFLOWS:
+1. Always start with one or more trigger blocks
+2. Create MINIMUM 20 blocks for comprehensive automation - this is mandatory!
+3. Use logical flow: triggers -> validation -> enrichment -> processing -> decisions -> actions -> logging
+4. Include error handling branches with control_condition blocks
+5. Add logging blocks (system_log) at key checkpoints for audit trail
+6. Use AI blocks strategically: ai_extract for parsing, ai_classify for routing, ai_decision for complex logic
+7. Include notification blocks (system_notify, system_email) for important events
+8. Add control_delay blocks between external API calls to prevent rate limiting
+9. Use transform_merge to combine data from parallel branches
+10. Always end with system_save to persist results and system_log for final audit
 
-      userPrompt = `Create a workflow for this objective: ${objective}
+POSITIONING FOR COMPLEX WORKFLOWS:
+- Main flow: x=300, y increments by 100 per block
+- Parallel branch left: x=50
+- Parallel branch right: x=550  
+- Error handling branch: x=800
+- Start y at 50, increment by 100 for each row
+
+MANDATORY BLOCK STRUCTURE (follow this pattern):
+1. TRIGGERS (1-2 blocks): trigger_email, trigger_webhook, trigger_file, trigger_form
+2. VALIDATION (2-3 blocks): ai_extract to parse input, transform_filter for validation
+3. ENRICHMENT (2-3 blocks): http_request for external data, ai_generate for context
+4. CLASSIFICATION (2-3 blocks): ai_classify for routing, ai_sentiment for tone
+5. CORE PROCESSING (4-6 blocks): ai_summary, ai_decision, transform_json, ai_translate
+6. DECISION BRANCHING (2-3 blocks): control_condition for routing logic
+7. ACTIONS PER BRANCH (4-6 blocks): system_email, http_webhook, system_notify
+8. PERSISTENCE & LOGGING (2-3 blocks): system_save, system_log
+
+Generate unique IDs using patterns like "trigger-1", "validate-1", "enrich-1", "classify-1", "process-1", "decide-1", "action-1", "log-1"`;
+
+      userPrompt = `Create a COMPREHENSIVE workflow with MINIMUM 20 BLOCKS for this objective: ${objective}
 
 ${context ? `Additional context: ${context}` : ''}
 ${constraints ? `Constraints: ${constraints}` : ''}
+
+IMPORTANT: Generate at least 20 blocks following the mandatory structure pattern. Include validation, enrichment, classification, processing, decision branching, actions, and logging.
 
 Output ONLY the JSON workflow object with blocks AND connections. No explanations.`;
     }
@@ -139,7 +160,7 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
     if (stream) {
       console.log('Using streaming mode...');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout for complex workflows
       
       try {
         const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -203,9 +224,9 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
-      console.log('Request timeout after 60s');
+      console.log('Request timeout after 120s');
       controller.abort();
-    }, 60000); // 60s timeout
+    }, 120000); // 120s timeout for complex workflows
     
     let response;
     try {
@@ -323,12 +344,57 @@ Output ONLY the JSON workflow object with blocks AND connections. No explanation
       workflow.connections = [];
     }
 
-    // Ensure positions are set correctly
-    workflow.blocks = workflow.blocks.map((block: any, index: number) => ({
-      ...block,
-      id: block.id || `block-${index + 1}`,
-      position: block.position || { x: 100, y: 50 + index * 150 }
-    }));
+    // Intelligent positioning function for complex workflows
+    function calculateBlockPositions(blocks: any[]): any[] {
+      const VERTICAL_SPACING = 100;
+      const HORIZONTAL_SPACING = 280;
+      const START_Y = 50;
+      const MAIN_X = 300;
+      
+      // Group blocks by type prefix for logical layout
+      const getGroupPriority = (type: string): number => {
+        if (type?.startsWith('trigger_')) return 0;
+        if (['ai_extract', 'transform_filter', 'transform_json'].includes(type)) return 1;
+        if (type?.startsWith('http_') || type === 'ai_generate') return 2;
+        if (['ai_classify', 'ai_sentiment'].includes(type)) return 3;
+        if (['ai_summary', 'ai_decision', 'ai_translate'].includes(type)) return 4;
+        if (['control_condition', 'control_loop', 'control_branch'].includes(type)) return 5;
+        if (['system_email', 'system_notify', 'http_webhook'].includes(type)) return 6;
+        if (['system_save', 'system_log'].includes(type)) return 7;
+        return 4; // Default to processing group
+      };
+      
+      // Sort blocks by group priority
+      const sortedBlocks = [...blocks].sort((a, b) => 
+        getGroupPriority(a.type) - getGroupPriority(b.type)
+      );
+      
+      // Position blocks
+      let currentY = START_Y;
+      let lastGroup = -1;
+      
+      return sortedBlocks.map((block, index) => {
+        const currentGroup = getGroupPriority(block.type);
+        
+        // Add extra spacing between groups
+        if (lastGroup !== -1 && currentGroup !== lastGroup) {
+          currentY += 30; // Extra gap between groups
+        }
+        lastGroup = currentGroup;
+        
+        const position = { x: MAIN_X, y: currentY };
+        currentY += VERTICAL_SPACING;
+        
+        return {
+          ...block,
+          id: block.id || `block-${index + 1}`,
+          position: block.position || position
+        };
+      });
+    }
+
+    // Apply intelligent positioning
+    workflow.blocks = calculateBlockPositions(workflow.blocks);
 
     // If no connections were generated but we have multiple blocks, create linear connections
     if (workflow.connections.length === 0 && workflow.blocks.length > 1) {
