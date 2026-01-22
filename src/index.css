@@ -160,9 +160,29 @@
   }
 
   /* Prevent browser scroll anchoring “teleport” during expanding sections */
-  .no-scroll-anchoring {
-    overflow-anchor: none;
-  }
+.no-scroll-anchoring {
+  overflow-anchor: none;
+}
+
+/* Workflow canvas stability fix */
+.workflow-canvas-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+  height: 100%;
+  flex: 1;
+}
+
+.workflow-canvas-container > * {
+  flex-shrink: 0;
+}
+
+.workflow-canvas-area {
+  flex: 1;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
 }
 
 /* Text gradient - Violet to Light Blue */
