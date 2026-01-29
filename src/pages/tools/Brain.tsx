@@ -2,7 +2,8 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, ImagePlus, BarChart3, StopCircle, Globe, Building2 } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2 } from "lucide-react";
+import { detectIntent } from "@/lib/intent-detector";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
 import { ChatMessage } from "@/components/brain/ChatMessage";
@@ -50,7 +51,6 @@ export default function BrainPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
-  const [generationMode, setGenerationMode] = useState<'chat' | 'image' | 'chart'>('chat');
   const [showUniversalSearch, setShowUniversalSearch] = useState(false);
   const [showKnowledgeHub, setShowKnowledgeHub] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -150,9 +150,14 @@ export default function BrainPage() {
     e.preventDefault();
     if ((!message.trim() && attachments.length === 0) || sendingMessage || generatingImage) return;
     
+    // Auto-detect intent from message
+    const detectedIntent = detectIntent(message);
+    
     // Handle image/chart generation
-    if (generationMode !== 'chat' && message.trim()) {
-      await handleGenerateImage(message, generationMode);
+    if (detectedIntent !== 'chat' && message.trim()) {
+      await handleGenerateImage(message, detectedIntent);
+      setMessage("");
+      setAttachments([]);
       return;
     }
     
@@ -208,7 +213,6 @@ export default function BrainPage() {
       });
     } finally {
       setGeneratingImage(false);
-      setGenerationMode('chat');
     }
   };
 
@@ -253,7 +257,7 @@ export default function BrainPage() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col md:flex-row relative overflow-hidden">
+      <div className="h-[calc(100vh-3.5rem)] flex flex-col md:flex-row relative overflow-hidden">
         {/* Mobile toggle button */}
         <button
           className="md:hidden fixed bottom-20 right-4 z-50 w-12 h-12 rounded-full bg-agent-brain text-white shadow-lg flex items-center justify-center"
@@ -586,37 +590,8 @@ export default function BrainPage() {
 
               {/* Main input container */}
               <div className="bg-secondary/80 backdrop-blur-xl rounded-2xl border border-border/50 shadow-lg overflow-hidden">
-                {/* Mode selector row */}
-                <div className="flex items-center gap-1 p-2 border-b border-border/30">
-                  <TooltipProvider>
-                    {[
-                      { mode: 'chat' as const, icon: Sparkles, label: 'Chat', color: 'text-agent-brain' },
-                      { mode: 'image' as const, icon: ImagePlus, label: 'Image', color: 'text-emerald-500' },
-                      { mode: 'chart' as const, icon: BarChart3, label: 'Chart', color: 'text-amber-500' },
-                    ].map(({ mode, icon: Icon, label, color }) => (
-                      <Tooltip key={mode}>
-                        <TooltipTrigger asChild>
-                          <button
-                            type="button"
-                            onClick={() => setGenerationMode(mode)}
-                            className={cn(
-                              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-                              generationMode === mode 
-                                ? "bg-background shadow-sm text-foreground" 
-                                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                            )}
-                          >
-                            <Icon className={cn("w-4 h-4", generationMode === mode && color)} />
-                            <span className="hidden sm:inline">{label}</span>
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">{label}</TooltipContent>
-                      </Tooltip>
-                    ))}
-                  </TooltipProvider>
-                  
-                  <div className="flex-1" />
-                  
+                {/* Input row */}
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
                   {/* File attach button */}
                   <input
                     type="file"
@@ -632,7 +607,7 @@ export default function BrainPage() {
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-background/50 transition-colors"
+                          className="shrink-0 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-background/50 transition-colors"
                         >
                           <Paperclip className="w-5 h-5" />
                         </button>
@@ -640,20 +615,11 @@ export default function BrainPage() {
                       <TooltipContent side="top">Joindre un fichier</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                </div>
-
-                {/* Input row */}
-                <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
+                  
                   <input
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder={
-                      generationMode === 'image' 
-                        ? "Décrivez l'image à générer..." 
-                        : generationMode === 'chart'
-                        ? "Décrivez le graphique à créer..."
-                        : "Posez votre question à AETHER Brain..."
-                    }
+                    placeholder="Posez votre question, demandez une image ou un graphique..."
                     className="flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground text-base py-2"
                     disabled={sendingMessage || generatingImage}
                   />
@@ -685,7 +651,7 @@ export default function BrainPage() {
               
               {/* Helper text */}
               <p className="text-center text-xs text-muted-foreground mt-3">
-                AETHER Brain peut faire des erreurs. Vérifiez les informations importantes.
+                L'IA détecte automatiquement si vous voulez du texte, une image ou un graphique.
               </p>
             </div>
           </div>
