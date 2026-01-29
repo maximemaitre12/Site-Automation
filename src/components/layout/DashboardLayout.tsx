@@ -193,7 +193,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
       </header>
 
       {/* Main Content */}
-      <main className="pt-12 sm:pt-14 h-[calc(100vh-3rem)] sm:h-[calc(100vh-3.5rem)] overflow-hidden flex flex-col">
+      <main className="mt-12 sm:mt-14 h-[calc(100vh-3rem)] sm:h-[calc(100vh-3.5rem)] overflow-hidden flex flex-col">
         {children}
       </main>
 
