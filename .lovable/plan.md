@@ -1,173 +1,78 @@
 
-## Plan : Page Brain Sans Scroll + Detection Automatique du Mode IA
+## Plan : Corriger le Scroll de la Page Brain
 
-### Objectif
-1. Empecher le scroll de la page Brain (layout fixe avec scroll interne uniquement dans les messages)
-2. L'IA detecte automatiquement si l'utilisateur veut un chat, une image ou un graphique - sans selection manuelle
+### Diagnostic
+Le problème provient d'un calcul de hauteur en double :
+1. `DashboardLayout` → `main` applique déjà `h-[calc(100vh-3.5rem)]`
+2. `Brain.tsx` → le container enfant applique aussi `h-[calc(100vh-3.5rem)]`
+
+Cela crée une hauteur totale supérieure au viewport, causant le scroll.
 
 ---
 
-### Partie 1 : Supprimer le Scroll de la Page Brain
+### Solution
 
-**Fichier** : `src/pages/tools/Brain.tsx`
+#### Fichier : `src/pages/tools/Brain.tsx`
 
-**Probleme actuel** : La page utilise `overflow-hidden` sur le parent mais le `DashboardLayout` permet le scroll global.
-
-**Modifications** :
-
-1. **Ligne 256** - Forcer une hauteur fixe sur le container principal :
+**Modification 1 - Ligne 260** : Remplacer la hauteur fixe par `h-full`
 ```tsx
-// Remplacer :
-<div className="h-full flex flex-col md:flex-row relative overflow-hidden">
-
-// Par :
+// Avant :
 <div className="h-[calc(100vh-3.5rem)] flex flex-col md:flex-row relative overflow-hidden">
+
+// Après :
+<div className="h-full flex flex-col md:flex-row relative overflow-hidden">
+```
+Le parent (`main` dans DashboardLayout) gère déjà la hauteur correcte.
+
+**Modification 2 - Sidebar (lignes 270-274)** : Ajouter `h-full` et `overflow-hidden`
+```tsx
+<aside className={cn(
+  "w-full md:w-64 lg:w-72 border-r border-border p-3 md:p-4 flex flex-col bg-card/50 transition-all h-full overflow-hidden",
+  "fixed md:relative inset-0 z-40 md:z-auto md:h-full",
+  showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+)}>
 ```
 
-2. **Ligne 499** - S'assurer que ScrollArea ne depasse pas :
+**Modification 3 - Zone chat (lignes 395-403)** : S'assurer que le container chat a une hauteur limitée
 ```tsx
-// Le ScrollArea pour les messages doit avoir une hauteur calculee
+<div 
+  className={cn(
+    "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden h-full",
+    isDragging && "bg-primary/5 ring-2 ring-primary ring-inset"
+  )}
+>
+```
+
+**Modification 4 - ScrollArea messages (ligne 503)** : Ajouter `min-h-0` pour flexbox
+```tsx
 <ScrollArea className="flex-1 min-h-0 px-4 md:px-6 py-6">
 ```
 
-3. **Ligne 555** - Input bar avec `shrink-0` (deja present, verifier)
+---
+
+### Résumé des Changements
+
+| Ligne | Avant | Après |
+|-------|-------|-------|
+| 260 | `h-[calc(100vh-3.5rem)]` | `h-full` |
+| 270-274 | Sidebar sans `h-full` | Ajouter `h-full overflow-hidden` |
+| 395-403 | Zone chat sans `h-full` | Ajouter `h-full` |
+| 503 | `flex-1` | `flex-1 min-h-0` |
 
 ---
 
-### Partie 2 : Detection Automatique du Mode (Chat/Image/Chart)
-
-**Approche** : Creer une Edge Function "intent-detector" qui analyse le message et determine automatiquement le type de reponse attendue.
-
-#### 2.1 Nouvelle Edge Function : `brain-detect-intent`
-
-**Fichier** : `supabase/functions/brain-detect-intent/index.ts`
-
-```typescript
-// Cette fonction ultra-rapide analyse le prompt et retourne:
-// - "chat" : reponse textuelle classique
-// - "image" : generation d'image (photos, illustrations, designs)
-// - "chart" : visualisation de donnees (graphiques, diagrammes)
-
-const INTENT_PATTERNS = {
-  image: [
-    /genere?\s*(une?|moi)?\s*(image|photo|illustration|logo|dessin|visuel|poster|affiche)/i,
-    /cree?\s*(une?|moi)?\s*(image|photo|illustration|logo|dessin)/i,
-    /dessine/i,
-    /montre\s*moi\s*(a quoi|comment)/i,
-    /imagine\s*(une?|un)/i,
-    /visualise/i,
-    /make\s*(an?|me)?\s*(image|picture|photo|illustration)/i,
-    /generate\s*(an?|me)?\s*(image|picture|photo)/i,
-  ],
-  chart: [
-    /genere?\s*(un|moi)?\s*(graph(ique)?|chart|diagramme|camembert|histogramme|courbe)/i,
-    /cree?\s*(un|moi)?\s*(graph(ique)?|chart|diagramme)/i,
-    /visualise?\s*(les)?\s*(donnees|data|chiffres|statistiques)/i,
-    /represente?\s*(graphiquement|visuellement)/i,
-    /trace\s*(une?)?\s*(courbe|graph)/i,
-    /pie\s*chart|bar\s*chart|line\s*chart/i,
-  ]
-};
-
-// L'IA classe aussi via un prompt rapide si les patterns ne matchent pas
-```
-
-#### 2.2 Modifier le Hook useBrain
-
-**Fichier** : `src/hooks/useBrain.ts`
-
-Ajouter une fonction `detectIntent` qui appelle l'Edge Function avant d'envoyer le message :
-
-```typescript
-const detectIntent = async (message: string): Promise<'chat' | 'image' | 'chart'> => {
-  // D'abord, detection locale par patterns pour rapidite
-  const imagePatterns = [/* patterns */];
-  const chartPatterns = [/* patterns */];
-  
-  // Si match local, retourner directement
-  // Sinon, appeler l'Edge Function pour analyse IA
-}
-```
-
-#### 2.3 Modifier la Page Brain
-
-**Fichier** : `src/pages/tools/Brain.tsx`
-
-1. **Supprimer le selecteur de mode** (lignes 589-616) - L'utilisateur n'a plus besoin de choisir
-
-2. **Modifier `handleSendMessage`** (ligne 149) :
-```typescript
-const handleSendMessage = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if ((!message.trim() && attachments.length === 0) || sendingMessage || generatingImage) return;
-  
-  // Detection automatique de l'intent
-  const detectedIntent = await detectIntent(message);
-  
-  if (detectedIntent === 'image' || detectedIntent === 'chart') {
-    await handleGenerateImage(message, detectedIntent);
-  } else {
-    // Chat normal
-    const msg = message || (attachments.length > 0 ? `Analyse...` : '');
-    await sendMessage(msg, undefined, { attachments });
-  }
-  
-  setMessage("");
-  setAttachments([]);
-};
-```
-
-3. **Simplifier l'UI** - Retirer les boutons Chat/Image/Chart et garder uniquement :
-   - Input texte
-   - Bouton attach fichier
-   - Bouton envoyer
-
----
-
-### Resume des Modifications
-
-| Fichier | Modification |
-|---------|--------------|
-| `src/pages/tools/Brain.tsx` | Layout fixe sans scroll, supprimer selecteur de mode, detection auto |
-| `src/hooks/useBrain.ts` | Ajouter fonction `detectIntent()` |
-| `supabase/functions/brain-detect-intent/index.ts` | Nouvelle Edge Function pour detection d'intent |
-| `supabase/config.toml` | Ajouter config pour brain-detect-intent |
-
----
-
-### Logique de Detection
+### Pourquoi ça fonctionne
 
 ```text
-Utilisateur tape: "Genere une image d'un coucher de soleil"
-  -> Pattern match "genere.*image" -> mode = 'image'
-  -> Appel brain-generate-image
-
-Utilisateur tape: "Cree un graphique des ventes Q1"  
-  -> Pattern match "cree.*graphique" -> mode = 'chart'
-  -> Appel brain-generate-image (type: chart)
-
-Utilisateur tape: "Explique moi les KPIs de l'equipe"
-  -> Aucun pattern match -> mode = 'chat'
-  -> Appel ai-chat-stream normal
+DashboardLayout
+└── main (h-[calc(100vh-3.5rem)] overflow-hidden)
+    └── Brain container (h-full → hérite de la hauteur du parent)
+        ├── Sidebar (h-full overflow-hidden)
+        │   └── ScrollArea (flex-1 → scroll interne)
+        └── Chat area (h-full flex-col)
+            ├── Header (shrink-0)
+            ├── ScrollArea messages (flex-1 min-h-0 → scroll interne)
+            └── Input bar (shrink-0)
 ```
 
-### Patterns de Detection (Francais + Anglais)
-
-**Images** :
-- "genere une image de...", "cree une illustration", "dessine moi", "montre moi a quoi ressemble"
-- "generate an image of...", "create a picture of...", "draw me"
-
-**Charts** :
-- "genere un graphique", "cree un diagramme", "visualise les donnees", "trace une courbe"
-- "create a chart", "make a pie chart", "visualize the data"
-
----
-
-### Resultat Attendu
-
-1. La page Brain ne scroll plus - hauteur fixe avec scroll interne uniquement
-2. L'utilisateur tape son message naturellement
-3. L'IA detecte automatiquement s'il veut du texte, une image ou un graphique
-4. Aucune selection manuelle requise
-5. Experience plus fluide et intuitive
-
+La chaîne de hauteurs est maintenant correcte : le parent définit la hauteur une seule fois, et tous les enfants héritent avec `h-full`.
