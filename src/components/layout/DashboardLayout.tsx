@@ -99,7 +99,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-[100dvh] bg-background overflow-hidden overscroll-none">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="px-3 sm:px-4 md:px-6">
@@ -193,7 +193,7 @@ export function DashboardLayout({ children, headerActions }: DashboardLayoutProp
       </header>
 
       {/* Main Content */}
-      <main className="mt-12 sm:mt-14 h-[calc(100vh-3rem)] sm:h-[calc(100vh-3.5rem)] overflow-hidden flex flex-col">
+      <main className="mt-12 sm:mt-14 h-[calc(100dvh-3rem)] sm:h-[calc(100dvh-3.5rem)] overflow-hidden flex flex-col overscroll-none">
         {children}
       </main>
 
