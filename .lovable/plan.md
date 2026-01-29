@@ -1,78 +1,66 @@
 
-## Plan : Corriger le Scroll de la Page Brain
+## Plan : Corriger le Scroll + Fixer la Génération d'Images
 
-### Diagnostic
-Le problème provient d'un calcul de hauteur en double :
-1. `DashboardLayout` → `main` applique déjà `h-[calc(100vh-3.5rem)]`
-2. `Brain.tsx` → le container enfant applique aussi `h-[calc(100vh-3.5rem)]`
+### Problème 1 : Page Brain scrolle encore
 
-Cela crée une hauteur totale supérieure au viewport, causant le scroll.
+**Cause racine** : Dans `DashboardLayout.tsx` ligne 196, le `main` utilise :
+- `pt-12 sm:pt-14` (padding-top pour compenser le header fixe)
+- `h-[calc(100vh-3rem)]` (hauteur calculée)
+
+Le padding **s'ajoute** à la hauteur du contenu, créant un débordement.
+
+**Solution** : Ne pas utiliser de padding-top sur `main`. Puisque le header est `fixed` avec `h-12 sm:h-14`, les enfants ont déjà assez d'espace.
 
 ---
 
-### Solution
+### Fichier 1 : `src/components/layout/DashboardLayout.tsx`
 
-#### Fichier : `src/pages/tools/Brain.tsx`
-
-**Modification 1 - Ligne 260** : Remplacer la hauteur fixe par `h-full`
+**Ligne 196** - Supprimer le padding-top et ajuster la hauteur :
 ```tsx
 // Avant :
-<div className="h-[calc(100vh-3.5rem)] flex flex-col md:flex-row relative overflow-hidden">
+<main className="pt-12 sm:pt-14 h-[calc(100vh-3rem)] sm:h-[calc(100vh-3.5rem)] overflow-hidden flex flex-col">
 
 // Après :
-<div className="h-full flex flex-col md:flex-row relative overflow-hidden">
-```
-Le parent (`main` dans DashboardLayout) gère déjà la hauteur correcte.
-
-**Modification 2 - Sidebar (lignes 270-274)** : Ajouter `h-full` et `overflow-hidden`
-```tsx
-<aside className={cn(
-  "w-full md:w-64 lg:w-72 border-r border-border p-3 md:p-4 flex flex-col bg-card/50 transition-all h-full overflow-hidden",
-  "fixed md:relative inset-0 z-40 md:z-auto md:h-full",
-  showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-)}>
+<main className="mt-12 sm:mt-14 h-[calc(100vh-3rem)] sm:h-[calc(100vh-3.5rem)] overflow-hidden flex flex-col">
 ```
 
-**Modification 3 - Zone chat (lignes 395-403)** : S'assurer que le container chat a une hauteur limitée
-```tsx
-<div 
-  className={cn(
-    "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden h-full",
-    isDragging && "bg-primary/5 ring-2 ring-primary ring-inset"
-  )}
->
-```
+Le `margin-top` pousse le `main` sous le header sans ajouter de hauteur interne.
 
-**Modification 4 - ScrollArea messages (ligne 503)** : Ajouter `min-h-0` pour flexbox
-```tsx
-<ScrollArea className="flex-1 min-h-0 px-4 md:px-6 py-6">
+---
+
+### Problème 2 : Génération d'images ne fonctionne pas
+
+**Cause** : Le modèle utilisé `google/gemini-2.5-flash-image-preview` n'existe pas.
+
+**Solution** : Utiliser le bon modèle `google/gemini-3-pro-image-preview` qui est dans la liste des modèles supportés.
+
+---
+
+### Fichier 2 : `supabase/functions/brain-generate-image/index.ts`
+
+**Ligne 43** - Corriger le nom du modèle :
+```typescript
+// Avant :
+model: 'google/gemini-2.5-flash-image-preview',
+
+// Après :
+model: 'google/gemini-3-pro-image-preview',
 ```
 
 ---
 
-### Résumé des Changements
+### Résumé des Modifications
 
-| Ligne | Avant | Après |
-|-------|-------|-------|
-| 260 | `h-[calc(100vh-3.5rem)]` | `h-full` |
-| 270-274 | Sidebar sans `h-full` | Ajouter `h-full overflow-hidden` |
-| 395-403 | Zone chat sans `h-full` | Ajouter `h-full` |
-| 503 | `flex-1` | `flex-1 min-h-0` |
+| Fichier | Ligne | Modification |
+|---------|-------|--------------|
+| `DashboardLayout.tsx` | 196 | `pt-12` → `mt-12` (padding → margin) |
+| `brain-generate-image/index.ts` | 43 | Corriger le nom du modèle d'image |
 
 ---
 
-### Pourquoi ça fonctionne
+### Résultat Attendu
 
-```text
-DashboardLayout
-└── main (h-[calc(100vh-3.5rem)] overflow-hidden)
-    └── Brain container (h-full → hérite de la hauteur du parent)
-        ├── Sidebar (h-full overflow-hidden)
-        │   └── ScrollArea (flex-1 → scroll interne)
-        └── Chat area (h-full flex-col)
-            ├── Header (shrink-0)
-            ├── ScrollArea messages (flex-1 min-h-0 → scroll interne)
-            └── Input bar (shrink-0)
-```
-
-La chaîne de hauteurs est maintenant correcte : le parent définit la hauteur une seule fois, et tous les enfants héritent avec `h-full`.
+1. La page Brain a une hauteur fixe exacte (100vh - header), plus de scroll global
+2. Seule la zone des messages peut défiler (scroll interne)
+3. La détection automatique (chat/image/chart) fonctionne
+4. La génération d'images utilise le bon modèle et produit des résultats
