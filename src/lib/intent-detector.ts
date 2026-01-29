@@ -2,9 +2,11 @@
 const IMAGE_PATTERNS = [
   /gen[eè]re?\s*(une?|moi)?\s*(image|photo|illustration|logo|dessin|visuel|poster|affiche)/i,
   /cr[eé]e?\s*(une?|moi)?\s*(image|photo|illustration|logo|dessin)/i,
+  /fais\s*(moi)?\s*(une?)?\s*(image|photo|illustration|logo|dessin|visuel|poster|affiche)/i,
   /dessine/i,
   /montre\s*moi\s*(à quoi|comment)/i,
   /imagine\s*(une?|un)/i,
+  /^(logo|image|photo|illustration|visuel)\b/i,
   /make\s*(an?|me)?\s*(image|picture|photo|illustration)/i,
   /generate\s*(an?|me)?\s*(image|picture|photo)/i,
   /create\s*(an?|me)?\s*(image|picture|photo|illustration)/i,
@@ -17,9 +19,11 @@ const IMAGE_PATTERNS = [
 const CHART_PATTERNS = [
   /gen[eè]re?\s*(un|moi)?\s*(graph(ique)?|chart|diagramme|camembert|histogramme|courbe)/i,
   /cr[eé]e?\s*(un|moi)?\s*(graph(ique)?|chart|diagramme)/i,
+  /fais\s*(moi)?\s*(un)?\s*(graph(ique)?|chart|diagramme|camembert|histogramme|courbe)/i,
   /visualise?\s*(les)?\s*(donn[eé]es|data|chiffres|statistiques)/i,
   /repr[eé]sente?\s*(graphiquement|visuellement)/i,
   /trace\s*(une?)?\s*(courbe|graph)/i,
+  /^(graph(ique)?|chart|diagramme|camembert|histogramme|courbe)\b/i,
   /pie\s*chart|bar\s*chart|line\s*chart/i,
   /create\s*(a|an)?\s*(chart|graph|diagram|pie|bar|histogram)/i,
   /make\s*(a|an)?\s*(chart|graph|diagram)/i,
