@@ -275,6 +275,62 @@ COMPORTEMENT:
     }
   }, [user, currentConversation, conversations, toast, invalidateBrain]);
 
+  const addMessageWithoutAI = useCallback(async (
+    content: string,
+    role: 'user' | 'assistant' = 'user',
+    conversationId?: string
+  ): Promise<Conversation | null> => {
+    if (!user || !content.trim()) return null;
+
+    try {
+      let conv = currentConversation;
+      
+      if (!conv || (conversationId && conv.id !== conversationId)) {
+        if (conversationId) {
+          conv = conversations.find(c => c.id === conversationId) || null;
+        }
+        if (!conv) {
+          conv = await createConversation(content);
+        }
+      }
+      
+      if (!conv) return null;
+
+      const newMessage: Message = {
+        id: crypto.randomUUID(),
+        role,
+        content,
+        timestamp: new Date(),
+      };
+
+      const updatedMessages = [...conv.messages, newMessage];
+      
+      const updatedConv = { ...conv, messages: updatedMessages };
+      setCurrentConversation(updatedConv);
+      
+      const messagesForDb = updatedMessages.map(m => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp
+      }));
+
+      await supabase
+        .from('conversations')
+        .update({ 
+          messages: messagesForDb,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', conv.id);
+
+      invalidateBrain();
+      return updatedConv;
+    } catch (err) {
+      console.error('Error adding message:', err);
+      return null;
+    }
+  }, [user, currentConversation, conversations, createConversation, invalidateBrain]);
+
   const deleteConversation = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('conversations').delete().eq('id', id);
     if (error) {
@@ -427,6 +483,7 @@ COMPORTEMENT:
     searchDocuments,
     generateProcedure,
     improveText,
-    summarizeDocument
+    summarizeDocument,
+    addMessageWithoutAI
   };
 }

@@ -41,7 +41,8 @@ export default function BrainPage() {
     searchDocuments,
     generateProcedure,
     improveText,
-    setCurrentConversation
+    setCurrentConversation,
+    addMessageWithoutAI
   } = useBrain();
   const { toast } = useToast();
 
@@ -176,12 +177,16 @@ export default function BrainPage() {
     setGeneratingImage(true);
     setMessage("");
     
-    // Add user message to conversation
+    // Add user message WITHOUT triggering AI response
     const userMsg = type === 'image' 
       ? `🎨 Génère une image: ${prompt}` 
       : `📊 Génère un graphique: ${prompt}`;
     
-    await sendMessage(userMsg, undefined);
+    const conv = await addMessageWithoutAI(userMsg, 'user');
+    if (!conv) {
+      setGeneratingImage(false);
+      return;
+    }
     
     try {
       const { data, error } = await supabase.functions.invoke('brain-generate-image', {
@@ -191,13 +196,16 @@ export default function BrainPage() {
       if (error) throw error;
 
       if (data?.imageUrl) {
-        // Add image response as a special message
-        await sendMessage(`[IMAGE_GENERATED]${data.imageUrl}[/IMAGE_GENERATED]${data.description || 'Image générée avec succès.'}`, undefined);
+        // Add image response as assistant message (no AI chat)
+        const imageResponse = `[IMAGE_GENERATED]${data.imageUrl}[/IMAGE_GENERATED]${data.description || 'Image générée avec succès.'}`;
+        await addMessageWithoutAI(imageResponse, 'assistant');
+        
         toast({
           title: "Image générée",
           description: type === 'chart' ? "Graphique créé avec succès" : "Image créée avec succès"
         });
       } else if (data?.error) {
+        await addMessageWithoutAI(`Erreur: ${data.error}`, 'assistant');
         toast({
           title: "Erreur",
           description: data.error,
@@ -206,6 +214,7 @@ export default function BrainPage() {
       }
     } catch (err) {
       console.error('Image generation error:', err);
+      await addMessageWithoutAI('Désolé, une erreur est survenue lors de la génération.', 'assistant');
       toast({
         title: "Erreur",
         description: "Impossible de générer l'image",
