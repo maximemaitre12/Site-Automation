@@ -257,7 +257,7 @@ export default function BrainPage() {
 
   return (
     <DashboardLayout>
-      <div className="h-[calc(100vh-3.5rem)] flex flex-col md:flex-row relative overflow-hidden">
+      <div className="h-full flex flex-col md:flex-row relative overflow-hidden">
         {/* Mobile toggle button */}
         <button
           className="md:hidden fixed bottom-20 right-4 z-50 w-12 h-12 rounded-full bg-agent-brain text-white shadow-lg flex items-center justify-center"
@@ -268,8 +268,8 @@ export default function BrainPage() {
 
         {/* Sidebar */}
         <aside className={cn(
-          "w-full md:w-64 lg:w-72 border-r border-border p-3 md:p-4 flex flex-col bg-card/50 transition-all",
-          "fixed md:relative inset-0 z-40 md:z-auto",
+          "w-full md:w-64 lg:w-72 border-r border-border p-3 md:p-4 flex flex-col bg-card/50 transition-all h-full overflow-hidden",
+          "fixed md:relative inset-0 z-40 md:z-auto md:h-full",
           showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}>
           <Button variant="default" className="w-full mb-4 bg-agent-brain hover:bg-agent-brain/90" onClick={() => { handleNewChat(); setShowMobileSidebar(false); }}>
@@ -394,7 +394,7 @@ export default function BrainPage() {
         {/* Main Chat Area */}
         <div 
           className={cn(
-            "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden",
+            "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden h-full",
             isDragging && "bg-primary/5 ring-2 ring-primary ring-inset"
           )}
           onDragOver={handleDragOver}
@@ -500,7 +500,7 @@ export default function BrainPage() {
           </header>
 
           {/* Chat Messages */}
-          <ScrollArea className="flex-1 px-4 md:px-6 py-6">
+          <ScrollArea className="flex-1 min-h-0 px-4 md:px-6 py-6">
             {!currentConversation && conversations.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-4 py-20">
                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-6 shadow-lg shadow-agent-brain/20">
