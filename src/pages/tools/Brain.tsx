@@ -185,8 +185,15 @@ export default function BrainPage() {
     const conv = await addMessageWithoutAI(userMsg, 'user');
     if (!conv) {
       setGeneratingImage(false);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la conversation",
+        variant: "destructive"
+      });
       return;
     }
+    
+    const convId = conv.id; // Capture the conversation ID
     
     try {
       const { data, error } = await supabase.functions.invoke('brain-generate-image', {
@@ -196,25 +203,33 @@ export default function BrainPage() {
       if (error) throw error;
 
       if (data?.imageUrl) {
-        // Add image response as assistant message (no AI chat)
+        // Add image response as assistant message (pass conversation ID)
         const imageResponse = `[IMAGE_GENERATED]${data.imageUrl}[/IMAGE_GENERATED]${data.description || 'Image générée avec succès.'}`;
-        await addMessageWithoutAI(imageResponse, 'assistant');
+        await addMessageWithoutAI(imageResponse, 'assistant', convId);
         
         toast({
           title: "Image générée",
           description: type === 'chart' ? "Graphique créé avec succès" : "Image créée avec succès"
         });
       } else if (data?.error) {
-        await addMessageWithoutAI(`Erreur: ${data.error}`, 'assistant');
+        await addMessageWithoutAI(`Erreur: ${data.error}`, 'assistant', convId);
         toast({
           title: "Erreur",
           description: data.error,
           variant: "destructive"
         });
+      } else {
+        // No imageUrl and no error - unexpected response
+        await addMessageWithoutAI('La génération n\'a pas retourné d\'image. Réessayez avec un autre prompt.', 'assistant', convId);
+        toast({
+          title: "Attention",
+          description: "Aucune image générée",
+          variant: "destructive"
+        });
       }
     } catch (err) {
       console.error('Image generation error:', err);
-      await addMessageWithoutAI('Désolé, une erreur est survenue lors de la génération.', 'assistant');
+      await addMessageWithoutAI('Désolé, une erreur est survenue lors de la génération.', 'assistant', convId);
       toast({
         title: "Erreur",
         description: "Impossible de générer l'image",
