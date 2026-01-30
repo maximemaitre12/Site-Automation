@@ -236,20 +236,13 @@ export function DocViewerDialog({
               </div>
             </div>
             <div className="flex gap-2 flex-shrink-0">
-              <Button variant="outline" size="sm" onClick={handleCopyContent}>
+              <Button variant="outline" size="sm" onClick={handleCopyContent} title="Copier">
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </Button>
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="w-4 h-4" />
+              <Button variant="outline" size="sm" onClick={handleDownloadPDF} title="Télécharger en PDF">
+                <FileDown className="w-4 h-4 mr-1.5" />
+                <span className="hidden sm:inline">PDF</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={handleDownloadPDF} title="Exporter en PDF">
-                <FileDown className="w-4 h-4" />
-              </Button>
-              {document.file_url && (
-                <Button variant="outline" size="sm" onClick={() => window.open(document.file_url!, '_blank')}>
-                  <ExternalLink className="w-4 h-4" />
-                </Button>
-              )}
             </div>
           </div>
         </DialogHeader>
@@ -623,102 +616,106 @@ export function DocViewerDialog({
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="rewrite" className="flex-1 min-h-0 mt-4 space-y-4">
-            <Card className="p-4">
-              <h4 className="font-medium flex items-center gap-2 mb-4">
-                <Wand2 className="w-4 h-4 text-primary" />
-                Réécrire le document
-              </h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                L'IA va réécrire votre document de manière professionnelle, comme s'il avait été rédigé par une équipe d'experts. Le résultat sera 100% humain, sans aucune trace d'IA.
-              </p>
+          <TabsContent value="rewrite" className="flex-1 min-h-0 mt-4">
+            <ScrollArea className="h-[400px]">
+              <div className="space-y-4 pr-4">
+                <Card className="p-4">
+                  <h4 className="font-medium flex items-center gap-2 mb-4">
+                    <Wand2 className="w-4 h-4 text-primary" />
+                    Améliorer le document
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    L'IA va réécrire votre document de manière professionnelle, comme s'il avait été rédigé par une équipe d'experts.
+                  </p>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Style de rédaction</Label>
-                    <Select value={rewriteStyle} onValueChange={setRewriteStyle}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="professional">Professionnel</SelectItem>
-                        <SelectItem value="formal">Formel</SelectItem>
-                        <SelectItem value="concise">Concis</SelectItem>
-                        <SelectItem value="detailed">Détaillé</SelectItem>
-                        <SelectItem value="simplified">Simplifié</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Style de rédaction</Label>
+                        <Select value={rewriteStyle} onValueChange={setRewriteStyle}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="professional">Professionnel</SelectItem>
+                            <SelectItem value="formal">Formel</SelectItem>
+                            <SelectItem value="concise">Concis</SelectItem>
+                            <SelectItem value="detailed">Détaillé</SelectItem>
+                            <SelectItem value="simplified">Simplifié</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Format du document</Label>
+                        <Select value={rewriteFormat} onValueChange={setRewriteFormat}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Automatique" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="auto">Automatique</SelectItem>
+                            <SelectItem value="report">Rapport</SelectItem>
+                            <SelectItem value="memo">Mémo</SelectItem>
+                            <SelectItem value="procedure">Procédure</SelectItem>
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="presentation">Présentation</SelectItem>
+                            <SelectItem value="contract">Contrat</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Instructions spécifiques (optionnel)</Label>
+                      <Textarea
+                        placeholder="Ex: Ajouter plus de détails techniques, utiliser un ton plus formel..."
+                        value={rewriteInstructions}
+                        onChange={(e) => setRewriteInstructions(e.target.value)}
+                        rows={2}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Règles de l'entreprise (optionnel)</Label>
+                      <Textarea
+                        placeholder="Ex: Toujours commencer par 'Cher client', utiliser 'nous' au lieu de 'je', etc."
+                        value={companyRules}
+                        onChange={(e) => setCompanyRules(e.target.value)}
+                        rows={2}
+                      />
+                    </div>
+
+                    <Button 
+                      onClick={handleRewrite} 
+                      disabled={rewriting || !document.content}
+                      className="w-full"
+                    >
+                      {rewriting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Amélioration en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="w-4 h-4 mr-2" />
+                          Améliorer le document
+                        </>
+                      )}
+                    </Button>
                   </div>
+                </Card>
 
-                  <div className="space-y-2">
-                    <Label>Format du document</Label>
-                    <Select value={rewriteFormat} onValueChange={setRewriteFormat}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Automatique" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="auto">Automatique</SelectItem>
-                        <SelectItem value="report">Rapport</SelectItem>
-                        <SelectItem value="memo">Mémo</SelectItem>
-                        <SelectItem value="procedure">Procédure</SelectItem>
-                        <SelectItem value="email">Email</SelectItem>
-                        <SelectItem value="presentation">Présentation</SelectItem>
-                        <SelectItem value="contract">Contrat</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Instructions spécifiques (optionnel)</Label>
-                  <Textarea
-                    placeholder="Ex: Ajouter plus de détails techniques, utiliser un ton plus formel..."
-                    value={rewriteInstructions}
-                    onChange={(e) => setRewriteInstructions(e.target.value)}
-                    rows={2}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Règles de l'entreprise (optionnel)</Label>
-                  <Textarea
-                    placeholder="Ex: Toujours commencer par 'Cher client', utiliser 'nous' au lieu de 'je', etc."
-                    value={companyRules}
-                    onChange={(e) => setCompanyRules(e.target.value)}
-                    rows={2}
-                  />
-                </div>
-
-                <Button 
-                  onClick={handleRewrite} 
-                  disabled={rewriting || !document.content}
-                  className="w-full"
-                >
-                  {rewriting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Réécriture en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="w-4 h-4 mr-2" />
-                      Réécrire le document
-                    </>
-                  )}
-                </Button>
+                {document.metadata?.lastRewrite && (
+                  <Card className="p-4 bg-muted/50">
+                    <p className="text-sm text-muted-foreground">
+                      Dernière amélioration: {format(new Date((document.metadata.lastRewrite as any).rewrittenAt), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                      {' '}• Style: {(document.metadata.lastRewrite as any).style}
+                      {(document.metadata.lastRewrite as any).format && ` • Format: ${(document.metadata.lastRewrite as any).format}`}
+                    </p>
+                  </Card>
+                )}
               </div>
-            </Card>
-
-            {document.metadata?.lastRewrite && (
-              <Card className="p-4 bg-muted/50">
-                <p className="text-sm text-muted-foreground">
-                  Dernière réécriture: {format(new Date((document.metadata.lastRewrite as any).rewrittenAt), 'dd/MM/yyyy à HH:mm', { locale: fr })}
-                  {' '}• Style: {(document.metadata.lastRewrite as any).style}
-                  {(document.metadata.lastRewrite as any).format && ` • Format: ${(document.metadata.lastRewrite as any).format}`}
-                </p>
-              </Card>
-            )}
+            </ScrollArea>
           </TabsContent>
 
           <TabsContent value="metadata" className="flex-1 min-h-0 mt-4">

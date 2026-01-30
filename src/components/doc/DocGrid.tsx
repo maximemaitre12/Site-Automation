@@ -193,33 +193,25 @@ export function DocGrid({
               onClick={() => onDocumentClick(doc)}
               className="group cursor-pointer relative"
             >
-              {/* Document Preview Card */}
+              {/* Document Card */}
               <div className={cn(
-                "aspect-[4/3] rounded-xl border-2 flex flex-col items-center justify-center mb-3 transition-all relative overflow-hidden",
-                "bg-gradient-to-br from-background to-muted/30",
-                "group-hover:shadow-xl group-hover:border-primary/50 group-hover:-translate-y-1",
+                "aspect-[4/3] rounded-xl border flex flex-col items-center justify-center mb-3 transition-all relative",
+                "bg-muted/30",
+                "group-hover:shadow-lg group-hover:border-primary/40 group-hover:-translate-y-0.5",
                 colors.border
               )}>
-                {/* Decorative lines to simulate document */}
-                <div className="absolute inset-4 flex flex-col gap-2 opacity-20">
-                  <div className="h-2 bg-current rounded w-3/4" />
-                  <div className="h-2 bg-current rounded w-full" />
-                  <div className="h-2 bg-current rounded w-5/6" />
-                  <div className="h-2 bg-current rounded w-2/3" />
-                </div>
-                
                 {/* File Icon */}
                 <div className={cn(
-                  "w-14 h-14 rounded-xl flex items-center justify-center relative z-10",
+                  "w-12 h-12 rounded-xl flex items-center justify-center",
                   colors.bg
                 )}>
-                  <FileIcon className={cn("w-7 h-7", colors.text)} />
+                  <FileIcon className={cn("w-6 h-6", colors.text)} />
                 </div>
                 
                 {/* AI Badge */}
                 {hasAI && (
-                  <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary/90 flex items-center justify-center shadow-lg">
-                    <Sparkles className="w-3.5 h-3.5 text-primary-foreground" />
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-primary-foreground" />
                   </div>
                 )}
 
