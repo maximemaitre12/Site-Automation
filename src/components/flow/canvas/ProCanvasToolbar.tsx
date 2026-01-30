@@ -110,60 +110,10 @@ function ProCanvasToolbarComponent({
             <TooltipContent>Add Block</TooltipContent>
           </Tooltip>
         )}
-        
-        {onAddStickyNote && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onAddStickyNote}
-                className="h-8 w-8 p-0 hover:bg-yellow-50 hover:text-yellow-600"
-              >
-                <StickyNote className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add Note</TooltipContent>
-          </Tooltip>
-        )}
-        
-        {onAddGroup && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onAddGroup}
-                className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-              >
-                <Group className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add Group</TooltipContent>
-          </Tooltip>
-        )}
       </div>
 
-      {/* Center: Search */}
-      <div className="flex-1 max-w-md">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={`Search ${blockCount} blocks...`}
-            className="pl-9 pr-8 h-9 bg-white border-gray-200 shadow-sm rounded-xl text-sm"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
+      {/* Spacer */}
+      <div className="flex-1" />
 
       {/* Right: View & Action controls */}
       <div className="flex items-center gap-2">
@@ -235,50 +185,6 @@ function ProCanvasToolbarComponent({
           </Tooltip>
         </div>
 
-        {/* Toggle controls */}
-        <div className="flex items-center gap-1 bg-white rounded-xl border border-gray-200 shadow-sm p-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={showGrid ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={onToggleGrid}
-                className={cn("h-8 w-8 p-0", showGrid && "bg-gray-100")}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Toggle Grid</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={showMiniMap ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={onToggleMiniMap}
-                className={cn("h-8 w-8 p-0", showMiniMap && "bg-gray-100")}
-              >
-                <Map className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Toggle MiniMap</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={snapToGrid ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={onToggleSnapToGrid}
-                className={cn("h-8 w-8 p-0", snapToGrid && "bg-gray-100")}
-              >
-                <Magnet className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Snap to Grid</TooltipContent>
-          </Tooltip>
-        </div>
 
         {/* History controls */}
         <div className="flex items-center gap-1 bg-white rounded-xl border border-gray-200 shadow-sm p-1">
