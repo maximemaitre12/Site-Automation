@@ -85,7 +85,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
         disabled={!hasBlocks}
       >
         <Play className="w-4 h-4 mr-2" />
-        Run Workflow
+        Run
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

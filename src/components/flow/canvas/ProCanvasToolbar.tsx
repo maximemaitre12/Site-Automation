@@ -219,38 +219,6 @@ function ProCanvasToolbarComponent({
           </Tooltip>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1 bg-white rounded-xl border border-gray-200 shadow-sm p-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onSave}
-                className={cn(
-                  "h-8 px-3 gap-1.5",
-                  hasUnsavedChanges && "text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                )}
-              >
-                <Save className="w-4 h-4" />
-                <span className="text-xs font-medium hidden sm:inline">Save</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Save (Ctrl+S)</TooltipContent>
-          </Tooltip>
-
-          <Button
-            size="sm"
-            onClick={onRun}
-            disabled={isRunning}
-            className="h-8 px-3 gap-1.5 bg-green-600 hover:bg-green-700 text-white"
-          >
-            <Play className={cn("w-4 h-4", isRunning && "animate-pulse")} />
-            <span className="text-xs font-medium hidden sm:inline">
-              {isRunning ? 'Running...' : 'Run'}
-            </span>
-          </Button>
-        </div>
       </div>
     </div>
   );
