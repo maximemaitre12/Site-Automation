@@ -248,7 +248,7 @@ export function DocViewerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-4xl h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3 min-w-0">
@@ -278,7 +278,7 @@ export function DocViewerDialog({
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="content" className="flex-1 flex flex-col min-h-0">
+        <Tabs defaultValue="content" className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <TabsList className="w-full justify-start flex-shrink-0">
             <TabsTrigger value="content">Contenu</TabsTrigger>
             <TabsTrigger value="ai">
@@ -292,8 +292,8 @@ export function DocViewerDialog({
             <TabsTrigger value="metadata">Métadonnées</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="content" className="flex-1 min-h-0 mt-4">
-            <ScrollArea className="h-[400px] rounded-lg border bg-muted/30 p-4">
+          <TabsContent value="content" className="flex-1 min-h-0 mt-4 overflow-hidden">
+            <ScrollArea className="h-full rounded-lg border bg-muted/30 p-4">
               {document.content ? (
                 <div className="prose prose-sm max-w-none whitespace-pre-wrap">
                   {document.content}
@@ -317,8 +317,8 @@ export function DocViewerDialog({
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="ai" className="flex-1 min-h-0 mt-4">
-            <ScrollArea className="h-[400px]">
+          <TabsContent value="ai" className="flex-1 min-h-0 mt-4 overflow-hidden">
+            <ScrollArea className="h-full">
               <div className="space-y-4 pr-4">
                 {/* Action buttons */}
                 <div className="flex gap-2">
@@ -647,8 +647,8 @@ export function DocViewerDialog({
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="rewrite" className="flex-1 min-h-0 mt-4">
-            <ScrollArea className="h-[400px]">
+          <TabsContent value="rewrite" className="flex-1 min-h-0 mt-4 overflow-hidden">
+            <ScrollArea className="h-full">
               <div className="space-y-4 pr-4">
                 <Card className="p-4">
                   <h4 className="font-medium flex items-center gap-2 mb-4">
