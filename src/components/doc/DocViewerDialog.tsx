@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { AetherDocument } from "@/hooks/useAetherDocs";
 import {
   FileText,
@@ -43,11 +50,16 @@ import {
   Sparkles,
   CheckCircle,
   XCircle,
-  BarChart3
+  BarChart3,
+  Palette,
+  FileType,
+  ChevronDown
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { BrandingSettingsPanel, getBrandingSettings, type BrandingSettings } from "./BrandingSettingsPanel";
+import { generatePDF, generateWord } from "@/lib/document-export";
 
 // Helper to safely parse tags (can be JSON string, array, or null)
 const parseTags = (tags: any): string[] => {
@@ -95,6 +107,14 @@ export function DocViewerDialog({
   const [rewriteFormat, setRewriteFormat] = useState<string>('auto');
   const [rewriteInstructions, setRewriteInstructions] = useState('');
   const [companyRules, setCompanyRules] = useState('');
+  const [exporting, setExporting] = useState(false);
+  const [branding, setBranding] = useState<BrandingSettings>(getBrandingSettings);
+  const [showBrandingPanel, setShowBrandingPanel] = useState(false);
+
+  // Load branding settings on mount
+  useEffect(() => {
+    setBranding(getBrandingSettings());
+  }, [open]);
 
   if (!document) return null;
 
@@ -107,286 +127,24 @@ export function DocViewerDialog({
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownloadWord = async () => {
     if (!document.content) {
       toast.error("Aucun contenu à télécharger");
       return;
     }
 
+    setExporting(true);
     try {
-      const { 
-        Document, 
-        Packer, 
-        Paragraph, 
-        TextRun, 
-        HeadingLevel, 
-        AlignmentType,
-        Header,
-        Footer,
-        PageNumber,
-        NumberFormat,
-        convertInchesToTwip,
-        BorderStyle
-      } = await import('docx');
-      
-      // Clean content: remove markdown artifacts and AI markers
-      const cleanContent = (text: string): string => {
-        return text
-          .replace(/^#+\s*/gm, '') // Remove markdown headers
-          .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markers
-          .replace(/\*([^*]+)\*/g, '$1') // Remove italic markers
-          .replace(/^[-*]\s+/gm, '• ') // Convert markdown lists to bullets
-          .replace(/^\d+\.\s+/gm, (match, offset, string) => match) // Keep numbered lists
-          .replace(/\[([^\]]+)\]/g, '$1') // Remove brackets
-          .replace(/---+/g, '') // Remove horizontal rules
-          .replace(/`([^`]+)`/g, '$1') // Remove code markers
-          .trim();
-      };
-
-      // Detect if line is a section header (all caps, short, or ends with colon)
-      const isHeader = (text: string): boolean => {
-        const cleaned = text.trim();
-        if (cleaned.length > 60) return false;
-        if (cleaned === cleaned.toUpperCase() && cleaned.length > 3) return true;
-        if (cleaned.endsWith(':') && cleaned.length < 50) return true;
-        return false;
-      };
-
-      // Detect if line is a bullet point
-      const isBulletPoint = (text: string): boolean => {
-        return /^[•\-\*]\s/.test(text.trim()) || /^\d+\.\s/.test(text.trim());
-      };
-
-      // Parse content into professionally formatted paragraphs
-      const lines = document.content.split('\n');
-      const paragraphs: any[] = [];
-      
-      lines.forEach((line, index) => {
-        const trimmed = line.trim();
-        if (!trimmed) {
-          // Add spacing paragraph for empty lines
-          paragraphs.push(new Paragraph({ spacing: { after: 120 } }));
-          return;
-        }
-
-        const cleaned = cleanContent(trimmed);
-        if (!cleaned) return;
-
-        if (isHeader(cleaned)) {
-          // Section header styling
-          paragraphs.push(new Paragraph({
-            children: [
-              new TextRun({ 
-                text: cleaned.replace(/:$/, ''),
-                bold: true, 
-                size: 26, // 13pt
-                font: "Calibri",
-                color: "2B579A"
-              })
-            ],
-            spacing: { before: 360, after: 160 },
-            border: {
-              bottom: {
-                color: "2B579A",
-                space: 4,
-                style: BorderStyle.SINGLE,
-                size: 6
-              }
-            }
-          }));
-        } else if (isBulletPoint(cleaned)) {
-          // Bullet point styling
-          const bulletText = cleaned.replace(/^[•\-\*]\s*/, '').replace(/^\d+\.\s*/, '');
-          paragraphs.push(new Paragraph({
-            children: [
-              new TextRun({ 
-                text: "  •  ",
-                font: "Calibri",
-                size: 22
-              }),
-              new TextRun({ 
-                text: bulletText,
-                font: "Calibri",
-                size: 22 // 11pt
-              })
-            ],
-            spacing: { after: 80, line: 276 }, // 1.15 line spacing
-            indent: { left: convertInchesToTwip(0.25) }
-          }));
-        } else {
-          // Regular paragraph styling
-          paragraphs.push(new Paragraph({
-            children: [
-              new TextRun({ 
-                text: cleaned,
-                font: "Calibri",
-                size: 22 // 11pt
-              })
-            ],
-            spacing: { after: 160, line: 276 }, // 1.15 line spacing
-            alignment: AlignmentType.JUSTIFIED
-          }));
-        }
-      });
-
-      // Create professional document
-      const doc = new Document({
-        creator: "AETHER",
-        title: document.title,
-        description: "Document généré par AETHER",
-        styles: {
-          default: {
-            heading1: {
-              run: {
-                font: "Calibri Light",
-                size: 52, // 26pt
-                bold: true,
-                color: "1F4E79"
-              },
-              paragraph: {
-                spacing: { after: 320, before: 0 }
-              }
-            },
-            heading2: {
-              run: {
-                font: "Calibri",
-                size: 28,
-                bold: true,
-                color: "2B579A"
-              },
-              paragraph: {
-                spacing: { after: 200, before: 280 }
-              }
-            }
-          }
+      const blob = await generateWord(
+        {
+          title: document.title,
+          content: document.content,
+          createdAt: document.created_at,
+          version: document.version
         },
-        sections: [{
-          properties: {
-            page: {
-              margin: {
-                top: convertInchesToTwip(1),
-                right: convertInchesToTwip(1),
-                bottom: convertInchesToTwip(1),
-                left: convertInchesToTwip(1.25)
-              }
-            }
-          },
-          headers: {
-            default: new Header({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: document.title,
-                      font: "Calibri",
-                      size: 18,
-                      color: "808080",
-                      italics: true
-                    })
-                  ],
-                  alignment: AlignmentType.RIGHT,
-                  border: {
-                    bottom: {
-                      color: "CCCCCC",
-                      space: 4,
-                      style: BorderStyle.SINGLE,
-                      size: 4
-                    }
-                  },
-                  spacing: { after: 200 }
-                })
-              ]
-            })
-          },
-          footers: {
-            default: new Footer({
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: "Page ",
-                      font: "Calibri",
-                      size: 18,
-                      color: "808080"
-                    }),
-                    new TextRun({
-                      children: [PageNumber.CURRENT],
-                      font: "Calibri",
-                      size: 18,
-                      color: "808080"
-                    }),
-                    new TextRun({
-                      text: " sur ",
-                      font: "Calibri",
-                      size: 18,
-                      color: "808080"
-                    }),
-                    new TextRun({
-                      children: [PageNumber.TOTAL_PAGES],
-                      font: "Calibri",
-                      size: 18,
-                      color: "808080"
-                    })
-                  ],
-                  alignment: AlignmentType.CENTER,
-                  border: {
-                    top: {
-                      color: "CCCCCC",
-                      space: 4,
-                      style: BorderStyle.SINGLE,
-                      size: 4
-                    }
-                  },
-                  spacing: { before: 200 }
-                })
-              ]
-            })
-          },
-          children: [
-            // Document title
-            new Paragraph({
-              children: [
-                new TextRun({ 
-                  text: document.title,
-                  font: "Calibri Light",
-                  size: 56, // 28pt
-                  bold: true,
-                  color: "1F4E79"
-                })
-              ],
-              spacing: { after: 120 },
-              alignment: AlignmentType.LEFT
-            }),
-            // Date line
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: format(new Date(document.created_at), "d MMMM yyyy", { locale: fr }),
-                  font: "Calibri",
-                  size: 20,
-                  color: "666666",
-                  italics: true
-                })
-              ],
-              spacing: { after: 400 },
-              border: {
-                bottom: {
-                  color: "1F4E79",
-                  space: 8,
-                  style: BorderStyle.SINGLE,
-                  size: 12
-                }
-              }
-            }),
-            // Spacer
-            new Paragraph({ spacing: { after: 200 } }),
-            // Content paragraphs
-            ...paragraphs
-          ]
-        }]
-      });
+        branding
+      );
 
-      const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = window.document.createElement('a');
       a.href = url;
@@ -397,66 +155,42 @@ export function DocViewerDialog({
     } catch (error) {
       console.error('Error generating Word document:', error);
       toast.error("Erreur lors de la génération du document");
+    } finally {
+      setExporting(false);
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!document.content) {
       toast.error("Aucun contenu à exporter");
       return;
     }
 
-    // Create a printable version
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error("Impossible d'ouvrir la fenêtre d'impression");
-      return;
+    setExporting(true);
+    try {
+      const blob = await generatePDF(
+        {
+          title: document.title,
+          content: document.content,
+          createdAt: document.created_at,
+          version: document.version
+        },
+        branding
+      );
+
+      const url = URL.createObjectURL(blob);
+      const a = window.document.createElement('a');
+      a.href = url;
+      a.download = `${document.title}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Document PDF téléchargé");
+    } catch (error) {
+      console.error('Error generating PDF document:', error);
+      toast.error("Erreur lors de la génération du PDF");
+    } finally {
+      setExporting(false);
     }
-
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${document.title}</title>
-        <style>
-          @page { margin: 2.5cm; }
-          body {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 12pt;
-            line-height: 1.6;
-            color: #000;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-          }
-          h1 { font-size: 18pt; margin-bottom: 24px; text-align: center; }
-          h2 { font-size: 14pt; margin-top: 24px; margin-bottom: 12px; }
-          p { text-align: justify; margin-bottom: 12px; }
-          .header { text-align: center; margin-bottom: 40px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }
-          .date { color: #666; font-size: 10pt; }
-          .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 10pt; color: #666; text-align: center; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h1>${document.title}</h1>
-          <p class="date">Document généré le ${format(new Date(), 'dd MMMM yyyy', { locale: fr })}</p>
-        </div>
-        <div class="content">
-          ${document.content.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('')}
-        </div>
-        <div class="footer">
-          Version ${document.version} • Dernière modification: ${format(new Date(document.updated_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
-        </div>
-      </body>
-      </html>
-    `;
-
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.onload = () => {
-      printWindow.print();
-    };
   };
 
   const handleAnalyze = async () => {
@@ -518,13 +252,55 @@ export function DocViewerDialog({
               <Button variant="outline" size="sm" onClick={handleCopyContent} title="Copier">
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </Button>
-              <Button variant="outline" size="sm" onClick={handleDownload} title="Télécharger en Word">
-                <Download className="w-4 h-4 mr-1.5" />
-                <span className="hidden sm:inline">Word</span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowBrandingPanel(!showBrandingPanel)} 
+                title="Charte graphique"
+              >
+                <Palette className="w-4 h-4" />
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="default" size="sm" disabled={exporting}>
+                    {exporting ? (
+                      <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4 mr-1.5" />
+                    )}
+                    Exporter
+                    <ChevronDown className="w-3.5 h-3.5 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleDownloadWord}>
+                    <FileType className="w-4 h-4 mr-2" />
+                    Télécharger en Word (.docx)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadPDF}>
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Télécharger en PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowBrandingPanel(true)}>
+                    <Palette className="w-4 h-4 mr-2" />
+                    Personnaliser la charte
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </DialogHeader>
+
+        {/* Branding Settings Panel - Collapsible */}
+        {showBrandingPanel && (
+          <div className="mb-4 flex-shrink-0">
+            <BrandingSettingsPanel 
+              onBrandingChange={setBranding}
+              compact={false}
+            />
+          </div>
+        )}
 
         <Tabs defaultValue="content" className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <TabsList className="w-full justify-start flex-shrink-0">
