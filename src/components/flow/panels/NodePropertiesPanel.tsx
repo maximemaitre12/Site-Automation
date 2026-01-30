@@ -344,7 +344,7 @@ function NodePropertiesPanelComponent({
   }, [fieldsBySection]);
 
   return (
-    <div className="w-80 h-full border-l border-border bg-card flex flex-col">
+    <div className="w-80 h-full border-l border-border bg-card flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-border shrink-0">
         <div className="flex items-start justify-between mb-3">
@@ -402,8 +402,8 @@ function NodePropertiesPanelComponent({
       </div>
 
       {/* Content */}
-      <ScrollArea className="flex-1">
-        <div className="p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-3 space-y-2 pb-8">
           {/* Render sections in order */}
           {orderedSections.map(sectionKey => 
             renderSection(sectionKey, fieldsBySection[sectionKey])
@@ -503,7 +503,7 @@ function NodePropertiesPanelComponent({
             </Collapsible>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
