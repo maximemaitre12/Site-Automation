@@ -14,12 +14,13 @@ import {
   Target,
   Zap,
   ChevronRight,
+  Info,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompany } from "@/hooks/useCompany";
-import { useWorkflows, useWorkflowRuns } from "@/hooks/useWorkflows";
+import { useWorkflowRuns } from "@/hooks/useWorkflows";
 import { useCompliance } from "@/hooks/useCompliance";
 import { useHR } from "@/hooks/useHR";
 import { useInterviews } from "@/hooks/useInterviews";
@@ -31,11 +32,10 @@ import { useAetherDocs } from "@/hooks/useAetherDocs";
 import {
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
 } from "recharts";
 import { format, subDays, startOfWeek, startOfMonth, differenceInDays } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -43,21 +43,24 @@ import { AnimatedCounter } from "@/components/landing/AnimatedCounter";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Time saved estimates per action (in minutes)
+// Estimations de temps par action (en minutes) - Benchmarks sectoriels
 const TIME_ESTIMATES = {
-  workflow_run: 15, // Each workflow automation saves ~15 min
-  document_generated: 45, // AI-generated document saves ~45 min
-  document_analyzed: 20, // Document analysis saves ~20 min
-  proposal_generated: 60, // Sales proposal saves ~1 hour
-  call_analyzed: 30, // Call analysis saves ~30 min
-  ticket_resolved: 25, // AI-assisted ticket saves ~25 min
-  audit_completed: 120, // Compliance audit saves ~2 hours
-  candidate_screened: 35, // CV screening saves ~35 min
-  interview_analyzed: 40, // Interview analysis saves ~40 min
-  brain_conversation: 10, // Each Brain interaction saves ~10 min
-  negotiation_sheet: 50, // Negotiation prep saves ~50 min
+  workflow_run: 15,        // Automatisation de tâches répétitives
+  document_generated: 45,  // Rédaction structurée complète
+  document_analyzed: 20,   // Extraction mots-clés + résumé
+  proposal_generated: 60,  // Recherche + personnalisation
+  call_analyzed: 30,       // Réécoute + synthèse
+  negotiation_sheet: 50,   // Préparation argumentaire
+  ticket_resolved: 25,     // Classification + réponse IA
+  audit_completed: 120,    // Analyse réglementaire complète
+  candidate_screened: 35,  // Lecture CV + scoring
+  interview_analyzed: 40,  // Rapport + recommandations
+  brain_conversation: 10,  // Recherche info + formulation
 };
+
+const HOURLY_RATE = 85; // €/heure (taux consultant moyen)
 
 interface TimeSavedByTool {
   name: string;
@@ -85,31 +88,28 @@ export default function Dashboard() {
   const [period, setPeriod] = useState<"week" | "month" | "all">("month");
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const isLoading = runsLoading || auditsLoading || hrLoading || interviewsLoading || ticketsLoading || brainLoading || salesLoading || sheetsLoading || docsLoading;
+  const isLoading = runsLoading || auditsLoading || hrLoading || interviewsLoading || 
+                    ticketsLoading || brainLoading || salesLoading || sheetsLoading || docsLoading;
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Filter data by period
+  // Filtrage par période - données réelles uniquement
   const filterByPeriod = <T extends { created_at: string }>(data: T[] | undefined): T[] => {
-    if (!data) return [];
+    if (!data?.length) return [];
     if (period === "all") return data;
 
     const now = new Date();
-    let startDate: Date;
-
-    if (period === "week") {
-      startDate = startOfWeek(now, { weekStartsOn: 1 });
-    } else {
-      startDate = startOfMonth(now);
-    }
+    const startDate = period === "week" 
+      ? startOfWeek(now, { weekStartsOn: 1 }) 
+      : startOfMonth(now);
 
     return data.filter(item => new Date(item.created_at) >= startDate);
   };
 
-  // Calculate time saved by tool
+  // Calcul du temps économisé par outil - basé sur données réelles
   const timeSavedByTool = useMemo((): TimeSavedByTool[] => {
     const filteredWorkflowRuns = filterByPeriod(workflowRuns);
     const filteredProposals = filterByPeriod(proposals);
@@ -118,12 +118,13 @@ export default function Dashboard() {
     const filteredTickets = filterByPeriod(tickets?.filter(t => t.status === "resolved"));
     const filteredAudits = filterByPeriod(audits);
     const filteredCandidates = filterByPeriod(candidates);
-    const filteredInterviews = filterByPeriod(interviews?.filter(i => i.ai_report));
+    const filteredInterviews = filterByPeriod(interviews?.filter(i => i.ai_report && Object.keys(i.ai_report as object).length > 0));
     const filteredConversations = filterByPeriod(conversations);
     const filteredDocs = filterByPeriod(aetherDocs);
 
+    // Documents générés (avec ai_summary) vs analysés (avec ai_keywords)
     const generatedDocs = filteredDocs?.filter(d => d.ai_summary) || [];
-    const analyzedDocs = filteredDocs?.filter(d => d.ai_keywords && (d.ai_keywords as unknown[]).length > 0) || [];
+    const analyzedDocs = filteredDocs?.filter(d => d.ai_keywords && Array.isArray(d.ai_keywords) && (d.ai_keywords as unknown[]).length > 0) || [];
 
     return [
       {
@@ -197,7 +198,7 @@ export default function Dashboard() {
     ].sort((a, b) => b.minutes - a.minutes);
   }, [workflowRuns, proposals, callAnalyses, negotiationSheets, tickets, audits, candidates, interviews, conversations, aetherDocs, period]);
 
-  // Total time saved
+  // Total temps économisé
   const totalMinutesSaved = useMemo(() => {
     return timeSavedByTool.reduce((sum, tool) => sum + tool.minutes, 0);
   }, [timeSavedByTool]);
@@ -210,7 +211,10 @@ export default function Dashboard() {
     return timeSavedByTool.reduce((sum, tool) => sum + tool.actions, 0);
   }, [timeSavedByTool]);
 
-  // Weekly data for chart
+  // Valeur économisée
+  const moneySaved = totalHoursSaved * HOURLY_RATE;
+
+  // Données pour le graphique 7 jours - basées sur données réelles
   const weeklyData = useMemo(() => {
     const days = [];
     const today = new Date();
@@ -222,60 +226,61 @@ export default function Dashboard() {
       const dayEnd = new Date(date);
       dayEnd.setHours(23, 59, 59, 999);
 
+      const isInRange = (createdAt: string) => {
+        const d = new Date(createdAt);
+        return d >= dayStart && d <= dayEnd;
+      };
+
       let dayMinutes = 0;
 
-      // Count workflow runs
-      dayMinutes += (workflowRuns?.filter(r => {
-        const d = new Date(r.created_at);
-        return d >= dayStart && d <= dayEnd;
-      }).length || 0) * TIME_ESTIMATES.workflow_run;
+      // Workflows
+      dayMinutes += (workflowRuns?.filter(r => isInRange(r.created_at)).length || 0) * TIME_ESTIMATES.workflow_run;
 
-      // Count conversations
-      dayMinutes += (conversations?.filter(c => {
-        const d = new Date(c.created_at);
-        return d >= dayStart && d <= dayEnd;
-      }).length || 0) * TIME_ESTIMATES.brain_conversation;
+      // Conversations Brain
+      dayMinutes += (conversations?.filter(c => isInRange(c.created_at)).length || 0) * TIME_ESTIMATES.brain_conversation;
 
-      // Count tickets resolved
-      dayMinutes += (tickets?.filter(t => {
-        if (t.status !== "resolved" || !t.resolved_at) return false;
-        const d = new Date(t.resolved_at);
-        return d >= dayStart && d <= dayEnd;
-      }).length || 0) * TIME_ESTIMATES.ticket_resolved;
+      // Tickets résolus
+      dayMinutes += (tickets?.filter(t => t.status === "resolved" && t.resolved_at && isInRange(t.resolved_at)).length || 0) * TIME_ESTIMATES.ticket_resolved;
 
-      // Count proposals
-      dayMinutes += (proposals?.filter(p => {
-        const d = new Date(p.created_at);
-        return d >= dayStart && d <= dayEnd;
-      }).length || 0) * TIME_ESTIMATES.proposal_generated;
+      // Propositions commerciales
+      dayMinutes += (proposals?.filter(p => isInRange(p.created_at)).length || 0) * TIME_ESTIMATES.proposal_generated;
 
-      // Count audits
-      dayMinutes += (audits?.filter(a => {
-        const d = new Date(a.created_at);
-        return d >= dayStart && d <= dayEnd;
-      }).length || 0) * TIME_ESTIMATES.audit_completed;
+      // Analyses d'appels
+      dayMinutes += (callAnalyses?.filter(c => isInRange(c.created_at)).length || 0) * TIME_ESTIMATES.call_analyzed;
+
+      // Fiches de négociation
+      dayMinutes += (negotiationSheets?.filter(n => isInRange(n.created_at)).length || 0) * TIME_ESTIMATES.negotiation_sheet;
+
+      // Audits
+      dayMinutes += (audits?.filter(a => isInRange(a.created_at)).length || 0) * TIME_ESTIMATES.audit_completed;
+
+      // Documents AETHER
+      dayMinutes += (aetherDocs?.filter(d => d.ai_summary && isInRange(d.created_at)).length || 0) * TIME_ESTIMATES.document_generated;
+      dayMinutes += (aetherDocs?.filter(d => d.ai_keywords && Array.isArray(d.ai_keywords) && (d.ai_keywords as unknown[]).length > 0 && isInRange(d.created_at)).length || 0) * TIME_ESTIMATES.document_analyzed;
+
+      // Candidats
+      dayMinutes += (candidates?.filter(c => isInRange(c.created_at)).length || 0) * TIME_ESTIMATES.candidate_screened;
+
+      // Entretiens analysés
+      dayMinutes += (interviews?.filter(i => i.ai_report && Object.keys(i.ai_report as object).length > 0 && isInRange(i.created_at)).length || 0) * TIME_ESTIMATES.interview_analyzed;
 
       days.push({
         name: format(date, "EEE", { locale: fr }),
-        date: format(date, "d MMM", { locale: fr }),
+        fullDate: format(date, "d MMM", { locale: fr }),
         minutes: dayMinutes,
-        hours: Math.round(dayMinutes / 60 * 10) / 10,
       });
     }
 
     return days;
-  }, [workflowRuns, conversations, tickets, proposals, audits]);
+  }, [workflowRuns, conversations, tickets, proposals, callAnalyses, negotiationSheets, audits, aetherDocs, candidates, interviews]);
 
-  // Money saved estimation (average hourly rate)
-  const hourlyRate = 85; // €85/hour average
-  const moneySaved = totalHoursSaved * hourlyRate;
-
-  // Period labels
+  // Labels période
   const periodLabel = period === "week" ? "cette semaine" : period === "month" ? "ce mois" : "au total";
   const periodDays = period === "week" ? 7 : period === "month" ? differenceInDays(new Date(), startOfMonth(new Date())) + 1 : 365;
 
-  // Format time display
+  // Formatage temps
   const formatTimeSaved = (minutes: number): string => {
+    if (minutes === 0) return "0 min";
     if (minutes < 60) return `${minutes} min`;
     const hours = Math.floor(minutes / 60);
     const remainingMins = minutes % 60;
@@ -301,11 +306,10 @@ export default function Dashboard() {
               </p>
             </div>
 
-            {/* Period Selector */}
             <Tabs value={period} onValueChange={(v) => setPeriod(v as "week" | "month" | "all")} className="w-auto">
               <TabsList className="bg-secondary/50">
-                <TabsTrigger value="week" className="text-xs sm:text-sm">Cette semaine</TabsTrigger>
-                <TabsTrigger value="month" className="text-xs sm:text-sm">Ce mois</TabsTrigger>
+                <TabsTrigger value="week" className="text-xs sm:text-sm">Semaine</TabsTrigger>
+                <TabsTrigger value="month" className="text-xs sm:text-sm">Mois</TabsTrigger>
                 <TabsTrigger value="all" className="text-xs sm:text-sm">Total</TabsTrigger>
               </TabsList>
             </Tabs>
@@ -313,7 +317,7 @@ export default function Dashboard() {
 
           {/* Hero Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Total Time Saved - Hero Card */}
+            {/* Temps économisé - Card principale */}
             <Card className="md:col-span-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
               <CardContent className="p-6 sm:p-8 relative">
@@ -324,17 +328,19 @@ export default function Dashboard() {
                       <span className="text-sm font-medium">Temps économisé {periodLabel}</span>
                     </div>
                     <div className="flex items-baseline gap-3">
-                      <span className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tabular-nums">
-                        {isLoading ? (
-                          <span className="animate-pulse">--</span>
-                        ) : (
-                          <AnimatedCounter end={totalHoursSaved} duration={1500} />
-                        )}
-                      </span>
-                      <span className="text-2xl sm:text-3xl text-muted-foreground font-medium">heures</span>
+                      {isLoading ? (
+                        <Skeleton className="h-16 w-32" />
+                      ) : (
+                        <>
+                          <span className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tabular-nums">
+                            <AnimatedCounter end={totalHoursSaved} duration={1500} />
+                          </span>
+                          <span className="text-2xl sm:text-3xl text-muted-foreground font-medium">heures</span>
+                        </>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground mt-3">
-                      Soit <span className="text-primary font-semibold">{totalDaysSaved} jours</span> de travail
+                      = <span className="text-primary font-semibold">{totalDaysSaved} jours</span> de travail
                     </p>
                   </div>
                   <div className="hidden sm:block text-right">
@@ -347,7 +353,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Secondary Stats */}
+            {/* KPIs secondaires */}
             <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
               <Card className="border-border bg-card/50">
                 <CardContent className="p-4 sm:p-5">
@@ -356,9 +362,13 @@ export default function Dashboard() {
                       <Target className="w-5 h-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
-                        {isLoading ? "--" : <AnimatedCounter end={totalActions} duration={1200} />}
-                      </p>
+                      {isLoading ? (
+                        <Skeleton className="h-8 w-16" />
+                      ) : (
+                        <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                          <AnimatedCounter end={totalActions} duration={1200} />
+                        </p>
+                      )}
                       <p className="text-xs text-muted-foreground">Actions automatisées</p>
                     </div>
                   </div>
@@ -372,9 +382,13 @@ export default function Dashboard() {
                       <Zap className="w-5 h-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
-                        {isLoading ? "--" : <AnimatedCounter end={moneySaved} prefix="€" duration={1500} />}
-                      </p>
+                      {isLoading ? (
+                        <Skeleton className="h-8 w-20" />
+                      ) : (
+                        <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                          <AnimatedCounter end={moneySaved} prefix="€" duration={1500} />
+                        </p>
+                      )}
                       <p className="text-xs text-muted-foreground">Valeur économisée</p>
                     </div>
                   </div>
@@ -383,59 +397,70 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Chart + Breakdown */}
+          {/* Graphique + Breakdown */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-            {/* Weekly Chart */}
+            {/* Graphique évolution 7 jours */}
             <Card className="lg:col-span-2 border-border bg-card/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
-                  Temps économisé par jour
+                  Évolution sur 7 jours
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[250px] sm:h-[280px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={weeklyData} barSize={32}>
-                      <defs>
-                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
-                          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis 
-                        dataKey="name" 
-                        stroke="hsl(var(--muted-foreground))" 
-                        fontSize={11} 
-                        tickLine={false} 
-                        axisLine={false}
-                      />
-                      <YAxis 
-                        stroke="hsl(var(--muted-foreground))" 
-                        fontSize={11} 
-                        tickLine={false} 
-                        axisLine={false}
-                        tickFormatter={(v) => `${v}min`}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          fontSize: "12px",
-                        }}
-                        formatter={(value: number) => [`${value} min (${(value / 60).toFixed(1)}h)`, "Temps économisé"]}
-                        labelFormatter={(label, payload) => payload[0]?.payload?.date || label}
-                      />
-                      <Bar dataKey="minutes" fill="url(#barGradient)" radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {isLoading ? (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Skeleton className="w-full h-full" />
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={weeklyData}>
+                        <defs>
+                          <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <XAxis 
+                          dataKey="name" 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={11} 
+                          tickLine={false} 
+                          axisLine={false}
+                        />
+                        <YAxis 
+                          stroke="hsl(var(--muted-foreground))" 
+                          fontSize={11} 
+                          tickLine={false} 
+                          axisLine={false}
+                          tickFormatter={(v) => `${v}min`}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            fontSize: "12px",
+                          }}
+                          formatter={(value: number) => [`${value} min (${(value / 60).toFixed(1)}h)`, "Temps économisé"]}
+                          labelFormatter={(_, payload) => payload[0]?.payload?.fullDate || ""}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="minutes" 
+                          stroke="hsl(var(--primary))" 
+                          strokeWidth={2}
+                          fill="url(#areaGradient)" 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* By Tool Breakdown */}
+            {/* Breakdown par outil */}
             <Card className="border-border bg-card/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -444,37 +469,41 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {timeSavedByTool.filter(t => t.minutes > 0).slice(0, 5).map((tool, index) => {
-                  const percentage = totalMinutesSaved > 0 ? (tool.minutes / totalMinutesSaved) * 100 : 0;
-                  return (
-                    <Link 
-                      key={tool.name} 
-                      to={tool.path}
-                      className="block group"
-                    >
-                      <div className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-secondary/50 transition-colors">
-                        <div className={`w-9 h-9 rounded-lg ${tool.bgClass} flex items-center justify-center shrink-0`}>
-                          <tool.icon className={`w-4 h-4 ${tool.colorClass}`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-foreground truncate">{tool.name}</span>
-                            <span className="text-sm font-semibold text-foreground tabular-nums">
-                              {formatTimeSaved(tool.minutes)}
-                            </span>
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                  ))
+                ) : timeSavedByTool.filter(t => t.minutes > 0).length > 0 ? (
+                  timeSavedByTool.filter(t => t.minutes > 0).slice(0, 5).map((tool) => {
+                    const percentage = totalMinutesSaved > 0 ? (tool.minutes / totalMinutesSaved) * 100 : 0;
+                    return (
+                      <Link 
+                        key={tool.name} 
+                        to={tool.path}
+                        className="block group"
+                      >
+                        <div className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-secondary/50 transition-colors">
+                          <div className={`w-9 h-9 rounded-lg ${tool.bgClass} flex items-center justify-center shrink-0`}>
+                            <tool.icon className={`w-4 h-4 ${tool.colorClass}`} />
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Progress value={percentage} className="h-1.5 flex-1" />
-                            <span className="text-xs text-muted-foreground w-8 text-right">{Math.round(percentage)}%</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm font-medium text-foreground truncate">{tool.name}</span>
+                              <span className="text-sm font-semibold text-foreground tabular-nums">
+                                {formatTimeSaved(tool.minutes)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Progress value={percentage} className="h-1.5 flex-1" />
+                              <span className="text-xs text-muted-foreground w-10 text-right">({tool.actions})</span>
+                            </div>
                           </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </Link>
-                  );
-                })}
-
-                {timeSavedByTool.every(t => t.minutes === 0) && (
+                      </Link>
+                    );
+                  })
+                ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <Clock className="w-10 h-10 mx-auto mb-3 opacity-30" />
                     <p className="text-sm">Pas encore d'activité</p>
@@ -485,7 +514,7 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Quick Access Tools */}
+          {/* Accès rapide aux outils */}
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Accès rapide</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
@@ -510,20 +539,29 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Time Saved Methodology */}
+          {/* Méthodologie */}
           <Card className="border-border bg-card/30">
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <Target className="w-5 h-5 text-muted-foreground" />
+                  <Info className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-1">Comment est calculé le temps économisé ?</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Chaque action automatisée est comparée au temps moyen qu'elle prendrait manuellement. 
-                    Par exemple : génération de document (~45 min), analyse de CV (~35 min), workflow automatisé (~15 min), 
-                    audit de conformité (~2h). Ces estimations sont basées sur des benchmarks sectoriels.
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Méthodologie de calcul</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                    Le temps économisé est calculé en comparant chaque action automatisée au temps moyen qu'elle prendrait manuellement, 
+                    basé sur des benchmarks sectoriels. La valeur est estimée à {HOURLY_RATE}€/heure (taux consultant moyen).
                   </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs text-muted-foreground">
+                    <span>• Workflow: {TIME_ESTIMATES.workflow_run}min</span>
+                    <span>• Document IA: {TIME_ESTIMATES.document_generated}min</span>
+                    <span>• Audit: {TIME_ESTIMATES.audit_completed}min</span>
+                    <span>• Proposition: {TIME_ESTIMATES.proposal_generated}min</span>
+                    <span>• Analyse appel: {TIME_ESTIMATES.call_analyzed}min</span>
+                    <span>• Fiche négo: {TIME_ESTIMATES.negotiation_sheet}min</span>
+                    <span>• Ticket IA: {TIME_ESTIMATES.ticket_resolved}min</span>
+                    <span>• CV analysé: {TIME_ESTIMATES.candidate_screened}min</span>
+                  </div>
                 </div>
               </div>
             </CardContent>
