@@ -29,8 +29,23 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
   const triggerBlock = blocks.find(b => b.type.startsWith('trigger_'));
   const hasBlocks = blocks.length > 0;
 
-  const handleRun = async () => {
-    if (!input.trim()) {
+  // Triggers that fetch their own data automatically (real integrations)
+  const autoTriggerTypes = [
+    'trigger_email', 
+    'trigger_webhook', 
+    'trigger_schedule',
+    'trigger_database',
+    'trigger_api'
+  ];
+  
+  const isAutoTrigger = triggerBlock && autoTriggerTypes.includes(triggerBlock.type);
+  const requiresManualInput = !isAutoTrigger;
+
+  const handleRun = async (autoInput?: string) => {
+    const inputData = autoInput ?? input;
+    
+    // Only require input for manual trigger types
+    if (requiresManualInput && !inputData.trim()) {
       toast.error('Please provide input data');
       return;
     }
@@ -40,8 +55,13 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
     setResult(null);
 
     try {
+      // For auto-triggers, pass empty string or trigger type as context
+      const executionInput = isAutoTrigger 
+        ? JSON.stringify({ autoTrigger: true, triggerType: triggerBlock?.type })
+        : inputData;
+      
       // Execute via server-side Edge Function for proper AI access
-      const execution = await executeWorkflowViaServer(blocks, input, workflowId);
+      const execution = await executeWorkflowViaServer(blocks, executionInput, workflowId);
       
       // Update logs progressively from server response
       if (execution.logs) {
@@ -98,23 +118,38 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto space-y-6 py-4">
-            {/* Input section */}
-            <div className="space-y-2">
-              <Label>Input Data</Label>
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  triggerBlock?.type === 'trigger_text' 
-                    ? 'Enter text to process...'
-                    : triggerBlock?.type === 'trigger_form'
-                    ? 'Enter form data (JSON or plain text)...'
-                    : 'Enter input data for the workflow...'
-                }
-                rows={5}
-                disabled={isRunning}
-              />
-            </div>
+            {/* Auto-trigger info */}
+            {isAutoTrigger && (
+              <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                <div className="flex items-center gap-2 text-primary">
+                  <Play className="w-4 h-4" />
+                  <span className="font-medium">Trigger automatique</span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Ce workflow récupère automatiquement les données depuis {triggerBlock?.type === 'trigger_email' ? 'votre boîte mail' : 'la source configurée'}.
+                </p>
+              </div>
+            )}
+
+            {/* Input section - only for manual triggers */}
+            {requiresManualInput && (
+              <div className="space-y-2">
+                <Label>Input Data</Label>
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={
+                    triggerBlock?.type === 'trigger_text' 
+                      ? 'Enter text to process...'
+                      : triggerBlock?.type === 'trigger_form'
+                      ? 'Enter form data (JSON or plain text)...'
+                      : 'Enter input data for the workflow...'
+                  }
+                  rows={5}
+                  disabled={isRunning}
+                />
+              </div>
+            )}
 
             {/* Execution logs */}
             {logs.length > 0 && (
@@ -218,8 +253,8 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
             </Button>
             <Button
               variant="hero"
-              onClick={handleRun}
-              disabled={isRunning || !input.trim()}
+              onClick={() => handleRun()}
+              disabled={isRunning || (requiresManualInput && !input.trim())}
             >
               {isRunning ? (
                 <>
@@ -229,7 +264,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
               ) : (
                 <>
                   <Play className="w-4 h-4 mr-2" />
-                  Execute
+                  {isAutoTrigger ? 'Lancer' : 'Execute'}
                 </>
               )}
             </Button>
