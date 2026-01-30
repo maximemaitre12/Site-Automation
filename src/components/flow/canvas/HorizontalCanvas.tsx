@@ -29,6 +29,7 @@ interface HorizontalCanvasProps {
   hasUnsavedChanges: boolean;
   isRunning?: boolean;
   className?: string;
+  onAutoLayout?: () => void;
 }
 
 function HorizontalCanvasComponent({
@@ -52,6 +53,7 @@ function HorizontalCanvasComponent({
   hasUnsavedChanges,
   isRunning = false,
   className,
+  onAutoLayout,
 }: HorizontalCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
