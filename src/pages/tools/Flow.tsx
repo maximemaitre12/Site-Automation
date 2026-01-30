@@ -67,6 +67,8 @@ export default function Flow() {
   const [history, setHistory] = useState<HistoryState[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const isUndoRedoAction = useRef(false);
+  const historyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingHistoryState = useRef<HistoryState | null>(null);
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -96,6 +98,7 @@ export default function Flow() {
   }, [selectedWorkflowId, selectedWorkflow?.id]);
 
   // Push to history when blocks/connections change (except during undo/redo)
+  // Uses debounce to avoid capturing every micro-movement during drag
   useEffect(() => {
     if (isUndoRedoAction.current) {
       isUndoRedoAction.current = false;
@@ -110,19 +113,37 @@ export default function Flow() {
       return;
     }
 
-    // Push new state, truncating any redo history
-    setHistory(prev => {
-      const truncated = prev.slice(0, historyIndex + 1);
-      const newEntry = { 
-        blocks: JSON.parse(JSON.stringify(localBlocks)), 
-        connections: JSON.parse(JSON.stringify(localConnections)) 
-      };
-      const newHistory = [...truncated, newEntry];
-      // Keep max 30 entries
-      if (newHistory.length > 30) return newHistory.slice(-30);
-      return newHistory;
-    });
-    setHistoryIndex(prev => Math.min(prev + 1, 29));
+    // Store the pending state
+    pendingHistoryState.current = { 
+      blocks: JSON.parse(JSON.stringify(localBlocks)), 
+      connections: JSON.parse(JSON.stringify(localConnections)) 
+    };
+
+    // Clear any existing timeout
+    if (historyTimeoutRef.current) {
+      clearTimeout(historyTimeoutRef.current);
+    }
+
+    // Debounce: only push to history after 300ms of no changes
+    historyTimeoutRef.current = setTimeout(() => {
+      if (!pendingHistoryState.current) return;
+      
+      setHistory(prev => {
+        const truncated = prev.slice(0, historyIndex + 1);
+        const newHistory = [...truncated, pendingHistoryState.current!];
+        // Keep max 30 entries
+        if (newHistory.length > 30) return newHistory.slice(-30);
+        return newHistory;
+      });
+      setHistoryIndex(prev => Math.min(prev + 1, 29));
+      pendingHistoryState.current = null;
+    }, 300);
+
+    return () => {
+      if (historyTimeoutRef.current) {
+        clearTimeout(historyTimeoutRef.current);
+      }
+    };
   }, [localBlocks, localConnections, selectedWorkflowId]);
 
   const handleUndo = useCallback(() => {
