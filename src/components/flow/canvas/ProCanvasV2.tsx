@@ -279,6 +279,7 @@ function ProCanvasV2Component({
       
       // Find blocks within selection rectangle
       const selected = new Set<string>();
+      const selectedBlocks: WorkflowBlock[] = [];
       blocks.forEach(block => {
         const blockRight = block.position.x + NODE_WIDTH;
         const blockBottom = block.position.y + NODE_TOTAL_HEIGHT;
@@ -287,12 +288,29 @@ function ProCanvasV2Component({
         if (block.position.x < maxX && blockRight > minX && 
             block.position.y < maxY && blockBottom > minY) {
           selected.add(block.id);
+          selectedBlocks.push(block);
         }
       });
       
       setSelectedBlockIds(selected);
       setIsSelecting(false);
-      setSelectionRect(null);
+      
+      // If blocks were selected, adapt the selection rect to fit them
+      if (selectedBlocks.length > 0) {
+        const boundsMinX = Math.min(...selectedBlocks.map(b => b.position.x)) - 10;
+        const boundsMinY = Math.min(...selectedBlocks.map(b => b.position.y)) - 10;
+        const boundsMaxX = Math.max(...selectedBlocks.map(b => b.position.x + NODE_WIDTH)) + 10;
+        const boundsMaxY = Math.max(...selectedBlocks.map(b => b.position.y + NODE_TOTAL_HEIGHT)) + 10;
+        
+        setSelectionRect({
+          startX: boundsMinX,
+          startY: boundsMinY,
+          endX: boundsMaxX,
+          endY: boundsMaxY,
+        });
+      } else {
+        setSelectionRect(null);
+      }
     }
     
     setIsPanning(false);
@@ -409,15 +427,36 @@ function ProCanvasV2Component({
     });
   }, [zoom]);
 
-  // Canvas click (deselect)
+  // Canvas click (deselect) - only if not currently selecting
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
     if (e.target === svgRef.current || (e.target as Element).classList.contains('canvas-background')) {
+      // Only deselect if we have selection and no active selection rectangle
+      if (selectedBlockIds.size > 0 && !isSelecting) {
+        // Keep selection if clicking inside the selection rect
+        if (selectionRect) {
+          const rect = containerRef.current?.getBoundingClientRect();
+          if (rect) {
+            const canvasX = (e.clientX - rect.left - pan.x) / zoom;
+            const canvasY = (e.clientY - rect.top - pan.y) / zoom;
+            const minX = Math.min(selectionRect.startX, selectionRect.endX);
+            const maxX = Math.max(selectionRect.startX, selectionRect.endX);
+            const minY = Math.min(selectionRect.startY, selectionRect.endY);
+            const maxY = Math.max(selectionRect.startY, selectionRect.endY);
+            
+            if (canvasX >= minX && canvasX <= maxX && canvasY >= minY && canvasY <= maxY) {
+              return; // Click inside selection, don't deselect
+            }
+          }
+        }
+        // Click outside selection, clear it
+        setSelectedBlockIds(new Set());
+        setSelectionRect(null);
+      }
       onBlockSelect(null);
       setSelectedNoteId(null);
       setSelectedGroupId(null);
-      setSelectedBlockIds(new Set());
     }
-  }, [onBlockSelect]);
+  }, [onBlockSelect, selectedBlockIds, isSelecting, selectionRect, pan, zoom]);
 
   // Keyboard shortcuts
   useEffect(() => {
