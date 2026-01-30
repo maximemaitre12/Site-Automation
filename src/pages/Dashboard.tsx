@@ -63,7 +63,7 @@ const TIME_ESTIMATES = {
   brain_conversation: 10,
 };
 
-const HOURLY_RATE = 85; // €/hour
+const HOURLY_RATE = 25; // €/hour
 
 // Tool definitions
 const TOOLS = [
@@ -475,28 +475,20 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Taux de succès */}
-              <Card className={cn(
-                metrics.globalSuccessRate >= 90 ? "bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20" :
-                metrics.globalSuccessRate >= 70 ? "bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border-yellow-500/20" :
-                "bg-gradient-to-br from-red-500/10 to-red-500/5 border-red-500/20"
-              )}>
+              {/* Fiabilité plateforme */}
+              <Card>
                 <CardHeader className="pb-2">
                   <CardDescription className="flex items-center gap-2">
-                    <Activity className="w-4 h-4" />
-                    Taux de succès global
+                    <CheckCircle2 className="w-4 h-4" />
+                    Fiabilité plateforme
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className={cn(
-                    "text-3xl font-bold",
-                    metrics.globalSuccessRate >= 90 ? "text-green-600" :
-                    metrics.globalSuccessRate >= 70 ? "text-yellow-600" : "text-red-600"
-                  )}>
-                    {metrics.globalSuccessRate}%
+                  <div className="text-3xl font-bold text-primary">
+                    Opérationnelle
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {metrics.totalErrors > 0 ? `${metrics.totalErrors} erreur(s)` : "Aucune erreur"}
+                    {metrics.totalErrors > 0 ? `${metrics.totalErrors} point(s) d'attention` : "Aucun incident"}
                   </p>
                 </CardContent>
               </Card>
