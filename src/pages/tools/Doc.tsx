@@ -151,7 +151,7 @@ export default function DocPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full overflow-hidden bg-gradient-to-b from-background to-background/95">
+      <div className="flex flex-col h-full overflow-y-auto bg-gradient-to-b from-background to-background/95">
         {/* Modern Header */}
         <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
           <div className="max-w-7xl mx-auto">
@@ -208,7 +208,7 @@ export default function DocPage() {
         </header>
 
         {/* Main content area */}
-        <div className="flex flex-1 overflow-hidden relative px-4 md:px-8">
+        <div className="flex flex-1 relative px-4 md:px-8 pb-24">
           <div className="max-w-7xl mx-auto w-full flex">
             {/* Sidebar - Folders */}
             <div className={cn(
@@ -233,7 +233,7 @@ export default function DocPage() {
             )}
 
             {/* Main content */}
-            <div className="flex-1 flex flex-col min-w-0 md:pl-6 overflow-hidden">
+            <div className="flex-1 flex flex-col min-w-0 md:pl-6">
               <DocHeader
                 breadcrumbs={breadcrumbs}
                 searchQuery={searchQuery}
@@ -245,17 +245,15 @@ export default function DocPage() {
                 onBreadcrumbClick={(id) => setCurrentFolder(id)}
               />
 
-              <div className="flex-1 overflow-y-auto pb-24">
-                <DocGrid
-                  documents={filteredDocuments}
-                  folders={folders.filter(f => f.parent_id === currentFolder)}
-                  viewMode={viewMode}
-                  onDocumentClick={handleDocumentClick}
-                  onFolderClick={(folder) => setCurrentFolder(folder.id)}
-                  onDeleteDocument={deleteDocument}
-                  onMoveDocument={moveDocument}
-                />
-              </div>
+              <DocGrid
+                documents={filteredDocuments}
+                folders={folders.filter(f => f.parent_id === currentFolder)}
+                viewMode={viewMode}
+                onDocumentClick={handleDocumentClick}
+                onFolderClick={(folder) => setCurrentFolder(folder.id)}
+                onDeleteDocument={deleteDocument}
+                onMoveDocument={moveDocument}
+              />
             </div>
           </div>
         </div>
