@@ -292,13 +292,15 @@ export function DocViewerDialog({
           </div>
         </DialogHeader>
 
-        {/* Branding Settings Panel - Collapsible */}
+        {/* Branding Settings Panel - Collapsible with scroll */}
         {showBrandingPanel && (
-          <div className="mb-4 flex-shrink-0">
-            <BrandingSettingsPanel 
-              onBrandingChange={setBranding}
-              compact={false}
-            />
+          <div className="mb-4 flex-shrink-0 max-h-[40vh] overflow-y-auto rounded-lg border">
+            <ScrollArea className="h-full">
+              <BrandingSettingsPanel 
+                onBrandingChange={setBranding}
+                compact={false}
+              />
+            </ScrollArea>
           </div>
         )}
 
