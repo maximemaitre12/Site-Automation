@@ -205,17 +205,17 @@ export default function Flow() {
     if (!selectedWorkflowId) return;
     const def = BLOCK_DEFINITIONS[type];
     
-    // Find the last block in the chain or the selected block to connect from
+    // Find the rightmost block to position new block horizontally
     const sourceBlock = selectedBlockId 
       ? localBlocks.find(b => b.id === selectedBlockId)
       : localBlocks.length > 0 
-        ? localBlocks.reduce((last, b) => b.position.y > last.position.y ? b : last, localBlocks[0])
+        ? localBlocks.reduce((last, b) => b.position.x > last.position.x ? b : last, localBlocks[0])
         : null;
     
-    // Position new block below the source block
+    // Position new block to the RIGHT of source block (HORIZONTAL LAYOUT)
     const newPosition = sourceBlock 
-      ? { x: sourceBlock.position.x, y: sourceBlock.position.y + 140 }
-      : { x: 100, y: localBlocks.length * 140 };
+      ? { x: sourceBlock.position.x + 280, y: sourceBlock.position.y }
+      : { x: 100, y: 200 };
     
     const newBlock: WorkflowBlock = {
       id: crypto.randomUUID(),
@@ -271,7 +271,7 @@ export default function Flow() {
       ...block,
       id: crypto.randomUUID(),
       name: `${block.name} (copy)`,
-      position: { x: block.position.x, y: block.position.y + 120 }
+      position: { x: block.position.x + 60, y: block.position.y + 80 }
     };
     setLocalBlocks(prev => [...prev, newBlock]);
     setHasUnsavedChanges(true);

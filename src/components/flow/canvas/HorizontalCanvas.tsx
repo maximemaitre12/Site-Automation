@@ -96,6 +96,10 @@ function HorizontalCanvasComponent({
     setZoom(1);
   }, []);
 
+  // Professional node dimensions
+  const NODE_WIDTH = 240;
+  const NODE_HEIGHT = 100;
+
   const handleFitView = useCallback(() => {
     if (blocks.length === 0 || !containerRef.current) return;
     
@@ -104,11 +108,11 @@ function HorizontalCanvasComponent({
     
     const minX = Math.min(...positions.map(p => p.x));
     const minY = Math.min(...positions.map(p => p.y));
-    const maxX = Math.max(...positions.map(p => p.x + DEFAULT_CANVAS_CONFIG.nodeWidth));
-    const maxY = Math.max(...positions.map(p => p.y + DEFAULT_CANVAS_CONFIG.nodeHeight));
+    const maxX = Math.max(...positions.map(p => p.x + NODE_WIDTH));
+    const maxY = Math.max(...positions.map(p => p.y + NODE_HEIGHT));
     
-    const contentWidth = maxX - minX + 100;
-    const contentHeight = maxY - minY + 100;
+    const contentWidth = maxX - minX + 150;
+    const contentHeight = maxY - minY + 150;
     
     const scaleX = containerRect.width / contentWidth;
     const scaleY = containerRect.height / contentHeight;
@@ -116,8 +120,8 @@ function HorizontalCanvasComponent({
     
     setZoom(newZoom);
     setPan({
-      x: -minX * newZoom + (containerRect.width - contentWidth * newZoom) / 2 + 50 * newZoom,
-      y: -minY * newZoom + (containerRect.height - contentHeight * newZoom) / 2 + 50 * newZoom,
+      x: -minX * newZoom + (containerRect.width - contentWidth * newZoom) / 2 + 75 * newZoom,
+      y: -minY * newZoom + (containerRect.height - contentHeight * newZoom) / 2 + 75 * newZoom,
     });
   }, [blocks]);
 
