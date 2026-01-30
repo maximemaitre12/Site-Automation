@@ -1,20 +1,13 @@
 import { useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  TrendingUp, 
-  TrendingDown, 
   Clock, 
   Zap, 
-  AlertTriangle, 
-  CheckCircle2, 
-  XCircle,
   Users,
   Workflow,
   FileText,
@@ -23,13 +16,9 @@ import {
   ShieldCheck,
   Brain,
   Database,
-  Activity,
   DollarSign,
-  Target,
-  AlertCircle,
-  ArrowRight,
-  RefreshCw,
-  Lightbulb
+  Info,
+  ArrowRight
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkflows, useWorkflowRuns } from "@/hooks/useWorkflows";
@@ -42,9 +31,9 @@ import { useBrain } from "@/hooks/useBrain";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
 import { useNegotiationSheets } from "@/hooks/useNegotiationSheets";
 import { useDataPlatform } from "@/hooks/useDataPlatform";
-import { format, subDays, startOfWeek, startOfMonth, isAfter, differenceInDays } from "date-fns";
+import { format, subDays, startOfWeek, startOfMonth, isAfter } from "date-fns";
 import { fr } from "date-fns/locale";
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -87,14 +76,14 @@ export default function Dashboard() {
   const { workflows, loading: workflowsLoading } = useWorkflows();
   const { runs: workflowRuns, loading: runsLoading } = useWorkflowRuns();
   const { documents: aetherDocs, loading: docsLoading } = useAetherDocs();
-  const { tickets, loading: ticketsLoading, getStats: getSupportStats } = useSupport();
+  const { tickets, loading: ticketsLoading } = useSupport();
   const { audits, loading: auditsLoading } = useCompliance();
-  const { candidates, jobs, loading: hrLoading } = useHR();
+  const { candidates, loading: hrLoading } = useHR();
   const { interviews, loading: interviewsLoading } = useInterviews();
   const { conversations, loading: brainLoading } = useBrain();
   const { proposals, callAnalyses, loading: salesLoading } = useSalesProposals();
   const { sheets: negotiationSheets, loading: sheetsLoading } = useNegotiationSheets();
-  const { sources: dataSources, pipelineRuns, stats: dataStats, loading: dataLoading } = useDataPlatform();
+  const { pipelineRuns, loading: dataLoading } = useDataPlatform();
 
   const isLoading = workflowsLoading || runsLoading || docsLoading || ticketsLoading || 
     auditsLoading || hrLoading || interviewsLoading || brainLoading || salesLoading || 
@@ -139,28 +128,18 @@ export default function Dashboard() {
         name: "AETHER Flow",
         actions: filteredWorkflowRuns.length,
         minutes: filteredWorkflowRuns.length * TIME_ESTIMATES.workflow_run,
-        successRate: filteredWorkflowRuns.length > 0 
-          ? Math.round((filteredWorkflowRuns.filter(r => r.status === "completed").length / filteredWorkflowRuns.length) * 100)
-          : 0,
-        errors: filteredWorkflowRuns.filter(r => r.status === "failed").length,
       },
       {
         id: "doc",
         name: "AETHER Doc",
         actions: docsGenerated + docsAnalyzed,
         minutes: (docsGenerated * TIME_ESTIMATES.document_generated) + (docsAnalyzed * TIME_ESTIMATES.document_analyzed),
-        successRate: 100,
-        errors: 0,
       },
       {
         id: "data",
         name: "AETHER Data",
         actions: filteredPipelineRuns.length,
         minutes: filteredPipelineRuns.length * 20,
-        successRate: filteredPipelineRuns.length > 0
-          ? Math.round((filteredPipelineRuns.filter(r => r.status === "completed").length / filteredPipelineRuns.length) * 100)
-          : 0,
-        errors: filteredPipelineRuns.filter(r => r.status === "failed").length,
       },
       {
         id: "sales",
@@ -169,8 +148,6 @@ export default function Dashboard() {
         minutes: (filteredProposals.length * TIME_ESTIMATES.proposal_generated) + 
                  (filteredCallAnalyses.length * TIME_ESTIMATES.call_analyzed) +
                  (filteredSheets.length * TIME_ESTIMATES.negotiation_sheet),
-        successRate: 100,
-        errors: 0,
       },
       {
         id: "hr",
@@ -178,34 +155,24 @@ export default function Dashboard() {
         actions: candidatesWithAnalysis + interviewsWithReport,
         minutes: (candidatesWithAnalysis * TIME_ESTIMATES.candidate_screened) + 
                  (interviewsWithReport * TIME_ESTIMATES.interview_analyzed),
-        successRate: 100,
-        errors: 0,
       },
       {
         id: "support",
         name: "Support",
         actions: ticketsResolved,
         minutes: ticketsResolved * TIME_ESTIMATES.ticket_resolved,
-        successRate: filteredTickets.length > 0
-          ? Math.round((ticketsResolved / filteredTickets.length) * 100)
-          : 0,
-        errors: filteredTickets.filter(t => t.priority === "critical" && t.status !== "resolved").length,
       },
       {
         id: "brain",
         name: "Brain",
         actions: filteredConversations.length,
         minutes: filteredConversations.length * TIME_ESTIMATES.brain_conversation,
-        successRate: 100,
-        errors: 0,
       },
       {
         id: "compliance",
         name: "Compliance",
         actions: filteredAudits.length,
         minutes: filteredAudits.length * TIME_ESTIMATES.audit_completed,
-        successRate: 100,
-        errors: 0,
       },
     ].sort((a, b) => b.minutes - a.minutes);
 
@@ -214,16 +181,6 @@ export default function Dashboard() {
     const totalMinutes = toolMetrics.reduce((sum, t) => sum + t.minutes, 0);
     const totalHours = Math.round(totalMinutes / 60 * 10) / 10;
     const totalValue = Math.round((totalMinutes / 60) * HOURLY_RATE);
-    const totalErrors = toolMetrics.reduce((sum, t) => sum + t.errors, 0);
-    const globalSuccessRate = totalActions > 0
-      ? Math.round(toolMetrics.reduce((sum, t) => sum + (t.successRate * t.actions), 0) / totalActions)
-      : 0;
-
-    // Active resources
-    const activeWorkflows = workflows.filter(w => w.is_active).length;
-    const activeSources = dataSources.filter(s => s.status === "active").length;
-    const openTickets = tickets.filter(t => t.status === "open").length;
-    const criticalTickets = tickets.filter(t => t.priority === "critical" || t.priority === "high").length;
 
     return {
       toolMetrics,
@@ -231,16 +188,10 @@ export default function Dashboard() {
       totalMinutes,
       totalHours,
       totalValue,
-      totalErrors,
-      globalSuccessRate,
-      activeWorkflows,
-      activeSources,
-      openTickets,
-      criticalTickets,
       workdays: Math.round(totalHours / 8 * 10) / 10,
     };
   }, [workflowRuns, aetherDocs, tickets, audits, candidates, interviews, conversations, 
-      proposals, callAnalyses, negotiationSheets, pipelineRuns, workflows, dataSources, period]);
+      proposals, callAnalyses, negotiationSheets, pipelineRuns, period]);
 
   // Daily chart data (last 7 days)
   const chartData = useMemo(() => {
@@ -251,7 +202,6 @@ export default function Dashboard() {
         date: format(date, "EEE", { locale: fr }),
         fullDate: format(date, "yyyy-MM-dd"),
         minutes: 0,
-        actions: 0,
       };
     });
 
@@ -263,7 +213,6 @@ export default function Dashboard() {
         const dayIndex = days.findIndex(d => d.fullDate === itemDate);
         if (dayIndex !== -1) {
           days[dayIndex].minutes += TIME_ESTIMATES[estimateKey];
-          days[dayIndex].actions += 1;
         }
       });
     };
@@ -277,89 +226,6 @@ export default function Dashboard() {
 
     return days;
   }, [workflowRuns, aetherDocs, tickets, audits, conversations, proposals]);
-
-  // Risk analysis
-  const risks = useMemo(() => {
-    const items: Array<{ type: "critical" | "warning" | "opportunity"; label: string; tool: string; action?: string; path?: string }> = [];
-
-    // Critical: Failed workflows
-    const failedWorkflows = workflowRuns.filter(r => r.status === "failed").length;
-    if (failedWorkflows > 0) {
-      items.push({
-        type: "critical",
-        label: `${failedWorkflows} workflow(s) en échec`,
-        tool: "AETHER Flow",
-        action: "Corriger",
-        path: "/tools/flow",
-      });
-    }
-
-    // Critical: Critical tickets
-    const criticalOpen = tickets.filter(t => t.priority === "critical" && t.status === "open").length;
-    if (criticalOpen > 0) {
-      items.push({
-        type: "critical",
-        label: `${criticalOpen} ticket(s) critique(s) ouvert(s)`,
-        tool: "Support",
-        action: "Traiter",
-        path: "/tools/support",
-      });
-    }
-
-    // Warning: Data sources in error
-    const errorSources = dataSources.filter(s => s.status === "error").length;
-    if (errorSources > 0) {
-      items.push({
-        type: "warning",
-        label: `${errorSources} source(s) de données en erreur`,
-        tool: "AETHER Data",
-        action: "Vérifier",
-        path: "/tools/data",
-      });
-    }
-
-    // Warning: Low workflow success rate
-    const workflowSuccessRate = workflowRuns.length > 0 
-      ? (workflowRuns.filter(r => r.status === "completed").length / workflowRuns.length) * 100 
-      : 100;
-    if (workflowSuccessRate < 80 && workflowRuns.length > 0) {
-      items.push({
-        type: "warning",
-        label: `Taux de succès workflows faible (${Math.round(workflowSuccessRate)}%)`,
-        tool: "AETHER Flow",
-        action: "Optimiser",
-        path: "/tools/flow",
-      });
-    }
-
-    // Opportunity: Inactive workflows
-    const inactiveWorkflows = workflows.filter(w => !w.is_active).length;
-    if (inactiveWorkflows > 0) {
-      items.push({
-        type: "opportunity",
-        label: `${inactiveWorkflows} workflow(s) inactif(s) à réactiver`,
-        tool: "AETHER Flow",
-        path: "/tools/flow",
-      });
-    }
-
-    // Opportunity: Candidates without analysis
-    const candidatesNoAnalysis = candidates.filter(c => !c.ai_analysis).length;
-    if (candidatesNoAnalysis > 0) {
-      items.push({
-        type: "opportunity",
-        label: `${candidatesNoAnalysis} candidat(s) sans analyse IA`,
-        tool: "HR Copilot",
-        action: "Analyser",
-        path: "/tools/hr",
-      });
-    }
-
-    return items;
-  }, [workflowRuns, tickets, dataSources, workflows, candidates]);
-
-  // Support stats
-  const supportStats = getSupportStats();
 
   const formatTime = (minutes: number): string => {
     if (minutes < 60) return `${minutes}min`;
@@ -376,8 +242,8 @@ export default function Dashboard() {
         <ScrollArea className="flex-1">
           <div className="p-4 sm:p-6 lg:p-8 space-y-6">
             <Skeleton className="h-8 w-64" />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {[...Array(4)].map((_, i) => (
+            <div className="grid gap-4 md:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
                 <Skeleton key={i} className="h-32" />
               ))}
             </div>
@@ -388,10 +254,12 @@ export default function Dashboard() {
     );
   }
 
+  const maxMinutes = Math.max(...metrics.toolMetrics.map(t => t.minutes), 1);
+
   return (
     <DashboardLayout>
       <ScrollArea className="flex-1">
-        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -399,372 +267,253 @@ export default function Dashboard() {
                 Bonjour, {userName}
               </h1>
               <p className="text-muted-foreground">
-                Centre de contrôle AETHER
+                Votre tableau de bord AETHER
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Tabs value={period} onValueChange={(v) => setPeriod(v as Period)}>
-                <TabsList>
-                  <TabsTrigger value="week">Semaine</TabsTrigger>
-                  <TabsTrigger value="month">Mois</TabsTrigger>
-                  <TabsTrigger value="all">Total</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+            <Tabs value={period} onValueChange={(v) => setPeriod(v as Period)}>
+              <TabsList>
+                <TabsTrigger value="week">Semaine</TabsTrigger>
+                <TabsTrigger value="month">Mois</TabsTrigger>
+                <TabsTrigger value="all">Total</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
 
-          {/* Niveau 1: Vue Exécutive */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Target className="w-5 h-5" />
-              Vue Exécutive
-            </h2>
-            
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {/* Temps économisé */}
-              <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-                <CardHeader className="pb-2">
-                  <CardDescription className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    Temps économisé
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-primary">
-                    {metrics.totalHours}h
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    = {metrics.workdays} jours de travail
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Actions automatisées */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription className="flex items-center gap-2">
-                    <Zap className="w-4 h-4" />
-                    Actions automatisées
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">
-                    {metrics.totalActions}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    sur {metrics.toolMetrics.filter(t => t.actions > 0).length} outils actifs
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Valeur générée */}
-              <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-                <CardHeader className="pb-2">
-                  <CardDescription className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4" />
-                    Valeur générée
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-green-600">
-                    {metrics.totalValue.toLocaleString()}€
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    @{HOURLY_RATE}€/h économisé
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Fiabilité plateforme */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardDescription className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Fiabilité plateforme
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-primary">
-                    Opérationnelle
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {metrics.totalErrors > 0 ? `${metrics.totalErrors} point(s) d'attention` : "Aucun incident"}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Secondary stats row */}
-            <div className="grid gap-4 md:grid-cols-4">
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Workflows actifs</p>
-                    <p className="text-2xl font-bold">{metrics.activeWorkflows}</p>
-                  </div>
-                  <Workflow className="w-8 h-8 text-muted-foreground/50" />
+          {/* Main KPIs */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {/* Temps économisé - Hero card */}
+            <Card className="md:col-span-1 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+              <CardHeader className="pb-2">
+                <CardDescription className="flex items-center gap-2 text-primary/80">
+                  <Clock className="w-4 h-4" />
+                  Temps économisé
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-primary">
+                  {metrics.totalHours}h
                 </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Sources données</p>
-                    <p className="text-2xl font-bold">{metrics.activeSources}</p>
-                  </div>
-                  <Database className="w-8 h-8 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground mt-1">
+                  = {metrics.workdays} jours de travail
+                </p>
+                {metrics.totalActions > 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    +{Math.round(metrics.totalMinutes / 7)}min/jour en moyenne
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Actions */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription className="flex items-center gap-2">
+                  <Zap className="w-4 h-4" />
+                  Actions automatisées
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">
+                  {metrics.totalActions}
                 </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Tickets ouverts</p>
-                    <p className="text-2xl font-bold">{metrics.openTickets}</p>
-                  </div>
-                  <MessageSquare className="w-8 h-8 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground mt-1">
+                  sur {metrics.toolMetrics.filter(t => t.actions > 0).length} outils
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Valeur */}
+            <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
+              <CardHeader className="pb-2">
+                <CardDescription className="flex items-center gap-2 text-green-600/80">
+                  <DollarSign className="w-4 h-4" />
+                  Valeur économisée
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-green-600">
+                  {metrics.totalValue.toLocaleString()}€
                 </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Incidents critiques</p>
-                    <p className={cn("text-2xl font-bold", metrics.criticalTickets > 0 && "text-red-600")}>
-                      {metrics.criticalTickets}
-                    </p>
-                  </div>
-                  <AlertTriangle className={cn("w-8 h-8", metrics.criticalTickets > 0 ? "text-red-500" : "text-muted-foreground/50")} />
-                </div>
-              </Card>
-            </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  @{HOURLY_RATE}€/h
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Niveau 2: Santé Opérationnelle */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Activity className="w-5 h-5" />
-              Santé Opérationnelle
-            </h2>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* Evolution chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Évolution sur 7 jours</CardTitle>
-                  <CardDescription>Minutes économisées par jour</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {chartData.some(d => d.minutes > 0) ? (
-                    <ResponsiveContainer width="100%" height={200}>
-                      <AreaChart data={chartData}>
-                        <defs>
-                          <linearGradient id="colorMinutes" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                        <YAxis hide />
-                        <Tooltip 
-                          content={({ active, payload }) => {
-                            if (active && payload?.length) {
-                              return (
-                                <div className="bg-background border rounded-lg p-2 shadow-lg">
-                                  <p className="font-medium">{formatTime(payload[0].value as number)}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {payload[0].payload.actions} action(s)
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Area 
-                          type="monotone" 
-                          dataKey="minutes" 
-                          stroke="hsl(var(--primary))" 
-                          fill="url(#colorMinutes)"
-                          strokeWidth={2}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-                      Pas de données sur les 7 derniers jours
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Performance par outil */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Performance par Outil</CardTitle>
-                  <CardDescription>Temps économisé et taux de succès</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {metrics.toolMetrics.filter(t => t.actions > 0).length > 0 ? (
-                    metrics.toolMetrics.filter(t => t.actions > 0).slice(0, 5).map((tool) => {
-                      const toolDef = TOOLS.find(t => t.id === tool.id);
-                      const Icon = toolDef?.icon || Zap;
-                      const maxMinutes = Math.max(...metrics.toolMetrics.map(t => t.minutes), 1);
-                      
-                      return (
-                        <Link 
-                          key={tool.id} 
-                          to={toolDef?.path || "#"}
-                          className="block hover:bg-muted/50 rounded-lg p-2 -mx-2 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div 
-                              className="w-8 h-8 rounded-lg flex items-center justify-center"
-                              style={{ backgroundColor: `${toolDef?.color}20` }}
-                            >
-                              <Icon className="w-4 h-4" style={{ color: toolDef?.color }} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-medium truncate">{tool.name}</span>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-bold">{formatTime(tool.minutes)}</span>
-                                  <Badge variant={tool.successRate >= 90 ? "default" : tool.successRate >= 70 ? "secondary" : "destructive"} className="text-xs">
-                                    {tool.successRate}%
-                                  </Badge>
-                                </div>
+          {/* Chart - Evolution sur 7 jours */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Évolution sur 7 jours</CardTitle>
+              <CardDescription>Temps économisé par jour (en minutes)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {chartData.some(d => d.minutes > 0) ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="colorMinutes" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <XAxis 
+                        dataKey="date" 
+                        axisLine={false} 
+                        tickLine={false}
+                        className="text-xs"
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false}
+                        tickFormatter={(value) => `${value}min`}
+                        className="text-xs"
+                      />
+                      <Tooltip 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="bg-background border rounded-lg shadow-lg p-3">
+                                <p className="text-sm font-medium">{formatTime(payload[0].value as number)}</p>
                               </div>
-                              <Progress 
-                                value={(tool.minutes / maxMinutes) * 100} 
-                                className="h-1.5"
-                              />
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {tool.actions} action(s) {tool.errors > 0 && `· ${tool.errors} erreur(s)`}
-                              </p>
-                            </div>
-                          </div>
-                        </Link>
-                      );
-                    })
-                  ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                      <Zap className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p>Aucune activité sur cette période</p>
-                      <p className="text-sm">Commencez à utiliser les outils AETHER</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="minutes"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorMinutes)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-muted-foreground">
+                  Pas encore d'activité cette semaine
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Niveau 3: Analyse & Décisions */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Lightbulb className="w-5 h-5" />
-              Analyse & Décisions
-            </h2>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              {/* Alertes et risques */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    Alertes & Actions Requises
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {risks.length > 0 ? (
-                    <div className="space-y-2">
-                      {risks.map((risk, idx) => (
-                        <div 
-                          key={idx}
-                          className={cn(
-                            "flex items-center justify-between p-3 rounded-lg",
-                            risk.type === "critical" && "bg-red-500/10 border border-red-500/20",
-                            risk.type === "warning" && "bg-yellow-500/10 border border-yellow-500/20",
-                            risk.type === "opportunity" && "bg-blue-500/10 border border-blue-500/20"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                            {risk.type === "critical" && <XCircle className="w-4 h-4 text-red-500" />}
-                            {risk.type === "warning" && <AlertTriangle className="w-4 h-4 text-yellow-500" />}
-                            {risk.type === "opportunity" && <Lightbulb className="w-4 h-4 text-blue-500" />}
-                            <div>
-                              <p className="text-sm font-medium">{risk.label}</p>
-                              <p className="text-xs text-muted-foreground">{risk.tool}</p>
-                            </div>
-                          </div>
-                          {risk.path && (
-                            <Button variant="ghost" size="sm" asChild>
-                              <Link to={risk.path}>
-                                {risk.action || "Voir"}
-                                <ArrowRight className="w-3 h-3 ml-1" />
-                              </Link>
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-8 text-center">
-                      <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-green-500" />
-                      <p className="font-medium text-green-600">Tout est opérationnel</p>
-                      <p className="text-sm text-muted-foreground">Aucune alerte à signaler</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Quick access */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Accès Rapide</CardTitle>
-                  <CardDescription>Accédez directement à vos outils</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-4 gap-2">
-                    {TOOLS.map((tool) => {
-                      const toolMetric = metrics.toolMetrics.find(t => t.id === tool.id);
-                      return (
-                        <Link
-                          key={tool.id}
-                          to={tool.path}
-                          className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-muted/50 transition-colors text-center"
-                        >
+          {/* Par Outil */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Par outil</CardTitle>
+              <CardDescription>Temps économisé par module AETHER</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {metrics.toolMetrics.filter(t => t.actions > 0).length > 0 ? (
+                metrics.toolMetrics
+                  .filter(t => t.actions > 0)
+                  .map((tool) => {
+                    const toolDef = TOOLS.find(t => t.id === tool.id);
+                    const Icon = toolDef?.icon || Workflow;
+                    const percentage = (tool.minutes / maxMinutes) * 100;
+                    
+                    return (
+                      <Link 
+                        key={tool.id} 
+                        to={toolDef?.path || "#"}
+                        className="block group"
+                      >
+                        <div className="flex items-center gap-4">
                           <div 
                             className="w-10 h-10 rounded-lg flex items-center justify-center"
-                            style={{ backgroundColor: `${tool.color}20` }}
+                            style={{ backgroundColor: `${toolDef?.color}20` }}
                           >
-                            <tool.icon className="w-5 h-5" style={{ color: tool.color }} />
+                            <Icon 
+                              className="w-5 h-5" 
+                              style={{ color: toolDef?.color }}
+                            />
                           </div>
-                          <div>
-                            <p className="text-xs font-medium truncate">{tool.name.split(" ")[0]}</p>
-                            {toolMetric && toolMetric.actions > 0 && (
-                              <p className="text-[10px] text-muted-foreground">{toolMetric.actions} actions</p>
-                            )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium group-hover:text-primary transition-colors">
+                                {tool.name}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {formatTime(tool.minutes)} ({tool.actions})
+                              </span>
+                            </div>
+                            <Progress 
+                              value={percentage} 
+                              className="h-2"
+                            />
                           </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+                          <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </Link>
+                    );
+                  })
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Pas encore d'activité enregistrée</p>
+                  <p className="text-sm mt-1">Utilisez les outils AETHER pour voir vos statistiques ici</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Accès rapide */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Accès rapide</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              {TOOLS.map((tool) => {
+                const Icon = tool.icon;
+                const toolMetric = metrics.toolMetrics.find(t => t.id === tool.id);
+                
+                return (
+                  <Link
+                    key={tool.id}
+                    to={tool.path}
+                    className="group"
+                  >
+                    <Card className="p-4 hover:border-primary/50 transition-colors h-full">
+                      <div className="flex flex-col items-center text-center gap-2">
+                        <div 
+                          className="w-10 h-10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform"
+                          style={{ backgroundColor: `${tool.color}20` }}
+                        >
+                          <Icon 
+                            className="w-5 h-5" 
+                            style={{ color: tool.color }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium line-clamp-1">
+                          {tool.name.replace("AETHER ", "")}
+                        </span>
+                        {toolMetric && toolMetric.minutes > 0 && (
+                          <span className="text-xs text-muted-foreground">
+                            {formatTime(toolMetric.minutes)}
+                          </span>
+                        )}
+                      </div>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
           {/* Méthodologie */}
           <Card className="bg-muted/30">
-            <CardContent className="py-4">
+            <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Brain className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">Méthodologie de calcul</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Temps économisé basé sur des benchmarks sectoriels : workflow automatisé (15min), 
-                    document IA (45min), audit compliance (2h), analyse CV (35min). 
-                    Valeur calculée au taux horaire de {HOURLY_RATE}€/h.
-                    Toutes les données proviennent exclusivement de votre activité réelle.
+                <Info className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium mb-1">Méthodologie</p>
+                  <p>
+                    Le temps économisé est calculé selon des benchmarks sectoriels : 
+                    workflow ({TIME_ESTIMATES.workflow_run}min), 
+                    document IA ({TIME_ESTIMATES.document_generated}min), 
+                    audit ({TIME_ESTIMATES.audit_completed}min), 
+                    etc. Valorisation à {HOURLY_RATE}€/h.
                   </p>
                 </div>
               </div>
