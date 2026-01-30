@@ -22,7 +22,9 @@ export function useWorkflows() {
       return (data || []).map(w => ({
         ...w,
         blocks: (w.blocks as unknown as WorkflowBlock[]) || [],
-        connections: (w.connections as unknown as BlockConnection[]) || []
+        connections: (w.connections as unknown as BlockConnection[]) || [],
+        variables: (w.variables as Record<string, any>) || {},
+        settings: (w.settings as Record<string, any>) || {},
       }));
     },
     enabled: !!user,
@@ -106,6 +108,8 @@ export function useWorkflows() {
           ...updates,
           blocks: updates.blocks as unknown as any,
           connections: updates.connections as unknown as any,
+          variables: updates.variables as unknown as any,
+          settings: updates.settings as unknown as any,
           updated_at: new Date().toISOString()
         })
         .eq('id', id)

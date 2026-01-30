@@ -195,6 +195,15 @@ export interface WorkflowBlock {
   description?: string;
 }
 
+export interface WorkflowSettings {
+  autoLayout?: boolean;
+  gridSnap?: number;
+  zoomLevel?: number;
+  panPosition?: { x: number; y: number };
+  executionMode?: 'sequential' | 'parallel' | 'auto';
+  defaultTimeout?: number;
+}
+
 export interface Workflow {
   id: string;
   user_id: string;
@@ -203,6 +212,7 @@ export interface Workflow {
   blocks: WorkflowBlock[];
   connections: BlockConnection[];
   variables?: Record<string, any>;
+  settings?: WorkflowSettings;
   is_active: boolean;
   is_template?: boolean;
   template_category?: string;
