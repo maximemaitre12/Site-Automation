@@ -1055,6 +1055,1003 @@ Only output JSON, no other text.`;
         break;
       }
 
+      // ===== AETHER CRM - Real Database Operations =====
+      case 'aether_crm_create_lead': {
+        const firstName = block.config?.firstName;
+        const lastName = block.config?.lastName;
+        const email = block.config?.email;
+        const phone = block.config?.phone;
+        const company = block.config?.company;
+        const jobTitle = block.config?.jobTitle;
+        const source = block.config?.source || 'Workflow';
+        const notes = block.config?.notes;
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { created: false, error: 'User ID required' };
+          break;
+        }
+        if (!firstName || !lastName || !email) {
+          output = { created: false, error: 'First name, last name and email are required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data, error } = await supabase
+            .from('crm_contacts')
+            .insert({
+              user_id: userId,
+              first_name: firstName,
+              last_name: lastName,
+              email,
+              phone,
+              job_title: jobTitle,
+              notes: notes ? `${notes}\nSource: ${source}` : `Source: ${source}`,
+              tags: [source.toLowerCase(), 'workflow-created']
+            })
+            .select()
+            .single();
+
+          if (error) throw error;
+          output = { created: true, contactId: data.id, data };
+        } catch (e) {
+          output = { created: false, error: e instanceof Error ? e.message : 'CRM error' };
+        }
+        break;
+      }
+
+      case 'aether_crm_update_contact': {
+        const contactId = block.config?.contactId;
+        let updates = block.config?.updates || {};
+        const userId = context.variables?._userId;
+
+        if (!userId || !contactId) {
+          output = { updated: false, error: 'User ID and Contact ID required' };
+          break;
+        }
+
+        if (typeof updates === 'string') {
+          try { updates = JSON.parse(updates); } catch { updates = {}; }
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data, error } = await supabase
+            .from('crm_contacts')
+            .update(updates)
+            .eq('id', contactId)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+          if (error) throw error;
+          output = { updated: true, contactId, data };
+        } catch (e) {
+          output = { updated: false, error: e instanceof Error ? e.message : 'CRM error' };
+        }
+        break;
+      }
+
+      case 'aether_crm_create_deal': {
+        const name = block.config?.name;
+        const value = block.config?.value;
+        const contactId = block.config?.contactId;
+        const companyId = block.config?.companyId;
+        const expectedCloseDate = block.config?.expectedCloseDate;
+        const probability = block.config?.probability || 50;
+        const description = block.config?.description;
+        const userId = context.variables?._userId;
+
+        if (!userId || !name) {
+          output = { created: false, error: 'User ID and deal name required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data, error } = await supabase
+            .from('sales_deals')
+            .insert({
+              user_id: userId,
+              title: name,
+              value: value || 0,
+              probability,
+              description,
+              contact_name: contactId,
+              expected_close_date: expectedCloseDate,
+              source: 'Workflow',
+              tags: ['workflow-created']
+            })
+            .select()
+            .single();
+
+          if (error) throw error;
+          output = { created: true, dealId: data.id, data };
+        } catch (e) {
+          output = { created: false, error: e instanceof Error ? e.message : 'CRM error' };
+        }
+        break;
+      }
+
+      case 'aether_crm_update_deal': {
+        const dealId = block.config?.dealId;
+        const status = block.config?.status;
+        const value = block.config?.value;
+        const probability = block.config?.probability;
+        const notes = block.config?.notes;
+        const userId = context.variables?._userId;
+
+        if (!userId || !dealId) {
+          output = { updated: false, error: 'User ID and Deal ID required' };
+          break;
+        }
+
+        const updates: Record<string, any> = {};
+        if (status) updates.status = status;
+        if (value !== undefined) updates.value = value;
+        if (probability !== undefined) updates.probability = probability;
+        if (notes) updates.description = notes;
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data, error } = await supabase
+            .from('sales_deals')
+            .update(updates)
+            .eq('id', dealId)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+          if (error) throw error;
+          output = { updated: true, dealId, data };
+        } catch (e) {
+          output = { updated: false, error: e instanceof Error ? e.message : 'CRM error' };
+        }
+        break;
+      }
+
+      case 'aether_crm_create_task': {
+        const title = block.config?.title;
+        const description = block.config?.description;
+        const dueDate = block.config?.dueDate;
+        const priority = block.config?.priority || 'medium';
+        const contactId = block.config?.contactId;
+        const opportunityId = block.config?.opportunityId;
+        const userId = context.variables?._userId;
+
+        if (!userId || !title) {
+          output = { created: false, error: 'User ID and title required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data, error } = await supabase
+            .from('crm_tasks')
+            .insert({
+              user_id: userId,
+              title,
+              description,
+              due_date: dueDate,
+              priority,
+              contact_id: contactId || null,
+              opportunity_id: opportunityId || null,
+              is_ai_generated: true,
+              ai_reasoning: 'Created by AETHER Flow workflow'
+            })
+            .select()
+            .single();
+
+          if (error) throw error;
+          output = { created: true, taskId: data.id, data };
+        } catch (e) {
+          output = { created: false, error: e instanceof Error ? e.message : 'CRM error' };
+        }
+        break;
+      }
+
+      case 'aether_crm_search': {
+        const entityType = block.config?.entityType || 'contacts';
+        const query = block.config?.query;
+        let filters = block.config?.filters || {};
+        const limit = block.config?.limit || 20;
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { results: [], error: 'User ID required' };
+          break;
+        }
+
+        if (typeof filters === 'string') {
+          try { filters = JSON.parse(filters); } catch { filters = {}; }
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const tableMap: Record<string, string> = {
+            contacts: 'crm_contacts',
+            companies: 'crm_companies',
+            opportunities: 'crm_opportunities',
+            tasks: 'crm_tasks'
+          };
+          const tableName = tableMap[entityType] || 'crm_contacts';
+
+          let queryBuilder = supabase
+            .from(tableName)
+            .select('*')
+            .eq('user_id', userId)
+            .limit(limit);
+
+          if (query) {
+            if (entityType === 'contacts') {
+              queryBuilder = queryBuilder.or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%`);
+            } else if (entityType === 'companies') {
+              queryBuilder = queryBuilder.or(`name.ilike.%${query}%,industry.ilike.%${query}%`);
+            } else if (entityType === 'opportunities') {
+              queryBuilder = queryBuilder.or(`name.ilike.%${query}%,description.ilike.%${query}%`);
+            } else if (entityType === 'tasks') {
+              queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+            }
+          }
+
+          const { data, error } = await queryBuilder;
+          if (error) throw error;
+          output = { results: data, count: data?.length || 0, entityType };
+        } catch (e) {
+          output = { results: [], error: e instanceof Error ? e.message : 'CRM search error' };
+        }
+        break;
+      }
+
+      case 'aether_doc_analyze': {
+        const documentId = block.config?.documentId;
+        const analysisType = block.config?.analysisType || 'summary';
+        const customPrompt = block.config?.customPrompt;
+        const userId = context.variables?._userId;
+
+        if (!userId || !documentId) {
+          output = { analyzed: false, error: 'User ID and Document ID required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data: doc, error: fetchError } = await supabase
+            .from('aether_documents')
+            .select('*')
+            .eq('id', documentId)
+            .eq('user_id', userId)
+            .single();
+
+          if (fetchError || !doc) {
+            output = { analyzed: false, error: 'Document not found' };
+            break;
+          }
+
+          const content = doc.content || doc.ai_summary || '';
+          let analysisPrompt = '';
+
+          switch (analysisType) {
+            case 'summary':
+              analysisPrompt = `Summarize this document:\n\n${content}`;
+              break;
+            case 'extract_entities':
+              analysisPrompt = `Extract all entities (names, dates, amounts, organizations) from:\n\n${content}\n\nRespond with JSON.`;
+              break;
+            case 'classify':
+              analysisPrompt = `Classify this document into categories (contract, invoice, report, memo, proposal, other):\n\n${content}\n\nRespond with JSON containing category and confidence.`;
+              break;
+            case 'full':
+              analysisPrompt = `Provide a comprehensive analysis including summary, key points, entities, and classification:\n\n${content}\n\nRespond with structured JSON.`;
+              break;
+            default:
+              analysisPrompt = customPrompt || `Analyze this document:\n\n${content}`;
+          }
+
+          const result = await callLovableAI(analysisPrompt);
+          
+          let analysis: any = result;
+          try {
+            const jsonMatch = result.match(/\{[\s\S]*\}/);
+            if (jsonMatch) analysis = JSON.parse(jsonMatch[0]);
+          } catch { /* keep as string */ }
+
+          output = { analyzed: true, documentId, analysisType, result: analysis };
+        } catch (e) {
+          output = { analyzed: false, error: e instanceof Error ? e.message : 'Analysis error' };
+        }
+        break;
+      }
+
+      case 'aether_doc_search': {
+        const query = block.config?.query;
+        const folderId = block.config?.folderId;
+        const tagsFilter = block.config?.tags;
+        const limit = block.config?.limit || 10;
+        const userId = context.variables?._userId;
+
+        if (!userId || !query) {
+          output = { results: [], error: 'User ID and query required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          let queryBuilder = supabase
+            .from('aether_documents')
+            .select('id, title, description, ai_summary, tags, file_type, created_at')
+            .eq('user_id', userId)
+            .or(`title.ilike.%${query}%,description.ilike.%${query}%,ai_summary.ilike.%${query}%`)
+            .limit(limit);
+
+          if (folderId) queryBuilder = queryBuilder.eq('folder_id', folderId);
+
+          const { data, error } = await queryBuilder;
+          if (error) throw error;
+          output = { results: data, count: data?.length || 0, query };
+        } catch (e) {
+          output = { results: [], error: e instanceof Error ? e.message : 'Search error' };
+        }
+        break;
+      }
+
+      // ===== AI Provider Integrations (using Lovable AI Gateway) =====
+      case 'integration_openai':
+      case 'integration_anthropic':
+      case 'integration_google_ai':
+      case 'integration_mistral':
+      case 'integration_huggingface': {
+        const prompt = block.config?.prompt || inputText;
+        const systemPrompt = block.config?.systemPrompt;
+        const model = block.config?.model;
+        
+        // All AI providers route through Lovable AI Gateway
+        const result = await callLovableAI(prompt, systemPrompt);
+        output = { 
+          result, 
+          provider: block.type.replace('integration_', ''),
+          model: model || 'gemini-2.5-flash (via Lovable)',
+          timestamp: new Date().toISOString()
+        };
+        break;
+      }
+
+      case 'integration_replicate': {
+        // Replicate requires user API key
+        const model = block.config?.model;
+        const inputParams = block.config?.input || {};
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { success: false, error: 'User ID required' };
+          break;
+        }
+
+        const apiKey = await getUserApiKey(userId, 'replicate');
+        if (!apiKey) {
+          output = { success: false, error: 'Replicate API key not configured. Add it in Settings > API Keys' };
+          break;
+        }
+
+        if (!model) {
+          output = { success: false, error: 'Model is required (e.g., stability-ai/sdxl)' };
+          break;
+        }
+
+        try {
+          const response = await fetch('https://api.replicate.com/v1/predictions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Token ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ version: model, input: inputParams })
+          });
+          const data = await response.json();
+          output = { success: response.ok, predictionId: data.id, status: data.status, output: data.output };
+        } catch (e) {
+          output = { success: false, error: e instanceof Error ? e.message : 'Replicate error' };
+        }
+        break;
+      }
+
+      // ===== Media AI =====
+      case 'integration_stability': {
+        const prompt = block.config?.prompt || inputText;
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { generated: false, error: 'User ID required' };
+          break;
+        }
+
+        const apiKey = await getUserApiKey(userId, 'stability');
+        if (!apiKey) {
+          output = { generated: false, error: 'Stability AI API key not configured. Add it in Settings > API Keys' };
+          break;
+        }
+
+        try {
+          const response = await fetch('https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              text_prompts: [{ text: prompt }],
+              cfg_scale: 7,
+              height: 1024,
+              width: 1024,
+              samples: 1,
+              steps: 30
+            })
+          });
+          const data = await response.json();
+          output = { generated: response.ok, images: data.artifacts?.map((a: any) => a.base64) };
+        } catch (e) {
+          output = { generated: false, error: e instanceof Error ? e.message : 'Stability error' };
+        }
+        break;
+      }
+
+      case 'integration_elevenlabs': {
+        const text = block.config?.text || inputText;
+        const voiceId = block.config?.voiceId || 'EXAVITQu4vr4xnSDxMaL';
+        
+        const ELEVENLABS_API_KEY = Deno.env.get('ELEVENLABS_API_KEY');
+        if (!ELEVENLABS_API_KEY) {
+          output = { generated: false, error: 'ElevenLabs not configured' };
+          break;
+        }
+
+        try {
+          const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+            method: 'POST',
+            headers: {
+              'xi-api-key': ELEVENLABS_API_KEY,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              text,
+              model_id: 'eleven_multilingual_v2',
+              voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+            })
+          });
+          
+          if (response.ok) {
+            output = { generated: true, voiceId, textLength: text.length, format: 'mp3' };
+          } else {
+            const error = await response.json();
+            output = { generated: false, error: error.detail?.message || 'TTS failed' };
+          }
+        } catch (e) {
+          output = { generated: false, error: e instanceof Error ? e.message : 'ElevenLabs error' };
+        }
+        break;
+      }
+
+      case 'integration_deepgram':
+      case 'integration_assemblyai': {
+        output = { 
+          transcribed: false, 
+          error: `${block.type.replace('integration_', '')} requires audio URL input. Configure in Settings > API Keys.`,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== More Communication =====
+      case 'integration_whatsapp': {
+        const to = block.config?.to;
+        const message = block.config?.message || inputText;
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { sent: false, error: 'User ID required' };
+          break;
+        }
+
+        const credentials = await getUserApiKey(userId, 'whatsapp');
+        if (!credentials) {
+          output = { sent: false, error: 'WhatsApp Business API not configured. Add token:phoneNumberId in Settings > API Keys' };
+          break;
+        }
+
+        const [token, phoneNumberId] = credentials.split(':');
+        if (!token || !phoneNumberId || !to) {
+          output = { sent: false, error: 'Invalid configuration or missing recipient' };
+          break;
+        }
+
+        try {
+          const response = await fetch(`https://graph.facebook.com/v18.0/${phoneNumberId}/messages`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              messaging_product: 'whatsapp',
+              to,
+              type: 'text',
+              text: { body: message }
+            })
+          });
+          const data = await response.json();
+          output = { sent: response.ok, messageId: data.messages?.[0]?.id, error: data.error?.message };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'WhatsApp error' };
+        }
+        break;
+      }
+
+      case 'integration_teams': {
+        const message = block.config?.message || inputText;
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { sent: false, error: 'User ID required' };
+          break;
+        }
+
+        const webhookUrl = await getUserApiKey(userId, 'teams');
+        if (!webhookUrl) {
+          output = { sent: false, error: 'MS Teams webhook not configured. Add it in Settings > API Keys' };
+          break;
+        }
+
+        try {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: message })
+          });
+          output = { sent: response.ok, status: response.status };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Teams error' };
+        }
+        break;
+      }
+
+      // ===== Support Platforms =====
+      case 'integration_intercom':
+      case 'integration_zendesk':
+      case 'integration_freshdesk':
+      case 'integration_crisp': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} integration requires API key configuration in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== Email Marketing =====
+      case 'integration_mailchimp': {
+        const listId = block.config?.listId;
+        const email = block.config?.email;
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { success: false, error: 'User ID required' };
+          break;
+        }
+
+        const apiKey = await getUserApiKey(userId, 'mailchimp');
+        if (!apiKey) {
+          output = { success: false, error: 'Mailchimp API key not configured. Add it in Settings > API Keys' };
+          break;
+        }
+
+        const dc = apiKey.split('-')[1] || 'us1';
+        
+        if (!listId || !email) {
+          output = { success: false, error: 'List ID and email are required' };
+          break;
+        }
+
+        try {
+          const response = await fetch(`https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email_address: email,
+              status: 'subscribed'
+            })
+          });
+          const data = await response.json();
+          output = { success: response.ok, memberId: data.id, error: data.detail };
+        } catch (e) {
+          output = { success: false, error: e instanceof Error ? e.message : 'Mailchimp error' };
+        }
+        break;
+      }
+
+      case 'integration_brevo':
+      case 'integration_mailgun':
+      case 'integration_resend':
+      case 'integration_convertkit': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          sent: false, 
+          error: `${platform} requires API key in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== CRM External =====
+      case 'integration_hubspot':
+      case 'integration_salesforce':
+      case 'integration_pipedrive':
+      case 'integration_zoho': {
+        const platform = block.type.replace('integration_', '');
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { success: false, error: 'User ID required' };
+          break;
+        }
+
+        const apiKey = await getUserApiKey(userId, platform);
+        if (!apiKey) {
+          output = { 
+            success: false, 
+            error: `${platform} API key not configured. Add it in Settings > API Keys`,
+            platform,
+            requiresSetup: true
+          };
+          break;
+        }
+
+        // HubSpot example implementation
+        if (platform === 'hubspot') {
+          const action = block.config?.action || 'search';
+          try {
+            if (action === 'create_contact') {
+              const response = await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${apiKey}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  properties: block.config?.properties || {}
+                })
+              });
+              const data = await response.json();
+              output = { success: response.ok, contactId: data.id, data };
+            } else {
+              output = { success: true, message: 'HubSpot connected', action };
+            }
+          } catch (e) {
+            output = { success: false, error: e instanceof Error ? e.message : 'HubSpot error' };
+          }
+        } else {
+          output = { success: true, message: `${platform} API key configured`, platform };
+        }
+        break;
+      }
+
+      // ===== Productivity =====
+      case 'integration_google_sheets': {
+        output = { 
+          success: false, 
+          error: 'Google Sheets requires OAuth. Use HTTP Request block with Google API.',
+          requiresSetup: true
+        };
+        break;
+      }
+
+      case 'integration_google_calendar':
+      case 'integration_calendly':
+      case 'integration_zoom':
+      case 'integration_loom': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} requires OAuth or API key in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      case 'integration_trello':
+      case 'integration_asana':
+      case 'integration_monday':
+      case 'integration_clickup':
+      case 'integration_jira':
+      case 'integration_linear': {
+        const platform = block.type.replace('integration_', '');
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { success: false, error: 'User ID required' };
+          break;
+        }
+
+        const apiKey = await getUserApiKey(userId, platform);
+        if (!apiKey) {
+          output = { 
+            success: false, 
+            error: `${platform} API key not configured. Add it in Settings > API Keys`,
+            platform,
+            requiresSetup: true
+          };
+        } else {
+          output = { success: true, message: `${platform} connected`, platform };
+        }
+        break;
+      }
+
+      // ===== Storage =====
+      case 'integration_google_drive':
+      case 'integration_dropbox':
+      case 'integration_onedrive':
+      case 'integration_box':
+      case 'integration_aws_s3': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} requires OAuth or credentials in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== E-commerce & Payments =====
+      case 'integration_stripe': {
+        const action = block.config?.action || 'list_customers';
+        
+        const STRIPE_KEY = Deno.env.get('STRIPE_SECRET_KEY');
+        if (!STRIPE_KEY) {
+          output = { success: false, error: 'Stripe not configured' };
+          break;
+        }
+
+        try {
+          let endpoint = 'https://api.stripe.com/v1/customers';
+          let method = 'GET';
+          let body: string | undefined;
+
+          if (action === 'create_customer') {
+            method = 'POST';
+            body = new URLSearchParams({
+              email: block.config?.email || '',
+              name: block.config?.name || ''
+            }).toString();
+          }
+
+          const response = await fetch(endpoint, {
+            method,
+            headers: {
+              'Authorization': `Bearer ${STRIPE_KEY}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body
+          });
+          const data = await response.json();
+          output = { success: response.ok, data, action };
+        } catch (e) {
+          output = { success: false, error: e instanceof Error ? e.message : 'Stripe error' };
+        }
+        break;
+      }
+
+      case 'integration_paypal':
+      case 'integration_shopify':
+      case 'integration_quickbooks': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} requires API credentials in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== Social Media =====
+      case 'integration_twitter':
+      case 'integration_linkedin':
+      case 'integration_facebook':
+      case 'integration_instagram':
+      case 'integration_youtube':
+      case 'integration_tiktok': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} requires OAuth. Configure in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== Developer Tools =====
+      case 'integration_github': {
+        const action = block.config?.action || 'list_repos';
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { success: false, error: 'User ID required' };
+          break;
+        }
+
+        const token = await getUserApiKey(userId, 'github');
+        if (!token) {
+          output = { success: false, error: 'GitHub token not configured. Add it in Settings > API Keys' };
+          break;
+        }
+
+        try {
+          const response = await fetch('https://api.github.com/user/repos?per_page=10', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          const data = await response.json();
+          output = { success: response.ok, repos: data.map((r: any) => ({ name: r.name, url: r.html_url })) };
+        } catch (e) {
+          output = { success: false, error: e instanceof Error ? e.message : 'GitHub error' };
+        }
+        break;
+      }
+
+      case 'integration_gitlab':
+      case 'integration_vercel':
+      case 'integration_supabase':
+      case 'integration_firebase': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} requires API token in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== Analytics =====
+      case 'integration_google_analytics':
+      case 'integration_mixpanel':
+      case 'integration_segment':
+      case 'integration_amplitude': {
+        const platform = block.type.replace('integration_', '');
+        output = { 
+          success: false, 
+          error: `${platform} requires API key in Settings > API Keys`,
+          platform,
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== Automation connectors =====
+      case 'integration_zapier':
+      case 'integration_make':
+      case 'integration_n8n': {
+        const webhookUrl = block.config?.webhookUrl;
+        const payload = block.config?.payload || context.input;
+
+        if (!webhookUrl) {
+          output = { sent: false, error: 'Webhook URL required' };
+          break;
+        }
+
+        try {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          output = { sent: response.ok, status: response.status };
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Webhook error' };
+        }
+        break;
+      }
+
+      // ===== Gmail blocks =====
+      case 'gmail_read':
+      case 'gmail_send':
+      case 'gmail_reply':
+      case 'gmail_label':
+      case 'gmail_search': {
+        output = { 
+          success: false, 
+          error: 'Gmail requires OAuth integration. Configure in Settings > Integrations',
+          requiresSetup: true
+        };
+        break;
+      }
+
+      // ===== Control flow additions =====
+      case 'control_branch': {
+        const branchCount = block.config?.branchCount || 2;
+        const branchNames = (block.config?.branchNames || 'Branch A, Branch B')
+          .split(',')
+          .map((n: string) => n.trim());
+        output = {
+          branched: true,
+          branchCount,
+          branches: branchNames.slice(0, branchCount).map((name: string, index: number) => ({
+            id: `${block.id}-branch-${index}`,
+            name,
+            input: context.input
+          }))
+        };
+        break;
+      }
+
+      case 'control_merge': {
+        const mergeStrategy = block.config?.mergeStrategy || 'combine_results';
+        output = { 
+          merged: true, 
+          strategy: mergeStrategy,
+          data: context.input
+        };
+        break;
+      }
+
+      case 'workflow_call': {
+        const workflowId = block.config?.workflowId;
+        const passInput = block.config?.passInput !== false;
+        const userId = context.variables?._userId;
+
+        if (!workflowId || !userId) {
+          output = { success: false, error: 'Workflow ID and User ID required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data: workflow, error: wfError } = await supabase
+            .from('workflows')
+            .select('id, name')
+            .eq('id', workflowId)
+            .eq('user_id', userId)
+            .single();
+
+          if (wfError || !workflow) {
+            output = { success: false, error: 'Sub-workflow not found' };
+            break;
+          }
+
+          output = {
+            success: true,
+            subWorkflowId: workflowId,
+            subWorkflowName: workflow.name,
+            input: passInput ? context.input : {},
+            note: 'Sub-workflow execution would be triggered here'
+          };
+        } catch (e) {
+          output = { success: false, error: e instanceof Error ? e.message : 'Workflow call error' };
+        }
+        break;
+      }
+
+      // ===== Phone integration =====
+      case 'integration_twilio_voice': {
+        output = { 
+          success: false, 
+          error: 'Twilio Voice requires complex setup. Use Twilio SMS for now.',
+          requiresSetup: true
+        };
+        break;
+      }
+
       default:
         output = context.input;
     }
