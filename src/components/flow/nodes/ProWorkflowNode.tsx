@@ -5,6 +5,7 @@
 
 import { memo, useMemo } from 'react';
 import { WorkflowBlock, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { N8N_BLOCK_DEFINITIONS } from '@/types/workflow-n8n';
 import { BlockVisualState } from '@/types/workflow-v2';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -56,8 +57,12 @@ function ProWorkflowNodeComponent({
   onDoubleClick,
   onDragStart,
 }: ProWorkflowNodeProps) {
-  const definition = BLOCK_DEFINITIONS[block.type];
-  const colors = categoryColors[definition?.category || 'system'];
+  // Support both legacy and N8N block types
+  const legacyDef = BLOCK_DEFINITIONS[block.type as keyof typeof BLOCK_DEFINITIONS];
+  const n8nDef = N8N_BLOCK_DEFINITIONS[block.type as keyof typeof N8N_BLOCK_DEFINITIONS];
+  const definition = legacyDef || n8nDef;
+  const category = definition?.category || 'system';
+  const colors = categoryColors[category];
   const status = statusConfig[visualState.executionStatus] || statusConfig.idle;
 
   const IconComponent = useMemo(() => {
