@@ -77,6 +77,8 @@ export type Database = {
           file_url: string | null
           folder_id: string | null
           id: string
+          is_archived: boolean | null
+          is_favorite: boolean | null
           metadata: Json | null
           status: string | null
           tags: Json | null
@@ -101,6 +103,8 @@ export type Database = {
           file_url?: string | null
           folder_id?: string | null
           id?: string
+          is_archived?: boolean | null
+          is_favorite?: boolean | null
           metadata?: Json | null
           status?: string | null
           tags?: Json | null
@@ -125,6 +129,8 @@ export type Database = {
           file_url?: string | null
           folder_id?: string | null
           id?: string
+          is_archived?: boolean | null
+          is_favorite?: boolean | null
           metadata?: Json | null
           status?: string | null
           tags?: Json | null

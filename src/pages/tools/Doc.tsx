@@ -54,6 +54,8 @@ export default function DocPage() {
     rewriteDocument,
     moveDocument,
     updateDocument,
+    toggleFavorite,
+    toggleArchive,
     refreshDocuments
   } = useAetherDocs();
 
@@ -119,15 +121,31 @@ export default function DocPage() {
     });
   }, [templates, activeCategory]);
 
-  const currentFolderData = currentFolder 
+  // Check if we're in a special filter view (not a real folder)
+  const specialFilters = ['all', 'recent', 'starred', 'archived'];
+  const isSpecialFilter = !currentFolder || specialFilters.includes(currentFolder) || currentFolder.startsWith('type:');
+
+  const currentFolderData = currentFolder && !isSpecialFilter
     ? folders.find(f => f.id === currentFolder) 
     : null;
 
   const breadcrumbs = (() => {
     const crumbs: { id: string | null; name: string }[] = [{ id: null, name: 'Tous les documents' }];
-    if (currentFolderData) {
+    
+    if (currentFolder === 'starred') {
+      crumbs[0] = { id: 'starred', name: 'Favoris' };
+    } else if (currentFolder === 'archived') {
+      crumbs[0] = { id: 'archived', name: 'Archivés' };
+    } else if (currentFolder === 'recent') {
+      crumbs[0] = { id: 'recent', name: 'Récents' };
+    } else if (currentFolder?.startsWith('type:')) {
+      const typeLabel = currentFolder.replace('type:', '');
+      const labels: Record<string, string> = { pdf: 'PDF', images: 'Images', spreadsheets: 'Tableurs' };
+      crumbs[0] = { id: currentFolder, name: labels[typeLabel] || typeLabel };
+    } else if (currentFolderData) {
       crumbs.push({ id: currentFolderData.id, name: currentFolderData.name });
     }
+    
     return crumbs;
   })();
 
@@ -257,13 +275,15 @@ export default function DocPage() {
               <div className="flex-1 min-h-0 flex flex-col">
                 <DocGrid
                   documents={filteredDocuments}
-                  folders={folders.filter(f => f.parent_id === currentFolder)}
+                  folders={isSpecialFilter ? [] : folders.filter(f => f.parent_id === currentFolder)}
                   viewMode={viewMode}
                   onDocumentClick={handleDocumentClick}
                   onFolderClick={(folder) => setCurrentFolder(folder.id)}
                   onDeleteDocument={deleteDocument}
                   onMoveDocument={moveDocument}
                   onRenameDocument={handleRenameDocument}
+                  onToggleFavorite={toggleFavorite}
+                  onToggleArchive={toggleArchive}
                 />
               </div>
             </div>
