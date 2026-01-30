@@ -290,60 +290,73 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
           };
         } else if (userId) {
           // Fetch latest unprocessed email from hr_emails table
-          try {
-            const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-            const { data: emails, error } = await supabase
-              .from('hr_emails')
-              .select('*')
-              .eq('user_id', userId)
-              .eq('is_read', false)
-              .order('received_at', { ascending: false })
-              .limit(1);
-
-            if (error) throw error;
-            
-            if (emails && emails.length > 0) {
-              const email = emails[0];
-              output = {
-                type: 'email',
-                id: email.id,
-                subject: email.subject,
-                from: email.from_address,
-                to: email.to_address,
-                body: email.body,
-                receivedAt: email.received_at,
-                hasAttachments: email.has_attachments,
-                attachments: email.attachments,
-                extracted: email.extracted_data,
-                timestamp: new Date().toISOString()
-              };
-              
-              // Mark as read
-              await supabase
-                .from('hr_emails')
-                .update({ is_read: true })
-                .eq('id', email.id);
-            } else {
-              output = {
-                type: 'email',
-                empty: true,
-                message: 'No unread emails found',
-                timestamp: new Date().toISOString()
-              };
-            }
-          } catch (e) {
-            output = {
-              type: 'email',
-              error: e instanceof Error ? e.message : 'Failed to fetch emails',
-              timestamp: new Date().toISOString()
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          // First check if user has an email account configured
+          const { data: accounts, error: accountError } = await supabase
+            .from('hr_email_accounts')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('is_active', true)
+            .limit(1);
+          
+          if (accountError) {
+            return { output: null, error: `Erreur de configuration email: ${accountError.message}` };
+          }
+          
+          if (!accounts || accounts.length === 0) {
+            return { 
+              output: null, 
+              error: 'Aucun compte email connecté. Veuillez configurer votre compte email dans Agent HR → Paramètres Email avant d\'utiliser ce trigger.' 
             };
           }
-        } else {
+          
+          // Now fetch emails
+          const { data: emails, error } = await supabase
+            .from('hr_emails')
+            .select('*')
+            .eq('user_id', userId)
+            .in('status', ['new', 'read'])
+            .order('email_date', { ascending: false })
+            .limit(1);
+
+          if (error) {
+            return { output: null, error: `Erreur lors de la récupération des emails: ${error.message}` };
+          }
+          
+          if (!emails || emails.length === 0) {
+            return { 
+              output: null, 
+              error: 'Aucun email non traité trouvé. Importez des emails dans Agent HR → Inbox avant d\'exécuter ce workflow.' 
+            };
+          }
+          
+          const email = emails[0];
           output = {
             type: 'email',
-            empty: true,
-            message: 'No email data provided and no user context',
+            id: email.id,
+            subject: email.subject,
+            from: email.from_email,
+            fromName: email.from_name,
+            to: email.to_email,
+            body: email.body_text || email.body_html,
+            bodyHtml: email.body_html,
+            receivedAt: email.email_date,
+            hasAttachments: (email.attachments as any[])?.length > 0,
+            attachments: email.attachments,
+            aiAnalysis: email.ai_analysis,
             timestamp: new Date().toISOString()
+          };
+          
+          // Mark as processed (archived)
+          await supabase
+            .from('hr_emails')
+            .update({ status: 'archived' })
+            .eq('id', email.id);
+        } else {
+          return { 
+            output: null, 
+            error: 'Utilisateur non authentifié. Veuillez vous connecter pour utiliser le trigger email.' 
           };
         }
         break;
