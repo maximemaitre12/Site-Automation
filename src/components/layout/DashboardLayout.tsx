@@ -118,24 +118,25 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
 
             {/* Center - Logo or Tool Name */}
             {toolName ? (
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 justify-center px-2">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 px-4 sm:px-6">
                 {toolIcon && (
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0">
                     {toolIcon}
                   </div>
                 )}
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-sm sm:text-base font-semibold text-foreground truncate">{toolName}</h1>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <h1 className="text-base sm:text-lg font-semibold text-foreground">{toolName}</h1>
                     {showAIBadge && (
-                      <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                        <Sparkles className="w-3 h-3" />
-                        IA
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">IA intégrée</span>
+                        <span className="sm:hidden">IA</span>
                       </span>
                     )}
                   </div>
                   {toolDescription && (
-                    <p className="text-muted-foreground text-xs hidden md:block truncate">{toolDescription}</p>
+                    <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block mt-0.5">{toolDescription}</p>
                   )}
                 </div>
               </div>
