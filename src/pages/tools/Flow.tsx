@@ -14,6 +14,7 @@ import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
 import { TemplateGallery } from '@/components/flow/TemplateGallery';
 import { BlockPickerDialog } from '@/components/flow/BlockPickerDialog';
 import { AIAutomationRules } from '@/components/flow/AIAutomationRules';
+import { NodePropertiesPanel } from '@/components/flow/panels/NodePropertiesPanel';
 import { autoLayoutBlocks, applyLayoutToBlocks, suggestNewBlockPosition } from '@/lib/workflow-layout';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
@@ -488,28 +489,39 @@ export default function Flow() {
                   </div>
                   
                   {/* Pro Canvas V2 - N8N Style */}
-                  <div className="flex-1 overflow-hidden workflow-canvas-area" style={{ minHeight: '500px' }}>
-                    <ProCanvasV2
-                      blocks={localBlocks}
-                      connections={localConnections}
-                      selectedBlockId={selectedBlockId}
-                      onBlockSelect={setSelectedBlockId}
-                      onBlockUpdate={handleUpdateBlock}
-                      onBlockDelete={handleDeleteBlock}
-                      onBlockDuplicate={handleDuplicateBlock}
-                      onConnectionAdd={handleAddConnection}
-                      onConnectionRemove={handleRemoveConnection}
-                      onBlocksChange={setLocalBlocks}
-                      onSave={handleSaveWorkflow}
-                      onRun={() => {}}
-                      onUndo={handleUndo}
-                      onRedo={handleRedo}
-                      canUndo={canUndo}
-                      canRedo={canRedo}
-                      hasUnsavedChanges={hasUnsavedChanges}
-                      onAutoLayout={handleAutoLayout}
-                      onAddBlock={() => setIsBlockPickerOpen(true)}
-                    />
+                  <div className="flex-1 flex overflow-hidden workflow-canvas-area" style={{ minHeight: '500px' }}>
+                    <div className="flex-1 overflow-hidden">
+                      <ProCanvasV2
+                        blocks={localBlocks}
+                        connections={localConnections}
+                        selectedBlockId={selectedBlockId}
+                        onBlockSelect={setSelectedBlockId}
+                        onBlockUpdate={handleUpdateBlock}
+                        onBlockDelete={handleDeleteBlock}
+                        onBlockDuplicate={handleDuplicateBlock}
+                        onConnectionAdd={handleAddConnection}
+                        onConnectionRemove={handleRemoveConnection}
+                        onBlocksChange={setLocalBlocks}
+                        onSave={handleSaveWorkflow}
+                        onRun={() => {}}
+                        onUndo={handleUndo}
+                        onRedo={handleRedo}
+                        canUndo={canUndo}
+                        canRedo={canRedo}
+                        hasUnsavedChanges={hasUnsavedChanges}
+                        onAutoLayout={handleAutoLayout}
+                        onAddBlock={() => setIsBlockPickerOpen(true)}
+                      />
+                    </div>
+                    
+                    {/* Properties Panel - Shows when a block is selected */}
+                    {selectedBlock && (
+                      <NodePropertiesPanel
+                        block={selectedBlock}
+                        onUpdate={handleUpdateBlock}
+                        onClose={() => setSelectedBlockId(null)}
+                      />
+                    )}
                   </div>
                 </div>
               ) : (

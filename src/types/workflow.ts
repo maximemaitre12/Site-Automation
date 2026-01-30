@@ -364,6 +364,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key', 'service_account'], defaultValue: 'oauth', helpText: 'OAuth recommandé pour Gmail' },
+      { key: 'clientId', label: 'Client ID (OAuth)', type: 'text', placeholder: 'Votre Google Client ID' },
+      { key: 'clientSecret', label: 'Client Secret (OAuth)', type: 'text', placeholder: '***' },
+      { key: 'refreshToken', label: 'Refresh Token', type: 'text', placeholder: 'Token de rafraîchissement OAuth' },
       { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com' },
       { key: 'maxResults', label: 'Nombre max', type: 'number', defaultValue: 10 },
       { key: 'includeAttachments', label: 'Inclure pièces jointes', type: 'boolean', defaultValue: false }
@@ -379,6 +383,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key', 'service_account'], defaultValue: 'oauth' },
+      { key: 'clientId', label: 'Client ID (OAuth)', type: 'text', placeholder: 'Votre Google Client ID' },
+      { key: 'clientSecret', label: 'Client Secret (OAuth)', type: 'text', placeholder: '***' },
+      { key: 'refreshToken', label: 'Refresh Token', type: 'text', placeholder: 'Token de rafraîchissement OAuth' },
       { key: 'to', label: 'Destinataire', type: 'text', placeholder: 'recipient@email.com', required: true },
       { key: 'cc', label: 'CC', type: 'text', placeholder: 'cc@email.com' },
       { key: 'subject', label: 'Objet', type: 'text', required: true },
@@ -396,6 +404,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key'], defaultValue: 'oauth' },
+      { key: 'refreshToken', label: 'Refresh Token', type: 'text', placeholder: 'Token OAuth' },
       { key: 'messageId', label: 'ID du message', type: 'text', placeholder: 'ID de l\'email auquel répondre', required: true },
       { key: 'body', label: 'Réponse', type: 'textarea', required: true },
       { key: 'replyAll', label: 'Répondre à tous', type: 'boolean', defaultValue: false }
@@ -411,6 +421,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key'], defaultValue: 'oauth' },
+      { key: 'refreshToken', label: 'Refresh Token', type: 'text' },
       { key: 'messageId', label: 'ID du message', type: 'text', required: true },
       { key: 'addLabels', label: 'Ajouter libellés', type: 'text', placeholder: 'IMPORTANT, STARRED' },
       { key: 'removeLabels', label: 'Retirer libellés', type: 'text', placeholder: 'UNREAD, INBOX' }
@@ -426,6 +438,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key'], defaultValue: 'oauth' },
+      { key: 'refreshToken', label: 'Refresh Token', type: 'text' },
       { key: 'query', label: 'Requête Gmail', type: 'text', placeholder: 'has:attachment larger:5M', required: true },
       { key: 'maxResults', label: 'Résultats max', type: 'number', defaultValue: 20 },
       { key: 'dateFrom', label: 'Date début', type: 'text', placeholder: '2024/01/01' },
@@ -829,7 +843,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     configFields: [
       { key: 'method', label: 'Method', type: 'select', options: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] },
       { key: 'url', label: 'URL', type: 'text', placeholder: 'https://api.example.com/endpoint', required: true },
-      { key: 'headers', label: 'Headers (JSON)', type: 'json', placeholder: '{"Authorization": "Bearer {{token}}"}' },
+      { key: 'authType', label: 'Authentification', type: 'select', options: ['none', 'bearer_token', 'api_key', 'basic_auth', 'oauth2'], defaultValue: 'none', helpText: 'Type d\'authentification pour l\'API' },
+      { key: 'apiKey', label: 'API Key / Token', type: 'text', placeholder: 'Votre clé API ou Bearer token' },
+      { key: 'apiKeyHeader', label: 'Header pour API Key', type: 'text', placeholder: 'Authorization', defaultValue: 'Authorization' },
+      { key: 'username', label: 'Username (Basic Auth)', type: 'text', placeholder: 'Nom d\'utilisateur' },
+      { key: 'password', label: 'Password (Basic Auth)', type: 'text', placeholder: '***' },
+      { key: 'headers', label: 'Headers additionnels (JSON)', type: 'json', placeholder: '{"Content-Type": "application/json"}' },
       { key: 'body', label: 'Body (JSON)', type: 'json' },
       { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000 }
     ]
@@ -843,6 +862,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     configFields: [
       { key: 'url', label: 'Webhook URL', type: 'text', placeholder: 'https://hooks.example.com/webhook', required: true },
+      { key: 'authType', label: 'Authentification', type: 'select', options: ['none', 'bearer_token', 'secret_header'], defaultValue: 'none' },
+      { key: 'secretKey', label: 'Secret / Token', type: 'text', placeholder: 'Clé secrète pour signature' },
       { key: 'payload', label: 'Payload Template', type: 'json' },
       { key: 'retry', label: 'Retry on Failure', type: 'boolean', defaultValue: true }
     ]
@@ -858,8 +879,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'botToken', label: 'Bot Token', type: 'text', placeholder: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11', required: true, helpText: 'Obtenez-le via @BotFather sur Telegram' },
       { key: 'chatId', label: 'Chat ID', type: 'text', placeholder: '123456789', required: true },
-      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Hello!' }
+      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Hello!' },
+      { key: 'parseMode', label: 'Format', type: 'select', options: ['text', 'HTML', 'Markdown'], defaultValue: 'text' }
     ]
   },
   integration_slack: {
@@ -871,8 +894,13 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'authMethod', label: 'Méthode d\'auth', type: 'select', options: ['webhook_url', 'bot_token'], defaultValue: 'webhook_url', helpText: 'Webhook pour messages simples, Bot Token pour fonctionnalités avancées' },
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', placeholder: 'https://hooks.slack.com/services/T.../B.../...' },
+      { key: 'botToken', label: 'Bot Token (xoxb-...)', type: 'text', placeholder: 'xoxb-your-token' },
       { key: 'channel', label: 'Channel', type: 'text', placeholder: '#general', required: true },
-      { key: 'message', label: 'Message', type: 'textarea' }
+      { key: 'message', label: 'Message', type: 'textarea' },
+      { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Bot' },
+      { key: 'iconEmoji', label: 'Icon Emoji', type: 'text', placeholder: ':robot_face:' }
     ]
   },
   integration_discord: {
@@ -884,8 +912,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', placeholder: 'https://discord.com/api/webhooks/...', required: true, helpText: 'Créez un webhook dans les paramètres du channel Discord' },
       { key: 'message', label: 'Message', type: 'textarea', required: true },
-      { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Flow' }
+      { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Flow' },
+      { key: 'avatarUrl', label: 'Avatar URL', type: 'text', placeholder: 'URL de l\'image de profil du bot' },
+      { key: 'embedTitle', label: 'Embed Title', type: 'text' },
+      { key: 'embedColor', label: 'Embed Color (hex)', type: 'text', placeholder: '#5865F2' }
     ]
   },
   integration_whatsapp: {
@@ -897,8 +929,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'accessToken', label: 'Access Token', type: 'text', placeholder: 'Token d\'accès WhatsApp Business API', required: true },
+      { key: 'phoneNumberId', label: 'Phone Number ID', type: 'text', placeholder: 'ID du numéro WhatsApp Business', required: true },
       { key: 'to', label: 'Phone Number', type: 'text', placeholder: '+33612345678', required: true },
-      { key: 'message', label: 'Message', type: 'textarea' }
+      { key: 'templateName', label: 'Template Name', type: 'text', placeholder: 'Nom du template approuvé' },
+      { key: 'message', label: 'Message (si pas de template)', type: 'textarea' }
     ]
   },
   integration_teams: {
@@ -910,8 +945,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
-      { key: 'message', label: 'Message', type: 'textarea' }
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true, helpText: 'Créez un connecteur Webhook dans Teams' },
+      { key: 'title', label: 'Message Title', type: 'text' },
+      { key: 'message', label: 'Message', type: 'textarea' },
+      { key: 'themeColor', label: 'Theme Color (hex)', type: 'text', placeholder: '#0078D4' }
     ]
   },
   integration_intercom: {
@@ -983,10 +1020,14 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'SG.xxxxxxxxxxxxx', required: true, helpText: 'Clé API SendGrid (commence par SG.)' },
       { key: 'to', label: 'To', type: 'text', required: true },
       { key: 'from', label: 'From', type: 'text', required: true },
+      { key: 'fromName', label: 'From Name', type: 'text', placeholder: 'AETHER' },
       { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'message', label: 'Body', type: 'textarea' }
+      { key: 'message', label: 'Body (Text)', type: 'textarea' },
+      { key: 'htmlContent', label: 'Body (HTML)', type: 'textarea' },
+      { key: 'templateId', label: 'Template ID (optionnel)', type: 'text', placeholder: 'd-xxxxxxxx' }
     ]
   },
   integration_mailchimp: {
@@ -998,10 +1039,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['add_subscriber', 'update_subscriber'] },
-      { key: 'listId', label: 'List ID', type: 'text', required: true },
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'xxxxx-us1', required: true, helpText: 'Format: apikey-datacenter (ex: abc123-us1)' },
+      { key: 'action', label: 'Action', type: 'select', options: ['add_subscriber', 'update_subscriber', 'send_campaign'] },
+      { key: 'listId', label: 'List/Audience ID', type: 'text', required: true },
       { key: 'email', label: 'Email', type: 'text' },
-      { key: 'mergeFields', label: 'Merge Fields (JSON)', type: 'json' }
+      { key: 'mergeFields', label: 'Merge Fields (JSON)', type: 'json', placeholder: '{"FNAME": "John", "LNAME": "Doe"}' },
+      { key: 'tags', label: 'Tags (virgules)', type: 'text', placeholder: 'newsletter, prospect' }
     ]
   },
   integration_brevo: {
@@ -1013,10 +1056,14 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['send_email', 'create_contact'] },
-      { key: 'to', label: 'To', type: 'text' },
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'xkeysib-xxxxx', required: true },
+      { key: 'action', label: 'Action', type: 'select', options: ['send_email', 'create_contact', 'send_sms'] },
+      { key: 'to', label: 'To (email ou phone)', type: 'text' },
+      { key: 'senderEmail', label: 'Sender Email', type: 'text' },
+      { key: 'senderName', label: 'Sender Name', type: 'text' },
       { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'htmlContent', label: 'HTML', type: 'textarea' }
+      { key: 'htmlContent', label: 'HTML', type: 'textarea' },
+      { key: 'templateId', label: 'Template ID', type: 'number' }
     ]
   },
   integration_mailgun: {
@@ -1028,10 +1075,13 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'key-xxxxxxx', required: true },
+      { key: 'domain', label: 'Domain', type: 'text', placeholder: 'mg.yourdomain.com', required: true },
       { key: 'to', label: 'To', type: 'text', required: true },
       { key: 'from', label: 'From', type: 'text', required: true },
       { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'text', label: 'Text', type: 'textarea' }
+      { key: 'text', label: 'Text', type: 'textarea' },
+      { key: 'html', label: 'HTML', type: 'textarea' }
     ]
   },
   integration_resend: {
@@ -1043,10 +1093,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 're_xxxxxxxxx', required: true, helpText: 'Clé API Resend (commence par re_)' },
       { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'from', label: 'From', type: 'text', required: true },
+      { key: 'from', label: 'From', type: 'text', required: true, placeholder: 'you@yourdomaine.com' },
       { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'html', label: 'HTML', type: 'textarea' }
+      { key: 'html', label: 'HTML', type: 'textarea' },
+      { key: 'text', label: 'Text fallback', type: 'textarea' }
     ]
   },
   integration_convertkit: {
@@ -1105,9 +1157,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'model', label: 'Model', type: 'select', options: ['gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] },
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'sk-xxxxxxxxxxxxxxx', required: true, helpText: 'Votre clé API OpenAI (commence par sk-)' },
+      { key: 'model', label: 'Model', type: 'select', options: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo', 'o1-preview', 'o1-mini'] },
       { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
+      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea', placeholder: 'Instructions pour le modèle...' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 },
+      { key: 'temperature', label: 'Temperature (0-2)', type: 'number', defaultValue: 0.7 }
     ]
   },
   integration_anthropic: {
@@ -1119,8 +1174,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'model', label: 'Model', type: 'select', options: ['claude-3-opus', 'claude-3-sonnet'] },
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'sk-ant-xxxxxxxx', required: true, helpText: 'Votre clé API Anthropic' },
+      { key: 'model', label: 'Model', type: 'select', options: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'] },
       { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea' },
       { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
     ]
   },
@@ -1133,8 +1190,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'model', label: 'Model', type: 'select', options: ['gemini-pro', 'gemini-pro-vision'] },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true }
+      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'AIzaSyxxxxxxxx', required: true, helpText: 'Clé API Google AI Studio' },
+      { key: 'model', label: 'Model', type: 'select', options: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro', 'gemini-pro-vision'] },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'maxTokens', label: 'Max Output Tokens', type: 'number', defaultValue: 2048 }
     ]
   },
   integration_mistral: {
@@ -1146,8 +1205,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'model', label: 'Model', type: 'select', options: ['mistral-large', 'mistral-medium'] },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true }
+      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API Mistral' },
+      { key: 'model', label: 'Model', type: 'select', options: ['mistral-large-latest', 'mistral-medium-latest', 'mistral-small-latest', 'open-mixtral-8x22b'] },
+      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
     ]
   },
   integration_huggingface: {
@@ -1159,8 +1220,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'modelId', label: 'Model ID', type: 'text', required: true },
-      { key: 'inputs', label: 'Inputs', type: 'textarea' }
+      { key: 'apiToken', label: 'API Token', type: 'text', placeholder: 'hf_xxxxxxxxx', required: true, helpText: 'Token d\'accès Hugging Face' },
+      { key: 'modelId', label: 'Model ID', type: 'text', required: true, placeholder: 'meta-llama/Llama-2-70b-chat-hf' },
+      { key: 'inputs', label: 'Inputs', type: 'textarea' },
+      { key: 'parameters', label: 'Parameters (JSON)', type: 'json', placeholder: '{"max_new_tokens": 500}' }
     ]
   },
   integration_replicate: {
@@ -1172,7 +1235,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'model', label: 'Model', type: 'text', required: true },
+      { key: 'apiToken', label: 'API Token', type: 'text', placeholder: 'r8_xxxxxxxxx', required: true, helpText: 'Token API Replicate' },
+      { key: 'model', label: 'Model', type: 'text', required: true, placeholder: 'stability-ai/sdxl:xxx' },
       { key: 'input', label: 'Input (JSON)', type: 'json', required: true }
     ]
   },
@@ -1185,9 +1249,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Clé API Stability AI' },
       { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
+      { key: 'negativePrompt', label: 'Negative Prompt', type: 'textarea' },
       { key: 'width', label: 'Width', type: 'number', defaultValue: 1024 },
-      { key: 'height', label: 'Height', type: 'number', defaultValue: 1024 }
+      { key: 'height', label: 'Height', type: 'number', defaultValue: 1024 },
+      { key: 'steps', label: 'Steps', type: 'number', defaultValue: 30 }
     ]
   },
   integration_elevenlabs: {
@@ -1199,8 +1266,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API ElevenLabs' },
+      { key: 'voiceId', label: 'Voice ID', type: 'text', placeholder: 'ID de la voix (ex: 21m00Tcm4TlvDq8ikWAM)' },
       { key: 'text', label: 'Text', type: 'textarea', required: true },
-      { key: 'voiceId', label: 'Voice ID', type: 'text' }
+      { key: 'modelId', label: 'Model', type: 'select', options: ['eleven_multilingual_v2', 'eleven_monolingual_v1', 'eleven_turbo_v2'], defaultValue: 'eleven_multilingual_v2' },
+      { key: 'stability', label: 'Stability (0-1)', type: 'number', defaultValue: 0.5 },
+      { key: 'similarityBoost', label: 'Similarity Boost (0-1)', type: 'number', defaultValue: 0.75 }
     ]
   },
   integration_deepgram: {
@@ -1212,8 +1283,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API Deepgram' },
       { key: 'audioUrl', label: 'Audio URL', type: 'text', required: true },
-      { key: 'language', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de'] }
+      { key: 'language', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl', 'ja', 'zh'] },
+      { key: 'model', label: 'Model', type: 'select', options: ['nova-2', 'nova', 'enhanced', 'base'], defaultValue: 'nova-2' },
+      { key: 'punctuate', label: 'Punctuate', type: 'boolean', defaultValue: true },
+      { key: 'diarize', label: 'Speaker Diarization', type: 'boolean', defaultValue: false }
     ]
   },
   integration_assemblyai: {
@@ -1225,8 +1300,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
+      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API AssemblyAI' },
       { key: 'audioUrl', label: 'Audio URL', type: 'text', required: true },
-      { key: 'languageCode', label: 'Language', type: 'select', options: ['en', 'fr', 'es'] }
+      { key: 'languageCode', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl', 'ja', 'zh'] },
+      { key: 'speakerLabels', label: 'Speaker Labels', type: 'boolean', defaultValue: false },
+      { key: 'autoChapters', label: 'Auto Chapters', type: 'boolean', defaultValue: false }
     ]
   },
 
@@ -1240,8 +1318,10 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_contact', 'update_contact', 'create_deal'] },
-      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
+      { key: 'accessToken', label: 'Access Token', type: 'text', required: true, helpText: 'Token d\'accès HubSpot (Private App ou OAuth)' },
+      { key: 'action', label: 'Action', type: 'select', options: ['create_contact', 'update_contact', 'create_deal', 'create_company', 'search'] },
+      { key: 'objectId', label: 'Object ID (pour update)', type: 'text' },
+      { key: 'properties', label: 'Properties (JSON)', type: 'json', placeholder: '{"email": "contact@example.com", "firstname": "John"}' }
     ]
   },
   integration_salesforce: {
