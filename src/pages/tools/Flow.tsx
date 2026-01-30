@@ -194,19 +194,29 @@ export default function Flow() {
     console.log('AI Generate called with', blocks.length, 'blocks and', connections?.length || 0, 'connections');
     const workflow = await createWorkflow(name, description);
     if (workflow) {
-      const success = await updateWorkflow(workflow.id, { blocks, connections: connections || [] });
+      // Apply auto-layout to blocks before saving
+      const layoutedBlocks = blocks.length > 0 
+        ? applyLayoutToBlocks(blocks, autoLayoutBlocks(blocks, connections || []))
+        : blocks;
+      
+      const success = await updateWorkflow(workflow.id, { blocks: layoutedBlocks, connections: connections || [] });
       if (success) {
         setSelectedWorkflowId(workflow.id);
-        setLocalBlocks(blocks);
+        setLocalBlocks(layoutedBlocks);
         setLocalConnections(connections || []);
-        console.log('Workflow created and selected:', workflow.id, 'with blocks:', blocks);
+        console.log('Workflow created and selected:', workflow.id, 'with blocks:', layoutedBlocks);
         toast.success('Workflow IA créé avec succès !');
       }
     }
   };
 
   const handleAIModify = (blocks: WorkflowBlock[], connections: BlockConnection[]) => {
-    setLocalBlocks(blocks);
+    // Apply auto-layout to modified blocks
+    const layoutedBlocks = blocks.length > 0 
+      ? applyLayoutToBlocks(blocks, autoLayoutBlocks(blocks, connections))
+      : blocks;
+    
+    setLocalBlocks(layoutedBlocks);
     setLocalConnections(connections);
     setHasUnsavedChanges(true);
     toast.success('Workflow modified by AI - save to apply changes');
@@ -215,9 +225,14 @@ export default function Flow() {
   const handleTemplateSelect = async (blocks: WorkflowBlock[], name: string, description: string) => {
     const workflow = await createWorkflow(name, description);
     if (workflow) {
-      await updateWorkflow(workflow.id, { blocks });
+      // Apply auto-layout to template blocks
+      const layoutedBlocks = blocks.length > 0 
+        ? applyLayoutToBlocks(blocks, autoLayoutBlocks(blocks, []))
+        : blocks;
+      
+      await updateWorkflow(workflow.id, { blocks: layoutedBlocks });
       setSelectedWorkflowId(workflow.id);
-      setLocalBlocks(blocks);
+      setLocalBlocks(layoutedBlocks);
       toast.success('Template workflow created!');
     }
   };
