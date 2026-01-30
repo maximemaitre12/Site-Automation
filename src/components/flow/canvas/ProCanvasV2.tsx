@@ -197,11 +197,12 @@ function ProCanvasV2Component({
     onBlocksChange(newBlocks);
   }, [blocks, connections, onBlocksChange]);
 
-  // Wheel zoom with smooth scaling
+  // Wheel zoom with smooth scaling (reduced sensitivity for trackpad)
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.08 : 0.08;
+      // Use smaller delta for smoother trackpad zoom
+      const delta = -e.deltaY * 0.002;
       setZoom(z => Math.max(DEFAULT_CANVAS_CONFIG.minZoom, Math.min(DEFAULT_CANVAS_CONFIG.maxZoom, z + delta)));
     } else {
       // Regular scroll = pan
