@@ -628,12 +628,12 @@ function ProCanvasV2Component({
                 x={pan.x % gridSize}
                 y={pan.y % gridSize}
               >
-                <circle
-                  cx={gridSize / 2}
-                  cy={gridSize / 2}
-                  r={Math.max(0.5, 0.8 * zoom)}
-                  fill={`rgba(180, 180, 180, ${Math.min(0.4, zoom * 0.35)})`}
-                />
+              <circle
+                cx={gridSize / 2}
+                cy={gridSize / 2}
+                r={Math.max(0.6, 1 * zoom)}
+                fill={`rgba(160, 160, 170, ${Math.min(0.5, 0.25 + zoom * 0.25)})`}
+              />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid-pattern)" className="canvas-background" />
