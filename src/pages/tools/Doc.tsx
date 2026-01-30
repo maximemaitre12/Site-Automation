@@ -198,54 +198,6 @@ export default function DocPage() {
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-primary/30 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Files className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">{documents.length}</p>
-                    <p className="text-xs text-muted-foreground">Documents</p>
-                  </div>
-                </div>
-              </div>
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-agent-hr/30 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-agent-hr/10 flex items-center justify-center">
-                    <FolderOpen className="w-5 h-5 text-agent-hr" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">{folders.length}</p>
-                    <p className="text-xs text-muted-foreground">Dossiers</p>
-                  </div>
-                </div>
-              </div>
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-agent-compliance/30 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-agent-compliance/10 flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-agent-compliance" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">{templates.length}</p>
-                    <p className="text-xs text-muted-foreground">Templates</p>
-                  </div>
-                </div>
-              </div>
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-agent-sales/30 transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-agent-sales/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-agent-sales" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">{categoryCounts.ai}</p>
-                    <p className="text-xs text-muted-foreground">Analysés IA</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Category Tabs */}
             <DocCategoryTabs 
               activeCategory={activeCategory} 
