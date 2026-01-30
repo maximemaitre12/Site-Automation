@@ -141,6 +141,22 @@ function ProCanvasV2Component({
     });
   }, [pan, zoom]);
 
+  // Prevent browser zoom when using trackpad on canvas
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const preventBrowserZoom = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+      }
+    };
+
+    // Must use { passive: false } to be able to preventDefault
+    container.addEventListener('wheel', preventBrowserZoom, { passive: false });
+    return () => container.removeEventListener('wheel', preventBrowserZoom);
+  }, []);
+
   // Filtered blocks based on search
   const filteredBlockIds = useMemo(() => {
     if (!searchQuery.trim()) return null;
