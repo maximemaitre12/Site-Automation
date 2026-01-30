@@ -420,37 +420,9 @@ export default function Flow() {
               {selectedWorkflow ? (
                 <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ minHeight: '400px' }}>
                   <div className="flex items-center justify-between gap-2 px-3 md:px-6 py-2 md:py-3 border-b border-border bg-card/30 flex-shrink-0">
-                    {/* Left side: History, Undo/Redo, Save */}
-                    <div className="flex items-center gap-1 md:gap-2">
-                      <WorkflowHistory runs={runs} loading={runsLoading} />
-                      <div className="hidden sm:flex items-center gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" onClick={handleUndo} disabled={!canUndo} className="h-7 md:h-8 w-7 md:w-8 p-0">
-                              <Undo2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Annuler</TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm" onClick={handleRedo} disabled={!canRedo} className="h-7 md:h-8 w-7 md:w-8 p-0">
-                              <Redo2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Rétablir</TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges} className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm">
-                        <Save className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        <span className="hidden xs:inline">Save</span>
-                        {hasUnsavedChanges && <span className="w-1.5 h-1.5 bg-warning rounded-full" />}
-                      </Button>
-                    </div>
-                    
-                    {/* Center: Workflow name */}
-                    <div className="flex-1 text-center hidden md:block">
-                      <h2 className="font-semibold text-foreground truncate px-4">{selectedWorkflow.name}</h2>
+                    {/* Left side: Workflow name */}
+                    <div className="flex-1">
+                      <h2 className="font-semibold text-foreground truncate">{selectedWorkflow.name}</h2>
                     </div>
                     
                     {/* Right side: Auto-layout, AI, Add Block, Execute */}
