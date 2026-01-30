@@ -6,7 +6,7 @@
 import { useState, useCallback, useRef, useEffect, memo, useMemo } from 'react';
 import { WorkflowBlock, BlockConnection, BLOCK_DEFINITIONS, ExecutionStatus } from '@/types/workflow';
 import { DEFAULT_CANVAS_CONFIG, BlockVisualState } from '@/types/workflow-v2';
-import { ProWorkflowNode } from '../nodes/ProWorkflowNode';
+import { ProWorkflowNode, NODE_WIDTH, NODE_HEIGHT, NODE_TOTAL_HEIGHT } from '../nodes/ProWorkflowNode';
 import { ProEdge } from '../edges/ProEdge';
 import { ProCanvasToolbar } from './ProCanvasToolbar';
 import { ProMiniMap } from './ProMiniMap';
@@ -144,10 +144,6 @@ function ProCanvasV2Component({
     setZoom(1);
   }, []);
 
-  // Professional node dimensions
-  const NODE_WIDTH = 240;
-  const NODE_HEIGHT = 100;
-
   const handleFitView = useCallback(() => {
     if (blocks.length === 0 || !containerRef.current) return;
     
@@ -157,7 +153,7 @@ function ProCanvasV2Component({
     const minX = Math.min(...positions.map(p => p.x)) - 100;
     const minY = Math.min(...positions.map(p => p.y)) - 100;
     const maxX = Math.max(...positions.map(p => p.x + NODE_WIDTH)) + 100;
-    const maxY = Math.max(...positions.map(p => p.y + NODE_HEIGHT)) + 100;
+    const maxY = Math.max(...positions.map(p => p.y + NODE_TOTAL_HEIGHT)) + 100;
     
     const contentWidth = maxX - minX;
     const contentHeight = maxY - minY;
