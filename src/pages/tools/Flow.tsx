@@ -425,22 +425,8 @@ export default function Flow() {
                       <h2 className="font-semibold text-foreground truncate">{selectedWorkflow.name}</h2>
                     </div>
                     
-                    {/* Right side: Auto-layout, AI, Add Block, Execute */}
+                    {/* Right side: AI, Add Block, Execute */}
                     <div className="flex items-center gap-1 md:gap-2">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={handleAutoLayout}
-                            disabled={localBlocks.length < 2}
-                            className="gap-1 h-7 md:h-8 px-2 text-xs"
-                          >
-                            <LayoutGrid className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Auto-layout (réorganiser)</TooltipContent>
-                      </Tooltip>
                       <Button 
                         variant="outline" 
                         size="sm" 
