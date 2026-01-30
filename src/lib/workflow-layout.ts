@@ -29,12 +29,12 @@ interface LayoutOptions {
 }
 
 const DEFAULT_OPTIONS: Required<LayoutOptions> = {
-  nodeWidth: 240,           // Updated to match new node design
-  nodeHeight: 100,          // Updated to match new node design
-  columnSpacing: 160,       // Space between columns (generous for readability)
-  rowSpacing: 60,           // Space between rows in same column
-  startX: 80,
-  startY: 80,
+  nodeWidth: 100,            // N8N style square node
+  nodeHeight: 100,           // N8N style square node
+  columnSpacing: 120,        // Space between columns (horizontal gap with room for connectors)
+  rowSpacing: 80,            // Space between rows in same column (including label space)
+  startX: 100,
+  startY: 100,
   direction: 'horizontal',
 };
 
