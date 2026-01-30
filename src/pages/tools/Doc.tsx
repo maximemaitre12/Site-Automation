@@ -198,12 +198,6 @@ export default function DocPage() {
               </div>
             </div>
 
-            {/* Category Tabs */}
-            <DocCategoryTabs 
-              activeCategory={activeCategory} 
-              onCategoryChange={setActiveCategory}
-              counts={categoryCounts}
-            />
           </div>
         </header>
 
