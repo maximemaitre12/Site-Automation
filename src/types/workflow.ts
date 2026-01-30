@@ -347,12 +347,31 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'trigger',
     color: 'from-red-500 to-pink-400',
     icon: 'Mail',
-    description: 'Trigger when email received',
+    description: 'Déclencher quand un email est reçu (Gmail, Outlook, IMAP...)',
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'address', label: 'Email Address', type: 'text', placeholder: 'workflow@your-domain.com' },
-      { key: 'subjectFilter', label: 'Subject Filter', type: 'text', placeholder: 'Invoice*' }
+      // Section: Authentification
+      { key: 'authMethod', label: 'Méthode de connexion', type: 'select', options: ['oauth_google', 'api_key', 'imap'], defaultValue: 'oauth_google', helpText: 'OAuth Google recommandé pour Gmail, IMAP pour tout fournisseur (Outlook, Yahoo...)', section: 'auth' },
+      // OAuth Google fields
+      { key: 'connectOAuth', label: 'Connecter compte Google', type: 'oauth_button', helpText: 'Cliquez pour autoriser l\'accès à votre compte Gmail', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleClientId', label: 'Client ID Google', type: 'text', placeholder: 'Votre Client ID Google Cloud', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleClientSecret', label: 'Client Secret', type: 'password', placeholder: '***', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleRefreshToken', label: 'Refresh Token', type: 'password', placeholder: 'Token obtenu après autorisation OAuth', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      // API Key fields
+      { key: 'apiKey', label: 'Clé API Gmail', type: 'password', placeholder: 'Votre clé API Google', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      { key: 'apiKeyEmail', label: 'Adresse email associée', type: 'text', placeholder: 'email@gmail.com', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      // IMAP fields (pour n'importe quel fournisseur)
+      { key: 'imapHost', label: 'Serveur IMAP', type: 'text', placeholder: 'imap.gmail.com ou imap.outlook.com', defaultValue: 'imap.gmail.com', section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      { key: 'imapPort', label: 'Port IMAP', type: 'number', defaultValue: 993, section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      { key: 'imapEmail', label: 'Email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      { key: 'imapPassword', label: 'Mot de passe / App Password', type: 'password', placeholder: 'Utilisez un mot de passe d\'application', required: true, helpText: 'Pour Gmail, créez un "App Password" dans les paramètres Google', section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      // Section: Filtres
+      { key: 'subjectFilter', label: 'Filtre sujet', type: 'text', placeholder: 'Invoice* ou *Facture*', section: 'filters' },
+      { key: 'fromFilter', label: 'Filtre expéditeur', type: 'text', placeholder: 'client@exemple.com', section: 'filters' },
+      { key: 'folder', label: 'Dossier à surveiller', type: 'select', options: ['INBOX', 'ALL'], defaultValue: 'INBOX', section: 'filters' },
+      { key: 'unreadOnly', label: 'Non lus uniquement', type: 'boolean', defaultValue: true, section: 'filters' },
+      { key: 'markAsRead', label: 'Marquer comme lu après traitement', type: 'boolean', defaultValue: true, section: 'filters' }
     ]
   },
 
