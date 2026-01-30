@@ -30,9 +30,9 @@ interface LayoutOptions {
 
 const DEFAULT_OPTIONS: Required<LayoutOptions> = {
   nodeWidth: 100,            // N8N style square node
-  nodeHeight: 100,           // N8N style square node
+  nodeHeight: 150,           // Total height including label below (100 card + 50 label)
   columnSpacing: 120,        // Space between columns (horizontal gap with room for connectors)
-  rowSpacing: 80,            // Space between rows in same column (including label space)
+  rowSpacing: 40,            // Space between rows in same column
   startX: 100,
   startY: 100,
   direction: 'horizontal',
