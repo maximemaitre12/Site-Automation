@@ -266,7 +266,7 @@ export default function DocPage() {
           open={viewerOpen}
           onOpenChange={setViewerOpen}
           document={selectedDocument}
-          onAnalyze={analyzeDocument}
+          onAnalyze={(docId) => analyzeDocument(docId, true)}
           onRewrite={rewriteDocument}
           onRefresh={() => {
             refreshDocuments();
