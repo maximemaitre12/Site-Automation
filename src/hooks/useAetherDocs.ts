@@ -302,12 +302,14 @@ export function useAetherDocs() {
     return true;
   };
 
-  const analyzeDocument = async (documentId: string) => {
+  const analyzeDocument = async (documentId: string, showToasts = false) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
     try {
-      toast.info('Analyse IA en cours...');
+      if (showToasts) {
+        toast.info('Analyse IA en cours...');
+      }
       
       const { data, error } = await supabase.functions.invoke('doc-analyze', {
         body: { documentId }
@@ -317,27 +319,35 @@ export function useAetherDocs() {
 
       if (error) {
         console.error('Analysis error:', error);
-        toast.error('Erreur lors de l\'analyse: ' + (error.message || 'Erreur inconnue'));
+        if (showToasts) {
+          toast.error('Erreur lors de l\'analyse: ' + (error.message || 'Erreur inconnue'));
+        }
         return false;
       }
 
       // Check if the response indicates an error
       if (data?.error) {
         console.error('Analysis response error:', data.error);
-        toast.error('Erreur lors de l\'analyse: ' + data.error);
+        if (showToasts) {
+          toast.error('Erreur lors de l\'analyse: ' + data.error);
+        }
         return false;
       }
       
       await fetchDocuments();
-      toast.success('Analyse IA terminée');
+      if (showToasts) {
+        toast.success('Analyse IA terminée');
+      }
       return true;
     } catch (e: any) {
       clearTimeout(timeoutId);
       console.error('Analysis failed:', e);
       
       if (e.name === 'AbortError') {
-        toast.error('L\'analyse a pris trop de temps. Réessayez plus tard.');
-      } else {
+        if (showToasts) {
+          toast.error('L\'analyse a pris trop de temps. Réessayez plus tard.');
+        }
+      } else if (showToasts) {
         toast.error('Erreur lors de l\'analyse: ' + (e.message || 'Erreur inconnue'));
       }
       return false;
@@ -397,6 +407,11 @@ export function useAetherDocs() {
 
       await fetchDocuments();
       toast.success('Document Word généré avec succès');
+      
+      // Auto-trigger AI analysis in background (silently)
+      if (data?.documentId) {
+        analyzeDocument(data.documentId, false);
+      }
       
       // Auto-download the Word file if URL is available
       if (data?.downloadUrl) {

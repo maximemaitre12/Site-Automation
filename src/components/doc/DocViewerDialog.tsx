@@ -568,26 +568,43 @@ export function DocViewerDialog({
           <TabsContent value="ai" className="flex-1 min-h-0 mt-4 overflow-hidden">
             <ScrollArea className="h-full">
               <div className="space-y-4 pr-4">
-                {/* Action buttons */}
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleAnalyze} 
-                    disabled={analyzing}
-                    variant="outline"
-                  >
-                    {analyzing ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Analyse en cours...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        {document.ai_summary ? 'Relancer l\'analyse' : 'Lancer l\'analyse IA'}
-                      </>
-                    )}
-                  </Button>
-                </div>
+                {/* Show loading state if no analysis yet */}
+                {!document.ai_summary && !analyzing && (
+                  <Card className="p-6 text-center">
+                    <Brain className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground mb-4">
+                      L'analyse IA est en cours de préparation...
+                    </p>
+                    <Button onClick={handleAnalyze} variant="outline" size="sm">
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Lancer manuellement
+                    </Button>
+                  </Card>
+                )}
+                
+                {analyzing && (
+                  <Card className="p-6 text-center">
+                    <Loader2 className="w-12 h-12 text-primary mx-auto mb-3 animate-spin" />
+                    <p className="font-medium">Analyse IA en cours...</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Extraction du résumé, mots-clés, entités et recommandations
+                    </p>
+                  </Card>
+                )}
+
+                {/* Refresh button only when analysis exists */}
+                {document.ai_summary && !analyzing && (
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={handleAnalyze} 
+                      variant="ghost"
+                      size="sm"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Relancer l'analyse
+                    </Button>
+                  </div>
+                )}
 
                 {/* Readability Score */}
                 {aiAnalysis?.readabilityScore && (
