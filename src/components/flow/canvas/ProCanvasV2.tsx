@@ -616,8 +616,8 @@ function ProCanvasV2Component({
         className="absolute inset-0 w-full h-full canvas-background"
         style={{ cursor: isPanning ? 'grabbing' : 'default' }}
       >
-        {/* Grid pattern - white theme style */}
-        {showGrid && (
+        {/* Grid pattern - fades out when zooming out */}
+        {showGrid && zoom > 0.3 && (
           <>
             <defs>
               <pattern
@@ -631,8 +631,8 @@ function ProCanvasV2Component({
                 <circle
                   cx={gridSize / 2}
                   cy={gridSize / 2}
-                  r={1.2}
-                  fill="#d1d5db"
+                  r={Math.max(0.5, 0.8 * zoom)}
+                  fill={`rgba(180, 180, 180, ${Math.min(0.4, zoom * 0.35)})`}
                 />
               </pattern>
             </defs>
