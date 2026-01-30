@@ -12,6 +12,14 @@ import { DocViewerDialog } from "@/components/doc/DocViewerDialog";
 import { Loader2, FileText, Files, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // Map template categories to document categories
 const templateCategoryMap: Record<string, DocCategory> = {
@@ -45,6 +53,7 @@ export default function DocPage() {
     analyzeDocument,
     rewriteDocument,
     moveDocument,
+    updateDocument,
     refreshDocuments
   } = useAetherDocs();
 
@@ -55,6 +64,8 @@ export default function DocPage() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [activeCategory, setActiveCategory] = useState<DocCategory>('all');
+  const [renameDocId, setRenameDocId] = useState<string | null>(null);
+  const [renameTitle, setRenameTitle] = useState('');
 
   // Filter documents by category
   const filteredDocuments = useMemo(() => {
@@ -137,6 +148,19 @@ export default function DocPage() {
   const handleGenerate = async (templateId: string, variables: Record<string, string>, title: string) => {
     await generateDocument(templateId, variables, title);
     setGenerateDialogOpen(false);
+  };
+
+  const handleRenameDocument = (docId: string, currentTitle: string) => {
+    setRenameDocId(docId);
+    setRenameTitle(currentTitle);
+  };
+
+  const handleRenameSubmit = async () => {
+    if (renameDocId && renameTitle.trim()) {
+      await updateDocument(renameDocId, { title: renameTitle.trim() });
+      setRenameDocId(null);
+      setRenameTitle('');
+    }
   };
 
   const headerActions = (
@@ -232,6 +256,7 @@ export default function DocPage() {
                   onFolderClick={(folder) => setCurrentFolder(folder.id)}
                   onDeleteDocument={deleteDocument}
                   onMoveDocument={moveDocument}
+                  onRenameDocument={handleRenameDocument}
                 />
               </div>
             </div>
@@ -276,6 +301,31 @@ export default function DocPage() {
             }
           }}
         />
+
+        {/* Rename Dialog */}
+        <Dialog open={renameDocId !== null} onOpenChange={(open) => !open && setRenameDocId(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Renommer le document</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                value={renameTitle}
+                onChange={(e) => setRenameTitle(e.target.value)}
+                placeholder="Nouveau nom"
+                onKeyDown={(e) => e.key === 'Enter' && handleRenameSubmit()}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRenameDocId(null)}>
+                Annuler
+              </Button>
+              <Button onClick={handleRenameSubmit} disabled={!renameTitle.trim()}>
+                Renommer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
