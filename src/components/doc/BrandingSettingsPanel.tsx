@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Palette, Type, Image, Save, RotateCcw } from "lucide-react";
+import { Palette, Type, Image, Save, RotateCcw, X } from "lucide-react";
 import { toast } from "sonner";
 
 export interface BrandingSettings {
@@ -37,10 +37,11 @@ const FONT_OPTIONS = [
 
 interface BrandingSettingsPanelProps {
   onBrandingChange?: (branding: BrandingSettings) => void;
+  onClose?: () => void;
   compact?: boolean;
 }
 
-export function BrandingSettingsPanel({ onBrandingChange, compact = false }: BrandingSettingsPanelProps) {
+export function BrandingSettingsPanel({ onBrandingChange, onClose, compact = false }: BrandingSettingsPanelProps) {
   const [branding, setBranding] = useState<BrandingSettings>(() => {
     const saved = localStorage.getItem('aether_doc_branding');
     return saved ? JSON.parse(saved) : DEFAULT_BRANDING;
@@ -161,6 +162,11 @@ export function BrandingSettingsPanel({ onBrandingChange, compact = false }: Bra
             <Save className="w-3.5 h-3.5 mr-1" />
             Enregistrer
           </Button>
+          {onClose && (
+            <Button variant="ghost" size="sm" onClick={onClose} className="ml-2">
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 

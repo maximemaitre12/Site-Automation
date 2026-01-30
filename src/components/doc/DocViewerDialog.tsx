@@ -298,6 +298,7 @@ export function DocViewerDialog({
             <ScrollArea className="h-full">
               <BrandingSettingsPanel 
                 onBrandingChange={setBranding}
+                onClose={() => setShowBrandingPanel(false)}
                 compact={false}
               />
             </ScrollArea>
