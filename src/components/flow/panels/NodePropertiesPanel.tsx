@@ -99,10 +99,20 @@ function NodePropertiesPanelComponent({
     });
   };
 
+  // Returns the effective config value for a key, falling back to the field defaultValue.
+  // This is important for conditional fields (showWhen) so defaults are respected even
+  // before the user manually touches the controlling field.
+  const getEffectiveConfigValue = (key: string) => {
+    const raw = block.config?.[key];
+    if (raw !== undefined) return raw;
+    const fieldDef = definition?.configFields?.find((f) => f.key === key);
+    return fieldDef?.defaultValue;
+  };
+
   // Check if field should be visible based on showWhen condition
   const isFieldVisible = (field: ConfigField): boolean => {
     if (!field.showWhen) return true;
-    const conditionValue = block.config[field.showWhen.field];
+    const conditionValue = getEffectiveConfigValue(field.showWhen.field);
     return conditionValue === field.showWhen.value;
   };
 
@@ -344,7 +354,7 @@ function NodePropertiesPanelComponent({
   }, [fieldsBySection]);
 
   return (
-    <div className="w-80 h-full border-l border-border bg-card flex flex-col overflow-hidden">
+    <div className="w-80 h-full min-h-0 border-l border-border bg-card flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-border shrink-0">
         <div className="flex items-start justify-between mb-3">
@@ -402,7 +412,7 @@ function NodePropertiesPanelComponent({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
         <div className="p-3 space-y-2 pb-8">
           {/* Render sections in order */}
           {orderedSections.map(sectionKey => 
