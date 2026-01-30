@@ -1,193 +1,148 @@
 import { useState } from 'react';
+import { useDataPlatform, DataSource } from '@/hooks/useDataPlatform';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Building2, MapPin, Database, RefreshCw, CheckCircle2,
-  AlertTriangle, TrendingUp, Globe, Layers, ArrowRight,
-  Cloud, Server, Wifi, WifiOff, Activity, BarChart3
+  AlertTriangle, Globe, Layers, ArrowRight,
+  Cloud, Server, Wifi, WifiOff, Activity, BarChart3, Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface SiteDataSource {
-  id: string;
-  siteName: string;
-  location: string;
-  country: string;
-  status: 'connected' | 'syncing' | 'offline' | 'error';
-  lastSync: string;
-  recordsCount: number;
-  dataQuality: number;
-  sources: {
-    name: string;
-    type: 'database' | 'api' | 'file' | 'manual';
-    status: 'active' | 'inactive';
-    records: number;
-  }[];
-}
-
-const mockSiteData: SiteDataSource[] = [
-  {
-    id: '1',
-    siteName: 'Siège Social',
-    location: 'Région Parisienne',
-    country: 'FR',
-    status: 'connected',
-    lastSync: '2 min ago',
-    recordsCount: 1245000,
-    dataQuality: 98,
-    sources: [
-      { name: 'ERP Central', type: 'database', status: 'active', records: 890000 },
-      { name: 'Système RH', type: 'api', status: 'active', records: 45000 },
-      { name: 'Base Opérations', type: 'database', status: 'active', records: 310000 },
-    ]
-  },
-  {
-    id: '2',
-    siteName: 'Centre Technique Nord',
-    location: 'Lille',
-    country: 'FR',
-    status: 'connected',
-    lastSync: '5 min ago',
-    recordsCount: 567000,
-    dataQuality: 95,
-    sources: [
-      { name: 'ERP Local', type: 'database', status: 'active', records: 450000 },
-      { name: 'Système Atelier', type: 'api', status: 'active', records: 117000 },
-    ]
-  },
-  {
-    id: '3',
-    siteName: 'Plateforme Logistique',
-    location: 'Nantes',
-    country: 'FR',
-    status: 'syncing',
-    lastSync: '12 min ago',
-    recordsCount: 423000,
-    dataQuality: 92,
-    sources: [
-      { name: 'WMS Entrepôt', type: 'database', status: 'active', records: 380000 },
-      { name: 'Tracking Flotte', type: 'api', status: 'active', records: 43000 },
-    ]
-  },
-  {
-    id: '4',
-    siteName: 'Centre Distribution',
-    location: 'Barcelone',
-    country: 'ES',
-    status: 'connected',
-    lastSync: '8 min ago',
-    recordsCount: 312000,
-    dataQuality: 89,
-    sources: [
-      { name: 'ERP Régional', type: 'database', status: 'active', records: 290000 },
-      { name: 'Système Livraison', type: 'api', status: 'inactive', records: 22000 },
-    ]
-  },
-  {
-    id: '5',
-    siteName: 'Centre de Services',
-    location: 'Bruxelles',
-    country: 'BE',
-    status: 'connected',
-    lastSync: '3 min ago',
-    recordsCount: 198000,
-    dataQuality: 94,
-    sources: [
-      { name: 'Base Services', type: 'database', status: 'active', records: 178000 },
-      { name: 'Intégration CRM', type: 'api', status: 'active', records: 20000 },
-    ]
-  },
-  {
-    id: '6',
-    siteName: 'Unité Technique Est',
-    location: 'Strasbourg',
-    country: 'FR',
-    status: 'error',
-    lastSync: '2 hours ago',
-    recordsCount: 156000,
-    dataQuality: 78,
-    sources: [
-      { name: 'Système Atelier', type: 'database', status: 'inactive', records: 156000 },
-    ]
-  },
-  {
-    id: '7',
-    siteName: 'Antenne Sud',
-    location: 'Marseille',
-    country: 'FR',
-    status: 'connected',
-    lastSync: '6 min ago',
-    recordsCount: 234000,
-    dataQuality: 91,
-    sources: [
-      { name: 'Gestion Stock', type: 'database', status: 'active', records: 210000 },
-      { name: 'Suivi Équipements', type: 'api', status: 'active', records: 24000 },
-    ]
-  },
-  {
-    id: '8',
-    siteName: 'Centre Traitement',
-    location: 'Rotterdam',
-    country: 'NL',
-    status: 'connected',
-    lastSync: '4 min ago',
-    recordsCount: 189000,
-    dataQuality: 96,
-    sources: [
-      { name: 'Base Production', type: 'database', status: 'active', records: 165000 },
-      { name: 'Système Qualité', type: 'api', status: 'active', records: 24000 },
-    ]
-  },
-];
-
 const statusConfig = {
-  connected: { 
-    label: 'Connected', 
+  active: { 
+    label: 'Actif', 
     color: 'bg-success/10 text-success border-success/20', 
     icon: Wifi,
     dotColor: 'bg-success'
   },
   syncing: { 
-    label: 'Syncing', 
+    label: 'Sync...', 
     color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', 
     icon: RefreshCw,
     dotColor: 'bg-blue-500'
   },
-  offline: { 
-    label: 'Offline', 
+  inactive: { 
+    label: 'Inactif', 
     color: 'bg-muted text-muted-foreground border-border', 
     icon: WifiOff,
     dotColor: 'bg-muted-foreground'
   },
   error: { 
-    label: 'Error', 
+    label: 'Erreur', 
     color: 'bg-destructive/10 text-destructive border-destructive/20', 
     icon: AlertTriangle,
     dotColor: 'bg-destructive'
   },
 };
 
-const countryFlags: Record<string, string> = {
-  DE: '🇩🇪',
-  FR: '🇫🇷',
-  IT: '🇮🇹',
-  CZ: '🇨🇿',
-  ES: '🇪🇸',
-  BE: '🇧🇪',
-  PL: '🇵🇱',
-  NL: '🇳🇱',
-};
-
 export function MultiSiteDataView() {
-  const [selectedSite, setSelectedSite] = useState<SiteDataSource | null>(null);
+  const { sources, catalog, stats, loading, syncSource } = useDataPlatform();
+  const [selectedSource, setSelectedSource] = useState<DataSource | null>(null);
 
-  const totalRecords = mockSiteData.reduce((sum, s) => sum + s.recordsCount, 0);
-  const connectedSites = mockSiteData.filter(s => s.status === 'connected' || s.status === 'syncing').length;
-  const avgQuality = Math.round(mockSiteData.reduce((sum, s) => sum + s.dataQuality, 0) / mockSiteData.length);
-  const totalSources = mockSiteData.reduce((sum, s) => sum + s.sources.length, 0);
+  const totalRecords = stats.totalRecords;
+  const activeSources = stats.activeSources;
+  const avgQuality = stats.avgQualityScore;
+  const totalDatasets = stats.totalDatasets;
+
+  // Empty state
+  if (!loading && sources.length === 0) {
+    return (
+      <div className="space-y-6">
+        {/* Aggregated Stats - All zeros */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <Card className="bg-gradient-to-br from-agent-data/10 to-agent-data/5 border-agent-data/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-agent-data/20 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-agent-data" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-xs text-muted-foreground">Sources</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-success/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                  <Wifi className="w-5 h-5 text-success" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">0/0</p>
+                  <p className="text-xs text-muted-foreground">Connectées</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Database className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-xs text-muted-foreground">Records</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-amber-500/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                  <Server className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-xs text-muted-foreground">Datasets</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-agent-data/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-agent-data/10 flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-agent-data" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">-</p>
+                  <p className="text-xs text-muted-foreground">Qualité</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Empty State Card */}
+        <Card className="overflow-hidden">
+          <CardContent className="py-16 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-agent-data/10 flex items-center justify-center mx-auto mb-4">
+              <Layers className="w-8 h-8 text-agent-data" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Aucune source de données</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Configurez vos sources de données pour commencer à centraliser et gouverner vos données multi-sites.
+            </p>
+            <Button className="gap-2">
+              <Plus className="w-4 h-4" />
+              Ajouter une source
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -200,8 +155,8 @@ export function MultiSiteDataView() {
                 <Building2 className="w-5 h-5 text-agent-data" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{mockSiteData.length}</p>
-                <p className="text-xs text-muted-foreground">Sites</p>
+                <p className="text-2xl font-bold">{sources.length}</p>
+                <p className="text-xs text-muted-foreground">Sources</p>
               </div>
             </div>
           </CardContent>
@@ -214,8 +169,8 @@ export function MultiSiteDataView() {
                 <Wifi className="w-5 h-5 text-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{connectedSites}/{mockSiteData.length}</p>
-                <p className="text-xs text-muted-foreground">Connected</p>
+                <p className="text-2xl font-bold">{activeSources}/{sources.length}</p>
+                <p className="text-xs text-muted-foreground">Actives</p>
               </div>
             </div>
           </CardContent>
@@ -228,7 +183,14 @@ export function MultiSiteDataView() {
                 <Database className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{(totalRecords / 1000000).toFixed(1)}M</p>
+                <p className="text-2xl font-bold">
+                  {totalRecords >= 1000000 
+                    ? `${(totalRecords / 1000000).toFixed(1)}M` 
+                    : totalRecords >= 1000 
+                      ? `${(totalRecords / 1000).toFixed(0)}k`
+                      : totalRecords
+                  }
+                </p>
                 <p className="text-xs text-muted-foreground">Records</p>
               </div>
             </div>
@@ -242,8 +204,8 @@ export function MultiSiteDataView() {
                 <Server className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{totalSources}</p>
-                <p className="text-xs text-muted-foreground">Data Sources</p>
+                <p className="text-2xl font-bold">{totalDatasets}</p>
+                <p className="text-xs text-muted-foreground">Datasets</p>
               </div>
             </div>
           </CardContent>
@@ -256,15 +218,15 @@ export function MultiSiteDataView() {
                 <Activity className="w-5 h-5 text-agent-data" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{avgQuality}%</p>
-                <p className="text-xs text-muted-foreground">Avg Quality</p>
+                <p className="text-2xl font-bold">{avgQuality > 0 ? `${avgQuality}%` : '-'}</p>
+                <p className="text-xs text-muted-foreground">Qualité moy.</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Central Data Hub Visualization */}
+      {/* Data Sources Hub */}
       <Card className="overflow-hidden">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -273,9 +235,9 @@ export function MultiSiteDataView() {
                 <Layers className="w-5 h-5 text-white" />
               </div>
               <div>
-                <CardTitle className="text-lg">Decentralized Data Collection</CardTitle>
+                <CardTitle className="text-lg">Hub de données centralisé</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Real-time aggregation from {mockSiteData.length} locations across {Object.keys(countryFlags).length} countries
+                  Agrégation de {sources.length} source{sources.length > 1 ? 's' : ''} de données
                 </p>
               </div>
             </div>
@@ -286,117 +248,106 @@ export function MultiSiteDataView() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Sites Grid */}
+          {/* Sources Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            {mockSiteData.map((site) => {
-              const status = statusConfig[site.status];
+            {sources.map((source) => {
+              const status = statusConfig[source.status] || statusConfig.inactive;
               const StatusIcon = status.icon;
               
               return (
                 <button
-                  key={site.id}
-                  onClick={() => setSelectedSite(selectedSite?.id === site.id ? null : site)}
+                  key={source.id}
+                  onClick={() => setSelectedSource(selectedSource?.id === source.id ? null : source)}
                   className={cn(
                     "p-4 rounded-xl border text-left transition-all hover:shadow-md",
-                    selectedSite?.id === site.id 
+                    selectedSource?.id === source.id 
                       ? "border-agent-data ring-2 ring-agent-data/20 bg-agent-data/5" 
                       : "border-border/50 hover:border-agent-data/30"
                   )}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{countryFlags[site.country] || '🌍'}</span>
+                      <Database className="w-4 h-4 text-agent-data" />
                       <div className={cn("w-2 h-2 rounded-full", status.dotColor)} />
                     </div>
                     <Badge variant="outline" className={cn("text-[10px]", status.color)}>
-                      <StatusIcon className={cn("w-3 h-3 mr-1", site.status === 'syncing' && "animate-spin")} />
+                      <StatusIcon className={cn("w-3 h-3 mr-1", source.status === 'syncing' && "animate-spin")} />
                       {status.label}
                     </Badge>
                   </div>
                   
-                  <h3 className="font-semibold text-sm text-foreground truncate">{site.siteName}</h3>
-                  <p className="text-xs text-muted-foreground mb-3">{site.location}</p>
+                  <h3 className="font-semibold text-sm text-foreground truncate">{source.name}</h3>
+                  <p className="text-xs text-muted-foreground mb-3 capitalize">{source.connector}</p>
                   
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">Records</span>
-                      <span className="font-medium">{(site.recordsCount / 1000).toFixed(0)}k</span>
+                      <span className="font-medium">{source.records_count.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Quality</span>
-                      <span className={cn(
-                        "font-medium",
-                        site.dataQuality >= 90 ? "text-success" : 
-                        site.dataQuality >= 80 ? "text-warning" : "text-destructive"
-                      )}>
-                        {site.dataQuality}%
-                      </span>
+                      <span className="text-muted-foreground">Fréquence</span>
+                      <span className="font-medium capitalize">{source.sync_frequency}</span>
                     </div>
-                    <Progress 
-                      value={site.dataQuality} 
-                      className={cn(
-                        "h-1.5",
-                        site.dataQuality >= 90 && "[&>div]:bg-success",
-                        site.dataQuality >= 80 && site.dataQuality < 90 && "[&>div]:bg-warning",
-                        site.dataQuality < 80 && "[&>div]:bg-destructive"
-                      )}
-                    />
                   </div>
                   
-                  <p className="text-[10px] text-muted-foreground mt-2">
-                    Last sync: {site.lastSync}
-                  </p>
+                  {source.last_sync_at && (
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      Dernière sync: {new Date(source.last_sync_at).toLocaleDateString('fr-FR')}
+                    </p>
+                  )}
                 </button>
               );
             })}
           </div>
 
-          {/* Selected Site Details */}
-          {selectedSite && (
+          {/* Selected Source Details */}
+          {selectedSource && (
             <div className="mt-6 p-4 rounded-xl bg-muted/30 border border-border/50">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{countryFlags[selectedSite.country]}</span>
+                  <Database className="w-6 h-6 text-agent-data" />
                   <div>
-                    <h3 className="font-semibold">{selectedSite.siteName}</h3>
-                    <p className="text-sm text-muted-foreground">{selectedSite.location}, {selectedSite.country}</p>
+                    <h3 className="font-semibold">{selectedSource.name}</h3>
+                    <p className="text-sm text-muted-foreground capitalize">{selectedSource.connector} • {selectedSource.source_type}</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
-                  <ArrowRight className="w-4 h-4 mr-2" />
-                  View Details
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => syncSource(selectedSource.id)}
+                  disabled={selectedSource.status === 'syncing'}
+                >
+                  <RefreshCw className={cn("w-4 h-4 mr-2", selectedSource.status === 'syncing' && "animate-spin")} />
+                  Synchroniser
                 </Button>
               </div>
               
-              <p className="text-xs font-medium text-muted-foreground mb-2">Connected Data Sources</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {selectedSite.sources.map((source) => (
-                  <div 
-                    key={source.name}
-                    className="flex items-center justify-between p-3 rounded-lg bg-background border border-border/50"
-                  >
-                    <div className="flex items-center gap-2">
-                      {source.type === 'database' && <Database className="w-4 h-4 text-agent-data" />}
-                      {source.type === 'api' && <Cloud className="w-4 h-4 text-blue-500" />}
-                      <div>
-                        <p className="text-sm font-medium">{source.name}</p>
-                        <p className="text-xs text-muted-foreground">{(source.records / 1000).toFixed(0)}k records</p>
-                      </div>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className={cn(
-                        "text-xs",
-                        source.status === 'active' 
-                          ? "bg-success/10 text-success border-success/20" 
-                          : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {source.status}
-                    </Badge>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-3 rounded-lg bg-background border border-border/50">
+                  <p className="text-xs text-muted-foreground">Records</p>
+                  <p className="text-lg font-semibold">{selectedSource.records_count.toLocaleString()}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-background border border-border/50">
+                  <p className="text-xs text-muted-foreground">Fréquence</p>
+                  <p className="text-lg font-semibold capitalize">{selectedSource.sync_frequency}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-background border border-border/50">
+                  <p className="text-xs text-muted-foreground">Type</p>
+                  <p className="text-lg font-semibold capitalize">{selectedSource.source_type}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-background border border-border/50">
+                  <p className="text-xs text-muted-foreground">Statut</p>
+                  <Badge variant="outline" className={statusConfig[selectedSource.status]?.color}>
+                    {statusConfig[selectedSource.status]?.label}
+                  </Badge>
+                </div>
               </div>
+              
+              {selectedSource.error_message && (
+                <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                  <p className="text-sm text-destructive">{selectedSource.error_message}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -404,17 +355,17 @@ export function MultiSiteDataView() {
           <div className="mt-6 flex items-center justify-center gap-4 p-4 rounded-xl bg-gradient-to-r from-agent-data/5 via-primary/5 to-agent-data/5 border border-agent-data/20">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-agent-data" />
-              <span className="text-sm font-medium">{mockSiteData.length} Sites</span>
+              <span className="text-sm font-medium">{sources.length} Source{sources.length > 1 ? 's' : ''}</span>
             </div>
             <ArrowRight className="w-4 h-4 text-muted-foreground" />
             <div className="flex items-center gap-2">
               <Layers className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Central Hub</span>
+              <span className="text-sm font-medium">Hub Central</span>
             </div>
             <ArrowRight className="w-4 h-4 text-muted-foreground" />
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-agent-data" />
-              <span className="text-sm font-medium">Unified Analytics</span>
+              <span className="text-sm font-medium">Analytics</span>
             </div>
           </div>
         </CardContent>
