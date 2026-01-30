@@ -37,18 +37,26 @@ interface DocGridProps {
 
 const getFileIcon = (fileType: string | null) => {
   if (!fileType) return FileText;
-  if (fileType.includes('pdf')) return FileText;
-  if (fileType.includes('image')) return FileImage;
-  if (fileType.includes('spreadsheet') || fileType.includes('excel') || fileType.includes('csv')) return FileSpreadsheet;
+  const type = fileType.toLowerCase();
+  if (type.includes('pdf')) return FileText;
+  if (type.includes('image')) return FileImage;
+  if (type.includes('spreadsheet') || type.includes('excel') || type.includes('csv') || type.includes('sheet')) return FileSpreadsheet;
+  if (type.includes('word') || type.includes('document') || type.includes('msword')) return File;
+  if (type.includes('markdown') || type.includes('text')) return FileText;
   return FileText;
 };
 
 const getFileColor = (fileType: string | null) => {
   if (!fileType) return { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/20' };
-  if (fileType.includes('pdf')) return { bg: 'bg-red-500/10', text: 'text-red-600', border: 'border-red-200' };
-  if (fileType.includes('image')) return { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-200' };
-  if (fileType.includes('spreadsheet') || fileType.includes('excel') || fileType.includes('csv')) 
+  const type = fileType.toLowerCase();
+  if (type.includes('pdf')) return { bg: 'bg-red-500/10', text: 'text-red-600', border: 'border-red-200' };
+  if (type.includes('image')) return { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-200' };
+  if (type.includes('spreadsheet') || type.includes('excel') || type.includes('csv') || type.includes('sheet')) 
     return { bg: 'bg-emerald-500/10', text: 'text-emerald-600', border: 'border-emerald-200' };
+  if (type.includes('word') || type.includes('document') || type.includes('msword'))
+    return { bg: 'bg-blue-600/10', text: 'text-blue-700', border: 'border-blue-300' };
+  if (type.includes('markdown') || type.includes('text'))
+    return { bg: 'bg-slate-500/10', text: 'text-slate-600', border: 'border-slate-200' };
   return { bg: 'bg-primary/10', text: 'text-primary', border: 'border-primary/20' };
 };
 
