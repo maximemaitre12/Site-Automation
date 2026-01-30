@@ -1,6 +1,6 @@
 // ==========================================
 // Professional Workflow Node - N8N Style
-// Square cards with icon + label below
+// Exact replica of n8n design
 // ==========================================
 
 import { memo, useMemo } from 'react';
@@ -21,31 +21,31 @@ interface ProWorkflowNodeProps {
   zoom: number;
 }
 
-// N8N style node dimensions
-export const NODE_WIDTH = 100;
-export const NODE_HEIGHT = 100;
-export const NODE_TOTAL_HEIGHT = 150; // Including label below
+// N8N exact dimensions
+export const NODE_WIDTH = 80;
+export const NODE_HEIGHT = 80;
+export const NODE_TOTAL_HEIGHT = 120; // Card + label space
 
-// Category colors
-const categoryColors: Record<string, { accent: string }> = {
-  trigger: { accent: '#3b82f6' },
-  ai: { accent: '#8b5cf6' },
-  transform: { accent: '#f59e0b' },
-  control: { accent: '#64748b' },
-  integration: { accent: '#22c55e' },
-  system: { accent: '#6b7280' },
-  aether: { accent: '#10b981' },
+// Category colors matching n8n style
+const categoryColors: Record<string, { bg: string; icon: string; border: string }> = {
+  trigger: { bg: '#f0f9ff', icon: '#0ea5e9', border: '#bae6fd' },
+  ai: { bg: '#faf5ff', icon: '#a855f7', border: '#e9d5ff' },
+  transform: { bg: '#fffbeb', icon: '#f59e0b', border: '#fde68a' },
+  control: { bg: '#f0fdf4', icon: '#22c55e', border: '#bbf7d0' },
+  integration: { bg: '#fef2f2', icon: '#ef4444', border: '#fecaca' },
+  system: { bg: '#f8fafc', icon: '#64748b', border: '#e2e8f0' },
+  aether: { bg: '#ecfdf5', icon: '#10b981', border: '#a7f3d0' },
 };
 
-// Status indicators
-const statusConfig: Record<string, { ring: string; pulse: boolean }> = {
-  idle: { ring: '', pulse: false },
-  pending: { ring: 'ring-2 ring-yellow-400', pulse: true },
-  running: { ring: 'ring-2 ring-blue-400', pulse: true },
-  success: { ring: 'ring-2 ring-green-400', pulse: false },
-  error: { ring: 'ring-2 ring-red-400', pulse: false },
-  skipped: { ring: 'ring-1 ring-gray-300', pulse: false },
-  cancelled: { ring: 'ring-1 ring-orange-300', pulse: false },
+// Status ring colors
+const statusConfig: Record<string, { ring: string; animate: boolean }> = {
+  idle: { ring: '', animate: false },
+  pending: { ring: 'ring-2 ring-amber-400', animate: true },
+  running: { ring: 'ring-2 ring-blue-500', animate: true },
+  success: { ring: 'ring-2 ring-emerald-500', animate: false },
+  error: { ring: 'ring-2 ring-red-500', animate: false },
+  skipped: { ring: 'ring-1 ring-gray-300', animate: false },
+  cancelled: { ring: 'ring-1 ring-orange-400', animate: false },
 };
 
 function ProWorkflowNodeComponent({
@@ -60,7 +60,6 @@ function ProWorkflowNodeComponent({
   const colors = categoryColors[definition?.category || 'system'];
   const status = statusConfig[visualState.executionStatus] || statusConfig.idle;
 
-  // Get icon component
   const IconComponent = useMemo(() => {
     const iconName = definition?.icon || 'Box';
     return (LucideIcons as any)[iconName] || LucideIcons.Box;
@@ -82,7 +81,7 @@ function ProWorkflowNodeComponent({
     }
   };
 
-  // Micro zoom - simple colored square
+  // Micro zoom - simple dot
   if (zoomLevel === 'micro') {
     return (
       <div
@@ -98,28 +97,26 @@ function ProWorkflowNodeComponent({
       >
         <div
           className={cn(
-            "w-full rounded-2xl transition-all duration-150",
-            visualState.isSelected && "ring-2 ring-primary",
+            "w-full h-[80px] rounded-xl",
+            visualState.isSelected && "ring-2 ring-blue-500",
             visualState.isFiltered && "opacity-30"
           )}
           style={{
-            height: NODE_HEIGHT,
-            backgroundColor: colors.accent + '20',
-            border: `2px solid ${colors.accent}40`,
+            backgroundColor: colors.bg,
+            border: `1px solid ${colors.border}`,
           }}
         >
           <div className="w-full h-full flex items-center justify-center">
-            <IconComponent className="w-8 h-8" style={{ color: colors.accent }} />
+            <IconComponent className="w-6 h-6" style={{ color: colors.icon }} />
           </div>
         </div>
       </div>
     );
   }
 
-  // Normal N8N style - square card with icon, label below
   return (
     <div
-      className="absolute cursor-pointer"
+      className="absolute cursor-pointer group"
       style={{
         left: block.position.x,
         top: block.position.y,
@@ -130,63 +127,65 @@ function ProWorkflowNodeComponent({
       onDoubleClick={handleDoubleClick}
       onMouseDown={handleMouseDown}
     >
-      {/* Main card */}
+      {/* Main card - exact n8n style */}
       <div
         className={cn(
-          "relative w-full bg-white rounded-2xl transition-all duration-200",
-          "border border-gray-200 shadow-sm",
-          visualState.isSelected && "ring-2 ring-primary ring-offset-2 shadow-lg",
-          visualState.isHovered && !visualState.isSelected && "shadow-md",
+          "relative w-full h-[80px] bg-white rounded-xl transition-all duration-150",
+          "shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]",
+          "border border-gray-200/80",
+          visualState.isSelected && "ring-2 ring-blue-500 ring-offset-2 shadow-lg",
+          visualState.isHovered && !visualState.isSelected && "shadow-md border-gray-300",
           visualState.isDragging && "shadow-xl scale-105 opacity-90",
           visualState.isFiltered && "opacity-30 pointer-events-none",
           status.ring,
-          status.pulse && "animate-pulse"
+          status.animate && "animate-pulse"
         )}
-        style={{ height: NODE_HEIGHT }}
       >
         {/* Centered icon */}
         <div className="w-full h-full flex items-center justify-center">
           <IconComponent 
-            className="w-10 h-10" 
-            style={{ color: colors.accent }}
+            className="w-8 h-8" 
+            style={{ color: colors.icon }}
             strokeWidth={1.5}
           />
         </div>
 
-        {/* Left connection handle (input) */}
+        {/* Input handle - left center */}
         <div 
           className={cn(
             "absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2",
-            "w-3 h-3 rounded-full bg-white border-2 border-gray-300",
-            "transition-all hover:border-primary hover:scale-125"
+            "w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-gray-300",
+            "transition-all group-hover:border-gray-400 group-hover:scale-110"
           )}
         />
         
-        {/* Right connection handle (output) */}
+        {/* Output handle - right center */}
         <div 
           className={cn(
             "absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2",
-            "w-3 h-3 rounded-full bg-white border-2 border-gray-300",
-            "transition-all hover:border-primary hover:scale-125"
+            "w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-gray-300",
+            "transition-all group-hover:border-gray-400 group-hover:scale-110"
           )}
         />
 
-        {/* Error/warning badge */}
+        {/* Error indicator */}
         {visualState.executionStatus === 'error' && (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-            <LucideIcons.AlertTriangle className="w-3 h-3 text-white" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
+            <LucideIcons.AlertTriangle className="w-2.5 h-2.5 text-white" />
           </div>
         )}
       </div>
 
-      {/* Label below card */}
-      <div className="mt-2 text-center px-1">
-        <p className="text-sm font-medium text-foreground truncate leading-tight">
+      {/* Label below - n8n style */}
+      <div className="mt-2 text-center">
+        <p className="text-[11px] font-medium text-gray-700 truncate leading-tight px-1">
           {block.name}
         </p>
-        <p className="text-xs text-muted-foreground truncate mt-0.5">
-          {definition?.name || block.type}
-        </p>
+        {zoomLevel !== 'mini' && (
+          <p className="text-[9px] text-gray-400 truncate mt-0.5">
+            {definition?.name || block.type}
+          </p>
+        )}
       </div>
     </div>
   );
