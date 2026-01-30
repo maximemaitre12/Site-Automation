@@ -433,7 +433,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { handleReset(); onClose(); } }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-xl">
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${mode === 'modify' ? 'from-amber-500 to-orange-600' : 'from-violet-500 to-purple-600'} flex items-center justify-center`}>
@@ -449,7 +449,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex-1 overflow-y-auto py-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {step === 'input' && (
             <div className="space-y-6">
               {/* Mode tabs if we have an existing workflow */}
