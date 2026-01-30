@@ -107,17 +107,48 @@ export function DocViewerDialog({
     }
   };
 
-  const handleDownload = () => {
-    if (document.file_url) {
-      window.open(document.file_url, '_blank');
-    } else if (document.content) {
-      const blob = new Blob([document.content], { type: 'text/plain' });
+  const handleDownload = async () => {
+    if (!document.content) {
+      toast.error("Aucun contenu à télécharger");
+      return;
+    }
+
+    try {
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel } = await import('docx');
+      
+      // Parse content into paragraphs
+      const paragraphs = document.content.split('\n').filter(p => p.trim()).map(text => {
+        return new Paragraph({
+          children: [new TextRun({ text, size: 24 })],
+          spacing: { after: 200, line: 360 }
+        });
+      });
+
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            new Paragraph({
+              text: document.title,
+              heading: HeadingLevel.HEADING_1,
+              spacing: { after: 400 }
+            }),
+            ...paragraphs
+          ]
+        }]
+      });
+
+      const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = window.document.createElement('a');
       a.href = url;
-      a.download = `${document.title}.txt`;
+      a.download = `${document.title}.docx`;
       a.click();
       URL.revokeObjectURL(url);
+      toast.success("Document Word téléchargé");
+    } catch (error) {
+      console.error('Error generating Word document:', error);
+      toast.error("Erreur lors de la génération du document");
     }
   };
 
@@ -239,9 +270,9 @@ export function DocViewerDialog({
               <Button variant="outline" size="sm" onClick={handleCopyContent} title="Copier">
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </Button>
-              <Button variant="outline" size="sm" onClick={handleDownloadPDF} title="Télécharger en PDF">
-                <FileDown className="w-4 h-4 mr-1.5" />
-                <span className="hidden sm:inline">PDF</span>
+              <Button variant="outline" size="sm" onClick={handleDownload} title="Télécharger en Word">
+                <Download className="w-4 h-4 mr-1.5" />
+                <span className="hidden sm:inline">Word</span>
               </Button>
             </div>
           </div>
