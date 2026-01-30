@@ -211,13 +211,13 @@ function ProCanvasV2Component({
     }
   }, []);
 
-  // Pan handlers (left-click on canvas background or middle-click)
+  // Pan handlers (middle-click for pan, left-click for selection)
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     // Close context menu on any click
     setContextMenu({ visible: false, x: 0, y: 0 });
     
-    // Right-click: start selection rectangle
-    if (e.button === 2) {
+    // Left-click on canvas background: start selection rectangle
+    if (e.button === 0 && (e.target === svgRef.current || (e.target as Element).closest('.canvas-background'))) {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
       
@@ -230,8 +230,8 @@ function ProCanvasV2Component({
       return;
     }
     
-    // Middle-click or left-click on canvas: pan
-    if (e.button === 1 || (e.button === 0 && (e.target === svgRef.current || (e.target as Element).closest('.canvas-background')))) {
+    // Middle-click: pan
+    if (e.button === 1) {
       setIsPanning(true);
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       e.preventDefault();
