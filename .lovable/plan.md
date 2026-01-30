@@ -1,182 +1,130 @@
 
+# Plan: Refonte Complète du Dashboard - KPIs Temps Economisé
 
-## Plan : Corriger le Flux de Génération d'Images
+## Objectif
+Reconstruire entièrement le Dashboard pour fournir une mesure précise et pertinente du temps économisé grâce à AETHER, avec des calculs basés uniquement sur les données réelles de la base de données.
 
-### Diagnostic
+## Principe Fondamental: ZERO Fausses Données
+- Tous les chiffres proviennent exclusivement des tables Supabase
+- Aucune donnée mockée ou simulée
+- Si pas de données = affichage "0" avec message explicatif
 
-Le problème est dans le flux de `handleGenerateImage` (ligne 173-217 de Brain.tsx) :
+## Sources de Données Réelles
 
-```tsx
-// Ligne 184 - PROBLÈME ICI
-await sendMessage(userMsg, undefined);  // ← Ceci envoie au chat IA qui RÉPOND
+| Hook | Table | Comptage |
+|------|-------|----------|
+| `useWorkflowRuns` | `workflow_runs` | Nombre d'exécutions |
+| `useAetherDocs` | `aether_documents` | Docs avec `ai_summary` (générés) + docs avec `ai_keywords` (analysés) |
+| `useSalesProposals` | `proposals`, `call_analyses` | Propositions + appels analysés |
+| `useNegotiationSheets` | `negotiation_sheets` | Fiches créées |
+| `useSupport` | `support_tickets` | Tickets avec status "resolved" |
+| `useCompliance` | `audits` | Audits complétés |
+| `useHR` | `candidates` | Candidats avec CV analysé |
+| `useInterviews` | `candidate_interviews` | Entretiens avec `ai_report` |
+| `useBrain` | `conversations` | Conversations IA |
+
+## Estimations de Temps (Benchmark Sectoriels)
+
+| Action | Temps Manuel | Justification |
+|--------|--------------|---------------|
+| Workflow exécuté | 15 min | Automatisation de tâches répétitives |
+| Document généré IA | 45 min | Rédaction structurée complète |
+| Document analysé | 20 min | Extraction mots-clés + résumé |
+| Proposition commerciale | 60 min | Recherche + personnalisation |
+| Appel analysé | 30 min | Réécoute + synthèse |
+| Fiche négociation | 50 min | Préparation argumentaire |
+| Ticket résolu IA | 25 min | Classification + réponse |
+| Audit compliance | 120 min | Analyse réglementaire |
+| CV analysé | 35 min | Lecture + scoring |
+| Entretien analysé | 40 min | Rapport + recommandations |
+| Conversation Brain | 10 min | Recherche info + formulation |
+
+## Structure du Dashboard
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  Header: Bonjour, [Nom]    [Semaine] [Mois] [Total]     │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌─────────────────────────────┐  ┌─────────────────┐   │
+│  │  TEMPS ECONOMISE            │  │ Actions: X      │   │
+│  │  XX heures                  │  ├─────────────────┤   │
+│  │  = X.X jours de travail     │  │ Valeur: X€      │   │
+│  │  +XX min/jour en moyenne    │  └─────────────────┘   │
+│  └─────────────────────────────┘                        │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│  EVOLUTION SUR 7 JOURS                                  │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  [AreaChart avec gradient - données réelles]      │  │
+│  └───────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────┤
+│  PAR OUTIL                                              │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │ AETHER Flow      ██████████████░░ 2h30  (10)    │    │
+│  │ AETHER Doc       █████████░░░░░░░ 1h45  (7)     │    │
+│  │ Sales Copilot    ███████░░░░░░░░░ 1h20  (5)     │    │
+│  │ ...                                              │    │
+│  └─────────────────────────────────────────────────┘    │
+├─────────────────────────────────────────────────────────┤
+│  ACCES RAPIDE AUX OUTILS                                │
+│  [Flow] [Doc] [Sales] [HR] [Support] [Brain] [Compliance]│
+├─────────────────────────────────────────────────────────┤
+│  ℹ️ Méthodologie: Explication des calculs               │
+└─────────────────────────────────────────────────────────┘
 ```
 
-Quand on demande une image, le code :
-1. Appelle `sendMessage()` pour ajouter le message utilisateur → **MAIS cela déclenche une réponse IA du chat normal**
-2. Puis appelle `brain-generate-image` en parallèle
-
-L'IA de chat répond "je ne peux pas générer d'images" car elle reçoit le message.
-
----
-
-### Solution
-
-Modifier la fonction `handleGenerateImage` pour :
-1. **Ajouter le message utilisateur SANS déclencher de réponse IA** (créer une fonction `addUserMessage` dans useBrain)
-2. Attendre la génération d'image
-3. Ajouter l'image comme message assistant SANS passer par le chat IA
-
----
-
-### Fichier 1 : `src/hooks/useBrain.ts`
-
-Ajouter une nouvelle fonction `addMessageWithoutAI` qui ajoute un message à la conversation sans appeler l'IA :
+## Logique de Calcul
 
 ```typescript
-// Nouvelle fonction à ajouter après sendMessage (~ligne 277)
-const addMessageWithoutAI = useCallback(async (
-  content: string,
-  role: 'user' | 'assistant' = 'user',
-  conversationId?: string
-): Promise<Conversation | null> => {
-  if (!user || !content.trim()) return null;
-
-  try {
-    let conv = currentConversation;
-    
-    if (!conv || (conversationId && conv.id !== conversationId)) {
-      if (conversationId) {
-        conv = conversations.find(c => c.id === conversationId) || null;
-      }
-      if (!conv) {
-        conv = await createConversation(content);
-      }
-    }
-    
-    if (!conv) return null;
-
-    const newMessage: Message = {
-      id: crypto.randomUUID(),
-      role,
-      content,
-      timestamp: new Date(),
-    };
-
-    const updatedMessages = [...conv.messages, newMessage];
-    
-    // Mettre à jour en local immédiatement
-    const updatedConv = { ...conv, messages: updatedMessages };
-    setCurrentConversation(updatedConv);
-    
-    // Sauvegarder en base
-    const messagesForDb = updatedMessages.map(m => ({
-      id: m.id,
-      role: m.role,
-      content: m.content,
-      timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp
-    }));
-
-    await supabase
-      .from('conversations')
-      .update({ 
-        messages: messagesForDb,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', conv.id);
-
-    invalidateBrain();
-    return updatedConv;
-  } catch (err) {
-    console.error('Error adding message:', err);
-    return null;
-  }
-}, [user, currentConversation, conversations, invalidateBrain]);
-```
-
-Et l'exporter dans le return.
-
----
-
-### Fichier 2 : `src/pages/tools/Brain.tsx`
-
-Modifier `handleGenerateImage` pour utiliser la nouvelle fonction :
-
-**Ligne 173-217** - Remplacer par :
-
-```tsx
-const handleGenerateImage = async (prompt: string, type: 'image' | 'chart') => {
-  if (!prompt.trim()) return;
+// Filtrage par période (données réelles uniquement)
+const filterByPeriod = (data, period) => {
+  if (!data?.length) return [];
+  if (period === 'all') return data;
   
-  setGeneratingImage(true);
-  setMessage("");
+  const startDate = period === 'week' 
+    ? startOfWeek(now) 
+    : startOfMonth(now);
   
-  // Ajouter le message utilisateur SANS déclencher de réponse IA
-  const userMsg = type === 'image' 
-    ? `🎨 Génère une image: ${prompt}` 
-    : `📊 Génère un graphique: ${prompt}`;
-  
-  const conv = await addMessageWithoutAI(userMsg, 'user');  // ← Nouvelle fonction
-  if (!conv) {
-    setGeneratingImage(false);
-    return;
-  }
-  
-  try {
-    const { data, error } = await supabase.functions.invoke('brain-generate-image', {
-      body: { prompt, type }
-    });
-
-    if (error) throw error;
-
-    if (data?.imageUrl) {
-      // Ajouter l'image comme réponse assistant (sans IA)
-      const imageResponse = `[IMAGE_GENERATED]${data.imageUrl}[/IMAGE_GENERATED]${data.description || 'Image générée avec succès.'}`;
-      await addMessageWithoutAI(imageResponse, 'assistant');  // ← Pas de chat IA
-      
-      toast({
-        title: "Image générée",
-        description: type === 'chart' ? "Graphique créé avec succès" : "Image créée avec succès"
-      });
-    } else if (data?.error) {
-      // Ajouter l'erreur comme message
-      await addMessageWithoutAI(`Erreur: ${data.error}`, 'assistant');
-      toast({
-        title: "Erreur",
-        description: data.error,
-        variant: "destructive"
-      });
-    }
-  } catch (err) {
-    console.error('Image generation error:', err);
-    await addMessageWithoutAI('Désolé, une erreur est survenue lors de la génération.', 'assistant');
-    toast({
-      title: "Erreur",
-      description: "Impossible de générer l'image",
-      variant: "destructive"
-    });
-  } finally {
-    setGeneratingImage(false);
-  }
+  return data.filter(item => 
+    new Date(item.created_at) >= startDate
+  );
 };
+
+// Calcul temps par outil (basé sur comptage réel)
+const timeSavedByTool = useMemo(() => {
+  const filtered = {
+    workflows: filterByPeriod(workflowRuns),
+    docs: filterByPeriod(aetherDocs),
+    // ... autres sources
+  };
+  
+  return [
+    {
+      name: "AETHER Flow",
+      minutes: filtered.workflows.length * 15,
+      actions: filtered.workflows.length,
+    },
+    // ... autres outils
+  ].sort((a, b) => b.minutes - a.minutes);
+}, [workflowRuns, aetherDocs, /* dépendances */]);
 ```
 
-Et mettre à jour l'import de useBrain pour inclure `addMessageWithoutAI`.
+## Valeur Economisée
 
----
+```text
+Valeur = Heures × 85€/h (taux consultant moyen)
+```
 
-### Résumé des Modifications
+## Fichier Modifié
 
-| Fichier | Modification |
-|---------|--------------|
-| `src/hooks/useBrain.ts` | Ajouter fonction `addMessageWithoutAI()` |
-| `src/pages/tools/Brain.tsx` | Utiliser `addMessageWithoutAI` au lieu de `sendMessage` dans `handleGenerateImage` |
+| Fichier | Action |
+|---------|--------|
+| `src/pages/Dashboard.tsx` | Réécriture complète avec données réelles |
 
----
+## Garanties
 
-### Résultat Attendu
-
-1. Quand l'utilisateur demande une image, seul le message utilisateur est ajouté
-2. Pas de réponse du chat IA disant "je ne peux pas"
-3. L'image générée par `brain-generate-image` s'affiche correctement
-4. Temps de réponse : ~55 secondes (temps réel de génération d'image via Gemini)
-
+- Aucun `Math.random()` ou donnée simulée
+- Affichage "0" si pas de données (pas de placeholder)
+- Message explicatif si base vide
+- Tous les chiffres traçables vers les tables Supabase
