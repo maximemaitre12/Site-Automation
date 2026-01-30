@@ -19,7 +19,10 @@ import {
   Download,
   Eye,
   Sparkles,
-  Pencil
+  Pencil,
+  Star,
+  Archive,
+  ArchiveRestore
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -33,6 +36,8 @@ interface DocGridProps {
   onDeleteDocument: (docId: string) => void;
   onMoveDocument: (docId: string, folderId: string | null) => void;
   onRenameDocument: (docId: string, currentTitle: string) => void;
+  onToggleFavorite: (docId: string) => void;
+  onToggleArchive: (docId: string) => void;
 }
 
 const getFileIcon = (fileType: string | null) => {
@@ -75,7 +80,9 @@ export function DocGrid({
   onFolderClick,
   onDeleteDocument,
   onMoveDocument,
-  onRenameDocument
+  onRenameDocument,
+  onToggleFavorite,
+  onToggleArchive
 }: DocGridProps) {
   if (documents.length === 0 && folders.length === 0) {
     return (
@@ -138,7 +145,12 @@ export function DocGrid({
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{doc.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium truncate">{doc.title}</p>
+                    {doc.is_favorite && (
+                      <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500 shrink-0" />
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     {format(new Date(doc.updated_at), 'dd MMMM yyyy', { locale: fr })}
                     {doc.file_size && ` • ${formatFileSize(doc.file_size)}`}
@@ -162,6 +174,24 @@ export function DocGrid({
                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRenameDocument(doc.id, doc.title); }}>
                       <Pencil className="w-4 h-4 mr-2" />
                       Renommer
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleFavorite(doc.id); }}>
+                      <Star className={cn("w-4 h-4 mr-2", doc.is_favorite && "fill-yellow-500 text-yellow-500")} />
+                      {doc.is_favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleArchive(doc.id); }}>
+                      {doc.is_archived ? (
+                        <>
+                          <ArchiveRestore className="w-4 h-4 mr-2" />
+                          Restaurer
+                        </>
+                      ) : (
+                        <>
+                          <Archive className="w-4 h-4 mr-2" />
+                          Archiver
+                        </>
+                      )}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); onDeleteDocument(doc.id); }}>
@@ -255,6 +285,24 @@ export function DocGrid({
                       Renommer
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleFavorite(doc.id); }}>
+                      <Star className={cn("w-4 h-4 mr-2", doc.is_favorite && "fill-yellow-500 text-yellow-500")} />
+                      {doc.is_favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleArchive(doc.id); }}>
+                      {doc.is_archived ? (
+                        <>
+                          <ArchiveRestore className="w-4 h-4 mr-2" />
+                          Restaurer
+                        </>
+                      ) : (
+                        <>
+                          <Archive className="w-4 h-4 mr-2" />
+                          Archiver
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); onDeleteDocument(doc.id); }}>
                       <Trash2 className="w-4 h-4 mr-2" />
                       Supprimer
@@ -265,9 +313,14 @@ export function DocGrid({
 
               {/* Document Info */}
               <div className="px-1">
-                <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">
-                  {doc.title}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">
+                    {doc.title}
+                  </p>
+                  {doc.is_favorite && (
+                    <Star className="w-3 h-3 fill-yellow-500 text-yellow-500 shrink-0" />
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {format(new Date(doc.updated_at), 'dd MMM yyyy', { locale: fr })}
                   {doc.file_size && ` • ${formatFileSize(doc.file_size)}`}

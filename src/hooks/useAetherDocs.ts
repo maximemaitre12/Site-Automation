@@ -49,9 +49,13 @@ export interface AetherDocument {
   status: string;
   access_level: string;
   metadata: Record<string, unknown>;
+  is_favorite: boolean;
+  is_archived: boolean;
   created_at: string;
   updated_at: string;
 }
+
+export type QuickFilter = 'all' | 'recent' | 'starred' | 'archived' | string;
 
 export function useAetherDocs() {
   const { user } = useAuth();
@@ -59,7 +63,7 @@ export function useAetherDocs() {
   const [folders, setFolders] = useState<DocFolder[]>([]);
   const [templates, setTemplates] = useState<DocTemplate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+  const [currentFolder, setCurrentFolder] = useState<QuickFilter | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchFolders = useCallback(async () => {
@@ -85,8 +89,33 @@ export function useAetherDocs() {
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
 
-    if (currentFolder) {
-      query = query.eq('folder_id', currentFolder);
+    // Handle quick filters
+    if (currentFolder === 'starred') {
+      query = query.eq('is_favorite', true).eq('is_archived', false);
+    } else if (currentFolder === 'archived') {
+      query = query.eq('is_archived', true);
+    } else if (currentFolder === 'recent') {
+      // Recent = last 7 days, not archived
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      query = query.eq('is_archived', false).gte('updated_at', sevenDaysAgo.toISOString());
+    } else if (currentFolder?.startsWith('type:')) {
+      // Filter by file type
+      const fileType = currentFolder.replace('type:', '');
+      query = query.eq('is_archived', false);
+      if (fileType === 'pdf') {
+        query = query.ilike('file_type', '%pdf%');
+      } else if (fileType === 'images') {
+        query = query.ilike('file_type', '%image%');
+      } else if (fileType === 'spreadsheets') {
+        query = query.or('file_type.ilike.%sheet%,file_type.ilike.%excel%,file_type.ilike.%csv%');
+      }
+    } else if (currentFolder && currentFolder !== 'all') {
+      // It's a folder ID
+      query = query.eq('folder_id', currentFolder).eq('is_archived', false);
+    } else {
+      // Show all non-archived documents
+      query = query.eq('is_archived', false);
     }
 
     if (searchQuery) {
@@ -267,7 +296,7 @@ export function useAetherDocs() {
 
   const updateDocument = async (
     documentId: string,
-    updates: Partial<Pick<AetherDocument, 'title' | 'description' | 'content' | 'tags' | 'status' | 'folder_id'>>
+    updates: Partial<Pick<AetherDocument, 'title' | 'description' | 'content' | 'tags' | 'status' | 'folder_id' | 'is_favorite' | 'is_archived'>>
   ) => {
     const { data, error } = await supabase
       .from('aether_documents')
@@ -282,8 +311,23 @@ export function useAetherDocs() {
     }
 
     await fetchDocuments();
-    toast.success('Document mis à jour');
     return data as AetherDocument;
+  };
+
+  const toggleFavorite = async (documentId: string) => {
+    const doc = documents.find(d => d.id === documentId);
+    if (!doc) return;
+    
+    await updateDocument(documentId, { is_favorite: !doc.is_favorite });
+    toast.success(doc.is_favorite ? 'Retiré des favoris' : 'Ajouté aux favoris');
+  };
+
+  const toggleArchive = async (documentId: string) => {
+    const doc = documents.find(d => d.id === documentId);
+    if (!doc) return;
+    
+    await updateDocument(documentId, { is_archived: !doc.is_archived });
+    toast.success(doc.is_archived ? 'Document restauré' : 'Document archivé');
   };
 
   const deleteDocument = async (documentId: string) => {
@@ -505,6 +549,8 @@ export function useAetherDocs() {
     searchDocuments,
     getDocumentsByTags,
     moveDocument,
+    toggleFavorite,
+    toggleArchive,
     refreshDocuments: fetchDocuments,
     refreshFolders: fetchFolders,
     refreshTemplates: fetchTemplates
