@@ -14,9 +14,10 @@ import {
   X, ChevronRight, Settings, RefreshCw, 
   FileJson, Zap, AlertCircle, CheckCircle2,
   Eye, EyeOff, ExternalLink, Key, Shield, Download,
-  Mail, FolderOpen, Tag
+  Mail, FolderOpen, Tag, Loader2, LogOut
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useGoogleOAuth } from '@/hooks/useGoogleOAuth';
 
 interface NodePropertiesPanelProps {
   block: WorkflowBlock | null;
@@ -49,6 +50,9 @@ function NodePropertiesPanelComponent({
     new Set(['config', 'auth', 'filters', 'message', 'format', 'destinations'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
+  
+  // Google OAuth hook
+  const { status: googleOAuthStatus, loading: googleOAuthLoading, connect: connectGoogle, disconnect: disconnectGoogle } = useGoogleOAuth();
 
   if (!block) return null;
 
@@ -93,10 +97,16 @@ function NodePropertiesPanelComponent({
     });
   };
 
-  const handleOAuthConnect = (provider: string) => {
-    toast.info(`Connexion OAuth ${provider}`, {
-      description: 'La fonctionnalité OAuth sera disponible prochainement. Pour l\'instant, utilisez une clé API ou IMAP.',
-    });
+  const handleOAuthConnect = async (provider: string) => {
+    if (provider.toLowerCase() === 'google') {
+      // Determine scopes based on block type
+      const scopes = ['gmail.readonly', 'gmail.send'];
+      await connectGoogle(scopes);
+    } else {
+      toast.info(`Connexion OAuth ${provider}`, {
+        description: 'Ce fournisseur n\'est pas encore supporté.',
+      });
+    }
   };
 
   // Returns the effective config value for a key, falling back to the field defaultValue.
@@ -175,16 +185,60 @@ function NodePropertiesPanelComponent({
         );
       
       case 'oauth_button':
+        // Show connected state if Google OAuth is connected
+        if (googleOAuthStatus?.connected && googleOAuthStatus.email) {
+          return (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-green-500/10 border border-green-500/20">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-green-700">Connecté</p>
+                  <p className="text-[10px] text-green-600 truncate">{googleOAuthStatus.email}</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full h-8 gap-2 text-xs text-muted-foreground"
+                onClick={disconnectGoogle}
+                disabled={googleOAuthLoading}
+              >
+                {googleOAuthLoading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <LogOut className="w-3 h-3" />
+                )}
+                Déconnecter
+              </Button>
+            </div>
+          );
+        }
+        
+        // Show connect button
         return (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full h-9 gap-2"
-            onClick={() => handleOAuthConnect('Google')}
-          >
-            <ExternalLink className="w-4 h-4" />
-            Connecter via Google OAuth
-          </Button>
+          <div className="space-y-2">
+            {!googleOAuthStatus?.configured && (
+              <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <p className="text-[10px] text-amber-700">
+                  OAuth non configuré. Ajoutez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans Cloud → Secrets.
+                </p>
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full h-9 gap-2"
+              onClick={() => handleOAuthConnect('Google')}
+              disabled={googleOAuthLoading}
+            >
+              {googleOAuthLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ExternalLink className="w-4 h-4" />
+              )}
+              Connecter via Google OAuth
+            </Button>
+          </div>
         );
       
       case 'textarea':

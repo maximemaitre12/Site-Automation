@@ -77,3 +77,15 @@ verify_jwt = true
 
 [functions.hr-email-extract]
 verify_jwt = true
+
+[functions.google-oauth-start]
+verify_jwt = true
+
+[functions.google-oauth-callback]
+verify_jwt = false
+
+[functions.google-oauth-status]
+verify_jwt = true
+
+[functions.google-oauth-disconnect]
+verify_jwt = true
