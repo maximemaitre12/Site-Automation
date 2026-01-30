@@ -13,8 +13,9 @@ import { ProMiniMap } from './ProMiniMap';
 import { StickyNote, WorkflowGroup } from '@/types/workflow-v2';
 import { StickyNoteComponent } from '../annotations/StickyNote';
 import { GroupContainer } from '../annotations/GroupContainer';
-import { autoLayoutBlocks, applyLayoutToBlocks, snapToGrid } from '@/lib/workflow-layout';
+import { autoLayoutBlocks, applyLayoutToBlocks, snapToGrid, suggestNewBlockPosition } from '@/lib/workflow-layout';
 import { cn } from '@/lib/utils';
+import { Trash2, Copy } from 'lucide-react';
 
 // Semantic zoom levels
 type ZoomLevel = 'micro' | 'mini' | 'normal' | 'detailed';
@@ -24,6 +25,19 @@ function getZoomLevel(zoom: number): ZoomLevel {
   if (zoom < 0.7) return 'mini';
   if (zoom < 1.2) return 'normal';
   return 'detailed';
+}
+
+interface SelectionRect {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+}
+
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
 }
 
 interface ProCanvasV2Props {
@@ -90,7 +104,7 @@ function ProCanvasV2Component({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 100, y: 100 });
   const [showGrid, setShowGrid] = useState(true);
-  const [showMiniMap, setShowMiniMap] = useState(true);
+  const [showMiniMap, setShowMiniMap] = useState(false);
   const [snapEnabled, setSnapEnabled] = useState(true);
   const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const [hoveredConnectionId, setHoveredConnectionId] = useState<string | null>(null);
@@ -101,6 +115,12 @@ function ProCanvasV2Component({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  
+  // Multi-selection state
+  const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(new Set());
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionRect, setSelectionRect] = useState<SelectionRect | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({ visible: false, x: 0, y: 0 });
 
   // Semantic zoom level
   const zoomLevel = getZoomLevel(zoom);
@@ -191,17 +211,43 @@ function ProCanvasV2Component({
     }
   }, []);
 
-  // Pan handlers
+  // Pan handlers (left-click on canvas background or middle-click)
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Close context menu on any click
+    setContextMenu({ visible: false, x: 0, y: 0 });
+    
+    // Right-click: start selection rectangle
+    if (e.button === 2) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
+      const canvasX = (e.clientX - rect.left - pan.x) / zoom;
+      const canvasY = (e.clientY - rect.top - pan.y) / zoom;
+      
+      setIsSelecting(true);
+      setSelectionRect({ startX: canvasX, startY: canvasY, endX: canvasX, endY: canvasY });
+      e.preventDefault();
+      return;
+    }
+    
+    // Middle-click or left-click on canvas: pan
     if (e.button === 1 || (e.button === 0 && (e.target === svgRef.current || (e.target as Element).closest('.canvas-background')))) {
       setIsPanning(true);
       setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
       e.preventDefault();
     }
-  }, [pan]);
+  }, [pan, zoom]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (isPanning) {
+    if (isSelecting && selectionRect) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
+      const canvasX = (e.clientX - rect.left - pan.x) / zoom;
+      const canvasY = (e.clientY - rect.top - pan.y) / zoom;
+      
+      setSelectionRect(prev => prev ? { ...prev, endX: canvasX, endY: canvasY } : null);
+    } else if (isPanning) {
       setPan({
         x: e.clientX - panStart.x,
         y: e.clientY - panStart.y,
@@ -221,12 +267,92 @@ function ProCanvasV2Component({
       
       onBlockUpdate(draggingBlockId, { position: { x: newX, y: newY } });
     }
-  }, [isPanning, panStart, draggingBlockId, dragOffset, pan, zoom, snapEnabled, onBlockUpdate]);
+  }, [isSelecting, selectionRect, isPanning, panStart, draggingBlockId, dragOffset, pan, zoom, snapEnabled, onBlockUpdate]);
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    // Finish selection rectangle
+    if (isSelecting && selectionRect) {
+      const minX = Math.min(selectionRect.startX, selectionRect.endX);
+      const maxX = Math.max(selectionRect.startX, selectionRect.endX);
+      const minY = Math.min(selectionRect.startY, selectionRect.endY);
+      const maxY = Math.max(selectionRect.startY, selectionRect.endY);
+      
+      // Find blocks within selection rectangle
+      const selected = new Set<string>();
+      blocks.forEach(block => {
+        const blockRight = block.position.x + NODE_WIDTH;
+        const blockBottom = block.position.y + NODE_TOTAL_HEIGHT;
+        
+        // Check if block intersects with selection rectangle
+        if (block.position.x < maxX && blockRight > minX && 
+            block.position.y < maxY && blockBottom > minY) {
+          selected.add(block.id);
+        }
+      });
+      
+      setSelectedBlockIds(selected);
+      setIsSelecting(false);
+      setSelectionRect(null);
+    }
+    
     setIsPanning(false);
     setDraggingBlockId(null);
-  }, []);
+  }, [isSelecting, selectionRect, blocks]);
+
+  // Context menu handler (right-click on selected blocks)
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Only show context menu if there are selected blocks
+    if (selectedBlockIds.size > 0) {
+      setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
+    }
+  }, [selectedBlockIds]);
+
+  // Clear selected blocks
+  const handleClearSelection = useCallback(() => {
+    selectedBlockIds.forEach(blockId => {
+      onBlockDelete(blockId);
+    });
+    setSelectedBlockIds(new Set());
+    setContextMenu({ visible: false, x: 0, y: 0 });
+  }, [selectedBlockIds, onBlockDelete]);
+
+  // Duplicate selected blocks
+  const handleDuplicateSelection = useCallback(() => {
+    if (selectedBlockIds.size === 0) return;
+    
+    const selectedBlocks = blocks.filter(b => selectedBlockIds.has(b.id));
+    const newBlocks: WorkflowBlock[] = [];
+    const idMap = new Map<string, string>();
+    
+    // Calculate offset for duplicated blocks
+    const offsetX = 150;
+    const offsetY = 80;
+    
+    // Create new blocks
+    selectedBlocks.forEach(block => {
+      const newId = crypto.randomUUID();
+      idMap.set(block.id, newId);
+      
+      newBlocks.push({
+        ...block,
+        id: newId,
+        name: `${block.name} (copy)`,
+        position: {
+          x: block.position.x + offsetX,
+          y: block.position.y + offsetY,
+        },
+      });
+    });
+    
+    // Add new blocks
+    onBlocksChange([...blocks, ...newBlocks]);
+    
+    // Select the new blocks
+    setSelectedBlockIds(new Set(newBlocks.map(b => b.id)));
+    setContextMenu({ visible: false, x: 0, y: 0 });
+  }, [selectedBlockIds, blocks, onBlocksChange]);
 
   // Block drag
   const handleBlockDragStart = useCallback((blockId: string, e: React.MouseEvent) => {
@@ -289,6 +415,7 @@ function ProCanvasV2Component({
       onBlockSelect(null);
       setSelectedNoteId(null);
       setSelectedGroupId(null);
+      setSelectedBlockIds(new Set());
     }
   }, [onBlockSelect]);
 
@@ -344,8 +471,9 @@ function ProCanvasV2Component({
   const blockVisualStates: Record<string, BlockVisualState> = {};
   blocks.forEach(block => {
     const isFiltered = filteredBlockIds ? !filteredBlockIds.has(block.id) : false;
+    const isMultiSelected = selectedBlockIds.has(block.id);
     blockVisualStates[block.id] = {
-      isSelected: block.id === selectedBlockId,
+      isSelected: block.id === selectedBlockId || isMultiSelected,
       isHovered: block.id === hoveredBlockId,
       isDragging: block.id === draggingBlockId,
       isConnecting: false,
@@ -365,6 +493,7 @@ function ProCanvasV2Component({
       className={cn(
         "relative w-full h-full overflow-hidden bg-[#fafbfc] transition-colors duration-200",
         isPanning && "cursor-grabbing",
+        isSelecting && "cursor-crosshair",
         className
       )}
       onWheel={handleWheel}
@@ -373,6 +502,7 @@ function ProCanvasV2Component({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onClick={handleCanvasClick}
+      onContextMenu={handleContextMenu}
     >
       {/* Toolbar */}
       <ProCanvasToolbar
@@ -498,6 +628,23 @@ function ProCanvasV2Component({
             />
           ))}
         </g>
+
+        {/* Selection Rectangle */}
+        {isSelecting && selectionRect && (
+          <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+            <rect
+              x={Math.min(selectionRect.startX, selectionRect.endX)}
+              y={Math.min(selectionRect.startY, selectionRect.endY)}
+              width={Math.abs(selectionRect.endX - selectionRect.startX)}
+              height={Math.abs(selectionRect.endY - selectionRect.startY)}
+              fill="rgba(34, 197, 94, 0.1)"
+              stroke="#22c55e"
+              strokeWidth={1.5 / zoom}
+              strokeDasharray={`${4 / zoom}`}
+              rx={4 / zoom}
+            />
+          </g>
+        )}
       </svg>
 
       {/* Blocks layer (HTML for better styling) */}
@@ -575,7 +722,43 @@ function ProCanvasV2Component({
         <span>Ctrl+Scroll: Zoom</span>
         <span>•</span>
         <span>F: Fit</span>
+        <span>•</span>
+        <span>Clic droit: Sélection</span>
       </div>
+
+      {/* Context Menu */}
+      {contextMenu.visible && selectedBlockIds.size > 0 && (
+        <div
+          className="fixed z-50 bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[160px] animate-in fade-in zoom-in-95 duration-150"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={handleClearSelection}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Clear section</span>
+            <span className="ml-auto text-xs text-muted-foreground">{selectedBlockIds.size}</span>
+          </button>
+          <button
+            onClick={handleDuplicateSelection}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Copy className="w-4 h-4" />
+            <span>Duplicate</span>
+            <span className="ml-auto text-xs text-muted-foreground">{selectedBlockIds.size}</span>
+          </button>
+        </div>
+      )}
+
+      {/* Selection indicator */}
+      {selectedBlockIds.size > 0 && !contextMenu.visible && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-green-600 text-white rounded-full px-4 py-1.5 text-sm font-medium shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <span>{selectedBlockIds.size} bloc{selectedBlockIds.size > 1 ? 's' : ''} sélectionné{selectedBlockIds.size > 1 ? 's' : ''}</span>
+          <span className="text-green-200 text-xs">• Clic droit pour options</span>
+        </div>
+      )}
     </div>
   );
 }
