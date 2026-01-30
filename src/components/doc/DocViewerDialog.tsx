@@ -231,14 +231,14 @@ export function DocViewerDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[85vh] flex flex-col overflow-hidden">
-        <DialogHeader className="flex-shrink-0">
+        <DialogHeader className="flex-shrink-0 pr-8">
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3 min-w-0">
+            <div className="flex items-start gap-3 min-w-0 flex-1">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <FileText className="w-6 h-6 text-primary" />
               </div>
-              <div className="min-w-0">
-                <DialogTitle className="text-xl truncate">{document.title}</DialogTitle>
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-xl truncate pr-2">{document.title}</DialogTitle>
                 <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
@@ -248,47 +248,47 @@ export function DocViewerDialog({
                 </div>
               </div>
             </div>
-            <div className="flex gap-2 flex-shrink-0">
-              <Button variant="outline" size="sm" onClick={handleCopyContent} title="Copier">
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setShowBrandingPanel(!showBrandingPanel)} 
-                title="Charte graphique"
-              >
-                <Palette className="w-4 h-4" />
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="default" size="sm" disabled={exporting}>
-                    {exporting ? (
-                      <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-                    ) : (
-                      <Download className="w-4 h-4 mr-1.5" />
-                    )}
-                    Exporter
-                    <ChevronDown className="w-3.5 h-3.5 ml-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleDownloadWord}>
-                    <FileType className="w-4 h-4 mr-2" />
-                    Télécharger en Word (.docx)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDownloadPDF}>
-                    <FileDown className="w-4 h-4 mr-2" />
-                    Télécharger en PDF
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setShowBrandingPanel(true)}>
-                    <Palette className="w-4 h-4 mr-2" />
-                    Personnaliser la charte
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+          </div>
+          <div className="flex gap-2 mt-3">
+            <Button variant="outline" size="sm" onClick={handleCopyContent} title="Copier">
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowBrandingPanel(!showBrandingPanel)} 
+              title="Charte graphique"
+            >
+              <Palette className="w-4 h-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="default" size="sm" disabled={exporting}>
+                  {exporting ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-1.5" />
+                  )}
+                  Exporter
+                  <ChevronDown className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-background border shadow-lg z-50">
+                <DropdownMenuItem onClick={handleDownloadWord}>
+                  <FileType className="w-4 h-4 mr-2" />
+                  Télécharger en Word (.docx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDownloadPDF}>
+                  <FileDown className="w-4 h-4 mr-2" />
+                  Télécharger en PDF
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowBrandingPanel(true)}>
+                  <Palette className="w-4 h-4 mr-2" />
+                  Personnaliser la charte
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </DialogHeader>
 
