@@ -67,7 +67,6 @@ export default function Flow() {
   const [history, setHistory] = useState<HistoryState[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const isUndoRedoAction = useRef(false);
-  const lastSavedState = useRef<string>('');
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
@@ -87,13 +86,11 @@ export default function Flow() {
       const initialState = { blocks: JSON.parse(JSON.stringify(blocks)), connections: JSON.parse(JSON.stringify(connections)) };
       setHistory([initialState]);
       setHistoryIndex(0);
-      lastSavedState.current = JSON.stringify(initialState);
     } else {
       setLocalBlocks([]);
       setLocalConnections([]);
       setHistory([]);
       setHistoryIndex(-1);
-      lastSavedState.current = '';
     }
     setSelectedBlockId(null);
   }, [selectedWorkflowId, selectedWorkflow?.id]);
@@ -108,12 +105,12 @@ export default function Flow() {
     
     const currentState = JSON.stringify({ blocks: localBlocks, connections: localConnections });
     
-    // Don't push if state matches last saved state
-    if (currentState === lastSavedState.current) return;
-    
-    lastSavedState.current = currentState;
+    // Don't push if state is identical to the current history entry
+    if (history[historyIndex] && currentState === JSON.stringify(history[historyIndex])) {
+      return;
+    }
 
-    // Push new state
+    // Push new state, truncating any redo history
     setHistory(prev => {
       const truncated = prev.slice(0, historyIndex + 1);
       const newEntry = { 
@@ -126,35 +123,37 @@ export default function Flow() {
       return newHistory;
     });
     setHistoryIndex(prev => Math.min(prev + 1, 29));
-  }, [localBlocks, localConnections, selectedWorkflowId, historyIndex]);
+  }, [localBlocks, localConnections, selectedWorkflowId]);
 
-  const handleUndo = () => {
-    if (!canUndo) return;
-    isUndoRedoAction.current = true;
-    const prevState = history[historyIndex - 1];
+  const handleUndo = useCallback(() => {
+    if (historyIndex <= 0 || history.length === 0) return;
+    
+    const prevIndex = historyIndex - 1;
+    const prevState = history[prevIndex];
     if (prevState) {
+      isUndoRedoAction.current = true;
       setLocalBlocks(JSON.parse(JSON.stringify(prevState.blocks)));
       setLocalConnections(JSON.parse(JSON.stringify(prevState.connections)));
-      lastSavedState.current = JSON.stringify(prevState);
-      setHistoryIndex(historyIndex - 1);
+      setHistoryIndex(prevIndex);
       setHasUnsavedChanges(true);
       toast.info('Action annulée');
     }
-  };
+  }, [history, historyIndex]);
 
-  const handleRedo = () => {
-    if (!canRedo) return;
-    isUndoRedoAction.current = true;
-    const nextState = history[historyIndex + 1];
+  const handleRedo = useCallback(() => {
+    if (historyIndex >= history.length - 1) return;
+    
+    const nextIndex = historyIndex + 1;
+    const nextState = history[nextIndex];
     if (nextState) {
+      isUndoRedoAction.current = true;
       setLocalBlocks(JSON.parse(JSON.stringify(nextState.blocks)));
       setLocalConnections(JSON.parse(JSON.stringify(nextState.connections)));
-      lastSavedState.current = JSON.stringify(nextState);
-      setHistoryIndex(historyIndex + 1);
+      setHistoryIndex(nextIndex);
       setHasUnsavedChanges(true);
       toast.info('Action rétablie');
     }
-  };
+  }, [history, historyIndex]);
 
   const handleCreateWorkflow = async () => {
     if (!newWorkflowName.trim()) {
