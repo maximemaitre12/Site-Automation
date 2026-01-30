@@ -1,5 +1,5 @@
-import { memo, useState } from 'react';
-import { WorkflowBlock, BLOCK_DEFINITIONS, ExecutionStatus } from '@/types/workflow';
+import { memo, useState, useMemo } from 'react';
+import { WorkflowBlock, BLOCK_DEFINITIONS, ExecutionStatus, ConfigField } from '@/types/workflow';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { cn } from '@/lib/utils';
 import * as LucideIcons from 'lucide-react';
 import { 
-  X, ChevronRight, Settings, Link2, RefreshCw, 
-  Clock, FileJson, History, Zap, AlertCircle, CheckCircle2
+  X, ChevronRight, Settings, RefreshCw, 
+  FileJson, Zap, AlertCircle, CheckCircle2,
+  Eye, EyeOff, ExternalLink, Key, Shield, Download,
+  Mail, FolderOpen, Tag
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface NodePropertiesPanelProps {
   block: WorkflowBlock | null;
@@ -23,6 +26,18 @@ interface NodePropertiesPanelProps {
   onClose: () => void;
 }
 
+// Section labels for better UX
+const SECTION_LABELS: Record<string, { label: string; icon: typeof Settings }> = {
+  auth: { label: 'Authentification', icon: Key },
+  filters: { label: 'Filtres', icon: Settings },
+  message: { label: 'Message', icon: Mail },
+  reply: { label: 'Réponse', icon: Mail },
+  search: { label: 'Recherche', icon: Settings },
+  format: { label: 'Format', icon: FileJson },
+  destinations: { label: 'Destinations', icon: FolderOpen },
+  advanced: { label: 'Options avancées', icon: Settings },
+};
+
 function NodePropertiesPanelComponent({
   block,
   executionStatus = 'idle',
@@ -31,8 +46,9 @@ function NodePropertiesPanelComponent({
   onClose,
 }: NodePropertiesPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['config', 'retry'])
+    new Set(['config', 'auth', 'filters', 'message', 'format', 'destinations'])
   );
+  const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
 
   if (!block) return null;
 
@@ -53,6 +69,18 @@ function NodePropertiesPanelComponent({
     });
   };
 
+  const togglePasswordVisibility = (key: string) => {
+    setShowPasswords((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
   const handleConfigChange = (key: string, value: any) => {
     onUpdate(block.id, {
       config: { ...block.config, [key]: value },
@@ -64,6 +92,256 @@ function NodePropertiesPanelComponent({
       retryConfig: { ...block.retryConfig, enabled: true, maxRetries: 3, backoffMs: 1000, ...updates },
     });
   };
+
+  const handleOAuthConnect = (provider: string) => {
+    toast.info(`Connexion OAuth ${provider}`, {
+      description: 'La fonctionnalité OAuth sera disponible prochainement. Pour l\'instant, utilisez une clé API ou IMAP.',
+    });
+  };
+
+  // Check if field should be visible based on showWhen condition
+  const isFieldVisible = (field: ConfigField): boolean => {
+    if (!field.showWhen) return true;
+    const conditionValue = block.config[field.showWhen.field];
+    return conditionValue === field.showWhen.value;
+  };
+
+  // Group fields by section
+  const fieldsBySection = useMemo(() => {
+    const sections: Record<string, ConfigField[]> = { default: [] };
+    
+    definition?.configFields.forEach((field) => {
+      if (!isFieldVisible(field)) return;
+      
+      const sectionKey = field.section || 'default';
+      if (!sections[sectionKey]) {
+        sections[sectionKey] = [];
+      }
+      sections[sectionKey].push(field);
+    });
+    
+    return sections;
+  }, [definition?.configFields, block.config]);
+
+  const renderField = (field: ConfigField) => {
+    const value = block.config[field.key];
+    const defaultVal = field.defaultValue;
+
+    switch (field.type) {
+      case 'text':
+        return (
+          <Input
+            value={value || ''}
+            onChange={(e) => handleConfigChange(field.key, e.target.value)}
+            placeholder={field.placeholder}
+            className="h-8 text-sm"
+          />
+        );
+      
+      case 'password':
+        return (
+          <div className="relative">
+            <Input
+              type={showPasswords.has(field.key) ? 'text' : 'password'}
+              value={value || ''}
+              onChange={(e) => handleConfigChange(field.key, e.target.value)}
+              placeholder={field.placeholder || '••••••••'}
+              className="h-8 text-sm pr-10"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-8 w-8 p-0"
+              onClick={() => togglePasswordVisibility(field.key)}
+            >
+              {showPasswords.has(field.key) ? (
+                <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
+              ) : (
+                <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+              )}
+            </Button>
+          </div>
+        );
+      
+      case 'oauth_button':
+        return (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full h-9 gap-2"
+            onClick={() => handleOAuthConnect('Google')}
+          >
+            <ExternalLink className="w-4 h-4" />
+            Connecter via Google OAuth
+          </Button>
+        );
+      
+      case 'textarea':
+        return (
+          <Textarea
+            value={value || ''}
+            onChange={(e) => handleConfigChange(field.key, e.target.value)}
+            placeholder={field.placeholder}
+            className="text-sm min-h-[80px]"
+          />
+        );
+      
+      case 'number':
+        return (
+          <Input
+            type="number"
+            value={value ?? defaultVal ?? ''}
+            onChange={(e) => handleConfigChange(field.key, Number(e.target.value))}
+            placeholder={field.placeholder}
+            className="h-8 text-sm"
+          />
+        );
+      
+      case 'boolean':
+        return (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">
+              {value ?? defaultVal ? 'Activé' : 'Désactivé'}
+            </span>
+            <Switch
+              checked={value ?? defaultVal ?? false}
+              onCheckedChange={(checked) => handleConfigChange(field.key, checked)}
+            />
+          </div>
+        );
+      
+      case 'select':
+        return (
+          <Select
+            value={value || defaultVal}
+            onValueChange={(val) => handleConfigChange(field.key, val)}
+          >
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue placeholder="Sélectionner..." />
+            </SelectTrigger>
+            <SelectContent>
+              {field.options?.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {formatOptionLabel(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      
+      case 'json':
+        return (
+          <Textarea
+            value={typeof value === 'string' ? value : JSON.stringify(value || {}, null, 2)}
+            onChange={(e) => {
+              try {
+                const parsed = JSON.parse(e.target.value);
+                handleConfigChange(field.key, parsed);
+              } catch {
+                handleConfigChange(field.key, e.target.value);
+              }
+            }}
+            placeholder={field.placeholder}
+            className="text-sm min-h-[60px] font-mono text-xs"
+          />
+        );
+      
+      default:
+        return (
+          <Input
+            value={value || ''}
+            onChange={(e) => handleConfigChange(field.key, e.target.value)}
+            placeholder={field.placeholder}
+            className="h-8 text-sm"
+          />
+        );
+    }
+  };
+
+  const formatOptionLabel = (option: string): string => {
+    const labels: Record<string, string> = {
+      'oauth_google': '🔐 Google OAuth (recommandé)',
+      'api_key': '🔑 Clé API',
+      'imap': '📬 IMAP (tout fournisseur)',
+      'smtp': '📤 SMTP (tout fournisseur)',
+      'service_account': '🤖 Service Account',
+      'pdf': '📄 PDF',
+      'docx': '📝 Word (.docx)',
+      'xlsx': '📊 Excel (.xlsx)',
+      'csv': '📋 CSV',
+      'json': '🔧 JSON',
+      'txt': '📃 Texte brut',
+      'html': '🌐 HTML',
+      'md': '📝 Markdown',
+    };
+    return labels[option] || option;
+  };
+
+  const renderSection = (sectionKey: string, fields: ConfigField[]) => {
+    if (fields.length === 0) return null;
+    
+    const sectionInfo = SECTION_LABELS[sectionKey];
+    const SectionIcon = sectionInfo?.icon || Settings;
+    
+    if (sectionKey === 'default') {
+      // Render fields without section grouping
+      return fields.map((field) => (
+        <div key={field.key} className="space-y-1.5">
+          <Label className="text-xs font-medium flex items-center gap-1">
+            {field.label}
+            {field.required && <span className="text-red-500">*</span>}
+          </Label>
+          {renderField(field)}
+          {field.helpText && (
+            <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
+          )}
+        </div>
+      ));
+    }
+
+    return (
+      <Collapsible
+        key={sectionKey}
+        open={expandedSections.has(sectionKey)}
+        onOpenChange={() => toggleSection(sectionKey)}
+      >
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-secondary/50 transition-colors">
+          <div className="flex items-center gap-2">
+            <SectionIcon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium">{sectionInfo?.label || sectionKey}</span>
+            <span className="text-xs text-muted-foreground">({fields.length})</span>
+          </div>
+          <ChevronRight className={cn(
+            "w-4 h-4 text-muted-foreground transition-transform",
+            expandedSections.has(sectionKey) && "rotate-90"
+          )} />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="p-3 space-y-4 border-l-2 border-muted ml-2">
+            {fields.map((field) => (
+              <div key={field.key} className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1">
+                  {field.label}
+                  {field.required && <span className="text-red-500">*</span>}
+                </Label>
+                {renderField(field)}
+                {field.helpText && (
+                  <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  };
+
+  // Get ordered sections (auth first, then others, default last)
+  const orderedSections = useMemo(() => {
+    const order = ['auth', 'filters', 'message', 'reply', 'search', 'format', 'destinations', 'advanced', 'default'];
+    return order.filter(s => fieldsBySection[s]?.length > 0);
+  }, [fieldsBySection]);
 
   return (
     <div className="w-80 h-full border-l border-border bg-card flex flex-col">
@@ -113,101 +391,23 @@ function NodePropertiesPanelComponent({
             <span>Action réelle - Affecte les données en production</span>
           </div>
         )}
+        
+        {/* Auth required indicator */}
+        {definition?.requiresAuth && (
+          <div className="flex items-center gap-2 p-2 mt-2 rounded-lg bg-blue-500/10 text-blue-600 text-xs">
+            <Shield className="w-3.5 h-3.5" />
+            <span>Authentification requise</span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <ScrollArea className="flex-1">
         <div className="p-3 space-y-2">
-          {/* Configuration Section */}
-          <Collapsible
-            open={expandedSections.has('config')}
-            onOpenChange={() => toggleSection('config')}
-          >
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-secondary/50 transition-colors">
-              <div className="flex items-center gap-2">
-                <Settings className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Configuration</span>
-              </div>
-              <ChevronRight className={cn(
-                "w-4 h-4 text-muted-foreground transition-transform",
-                expandedSections.has('config') && "rotate-90"
-              )} />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="p-3 space-y-4">
-                {definition?.configFields.map((field) => (
-                  <div key={field.key} className="space-y-1.5">
-                    <Label className="text-xs font-medium">
-                      {field.label}
-                      {field.required && <span className="text-red-500 ml-0.5">*</span>}
-                    </Label>
-                    
-                    {field.type === 'text' && (
-                      <Input
-                        value={block.config[field.key] || ''}
-                        onChange={(e) => handleConfigChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        className="h-8 text-sm"
-                      />
-                    )}
-                    
-                    {field.type === 'textarea' && (
-                      <Textarea
-                        value={block.config[field.key] || ''}
-                        onChange={(e) => handleConfigChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        className="text-sm min-h-[80px]"
-                      />
-                    )}
-                    
-                    {field.type === 'number' && (
-                      <Input
-                        type="number"
-                        value={block.config[field.key] || field.defaultValue || ''}
-                        onChange={(e) => handleConfigChange(field.key, Number(e.target.value))}
-                        placeholder={field.placeholder}
-                        className="h-8 text-sm"
-                      />
-                    )}
-                    
-                    {field.type === 'boolean' && (
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={block.config[field.key] ?? field.defaultValue ?? false}
-                          onCheckedChange={(checked) => handleConfigChange(field.key, checked)}
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {block.config[field.key] ? 'Activé' : 'Désactivé'}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {field.type === 'select' && field.options && (
-                      <Select
-                        value={block.config[field.key] || field.defaultValue}
-                        onValueChange={(value) => handleConfigChange(field.key, value)}
-                      >
-                        <SelectTrigger className="h-8 text-sm">
-                          <SelectValue placeholder="Sélectionner..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {field.options.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    
-                    {field.helpText && (
-                      <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          {/* Render sections in order */}
+          {orderedSections.map(sectionKey => 
+            renderSection(sectionKey, fieldsBySection[sectionKey])
+          )}
 
           {/* Retry & Timeout Section */}
           <Collapsible

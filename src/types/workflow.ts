@@ -142,6 +142,7 @@ export type BlockType =
   | 'system_email'
   | 'system_webhook'
   | 'system_save'
+  | 'system_download'
   | 'system_notify'
   | 'system_log';
 
@@ -270,12 +271,14 @@ export interface BlockDefinition {
 export interface ConfigField {
   key: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'number' | 'boolean' | 'json' | 'code' | 'keyvalue';
+  type: 'text' | 'textarea' | 'select' | 'number' | 'boolean' | 'json' | 'code' | 'keyvalue' | 'password' | 'oauth_button' | 'file_formats';
   options?: string[];
   placeholder?: string;
   defaultValue?: any;
   required?: boolean;
   helpText?: string;
+  showWhen?: { field: string; value: any }; // Conditional display
+  section?: string; // Group fields into sections
 }
 
 // ==========================================
@@ -360,17 +363,33 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     subCategory: 'gmail',
     color: 'from-red-500 to-red-400',
     icon: 'Inbox',
-    description: 'Lire les emails de la boîte Gmail (OAuth requis)',
+    description: 'Lire les emails de la boîte Gmail (connectez votre compte)',
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key', 'service_account'], defaultValue: 'oauth', helpText: 'OAuth recommandé pour Gmail' },
-      { key: 'clientId', label: 'Client ID (OAuth)', type: 'text', placeholder: 'Votre Google Client ID' },
-      { key: 'clientSecret', label: 'Client Secret (OAuth)', type: 'text', placeholder: '***' },
-      { key: 'refreshToken', label: 'Refresh Token', type: 'text', placeholder: 'Token de rafraîchissement OAuth' },
-      { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com' },
-      { key: 'maxResults', label: 'Nombre max', type: 'number', defaultValue: 10 },
-      { key: 'includeAttachments', label: 'Inclure pièces jointes', type: 'boolean', defaultValue: false }
+      // Section: Authentification
+      { key: 'authMethod', label: 'Méthode de connexion', type: 'select', options: ['oauth_google', 'api_key', 'imap'], defaultValue: 'oauth_google', helpText: 'OAuth Google recommandé pour Gmail, API Key pour accès programmatique, IMAP pour tout fournisseur', section: 'auth' },
+      // OAuth Google fields
+      { key: 'connectOAuth', label: 'Connecter compte Google', type: 'oauth_button', helpText: 'Cliquez pour autoriser l\'accès à votre compte Gmail', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleClientId', label: 'Client ID Google', type: 'text', placeholder: 'Votre Client ID Google Cloud', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleClientSecret', label: 'Client Secret', type: 'password', placeholder: '***', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleRefreshToken', label: 'Refresh Token', type: 'password', placeholder: 'Token obtenu après autorisation OAuth', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleAccessToken', label: 'Access Token (optionnel)', type: 'password', placeholder: 'Laissez vide pour utiliser le refresh token', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      // API Key fields
+      { key: 'apiKey', label: 'Clé API Gmail', type: 'password', placeholder: 'Votre clé API Google', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      { key: 'apiKeyEmail', label: 'Adresse email associée', type: 'text', placeholder: 'email@gmail.com', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      // IMAP fields (pour n'importe quel fournisseur)
+      { key: 'imapHost', label: 'Serveur IMAP', type: 'text', placeholder: 'imap.gmail.com', defaultValue: 'imap.gmail.com', section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      { key: 'imapPort', label: 'Port IMAP', type: 'number', defaultValue: 993, section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      { key: 'imapEmail', label: 'Email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      { key: 'imapPassword', label: 'Mot de passe / App Password', type: 'password', placeholder: 'Utilisez un mot de passe d\'application', required: true, helpText: 'Pour Gmail, créez un "App Password" dans les paramètres Google', section: 'auth', showWhen: { field: 'authMethod', value: 'imap' } },
+      // Section: Filtres de lecture
+      { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com', section: 'filters' },
+      { key: 'folder', label: 'Dossier', type: 'select', options: ['INBOX', 'SENT', 'DRAFTS', 'SPAM', 'TRASH', 'ALL'], defaultValue: 'INBOX', section: 'filters' },
+      { key: 'maxResults', label: 'Nombre max d\'emails', type: 'number', defaultValue: 10, section: 'filters' },
+      { key: 'unreadOnly', label: 'Non lus uniquement', type: 'boolean', defaultValue: true, section: 'filters' },
+      { key: 'includeAttachments', label: 'Inclure pièces jointes', type: 'boolean', defaultValue: false, section: 'filters' },
+      { key: 'markAsRead', label: 'Marquer comme lu après lecture', type: 'boolean', defaultValue: true, section: 'filters' }
     ]
   },
   gmail_send: {
@@ -379,19 +398,29 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     subCategory: 'gmail',
     color: 'from-red-500 to-orange-400',
     icon: 'Send',
-    description: 'Envoyer un email via Gmail (OAuth requis)',
+    description: 'Envoyer un email via Gmail ou autre fournisseur',
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key', 'service_account'], defaultValue: 'oauth' },
-      { key: 'clientId', label: 'Client ID (OAuth)', type: 'text', placeholder: 'Votre Google Client ID' },
-      { key: 'clientSecret', label: 'Client Secret (OAuth)', type: 'text', placeholder: '***' },
-      { key: 'refreshToken', label: 'Refresh Token', type: 'text', placeholder: 'Token de rafraîchissement OAuth' },
-      { key: 'to', label: 'Destinataire', type: 'text', placeholder: 'recipient@email.com', required: true },
-      { key: 'cc', label: 'CC', type: 'text', placeholder: 'cc@email.com' },
-      { key: 'subject', label: 'Objet', type: 'text', required: true },
-      { key: 'body', label: 'Corps du message', type: 'textarea', required: true },
-      { key: 'isHtml', label: 'Format HTML', type: 'boolean', defaultValue: false }
+      // Section: Authentification
+      { key: 'authMethod', label: 'Méthode de connexion', type: 'select', options: ['oauth_google', 'api_key', 'smtp'], defaultValue: 'oauth_google', section: 'auth' },
+      { key: 'connectOAuth', label: 'Connecter compte Google', type: 'oauth_button', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleClientId', label: 'Client ID Google', type: 'text', placeholder: 'Votre Client ID', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleClientSecret', label: 'Client Secret', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleRefreshToken', label: 'Refresh Token', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'apiKey', label: 'Clé API', type: 'password', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      { key: 'smtpHost', label: 'Serveur SMTP', type: 'text', placeholder: 'smtp.gmail.com', defaultValue: 'smtp.gmail.com', section: 'auth', showWhen: { field: 'authMethod', value: 'smtp' } },
+      { key: 'smtpPort', label: 'Port SMTP', type: 'number', defaultValue: 587, section: 'auth', showWhen: { field: 'authMethod', value: 'smtp' } },
+      { key: 'smtpEmail', label: 'Email', type: 'text', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'smtp' } },
+      { key: 'smtpPassword', label: 'Mot de passe / App Password', type: 'password', required: true, section: 'auth', showWhen: { field: 'authMethod', value: 'smtp' } },
+      // Section: Message
+      { key: 'to', label: 'Destinataire(s)', type: 'text', placeholder: 'email@example.com, autre@example.com', required: true, section: 'message' },
+      { key: 'cc', label: 'CC', type: 'text', placeholder: 'cc@email.com', section: 'message' },
+      { key: 'bcc', label: 'BCC', type: 'text', placeholder: 'bcc@email.com', section: 'message' },
+      { key: 'subject', label: 'Objet', type: 'text', required: true, section: 'message' },
+      { key: 'body', label: 'Corps du message', type: 'textarea', required: true, section: 'message' },
+      { key: 'isHtml', label: 'Format HTML', type: 'boolean', defaultValue: false, section: 'message' },
+      { key: 'attachFromPrevious', label: 'Joindre fichiers du bloc précédent', type: 'boolean', defaultValue: false, section: 'message' }
     ]
   },
   gmail_reply: {
@@ -404,11 +433,14 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key'], defaultValue: 'oauth' },
-      { key: 'refreshToken', label: 'Refresh Token', type: 'text', placeholder: 'Token OAuth' },
-      { key: 'messageId', label: 'ID du message', type: 'text', placeholder: 'ID de l\'email auquel répondre', required: true },
-      { key: 'body', label: 'Réponse', type: 'textarea', required: true },
-      { key: 'replyAll', label: 'Répondre à tous', type: 'boolean', defaultValue: false }
+      { key: 'authMethod', label: 'Méthode de connexion', type: 'select', options: ['oauth_google', 'api_key'], defaultValue: 'oauth_google', section: 'auth' },
+      { key: 'connectOAuth', label: 'Connecter compte Google', type: 'oauth_button', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleRefreshToken', label: 'Refresh Token', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'apiKey', label: 'Clé API', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      { key: 'messageId', label: 'ID du message (auto si précédent)', type: 'text', placeholder: 'Laissez vide pour répondre au dernier email lu', section: 'reply' },
+      { key: 'body', label: 'Réponse', type: 'textarea', required: true, section: 'reply' },
+      { key: 'replyAll', label: 'Répondre à tous', type: 'boolean', defaultValue: false, section: 'reply' },
+      { key: 'includeQuote', label: 'Inclure message original', type: 'boolean', defaultValue: true, section: 'reply' }
     ]
   },
   gmail_label: {
@@ -421,8 +453,9 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key'], defaultValue: 'oauth' },
-      { key: 'refreshToken', label: 'Refresh Token', type: 'text' },
+      { key: 'authMethod', label: 'Méthode', type: 'select', options: ['oauth_google', 'api_key'], defaultValue: 'oauth_google', section: 'auth' },
+      { key: 'googleRefreshToken', label: 'Refresh Token', type: 'password', section: 'auth' },
+      { key: 'apiKey', label: 'Clé API', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
       { key: 'messageId', label: 'ID du message', type: 'text', required: true },
       { key: 'addLabels', label: 'Ajouter libellés', type: 'text', placeholder: 'IMPORTANT, STARRED' },
       { key: 'removeLabels', label: 'Retirer libellés', type: 'text', placeholder: 'UNREAD, INBOX' }
@@ -438,12 +471,15 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      { key: 'authMethod', label: 'Méthode d\'authentification', type: 'select', options: ['oauth', 'api_key'], defaultValue: 'oauth' },
-      { key: 'refreshToken', label: 'Refresh Token', type: 'text' },
-      { key: 'query', label: 'Requête Gmail', type: 'text', placeholder: 'has:attachment larger:5M', required: true },
-      { key: 'maxResults', label: 'Résultats max', type: 'number', defaultValue: 20 },
-      { key: 'dateFrom', label: 'Date début', type: 'text', placeholder: '2024/01/01' },
-      { key: 'dateTo', label: 'Date fin', type: 'text', placeholder: '2024/12/31' }
+      { key: 'authMethod', label: 'Méthode', type: 'select', options: ['oauth_google', 'api_key'], defaultValue: 'oauth_google', section: 'auth' },
+      { key: 'connectOAuth', label: 'Connecter Google', type: 'oauth_button', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'googleRefreshToken', label: 'Refresh Token', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'oauth_google' } },
+      { key: 'apiKey', label: 'Clé API', type: 'password', section: 'auth', showWhen: { field: 'authMethod', value: 'api_key' } },
+      { key: 'query', label: 'Requête Gmail', type: 'text', placeholder: 'has:attachment larger:5M from:boss@company.com', required: true, section: 'search' },
+      { key: 'maxResults', label: 'Résultats max', type: 'number', defaultValue: 20, section: 'search' },
+      { key: 'dateFrom', label: 'Date début', type: 'text', placeholder: '2024/01/01', section: 'search' },
+      { key: 'dateTo', label: 'Date fin', type: 'text', placeholder: '2024/12/31', section: 'search' },
+      { key: 'includeBody', label: 'Inclure le corps des emails', type: 'boolean', defaultValue: true, section: 'search' }
     ]
   },
 
@@ -1967,6 +2003,31 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
       { key: 'table', label: 'Table Name', type: 'text', required: true },
       { key: 'operation', label: 'Operation', type: 'select', options: ['insert', 'upsert', 'update'] },
       { key: 'conflictColumn', label: 'Conflict Column (for upsert)', type: 'text' }
+    ]
+  },
+  system_download: {
+    name: 'Télécharger / Exporter',
+    category: 'system',
+    color: 'from-blue-500 to-cyan-400',
+    icon: 'Download',
+    description: 'Télécharger les résultats dans différents formats',
+    isRealAction: true,
+    configFields: [
+      // Section: Format de téléchargement
+      { key: 'format', label: 'Format de fichier', type: 'select', options: ['pdf', 'docx', 'xlsx', 'csv', 'json', 'txt', 'html', 'md'], defaultValue: 'pdf', helpText: 'Choisissez le format de sortie', section: 'format' },
+      { key: 'filename', label: 'Nom du fichier', type: 'text', placeholder: 'document_{{date}}', helpText: 'Utilisez {{date}}, {{timestamp}} pour des noms dynamiques', section: 'format' },
+      { key: 'includeMetadata', label: 'Inclure métadonnées', type: 'boolean', defaultValue: true, helpText: 'Ajoute la date, source, et autres infos au document', section: 'format' },
+      // Section: Destinations
+      { key: 'saveToAether', label: '💾 Sauvegarder dans Aether', type: 'boolean', defaultValue: true, helpText: 'Enregistre automatiquement dans AETHER Doc (recommandé)', section: 'destinations' },
+      { key: 'aetherFolder', label: 'Dossier Aether', type: 'text', placeholder: 'Workflows / Exports', helpText: 'Dossier de destination dans AETHER Doc', section: 'destinations', showWhen: { field: 'saveToAether', value: true } },
+      { key: 'aetherTags', label: 'Tags Aether', type: 'text', placeholder: 'workflow, auto-généré', section: 'destinations', showWhen: { field: 'saveToAether', value: true } },
+      { key: 'downloadBrowser', label: '📥 Télécharger dans le navigateur', type: 'boolean', defaultValue: true, helpText: 'Déclenche un téléchargement direct', section: 'destinations' },
+      { key: 'sendByEmail', label: '📧 Envoyer par email', type: 'boolean', defaultValue: false, section: 'destinations' },
+      { key: 'emailTo', label: 'Destinataire email', type: 'text', placeholder: 'email@example.com', section: 'destinations', showWhen: { field: 'sendByEmail', value: true } },
+      // Section: Options avancées
+      { key: 'compression', label: 'Compresser (ZIP)', type: 'boolean', defaultValue: false, helpText: 'Compresse le fichier en ZIP', section: 'advanced' },
+      { key: 'password', label: 'Mot de passe (PDF/ZIP)', type: 'password', placeholder: 'Optionnel', section: 'advanced' },
+      { key: 'watermark', label: 'Filigrane', type: 'text', placeholder: 'CONFIDENTIEL', section: 'advanced' }
     ]
   },
   system_notify: {
