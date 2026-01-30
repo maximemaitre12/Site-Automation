@@ -114,25 +114,273 @@ export function DocViewerDialog({
     }
 
     try {
-      const { Document, Packer, Paragraph, TextRun, HeadingLevel } = await import('docx');
+      const { 
+        Document, 
+        Packer, 
+        Paragraph, 
+        TextRun, 
+        HeadingLevel, 
+        AlignmentType,
+        Header,
+        Footer,
+        PageNumber,
+        NumberFormat,
+        convertInchesToTwip,
+        BorderStyle
+      } = await import('docx');
       
-      // Parse content into paragraphs
-      const paragraphs = document.content.split('\n').filter(p => p.trim()).map(text => {
-        return new Paragraph({
-          children: [new TextRun({ text, size: 24 })],
-          spacing: { after: 200, line: 360 }
-        });
+      // Clean content: remove markdown artifacts and AI markers
+      const cleanContent = (text: string): string => {
+        return text
+          .replace(/^#+\s*/gm, '') // Remove markdown headers
+          .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markers
+          .replace(/\*([^*]+)\*/g, '$1') // Remove italic markers
+          .replace(/^[-*]\s+/gm, '• ') // Convert markdown lists to bullets
+          .replace(/^\d+\.\s+/gm, (match, offset, string) => match) // Keep numbered lists
+          .replace(/\[([^\]]+)\]/g, '$1') // Remove brackets
+          .replace(/---+/g, '') // Remove horizontal rules
+          .replace(/`([^`]+)`/g, '$1') // Remove code markers
+          .trim();
+      };
+
+      // Detect if line is a section header (all caps, short, or ends with colon)
+      const isHeader = (text: string): boolean => {
+        const cleaned = text.trim();
+        if (cleaned.length > 60) return false;
+        if (cleaned === cleaned.toUpperCase() && cleaned.length > 3) return true;
+        if (cleaned.endsWith(':') && cleaned.length < 50) return true;
+        return false;
+      };
+
+      // Detect if line is a bullet point
+      const isBulletPoint = (text: string): boolean => {
+        return /^[•\-\*]\s/.test(text.trim()) || /^\d+\.\s/.test(text.trim());
+      };
+
+      // Parse content into professionally formatted paragraphs
+      const lines = document.content.split('\n');
+      const paragraphs: any[] = [];
+      
+      lines.forEach((line, index) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          // Add spacing paragraph for empty lines
+          paragraphs.push(new Paragraph({ spacing: { after: 120 } }));
+          return;
+        }
+
+        const cleaned = cleanContent(trimmed);
+        if (!cleaned) return;
+
+        if (isHeader(cleaned)) {
+          // Section header styling
+          paragraphs.push(new Paragraph({
+            children: [
+              new TextRun({ 
+                text: cleaned.replace(/:$/, ''),
+                bold: true, 
+                size: 26, // 13pt
+                font: "Calibri",
+                color: "2B579A"
+              })
+            ],
+            spacing: { before: 360, after: 160 },
+            border: {
+              bottom: {
+                color: "2B579A",
+                space: 4,
+                style: BorderStyle.SINGLE,
+                size: 6
+              }
+            }
+          }));
+        } else if (isBulletPoint(cleaned)) {
+          // Bullet point styling
+          const bulletText = cleaned.replace(/^[•\-\*]\s*/, '').replace(/^\d+\.\s*/, '');
+          paragraphs.push(new Paragraph({
+            children: [
+              new TextRun({ 
+                text: "  •  ",
+                font: "Calibri",
+                size: 22
+              }),
+              new TextRun({ 
+                text: bulletText,
+                font: "Calibri",
+                size: 22 // 11pt
+              })
+            ],
+            spacing: { after: 80, line: 276 }, // 1.15 line spacing
+            indent: { left: convertInchesToTwip(0.25) }
+          }));
+        } else {
+          // Regular paragraph styling
+          paragraphs.push(new Paragraph({
+            children: [
+              new TextRun({ 
+                text: cleaned,
+                font: "Calibri",
+                size: 22 // 11pt
+              })
+            ],
+            spacing: { after: 160, line: 276 }, // 1.15 line spacing
+            alignment: AlignmentType.JUSTIFIED
+          }));
+        }
       });
 
+      // Create professional document
       const doc = new Document({
+        creator: "AETHER",
+        title: document.title,
+        description: "Document généré par AETHER",
+        styles: {
+          default: {
+            heading1: {
+              run: {
+                font: "Calibri Light",
+                size: 52, // 26pt
+                bold: true,
+                color: "1F4E79"
+              },
+              paragraph: {
+                spacing: { after: 320, before: 0 }
+              }
+            },
+            heading2: {
+              run: {
+                font: "Calibri",
+                size: 28,
+                bold: true,
+                color: "2B579A"
+              },
+              paragraph: {
+                spacing: { after: 200, before: 280 }
+              }
+            }
+          }
+        },
         sections: [{
-          properties: {},
+          properties: {
+            page: {
+              margin: {
+                top: convertInchesToTwip(1),
+                right: convertInchesToTwip(1),
+                bottom: convertInchesToTwip(1),
+                left: convertInchesToTwip(1.25)
+              }
+            }
+          },
+          headers: {
+            default: new Header({
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: document.title,
+                      font: "Calibri",
+                      size: 18,
+                      color: "808080",
+                      italics: true
+                    })
+                  ],
+                  alignment: AlignmentType.RIGHT,
+                  border: {
+                    bottom: {
+                      color: "CCCCCC",
+                      space: 4,
+                      style: BorderStyle.SINGLE,
+                      size: 4
+                    }
+                  },
+                  spacing: { after: 200 }
+                })
+              ]
+            })
+          },
+          footers: {
+            default: new Footer({
+              children: [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: "Page ",
+                      font: "Calibri",
+                      size: 18,
+                      color: "808080"
+                    }),
+                    new TextRun({
+                      children: [PageNumber.CURRENT],
+                      font: "Calibri",
+                      size: 18,
+                      color: "808080"
+                    }),
+                    new TextRun({
+                      text: " sur ",
+                      font: "Calibri",
+                      size: 18,
+                      color: "808080"
+                    }),
+                    new TextRun({
+                      children: [PageNumber.TOTAL_PAGES],
+                      font: "Calibri",
+                      size: 18,
+                      color: "808080"
+                    })
+                  ],
+                  alignment: AlignmentType.CENTER,
+                  border: {
+                    top: {
+                      color: "CCCCCC",
+                      space: 4,
+                      style: BorderStyle.SINGLE,
+                      size: 4
+                    }
+                  },
+                  spacing: { before: 200 }
+                })
+              ]
+            })
+          },
           children: [
+            // Document title
             new Paragraph({
-              text: document.title,
-              heading: HeadingLevel.HEADING_1,
-              spacing: { after: 400 }
+              children: [
+                new TextRun({ 
+                  text: document.title,
+                  font: "Calibri Light",
+                  size: 56, // 28pt
+                  bold: true,
+                  color: "1F4E79"
+                })
+              ],
+              spacing: { after: 120 },
+              alignment: AlignmentType.LEFT
             }),
+            // Date line
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: format(new Date(document.created_at), "d MMMM yyyy", { locale: fr }),
+                  font: "Calibri",
+                  size: 20,
+                  color: "666666",
+                  italics: true
+                })
+              ],
+              spacing: { after: 400 },
+              border: {
+                bottom: {
+                  color: "1F4E79",
+                  space: 8,
+                  style: BorderStyle.SINGLE,
+                  size: 12
+                }
+              }
+            }),
+            // Spacer
+            new Paragraph({ spacing: { after: 200 } }),
+            // Content paragraphs
             ...paragraphs
           ]
         }]
