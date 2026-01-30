@@ -254,15 +254,100 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
     let output: any;
 
     switch (block.type) {
-      // ===== TRIGGERS =====
+      // ===== TRIGGERS - Real Data Capture =====
       case 'trigger_text':
       case 'trigger_file':
-      case 'trigger_webhook':
       case 'trigger_form':
       case 'trigger_schedule':
-      case 'trigger_email':
+        // These triggers pass through their input data
         output = context.input;
         break;
+
+      case 'trigger_webhook': {
+        // Webhook trigger - input comes from external webhook call
+        // The workflow is triggered by POST to /workflow-stream-events with webhook payload
+        const webhookData = context.input;
+        output = {
+          type: 'webhook',
+          timestamp: new Date().toISOString(),
+          payload: webhookData,
+          headers: webhookData?._headers || {},
+          source: webhookData?._source || 'external'
+        };
+        break;
+      }
+
+      case 'trigger_email': {
+        // Email trigger - captures email data from input or fetches from HR emails
+        const userId = context.variables?._userId;
+        
+        if (context.input && typeof context.input === 'object' && context.input.subject) {
+          // Email already provided in input
+          output = {
+            type: 'email',
+            ...context.input,
+            timestamp: new Date().toISOString()
+          };
+        } else if (userId) {
+          // Fetch latest unprocessed email from hr_emails table
+          try {
+            const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+            const { data: emails, error } = await supabase
+              .from('hr_emails')
+              .select('*')
+              .eq('user_id', userId)
+              .eq('is_read', false)
+              .order('received_at', { ascending: false })
+              .limit(1);
+
+            if (error) throw error;
+            
+            if (emails && emails.length > 0) {
+              const email = emails[0];
+              output = {
+                type: 'email',
+                id: email.id,
+                subject: email.subject,
+                from: email.from_address,
+                to: email.to_address,
+                body: email.body,
+                receivedAt: email.received_at,
+                hasAttachments: email.has_attachments,
+                attachments: email.attachments,
+                extracted: email.extracted_data,
+                timestamp: new Date().toISOString()
+              };
+              
+              // Mark as read
+              await supabase
+                .from('hr_emails')
+                .update({ is_read: true })
+                .eq('id', email.id);
+            } else {
+              output = {
+                type: 'email',
+                empty: true,
+                message: 'No unread emails found',
+                timestamp: new Date().toISOString()
+              };
+            }
+          } catch (e) {
+            output = {
+              type: 'email',
+              error: e instanceof Error ? e.message : 'Failed to fetch emails',
+              timestamp: new Date().toISOString()
+            };
+          }
+        } else {
+          output = {
+            type: 'email',
+            empty: true,
+            message: 'No email data provided and no user context',
+            timestamp: new Date().toISOString()
+          };
+        }
+        break;
+      }
 
       // ===== AI ACTIONS =====
       case 'ai_summary': {
@@ -1963,17 +2048,211 @@ Only output JSON, no other text.`;
         break;
       }
 
-      // ===== Gmail blocks =====
-      case 'gmail_read':
-      case 'gmail_send':
-      case 'gmail_reply':
-      case 'gmail_label':
+      // ===== Gmail blocks - Real Email Operations =====
+      case 'gmail_read': {
+        const userId = context.variables?._userId;
+        if (!userId) {
+          output = { success: false, error: 'User ID required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const limit = block.config?.limit || 10;
+          const unreadOnly = block.config?.unreadOnly !== false;
+          
+          let query = supabase
+            .from('hr_emails')
+            .select('*')
+            .eq('user_id', userId)
+            .order('received_at', { ascending: false })
+            .limit(limit);
+          
+          if (unreadOnly) {
+            query = query.eq('is_read', false);
+          }
+
+          const { data: emails, error } = await query;
+          if (error) throw error;
+
+          output = {
+            success: true,
+            emails: emails?.map(e => ({
+              id: e.id,
+              subject: e.subject,
+              from: e.from_address,
+              to: e.to_address,
+              body: e.body,
+              receivedAt: e.received_at,
+              isRead: e.is_read,
+              extracted: e.extracted_data
+            })) || [],
+            count: emails?.length || 0
+          };
+        } catch (e) {
+          output = { success: false, error: e instanceof Error ? e.message : 'Failed to read emails' };
+        }
+        break;
+      }
+
+      case 'gmail_send': {
+        const to = block.config?.to;
+        const subject = block.config?.subject || 'Notification from AETHER';
+        const body = block.config?.body || inputText;
+        const userId = context.variables?._userId;
+
+        if (!userId || !to) {
+          output = { sent: false, error: 'User ID and recipient required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          // Use hr-email-send edge function if available
+          const { data, error } = await supabase.functions.invoke('hr-email-send', {
+            body: { to, subject, body, userId }
+          });
+
+          if (error) {
+            // Fallback: store in outbox for manual send
+            await supabase.from('hr_emails').insert({
+              user_id: userId,
+              subject,
+              to_address: to,
+              body,
+              direction: 'outbound',
+              status: 'pending'
+            });
+            output = { sent: false, queued: true, message: 'Email queued for sending' };
+          } else {
+            output = { sent: true, ...data };
+          }
+        } catch (e) {
+          output = { sent: false, error: e instanceof Error ? e.message : 'Failed to send email' };
+        }
+        break;
+      }
+
+      case 'gmail_reply': {
+        const emailId = block.config?.emailId || context.input?.id;
+        const body = block.config?.body || inputText;
+        const userId = context.variables?._userId;
+
+        if (!userId || !emailId) {
+          output = { replied: false, error: 'User ID and email ID required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          // Get original email
+          const { data: original, error: fetchError } = await supabase
+            .from('hr_emails')
+            .select('*')
+            .eq('id', emailId)
+            .eq('user_id', userId)
+            .single();
+
+          if (fetchError || !original) {
+            output = { replied: false, error: 'Original email not found' };
+            break;
+          }
+
+          // Create reply
+          const replySubject = original.subject?.startsWith('Re:') 
+            ? original.subject 
+            : `Re: ${original.subject}`;
+
+          const { data, error } = await supabase.functions.invoke('hr-email-send', {
+            body: {
+              to: original.from_address,
+              subject: replySubject,
+              body,
+              replyToId: emailId,
+              userId
+            }
+          });
+
+          output = { replied: !error, originalId: emailId, ...data };
+        } catch (e) {
+          output = { replied: false, error: e instanceof Error ? e.message : 'Failed to reply' };
+        }
+        break;
+      }
+
+      case 'gmail_label': {
+        const emailId = block.config?.emailId || context.input?.id;
+        const label = block.config?.label || 'processed';
+        const userId = context.variables?._userId;
+
+        if (!userId || !emailId) {
+          output = { labeled: false, error: 'User ID and email ID required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          // Get current labels and append new one
+          const { data: emailData } = await supabase
+            .from('hr_emails')
+            .select('labels')
+            .eq('id', emailId)
+            .eq('user_id', userId)
+            .single();
+
+          const currentLabels = emailData?.labels || [];
+          const newLabels = [...new Set([...currentLabels, label])];
+
+          const { error } = await supabase
+            .from('hr_emails')
+            .update({ 
+              labels: newLabels,
+              is_read: true 
+            })
+            .eq('id', emailId)
+            .eq('user_id', userId);
+
+          output = { labeled: !error, emailId, label };
+        } catch (e) {
+          output = { labeled: false, error: e instanceof Error ? e.message : 'Failed to label' };
+        }
+        break;
+      }
+
       case 'gmail_search': {
-        output = { 
-          success: false, 
-          error: 'Gmail requires OAuth integration. Configure in Settings > Integrations',
-          requiresSetup: true
-        };
+        const query = block.config?.query || '';
+        const userId = context.variables?._userId;
+
+        if (!userId) {
+          output = { results: [], error: 'User ID required' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          const { data: emails, error } = await supabase
+            .from('hr_emails')
+            .select('*')
+            .eq('user_id', userId)
+            .or(`subject.ilike.%${query}%,body.ilike.%${query}%,from_address.ilike.%${query}%`)
+            .order('received_at', { ascending: false })
+            .limit(20);
+
+          if (error) throw error;
+
+          output = {
+            success: true,
+            results: emails || [],
+            count: emails?.length || 0,
+            query
+          };
+        } catch (e) {
+          output = { results: [], error: e instanceof Error ? e.message : 'Search failed' };
+        }
         break;
       }
 
