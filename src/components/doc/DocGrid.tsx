@@ -18,7 +18,8 @@ import {
   Trash2,
   Download,
   Eye,
-  Sparkles
+  Sparkles,
+  Pencil
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -31,6 +32,7 @@ interface DocGridProps {
   onFolderClick: (folder: DocFolder) => void;
   onDeleteDocument: (docId: string) => void;
   onMoveDocument: (docId: string, folderId: string | null) => void;
+  onRenameDocument: (docId: string, currentTitle: string) => void;
 }
 
 const getFileIcon = (fileType: string | null) => {
@@ -64,7 +66,8 @@ export function DocGrid({
   onDocumentClick,
   onFolderClick,
   onDeleteDocument,
-  onMoveDocument
+  onMoveDocument,
+  onRenameDocument
 }: DocGridProps) {
   if (documents.length === 0 && folders.length === 0) {
     return (
@@ -139,7 +142,7 @@ export function DocGrid({
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="bg-background border shadow-lg z-50">
                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDocumentClick(doc); }}>
                       <Eye className="w-4 h-4 mr-2" />
                       Voir
@@ -147,6 +150,10 @@ export function DocGrid({
                     <DropdownMenuItem>
                       <Download className="w-4 h-4 mr-2" />
                       Télécharger
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRenameDocument(doc.id, doc.title); }}>
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Renommer
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); onDeleteDocument(doc.id); }}>
@@ -226,7 +233,7 @@ export function DocGrid({
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
+                  <DropdownMenuContent align="start" className="bg-background border shadow-lg z-50">
                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDocumentClick(doc); }}>
                       <Eye className="w-4 h-4 mr-2" />
                       Voir
@@ -234,6 +241,10 @@ export function DocGrid({
                     <DropdownMenuItem>
                       <Download className="w-4 h-4 mr-2" />
                       Télécharger
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRenameDocument(doc.id, doc.title); }}>
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Renommer
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); onDeleteDocument(doc.id); }}>
