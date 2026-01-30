@@ -350,20 +350,27 @@ function ProCanvasV2Component({
 
   // Clear selected blocks
   const handleClearSelection = useCallback(() => {
-    selectedBlockIds.forEach(blockId => {
+    const idsToDelete = Array.from(selectedBlockIds);
+    // Clear state first to avoid stale closure issues
+    setSelectedBlockIds(new Set());
+    setSelectionRect(null);
+    setContextMenu({ visible: false, x: 0, y: 0 });
+    // Then delete blocks
+    idsToDelete.forEach(blockId => {
       onBlockDelete(blockId);
     });
-    setSelectedBlockIds(new Set());
-    setContextMenu({ visible: false, x: 0, y: 0 });
   }, [selectedBlockIds, onBlockDelete]);
 
   // Duplicate selected blocks
   const handleDuplicateSelection = useCallback(() => {
     if (selectedBlockIds.size === 0) return;
     
-    const selectedBlocks = blocks.filter(b => selectedBlockIds.has(b.id));
+    const currentSelectedIds = Array.from(selectedBlockIds);
+    const selectedBlocks = blocks.filter(b => currentSelectedIds.includes(b.id));
+    
+    if (selectedBlocks.length === 0) return;
+    
     const newBlocks: WorkflowBlock[] = [];
-    const idMap = new Map<string, string>();
     
     // Calculate offset for duplicated blocks
     const offsetX = 150;
@@ -372,7 +379,6 @@ function ProCanvasV2Component({
     // Create new blocks
     selectedBlocks.forEach(block => {
       const newId = crypto.randomUUID();
-      idMap.set(block.id, newId);
       
       newBlocks.push({
         ...block,
@@ -385,12 +391,15 @@ function ProCanvasV2Component({
       });
     });
     
+    // Close menu and update selection first
+    setContextMenu({ visible: false, x: 0, y: 0 });
+    setSelectionRect(null);
+    
     // Add new blocks
     onBlocksChange([...blocks, ...newBlocks]);
     
     // Select the new blocks
     setSelectedBlockIds(new Set(newBlocks.map(b => b.id)));
-    setContextMenu({ visible: false, x: 0, y: 0 });
   }, [selectedBlockIds, blocks, onBlocksChange]);
 
   // Block drag
@@ -798,22 +807,29 @@ function ProCanvasV2Component({
         <div
           className="fixed z-50 bg-white rounded-xl shadow-xl border border-gray-200 py-1 min-w-[160px] animate-in fade-in zoom-in-95 duration-150"
           style={{ left: contextMenu.x, top: contextMenu.y }}
+          onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={handleClearSelection}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClearSelection();
+            }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
-            <span>Clear section</span>
+            <span>Supprimer</span>
             <span className="ml-auto text-xs text-muted-foreground">{selectedBlockIds.size}</span>
           </button>
           <button
-            onClick={handleDuplicateSelection}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDuplicateSelection();
+            }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <Copy className="w-4 h-4" />
-            <span>Duplicate</span>
+            <span>Dupliquer</span>
             <span className="ml-auto text-xs text-muted-foreground">{selectedBlockIds.size}</span>
           </button>
         </div>
