@@ -233,7 +233,7 @@ export default function DocPage() {
             )}
 
             {/* Main content */}
-            <div className="flex-1 flex flex-col min-w-0 md:pl-6">
+            <div className="flex-1 flex flex-col min-w-0 md:pl-6 min-h-0">
               <DocHeader
                 breadcrumbs={breadcrumbs}
                 searchQuery={searchQuery}
@@ -245,15 +245,17 @@ export default function DocPage() {
                 onBreadcrumbClick={(id) => setCurrentFolder(id)}
               />
 
-              <DocGrid
-                documents={filteredDocuments}
-                folders={folders.filter(f => f.parent_id === currentFolder)}
-                viewMode={viewMode}
-                onDocumentClick={handleDocumentClick}
-                onFolderClick={(folder) => setCurrentFolder(folder.id)}
-                onDeleteDocument={deleteDocument}
-                onMoveDocument={moveDocument}
-              />
+              <div className="flex-1 min-h-0 flex flex-col">
+                <DocGrid
+                  documents={filteredDocuments}
+                  folders={folders.filter(f => f.parent_id === currentFolder)}
+                  viewMode={viewMode}
+                  onDocumentClick={handleDocumentClick}
+                  onFolderClick={(folder) => setCurrentFolder(folder.id)}
+                  onDeleteDocument={deleteDocument}
+                  onMoveDocument={moveDocument}
+                />
+              </div>
             </div>
           </div>
         </div>
