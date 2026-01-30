@@ -66,6 +66,7 @@ export default function DocPage() {
   const [activeCategory, setActiveCategory] = useState<DocCategory>('all');
   const [renameDocId, setRenameDocId] = useState<string | null>(null);
   const [renameTitle, setRenameTitle] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
 
   // Filter documents by category
   const filteredDocuments = useMemo(() => {
@@ -156,10 +157,16 @@ export default function DocPage() {
   };
 
   const handleRenameSubmit = async () => {
-    if (renameDocId && renameTitle.trim()) {
-      await updateDocument(renameDocId, { title: renameTitle.trim() });
+    if (renameDocId && renameTitle.trim() && !isRenaming) {
+      setIsRenaming(true);
+      // Fermer immédiatement pour une UX réactive
+      const docId = renameDocId;
+      const newTitle = renameTitle.trim();
       setRenameDocId(null);
       setRenameTitle('');
+      
+      await updateDocument(docId, { title: newTitle });
+      setIsRenaming(false);
     }
   };
 
