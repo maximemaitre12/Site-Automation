@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Database, FolderSearch, Shield, Search, Sparkles, TrendingUp, AlertTriangle, CheckCircle, Building2 } from 'lucide-react';
+import { Database, FolderSearch, Shield, Search, Sparkles, Building2 } from 'lucide-react';
 import DataSources from '@/components/data/DataSources';
 import DataCatalog from '@/components/data/DataCatalog';
 import DataGovernance from '@/components/data/DataGovernance';
@@ -43,55 +43,6 @@ const Data = () => {
                 </p>
               </div>
             </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-agent-data/30 transition-all hover:shadow-lg hover:shadow-agent-data/5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-agent-data/10 flex items-center justify-center">
-                    <Database className="w-5 h-5 text-agent-data" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">24</p>
-                    <p className="text-xs text-muted-foreground">Datasets</p>
-                  </div>
-                </div>
-              </div>
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-success/30 transition-all hover:shadow-lg hover:shadow-success/5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-success" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">94%</p>
-                    <p className="text-xs text-muted-foreground">Qualité</p>
-                  </div>
-                </div>
-              </div>
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-warning/30 transition-all hover:shadow-lg hover:shadow-warning/5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-warning" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">3</p>
-                    <p className="text-xs text-muted-foreground">Alertes</p>
-                  </div>
-                </div>
-              </div>
-              <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">1.2M</p>
-                    <p className="text-xs text-muted-foreground">Lignes</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Tabs */}
             <AgentTabs 
               tabs={tabs} 
