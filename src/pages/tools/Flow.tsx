@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,9 +14,10 @@ import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
 import { TemplateGallery } from '@/components/flow/TemplateGallery';
 import { BlockPickerDialog } from '@/components/flow/BlockPickerDialog';
 import { AIAutomationRules } from '@/components/flow/AIAutomationRules';
+import { autoLayoutBlocks, applyLayoutToBlocks, suggestNewBlockPosition } from '@/lib/workflow-layout';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
-  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2, Bot
+  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2, Bot, LayoutGrid
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -205,17 +206,12 @@ export default function Flow() {
     if (!selectedWorkflowId) return;
     const def = BLOCK_DEFINITIONS[type];
     
-    // Find the rightmost block to position new block horizontally
-    const sourceBlock = selectedBlockId 
-      ? localBlocks.find(b => b.id === selectedBlockId)
-      : localBlocks.length > 0 
-        ? localBlocks.reduce((last, b) => b.position.x > last.position.x ? b : last, localBlocks[0])
-        : null;
+    // Use intelligent position suggestion based on graph structure
+    const sourceBlockId = selectedBlockId || (localBlocks.length > 0 
+      ? localBlocks.reduce((last, b) => b.position.x > last.position.x ? b : last, localBlocks[0]).id
+      : undefined);
     
-    // Position new block to the RIGHT of source block (HORIZONTAL LAYOUT)
-    const newPosition = sourceBlock 
-      ? { x: sourceBlock.position.x + 280, y: sourceBlock.position.y }
-      : { x: 100, y: 200 };
+    const newPosition = suggestNewBlockPosition(localBlocks, localConnections, sourceBlockId);
     
     const newBlock: WorkflowBlock = {
       id: crypto.randomUUID(),
@@ -225,21 +221,36 @@ export default function Flow() {
       position: newPosition
     };
     
-    setLocalBlocks(prev => [...prev, newBlock]);
+    // Prepare new connection if there's a source
+    const newConnection: BlockConnection | null = sourceBlockId ? {
+      id: crypto.randomUUID(),
+      sourceBlockId,
+      targetBlockId: newBlock.id
+    } : null;
     
-    // Auto-connect from source block if exists
-    if (sourceBlock) {
-      const newConnection: BlockConnection = {
-        id: crypto.randomUUID(),
-        sourceBlockId: sourceBlock.id,
-        targetBlockId: newBlock.id
-      };
-      setLocalConnections(prev => [...prev, newConnection]);
-    }
+    // Add block and connection
+    const updatedBlocks = [...localBlocks, newBlock];
+    const updatedConnections = newConnection 
+      ? [...localConnections, newConnection] 
+      : localConnections;
     
+    setLocalBlocks(updatedBlocks);
+    setLocalConnections(updatedConnections);
     setHasUnsavedChanges(true);
     setSelectedBlockId(newBlock.id);
   };
+
+  // Auto-layout function - reorganize all blocks algorithmically
+  const handleAutoLayout = useCallback(() => {
+    if (localBlocks.length === 0) return;
+    
+    const layout = autoLayoutBlocks(localBlocks, localConnections);
+    const repositionedBlocks = applyLayoutToBlocks(localBlocks, layout);
+    
+    setLocalBlocks(repositionedBlocks);
+    setHasUnsavedChanges(true);
+    toast.success('Layout optimisé automatiquement');
+  }, [localBlocks, localConnections]);
 
   const handleUpdateBlock = (blockId: string, updates: Partial<WorkflowBlock>) => {
     setLocalBlocks(prev => prev.map(b => b.id === blockId ? { ...b, ...updates } : b));
@@ -267,11 +278,15 @@ export default function Flow() {
   const handleDuplicateBlock = (blockId: string) => {
     const block = localBlocks.find(b => b.id === blockId);
     if (!block) return;
+    
+    // Position duplicate to the right with slight Y offset
+    const newPosition = suggestNewBlockPosition(localBlocks, localConnections, blockId);
+    
     const newBlock: WorkflowBlock = {
       ...block,
       id: crypto.randomUUID(),
       name: `${block.name} (copy)`,
-      position: { x: block.position.x + 60, y: block.position.y + 80 }
+      position: { x: newPosition.x, y: newPosition.y + 40 }
     };
     setLocalBlocks(prev => [...prev, newBlock]);
     setHasUnsavedChanges(true);
@@ -470,8 +485,22 @@ export default function Flow() {
                       <h2 className="font-semibold text-foreground truncate px-4">{selectedWorkflow.name}</h2>
                     </div>
                     
-                    {/* Right side: AI, Add Block, Execute */}
+                    {/* Right side: Auto-layout, AI, Add Block, Execute */}
                     <div className="flex items-center gap-1 md:gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={handleAutoLayout}
+                            disabled={localBlocks.length < 2}
+                            className="gap-1 h-7 md:h-8 px-2 text-xs"
+                          >
+                            <LayoutGrid className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Auto-layout (réorganiser)</TooltipContent>
+                      </Tooltip>
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -515,6 +544,7 @@ export default function Flow() {
                       canUndo={canUndo}
                       canRedo={canRedo}
                       hasUnsavedChanges={hasUnsavedChanges}
+                      onAutoLayout={handleAutoLayout}
                     />
                   </div>
                 </div>
