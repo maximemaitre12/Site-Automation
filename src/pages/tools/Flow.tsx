@@ -489,8 +489,8 @@ export default function Flow() {
                   </div>
                   
                   {/* Pro Canvas V2 - N8N Style */}
-                  <div className="flex-1 flex overflow-hidden workflow-canvas-area" style={{ minHeight: '500px' }}>
-                    <div className="flex-1 overflow-hidden">
+                  <div className="flex-1 flex overflow-hidden min-h-0 workflow-canvas-area" style={{ minHeight: '500px' }}>
+                    <div className="flex-1 overflow-hidden min-h-0">
                       <ProCanvasV2
                         blocks={localBlocks}
                         connections={localConnections}
