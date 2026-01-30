@@ -1,6 +1,5 @@
 import { memo, useMemo } from 'react';
 import { BlockConnection, ExecutionStatus } from '@/types/workflow';
-import { calculateConnectionPath, DEFAULT_CANVAS_CONFIG } from '@/lib/workflow-layout';
 import { cn } from '@/lib/utils';
 
 interface AnimatedEdgeProps {
@@ -14,15 +13,42 @@ interface AnimatedEdgeProps {
   onClick?: (connectionId: string) => void;
 }
 
-const statusColors: Record<ExecutionStatus, string> = {
-  idle: 'stroke-muted-foreground/40',
-  pending: 'stroke-yellow-500',
-  running: 'stroke-blue-500',
-  success: 'stroke-green-500',
-  error: 'stroke-red-500',
-  skipped: 'stroke-muted-foreground/30',
-  cancelled: 'stroke-orange-500',
+// Professional node dimensions
+const NODE_WIDTH = 240;
+const NODE_HEIGHT = 100;
+
+const statusColors: Record<ExecutionStatus, { stroke: string; glow: string }> = {
+  idle: { stroke: '#6b7280', glow: 'none' },
+  pending: { stroke: '#eab308', glow: 'drop-shadow(0 0 4px #eab30880)' },
+  running: { stroke: '#3b82f6', glow: 'drop-shadow(0 0 8px #3b82f680)' },
+  success: { stroke: '#22c55e', glow: 'drop-shadow(0 0 6px #22c55e80)' },
+  error: { stroke: '#ef4444', glow: 'drop-shadow(0 0 6px #ef444480)' },
+  skipped: { stroke: '#9ca3af', glow: 'none' },
+  cancelled: { stroke: '#f97316', glow: 'drop-shadow(0 0 4px #f9731680)' },
 };
+
+function calculatePath(
+  source: { x: number; y: number },
+  target: { x: number; y: number }
+): string {
+  // Source exits from right side, target enters from left side
+  const sourceX = source.x + NODE_WIDTH;
+  const sourceY = source.y + NODE_HEIGHT / 2;
+  const targetX = target.x;
+  const targetY = target.y + NODE_HEIGHT / 2;
+
+  // Calculate control point offset based on distance
+  const deltaX = targetX - sourceX;
+  const cpOffset = Math.max(80, Math.min(150, Math.abs(deltaX) * 0.4));
+
+  // Bézier curve with pronounced curves
+  const cp1x = sourceX + cpOffset;
+  const cp1y = sourceY;
+  const cp2x = targetX - cpOffset;
+  const cp2y = targetY;
+
+  return `M ${sourceX} ${sourceY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
+}
 
 function AnimatedEdgeComponent({
   connection,
@@ -35,148 +61,164 @@ function AnimatedEdgeComponent({
   onClick,
 }: AnimatedEdgeProps) {
   const path = useMemo(() => {
-    return calculateConnectionPath(
-      sourcePosition,
-      targetPosition,
-      DEFAULT_CANVAS_CONFIG.nodeWidth,
-      DEFAULT_CANVAS_CONFIG.nodeHeight,
-      'horizontal'
-    );
+    return calculatePath(sourcePosition, targetPosition);
   }, [sourcePosition, targetPosition]);
 
-  const strokeColor = statusColors[status] || statusColors.idle;
+  const colorConfig = statusColors[status] || statusColors.idle;
   const shouldAnimate = animated || status === 'running';
+  const isActive = status !== 'idle' && status !== 'skipped';
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClick?.(connection.id);
   };
 
+  // Calculate arrow position and angle
+  const targetX = targetPosition.x;
+  const targetY = targetPosition.y + NODE_HEIGHT / 2;
+  const cp2x = targetX - 80;
+  const cp2y = targetY;
+  const angle = Math.atan2(targetY - cp2y, targetX - cp2x) * (180 / Math.PI);
+
   return (
-    <g className="workflow-edge group">
-      {/* Invisible wider path for easier selection */}
+    <g className="workflow-edge group" style={{ filter: isActive ? colorConfig.glow : 'none' }}>
+      {/* Invisible wider path for easier clicking */}
       <path
         d={path}
         fill="none"
         stroke="transparent"
-        strokeWidth={20}
+        strokeWidth={24}
         className="cursor-pointer"
         onClick={handleClick}
       />
       
-      {/* Background path (shadow effect) */}
-      <path
-        d={path}
-        fill="none"
-        strokeWidth={4}
-        className={cn(
-          "transition-all duration-200",
-          isSelected ? "stroke-primary/30" : "stroke-transparent",
-          isHovered && !isSelected && "stroke-muted-foreground/20"
-        )}
-      />
-
-      {/* Main path */}
-      <path
-        d={path}
-        fill="none"
-        strokeWidth={2}
-        strokeLinecap="round"
-        className={cn(
-          "transition-all duration-200",
-          strokeColor,
-          isSelected && "stroke-primary !stroke-[3px]",
-          isHovered && !isSelected && "stroke-muted-foreground",
-          "group-hover:stroke-muted-foreground/70"
-        )}
-      />
-
-      {/* Animated flow indicator */}
-      {shouldAnimate && (
-        <circle r="4" fill="currentColor" className="text-blue-500">
-          <animateMotion
-            dur="1s"
-            repeatCount="indefinite"
-            path={path}
-          />
-        </circle>
+      {/* Shadow/glow layer for selected/hovered */}
+      {(isSelected || isHovered) && (
+        <path
+          d={path}
+          fill="none"
+          stroke={isSelected ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))'}
+          strokeWidth={6}
+          strokeLinecap="round"
+          opacity={0.3}
+        />
       )}
 
-      {/* Success particle animation */}
-      {status === 'success' && (
+      {/* Main path - thicker stroke */}
+      <path
+        d={path}
+        fill="none"
+        stroke={isSelected ? 'hsl(var(--primary))' : colorConfig.stroke}
+        strokeWidth={3}
+        strokeLinecap="round"
+        className={cn(
+          "transition-all duration-300",
+          status === 'idle' && "opacity-50 group-hover:opacity-80"
+        )}
+      />
+
+      {/* Animated flow particles for running state */}
+      {shouldAnimate && (
         <>
-          <circle r="3" fill="currentColor" className="text-green-500">
+          <circle r="5" fill="#3b82f6">
             <animateMotion
-              dur="0.5s"
-              repeatCount="1"
-              fill="freeze"
+              dur="1.2s"
+              repeatCount="indefinite"
               path={path}
             />
             <animate
               attributeName="opacity"
-              from="1"
-              to="0"
-              dur="0.5s"
-              fill="freeze"
+              values="1;0.5;1"
+              dur="1.2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+          <circle r="3" fill="#60a5fa">
+            <animateMotion
+              dur="1.2s"
+              repeatCount="indefinite"
+              path={path}
+              begin="0.3s"
+            />
+          </circle>
+          <circle r="2" fill="#93c5fd">
+            <animateMotion
+              dur="1.2s"
+              repeatCount="indefinite"
+              path={path}
+              begin="0.6s"
             />
           </circle>
         </>
       )}
 
-      {/* Error pulse animation */}
+      {/* Success flash animation */}
+      {status === 'success' && (
+        <circle r="6" fill="#22c55e">
+          <animateMotion
+            dur="0.4s"
+            repeatCount="1"
+            fill="freeze"
+            path={path}
+          />
+          <animate
+            attributeName="r"
+            from="6"
+            to="2"
+            dur="0.4s"
+            fill="freeze"
+          />
+          <animate
+            attributeName="opacity"
+            from="1"
+            to="0"
+            dur="0.4s"
+            fill="freeze"
+          />
+        </circle>
+      )}
+
+      {/* Error pulse */}
       {status === 'error' && (
         <path
           d={path}
           fill="none"
-          strokeWidth={4}
+          stroke="#ef4444"
+          strokeWidth={5}
           strokeLinecap="round"
-          className="stroke-red-500 animate-pulse"
-          strokeOpacity={0.5}
+          opacity={0.4}
+          className="animate-pulse"
         />
       )}
 
-      {/* Arrow at end */}
-      <ArrowMarker 
-        path={path} 
-        status={status}
-        isSelected={isSelected}
+      {/* Arrow at end - larger and more visible */}
+      <polygon
+        points="-8,-5 0,0 -8,5"
+        fill={isSelected ? 'hsl(var(--primary))' : colorConfig.stroke}
+        transform={`translate(${targetX}, ${targetY}) rotate(${angle})`}
+        className="transition-all duration-300"
       />
+
+      {/* Delete button on hover */}
+      {isHovered && onClick && (
+        <g 
+          transform={`translate(${(sourcePosition.x + NODE_WIDTH + targetPosition.x) / 2}, ${(sourcePosition.y + targetPosition.y + NODE_HEIGHT) / 2})`}
+          onClick={handleClick}
+          className="cursor-pointer"
+        >
+          <circle r="10" fill="hsl(var(--destructive))" opacity="0.9" />
+          <text
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="white"
+            fontSize="12"
+            fontWeight="bold"
+          >
+            ×
+          </text>
+        </g>
+      )}
     </g>
-  );
-}
-
-interface ArrowMarkerProps {
-  path: string;
-  status: ExecutionStatus;
-  isSelected: boolean;
-}
-
-function ArrowMarker({ path, status, isSelected }: ArrowMarkerProps) {
-  // Extract end point and direction from path
-  const pathData = path.split(' ');
-  const endX = parseFloat(pathData[pathData.length - 2]);
-  const endY = parseFloat(pathData[pathData.length - 1]);
-  
-  // Get control point for direction
-  const cp2x = parseFloat(pathData[pathData.length - 4].replace(',', ''));
-  const cp2y = parseFloat(pathData[pathData.length - 3].replace(',', ''));
-  
-  // Calculate angle
-  const angle = Math.atan2(endY - cp2y, endX - cp2x) * (180 / Math.PI);
-
-  const fillColor = isSelected 
-    ? 'fill-primary' 
-    : status === 'running' ? 'fill-blue-500'
-    : status === 'success' ? 'fill-green-500'
-    : status === 'error' ? 'fill-red-500'
-    : 'fill-muted-foreground/40';
-
-  return (
-    <polygon
-      points="-6,-4 0,0 -6,4"
-      className={cn("transition-all duration-200", fillColor)}
-      transform={`translate(${endX}, ${endY}) rotate(${angle})`}
-    />
   );
 }
 
