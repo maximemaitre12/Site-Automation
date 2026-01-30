@@ -9,7 +9,7 @@ import { DocCategoryTabs, DocCategory } from "@/components/doc/DocCategoryTabs";
 import { DocUploadDialog } from "@/components/doc/DocUploadDialog";
 import { DocGenerateDialog } from "@/components/doc/DocGenerateDialog";
 import { DocViewerDialog } from "@/components/doc/DocViewerDialog";
-import { Loader2, Menu, X, FileText, Sparkles, FolderOpen, Files, Wand2 } from "lucide-react";
+import { Loader2, FileText, Files, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -139,9 +139,36 @@ export default function DocPage() {
     setGenerateDialogOpen(false);
   };
 
+  const headerActions = (
+    <>
+      <Button 
+        variant="outline" 
+        size="sm"
+        onClick={() => setUploadDialogOpen(true)}
+        className="hidden sm:flex"
+      >
+        <Files className="w-4 h-4 mr-2" />
+        Importer
+      </Button>
+      <Button 
+        size="sm"
+        onClick={() => setGenerateDialogOpen(true)}
+      >
+        <Wand2 className="w-4 h-4 sm:mr-2" />
+        <span className="hidden sm:inline">Générer</span>
+      </Button>
+    </>
+  );
+
   if (loading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout
+        toolName="Document Hub"
+        toolDescription="Génération et gestion intelligente de documents"
+        toolIcon={<FileText className="w-5 h-5 text-primary" />}
+        showAIBadge
+        headerActions={headerActions}
+      >
         <div className="flex items-center justify-center h-full">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -150,59 +177,16 @@ export default function DocPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      toolName="Document Hub"
+      toolDescription="Génération et gestion intelligente de documents"
+      toolIcon={<FileText className="w-5 h-5 text-primary" />}
+      showAIBadge
+      headerActions={headerActions}
+    >
       <div className="flex flex-col h-full overflow-y-auto bg-gradient-to-b from-background to-background/95">
-        {/* Modern Header */}
-        <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-4 mb-6">
-              <button
-                className="md:hidden p-2 -ml-2 rounded-xl hover:bg-muted shrink-0"
-                onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-              >
-                {showMobileSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg shadow-primary/10">
-                <FileText className="w-6 h-6 md:w-7 md:h-7 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-xl md:text-2xl font-bold text-foreground">Document Hub</h1>
-                  <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                    <Sparkles className="w-3 h-3" />
-                    IA intégrée
-                  </span>
-                </div>
-                <p className="text-muted-foreground text-sm mt-0.5 hidden md:block">
-                  Génération et gestion intelligente de documents
-                </p>
-              </div>
-              
-              {/* Action buttons */}
-              <div className="hidden md:flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setUploadDialogOpen(true)}
-                  className="rounded-xl"
-                >
-                  <Files className="w-4 h-4 mr-2" />
-                  Importer
-                </Button>
-                <Button 
-                  onClick={() => setGenerateDialogOpen(true)}
-                  className="rounded-xl bg-gradient-to-r from-primary to-primary/80"
-                >
-                  <Wand2 className="w-4 h-4 mr-2" />
-                  Générer
-                </Button>
-              </div>
-            </div>
-
-          </div>
-        </header>
-
         {/* Main content area */}
-        <div className="flex flex-1 relative px-4 md:px-8 pb-24">
+        <div className="flex flex-1 relative px-4 md:px-8 pb-24 pt-4">
           <div className="max-w-7xl mx-auto w-full flex">
             {/* Sidebar - Folders */}
             <div className={cn(
