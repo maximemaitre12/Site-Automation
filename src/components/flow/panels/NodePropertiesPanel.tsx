@@ -394,21 +394,6 @@ function NodePropertiesPanelComponent({
           </div>
         )}
 
-        {/* Real action warning */}
-        {definition?.isRealAction && (
-          <div className="flex items-center gap-2 p-2 mt-2 rounded-lg bg-emerald-500/10 text-emerald-600 text-xs">
-            <Zap className="w-3.5 h-3.5" />
-            <span>Action réelle - Affecte les données en production</span>
-          </div>
-        )}
-        
-        {/* Auth required indicator */}
-        {definition?.requiresAuth && (
-          <div className="flex items-center gap-2 p-2 mt-2 rounded-lg bg-blue-500/10 text-blue-600 text-xs">
-            <Shield className="w-3.5 h-3.5" />
-            <span>Authentification requise</span>
-          </div>
-        )}
       </div>
 
       {/* Content */}
