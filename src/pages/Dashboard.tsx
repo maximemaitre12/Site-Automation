@@ -8,590 +8,528 @@ import {
   MessageSquare,
   Database,
   ShieldCheck,
-  ArrowRight,
-  Activity,
-  Zap,
   Clock,
-  ArrowUpRight,
-  Sparkles,
-  Settings,
-  Bell,
-  Search,
+  TrendingUp,
+  Calendar,
+  Target,
+  Zap,
+  ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompany } from "@/hooks/useCompany";
 import { useWorkflows, useWorkflowRuns } from "@/hooks/useWorkflows";
 import { useCompliance } from "@/hooks/useCompliance";
 import { useHR } from "@/hooks/useHR";
+import { useInterviews } from "@/hooks/useInterviews";
 import { useSupport } from "@/hooks/useSupport";
 import { useBrain } from "@/hooks/useBrain";
 import { useSalesProposals } from "@/hooks/useSalesProposals";
+import { useNegotiationSheets } from "@/hooks/useNegotiationSheets";
+import { useAetherDocs } from "@/hooks/useAetherDocs";
 import {
-  AreaChart,
-  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  BarChart,
+  Bar,
 } from "recharts";
-import { format, subDays, isToday, isThisWeek } from "date-fns";
+import { format, subDays, startOfWeek, startOfMonth, differenceInDays } from "date-fns";
+import { fr } from "date-fns/locale";
+import { AnimatedCounter } from "@/components/landing/AnimatedCounter";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+// Time saved estimates per action (in minutes)
+const TIME_ESTIMATES = {
+  workflow_run: 15, // Each workflow automation saves ~15 min
+  document_generated: 45, // AI-generated document saves ~45 min
+  document_analyzed: 20, // Document analysis saves ~20 min
+  proposal_generated: 60, // Sales proposal saves ~1 hour
+  call_analyzed: 30, // Call analysis saves ~30 min
+  ticket_resolved: 25, // AI-assisted ticket saves ~25 min
+  audit_completed: 120, // Compliance audit saves ~2 hours
+  candidate_screened: 35, // CV screening saves ~35 min
+  interview_analyzed: 40, // Interview analysis saves ~40 min
+  brain_conversation: 10, // Each Brain interaction saves ~10 min
+  negotiation_sheet: 50, // Negotiation prep saves ~50 min
+};
+
+interface TimeSavedByTool {
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  colorClass: string;
+  bgClass: string;
+  minutes: number;
+  actions: number;
+  path: string;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { company, loading: companyLoading } = useCompany();
-  const { workflows, loading: workflowsLoading } = useWorkflows();
+  const { company } = useCompany();
   const { runs: workflowRuns, loading: runsLoading } = useWorkflowRuns();
   const { audits, loading: auditsLoading } = useCompliance();
-  const { candidates, jobs, loading: hrLoading } = useHR();
+  const { candidates, loading: hrLoading } = useHR();
+  const { interviews, loading: interviewsLoading } = useInterviews();
   const { tickets, loading: ticketsLoading } = useSupport();
-  const { conversations, documents: brainDocs, loading: brainLoading } = useBrain();
+  const { conversations, loading: brainLoading } = useBrain();
   const { proposals, callAnalyses, loading: salesLoading } = useSalesProposals();
-  
+  const { sheets: negotiationSheets, loading: sheetsLoading } = useNegotiationSheets();
+  const { documents: aetherDocs, loading: docsLoading } = useAetherDocs();
+
+  const [period, setPeriod] = useState<"week" | "month" | "all">("month");
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Global loading state - only show skeleton on initial load
-  const isInitialLoading = workflowsLoading || runsLoading || auditsLoading || hrLoading || ticketsLoading || brainLoading || salesLoading;
+  const isLoading = runsLoading || auditsLoading || hrLoading || interviewsLoading || ticketsLoading || brainLoading || salesLoading || sheetsLoading || docsLoading;
 
-  // Update time every minute
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Helper function - must be defined before useMemo hooks that use it
-  const formatTimeAgo = (date: Date): string => {
+  // Filter data by period
+  const filterByPeriod = <T extends { created_at: string }>(data: T[] | undefined): T[] => {
+    if (!data) return [];
+    if (period === "all") return data;
+
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes} min ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
+    let startDate: Date;
+
+    if (period === "week") {
+      startDate = startOfWeek(now, { weekStartsOn: 1 });
+    } else {
+      startDate = startOfMonth(now);
+    }
+
+    return data.filter(item => new Date(item.created_at) >= startDate);
   };
 
-  // Calculate real stats
-  const stats = useMemo(() => {
-    const activeWorkflows = workflows?.filter(w => w.is_active)?.length || 0;
-    const totalWorkflowRuns = workflowRuns?.length || 0;
-    const totalDocuments = (brainDocs?.length || 0) + (audits?.length || 0);
-    const totalConversations = conversations?.length || 0;
-    const totalTickets = tickets?.length || 0;
-    const resolvedTickets = tickets?.filter(t => t.status === 'resolved')?.length || 0;
-    const totalCandidates = candidates?.length || 0;
-    const totalProposals = proposals?.length || 0;
-    const totalCallAnalyses = callAnalyses?.length || 0;
-    
-    return {
-      activeWorkflows,
-      totalWorkflowRuns,
-      totalDocuments,
-      totalConversations,
-      totalTickets,
-      resolvedTickets,
-      totalCandidates,
-      totalProposals,
-      totalCallAnalyses,
-      aiCalls: totalConversations + totalWorkflowRuns + (audits?.length || 0) + totalCallAnalyses,
-    };
-  }, [workflows, workflowRuns, brainDocs, audits, conversations, tickets, candidates, proposals, callAnalyses]);
+  // Calculate time saved by tool
+  const timeSavedByTool = useMemo((): TimeSavedByTool[] => {
+    const filteredWorkflowRuns = filterByPeriod(workflowRuns);
+    const filteredProposals = filterByPeriod(proposals);
+    const filteredCallAnalyses = filterByPeriod(callAnalyses);
+    const filteredNegotiationSheets = filterByPeriod(negotiationSheets);
+    const filteredTickets = filterByPeriod(tickets?.filter(t => t.status === "resolved"));
+    const filteredAudits = filterByPeriod(audits);
+    const filteredCandidates = filterByPeriod(candidates);
+    const filteredInterviews = filterByPeriod(interviews?.filter(i => i.ai_report));
+    const filteredConversations = filterByPeriod(conversations);
+    const filteredDocs = filterByPeriod(aetherDocs);
 
-  // Calculate usage by tool
-  const usageByToolData = useMemo(() => {
-    const flowUsage = (workflowRuns?.length || 0);
-    const supportUsage = (tickets?.length || 0);
-    const brainUsage = (conversations?.length || 0) + (brainDocs?.length || 0);
-    const hrUsage = (candidates?.length || 0) + (jobs?.length || 0);
-    const salesUsage = (proposals?.length || 0) + (callAnalyses?.length || 0);
-    const complianceUsage = (audits?.length || 0);
-    
-    const total = flowUsage + supportUsage + brainUsage + hrUsage + salesUsage + complianceUsage;
-    
-    if (total === 0) {
-      return [
-        { name: "Flow", value: 0, color: "#3b82f6" },
-        { name: "Support", value: 0, color: "#f43f5e" },
-        { name: "Brain", value: 0, color: "#8b5cf6" },
-        { name: "Autres", value: 0, color: "#64748b" },
-      ];
-    }
-    
+    const generatedDocs = filteredDocs?.filter(d => d.ai_summary) || [];
+    const analyzedDocs = filteredDocs?.filter(d => d.ai_keywords && (d.ai_keywords as unknown[]).length > 0) || [];
+
     return [
-      { name: "Flow", value: Math.round((flowUsage / total) * 100), color: "#3b82f6" },
-      { name: "Support", value: Math.round((supportUsage / total) * 100), color: "#f43f5e" },
-      { name: "Brain", value: Math.round((brainUsage / total) * 100), color: "#8b5cf6" },
-      { name: "Autres", value: Math.round(((hrUsage + salesUsage + complianceUsage) / total) * 100), color: "#64748b" },
-    ];
-  }, [workflowRuns, tickets, conversations, brainDocs, candidates, jobs, proposals, callAnalyses, audits]);
+      {
+        name: "AETHER Flow",
+        icon: Workflow,
+        colorClass: "text-agent-flow",
+        bgClass: "bg-agent-flow/10",
+        minutes: filteredWorkflowRuns.length * TIME_ESTIMATES.workflow_run,
+        actions: filteredWorkflowRuns.length,
+        path: "/tools/flow",
+      },
+      {
+        name: "AETHER Doc",
+        icon: FileText,
+        colorClass: "text-agent-doc",
+        bgClass: "bg-agent-doc/10",
+        minutes: generatedDocs.length * TIME_ESTIMATES.document_generated + analyzedDocs.length * TIME_ESTIMATES.document_analyzed,
+        actions: generatedDocs.length + analyzedDocs.length,
+        path: "/tools/doc",
+      },
+      {
+        name: "Sales Copilot",
+        icon: BarChart3,
+        colorClass: "text-agent-sales",
+        bgClass: "bg-agent-sales/10",
+        minutes: 
+          filteredProposals.length * TIME_ESTIMATES.proposal_generated +
+          filteredCallAnalyses.length * TIME_ESTIMATES.call_analyzed +
+          filteredNegotiationSheets.length * TIME_ESTIMATES.negotiation_sheet,
+        actions: filteredProposals.length + filteredCallAnalyses.length + filteredNegotiationSheets.length,
+        path: "/tools/sales",
+      },
+      {
+        name: "HR Copilot",
+        icon: Users,
+        colorClass: "text-agent-hr",
+        bgClass: "bg-agent-hr/10",
+        minutes: 
+          filteredCandidates.length * TIME_ESTIMATES.candidate_screened +
+          filteredInterviews.length * TIME_ESTIMATES.interview_analyzed,
+        actions: filteredCandidates.length + filteredInterviews.length,
+        path: "/tools/hr",
+      },
+      {
+        name: "Support Copilot",
+        icon: MessageSquare,
+        colorClass: "text-agent-support",
+        bgClass: "bg-agent-support/10",
+        minutes: filteredTickets.length * TIME_ESTIMATES.ticket_resolved,
+        actions: filteredTickets.length,
+        path: "/tools/support",
+      },
+      {
+        name: "Brain",
+        icon: Database,
+        colorClass: "text-agent-brain",
+        bgClass: "bg-agent-brain/10",
+        minutes: filteredConversations.length * TIME_ESTIMATES.brain_conversation,
+        actions: filteredConversations.length,
+        path: "/tools/brain",
+      },
+      {
+        name: "Compliance",
+        icon: ShieldCheck,
+        colorClass: "text-agent-compliance",
+        bgClass: "bg-agent-compliance/10",
+        minutes: filteredAudits.length * TIME_ESTIMATES.audit_completed,
+        actions: filteredAudits.length,
+        path: "/tools/compliance",
+      },
+    ].sort((a, b) => b.minutes - a.minutes);
+  }, [workflowRuns, proposals, callAnalyses, negotiationSheets, tickets, audits, candidates, interviews, conversations, aetherDocs, period]);
 
-  // Build recent activity from real data
-  const recentActivity = useMemo(() => {
-    const activities: Array<{ type: string; name: string; status: string; time: Date; timeLabel: string }> = [];
-    
-    // Add workflow runs
-    workflowRuns?.slice(0, 3).forEach(run => {
-      const workflow = workflows?.find(w => w.id === run.workflow_id);
-      activities.push({
-        type: "workflow",
-        name: workflow?.name || "Workflow",
-        status: run.status || "completed",
-        time: new Date(run.created_at),
-        timeLabel: formatTimeAgo(new Date(run.created_at)),
-      });
-    });
-    
-    // Add tickets
-    tickets?.slice(0, 2).forEach(ticket => {
-      activities.push({
-        type: "ticket",
-        name: `Ticket ${ticket.ticket_number}`,
-        status: ticket.status || "open",
-        time: new Date(ticket.created_at),
-        timeLabel: formatTimeAgo(new Date(ticket.created_at)),
-      });
-    });
-    
-    // Add audits
-    audits?.slice(0, 2).forEach(audit => {
-      activities.push({
-        type: "audit",
-        name: audit.title,
-        status: audit.status || "completed",
-        time: new Date(audit.created_at),
-        timeLabel: formatTimeAgo(new Date(audit.created_at)),
-      });
-    });
-    
-    // Add conversations
-    conversations?.slice(0, 2).forEach(conv => {
-      activities.push({
-        type: "ai",
-        name: conv.title,
-        status: "completed",
-        time: new Date(conv.created_at),
-        timeLabel: formatTimeAgo(new Date(conv.created_at)),
-      });
-    });
-    
-    // Sort by time and take top 5
-    return activities
-      .sort((a, b) => b.time.getTime() - a.time.getTime())
-      .slice(0, 5);
-  }, [workflowRuns, workflows, tickets, audits, conversations]);
+  // Total time saved
+  const totalMinutesSaved = useMemo(() => {
+    return timeSavedByTool.reduce((sum, tool) => sum + tool.minutes, 0);
+  }, [timeSavedByTool]);
 
-  const activityData = useMemo(() => {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const totalHoursSaved = Math.round(totalMinutesSaved / 60);
+  const totalDaysSaved = (totalMinutesSaved / 60 / 8).toFixed(1);
+
+  // Total actions
+  const totalActions = useMemo(() => {
+    return timeSavedByTool.reduce((sum, tool) => sum + tool.actions, 0);
+  }, [timeSavedByTool]);
+
+  // Weekly data for chart
+  const weeklyData = useMemo(() => {
+    const days = [];
     const today = new Date();
     
-    return days.map((name, index) => {
-      const date = subDays(today, 6 - index);
-      const dayStart = new Date(date.setHours(0, 0, 0, 0));
-      const dayEnd = new Date(date.setHours(23, 59, 59, 999));
-      
-      const workflowCount = workflowRuns?.filter(run => {
-        const runDate = new Date(run.created_at);
-        return runDate >= dayStart && runDate <= dayEnd;
-      }).length || 0;
-      
-      const aiCount = (conversations?.filter(conv => {
-        const convDate = new Date(conv.created_at);
-        return convDate >= dayStart && convDate <= dayEnd;
-      }).length || 0) + workflowCount;
-      
-      return {
-        name,
-        workflows: workflowCount,
-        ai: aiCount,
-      };
-    });
-  }, [workflowRuns, conversations]);
+    for (let i = 6; i >= 0; i--) {
+      const date = subDays(today, i);
+      const dayStart = new Date(date);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(date);
+      dayEnd.setHours(23, 59, 59, 999);
 
+      let dayMinutes = 0;
 
-  const greeting = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+      // Count workflow runs
+      dayMinutes += (workflowRuns?.filter(r => {
+        const d = new Date(r.created_at);
+        return d >= dayStart && d <= dayEnd;
+      }).length || 0) * TIME_ESTIMATES.workflow_run;
+
+      // Count conversations
+      dayMinutes += (conversations?.filter(c => {
+        const d = new Date(c.created_at);
+        return d >= dayStart && d <= dayEnd;
+      }).length || 0) * TIME_ESTIMATES.brain_conversation;
+
+      // Count tickets resolved
+      dayMinutes += (tickets?.filter(t => {
+        if (t.status !== "resolved" || !t.resolved_at) return false;
+        const d = new Date(t.resolved_at);
+        return d >= dayStart && d <= dayEnd;
+      }).length || 0) * TIME_ESTIMATES.ticket_resolved;
+
+      // Count proposals
+      dayMinutes += (proposals?.filter(p => {
+        const d = new Date(p.created_at);
+        return d >= dayStart && d <= dayEnd;
+      }).length || 0) * TIME_ESTIMATES.proposal_generated;
+
+      // Count audits
+      dayMinutes += (audits?.filter(a => {
+        const d = new Date(a.created_at);
+        return d >= dayStart && d <= dayEnd;
+      }).length || 0) * TIME_ESTIMATES.audit_completed;
+
+      days.push({
+        name: format(date, "EEE", { locale: fr }),
+        date: format(date, "d MMM", { locale: fr }),
+        minutes: dayMinutes,
+        hours: Math.round(dayMinutes / 60 * 10) / 10,
+      });
+    }
+
+    return days;
+  }, [workflowRuns, conversations, tickets, proposals, audits]);
+
+  // Money saved estimation (average hourly rate)
+  const hourlyRate = 85; // €85/hour average
+  const moneySaved = totalHoursSaved * hourlyRate;
+
+  // Period labels
+  const periodLabel = period === "week" ? "cette semaine" : period === "month" ? "ce mois" : "au total";
+  const periodDays = period === "week" ? 7 : period === "month" ? differenceInDays(new Date(), startOfMonth(new Date())) + 1 : 365;
+
+  // Format time display
+  const formatTimeSaved = (minutes: number): string => {
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMins = minutes % 60;
+    if (remainingMins === 0) return `${hours}h`;
+    return `${hours}h ${remainingMins}min`;
   };
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "là";
 
-  const tools = [
-    {
-      name: "AETHER Flow",
-      description: "Visual automation",
-      icon: Workflow,
-      colorClass: "text-agent-flow",
-      badgeClass: "bg-agent-flow/10 border-agent-flow/20",
-      path: "/tools/flow",
-      stats: { active: stats.activeWorkflows, runs: stats.totalWorkflowRuns },
-    },
-    {
-      name: "Sales Copilot",
-      description: "AI sales assistant",
-      icon: BarChart3,
-      colorClass: "text-agent-sales",
-      badgeClass: "bg-agent-sales/10 border-agent-sales/20",
-      path: "/tools/sales",
-      stats: { active: stats.totalProposals, runs: stats.totalCallAnalyses },
-    },
-    {
-      name: "HR Copilot",
-      description: "HR assistant",
-      icon: Users,
-      colorClass: "text-agent-hr",
-      badgeClass: "bg-agent-hr/10 border-agent-hr/20",
-      path: "/tools/hr",
-      stats: { active: jobs?.length || 0, runs: stats.totalCandidates },
-    },
-    {
-      name: "Support Copilot",
-      description: "AI support",
-      icon: MessageSquare,
-      colorClass: "text-agent-support",
-      badgeClass: "bg-agent-support/10 border-agent-support/20",
-      path: "/tools/support",
-      stats: { active: stats.totalTickets - stats.resolvedTickets, runs: stats.totalTickets },
-    },
-    {
-      name: "Brain",
-      description: "Internal assistant",
-      icon: Database,
-      colorClass: "text-agent-brain",
-      badgeClass: "bg-agent-brain/10 border-agent-brain/20",
-      path: "/tools/brain",
-      stats: { active: brainDocs?.length || 0, runs: stats.totalConversations },
-    },
-    {
-      name: "Compliance",
-      description: "Audit & compliance",
-      icon: ShieldCheck,
-      colorClass: "text-agent-compliance",
-      badgeClass: "bg-agent-compliance/10 border-agent-compliance/20",
-      path: "/tools/compliance",
-      stats: { active: audits?.length || 0, runs: audits?.length || 0 },
-    },
-  ];
-
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6 md:space-y-8">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="animate-fade-in">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 md:mb-2">
-              {greeting()}, <span className="text-gradient">{userName}</span>
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground">
-              {format(currentTime, "EEEE, MMMM d")}
-              {company && (
-                <span className="ml-2 text-primary">• {company.name}</span>
-              )}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                className="w-40 md:w-64 pl-9 bg-secondary/50 border-border"
-              />
+      <ScrollArea className="flex-1">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                Bonjour, <span className="text-gradient">{userName}</span>
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {format(currentTime, "EEEE d MMMM yyyy", { locale: fr })}
+                {company && <span className="ml-2 text-primary">• {company.name}</span>}
+              </p>
             </div>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10">
-              <Bell className="w-4 h-4 md:w-5 md:h-5" />
-              {recentActivity.length > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
-              )}
-            </Button>
-            <Link to="/settings/company">
-              <Button variant="ghost" size="icon" className="h-9 w-9 md:h-10 md:w-10">
-                <Settings className="w-4 h-4 md:w-5 md:h-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          {[
-            {
-              label: "Active workflows",
-              value: stats.activeWorkflows,
-              icon: Activity,
-              color: "from-blue-500/20 to-cyan-500/20",
-            },
-            {
-              label: "AI calls",
-              value: stats.aiCalls,
-              icon: Zap,
-              color: "from-purple-500/20 to-pink-500/20",
-            },
-            {
-              label: "Documents processed",
-              value: stats.totalDocuments,
-              icon: FileText,
-              color: "from-green-500/20 to-emerald-500/20",
-            },
-            {
-              label: "Support tickets",
-              value: stats.totalTickets,
-              icon: MessageSquare,
-              color: "from-orange-500/20 to-yellow-500/20",
-            },
-          ].map((stat, i) => (
-            <Card
-              key={stat.label}
-              className="border-border bg-card/50 backdrop-blur-sm overflow-hidden group hover:border-primary/30 transition-all duration-300 animate-fade-in"
-              style={{ animationDelay: `${(i + 1) * 0.1}s` }}
-            >
-              <CardContent className="p-3 md:p-5 relative">
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                />
-                
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-2 md:mb-4">
-                    <div className="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <stat.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            {/* Period Selector */}
+            <Tabs value={period} onValueChange={(v) => setPeriod(v as "week" | "month" | "all")} className="w-auto">
+              <TabsList className="bg-secondary/50">
+                <TabsTrigger value="week" className="text-xs sm:text-sm">Cette semaine</TabsTrigger>
+                <TabsTrigger value="month" className="text-xs sm:text-sm">Ce mois</TabsTrigger>
+                <TabsTrigger value="all" className="text-xs sm:text-sm">Total</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Hero Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total Time Saved - Hero Card */}
+            <Card className="md:col-span-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <CardContent className="p-6 sm:p-8 relative">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                      <Clock className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-medium">Temps économisé {periodLabel}</span>
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground tabular-nums">
+                        {isLoading ? (
+                          <span className="animate-pulse">--</span>
+                        ) : (
+                          <AnimatedCounter end={totalHoursSaved} duration={1500} />
+                        )}
+                      </span>
+                      <span className="text-2xl sm:text-3xl text-muted-foreground font-medium">heures</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-3">
+                      Soit <span className="text-primary font-semibold">{totalDaysSaved} jours</span> de travail
+                    </p>
+                  </div>
+                  <div className="hidden sm:block text-right">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 text-success text-sm font-medium">
+                      <TrendingUp className="w-4 h-4" />
+                      +{Math.round(totalMinutesSaved / periodDays)} min/jour
                     </div>
                   </div>
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-0.5 md:mb-1 tabular-nums">
-                    {isInitialLoading ? (
-                      <div className="h-8 w-12 bg-muted animate-pulse rounded" />
-                    ) : (
-                      stat.value
-                    )}
-                  </div>
-                  <div className="text-xs md:text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Activity Chart */}
-          <Card className="lg:col-span-2 border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <CardHeader className="pb-2 px-4 md:px-6">
-              <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
-                <Activity className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                Weekly activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-2 md:px-6">
-              <div className="h-[200px] md:h-[280px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={activityData}>
-                    <defs>
-                      <linearGradient id="gradientWorkflows" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(235 99% 62%)" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="hsl(235 99% 62%)" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="gradientAI" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(260 100% 65%)" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="hsl(260 100% 65%)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 13% 91%)" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      stroke="hsl(220 10% 46%)"
-                      fontSize={10}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis
-                      stroke="hsl(220 10% 46%)"
-                      fontSize={10}
-                      tickLine={false}
-                      axisLine={false}
-                      hide={true}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(0 0% 100%)",
-                        border: "1px solid hsl(220 13% 91%)",
-                        borderRadius: "8px",
-                        color: "hsl(220 15% 15%)",
-                        fontSize: "12px",
-                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="ai"
-                      stroke="hsl(260 100% 65%)"
-                      strokeWidth={2}
-                      fill="url(#gradientAI)"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="workflows"
-                      stroke="hsl(235 99% 62%)"
-                      strokeWidth={2}
-                      fill="url(#gradientWorkflows)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex items-center justify-center gap-4 md:gap-6 mt-3 md:mt-4">
-                <div className="flex items-center gap-1.5 md:gap-2">
-                  <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-primary" />
-                  <span className="text-xs md:text-sm text-muted-foreground">Workflows</span>
-                </div>
-                <div className="flex items-center gap-1.5 md:gap-2">
-                  <div className="w-2 h-2 md:w-3 md:h-3 rounded-full" style={{ background: "hsl(260 100% 65%)" }} />
-                  <span className="text-xs md:text-sm text-muted-foreground">Appels IA</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Usage by Tool */}
-          <Card className="border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <CardHeader className="pb-2 px-4 md:px-6">
-              <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
-                <Zap className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                Usage by tool
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 md:px-6">
-              <div className="h-[150px] md:h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={usageByToolData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={35}
-                      outerRadius={60}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {usageByToolData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(0 0% 100%)",
-                        border: "1px solid hsl(220 13% 91%)",
-                        borderRadius: "8px",
-                        color: "hsl(220 15% 15%)",
-                        fontSize: "12px",
-                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-1.5 md:gap-2 mt-3 md:mt-4">
-                {usageByToolData.map((item) => (
-                  <div key={item.name} className="flex items-center gap-1.5 md:gap-2">
-                    <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                    <span className="text-[10px] md:text-xs text-muted-foreground truncate">{item.name}</span>
-                    <span className="text-[10px] md:text-xs font-medium text-foreground ml-auto">{item.value}%</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity & Tools */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Recent Activity */}
-          <Card className="border-border bg-card/50 backdrop-blur-sm animate-fade-in" style={{ animationDelay: "0.5s" }}>
-            <CardHeader className="pb-2 px-4 md:px-6">
-              <CardTitle className="text-base md:text-lg font-semibold flex items-center gap-2">
-                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                Recent activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 md:px-6">
-              {recentActivity.length === 0 ? (
-                <div className="text-center py-6 md:py-8 text-muted-foreground">
-                  <Activity className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 md:mb-3 opacity-50" />
-                  <p className="text-xs md:text-sm">No recent activity</p>
-                  <p className="text-[10px] md:text-xs mt-1">Start using AETHER tools</p>
-                </div>
-              ) : (
-                <div className="space-y-2 md:space-y-3">
-                  {recentActivity.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
-                    >
-                      <div
-                        className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                          item.status === "completed" || item.status === "resolved"
-                            ? "bg-success"
-                            : item.status === "running" || item.status === "pending"
-                            ? "bg-warning animate-pulse"
-                            : "bg-primary"
-                        }`}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs md:text-sm font-medium text-foreground truncate">{item.name}</p>
-                        <p className="text-[10px] md:text-xs text-muted-foreground capitalize">{item.status}</p>
-                      </div>
-                      <span className="text-[10px] md:text-xs text-muted-foreground whitespace-nowrap">{item.timeLabel}</span>
+            {/* Secondary Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
+              <Card className="border-border bg-card/50">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                      <Target className="w-5 h-5 text-success" />
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Tools Grid */}
-          <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: "0.6s" }}>
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <h2 className="text-base md:text-lg font-semibold text-foreground">Your tools</h2>
+                    <div>
+                      <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                        {isLoading ? "--" : <AnimatedCounter end={totalActions} duration={1200} />}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Actions automatisées</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-border bg-card/50">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-warning" />
+                    </div>
+                    <div>
+                      <p className="text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+                        {isLoading ? "--" : <AnimatedCounter end={moneySaved} prefix="€" duration={1500} />}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Valeur économisée</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-              {tools.map((tool) => (
+          </div>
+
+          {/* Chart + Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+            {/* Weekly Chart */}
+            <Card className="lg:col-span-2 border-border bg-card/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Temps économisé par jour
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[250px] sm:h-[280px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={weeklyData} barSize={32}>
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
+                          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={11} 
+                        tickLine={false} 
+                        axisLine={false}
+                      />
+                      <YAxis 
+                        stroke="hsl(var(--muted-foreground))" 
+                        fontSize={11} 
+                        tickLine={false} 
+                        axisLine={false}
+                        tickFormatter={(v) => `${v}min`}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                        formatter={(value: number) => [`${value} min (${(value / 60).toFixed(1)}h)`, "Temps économisé"]}
+                        labelFormatter={(label, payload) => payload[0]?.payload?.date || label}
+                      />
+                      <Bar dataKey="minutes" fill="url(#barGradient)" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* By Tool Breakdown */}
+            <Card className="border-border bg-card/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-primary" />
+                  Par outil
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {timeSavedByTool.filter(t => t.minutes > 0).slice(0, 5).map((tool, index) => {
+                  const percentage = totalMinutesSaved > 0 ? (tool.minutes / totalMinutesSaved) * 100 : 0;
+                  return (
+                    <Link 
+                      key={tool.name} 
+                      to={tool.path}
+                      className="block group"
+                    >
+                      <div className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-secondary/50 transition-colors">
+                        <div className={`w-9 h-9 rounded-lg ${tool.bgClass} flex items-center justify-center shrink-0`}>
+                          <tool.icon className={`w-4 h-4 ${tool.colorClass}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-foreground truncate">{tool.name}</span>
+                            <span className="text-sm font-semibold text-foreground tabular-nums">
+                              {formatTimeSaved(tool.minutes)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Progress value={percentage} className="h-1.5 flex-1" />
+                            <span className="text-xs text-muted-foreground w-8 text-right">{Math.round(percentage)}%</span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </Link>
+                  );
+                })}
+
+                {timeSavedByTool.every(t => t.minutes === 0) && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Clock className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Pas encore d'activité</p>
+                    <p className="text-xs mt-1">Utilisez les outils pour voir le temps économisé</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Access Tools */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Accès rapide</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+              {timeSavedByTool.map((tool) => (
                 <Link
                   key={tool.name}
                   to={tool.path}
-                  className="group p-4 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/60 hover:bg-card/70 hover:border-primary/30 transition-all duration-300 hover:shadow-lg"
+                  className="group p-4 rounded-xl bg-card/50 border border-border/60 hover:bg-card hover:border-primary/30 hover:shadow-lg transition-all duration-300"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-11 h-11 rounded-2xl border ${tool.badgeClass} flex items-center justify-center shrink-0`}>
-                      <tool.icon className={`w-5 h-5 ${tool.colorClass}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-sm sm:text-base font-semibold text-foreground leading-snug whitespace-normal break-words">
-                        {tool.name}
-                      </h3>
-                      <p className="mt-0.5 text-xs text-muted-foreground leading-snug whitespace-normal break-words">
-                        {tool.description}
-                      </p>
-                    </div>
+                  <div className={`w-10 h-10 rounded-xl ${tool.bgClass} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                    <tool.icon className={`w-5 h-5 ${tool.colorClass}`} />
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">
-                      {tool.stats.active} actif{tool.stats.active > 1 ? 's' : ''}
-                    </span>
-                    <span className="text-primary font-medium">{tool.stats.runs} exec.</span>
+                  <h3 className="text-sm font-medium text-foreground leading-tight mb-1 line-clamp-2">
+                    {tool.name}
+                  </h3>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    <span>{formatTimeSaved(tool.minutes)}</span>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
+
+          {/* Time Saved Methodology */}
+          <Card className="border-border bg-card/30">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                  <Target className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-1">Comment est calculé le temps économisé ?</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Chaque action automatisée est comparée au temps moyen qu'elle prendrait manuellement. 
+                    Par exemple : génération de document (~45 min), analyse de CV (~35 min), workflow automatisé (~15 min), 
+                    audit de conformité (~2h). Ces estimations sont basées sur des benchmarks sectoriels.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
+      </ScrollArea>
     </DashboardLayout>
   );
 }
