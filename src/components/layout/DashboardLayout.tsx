@@ -116,36 +116,11 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* Center - Logo or Tool Name */}
-            {toolName ? (
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 px-4 sm:px-6">
-                {toolIcon && (
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0">
-                    {toolIcon}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <h1 className="text-base sm:text-lg font-semibold text-foreground">{toolName}</h1>
-                    {showAIBadge && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">IA intégrée</span>
-                        <span className="sm:hidden">IA</span>
-                      </span>
-                    )}
-                  </div>
-                  {toolDescription && (
-                    <p className="text-muted-foreground text-xs sm:text-sm hidden sm:block mt-0.5">{toolDescription}</p>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-                <AetherLogo size="md" className="sm:hidden" />
-                <AetherLogo size="lg" className="hidden sm:block" />
-              </Link>
-            )}
+            {/* Center - Logo */}
+            <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
+              <AetherLogo size="md" className="sm:hidden" />
+              <AetherLogo size="lg" className="hidden sm:block" />
+            </Link>
 
             {/* Header Actions - Right side */}
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
