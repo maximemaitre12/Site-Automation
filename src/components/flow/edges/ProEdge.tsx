@@ -1,6 +1,6 @@
 // ==========================================
 // Professional Edge Component - N8N Style
-// Horizontal connections with arrow markers
+// Smart curved connections like the reference
 // ==========================================
 
 import { memo, useMemo } from 'react';
@@ -23,89 +23,91 @@ interface ProEdgeProps {
   label?: string;
 }
 
-// Status colors - softer for white theme
-const statusColors: Record<ExecutionStatus, { stroke: string; fill: string }> = {
-  idle: { stroke: '#9ca3af', fill: '#9ca3af' },
-  pending: { stroke: '#f59e0b', fill: '#fbbf24' },
-  running: { stroke: '#3b82f6', fill: '#60a5fa' },
-  success: { stroke: '#22c55e', fill: '#4ade80' },
-  error: { stroke: '#ef4444', fill: '#f87171' },
-  skipped: { stroke: '#d1d5db', fill: '#e5e7eb' },
-  cancelled: { stroke: '#f97316', fill: '#fb923c' },
+// Subtle gray colors for n8n style
+const statusColors: Record<ExecutionStatus, { stroke: string; glow: string }> = {
+  idle: { stroke: '#b8bcc4', glow: '#b8bcc4' },
+  pending: { stroke: '#f59e0b', glow: '#fbbf24' },
+  running: { stroke: '#3b82f6', glow: '#60a5fa' },
+  success: { stroke: '#22c55e', glow: '#4ade80' },
+  error: { stroke: '#ef4444', glow: '#f87171' },
+  skipped: { stroke: '#d1d5db', glow: '#e5e7eb' },
+  cancelled: { stroke: '#f97316', glow: '#fb923c' },
 };
 
-type ConnectionDirection = 'horizontal' | 'vertical' | 'mixed';
-
-function detectConnectionDirection(
+function calculateSmartPath(
   source: { x: number; y: number },
   target: { x: number; y: number }
-): ConnectionDirection {
+): { path: string; midpoint: { x: number; y: number } } {
+  // Calculate center points
   const sourceCenterX = source.x + NODE_WIDTH / 2;
   const sourceCenterY = source.y + NODE_HEIGHT / 2;
   const targetCenterX = target.x + NODE_WIDTH / 2;
   const targetCenterY = target.y + NODE_HEIGHT / 2;
 
-  const deltaX = Math.abs(targetCenterX - sourceCenterX);
-  const deltaY = Math.abs(targetCenterY - sourceCenterY);
+  const deltaX = targetCenterX - sourceCenterX;
+  const deltaY = targetCenterY - sourceCenterY;
 
-  // If target is mostly below/above and horizontally aligned → vertical
-  if (deltaX < NODE_WIDTH * 0.6 && deltaY > NODE_HEIGHT * 0.5) {
-    return 'vertical';
-  }
-  // If target is mostly to the right/left → horizontal
-  if (deltaX > NODE_WIDTH * 0.3) {
-    return 'horizontal';
-  }
-  return 'mixed';
-}
-
-function calculatePath(
-  source: { x: number; y: number },
-  target: { x: number; y: number }
-): { path: string; midpoint: { x: number; y: number }; arrowPos: { x: number; y: number }; direction: ConnectionDirection } {
-  const direction = detectConnectionDirection(source, target);
-
-  // Horizontal layout: right-center of source → left-center of target
-  const sourceX = source.x + NODE_WIDTH;
-  const sourceY = source.y + NODE_HEIGHT / 2;
-  const targetX = target.x;
-  const targetY = target.y + NODE_HEIGHT / 2;
-
-  const deltaY = Math.abs(targetY - sourceY);
-  const deltaX = targetX - sourceX;
-  
+  let startX: number, startY: number, endX: number, endY: number;
   let path: string;
-  let midX: number, midY: number;
 
-  if (deltaY < 5) {
-    // Straight horizontal line
-    path = `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
-    midX = (sourceX + targetX) / 2;
-    midY = sourceY;
+  // Determine if we should use horizontal or vertical routing
+  const isMainlyHorizontal = Math.abs(deltaX) > Math.abs(deltaY) * 0.5;
+  const isMainlyVertical = Math.abs(deltaY) > Math.abs(deltaX) * 1.5;
+  const targetIsRight = deltaX > 0;
+  const targetIsBelow = deltaY > 0;
+
+  if (isMainlyVertical) {
+    // Vertical connection: bottom of source -> top of target
+    startX = source.x + NODE_WIDTH / 2;
+    startY = targetIsBelow ? source.y + NODE_HEIGHT : source.y;
+    endX = target.x + NODE_WIDTH / 2;
+    endY = targetIsBelow ? target.y : target.y + NODE_HEIGHT;
+
+    const vertDist = Math.abs(endY - startY);
+    const horizDist = Math.abs(endX - startX);
+
+    if (horizDist < 5) {
+      // Straight vertical line
+      path = `M ${startX} ${startY} L ${endX} ${endY}`;
+    } else {
+      // S-curve for vertical with horizontal offset
+      const midY = (startY + endY) / 2;
+      path = `M ${startX} ${startY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${endY}`;
+    }
   } else {
-    // Curved horizontal connection (smooth Bézier)
-    const cpOffset = Math.max(40, Math.min(100, Math.abs(deltaX) * 0.4));
+    // Horizontal connection: right of source -> left of target
+    startX = source.x + NODE_WIDTH;
+    startY = source.y + NODE_HEIGHT / 2;
+    endX = target.x;
+    endY = target.y + NODE_HEIGHT / 2;
 
-    const cp1x = sourceX + cpOffset;
-    const cp1y = sourceY;
-    const cp2x = targetX - cpOffset;
-    const cp2y = targetY;
+    // Handle backwards connections
+    if (!targetIsRight) {
+      startX = source.x;
+      endX = target.x + NODE_WIDTH;
+    }
 
-    path = `M ${sourceX} ${sourceY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
-    
-    midX = (sourceX + targetX) / 2;
-    midY = (sourceY + targetY) / 2;
+    const horizDist = Math.abs(endX - startX);
+    const vertDist = Math.abs(endY - startY);
+
+    if (vertDist < 5) {
+      // Straight horizontal line
+      path = `M ${startX} ${startY} L ${endX} ${endY}`;
+    } else {
+      // Smooth bezier curve - n8n style
+      const curvature = Math.min(horizDist * 0.5, 80);
+      const cp1x = startX + (targetIsRight ? curvature : -curvature);
+      const cp2x = endX + (targetIsRight ? -curvature : curvature);
+      path = `M ${startX} ${startY} C ${cp1x} ${startY}, ${cp2x} ${endY}, ${endX} ${endY}`;
+    }
   }
 
-  // Arrow position just before target
-  const arrowX = targetX - 8;
-  const arrowY = targetY;
-
-  return { 
-    path, 
-    midpoint: { x: midX, y: midY }, 
-    arrowPos: { x: arrowX, y: arrowY },
-    direction 
+  return {
+    path,
+    midpoint: {
+      x: (source.x + NODE_WIDTH / 2 + target.x + NODE_WIDTH / 2) / 2,
+      y: (source.y + NODE_HEIGHT / 2 + target.y + NODE_HEIGHT / 2) / 2,
+    },
   };
 }
 
@@ -120,13 +122,13 @@ function ProEdgeComponent({
   onHover,
   onClick,
 }: ProEdgeProps) {
-  const { path, midpoint, arrowPos } = useMemo(() => {
-    return calculatePath(sourcePosition, targetPosition);
+  const { path, midpoint } = useMemo(() => {
+    return calculateSmartPath(sourcePosition, targetPosition);
   }, [sourcePosition, targetPosition]);
 
   const colors = statusColors[status] || statusColors.idle;
   const shouldAnimate = status === 'running';
-  const strokeWidth = 2;
+  const strokeColor = isHovered ? '#3b82f6' : colors.stroke;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -136,35 +138,35 @@ function ProEdgeComponent({
   return (
     <g 
       className={cn(
-        "workflow-edge group transition-opacity duration-200",
+        "workflow-edge transition-opacity duration-200",
         isFiltered && "opacity-20"
       )}
       onMouseEnter={() => onHover?.(connection.id)}
       onMouseLeave={() => onHover?.(null)}
     >
-      {/* Invisible wider path for easier clicking */}
+      {/* Invisible hit area */}
       <path
         d={path}
         fill="none"
         stroke="transparent"
-        strokeWidth={20}
+        strokeWidth={16}
         className="cursor-pointer"
         onClick={handleClick}
       />
 
-      {/* Main path */}
+      {/* Main edge line - n8n style thin gray */}
       <path
         d={path}
         fill="none"
-        stroke={isHovered ? '#3b82f6' : colors.stroke}
-        strokeWidth={strokeWidth}
+        stroke={strokeColor}
+        strokeWidth={1.5}
         strokeLinecap="round"
-        className="transition-all duration-200"
+        className="transition-colors duration-150"
       />
 
-      {/* Animated flow particles for running state */}
+      {/* Animated particle for running state */}
       {shouldAnimate && (
-        <circle r="3" fill={colors.fill}>
+        <circle r="3" fill={colors.glow}>
           <animateMotion
             dur="0.8s"
             repeatCount="indefinite"
@@ -173,37 +175,10 @@ function ProEdgeComponent({
         </circle>
       )}
 
-      {/* Source handle circle */}
-      <circle
-        cx={sourcePosition.x + NODE_WIDTH}
-        cy={sourcePosition.y + NODE_HEIGHT / 2}
-        r={5}
-        fill="white"
-        stroke={isHovered ? '#3b82f6' : '#d1d5db'}
-        strokeWidth={2}
-      />
-
-      {/* Arrow marker before target */}
-      <polygon
-        points={`${arrowPos.x - 6},${arrowPos.y - 4} ${arrowPos.x},${arrowPos.y} ${arrowPos.x - 6},${arrowPos.y + 4}`}
-        fill={isHovered ? '#3b82f6' : colors.stroke}
-        className="transition-all duration-200"
-      />
-
-      {/* Target handle circle */}
-      <circle
-        cx={targetPosition.x}
-        cy={targetPosition.y + NODE_HEIGHT / 2}
-        r={5}
-        fill="white"
-        stroke={isHovered ? '#3b82f6' : '#d1d5db'}
-        strokeWidth={2}
-      />
-
       {/* Delete button on hover */}
       {isHovered && onClick && (
         <g 
-          transform={`translate(${midpoint.x}, ${midpoint.y - 16})`}
+          transform={`translate(${midpoint.x}, ${midpoint.y})`}
           onClick={handleClick}
           className="cursor-pointer"
         >
