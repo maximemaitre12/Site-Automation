@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { DocTemplate } from "@/hooks/useAetherDocs";
 import {
   FileText,
@@ -92,19 +91,19 @@ export function DocGenerateDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl h-[80vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0 border-b">
           <DialogTitle className="flex items-center gap-2">
             <Wand2 className="w-5 h-5 text-primary" />
-            Générer un document
+            Générer un document Word
           </DialogTitle>
           <DialogDescription>
-            Sélectionnez un template et laissez l'IA générer votre document.
+            Sélectionnez un template et laissez l'IA générer votre document professionnel.
           </DialogDescription>
         </DialogHeader>
 
         {!selectedTemplate ? (
-          <ScrollArea className="flex-1 -mx-6 px-6">
+          <div className="flex-1 overflow-y-auto px-6 py-4">
             <div className="space-y-6 pb-4">
               {Object.entries(groupedTemplates).map(([category, categoryTemplates]) => {
                 const CategoryIcon = categoryIcons[category] || FileText;
@@ -130,7 +129,7 @@ export function DocGenerateDialog({
                             <div className="min-w-0 flex-1">
                               <p className="font-medium text-sm md:text-base truncate">{template.name}</p>
                               {template.description && (
-                                <p className="text-xs md:text-sm text-muted-foreground line-clamp-1 md:line-clamp-2 mt-0.5">
+                                <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mt-0.5">
                                   {template.description}
                                 </p>
                               )}
@@ -155,60 +154,66 @@ export function DocGenerateDialog({
                 </div>
               )}
             </div>
-          </ScrollArea>
+          </div>
         ) : (
-          <div className="space-y-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedTemplate(null)}
-              className="mb-2"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour aux templates
-            </Button>
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="space-y-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedTemplate(null)}
+                className="mb-2"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Retour aux templates
+              </Button>
 
-            <Card className="p-4 bg-muted/50">
-              <div className="flex items-center gap-3">
-                {(() => {
-                  const CategoryIcon = categoryIcons[selectedTemplate.category] || FileText;
-                  return (
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <CategoryIcon className="w-5 h-5 text-primary" />
-                    </div>
-                  );
-                })()}
-                <div>
-                  <p className="font-medium">{selectedTemplate.name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+              <Card className="p-4 bg-muted/50">
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const CategoryIcon = categoryIcons[selectedTemplate.category] || FileText;
+                    return (
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <CategoryIcon className="w-5 h-5 text-primary" />
+                      </div>
+                    );
+                  })()}
+                  <div>
+                    <p className="font-medium">{selectedTemplate.name}</p>
+                    <p className="text-sm text-muted-foreground">{selectedTemplate.description}</p>
+                  </div>
                 </div>
+              </Card>
+
+              <div>
+                <Label>Titre du document *</Label>
+                <Input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Ex: Contrat de prestation XYZ"
+                  className="mt-1"
+                />
               </div>
-            </Card>
 
-            <div>
-              <Label>Titre du document *</Label>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ex: Contrat de prestation XYZ"
-                className="mt-1"
-              />
+              <div>
+                <Label>Instructions pour la génération</Label>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Décrivez le contenu souhaité, les informations à inclure, le ton, etc."
+                  className="mt-1 min-h-[120px]"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Donnez le maximum de contexte pour une génération optimale. Le document sera exporté en format Word (.docx).
+                </p>
+              </div>
             </div>
+          </div>
+        )}
 
-            <div>
-              <Label>Instructions pour l'IA</Label>
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Décrivez le contenu souhaité, les informations à inclure, le ton, etc."
-                className="mt-1 min-h-[120px]"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Donnez le maximum de contexte pour une meilleure génération.
-              </p>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
+        {selectedTemplate && (
+          <div className="flex-shrink-0 border-t px-6 py-4 bg-background">
+            <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
@@ -221,7 +226,7 @@ export function DocGenerateDialog({
                 ) : (
                   <>
                     <Wand2 className="w-4 h-4 mr-2" />
-                    Générer
+                    Générer le Word
                   </>
                 )}
               </Button>
