@@ -3605,36 +3605,42 @@ export type Database = {
       }
       workflow_runs: {
         Row: {
+          blocks_status: Json | null
           completed_at: string | null
           created_at: string
           error_message: string | null
           id: string
           input_data: Json | null
           output_data: Json | null
+          parallel_branches: Json | null
           started_at: string | null
           status: string | null
           user_id: string
           workflow_id: string
         }
         Insert: {
+          blocks_status?: Json | null
           completed_at?: string | null
           created_at?: string
           error_message?: string | null
           id?: string
           input_data?: Json | null
           output_data?: Json | null
+          parallel_branches?: Json | null
           started_at?: string | null
           status?: string | null
           user_id: string
           workflow_id: string
         }
         Update: {
+          blocks_status?: Json | null
           completed_at?: string | null
           created_at?: string
           error_message?: string | null
           id?: string
           input_data?: Json | null
           output_data?: Json | null
+          parallel_branches?: Json | null
           started_at?: string | null
           status?: string | null
           user_id?: string
@@ -3643,6 +3649,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workflow_runs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_secrets: {
+        Row: {
+          created_at: string | null
+          encrypted_value: string
+          id: string
+          key: string
+          user_id: string
+          workflow_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          encrypted_value: string
+          id?: string
+          key: string
+          user_id: string
+          workflow_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          encrypted_value?: string
+          id?: string
+          key?: string
+          user_id?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_secrets_workflow_id_fkey"
             columns: ["workflow_id"]
             isOneToOne: false
             referencedRelation: "workflows"
@@ -3659,8 +3700,10 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          settings: Json | null
           updated_at: string
           user_id: string
+          variables: Json | null
         }
         Insert: {
           blocks?: Json | null
@@ -3670,8 +3713,10 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          settings?: Json | null
           updated_at?: string
           user_id: string
+          variables?: Json | null
         }
         Update: {
           blocks?: Json | null
@@ -3681,8 +3726,10 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          settings?: Json | null
           updated_at?: string
           user_id?: string
+          variables?: Json | null
         }
         Relationships: []
       }

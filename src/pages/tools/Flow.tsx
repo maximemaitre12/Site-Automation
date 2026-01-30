@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useWorkflows, useWorkflowRuns } from '@/hooks/useWorkflows';
 import { Workflow, WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { WorkflowBuilder } from '@/components/flow/WorkflowBuilder';
-import { EnhancedWorkflowCanvas } from '@/components/flow/EnhancedWorkflowCanvas';
+import { HorizontalCanvas } from '@/components/flow/canvas/HorizontalCanvas';
 import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
 import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
 import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
@@ -495,19 +495,26 @@ export default function Flow() {
                     </div>
                   </div>
                   
-                  {/* Canvas */}
+                  {/* Canvas Horizontal */}
                   <div className="flex-1 overflow-hidden workflow-canvas-area" style={{ minHeight: '500px' }}>
-                    <EnhancedWorkflowCanvas
+                    <HorizontalCanvas
                       blocks={localBlocks}
                       connections={localConnections}
                       selectedBlockId={selectedBlockId}
-                      onSelectBlock={setSelectedBlockId}
-                      onUpdateBlock={handleUpdateBlock}
-                      onDeleteBlock={handleDeleteBlock}
-                      onDuplicateBlock={handleDuplicateBlock}
-                      onAddConnection={handleAddConnection}
-                      onRemoveConnection={handleRemoveConnection}
-                      onAddBlock={() => setIsBlockPickerOpen(true)}
+                      onBlockSelect={setSelectedBlockId}
+                      onBlockUpdate={handleUpdateBlock}
+                      onBlockDelete={handleDeleteBlock}
+                      onBlockDuplicate={handleDuplicateBlock}
+                      onConnectionAdd={handleAddConnection}
+                      onConnectionRemove={handleRemoveConnection}
+                      onBlocksChange={setLocalBlocks}
+                      onSave={handleSaveWorkflow}
+                      onRun={() => {}}
+                      onUndo={handleUndo}
+                      onRedo={handleRedo}
+                      canUndo={canUndo}
+                      canRedo={canRedo}
+                      hasUnsavedChanges={hasUnsavedChanges}
                     />
                   </div>
                 </div>

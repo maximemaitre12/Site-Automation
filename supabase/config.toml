@@ -3,6 +3,12 @@ project_id = "gydrpmetswrkrjcbkgqd"
 [functions.workflow-execute]
 verify_jwt = true
 
+[functions.workflow-execute-v2]
+verify_jwt = true
+
+[functions.workflow-stream-events]
+verify_jwt = false
+
 [functions.workflow-generate]
 verify_jwt = true
 
