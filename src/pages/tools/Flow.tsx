@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useWorkflows, useWorkflowRuns } from '@/hooks/useWorkflows';
 import { Workflow, WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { WorkflowBuilder } from '@/components/flow/WorkflowBuilder';
-import { HorizontalCanvas } from '@/components/flow/canvas/HorizontalCanvas';
+import { ProCanvasV2 } from '@/components/flow/canvas/ProCanvasV2';
 import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
 import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
 import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
@@ -524,9 +524,9 @@ export default function Flow() {
                     </div>
                   </div>
                   
-                  {/* Canvas Horizontal */}
+                  {/* Pro Canvas V2 - N8N Style */}
                   <div className="flex-1 overflow-hidden workflow-canvas-area" style={{ minHeight: '500px' }}>
-                    <HorizontalCanvas
+                    <ProCanvasV2
                       blocks={localBlocks}
                       connections={localConnections}
                       selectedBlockId={selectedBlockId}
@@ -545,6 +545,7 @@ export default function Flow() {
                       canRedo={canRedo}
                       hasUnsavedChanges={hasUnsavedChanges}
                       onAutoLayout={handleAutoLayout}
+                      onAddBlock={() => setIsBlockPickerOpen(true)}
                     />
                   </div>
                 </div>
