@@ -383,19 +383,34 @@ export function useAetherDocs() {
     if (!user) return null;
 
     try {
-      const { data, error } = await supabase.functions.invoke('doc-generate', {
+      toast.info('Génération du document Word en cours...');
+      
+      const { data, error } = await supabase.functions.invoke('doc-generate-word', {
         body: { templateId, variables, title }
       });
 
       if (error) {
+        console.error('Generate error:', error);
         toast.error('Erreur lors de la génération');
         return null;
       }
 
       await fetchDocuments();
-      toast.success('Document généré');
+      toast.success('Document Word généré avec succès');
+      
+      // Auto-download the Word file if URL is available
+      if (data?.downloadUrl) {
+        const link = document.createElement('a');
+        link.href = data.downloadUrl;
+        link.download = `${title}.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
       return data;
     } catch (e) {
+      console.error('Generate failed:', e);
       toast.error('Erreur lors de la génération');
       return null;
     }
