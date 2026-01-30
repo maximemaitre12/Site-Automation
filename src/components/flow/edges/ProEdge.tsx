@@ -36,35 +36,98 @@ const statusColors: Record<ExecutionStatus, { stroke: string; fill: string }> = 
   cancelled: { stroke: '#f97316', fill: '#fb923c' },
 };
 
+type ConnectionDirection = 'horizontal' | 'vertical' | 'mixed';
+
+function detectConnectionDirection(
+  source: { x: number; y: number },
+  target: { x: number; y: number }
+): ConnectionDirection {
+  const sourceCenterX = source.x + NODE_WIDTH / 2;
+  const sourceCenterY = source.y + NODE_HEIGHT / 2;
+  const targetCenterX = target.x + NODE_WIDTH / 2;
+  const targetCenterY = target.y + NODE_HEIGHT / 2;
+
+  const deltaX = Math.abs(targetCenterX - sourceCenterX);
+  const deltaY = Math.abs(targetCenterY - sourceCenterY);
+
+  // If target is mostly below/above and horizontally aligned → vertical
+  if (deltaX < NODE_WIDTH * 0.6 && deltaY > NODE_HEIGHT * 0.5) {
+    return 'vertical';
+  }
+  // If target is mostly to the right/left → horizontal
+  if (deltaX > NODE_WIDTH * 0.3) {
+    return 'horizontal';
+  }
+  return 'mixed';
+}
+
 function calculatePath(
   source: { x: number; y: number },
   target: { x: number; y: number }
-): { path: string; midpoint: { x: number; y: number } } {
-  const sourceX = source.x + NODE_WIDTH;
-  const sourceY = source.y + NODE_HEIGHT / 2;
-  const targetX = target.x;
-  const targetY = target.y + NODE_HEIGHT / 2;
+): { path: string; midpoint: { x: number; y: number }; direction: ConnectionDirection } {
+  const direction = detectConnectionDirection(source, target);
 
-  const deltaX = targetX - sourceX;
-  const deltaY = Math.abs(targetY - sourceY);
-  
-  // Adjust control point offset based on distance
-  const cpOffset = Math.max(60, Math.min(150, Math.abs(deltaX) * 0.35));
+  let sourceX: number, sourceY: number, targetX: number, targetY: number;
+  let path: string;
+  let midX: number, midY: number;
 
-  const cp1x = sourceX + cpOffset;
-  const cp1y = sourceY;
-  const cp2x = targetX - cpOffset;
-  const cp2y = targetY;
+  if (direction === 'vertical') {
+    // Vertical connection: bottom-center of source → top-center of target
+    const isTargetBelow = target.y > source.y;
+    
+    sourceX = source.x + NODE_WIDTH / 2;
+    sourceY = isTargetBelow ? source.y + NODE_HEIGHT : source.y;
+    targetX = target.x + NODE_WIDTH / 2;
+    targetY = isTargetBelow ? target.y : target.y + NODE_HEIGHT;
 
-  // Calculate midpoint on the Bézier curve
-  const t = 0.5;
-  const midX = Math.pow(1-t,3)*sourceX + 3*Math.pow(1-t,2)*t*cp1x + 3*(1-t)*Math.pow(t,2)*cp2x + Math.pow(t,3)*targetX;
-  const midY = Math.pow(1-t,3)*sourceY + 3*Math.pow(1-t,2)*t*cp1y + 3*(1-t)*Math.pow(t,2)*cp2y + Math.pow(t,3)*targetY;
+    const deltaX = Math.abs(targetX - sourceX);
+    
+    if (deltaX < 5) {
+      // Straight vertical line
+      path = `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
+      midX = (sourceX + targetX) / 2;
+      midY = (sourceY + targetY) / 2;
+    } else {
+      // Curved vertical connection with smooth S-curve
+      const midPointY = (sourceY + targetY) / 2;
+      path = `M ${sourceX} ${sourceY} C ${sourceX} ${midPointY}, ${targetX} ${midPointY}, ${targetX} ${targetY}`;
+      midX = (sourceX + targetX) / 2;
+      midY = midPointY;
+    }
+  } else {
+    // Horizontal connection: right-center of source → left-center of target
+    sourceX = source.x + NODE_WIDTH;
+    sourceY = source.y + NODE_HEIGHT / 2;
+    targetX = target.x;
+    targetY = target.y + NODE_HEIGHT / 2;
 
-  return {
-    path: `M ${sourceX} ${sourceY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`,
-    midpoint: { x: midX, y: midY },
-  };
+    const deltaY = Math.abs(targetY - sourceY);
+
+    if (deltaY < 5) {
+      // Straight horizontal line
+      path = `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
+      midX = (sourceX + targetX) / 2;
+      midY = (sourceY + targetY) / 2;
+    } else {
+      // Curved horizontal connection (Bézier)
+      const deltaX = targetX - sourceX;
+      const cpOffset = Math.max(60, Math.min(150, Math.abs(deltaX) * 0.35));
+
+      const cp1x = sourceX + cpOffset;
+      const cp1y = sourceY;
+      const cp2x = targetX - cpOffset;
+      const cp2y = targetY;
+
+      path = `M ${sourceX} ${sourceY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
+      
+      // Calculate midpoint on Bézier
+      const t = 0.5;
+      midX = Math.pow(1-t,3)*sourceX + 3*Math.pow(1-t,2)*t*cp1x + 3*(1-t)*Math.pow(t,2)*cp2x + Math.pow(t,3)*targetX;
+      midY = Math.pow(1-t,3)*sourceY + 3*Math.pow(1-t,2)*t*cp1y + 3*(1-t)*Math.pow(t,2)*cp2y + Math.pow(t,3)*targetY;
+    }
+  }
+
+  return { path, midpoint: { x: midX, y: midY }, direction };
 }
 
 function ProEdgeComponent({
@@ -79,7 +142,7 @@ function ProEdgeComponent({
   onClick,
   label,
 }: ProEdgeProps) {
-  const { path, midpoint } = useMemo(() => {
+  const { path, midpoint, direction } = useMemo(() => {
     return calculatePath(sourcePosition, targetPosition);
   }, [sourcePosition, targetPosition]);
 
@@ -92,9 +155,23 @@ function ProEdgeComponent({
     onClick?.(connection.id);
   };
 
-  // Arrow position
-  const targetX = targetPosition.x;
-  const targetY = targetPosition.y + NODE_HEIGHT / 2;
+  // Calculate arrow position based on direction
+  const arrowPosition = useMemo(() => {
+    if (direction === 'vertical') {
+      const isTargetBelow = targetPosition.y > sourcePosition.y;
+      return {
+        x: targetPosition.x + NODE_WIDTH / 2,
+        y: isTargetBelow ? targetPosition.y : targetPosition.y + NODE_HEIGHT
+      };
+    } else {
+      return {
+        x: targetPosition.x,
+        y: targetPosition.y + NODE_HEIGHT / 2
+      };
+    }
+  }, [targetPosition, sourcePosition, direction]);
+
+  // Stroke width based on zoom level
 
   // Stroke width based on zoom level
   const strokeWidth = zoomLevel === 'micro' ? 1.5 : zoomLevel === 'mini' ? 2 : 2.5;
@@ -207,8 +284,8 @@ function ProEdgeComponent({
 
       {/* Arrow at end - subtle and clean */}
       <circle
-        cx={targetX}
-        cy={targetY}
+        cx={arrowPosition.x}
+        cy={arrowPosition.y}
         r={4}
         fill="white"
         stroke={isHovered ? '#3b82f6' : colors.stroke}
