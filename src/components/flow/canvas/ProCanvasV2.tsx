@@ -99,6 +99,7 @@ function ProCanvasV2Component({
 }: ProCanvasV2Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const suppressCanvasClickRef = useRef(false);
 
   // Canvas state
   const [zoom, setZoom] = useState(1);
@@ -294,6 +295,9 @@ function ProCanvasV2Component({
       
       setSelectedBlockIds(selected);
       setIsSelecting(false);
+
+      // Prevent the click event fired after mouseup from immediately clearing the selection.
+      suppressCanvasClickRef.current = true;
       
       // If blocks were selected, adapt the selection rect to fit them
       if (selectedBlocks.length > 0) {
@@ -427,8 +431,13 @@ function ProCanvasV2Component({
     });
   }, [zoom]);
 
-  // Canvas click (deselect) - only if not currently selecting
+  // Canvas click (deselect) - ignore click right after a drag-selection
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
+    if (suppressCanvasClickRef.current) {
+      suppressCanvasClickRef.current = false;
+      return;
+    }
+
     if (e.target === svgRef.current || (e.target as Element).classList.contains('canvas-background')) {
       // Only deselect if we have selection and no active selection rectangle
       if (selectedBlockIds.size > 0 && !isSelecting) {
@@ -668,18 +677,20 @@ function ProCanvasV2Component({
           ))}
         </g>
 
-        {/* Selection Rectangle */}
-        {isSelecting && selectionRect && (
+        {/* Selection Rectangle (during drag + persistent around selected blocks) */}
+        {selectionRect && (isSelecting || selectedBlockIds.size > 0) && (
           <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
             <rect
               x={Math.min(selectionRect.startX, selectionRect.endX)}
               y={Math.min(selectionRect.startY, selectionRect.endY)}
               width={Math.abs(selectionRect.endX - selectionRect.startX)}
               height={Math.abs(selectionRect.endY - selectionRect.startY)}
-              fill="rgba(34, 197, 94, 0.1)"
-              stroke="#22c55e"
+              style={{
+                fill: 'hsl(var(--primary) / 0.10)',
+                stroke: 'hsl(var(--primary))',
+              }}
               strokeWidth={1.5 / zoom}
-              strokeDasharray={`${4 / zoom}`}
+              strokeDasharray={isSelecting ? `${4 / zoom}` : undefined}
               rx={4 / zoom}
             />
           </g>
@@ -762,7 +773,7 @@ function ProCanvasV2Component({
         <span>•</span>
         <span>F: Fit</span>
         <span>•</span>
-        <span>Clic droit: Sélection</span>
+        <span>Clic gauche: Sélection</span>
       </div>
 
       {/* Context Menu */}
