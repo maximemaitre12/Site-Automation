@@ -164,22 +164,24 @@
   overflow-anchor: none;
 }
 
-/* Workflow canvas stability fix */
+/* Workflow canvas stability fix (keeps fixed-viewport apps scrollable inside panels)
+   IMPORTANT: avoid forcing flex-shrink:0 on direct children, it breaks nested scrolling.
+*/
 .workflow-canvas-container {
   display: flex;
   flex-direction: column;
-  min-height: 500px;
   height: 100%;
+  min-height: 0;
   flex: 1;
 }
 
 .workflow-canvas-container > * {
-  flex-shrink: 0;
+  min-height: 0;
 }
 
 .workflow-canvas-area {
   flex: 1;
-  min-height: 400px;
+  min-height: 0;
   position: relative;
   overflow: hidden;
 }
