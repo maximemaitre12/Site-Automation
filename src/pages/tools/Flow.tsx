@@ -61,7 +61,7 @@ export default function Flow() {
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [viewMode, setViewMode] = useState<'canvas' | 'builder'>('canvas');
-  const [flowTab, setFlowTab] = useState<'workflows' | 'automation'>('workflows');
+  
   
   // Undo/Redo history
   const [history, setHistory] = useState<HistoryState[]>([]);
@@ -354,39 +354,8 @@ export default function Flow() {
   return (
     <DashboardLayout headerActions={headerActions}>
       <div className="flex flex-col h-full workflow-canvas-container" style={{ height: '100%', minHeight: '600px' }}>
-        {/* Header */}
-        <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card/30 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-flow/10 border border-agent-flow/20 flex items-center justify-center shrink-0">
-              <WorkflowIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-flow" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Flow</h1>
-              <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Automatisation et workflows IA</p>
-            </div>
-            
-            {/* Tabs for Workflows vs Automation */}
-            <Tabs value={flowTab} onValueChange={(v) => setFlowTab(v as typeof flowTab)} className="shrink-0">
-              <TabsList className="h-8 md:h-9">
-                <TabsTrigger value="workflows" className="gap-2 text-xs md:text-sm h-7 md:h-8 px-3">
-                  <Zap className="w-4 h-4" />
-                  <span className="hidden sm:inline">Workflows</span>
-                </TabsTrigger>
-                <TabsTrigger value="automation" className="gap-2 text-xs md:text-sm h-7 md:h-8 px-3">
-                  <Bot className="w-4 h-4" />
-                  <span className="hidden sm:inline">Auto IA</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </header>
 
-        {flowTab === 'automation' ? (
-          <div className="flex-1 overflow-auto p-3 md:p-6">
-            <AIAutomationRules />
-          </div>
-        ) : (
-          <>
+        {/* Main Content */}
             {/* Main Content */}
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
               {/* Sidebar - Workflows List */}
@@ -573,8 +542,6 @@ export default function Flow() {
                 </div>
               )}
             </div>
-          </>
-        )}
       </div>
 
       {/* Create Workflow Dialog */}
