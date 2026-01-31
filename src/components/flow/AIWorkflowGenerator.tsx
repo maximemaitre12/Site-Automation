@@ -93,7 +93,7 @@ const EXAMPLE_PROMPTS = [
     icon: Mail,
     title: 'Email Intelligence Agent',
     prompt: `Create a comprehensive email processing and automation agent with minimum 20 blocks:
-1. TRIGGER: Monitor inbox via IMAP/Gmail for new emails
+1. TRIGGER: Monitor inbox via Gmail OAuth for new emails
 2. FILTER: Apply rules (exclude spam, newsletters, automated)
 3. PARSE_SENDER: Extract sender info, check against contacts
 4. LANGUAGE_DETECT: Identify email language

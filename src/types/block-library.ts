@@ -279,8 +279,7 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
     params: [
       { key: 'provider', label: 'Email Provider', type: 'select', options: [
         { label: 'Gmail (OAuth)', value: 'gmail' },
-        { label: 'Outlook (OAuth)', value: 'outlook' },
-        { label: 'IMAP', value: 'imap' }
+        { label: 'Outlook (OAuth)', value: 'outlook' }
       ], defaultValue: 'gmail', section: 'main' },
       { key: 'query', label: 'Filter Query', type: 'string', placeholder: 'is:unread', section: 'main' },
       { key: 'maxResults', label: 'Max Emails', type: 'number', defaultValue: 10, section: 'settings' }

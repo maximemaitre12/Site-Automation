@@ -48,7 +48,7 @@ const N8N_TO_PRIMITIVE_MAP: Record<N8NBlockType, BlockType> = {
   tools_api_connector: 'http_request',
   tools_file_read: 'file_read',
   tools_file_write: 'file_write',
-  tools_email_send: 'email_smtp',
+  tools_email_send: 'email_oauth',
   tools_sms_send: 'message_send',
   tools_slack_post: 'message_send',
   tools_discord_post: 'message_send',
