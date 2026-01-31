@@ -166,12 +166,80 @@ function interpolateTemplate(value: unknown, input: any): unknown {
   if (typeof value !== 'string') return value;
   if (!value.includes('{{')) return value;
 
-  return value.replace(/{{\s*\$json(?:\.([^}]+))?\s*}}/g, (_match, rawPath) => {
-    const path = typeof rawPath === 'string' ? rawPath.trim() : '';
+  const toTitleCase = (s: string) => {
+    const lower = s.toLowerCase();
+    // Uppercase first letter after start/space/dash/underscore
+    return lower.replace(/(^|[\s\-_])\p{L}/gu, (m) => m.toUpperCase());
+  };
+
+  const slugify = (s: string) => {
+    const normalized = s
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase();
+    return normalized
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80);
+  };
+
+  const applyFilter = (inputStr: string, filterRaw: string) => {
+    const name = filterRaw.trim().toLowerCase();
+    switch (name) {
+      case 'title':
+      case 'titlecase':
+        return toTitleCase(inputStr);
+      case 'upper':
+        return inputStr.toUpperCase();
+      case 'lower':
+        return inputStr.toLowerCase();
+      case 'trim':
+        return inputStr.trim();
+      case 'slug':
+      case 'slugify':
+        return slugify(inputStr);
+      default:
+        return inputStr;
+    }
+  };
+
+  return value.replace(/{{\s*\$json(?:\.([^}]+))?\s*}}/g, (_match, rawExpr) => {
+    const expr = typeof rawExpr === 'string' ? rawExpr.trim() : '';
+    const parts = expr
+      ? expr.split('|').map((p) => p.trim()).filter(Boolean)
+      : [];
+
+    const path = parts.length > 0 ? parts[0] : '';
+    const filters = parts.slice(1);
+
     const resolved = path ? safeGetPath(input, path) : input;
     if (resolved === null || resolved === undefined) return '';
-    return typeof resolved === 'string' ? resolved : JSON.stringify(resolved);
+
+    let str = typeof resolved === 'string' ? resolved : JSON.stringify(resolved);
+    for (const f of filters) {
+      str = applyFilter(str, f);
+    }
+    return str;
   });
+}
+
+function sanitizeFilename(name: string, extension: string) {
+  const base = (name || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[/\\?%*:|"<>]/g, '-')
+    .replace(/\.+$/g, '')
+    .trim();
+
+  const cleaned = base
+    .replace(/[^\p{L}\p{N}\-_\. ]/gu, '')
+    .replace(/\s+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 120);
+
+  const safeBase = cleaned && cleaned !== '_' ? cleaned : `document_${Date.now()}`;
+  const ext = extension.startsWith('.') ? extension : `.${extension}`;
+  return safeBase.endsWith(ext) ? safeBase : `${safeBase}${ext}`;
 }
 
 // Safe filter function - replaces eval in filter operations
@@ -651,45 +719,76 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
       case 'generate_document': {
         const format = (block.config?.format || 'docx').toString().toLowerCase();
         const inputData = context.input;
-        const resolvedTitle = interpolateTemplate(block.config?.title || 'Generated Document', inputData) as string;
         const defaultFilename = format === 'pdf' ? 'document.pdf' : 'document.docx';
-        const resolvedFilename = (interpolateTemplate(
-          block.config?.filename || defaultFilename,
-          inputData
-        ) as string) || defaultFilename;
-        
+
+        // Resolve title with template + safe fallbacks
+        const rawTitle = String(interpolateTemplate(block.config?.title || '', inputData) ?? '').trim();
+
         // Try to resolve content from config, or fallback to common content fields from input
         let resolvedContent = interpolateTemplate(block.config?.content || '', inputData) as string;
-        
-        // If content is empty, try to extract from common input fields (ai_generate outputs "generated")
         if (!resolvedContent || resolvedContent.trim() === '') {
           if (typeof inputData === 'string') {
             resolvedContent = inputData;
           } else if (inputData && typeof inputData === 'object') {
-            // Check common content fields from AI generation blocks
-            resolvedContent = inputData.generated || 
-                             inputData.text_content || 
-                             inputData.content || 
-                             inputData.text || 
+            resolvedContent = inputData.generated ||
+                             inputData.text_content ||
+                             inputData.content ||
+                             inputData.text ||
                              inputData.output ||
                              inputData.result ||
                              '';
-            // If still object, stringify it
             if (typeof resolvedContent === 'object') {
               resolvedContent = JSON.stringify(resolvedContent, null, 2);
             }
           }
         }
+
+        const fallbackTitle = (() => {
+          if (rawTitle && rawTitle.replace(/[-–—\s]/g, '') !== '') return rawTitle;
+          if (typeof inputData === 'object' && inputData) {
+            const t = String(
+              (inputData.title || inputData.subject || inputData.email_subject || inputData.generated || '')
+            ).trim();
+            if (t) return t;
+          }
+          const firstLine = String(resolvedContent || '').split(/\r?\n/)[0]?.trim();
+          if (firstLine) return firstLine.slice(0, 90);
+          return 'Document';
+        })();
+
+        // Resolve filename with template + safe fallbacks
+        const rawFilename = String(
+          interpolateTemplate(block.config?.filename || '', inputData) ?? ''
+        ).trim();
+
+        const resolvedFilename = rawFilename
+          ? sanitizeFilename(rawFilename, format === 'pdf' ? '.pdf' : '.docx')
+          : sanitizeFilename(fallbackTitle, format === 'pdf' ? '.pdf' : '.docx');
         
-        console.log(`Generate document: format=${format}, title="${resolvedTitle}", contentLength=${(resolvedContent || '').length}`);
+        // If the generated content is suspiciously short, expand it into a deliverable document.
+        // This prevents "empty" PDFs that are impossible to ship to clients.
+        if ((resolvedContent || '').trim().length > 0 && (resolvedContent || '').trim().length < 200) {
+          try {
+            const systemPrompt = `Tu es un cadre dirigeant français avec 30 ans d'expérience en rédaction professionnelle.\n\nINTERDICTIONS ABSOLUES:\n- Pas de markdown (#, **, ---)\n- Pas de crochets []\n- Pas de phrases du type "Voici..."\n- Pas de placeholders\n\nOBJECTIF:\nTransformer l'entrée en un document complet, prêt à être envoyé à un client (ton expert, structuré, naturel).`;
+            const prompt = `Titre du document: ${fallbackTitle}\n\nEntrée à développer (trop courte actuellement):\n${resolvedContent}\n\nRédige un document complet en français (plusieurs paragraphes, éventuellement quelques puces si utile).`;
+            const expanded = await callLovableAI(prompt, systemPrompt);
+            if (expanded && expanded.trim().length > resolvedContent.trim().length) {
+              resolvedContent = expanded.trim();
+            }
+          } catch (e) {
+            console.warn('Failed to expand short document content:', e);
+          }
+        }
+
+        console.log(`Generate document: format=${format}, title="${fallbackTitle}", contentLength=${(resolvedContent || '').length}`);
 
         if (format === 'pdf') {
           // PDF document - provide structured data for frontend PDF generation
-          const finalFilename = resolvedFilename.endsWith('.pdf') ? resolvedFilename : `${resolvedFilename.replace(/\.[^.]+$/, '')}.pdf`;
+          const finalFilename = sanitizeFilename(resolvedFilename, '.pdf');
           output = {
             type: 'pdf_document',
             filename: finalFilename,
-            title: resolvedTitle,
+            title: fallbackTitle,
             content: resolvedContent,
             contentLength: (resolvedContent || '').length,
             ready: true,
@@ -697,7 +796,7 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
             _downloadData: {
               filename: finalFilename,
               content: resolvedContent,
-              title: resolvedTitle,
+              title: fallbackTitle,
               mimeType: 'application/pdf',
               format: 'pdf'
             },
@@ -707,16 +806,16 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
           // Word document (docx) - default
           output = {
             type: 'word_document',
-            filename: resolvedFilename,
-            title: resolvedTitle,
+            filename: sanitizeFilename(resolvedFilename, '.docx'),
+            title: fallbackTitle,
             content: resolvedContent,
             contentLength: (resolvedContent || '').length,
             ready: true,
             format: 'docx',
             _downloadData: {
-              filename: resolvedFilename,
+              filename: sanitizeFilename(resolvedFilename, '.docx'),
               content: resolvedContent,
-              title: resolvedTitle,
+              title: fallbackTitle,
               mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
               format: 'docx'
             },
@@ -868,22 +967,37 @@ Only output JSON, no other text.`;
 
       case 'ai_generate': {
         const userPrompt = block.config?.prompt || 'Generate a professional response';
-        const tone = block.config?.tone || 'professional';
+        const tone = block.config?.tone || block.config?.style || 'professional';
         const maxTokens = block.config?.maxTokens || 500;
+        const lengthPreset = (block.config?.length || '').toString().toLowerCase();
         const outputFormat = block.config?.output_format || 'text';
         const docType = block.config?.document_type || block.config?.type || 'professionnel';
         const folderId = block.config?.folder_id || context.variables?.folderId || context.variables?.folder_id;
         const tags = block.config?.tags;
         const workflowId = context.variables?.workflowId || context.variables?.workflow_id;
         const workflowRunId = context.variables?.workflowRunId || context.variables?.workflow_run_id;
-        
-        const systemPrompt = `You are a ${tone} content generator. Be concise and focused. Max ~${maxTokens} tokens.`;
+
+        const wantsLongForm =
+          ['medium', 'long'].includes(lengthPreset) ||
+          /\b(document|rapport|courrier|note|proc[ée]dure|contrat|devis|r[ée]clamation|support)\b/i.test(String(userPrompt));
+
+        const targetLengthHint =
+          lengthPreset === 'long'
+            ? '900–1600 mots'
+            : lengthPreset === 'medium'
+              ? '500–900 mots'
+              : '200–400 mots';
+
+        const systemPrompt = wantsLongForm
+          ? `Tu es un cadre dirigeant français avec 30 ans d'expérience en rédaction professionnelle.\n\nINTERDICTIONS ABSOLUES (ne fais JAMAIS ceci):\n- Pas de crochets []\n- Pas de markdown: **, ##, #, ---, *, -\n- Pas de phrases robotiques d'IA\n- Pas de templates (Objet:, Date:, Auteur:)\n\nSTYLE OBLIGATOIRE:\n- Rédaction naturelle, expert senior\n- Clair, structuré, actionnable\n- Longueur cible: ${targetLengthHint}\n- Ton: ${tone}\n- Si c'est un document, commence directement par le contenu (pas d'en-tête artificiel).`
+          : `You are a ${tone} content generator. Be concise and focused. Max ~${maxTokens} tokens.`;
+
         const prompt = `${userPrompt}
 
-Context/Input:
+Contexte / Données d'entrée:
 ${inputText}
 
-Generate the requested content.`;
+Génère le contenu demandé.`;
         
         const result = await callLovableAI(prompt, systemPrompt);
         output = { generated: result, tone, characterCount: result.length };
