@@ -38,7 +38,17 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
     });
   };
 
+  // Check if a field should be visible based on showWhen condition
+  const shouldShowField = (field: ConfigField): boolean => {
+    if (!field.showWhen) return true;
+    const currentValue = block.config?.[field.showWhen.field];
+    return currentValue === field.showWhen.value;
+  };
+
   const renderConfigField = (field: ConfigField) => {
+    // Skip hidden fields
+    if (!shouldShowField(field)) return null;
+    
     const value = block.config?.[field.key] ?? field.defaultValue ?? '';
 
     switch (field.type) {
@@ -49,6 +59,17 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
             value={value}
             onChange={(e) => updateConfig(field.key, e.target.value)}
             placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
+          />
+        );
+
+      case 'password':
+        return (
+          <Input
+            id={`config-${field.key}`}
+            type="password"
+            value={value}
+            onChange={(e) => updateConfig(field.key, e.target.value)}
+            placeholder={field.placeholder || '••••••••'}
           />
         );
 
@@ -93,7 +114,7 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
               onCheckedChange={(checked) => updateConfig(field.key, checked)}
             />
             <span className="text-sm text-muted-foreground">
-              {value ? 'Enabled' : 'Disabled'}
+              {value ? 'Activé' : 'Désactivé'}
             </span>
           </div>
         );
@@ -137,6 +158,28 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
           />
         );
     }
+  };
+
+  // Group fields by section
+  const groupFieldsBySection = (fields: ConfigField[]) => {
+    const sections: Record<string, ConfigField[]> = {};
+    fields.forEach(field => {
+      if (!shouldShowField(field)) return;
+      const section = field.section || 'general';
+      if (!sections[section]) sections[section] = [];
+      sections[section].push(field);
+    });
+    return sections;
+  };
+
+  const sectionLabels: Record<string, string> = {
+    connection: '🔗 Connexion',
+    auth: '🔐 Authentification',
+    filters: '🔍 Filtres',
+    message: '✉️ Message',
+    reply: '↩️ Réponse',
+    search: '🔎 Recherche',
+    general: '⚙️ Général',
   };
 
   return (
@@ -198,37 +241,45 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
               />
             </div>
 
-            {/* Config fields */}
+            {/* Config fields grouped by section */}
             {def?.configFields && def.configFields.length > 0 && (
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Code className="w-4 h-4" />
-                  Configuration
-                </h4>
-                
-                <TooltipProvider>
-                  {def.configFields.map((field) => (
-                    <div key={field.key} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor={`config-${field.key}`} className="flex items-center gap-1">
-                          {field.label}
-                          {field.required && <span className="text-destructive">*</span>}
-                        </Label>
-                        {field.helpText && (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="w-3 h-3 text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="max-w-xs">
-                              {field.helpText}
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                      {renderConfigField(field)}
-                    </div>
-                  ))}
-                </TooltipProvider>
+              <div className="space-y-6">
+                {Object.entries(groupFieldsBySection(def.configFields)).map(([section, fields]) => (
+                  <div key={section} className="space-y-4">
+                    <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
+                      {sectionLabels[section] || section}
+                    </h4>
+                    
+                    <TooltipProvider>
+                      {fields.map((field) => {
+                        const renderedField = renderConfigField(field);
+                        if (!renderedField) return null;
+                        
+                        return (
+                          <div key={field.key} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor={`config-${field.key}`} className="flex items-center gap-1 text-sm">
+                                {field.label}
+                                {field.required && <span className="text-destructive">*</span>}
+                              </Label>
+                              {field.helpText && (
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Info className="w-3 h-3 text-muted-foreground" />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="left" className="max-w-xs">
+                                    {field.helpText}
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                            </div>
+                            {renderedField}
+                          </div>
+                        );
+                      })}
+                    </TooltipProvider>
+                  </div>
+                ))}
               </div>
             )}
           </TabsContent>
