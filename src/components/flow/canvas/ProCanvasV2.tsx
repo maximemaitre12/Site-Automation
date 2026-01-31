@@ -499,9 +499,18 @@ function ProCanvasV2Component({
       const isInputFocused = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA';
       
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedBlockId && !isInputFocused) {
+        if (!isInputFocused) {
           e.preventDefault();
-          onBlockDelete(selectedBlockId);
+          // Delete multiple selected blocks
+          if (selectedBlockIds.size > 0) {
+            const idsToDelete = Array.from(selectedBlockIds);
+            setSelectedBlockIds(new Set());
+            setSelectionRect(null);
+            idsToDelete.forEach(id => onBlockDelete(id));
+          } else if (selectedBlockId) {
+            // Delete single selected block
+            onBlockDelete(selectedBlockId);
+          }
         }
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
@@ -539,7 +548,7 @@ function ProCanvasV2Component({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedBlockId, onBlockDelete, onUndo, onRedo, onSave, onBlockDuplicate, handleZoomIn, handleZoomOut, handleFitView]);
+  }, [selectedBlockId, selectedBlockIds, onBlockDelete, onUndo, onRedo, onSave, onBlockDuplicate, handleZoomIn, handleZoomOut, handleFitView]);
 
   // Build visual states
   const blockVisualStates: Record<string, BlockVisualState> = {};
