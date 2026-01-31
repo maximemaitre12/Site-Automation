@@ -168,14 +168,44 @@ function ProCanvasV2Component({
     );
   }, [blocks, searchQuery]);
 
-  // Zoom handlers with smooth animation
+  // Zoom handlers - zoom toward center of viewport
   const handleZoomIn = useCallback(() => {
-    setZoom(z => Math.min(z + 0.2, DEFAULT_CANVAS_CONFIG.maxZoom));
-  }, []);
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) {
+      setZoom(z => Math.min(z + 0.2, DEFAULT_CANVAS_CONFIG.maxZoom));
+      return;
+    }
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const newZoom = Math.min(zoom + 0.2, DEFAULT_CANVAS_CONFIG.maxZoom);
+    const zoomRatio = newZoom / zoom;
+    
+    setPan(p => ({
+      x: centerX - (centerX - p.x) * zoomRatio,
+      y: centerY - (centerY - p.y) * zoomRatio,
+    }));
+    setZoom(newZoom);
+  }, [zoom]);
 
   const handleZoomOut = useCallback(() => {
-    setZoom(z => Math.max(z - 0.2, DEFAULT_CANVAS_CONFIG.minZoom));
-  }, []);
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) {
+      setZoom(z => Math.max(z - 0.2, DEFAULT_CANVAS_CONFIG.minZoom));
+      return;
+    }
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const newZoom = Math.max(zoom - 0.2, DEFAULT_CANVAS_CONFIG.minZoom);
+    const zoomRatio = newZoom / zoom;
+    
+    setPan(p => ({
+      x: centerX - (centerX - p.x) * zoomRatio,
+      y: centerY - (centerY - p.y) * zoomRatio,
+    }));
+    setZoom(newZoom);
+  }, [zoom]);
 
   const handleZoomReset = useCallback(() => {
     setZoom(1);
@@ -213,13 +243,29 @@ function ProCanvasV2Component({
     onBlocksChange(newBlocks);
   }, [blocks, connections, onBlocksChange]);
 
-  // Wheel zoom with smooth scaling (reduced sensitivity for trackpad)
+  // Wheel zoom with smooth scaling - zooms toward mouse cursor
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
-      // Use smaller delta for smoother trackpad zoom
+      
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
+      // Mouse position relative to container
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      
+      // Calculate new zoom
       const delta = -e.deltaY * 0.002;
-      setZoom(z => Math.max(DEFAULT_CANVAS_CONFIG.minZoom, Math.min(DEFAULT_CANVAS_CONFIG.maxZoom, z + delta)));
+      const newZoom = Math.max(DEFAULT_CANVAS_CONFIG.minZoom, Math.min(DEFAULT_CANVAS_CONFIG.maxZoom, zoom + delta));
+      const zoomRatio = newZoom / zoom;
+      
+      // Adjust pan to keep the point under the mouse cursor fixed
+      setPan(p => ({
+        x: mouseX - (mouseX - p.x) * zoomRatio,
+        y: mouseY - (mouseY - p.y) * zoomRatio,
+      }));
+      setZoom(newZoom);
     } else {
       // Regular scroll = pan
       setPan(p => ({
@@ -227,7 +273,7 @@ function ProCanvasV2Component({
         y: p.y - e.deltaY * 0.5,
       }));
     }
-  }, []);
+  }, [zoom]);
 
   // Pan handlers (middle-click for pan, left-click for selection)
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
