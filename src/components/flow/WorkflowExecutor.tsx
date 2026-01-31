@@ -16,9 +16,17 @@ interface WorkflowExecutorProps {
   workflowId: string;
   workflowName: string;
   onRunCreated?: (runId: string, logs: WorkflowRunLog[], output: any) => void;
+  onFocusBlock?: (blockId: string) => void;
 }
 
-export function WorkflowExecutor({ blocks, connections = [], workflowId, workflowName, onRunCreated }: WorkflowExecutorProps) {
+export function WorkflowExecutor({
+  blocks,
+  connections = [],
+  workflowId,
+  workflowName,
+  onRunCreated,
+  onFocusBlock,
+}: WorkflowExecutorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [input, setInput] = useState('');
@@ -171,7 +179,9 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
         toast.success('Workflow completed successfully');
         await maybeAutoDownload(execution);
       } else {
-        toast.error((execution as any).error || 'Workflow failed');
+        const failedBlockName = (execution as any).failedBlockName;
+        const err = (execution as any).error || 'Workflow failed';
+        toast.error(failedBlockName ? `Blocage dans “${failedBlockName}” : ${err}` : err);
       }
 
       onRunCreated?.(workflowId, execution.logs, execution.output);
@@ -267,13 +277,22 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                   {logs.map((log, index) => {
                     const isExpanded = expandedLogs.has(log.blockId);
                     const isBranch = log.blockName.startsWith('[');
+                    const errorMessage = log.error || (log.output && typeof log.output === 'object' ? (log.output as any).error : undefined);
                     return (
                       <div
                         key={`${log.blockId}-${index}`}
                         className="border border-border rounded-lg overflow-hidden"
                       >
-                        <button
+                        <div
+                          role="button"
+                          tabIndex={0}
                           onClick={() => toggleLog(log.blockId)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleLog(log.blockId);
+                            }
+                          }}
                           className="w-full p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
                         >
                           {log.status === 'pending' && <Loader2 className="w-4 h-4 text-primary animate-spin" />}
@@ -285,6 +304,27 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                             {isBranch && <GitBranch className="w-3 h-3 text-amber-500" />}
                             {log.blockName}
                           </span>
+
+                          {log.status === 'error' && errorMessage && (
+                            <span className="hidden md:inline text-xs text-destructive truncate max-w-[220px]">
+                              {errorMessage}
+                            </span>
+                          )}
+
+                          {log.status === 'error' && onFocusBlock && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2 text-xs"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onFocusBlock(log.blockId);
+                              }}
+                            >
+                              Corriger
+                            </Button>
+                          )}
                           
                           {isBranch && (
                             <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-500 border-amber-500/30">
@@ -302,10 +342,35 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                           ) : (
                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
                           )}
-                        </button>
+                        </div>
                         
                         {isExpanded && (
                           <div className="p-3 border-t border-border bg-muted/30 space-y-3">
+                            {log.status === 'error' && errorMessage && (
+                              <div className="space-y-2">
+                                <div className="text-xs font-medium text-destructive">Erreur</div>
+                                <div className="text-xs text-destructive bg-background p-2 rounded">
+                                  {errorMessage}
+                                </div>
+                                {(log as any).errorDetails?.hint && (
+                                  <div className="text-xs text-muted-foreground">
+                                    <span className="font-medium">Conseil :</span> {(log as any).errorDetails.hint}
+                                  </div>
+                                )}
+                                {Array.isArray((log as any).errorDetails?.fields) && (
+                                  <div className="text-xs text-muted-foreground space-y-1">
+                                    <div className="font-medium">Champs à vérifier :</div>
+                                    <ul className="list-disc pl-4">
+                                      {(log as any).errorDetails.fields.map((f: any, i: number) => (
+                                        <li key={i}>
+                                          <span className="font-medium">{f.field}</span> — {f.message}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                             <div>
                               <div className="text-xs font-medium text-muted-foreground mb-1">Input</div>
                               <pre className="text-xs bg-background p-2 rounded overflow-x-auto max-h-32">
@@ -343,6 +408,29 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                 {!result.success && (result as any).error && (
                   <div className="text-sm text-destructive">
                     {(result as any).error}
+                  </div>
+                )}
+
+                {!result.success && onFocusBlock && (result as any).failedBlockId && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onFocusBlock((result as any).failedBlockId)}
+                    >
+                      Ouvrir le bloc en erreur
+                    </Button>
+                    {(result as any).failedBlockName && (
+                      <span className="text-xs text-muted-foreground truncate">
+                        {(result as any).failedBlockName}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {!result.success && (result as any).errorDetails?.hint && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    <span className="font-medium">Conseil :</span> {(result as any).errorDetails.hint}
                   </div>
                 )}
                 {result.output && (
