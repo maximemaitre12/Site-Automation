@@ -160,6 +160,20 @@ function safeGetPath(data: any, path: string): any {
   return current;
 }
 
+// Minimal n8n-style template interpolation.
+// Supports: "{{ $json }}" and "{{ $json.some.path[0] }}".
+function interpolateTemplate(value: unknown, input: any): unknown {
+  if (typeof value !== 'string') return value;
+  if (!value.includes('{{')) return value;
+
+  return value.replace(/{{\s*\$json(?:\.([^}]+))?\s*}}/g, (_match, rawPath) => {
+    const path = typeof rawPath === 'string' ? rawPath.trim() : '';
+    const resolved = path ? safeGetPath(input, path) : input;
+    if (resolved === null || resolved === undefined) return '';
+    return typeof resolved === 'string' ? resolved : JSON.stringify(resolved);
+  });
+}
+
 // Safe filter function - replaces eval in filter operations
 function safeFilter(items: any[], condition: string): any[] {
   return items.filter((item, index) => {
@@ -472,13 +486,10 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
           const messages = messagesData.messages || [];
 
           if (messages.length === 0) {
-            output = { 
-              type: 'gmail', 
-              emails: [], 
-              count: 0, 
-              message: 'Aucun email trouvé pour cette requête.' 
+            return {
+              output: null,
+              error: 'Aucun email trouvé pour cette requête Gmail. Vérifiez votre filtre (ex: "in:inbox" ou "is:unread") et que votre compte est bien connecté.'
             };
-            break;
           }
 
           // Fetch full details for each message
@@ -554,16 +565,54 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
             console.log(`Most recent email: From="${emails[0].from}", Subject="${emails[0].subject}", Date="${emails[0].date}"`);
           }
 
-          output = { 
-            type: 'gmail', 
-            emails,
-            count: emails.length,
-            query: finalQuery,
-            timestamp: new Date().toISOString()
-          };
+          // n8n-style: if maxResults===1, output a single item so expressions like {{ $json.subject }} work.
+          if ((maxResults || 1) === 1) {
+            output = {
+              ...(emails[0] || {}),
+              type: 'gmail_email',
+              query: finalQuery,
+              timestamp: new Date().toISOString(),
+            };
+          } else {
+            output = {
+              type: 'gmail',
+              items: emails,
+              count: emails.length,
+              query: finalQuery,
+              timestamp: new Date().toISOString(),
+            };
+          }
         } catch (gmailError) {
           return { output: null, error: `Erreur Gmail: ${gmailError instanceof Error ? gmailError.message : 'Erreur inconnue'}` };
         }
+        break;
+      }
+
+      // ===== BLOCK-LIBRARY COMPAT: Email Trigger (OAuth-only) =====
+      case 'email_trigger': {
+        const provider = (block.config?.provider || 'gmail').toString();
+        if (provider !== 'gmail') {
+          return {
+            output: null,
+            error: 'Seul Gmail (OAuth) est supporté pour le moment (IMAP/SMTP désactivés).',
+          };
+        }
+
+        // Reuse the Gmail trigger behavior (same tokens table), but keep the block type stable.
+        const query = block.config?.query || 'in:inbox';
+        const maxResults = block.config?.maxResults || 1;
+        const gmailResult = await executeBlock(
+          {
+            ...block,
+            type: 'trigger_gmail',
+            config: { ...block.config, query, maxResults },
+          },
+          context
+        );
+
+        // executeBlock returns {output, error?}
+        if (gmailResult.error) return gmailResult;
+        output = gmailResult.output;
         break;
       }
 
@@ -594,6 +643,37 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
           contentLength: content.length,
           ready: true,
           timestamp: new Date().toISOString()
+        };
+        break;
+      }
+
+      // ===== BLOCK-LIBRARY COMPAT: Generate Document =====
+      case 'generate_document': {
+        const format = (block.config?.format || 'docx').toString().toLowerCase();
+        if (format !== 'docx') {
+          return {
+            output: null,
+            error: 'Génération PDF pas encore supportée dans l’exécution (utilisez Word .docx pour le moment).',
+          };
+        }
+
+        const inputData = context.input;
+        const resolvedTitle = interpolateTemplate(block.config?.title || 'Generated Document', inputData) as string;
+        const resolvedFilename = (interpolateTemplate(
+          block.config?.filename || 'document.docx',
+          inputData
+        ) as string) || 'document.docx';
+        const resolvedContent = interpolateTemplate(block.config?.content || '', inputData) as string;
+
+        // Keep same shape as legacy doc_generate_word so downstream system_download can auto-download.
+        output = {
+          type: 'word_document',
+          filename: resolvedFilename,
+          title: resolvedTitle,
+          content: resolvedContent,
+          contentLength: (resolvedContent || '').length,
+          ready: true,
+          timestamp: new Date().toISOString(),
         };
         break;
       }
@@ -629,6 +709,40 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
             mimeType: format === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'text/plain'
           },
           timestamp: new Date().toISOString()
+        };
+        break;
+      }
+
+      // ===== BLOCK-LIBRARY COMPAT: Download File =====
+      case 'download_file': {
+        const inputData = context.input;
+        const resolvedFilename = (interpolateTemplate(block.config?.filename || '', inputData) as string) ||
+          (typeof inputData === 'object' && inputData?.filename ? String(inputData.filename) : 'output.txt');
+
+        const mimeType = (block.config?.mimeType || 'application/octet-stream').toString();
+
+        let content = '';
+        if (inputData?.type === 'word_document') {
+          content = inputData.content || '';
+        } else if (typeof inputData === 'string') {
+          content = inputData;
+        } else {
+          content = JSON.stringify(inputData ?? {}, null, 2);
+        }
+
+        output = {
+          type: 'download',
+          filename: resolvedFilename,
+          format: resolvedFilename.split('.').pop() || 'txt',
+          content,
+          contentLength: content.length,
+          downloadReady: true,
+          _downloadData: {
+            filename: resolvedFilename,
+            content,
+            mimeType,
+          },
+          timestamp: new Date().toISOString(),
         };
         break;
       }
