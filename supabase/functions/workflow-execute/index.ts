@@ -3015,6 +3015,48 @@ Only output JSON, no other text.`;
           break;
         }
 
+        // Look for document attachments in previous outputs or current input
+        const findDocumentData = (data: any): { filename: string; content: string; mimeType: string } | null => {
+          if (!data || typeof data !== 'object') return null;
+          
+          // Check if this is a document output from generate_document block
+          if (data.type === 'pdf_document' || data.type === 'word_document') {
+            const downloadData = data._downloadData || data;
+            return {
+              filename: downloadData.filename || data.filename || 'document.pdf',
+              content: downloadData.content || data.content || '',
+              mimeType: downloadData.mimeType || (data.type === 'pdf_document' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            };
+          }
+          
+          // Check nested structures
+          if (data._downloadData) {
+            return {
+              filename: data._downloadData.filename || 'document.pdf',
+              content: data._downloadData.content || '',
+              mimeType: data._downloadData.mimeType || 'application/pdf'
+            };
+          }
+          
+          return null;
+        };
+
+        // Check current input and previousOutputs for documents
+        let attachment = findDocumentData(context.input);
+        
+        if (!attachment && context.previousOutputs) {
+          for (const key of Object.keys(context.previousOutputs)) {
+            const found = findDocumentData(context.previousOutputs[key]);
+            if (found && found.content) {
+              attachment = found;
+              console.log(`[send_email] Found attachment from block: ${key}, filename: ${found.filename}`);
+              break;
+            }
+          }
+        }
+
+        console.log(`[send_email] Attachment found: ${attachment ? attachment.filename : 'none'}`);
+
         try {
           const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
           
@@ -3076,17 +3118,53 @@ Only output JSON, no other text.`;
             // Build the email in RFC 2822 format for Gmail API
             const senderEmail = tokenData.email || 'me';
             const fromHeader = fromName ? `${fromName} <${senderEmail}>` : senderEmail;
+            const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).slice(2)}`;
             
-            let emailContent = [
-              `From: ${fromHeader}`,
-              `To: ${to}`,
-              cc ? `Cc: ${cc}` : null,
-              `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
-              `MIME-Version: 1.0`,
-              `Content-Type: ${isHtml ? 'text/html' : 'text/plain'}; charset=UTF-8`,
-              ``,
-              isHtml ? body : body
-            ].filter(Boolean).join('\r\n');
+            let emailContent: string;
+            
+            if (attachment && attachment.content) {
+              // Build multipart email with attachment
+              console.log(`[send_email] Building email with attachment: ${attachment.filename}`);
+              
+              // Base64 encode the attachment content
+              const attachmentBase64 = btoa(unescape(encodeURIComponent(attachment.content)));
+              
+              emailContent = [
+                `From: ${fromHeader}`,
+                `To: ${to}`,
+                cc ? `Cc: ${cc}` : null,
+                `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+                `MIME-Version: 1.0`,
+                `Content-Type: multipart/mixed; boundary="${boundary}"`,
+                ``,
+                `--${boundary}`,
+                `Content-Type: ${isHtml ? 'text/html' : 'text/plain'}; charset=UTF-8`,
+                `Content-Transfer-Encoding: base64`,
+                ``,
+                btoa(unescape(encodeURIComponent(body))),
+                ``,
+                `--${boundary}`,
+                `Content-Type: ${attachment.mimeType}; name="${attachment.filename}"`,
+                `Content-Disposition: attachment; filename="${attachment.filename}"`,
+                `Content-Transfer-Encoding: base64`,
+                ``,
+                attachmentBase64,
+                ``,
+                `--${boundary}--`
+              ].filter(Boolean).join('\r\n');
+            } else {
+              // Simple email without attachment
+              emailContent = [
+                `From: ${fromHeader}`,
+                `To: ${to}`,
+                cc ? `Cc: ${cc}` : null,
+                `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+                `MIME-Version: 1.0`,
+                `Content-Type: ${isHtml ? 'text/html' : 'text/plain'}; charset=UTF-8`,
+                ``,
+                body
+              ].filter(Boolean).join('\r\n');
+            }
 
             // Base64url encode the email
             const base64Email = btoa(unescape(encodeURIComponent(emailContent)))
@@ -3115,7 +3193,9 @@ Only output JSON, no other text.`;
                 subject,
                 via: 'gmail',
                 from: senderEmail,
-                message: `Email envoyé avec succès depuis ${senderEmail}`
+                hasAttachment: !!attachment,
+                attachmentName: attachment?.filename,
+                message: `Email envoyé avec succès depuis ${senderEmail}${attachment ? ` avec pièce jointe: ${attachment.filename}` : ''}`
               };
               break;
             } else {
