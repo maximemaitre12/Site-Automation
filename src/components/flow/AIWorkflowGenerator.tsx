@@ -654,7 +654,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
                               <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                                 def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
                                 def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
-                                def?.category === 'integration' ? 'bg-emerald-500/20 text-emerald-400' :
+                                def?.category === 'http' ? 'bg-emerald-500/20 text-emerald-400' :
                                 'bg-muted text-muted-foreground'
                               }`}>
                                 {block.type}
@@ -710,7 +710,7 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
                                 def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
                                 def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
                                 def?.category === 'transform' ? 'bg-emerald-500/20 text-emerald-400' :
-                                def?.category === 'control' ? 'bg-amber-500/20 text-amber-400' :
+                                def?.category === 'logic' ? 'bg-amber-500/20 text-amber-400' :
                                 'bg-slate-500/20 text-slate-400'
                               }`}>
                                 {def?.category}

@@ -1,182 +1,127 @@
 // ==========================================
-// AETHER FLOW - Advanced Workflow Types
-// REAL EXECUTION ENGINE
+// AETHER FLOW - PRIMITIVES GÉNÉRIQUES N8N
+// Architecture 100% configurable
+// ZÉRO logique métier figée
+// ==========================================
+
+// ==========================================
+// BLOCK TYPES - Primitives uniquement
 // ==========================================
 
 export type BlockType = 
-  // Triggers
-  | 'trigger_text' 
-  | 'trigger_file' 
-  | 'trigger_webhook' 
-  | 'trigger_form'
-  | 'trigger_schedule'
-  | 'trigger_email'
-  // AI Actions
-  | 'ai_summary' 
-  | 'ai_extract' 
-  | 'ai_classify' 
-  | 'ai_generate'
-  | 'ai_decision'
-  | 'ai_translate'
-  | 'ai_sentiment'
-  | 'ai_vision'
-  // Data & Transform
-  | 'transform_json'
-  | 'transform_filter'
-  | 'transform_map'
-  | 'transform_merge'
-  // Control Flow
-  | 'control_condition'
-  | 'control_loop'
-  | 'control_delay'
-  | 'control_parallel'
-  | 'control_branch'
-  | 'control_merge'
-  // Workflow
-  | 'workflow_call'
-  // HTTP & Webhooks
-  | 'http_request'
-  | 'http_webhook'
-  // Gmail (REAL OAuth Integration)
-  | 'gmail_read'
-  | 'gmail_send'
-  | 'gmail_reply'
-  | 'gmail_label'
-  | 'gmail_search'
-  // Aether Internal CRM (REAL Database Operations)
-  | 'aether_crm_create_lead'
-  | 'aether_crm_update_contact'
-  | 'aether_crm_create_deal'
-  | 'aether_crm_update_deal'
-  | 'aether_crm_create_task'
-  | 'aether_crm_search'
-  // Aether Documents (REAL Operations)
-  | 'aether_doc_create'
-  | 'aether_doc_analyze'
-  | 'aether_doc_search'
-  // Communication (Messaging & Social)
-  | 'integration_telegram'
-  | 'integration_slack'
-  | 'integration_discord'
-  | 'integration_whatsapp'
-  | 'integration_teams'
-  | 'integration_intercom'
-  | 'integration_zendesk'
-  | 'integration_freshdesk'
-  | 'integration_crisp'
-  // Email Services
-  | 'integration_sendgrid'
-  | 'integration_mailchimp'
-  | 'integration_brevo'
-  | 'integration_mailgun'
-  | 'integration_resend'
-  | 'integration_convertkit'
-  // SMS & Phone
-  | 'integration_twilio_sms'
-  | 'integration_twilio_voice'
-  // AI & ML Providers
-  | 'integration_openai'
-  | 'integration_anthropic'
-  | 'integration_google_ai'
-  | 'integration_mistral'
-  | 'integration_huggingface'
-  | 'integration_replicate'
-  | 'integration_stability'
-  | 'integration_elevenlabs'
-  | 'integration_deepgram'
-  | 'integration_assemblyai'
-  // CRM External & Sales
-  | 'integration_hubspot'
-  | 'integration_salesforce'
-  | 'integration_pipedrive'
-  | 'integration_zoho'
-  // Productivity & Databases
-  | 'integration_notion'
-  | 'integration_airtable'
-  | 'integration_google_sheets'
-  | 'integration_google_calendar'
-  | 'integration_trello'
-  | 'integration_asana'
-  | 'integration_monday'
-  | 'integration_clickup'
-  | 'integration_jira'
-  | 'integration_linear'
-  | 'integration_calendly'
-  // Storage & Files
-  | 'integration_google_drive'
-  | 'integration_dropbox'
-  | 'integration_onedrive'
-  | 'integration_box'
-  | 'integration_aws_s3'
-  // Payments & Finance
-  | 'integration_stripe'
-  | 'integration_paypal'
-  | 'integration_shopify'
-  | 'integration_quickbooks'
-  // Social Media
-  | 'integration_twitter'
-  | 'integration_linkedin'
-  | 'integration_facebook'
-  | 'integration_instagram'
-  | 'integration_youtube'
-  | 'integration_tiktok'
-  // Development & DevOps
-  | 'integration_github'
-  | 'integration_gitlab'
-  | 'integration_vercel'
-  | 'integration_supabase'
-  | 'integration_firebase'
-  // Analytics
-  | 'integration_google_analytics'
-  | 'integration_mixpanel'
-  | 'integration_segment'
-  | 'integration_amplitude'
-  // Automation & No-Code
-  | 'integration_zapier'
-  | 'integration_make'
-  | 'integration_n8n'
-  // Video & Meetings
-  | 'integration_zoom'
-  | 'integration_loom'
-  // System Actions
-  | 'system_email'
-  | 'system_webhook'
-  | 'system_save'
-  | 'system_download'
-  | 'system_notify'
-  | 'system_log';
+  // === TRIGGERS (Déclencheurs) ===
+  | 'trigger_manual'      // Déclenchement manuel
+  | 'trigger_webhook'     // Webhook HTTP entrant
+  | 'trigger_schedule'    // Planification CRON
+  | 'trigger_event'       // Événement système/database
+  
+  // === AI / LLM (Appels IA) ===
+  | 'llm_call'            // Appel LLM générique (toutes actions IA)
+  | 'llm_structured'      // Extraction structurée avec schema
+  | 'llm_vision'          // Analyse d'images
+  | 'llm_embeddings'      // Génération d'embeddings
+  
+  // === LOGIC / CONTROL FLOW ===
+  | 'condition'           // If/Else
+  | 'switch'              // Switch multi-branches
+  | 'loop'                // Boucle sur items
+  | 'loop_while'          // Boucle conditionnelle
+  | 'merge'               // Fusion de branches
+  | 'split'               // Split parallèle
+  | 'wait'                // Attente/Delay
+  | 'error_handler'       // Gestion d'erreurs
+  | 'stop'                // Arrêt du workflow
+  
+  // === DATA TRANSFORM ===
+  | 'set_variable'        // Définir des variables
+  | 'code_js'             // Code JavaScript personnalisé
+  | 'json_parse'          // Parser JSON
+  | 'json_stringify'      // Sérialiser en JSON
+  | 'filter'              // Filtrer items
+  | 'map'                 // Mapper/Transformer items
+  | 'aggregate'           // Agréger items (sum, avg, count...)
+  | 'sort'                // Trier items
+  | 'limit'               // Limiter nombre d'items
+  | 'merge_data'          // Fusionner des données
+  | 'split_text'          // Découper du texte
+  | 'template'            // Template avec variables {{ }}
+  | 'date_time'           // Manipulation date/heure
+  | 'crypto'              // Hash, encrypt, decrypt
+  | 'base64'              // Encode/Decode base64
+  
+  // === HTTP / API ===
+  | 'http_request'        // Requête HTTP générique
+  | 'http_response'       // Réponse HTTP (pour webhooks)
+  | 'graphql'             // Requête GraphQL
+  | 'soap'                // Appel SOAP
+  | 'websocket'           // WebSocket send/receive
+  
+  // === EMAIL ===
+  | 'email_imap'          // Lire emails IMAP
+  | 'email_smtp'          // Envoyer email SMTP
+  | 'email_oauth'         // Email via OAuth (Gmail, Outlook)
+  
+  // === DATABASE ===
+  | 'db_query'            // Query SQL générique
+  | 'db_insert'           // Insert
+  | 'db_update'           // Update
+  | 'db_delete'           // Delete
+  | 'db_upsert'           // Upsert
+  
+  // === FILES / STORAGE ===
+  | 'file_read'           // Lire fichier
+  | 'file_write'          // Écrire fichier
+  | 'file_convert'        // Convertir format
+  | 'file_compress'       // Compresser/Décompresser
+  | 'storage_upload'      // Upload vers stockage
+  | 'storage_download'    // Download depuis stockage
+  
+  // === MESSAGING ===
+  | 'message_send'        // Envoyer message (Slack, Discord, Teams, etc.)
+  | 'message_receive'     // Recevoir message
+  
+  // === MEMORY / STATE ===
+  | 'memory_read'         // Lire depuis mémoire/cache
+  | 'memory_write'        // Écrire dans mémoire/cache
+  | 'memory_delete'       // Supprimer de mémoire
+  
+  // === TOOLS / FUNCTION CALLING ===
+  | 'tool_call'           // Appeler un outil externe
+  | 'tool_define'         // Définir un outil (pour agents)
+  
+  // === OUTPUT ===
+  | 'output_json'         // Sortie JSON
+  | 'output_file'         // Sortie fichier
+  | 'output_display'      // Affichage dans UI
+  | 'output_notify'       // Notification
+  | 'output_log';         // Log/Audit
 
-export type BlockCategory = 'trigger' | 'ai' | 'transform' | 'control' | 'integration' | 'system' | 'aether';
-
-// Sub-categories for better organization in UI
-export type IntegrationSubCategory = 
-  | 'communication' 
+export type BlockCategory = 
+  | 'trigger' 
+  | 'ai' 
+  | 'logic' 
+  | 'transform' 
+  | 'http' 
   | 'email' 
-  | 'ai_providers' 
-  | 'crm' 
-  | 'productivity' 
-  | 'storage' 
-  | 'payments' 
-  | 'social' 
-  | 'dev' 
-  | 'analytics' 
-  | 'automation' 
-  | 'video'
-  | 'sms'
-  | 'gmail'
-  | 'aether_internal';
+  | 'database' 
+  | 'files' 
+  | 'messaging' 
+  | 'memory' 
+  | 'tools' 
+  | 'output';
 
-// Execution status for real-time feedback
+// ==========================================
+// CORE INTERFACES
+// ==========================================
+
 export type ExecutionStatus = 'idle' | 'pending' | 'running' | 'success' | 'error' | 'skipped' | 'cancelled';
-
-// Action type indicator
 export type ActionType = 'real' | 'simulated' | 'ai';
 
 export interface BlockConnection {
   id: string;
   sourceBlockId: string;
   targetBlockId: string;
-  sourceHandle?: string; // For conditional outputs (true/false)
+  sourceHandle?: string;
   targetHandle?: string;
 }
 
@@ -191,9 +136,12 @@ export interface WorkflowBlock {
     enabled: boolean;
     maxRetries: number;
     backoffMs: number;
+    backoffMultiplier?: number;
   };
-  timeout?: number; // in ms
+  timeout?: number;
   description?: string;
+  disabled?: boolean;
+  notes?: string;
 }
 
 export interface WorkflowSettings {
@@ -203,6 +151,7 @@ export interface WorkflowSettings {
   panPosition?: { x: number; y: number };
   executionMode?: 'sequential' | 'parallel' | 'auto';
   defaultTimeout?: number;
+  timezone?: string;
 }
 
 export interface Workflow {
@@ -232,8 +181,8 @@ export interface WorkflowRunLog {
   timestamp: string;
   retryCount?: number;
   error?: string;
-  actionType?: ActionType; // Indicates if this was a REAL action
-  isLive?: boolean; // True if action affected real systems
+  actionType?: ActionType;
+  isLive?: boolean;
 }
 
 export interface WorkflowRun {
@@ -250,7 +199,32 @@ export interface WorkflowRun {
   logs?: WorkflowRunLog[];
   totalDuration?: number;
   blocksExecuted?: number;
-  realActionsCount?: number; // Count of REAL actions executed
+  realActionsCount?: number;
+}
+
+// ==========================================
+// CONFIG FIELD TYPES
+// ==========================================
+
+export interface ConfigField {
+  key: string;
+  label: string;
+  type: 'text' | 'textarea' | 'code' | 'select' | 'multiselect' | 'number' | 'boolean' | 'json' | 'keyvalue' | 'password' | 'oauth_button' | 'expression' | 'file' | 'color' | 'date' | 'cron';
+  options?: string[] | { value: string; label: string }[];
+  placeholder?: string;
+  defaultValue?: any;
+  required?: boolean;
+  helpText?: string;
+  showWhen?: { field: string; value: any } | { field: string; notValue: any };
+  section?: string;
+  advanced?: boolean;
+  expressionEnabled?: boolean; // Permet {{ }} expressions
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: string;
+    message?: string;
+  };
 }
 
 export interface BlockDefinition {
@@ -263,1878 +237,1885 @@ export interface BlockDefinition {
   inputs?: number;
   outputs?: number;
   allowMultipleOutputs?: boolean;
-  isRealAction?: boolean; // Indicates this block performs REAL actions
-  requiresAuth?: boolean; // Indicates OAuth or API key required
-  subCategory?: IntegrationSubCategory;
-}
-
-export interface ConfigField {
-  key: string;
-  label: string;
-  type: 'text' | 'textarea' | 'select' | 'number' | 'boolean' | 'json' | 'code' | 'keyvalue' | 'password' | 'oauth_button' | 'file_formats';
-  options?: string[];
-  placeholder?: string;
-  defaultValue?: any;
-  required?: boolean;
-  helpText?: string;
-  showWhen?: { field: string; value: any }; // Conditional display
-  section?: string; // Group fields into sections
+  isRealAction?: boolean;
+  requiresAuth?: boolean;
+  expressionContext?: string[]; // Variables disponibles dans les expressions
 }
 
 // ==========================================
-// BLOCK DEFINITIONS
+// BLOCK DEFINITIONS - PRIMITIVES 100% GÉNÉRIQUES
 // ==========================================
 
 export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
-  // ===== TRIGGERS =====
-  trigger_text: {
-    name: 'Text Input',
+  
+  // ===================================================================
+  // TRIGGERS - Déclencheurs configurables
+  // ===================================================================
+  
+  trigger_manual: {
+    name: 'Manual Trigger',
     category: 'trigger',
     color: 'from-blue-500 to-cyan-400',
-    icon: 'Type',
-    description: 'Start workflow with text input',
+    icon: 'Play',
+    description: 'Déclenchement manuel avec données d\'entrée configurables',
     configFields: [
-      { key: 'placeholder', label: 'Placeholder', type: 'text', placeholder: 'Enter text...' },
-      { key: 'multiline', label: 'Multiline', type: 'boolean', defaultValue: true }
+      // Input Schema
+      { key: 'inputMode', label: 'Mode d\'entrée', type: 'select', options: ['text', 'json', 'form', 'file', 'none'], defaultValue: 'text', section: 'input', helpText: 'Type de données attendu au démarrage' },
+      { key: 'inputSchema', label: 'Schéma d\'entrée (JSON Schema)', type: 'json', placeholder: '{"type": "object", "properties": {"name": {"type": "string"}}}', section: 'input', showWhen: { field: 'inputMode', value: 'form' }, helpText: 'Définit les champs du formulaire d\'entrée' },
+      { key: 'inputPlaceholder', label: 'Placeholder', type: 'text', placeholder: 'Entrez votre texte...', section: 'input', showWhen: { field: 'inputMode', value: 'text' } },
+      { key: 'multiline', label: 'Multi-lignes', type: 'boolean', defaultValue: false, section: 'input', showWhen: { field: 'inputMode', value: 'text' } },
+      { key: 'acceptedFileTypes', label: 'Types de fichiers acceptés', type: 'text', placeholder: '.pdf,.docx,.txt', section: 'input', showWhen: { field: 'inputMode', value: 'file' } },
+      { key: 'maxFileSizeMb', label: 'Taille max (MB)', type: 'number', defaultValue: 10, section: 'input', showWhen: { field: 'inputMode', value: 'file' } },
+      // Variables initiales
+      { key: 'initialVariables', label: 'Variables initiales (JSON)', type: 'json', placeholder: '{"key": "value"}', section: 'variables', helpText: 'Variables injectées au démarrage' },
     ]
   },
-  trigger_file: {
-    name: 'File Upload',
-    category: 'trigger',
-    color: 'from-purple-500 to-pink-400',
-    icon: 'FileUp',
-    description: 'Start workflow with file upload',
-    configFields: [
-      { key: 'acceptedTypes', label: 'Accepted Types', type: 'text', placeholder: '.pdf,.doc,.txt' },
-      { key: 'maxSizeMb', label: 'Max Size (MB)', type: 'number', defaultValue: 10 }
-    ]
-  },
+  
   trigger_webhook: {
     name: 'Webhook Trigger',
     category: 'trigger',
     color: 'from-green-500 to-emerald-400',
     icon: 'Globe',
-    description: 'Trigger via external webhook',
+    description: 'Déclenché par une requête HTTP entrante',
     isRealAction: true,
     configFields: [
-      { key: 'method', label: 'HTTP Method', type: 'select', options: ['POST', 'GET', 'PUT'], defaultValue: 'POST' },
-      { key: 'authRequired', label: 'Require Auth', type: 'boolean', defaultValue: true }
+      // HTTP Config
+      { key: 'path', label: 'Chemin URL', type: 'text', placeholder: '/my-webhook', section: 'http', helpText: 'Chemin relatif du webhook (auto-généré si vide)' },
+      { key: 'method', label: 'Méthode HTTP', type: 'select', options: ['POST', 'GET', 'PUT', 'PATCH', 'DELETE', 'ANY'], defaultValue: 'POST', section: 'http' },
+      { key: 'contentType', label: 'Content-Type attendu', type: 'select', options: ['application/json', 'application/x-www-form-urlencoded', 'multipart/form-data', 'text/plain', 'any'], defaultValue: 'application/json', section: 'http' },
+      // Auth
+      { key: 'authEnabled', label: 'Authentification requise', type: 'boolean', defaultValue: false, section: 'auth' },
+      { key: 'authType', label: 'Type d\'auth', type: 'select', options: ['none', 'basic', 'bearer', 'api_key', 'hmac'], defaultValue: 'none', section: 'auth', showWhen: { field: 'authEnabled', value: true } },
+      { key: 'authSecret', label: 'Secret/Token', type: 'password', section: 'auth', showWhen: { field: 'authEnabled', value: true } },
+      { key: 'authHeader', label: 'Header name (pour API key)', type: 'text', placeholder: 'X-API-Key', section: 'auth', showWhen: { field: 'authType', value: 'api_key' } },
+      // Response
+      { key: 'responseMode', label: 'Mode de réponse', type: 'select', options: ['immediate', 'wait_for_workflow', 'custom'], defaultValue: 'immediate', section: 'response', helpText: 'Quand envoyer la réponse HTTP' },
+      { key: 'immediateStatus', label: 'Code HTTP (immédiat)', type: 'number', defaultValue: 200, section: 'response', showWhen: { field: 'responseMode', value: 'immediate' } },
+      { key: 'immediateBody', label: 'Corps de réponse', type: 'textarea', placeholder: '{"status": "received"}', section: 'response', showWhen: { field: 'responseMode', value: 'immediate' } },
+      // Rate Limiting
+      { key: 'rateLimitEnabled', label: 'Rate limiting', type: 'boolean', defaultValue: false, section: 'limits' },
+      { key: 'rateLimitMax', label: 'Max requêtes', type: 'number', defaultValue: 100, section: 'limits', showWhen: { field: 'rateLimitEnabled', value: true } },
+      { key: 'rateLimitWindow', label: 'Fenêtre (secondes)', type: 'number', defaultValue: 60, section: 'limits', showWhen: { field: 'rateLimitEnabled', value: true } },
+      // IP Whitelist
+      { key: 'ipWhitelist', label: 'IPs autorisées (virgules)', type: 'text', placeholder: '192.168.1.1, 10.0.0.0/8', section: 'limits' },
     ]
   },
-  trigger_form: {
-    name: 'Custom Form',
-    category: 'trigger',
-    color: 'from-orange-500 to-amber-400',
-    icon: 'ClipboardList',
-    description: 'Custom form with multiple fields',
-    configFields: [
-      { key: 'fields', label: 'Form Fields (JSON)', type: 'json', placeholder: '[{"name": "field1", "type": "text"}]' }
-    ]
-  },
+  
   trigger_schedule: {
-    name: 'Schedule',
+    name: 'Schedule Trigger',
     category: 'trigger',
     color: 'from-sky-500 to-blue-400',
     icon: 'Clock',
-    description: 'Run on a schedule',
+    description: 'Exécution planifiée avec CRON ou intervalle',
     configFields: [
-      { key: 'cron', label: 'Cron Expression', type: 'text', placeholder: '0 9 * * *' },
-      { key: 'timezone', label: 'Timezone', type: 'select', options: ['UTC', 'Europe/Paris', 'America/New_York'] }
+      // Schedule Type
+      { key: 'scheduleType', label: 'Type de planification', type: 'select', options: ['cron', 'interval', 'specific_times'], defaultValue: 'cron', section: 'schedule' },
+      // CRON
+      { key: 'cronExpression', label: 'Expression CRON', type: 'cron', placeholder: '0 9 * * 1-5', section: 'schedule', showWhen: { field: 'scheduleType', value: 'cron' }, helpText: 'min hour day month weekday' },
+      // Interval
+      { key: 'intervalValue', label: 'Intervalle', type: 'number', defaultValue: 5, section: 'schedule', showWhen: { field: 'scheduleType', value: 'interval' } },
+      { key: 'intervalUnit', label: 'Unité', type: 'select', options: ['seconds', 'minutes', 'hours', 'days'], defaultValue: 'minutes', section: 'schedule', showWhen: { field: 'scheduleType', value: 'interval' } },
+      // Specific times
+      { key: 'specificTimes', label: 'Heures (JSON array)', type: 'json', placeholder: '["09:00", "14:00", "18:00"]', section: 'schedule', showWhen: { field: 'scheduleType', value: 'specific_times' } },
+      { key: 'specificDays', label: 'Jours', type: 'multiselect', options: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], section: 'schedule', showWhen: { field: 'scheduleType', value: 'specific_times' } },
+      // Timezone
+      { key: 'timezone', label: 'Fuseau horaire', type: 'select', options: ['UTC', 'Europe/Paris', 'Europe/London', 'America/New_York', 'America/Los_Angeles', 'Asia/Tokyo', 'Asia/Shanghai'], defaultValue: 'UTC', section: 'schedule' },
+      // Execution Window
+      { key: 'executionWindow', label: 'Fenêtre d\'exécution', type: 'boolean', defaultValue: false, section: 'advanced', helpText: 'Limiter l\'exécution à certaines heures' },
+      { key: 'windowStart', label: 'Début fenêtre', type: 'text', placeholder: '09:00', section: 'advanced', showWhen: { field: 'executionWindow', value: true } },
+      { key: 'windowEnd', label: 'Fin fenêtre', type: 'text', placeholder: '18:00', section: 'advanced', showWhen: { field: 'executionWindow', value: true } },
+      // Initial data
+      { key: 'staticInput', label: 'Données statiques (JSON)', type: 'json', placeholder: '{"source": "scheduled"}', section: 'data', helpText: 'Données injectées à chaque exécution' },
     ]
   },
-  trigger_email: {
-    name: 'Email Trigger',
+  
+  trigger_event: {
+    name: 'Event Trigger',
     category: 'trigger',
-    color: 'from-red-500 to-pink-400',
-    icon: 'Mail',
-    description: 'Déclencher quand un email est reçu via Google OAuth',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Section: Configuration API Google
-      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
-      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
-      // Section: Connexion compte
-      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
-      // Section: Filtres
-      { key: 'subjectFilter', label: 'Filtre sujet', type: 'text', placeholder: 'Invoice* ou *Facture*', section: 'filters' },
-      { key: 'fromFilter', label: 'Filtre expéditeur', type: 'text', placeholder: 'client@exemple.com', section: 'filters' },
-      { key: 'folder', label: 'Dossier à surveiller', type: 'select', options: ['INBOX', 'ALL'], defaultValue: 'INBOX', section: 'filters' },
-      { key: 'unreadOnly', label: 'Non lus uniquement', type: 'boolean', defaultValue: true, section: 'filters' },
-      { key: 'markAsRead', label: 'Marquer comme lu après traitement', type: 'boolean', defaultValue: true, section: 'filters' }
-    ]
-  },
-
-  // ===== EMAIL BLOCKS (Google OAuth Only) =====
-  gmail_read: {
-    name: 'Lire Emails',
-    category: 'aether',
-    subCategory: 'gmail',
-    color: 'from-red-500 to-red-400',
-    icon: 'Inbox',
-    description: 'Lire les emails via Google OAuth',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Section: Configuration API Google
-      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
-      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
-      // Section: Connexion compte
-      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
-      // Section: Filtres de lecture
-      { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com', section: 'filters' },
-      { key: 'folder', label: 'Dossier', type: 'select', options: ['INBOX', 'SENT', 'DRAFTS', 'SPAM', 'TRASH', 'ALL'], defaultValue: 'INBOX', section: 'filters' },
-      { key: 'maxResults', label: 'Nombre max d\'emails', type: 'number', defaultValue: 10, section: 'filters' },
-      { key: 'unreadOnly', label: 'Non lus uniquement', type: 'boolean', defaultValue: true, section: 'filters' },
-      { key: 'includeAttachments', label: 'Inclure pièces jointes', type: 'boolean', defaultValue: false, section: 'filters' },
-      { key: 'markAsRead', label: 'Marquer comme lu', type: 'boolean', defaultValue: true, section: 'filters' }
-    ]
-  },
-  gmail_send: {
-    name: 'Envoyer Email',
-    category: 'aether',
-    subCategory: 'gmail',
-    color: 'from-red-500 to-orange-400',
-    icon: 'Send',
-    description: 'Envoyer un email via Google OAuth',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Section: Configuration API Google
-      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
-      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
-      // Section: Connexion compte
-      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
-      // Section: Message
-      { key: 'to', label: 'Destinataire(s)', type: 'text', placeholder: 'email@example.com', required: true, section: 'message' },
-      { key: 'cc', label: 'CC', type: 'text', placeholder: 'cc@email.com', section: 'message' },
-      { key: 'bcc', label: 'BCC', type: 'text', placeholder: 'bcc@email.com', section: 'message' },
-      { key: 'subject', label: 'Objet', type: 'text', required: true, section: 'message' },
-      { key: 'body', label: 'Corps du message', type: 'textarea', required: true, section: 'message' },
-      { key: 'isHtml', label: 'Format HTML', type: 'boolean', defaultValue: false, section: 'message' },
-      { key: 'attachFromPrevious', label: 'Joindre fichiers du bloc précédent', type: 'boolean', defaultValue: false, section: 'message' }
-    ]
-  },
-  gmail_reply: {
-    name: 'Répondre Email',
-    category: 'aether',
-    subCategory: 'gmail',
-    color: 'from-red-600 to-pink-500',
-    icon: 'Reply',
-    description: 'Répondre à un email via Google OAuth',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Section: Configuration API Google
-      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
-      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
-      // Section: Connexion compte
-      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
-      // Section: Réponse
-      { key: 'messageId', label: 'ID du message (auto si précédent)', type: 'text', placeholder: 'Laissez vide pour répondre au dernier email lu', section: 'reply' },
-      { key: 'body', label: 'Réponse', type: 'textarea', required: true, section: 'reply' },
-      { key: 'replyAll', label: 'Répondre à tous', type: 'boolean', defaultValue: false, section: 'reply' },
-      { key: 'includeQuote', label: 'Inclure message original', type: 'boolean', defaultValue: true, section: 'reply' }
-    ]
-  },
-  gmail_label: {
-    name: 'Gérer Libellés',
-    category: 'aether',
-    subCategory: 'gmail',
-    color: 'from-amber-500 to-yellow-400',
-    icon: 'Tag',
-    description: 'Ajouter/Retirer des libellés via Google OAuth',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Section: Configuration API Google
-      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
-      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
-      // Section: Connexion compte
-      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
-      // Section: Actions
-      { key: 'messageId', label: 'ID du message', type: 'text', required: true },
-      { key: 'addLabels', label: 'Ajouter libellés', type: 'text', placeholder: 'IMPORTANT, STARRED' },
-      { key: 'removeLabels', label: 'Retirer libellés', type: 'text', placeholder: 'UNREAD, INBOX' }
-    ]
-  },
-  gmail_search: {
-    name: 'Rechercher Emails',
-    category: 'aether',
-    subCategory: 'gmail',
-    color: 'from-blue-500 to-indigo-400',
-    icon: 'Search',
-    description: 'Rechercher des emails via Google OAuth',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Section: Configuration API Google
-      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
-      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
-      // Section: Connexion compte
-      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
-      // Section: Recherche
-      { key: 'query', label: 'Requête', type: 'text', placeholder: 'from:boss@company.com subject:urgent', required: true, section: 'search' },
-      { key: 'maxResults', label: 'Résultats max', type: 'number', defaultValue: 20, section: 'search' },
-      { key: 'dateFrom', label: 'Date début', type: 'text', placeholder: '2024/01/01', section: 'search' },
-      { key: 'dateTo', label: 'Date fin', type: 'text', placeholder: '2024/12/31', section: 'search' },
-      { key: 'includeBody', label: 'Inclure le corps des emails', type: 'boolean', defaultValue: true, section: 'search' }
-    ]
-  },
-
-  // ===== AETHER CRM (REAL DATABASE OPERATIONS) =====
-  aether_crm_create_lead: {
-    name: 'CRM - Créer Lead',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-emerald-500 to-green-400',
-    icon: 'UserPlus',
-    description: 'Créer un nouveau lead dans Aether CRM (ACTION RÉELLE)',
-    isRealAction: true,
-    configFields: [
-      { key: 'firstName', label: 'Prénom', type: 'text', required: true },
-      { key: 'lastName', label: 'Nom', type: 'text', required: true },
-      { key: 'email', label: 'Email', type: 'text', required: true },
-      { key: 'phone', label: 'Téléphone', type: 'text' },
-      { key: 'company', label: 'Entreprise', type: 'text' },
-      { key: 'jobTitle', label: 'Poste', type: 'text' },
-      { key: 'source', label: 'Source', type: 'select', options: ['Website', 'Referral', 'LinkedIn', 'Event', 'Cold Call', 'Other'] },
-      { key: 'notes', label: 'Notes', type: 'textarea' }
-    ]
-  },
-  aether_crm_update_contact: {
-    name: 'CRM - Modifier Contact',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-blue-500 to-cyan-400',
-    icon: 'UserCog',
-    description: 'Mettre à jour un contact existant (ACTION RÉELLE)',
-    isRealAction: true,
-    configFields: [
-      { key: 'contactId', label: 'ID Contact', type: 'text', required: true },
-      { key: 'updates', label: 'Mises à jour (JSON)', type: 'json', placeholder: '{"email": "new@email.com", "phone": "+33..."}' }
-    ]
-  },
-  aether_crm_create_deal: {
-    name: 'CRM - Créer Opportunité',
-    category: 'aether',
-    subCategory: 'aether_internal',
     color: 'from-purple-500 to-violet-400',
-    icon: 'Target',
-    description: 'Créer une opportunité commerciale (ACTION RÉELLE)',
+    icon: 'Zap',
+    description: 'Déclenché par un événement système ou database',
     isRealAction: true,
     configFields: [
-      { key: 'name', label: 'Nom opportunité', type: 'text', required: true },
-      { key: 'value', label: 'Valeur (€)', type: 'number', required: true },
-      { key: 'contactId', label: 'ID Contact', type: 'text' },
-      { key: 'companyId', label: 'ID Entreprise', type: 'text' },
-      { key: 'expectedCloseDate', label: 'Date clôture prévue', type: 'text', placeholder: '2024-12-31' },
-      { key: 'probability', label: 'Probabilité (%)', type: 'number', defaultValue: 50 },
-      { key: 'description', label: 'Description', type: 'textarea' }
+      // Event Source
+      { key: 'eventSource', label: 'Source', type: 'select', options: ['database', 'storage', 'auth', 'custom', 'realtime'], defaultValue: 'database', section: 'source' },
+      // Database events
+      { key: 'dbTable', label: 'Table', type: 'text', placeholder: 'users', section: 'database', showWhen: { field: 'eventSource', value: 'database' } },
+      { key: 'dbEvent', label: 'Événement', type: 'multiselect', options: ['INSERT', 'UPDATE', 'DELETE'], section: 'database', showWhen: { field: 'eventSource', value: 'database' } },
+      { key: 'dbFilter', label: 'Filtre (condition SQL)', type: 'text', placeholder: 'status = \'active\'', section: 'database', showWhen: { field: 'eventSource', value: 'database' } },
+      { key: 'dbColumns', label: 'Colonnes à surveiller', type: 'text', placeholder: 'status, updated_at', section: 'database', showWhen: { field: 'eventSource', value: 'database' }, helpText: 'Vide = toutes colonnes' },
+      // Storage events
+      { key: 'storageBucket', label: 'Bucket', type: 'text', placeholder: 'documents', section: 'storage', showWhen: { field: 'eventSource', value: 'storage' } },
+      { key: 'storageEvent', label: 'Événement', type: 'multiselect', options: ['upload', 'delete', 'move'], section: 'storage', showWhen: { field: 'eventSource', value: 'storage' } },
+      { key: 'storagePathPattern', label: 'Pattern de chemin', type: 'text', placeholder: 'invoices/*.pdf', section: 'storage', showWhen: { field: 'eventSource', value: 'storage' } },
+      // Auth events
+      { key: 'authEvent', label: 'Événement auth', type: 'multiselect', options: ['signup', 'login', 'logout', 'password_reset', 'email_verified'], section: 'auth', showWhen: { field: 'eventSource', value: 'auth' } },
+      // Custom events
+      { key: 'customEventName', label: 'Nom de l\'événement', type: 'text', placeholder: 'my_custom_event', section: 'custom', showWhen: { field: 'eventSource', value: 'custom' } },
+      { key: 'customEventChannel', label: 'Channel', type: 'text', placeholder: 'notifications', section: 'custom', showWhen: { field: 'eventSource', value: 'custom' } },
+      // Debounce
+      { key: 'debounceEnabled', label: 'Debounce', type: 'boolean', defaultValue: false, section: 'advanced' },
+      { key: 'debounceMs', label: 'Délai (ms)', type: 'number', defaultValue: 1000, section: 'advanced', showWhen: { field: 'debounceEnabled', value: true } },
     ]
   },
-  aether_crm_update_deal: {
-    name: 'CRM - Modifier Opportunité',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-indigo-500 to-purple-400',
-    icon: 'TrendingUp',
-    description: 'Mettre à jour une opportunité (ACTION RÉELLE)',
-    isRealAction: true,
+
+  // ===================================================================
+  // AI / LLM - Appels IA 100% configurables
+  // ===================================================================
+  
+  llm_call: {
+    name: 'LLM Call',
+    category: 'ai',
+    color: 'from-violet-500 to-purple-400',
+    icon: 'Brain',
+    description: 'Appel LLM générique - tous types de tâches IA',
     configFields: [
-      { key: 'dealId', label: 'ID Opportunité', type: 'text', required: true },
-      { key: 'status', label: 'Statut', type: 'select', options: ['open', 'won', 'lost', 'negotiation', 'proposal_sent'] },
-      { key: 'value', label: 'Nouvelle valeur (€)', type: 'number' },
-      { key: 'probability', label: 'Probabilité (%)', type: 'number' },
-      { key: 'notes', label: 'Notes', type: 'textarea' }
+      // Model Selection
+      { key: 'provider', label: 'Provider', type: 'select', options: ['lovable', 'openai', 'anthropic', 'google', 'mistral', 'custom'], defaultValue: 'lovable', section: 'model', helpText: 'Lovable AI = pas de clé API requise' },
+      { key: 'model', label: 'Modèle', type: 'select', options: [
+        'google/gemini-3-flash-preview',
+        'google/gemini-2.5-pro',
+        'google/gemini-2.5-flash',
+        'google/gemini-2.5-flash-lite',
+        'openai/gpt-5',
+        'openai/gpt-5-mini',
+        'openai/gpt-5-nano',
+        'openai/gpt-5.2',
+        'google/gemini-3-pro-preview'
+      ], defaultValue: 'google/gemini-3-flash-preview', section: 'model' },
+      { key: 'customEndpoint', label: 'Endpoint personnalisé', type: 'text', placeholder: 'https://api.custom.ai/v1/chat', section: 'model', showWhen: { field: 'provider', value: 'custom' } },
+      { key: 'apiKey', label: 'API Key', type: 'password', section: 'model', showWhen: { field: 'provider', notValue: 'lovable' }, helpText: 'Requis pour les providers externes' },
+      
+      // Prompts
+      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea', placeholder: 'Tu es un assistant expert en...', section: 'prompts', helpText: 'Définit le comportement et le contexte', expressionEnabled: true },
+      { key: 'userPrompt', label: 'User Prompt / Instructions', type: 'textarea', placeholder: 'Analyse le texte suivant et...', required: true, section: 'prompts', expressionEnabled: true, helpText: 'Utilisez {{ $input }} pour les données entrantes' },
+      { key: 'promptTemplate', label: 'Template de prompt', type: 'select', options: ['custom', 'summarize', 'extract', 'classify', 'translate', 'generate', 'analyze', 'rewrite'], defaultValue: 'custom', section: 'prompts' },
+      
+      // Parameters
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.7, section: 'parameters', helpText: '0 = déterministe, 1 = créatif', validation: { min: 0, max: 2 } },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'parameters' },
+      { key: 'topP', label: 'Top P', type: 'number', defaultValue: 1, section: 'parameters', advanced: true },
+      { key: 'frequencyPenalty', label: 'Frequency Penalty', type: 'number', defaultValue: 0, section: 'parameters', advanced: true },
+      { key: 'presencePenalty', label: 'Presence Penalty', type: 'number', defaultValue: 0, section: 'parameters', advanced: true },
+      { key: 'stopSequences', label: 'Stop Sequences (JSON array)', type: 'json', placeholder: '["\\n\\n", "END"]', section: 'parameters', advanced: true },
+      
+      // Output
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['text', 'json', 'markdown', 'html'], defaultValue: 'text', section: 'output' },
+      { key: 'parseJson', label: 'Parser la réponse JSON', type: 'boolean', defaultValue: false, section: 'output', showWhen: { field: 'outputFormat', value: 'json' } },
+      
+      // Context / Memory
+      { key: 'includeHistory', label: 'Inclure historique', type: 'boolean', defaultValue: false, section: 'context', helpText: 'Inclut les messages précédents du workflow' },
+      { key: 'historyLimit', label: 'Limite historique', type: 'number', defaultValue: 10, section: 'context', showWhen: { field: 'includeHistory', value: true } },
+      { key: 'contextVariables', label: 'Variables de contexte', type: 'json', placeholder: '{"user_name": "{{ $input.name }}"}', section: 'context', expressionEnabled: true },
+      
+      // Streaming
+      { key: 'streaming', label: 'Streaming', type: 'boolean', defaultValue: false, section: 'advanced', helpText: 'Réponse en temps réel (streaming SSE)' },
+      
+      // Caching
+      { key: 'cacheEnabled', label: 'Cache activé', type: 'boolean', defaultValue: false, section: 'advanced' },
+      { key: 'cacheTtl', label: 'Durée cache (secondes)', type: 'number', defaultValue: 3600, section: 'advanced', showWhen: { field: 'cacheEnabled', value: true } },
     ]
   },
-  aether_crm_create_task: {
-    name: 'CRM - Créer Tâche',
-    category: 'aether',
-    subCategory: 'aether_internal',
+  
+  llm_structured: {
+    name: 'LLM Structured Output',
+    category: 'ai',
     color: 'from-amber-500 to-orange-400',
-    icon: 'CheckSquare',
-    description: 'Créer une tâche CRM (ACTION RÉELLE)',
-    isRealAction: true,
+    icon: 'FileJson',
+    description: 'Extraction de données structurées avec schéma',
     configFields: [
-      { key: 'title', label: 'Titre', type: 'text', required: true },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'dueDate', label: 'Date échéance', type: 'text', placeholder: '2024-12-31' },
-      { key: 'priority', label: 'Priorité', type: 'select', options: ['low', 'medium', 'high', 'urgent'] },
-      { key: 'contactId', label: 'ID Contact', type: 'text' },
-      { key: 'opportunityId', label: 'ID Opportunité', type: 'text' },
-      { key: 'assignTo', label: 'Assigner à', type: 'text', placeholder: 'ID utilisateur ou email' }
+      // Model
+      { key: 'provider', label: 'Provider', type: 'select', options: ['lovable', 'openai', 'anthropic', 'google'], defaultValue: 'lovable', section: 'model' },
+      { key: 'model', label: 'Modèle', type: 'select', options: [
+        'google/gemini-3-flash-preview',
+        'google/gemini-2.5-pro',
+        'openai/gpt-5',
+        'openai/gpt-5-mini'
+      ], defaultValue: 'google/gemini-3-flash-preview', section: 'model' },
+      { key: 'apiKey', label: 'API Key', type: 'password', section: 'model', showWhen: { field: 'provider', notValue: 'lovable' } },
+      
+      // Schema Definition
+      { key: 'schemaMode', label: 'Mode de schéma', type: 'select', options: ['fields', 'json_schema', 'typescript'], defaultValue: 'fields', section: 'schema' },
+      { key: 'fields', label: 'Champs à extraire', type: 'textarea', placeholder: 'name: string\nemail: string\ndate: date\namount: number', section: 'schema', showWhen: { field: 'schemaMode', value: 'fields' }, helpText: 'Un champ par ligne: nom: type' },
+      { key: 'jsonSchema', label: 'JSON Schema', type: 'json', placeholder: '{"type": "object", "properties": {...}}', section: 'schema', showWhen: { field: 'schemaMode', value: 'json_schema' } },
+      { key: 'typescriptSchema', label: 'Interface TypeScript', type: 'code', placeholder: 'interface Data {\n  name: string;\n  email: string;\n}', section: 'schema', showWhen: { field: 'schemaMode', value: 'typescript' } },
+      
+      // Instructions
+      { key: 'extractionPrompt', label: 'Instructions d\'extraction', type: 'textarea', placeholder: 'Extrais les informations suivantes du texte...', section: 'instructions', expressionEnabled: true },
+      { key: 'examples', label: 'Exemples (few-shot)', type: 'json', placeholder: '[{"input": "...", "output": {...}}]', section: 'instructions', helpText: 'Exemples pour guider l\'extraction' },
+      
+      // Validation
+      { key: 'strictMode', label: 'Mode strict', type: 'boolean', defaultValue: true, section: 'validation', helpText: 'Échec si champs obligatoires manquants' },
+      { key: 'nullForMissing', label: 'Null pour champs manquants', type: 'boolean', defaultValue: true, section: 'validation' },
+      { key: 'validateTypes', label: 'Valider les types', type: 'boolean', defaultValue: true, section: 'validation' },
+      
+      // Parameters
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.1, section: 'parameters', helpText: 'Bas pour extraction précise' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'parameters' },
     ]
   },
-  aether_crm_search: {
-    name: 'CRM - Rechercher',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-sky-500 to-blue-400',
-    icon: 'Search',
-    description: 'Rechercher dans le CRM (contacts, entreprises, opportunités)',
-    isRealAction: true,
-    configFields: [
-      { key: 'entityType', label: 'Type', type: 'select', options: ['contacts', 'companies', 'opportunities', 'tasks'], required: true },
-      { key: 'query', label: 'Recherche', type: 'text', placeholder: 'Nom, email, entreprise...' },
-      { key: 'filters', label: 'Filtres (JSON)', type: 'json', placeholder: '{"status": "open", "value_gte": 10000}' },
-      { key: 'limit', label: 'Limite', type: 'number', defaultValue: 20 }
-    ]
-  },
-
-  // ===== AETHER DOCUMENTS (REAL OPERATIONS) =====
-  aether_doc_create: {
-    name: 'Doc - Créer Document PDF',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-teal-500 to-emerald-400',
-    icon: 'FileText',
-    description: 'Créer un document PDF dans Aether Doc (ACTION RÉELLE)',
-    isRealAction: true,
-    configFields: [
-      { key: 'title', label: 'Titre du document', type: 'text', required: true },
-      { key: 'content', label: 'Contenu (ou vide pour génération IA)', type: 'textarea', helpText: 'Laissez vide pour utiliser le prompt IA ci-dessous' },
-      { key: 'prompt', label: 'Prompt IA (génération automatique)', type: 'textarea', placeholder: 'Génère un rapport professionnel sur...' },
-      { key: 'type', label: 'Type de document', type: 'select', options: ['rapport', 'contrat', 'proposition', 'memo', 'procedure', 'email', 'presentation', 'autre'], defaultValue: 'rapport' },
-      { key: 'tone', label: 'Ton', type: 'select', options: ['professionnel', 'formel', 'concis', 'détaillé', 'commercial'], defaultValue: 'professionnel' },
-      { key: 'folderId', label: 'ID Dossier (optionnel)', type: 'text' },
-      { key: 'tags', label: 'Tags (séparés par virgule)', type: 'text', placeholder: 'workflow, auto-généré, important' }
-    ]
-  },
-  aether_doc_analyze: {
-    name: 'Doc - Analyser Document',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-violet-500 to-purple-400',
-    icon: 'FileSearch',
-    description: 'Analyser un document avec IA (extraction, résumé)',
-    isRealAction: true,
-    configFields: [
-      { key: 'documentId', label: 'ID Document', type: 'text', required: true },
-      { key: 'analysisType', label: 'Type analyse', type: 'select', options: ['summary', 'extract_entities', 'classify', 'full'] },
-      { key: 'customPrompt', label: 'Instructions personnalisées', type: 'textarea' }
-    ]
-  },
-  aether_doc_search: {
-    name: 'Doc - Rechercher Documents',
-    category: 'aether',
-    subCategory: 'aether_internal',
-    color: 'from-cyan-500 to-teal-400',
-    icon: 'FolderSearch',
-    description: 'Recherche sémantique dans les documents',
-    isRealAction: true,
-    configFields: [
-      { key: 'query', label: 'Recherche', type: 'text', required: true },
-      { key: 'folderId', label: 'Dossier (optionnel)', type: 'text' },
-      { key: 'tags', label: 'Tags filter', type: 'text' },
-      { key: 'limit', label: 'Limite', type: 'number', defaultValue: 10 }
-    ]
-  },
-
-  // ===== AI ACTIONS =====
-  // Tous les blocs AI ont maintenant des paramètres complets comme N8N
-  ai_summary: {
-    name: 'AI Summary',
-    category: 'ai',
-    color: 'from-indigo-500 to-blue-400',
-    icon: 'Sparkles',
-    description: 'Résumer du texte avec l\'IA',
-    configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model', helpText: 'Modèle utilisé pour le résumé' },
-      { key: 'temperature', label: 'Température (Créativité)', type: 'number', defaultValue: 0.3, section: 'ai_model', helpText: '0 = précis, 1 = créatif' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'style', label: 'Style de résumé', type: 'select', options: ['short', 'detailed', 'bullet_points', 'executive'], defaultValue: 'short', section: 'general' },
-      { key: 'maxLength', label: 'Longueur max (mots)', type: 'number', defaultValue: 200, section: 'general' },
-      { key: 'language', label: 'Langue de sortie', type: 'text', placeholder: 'Même que l\'entrée', section: 'general' },
-      { key: 'customPrompt', label: 'Instructions personnalisées', type: 'textarea', placeholder: 'Ajoutez des instructions spécifiques...', section: 'advanced' }
-    ]
-  },
-  ai_extract: {
-    name: 'Extract Data',
-    category: 'ai',
-    color: 'from-yellow-500 to-orange-400',
-    icon: 'FileSearch',
-    description: 'Extraire des données structurées du texte',
-    configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model', helpText: 'Modèle utilisé pour l\'extraction' },
-      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.1, section: 'ai_model', helpText: 'Plus bas = plus précis pour l\'extraction' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'fields', label: 'Champs à extraire', type: 'textarea', placeholder: 'nom, email, date, montant, entreprise', required: true, section: 'general', helpText: 'Liste des champs séparés par des virgules' },
-      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['json', 'table', 'list'], defaultValue: 'json', section: 'general' },
-      { key: 'strict', label: 'Mode strict', type: 'boolean', helpText: 'Retourne null pour les champs manquants', section: 'general' },
-      { key: 'customPrompt', label: 'Instructions personnalisées', type: 'textarea', placeholder: 'Contexte ou règles spécifiques...', section: 'advanced' }
-    ]
-  },
-  ai_classify: {
-    name: 'AI Classification',
-    category: 'ai',
-    color: 'from-teal-500 to-cyan-400',
-    icon: 'Tags',
-    description: 'Classifier dans des catégories',
-    configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model' },
-      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.2, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'categories', label: 'Catégories', type: 'textarea', placeholder: 'Catégorie1, Catégorie2, Catégorie3', required: true, section: 'general', helpText: 'Catégories possibles séparées par virgule' },
-      { key: 'multiLabel', label: 'Multi-catégorie', type: 'boolean', section: 'general', helpText: 'Permet plusieurs catégories par item' },
-      { key: 'confidenceThreshold', label: 'Seuil de confiance', type: 'number', defaultValue: 0.7, section: 'general' },
-      { key: 'customPrompt', label: 'Critères personnalisés', type: 'textarea', placeholder: 'Définissez les critères de classification...', section: 'advanced' }
-    ]
-  },
-  ai_generate: {
-    name: 'Generate Content',
-    category: 'ai',
-    color: 'from-violet-500 to-purple-400',
-    icon: 'Wand2',
-    description: 'Générer du contenu avec l\'IA',
-    configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'openai/gpt-5.2', 'google/gemini-2.5-pro', 'google/gemini-3-pro-preview', 'google/gemini-2.5-flash'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model', helpText: 'Choisissez le modèle selon vos besoins' },
-      { key: 'temperature', label: 'Température (Créativité)', type: 'number', defaultValue: 0.7, section: 'ai_model', helpText: '0 = factuel, 1 = créatif' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea', placeholder: 'Tu es un assistant professionnel spécialisé dans...', section: 'general', helpText: 'Définit le comportement et le contexte de l\'IA' },
-      { key: 'prompt', label: 'Prompt de génération', type: 'textarea', placeholder: 'Génère un email professionnel pour...', required: true, section: 'general' },
-      { key: 'tone', label: 'Ton', type: 'select', options: ['professional', 'casual', 'formal', 'creative', 'technical', 'friendly', 'persuasive'], defaultValue: 'professional', section: 'general' },
-      { key: 'format', label: 'Format de sortie', type: 'select', options: ['text', 'markdown', 'html', 'json'], defaultValue: 'text', section: 'general' }
-    ]
-  },
-  ai_decision: {
-    name: 'AI Decision',
-    category: 'ai',
-    color: 'from-rose-500 to-pink-400',
-    icon: 'GitBranch',
-    description: 'Décision intelligente avec branchement',
-    configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model' },
-      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.1, section: 'ai_model', helpText: 'Plus bas pour des décisions cohérentes' },
-      // Section: Paramètres
-      { key: 'question', label: 'Question de décision', type: 'textarea', placeholder: 'Est-ce que cette demande doit être approuvée ?', required: true, section: 'general' },
-      { key: 'criteria', label: 'Critères de décision', type: 'textarea', placeholder: 'Approuver si montant < 1000€ ET client vérifié', section: 'general', helpText: 'Règles pour guider la décision' },
-      { key: 'outputTrue', label: 'Libellé sortie Vrai', type: 'text', defaultValue: 'Approuvé', section: 'general' },
-      { key: 'outputFalse', label: 'Libellé sortie Faux', type: 'text', defaultValue: 'Refusé', section: 'general' }
-    ],
-    outputs: 2,
-    allowMultipleOutputs: true
-  },
-  ai_translate: {
-    name: 'AI Translate',
-    category: 'ai',
-    color: 'from-cyan-500 to-blue-400',
-    icon: 'Languages',
-    description: 'Traduire du texte dans n\'importe quelle langue',
-    configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash'], defaultValue: 'google/gemini-2.5-flash', section: 'ai_model', helpText: 'Gemini excellent pour la traduction' },
-      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.3, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'sourceLanguage', label: 'Langue source', type: 'select', options: ['auto', 'English', 'French', 'Spanish', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Korean'], defaultValue: 'auto', section: 'general', helpText: 'Auto-détection par défaut' },
-      { key: 'targetLanguage', label: 'Langue cible', type: 'select', options: ['English', 'French', 'Spanish', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Korean'], required: true, section: 'general' },
-      { key: 'preserveFormatting', label: 'Conserver le formatage', type: 'boolean', defaultValue: true, section: 'general' },
-      { key: 'formalityLevel', label: 'Niveau de formalité', type: 'select', options: ['default', 'informal', 'formal', 'very_formal'], defaultValue: 'default', section: 'advanced' }
-    ]
-  },
-  ai_sentiment: {
-    name: 'Sentiment Analysis',
+  
+  llm_vision: {
+    name: 'LLM Vision',
     category: 'ai',
     color: 'from-pink-500 to-rose-400',
-    icon: 'Heart',
-    description: 'Analyser le sentiment et les émotions',
+    icon: 'Eye',
+    description: 'Analyse d\'images avec IA multimodale',
     configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-flash'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model' },
-      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.2, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'detailed', label: 'Analyse détaillée', type: 'boolean', defaultValue: true, section: 'general' },
-      { key: 'emotions', label: 'Détecter les émotions', type: 'boolean', defaultValue: true, section: 'general', helpText: 'Joie, tristesse, colère, peur, etc.' },
-      { key: 'aspects', label: 'Analyse par aspect', type: 'boolean', defaultValue: false, section: 'general', helpText: 'Sentiment par thème/aspect mentionné' },
-      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['simple', 'detailed', 'scores'], defaultValue: 'detailed', section: 'general' }
+      // Model
+      { key: 'provider', label: 'Provider', type: 'select', options: ['lovable', 'openai', 'anthropic', 'google'], defaultValue: 'lovable', section: 'model' },
+      { key: 'model', label: 'Modèle', type: 'select', options: [
+        'google/gemini-2.5-pro',
+        'google/gemini-2.5-flash',
+        'openai/gpt-5',
+        'openai/gpt-5-mini'
+      ], defaultValue: 'google/gemini-2.5-pro', section: 'model', helpText: 'Doit supporter la vision' },
+      { key: 'apiKey', label: 'API Key', type: 'password', section: 'model', showWhen: { field: 'provider', notValue: 'lovable' } },
+      
+      // Image Input
+      { key: 'imageSource', label: 'Source de l\'image', type: 'select', options: ['input', 'url', 'base64', 'file'], defaultValue: 'input', section: 'image' },
+      { key: 'imageUrl', label: 'URL de l\'image', type: 'text', placeholder: 'https://...', section: 'image', showWhen: { field: 'imageSource', value: 'url' }, expressionEnabled: true },
+      { key: 'imageBase64', label: 'Image Base64', type: 'textarea', section: 'image', showWhen: { field: 'imageSource', value: 'base64' }, expressionEnabled: true },
+      { key: 'maxImages', label: 'Max images', type: 'number', defaultValue: 4, section: 'image' },
+      { key: 'imageDetail', label: 'Niveau de détail', type: 'select', options: ['auto', 'low', 'high'], defaultValue: 'auto', section: 'image' },
+      
+      // Analysis
+      { key: 'analysisType', label: 'Type d\'analyse', type: 'select', options: ['describe', 'extract_text', 'analyze', 'compare', 'custom'], defaultValue: 'describe', section: 'analysis' },
+      { key: 'customPrompt', label: 'Instructions personnalisées', type: 'textarea', placeholder: 'Décris cette image en détail...', section: 'analysis', expressionEnabled: true },
+      { key: 'extractStructured', label: 'Extraction structurée', type: 'boolean', defaultValue: false, section: 'analysis' },
+      { key: 'outputSchema', label: 'Schéma de sortie (JSON)', type: 'json', placeholder: '{"objects": [], "text": ""}', section: 'analysis', showWhen: { field: 'extractStructured', value: true } },
+      
+      // Parameters
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.3, section: 'parameters' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1500, section: 'parameters' },
     ]
   },
-  ai_vision: {
-    name: 'AI Vision',
+  
+  llm_embeddings: {
+    name: 'Generate Embeddings',
     category: 'ai',
-    color: 'from-amber-500 to-yellow-400',
-    icon: 'Eye',
-    description: 'Analyser des images avec l\'IA',
+    color: 'from-teal-500 to-cyan-400',
+    icon: 'Layers',
+    description: 'Génération de vecteurs d\'embeddings',
     configFields: [
-      // Section: Modèle IA
-      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash'], defaultValue: 'google/gemini-2.5-flash', section: 'ai_model', helpText: 'Modèles avec capacité vision' },
-      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.3, section: 'ai_model' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000, section: 'ai_model' },
-      // Section: Paramètres
-      { key: 'task', label: 'Tâche', type: 'select', options: ['describe', 'extract_text', 'detect_objects', 'analyze', 'compare'], defaultValue: 'describe', section: 'general' },
-      { key: 'prompt', label: 'Prompt personnalisé', type: 'textarea', placeholder: 'Que voyez-vous dans cette image ?', section: 'general', helpText: 'Instructions spécifiques pour l\'analyse' },
-      { key: 'detailLevel', label: 'Niveau de détail', type: 'select', options: ['low', 'medium', 'high'], defaultValue: 'medium', section: 'general' }
+      // Model
+      { key: 'provider', label: 'Provider', type: 'select', options: ['openai', 'google', 'cohere', 'custom'], defaultValue: 'openai', section: 'model' },
+      { key: 'model', label: 'Modèle', type: 'select', options: [
+        'text-embedding-3-small',
+        'text-embedding-3-large',
+        'text-embedding-ada-002'
+      ], defaultValue: 'text-embedding-3-small', section: 'model' },
+      { key: 'apiKey', label: 'API Key', type: 'password', required: true, section: 'model' },
+      { key: 'customEndpoint', label: 'Endpoint personnalisé', type: 'text', section: 'model', showWhen: { field: 'provider', value: 'custom' } },
+      
+      // Input
+      { key: 'inputField', label: 'Champ d\'entrée', type: 'text', placeholder: 'text', defaultValue: 'text', section: 'input', helpText: 'Champ contenant le texte à vectoriser' },
+      { key: 'batchSize', label: 'Taille de batch', type: 'number', defaultValue: 100, section: 'input' },
+      { key: 'dimensions', label: 'Dimensions', type: 'number', section: 'input', helpText: 'Laissez vide pour défaut du modèle' },
+      
+      // Output
+      { key: 'outputField', label: 'Champ de sortie', type: 'text', defaultValue: 'embedding', section: 'output' },
+      { key: 'normalize', label: 'Normaliser', type: 'boolean', defaultValue: true, section: 'output' },
     ]
   },
 
-  // ===== DATA TRANSFORM =====
-  transform_json: {
-    name: 'JSON Transform',
+  // ===================================================================
+  // LOGIC / CONTROL FLOW
+  // ===================================================================
+  
+  condition: {
+    name: 'Condition (If/Else)',
+    category: 'logic',
+    color: 'from-amber-500 to-yellow-400',
+    icon: 'GitBranch',
+    description: 'Branchement conditionnel If/Else',
+    outputs: 2,
+    allowMultipleOutputs: true,
+    configFields: [
+      // Condition Mode
+      { key: 'conditionMode', label: 'Mode', type: 'select', options: ['simple', 'expression', 'code'], defaultValue: 'simple', section: 'condition' },
+      
+      // Simple mode
+      { key: 'field', label: 'Champ à tester', type: 'text', placeholder: '{{ $input.status }}', section: 'condition', showWhen: { field: 'conditionMode', value: 'simple' }, expressionEnabled: true },
+      { key: 'operator', label: 'Opérateur', type: 'select', options: [
+        { value: 'eq', label: '= Égal' },
+        { value: 'neq', label: '≠ Différent' },
+        { value: 'gt', label: '> Supérieur' },
+        { value: 'gte', label: '≥ Sup ou égal' },
+        { value: 'lt', label: '< Inférieur' },
+        { value: 'lte', label: '≤ Inf ou égal' },
+        { value: 'contains', label: 'Contient' },
+        { value: 'not_contains', label: 'Ne contient pas' },
+        { value: 'starts_with', label: 'Commence par' },
+        { value: 'ends_with', label: 'Finit par' },
+        { value: 'matches', label: 'Regex match' },
+        { value: 'is_empty', label: 'Est vide' },
+        { value: 'is_not_empty', label: 'N\'est pas vide' },
+        { value: 'is_null', label: 'Est null' },
+        { value: 'is_true', label: 'Est true' },
+        { value: 'is_false', label: 'Est false' },
+      ], defaultValue: 'eq', section: 'condition', showWhen: { field: 'conditionMode', value: 'simple' } },
+      { key: 'value', label: 'Valeur de comparaison', type: 'text', placeholder: 'approved', section: 'condition', showWhen: { field: 'conditionMode', value: 'simple' }, expressionEnabled: true },
+      { key: 'caseSensitive', label: 'Sensible à la casse', type: 'boolean', defaultValue: false, section: 'condition', showWhen: { field: 'conditionMode', value: 'simple' } },
+      
+      // Expression mode
+      { key: 'expression', label: 'Expression', type: 'textarea', placeholder: '{{ $input.amount > 1000 && $input.status === "pending" }}', section: 'condition', showWhen: { field: 'conditionMode', value: 'expression' }, helpText: 'Expression JavaScript retournant true/false' },
+      
+      // Code mode
+      { key: 'code', label: 'Code JavaScript', type: 'code', placeholder: 'return input.amount > 1000;', section: 'condition', showWhen: { field: 'conditionMode', value: 'code' } },
+      
+      // Labels
+      { key: 'trueLabel', label: 'Label branche True', type: 'text', defaultValue: 'True', section: 'labels' },
+      { key: 'falseLabel', label: 'Label branche False', type: 'text', defaultValue: 'False', section: 'labels' },
+    ]
+  },
+  
+  switch: {
+    name: 'Switch (Multi-branches)',
+    category: 'logic',
+    color: 'from-orange-500 to-amber-400',
+    icon: 'GitFork',
+    description: 'Branchement multi-voies',
+    outputs: 4,
+    allowMultipleOutputs: true,
+    configFields: [
+      // Mode
+      { key: 'switchMode', label: 'Mode', type: 'select', options: ['value', 'rules', 'expression'], defaultValue: 'value', section: 'switch' },
+      
+      // Value mode
+      { key: 'valueField', label: 'Champ à évaluer', type: 'text', placeholder: '{{ $input.type }}', section: 'switch', showWhen: { field: 'switchMode', value: 'value' }, expressionEnabled: true },
+      { key: 'cases', label: 'Cas (JSON)', type: 'json', placeholder: '[{"value": "email", "output": 0}, {"value": "sms", "output": 1}]', section: 'switch', showWhen: { field: 'switchMode', value: 'value' } },
+      
+      // Rules mode
+      { key: 'rules', label: 'Règles (JSON)', type: 'json', placeholder: '[{"condition": "$input.amount > 1000", "output": 0}, {"condition": "$input.priority === \'high\'", "output": 1}]', section: 'switch', showWhen: { field: 'switchMode', value: 'rules' }, helpText: 'Première règle vraie détermine la sortie' },
+      
+      // Default
+      { key: 'defaultOutput', label: 'Sortie par défaut', type: 'number', defaultValue: 0, section: 'switch' },
+      { key: 'fallthrough', label: 'Fallthrough (toutes les correspondances)', type: 'boolean', defaultValue: false, section: 'switch' },
+      
+      // Labels
+      { key: 'outputLabels', label: 'Labels des sorties (JSON)', type: 'json', placeholder: '["Email", "SMS", "Push", "Default"]', section: 'labels' },
+    ]
+  },
+  
+  loop: {
+    name: 'Loop (For Each)',
+    category: 'logic',
+    color: 'from-green-500 to-emerald-400',
+    icon: 'Repeat',
+    description: 'Boucle sur un tableau d\'items',
+    configFields: [
+      // Input
+      { key: 'itemsField', label: 'Champ contenant les items', type: 'text', placeholder: '{{ $input.items }}', defaultValue: '{{ $input }}', section: 'loop', expressionEnabled: true },
+      { key: 'batchSize', label: 'Taille de batch', type: 'number', defaultValue: 1, section: 'loop', helpText: '1 = séquentiel, >1 = parallèle par batches' },
+      
+      // Limits
+      { key: 'maxIterations', label: 'Max itérations', type: 'number', defaultValue: 1000, section: 'limits' },
+      { key: 'continueOnError', label: 'Continuer sur erreur', type: 'boolean', defaultValue: false, section: 'limits' },
+      { key: 'timeout', label: 'Timeout par item (ms)', type: 'number', defaultValue: 30000, section: 'limits' },
+      
+      // Context
+      { key: 'indexVariable', label: 'Nom variable index', type: 'text', defaultValue: '$index', section: 'context' },
+      { key: 'itemVariable', label: 'Nom variable item', type: 'text', defaultValue: '$item', section: 'context' },
+      
+      // Output
+      { key: 'collectResults', label: 'Collecter résultats', type: 'boolean', defaultValue: true, section: 'output' },
+      { key: 'outputMode', label: 'Mode de sortie', type: 'select', options: ['array', 'last', 'first', 'aggregate'], defaultValue: 'array', section: 'output' },
+    ]
+  },
+  
+  loop_while: {
+    name: 'Loop While',
+    category: 'logic',
+    color: 'from-lime-500 to-green-400',
+    icon: 'RefreshCw',
+    description: 'Boucle conditionnelle while',
+    configFields: [
+      // Condition
+      { key: 'condition', label: 'Condition (continuer tant que vrai)', type: 'textarea', placeholder: '{{ $loopCount < 10 && !$result.done }}', section: 'condition', expressionEnabled: true },
+      { key: 'checkBefore', label: 'Vérifier avant exécution', type: 'boolean', defaultValue: true, section: 'condition', helpText: 'false = do-while' },
+      
+      // Limits
+      { key: 'maxIterations', label: 'Max itérations', type: 'number', defaultValue: 100, section: 'limits' },
+      { key: 'timeout', label: 'Timeout total (ms)', type: 'number', defaultValue: 300000, section: 'limits' },
+      
+      // Delay
+      { key: 'delayBetween', label: 'Délai entre itérations (ms)', type: 'number', defaultValue: 0, section: 'timing' },
+      
+      // Context
+      { key: 'loopCountVariable', label: 'Variable compteur', type: 'text', defaultValue: '$loopCount', section: 'context' },
+    ]
+  },
+  
+  merge: {
+    name: 'Merge',
+    category: 'logic',
+    color: 'from-indigo-500 to-blue-400',
+    icon: 'GitMerge',
+    description: 'Fusion de plusieurs branches',
+    inputs: 4,
+    configFields: [
+      // Mode
+      { key: 'mergeMode', label: 'Mode de fusion', type: 'select', options: [
+        { value: 'wait_all', label: 'Attendre toutes les entrées' },
+        { value: 'first', label: 'Première entrée' },
+        { value: 'combine', label: 'Combiner les données' },
+        { value: 'append', label: 'Concaténer les tableaux' },
+        { value: 'by_key', label: 'Joindre par clé' },
+      ], defaultValue: 'wait_all', section: 'merge' },
+      
+      // Combine options
+      { key: 'combineStrategy', label: 'Stratégie de combinaison', type: 'select', options: ['merge', 'keep_first', 'keep_last', 'deep_merge'], defaultValue: 'merge', section: 'merge', showWhen: { field: 'mergeMode', value: 'combine' } },
+      
+      // Join by key
+      { key: 'joinKey', label: 'Clé de jointure', type: 'text', placeholder: 'id', section: 'merge', showWhen: { field: 'mergeMode', value: 'by_key' } },
+      { key: 'joinType', label: 'Type de jointure', type: 'select', options: ['inner', 'left', 'right', 'outer'], defaultValue: 'inner', section: 'merge', showWhen: { field: 'mergeMode', value: 'by_key' } },
+      
+      // Timeout
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 60000, section: 'timing' },
+      { key: 'continueIfMissing', label: 'Continuer si entrée manquante', type: 'boolean', defaultValue: false, section: 'timing' },
+    ]
+  },
+  
+  split: {
+    name: 'Split (Parallel)',
+    category: 'logic',
+    color: 'from-cyan-500 to-blue-400',
+    icon: 'Share2',
+    description: 'Exécution parallèle sur plusieurs branches',
+    outputs: 4,
+    allowMultipleOutputs: true,
+    configFields: [
+      // Mode
+      { key: 'splitMode', label: 'Mode', type: 'select', options: [
+        { value: 'clone', label: 'Cloner vers toutes les sorties' },
+        { value: 'distribute', label: 'Distribuer les items' },
+        { value: 'conditional', label: 'Conditionnel' },
+      ], defaultValue: 'clone', section: 'split' },
+      
+      // Distribute
+      { key: 'distributeField', label: 'Champ à distribuer', type: 'text', placeholder: '{{ $input.items }}', section: 'split', showWhen: { field: 'splitMode', value: 'distribute' }, expressionEnabled: true },
+      { key: 'distributeStrategy', label: 'Stratégie', type: 'select', options: ['round_robin', 'random', 'by_index'], defaultValue: 'round_robin', section: 'split', showWhen: { field: 'splitMode', value: 'distribute' } },
+      
+      // Conditional
+      { key: 'conditions', label: 'Conditions par sortie (JSON)', type: 'json', placeholder: '[{"output": 0, "condition": "$input.type === \'a\'"}, ...]', section: 'split', showWhen: { field: 'splitMode', value: 'conditional' } },
+      
+      // Labels
+      { key: 'outputLabels', label: 'Labels des sorties', type: 'json', placeholder: '["Branch 1", "Branch 2", "Branch 3", "Branch 4"]', section: 'labels' },
+    ]
+  },
+  
+  wait: {
+    name: 'Wait / Delay',
+    category: 'logic',
+    color: 'from-slate-500 to-gray-400',
+    icon: 'Hourglass',
+    description: 'Pause ou attente d\'un événement',
+    configFields: [
+      // Mode
+      { key: 'waitMode', label: 'Mode', type: 'select', options: [
+        { value: 'fixed', label: 'Délai fixe' },
+        { value: 'until', label: 'Jusqu\'à date/heure' },
+        { value: 'event', label: 'Attendre événement' },
+        { value: 'webhook', label: 'Attendre webhook' },
+      ], defaultValue: 'fixed', section: 'wait' },
+      
+      // Fixed delay
+      { key: 'delayValue', label: 'Durée', type: 'number', defaultValue: 5, section: 'wait', showWhen: { field: 'waitMode', value: 'fixed' } },
+      { key: 'delayUnit', label: 'Unité', type: 'select', options: ['milliseconds', 'seconds', 'minutes', 'hours', 'days'], defaultValue: 'seconds', section: 'wait', showWhen: { field: 'waitMode', value: 'fixed' } },
+      
+      // Until
+      { key: 'untilDate', label: 'Date/Heure', type: 'text', placeholder: '{{ $input.scheduledAt }}', section: 'wait', showWhen: { field: 'waitMode', value: 'until' }, expressionEnabled: true },
+      
+      // Event
+      { key: 'eventName', label: 'Nom événement', type: 'text', placeholder: 'user_confirmed', section: 'wait', showWhen: { field: 'waitMode', value: 'event' } },
+      
+      // Webhook
+      { key: 'webhookPath', label: 'Chemin webhook', type: 'text', placeholder: '/continue', section: 'wait', showWhen: { field: 'waitMode', value: 'webhook' } },
+      
+      // Timeout
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 86400000, section: 'timeout', helpText: '24h par défaut' },
+      { key: 'onTimeout', label: 'Action timeout', type: 'select', options: ['error', 'continue', 'skip'], defaultValue: 'error', section: 'timeout' },
+    ]
+  },
+  
+  error_handler: {
+    name: 'Error Handler',
+    category: 'logic',
+    color: 'from-red-500 to-rose-400',
+    icon: 'AlertTriangle',
+    description: 'Gestion des erreurs try/catch',
+    outputs: 2,
+    allowMultipleOutputs: true,
+    configFields: [
+      // Behavior
+      { key: 'catchAll', label: 'Attraper toutes les erreurs', type: 'boolean', defaultValue: true, section: 'behavior' },
+      { key: 'errorTypes', label: 'Types d\'erreurs (JSON)', type: 'json', placeholder: '["NetworkError", "ValidationError"]', section: 'behavior', showWhen: { field: 'catchAll', value: false } },
+      
+      // Retry
+      { key: 'retryEnabled', label: 'Retry automatique', type: 'boolean', defaultValue: false, section: 'retry' },
+      { key: 'maxRetries', label: 'Max retries', type: 'number', defaultValue: 3, section: 'retry', showWhen: { field: 'retryEnabled', value: true } },
+      { key: 'retryDelay', label: 'Délai entre retries (ms)', type: 'number', defaultValue: 1000, section: 'retry', showWhen: { field: 'retryEnabled', value: true } },
+      { key: 'retryBackoff', label: 'Backoff exponentiel', type: 'boolean', defaultValue: true, section: 'retry', showWhen: { field: 'retryEnabled', value: true } },
+      
+      // Fallback
+      { key: 'fallbackValue', label: 'Valeur de fallback (JSON)', type: 'json', placeholder: '{"status": "failed"}', section: 'fallback' },
+      
+      // Logging
+      { key: 'logError', label: 'Logger l\'erreur', type: 'boolean', defaultValue: true, section: 'logging' },
+      { key: 'includeStack', label: 'Inclure stack trace', type: 'boolean', defaultValue: false, section: 'logging' },
+      
+      // Labels
+      { key: 'successLabel', label: 'Label succès', type: 'text', defaultValue: 'Success', section: 'labels' },
+      { key: 'errorLabel', label: 'Label erreur', type: 'text', defaultValue: 'Error', section: 'labels' },
+    ]
+  },
+  
+  stop: {
+    name: 'Stop Workflow',
+    category: 'logic',
+    color: 'from-gray-600 to-gray-500',
+    icon: 'StopCircle',
+    description: 'Arrêter l\'exécution du workflow',
+    outputs: 0,
+    configFields: [
+      // Status
+      { key: 'exitStatus', label: 'Statut de sortie', type: 'select', options: ['success', 'error', 'cancelled'], defaultValue: 'success', section: 'exit' },
+      { key: 'exitMessage', label: 'Message', type: 'text', placeholder: 'Workflow terminé', section: 'exit', expressionEnabled: true },
+      
+      // Output
+      { key: 'outputData', label: 'Données de sortie (JSON)', type: 'json', placeholder: '{"result": "{{ $input }}"}', section: 'output', expressionEnabled: true },
+    ]
+  },
+
+  // ===================================================================
+  // DATA TRANSFORM
+  // ===================================================================
+  
+  set_variable: {
+    name: 'Set Variable',
+    category: 'transform',
+    color: 'from-blue-500 to-indigo-400',
+    icon: 'Variable',
+    description: 'Définir ou modifier des variables',
+    configFields: [
+      // Mode
+      { key: 'mode', label: 'Mode', type: 'select', options: ['single', 'multiple', 'json'], defaultValue: 'single', section: 'variable' },
+      
+      // Single
+      { key: 'variableName', label: 'Nom de la variable', type: 'text', placeholder: 'myVariable', section: 'variable', showWhen: { field: 'mode', value: 'single' } },
+      { key: 'variableValue', label: 'Valeur', type: 'textarea', placeholder: '{{ $input.field }}', section: 'variable', showWhen: { field: 'mode', value: 'single' }, expressionEnabled: true },
+      { key: 'variableType', label: 'Type', type: 'select', options: ['auto', 'string', 'number', 'boolean', 'array', 'object'], defaultValue: 'auto', section: 'variable', showWhen: { field: 'mode', value: 'single' } },
+      
+      // Multiple
+      { key: 'variables', label: 'Variables (JSON)', type: 'json', placeholder: '{"var1": "{{ $input.a }}", "var2": 123}', section: 'variable', showWhen: { field: 'mode', value: 'multiple' }, expressionEnabled: true },
+      
+      // JSON mode
+      { key: 'jsonExpression', label: 'Expression JSON', type: 'code', placeholder: '{\n  "processed": $input.data,\n  "timestamp": new Date().toISOString()\n}', section: 'variable', showWhen: { field: 'mode', value: 'json' } },
+      
+      // Scope
+      { key: 'scope', label: 'Portée', type: 'select', options: ['workflow', 'local', 'global'], defaultValue: 'workflow', section: 'scope' },
+    ]
+  },
+  
+  code_js: {
+    name: 'JavaScript Code',
+    category: 'transform',
+    color: 'from-yellow-500 to-amber-400',
+    icon: 'Code',
+    description: 'Code JavaScript personnalisé',
+    configFields: [
+      // Code
+      { key: 'code', label: 'Code', type: 'code', placeholder: '// Variables disponibles: input, $, helpers\n// Retournez le résultat avec return\n\nconst result = input.data.map(item => ({\n  ...item,\n  processed: true\n}));\n\nreturn result;', required: true, section: 'code' },
+      
+      // Mode
+      { key: 'executionMode', label: 'Mode', type: 'select', options: ['sync', 'async'], defaultValue: 'sync', section: 'execution' },
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000, section: 'execution' },
+      
+      // Helpers
+      { key: 'includeHelpers', label: 'Inclure helpers (lodash, dayjs...)', type: 'boolean', defaultValue: true, section: 'helpers' },
+      { key: 'customHelpers', label: 'Helpers personnalisés (JSON)', type: 'json', placeholder: '{"myHelper": "code..."}', section: 'helpers' },
+      
+      // Error handling
+      { key: 'errorBehavior', label: 'En cas d\'erreur', type: 'select', options: ['throw', 'return_null', 'return_empty', 'continue'], defaultValue: 'throw', section: 'errors' },
+    ]
+  },
+  
+  json_parse: {
+    name: 'JSON Parse',
     category: 'transform',
     color: 'from-emerald-500 to-green-400',
-    icon: 'Braces',
-    description: 'Transform JSON data',
+    icon: 'FileJson',
+    description: 'Parser une chaîne JSON',
     configFields: [
-      { key: 'expression', label: 'Path Expression', type: 'code', placeholder: 'data.items[*].name' },
-      { key: 'outputKey', label: 'Output Key', type: 'text', defaultValue: 'result' }
+      { key: 'inputField', label: 'Champ d\'entrée', type: 'text', placeholder: '{{ $input.jsonString }}', section: 'parse', expressionEnabled: true },
+      { key: 'outputField', label: 'Champ de sortie', type: 'text', defaultValue: 'parsed', section: 'parse' },
+      { key: 'strict', label: 'Mode strict', type: 'boolean', defaultValue: true, section: 'parse' },
+      { key: 'fallbackValue', label: 'Valeur par défaut si erreur', type: 'json', placeholder: '{}', section: 'parse' },
     ]
   },
-  transform_filter: {
-    name: 'Filter Data',
-    category: 'transform',
-    color: 'from-lime-500 to-green-400',
-    icon: 'Filter',
-    description: 'Filter array data by conditions',
-    configFields: [
-      { key: 'condition', label: 'Filter Condition', type: 'code', placeholder: 'item.status === "active"' },
-      { key: 'field', label: 'Target Field', type: 'text', placeholder: 'items' }
-    ]
-  },
-  transform_map: {
-    name: 'Map Data',
-    category: 'transform',
-    color: 'from-green-500 to-teal-400',
-    icon: 'ArrowRightLeft',
-    description: 'Map and transform array items',
-    configFields: [
-      { key: 'mapping', label: 'Mapping Template', type: 'json', placeholder: '{"id": "{{item.id}}", "name": "{{item.fullName}}"}' }
-    ]
-  },
-  transform_merge: {
-    name: 'Merge Data',
+  
+  json_stringify: {
+    name: 'JSON Stringify',
     category: 'transform',
     color: 'from-teal-500 to-emerald-400',
-    icon: 'Combine',
-    description: 'Merge multiple data sources',
+    icon: 'FileJson2',
+    description: 'Convertir en chaîne JSON',
     configFields: [
-      { key: 'strategy', label: 'Merge Strategy', type: 'select', options: ['shallow', 'deep', 'array_concat'] }
+      { key: 'inputField', label: 'Champ d\'entrée', type: 'text', placeholder: '{{ $input.data }}', section: 'stringify', expressionEnabled: true },
+      { key: 'outputField', label: 'Champ de sortie', type: 'text', defaultValue: 'json', section: 'stringify' },
+      { key: 'pretty', label: 'Formatage lisible', type: 'boolean', defaultValue: false, section: 'stringify' },
+      { key: 'indent', label: 'Indentation', type: 'number', defaultValue: 2, section: 'stringify', showWhen: { field: 'pretty', value: true } },
     ]
   },
-
-  // ===== CONTROL FLOW =====
-  control_condition: {
-    name: 'Condition',
-    category: 'control',
-    color: 'from-amber-500 to-orange-400',
-    icon: 'GitBranch',
-    description: 'Branch based on conditions',
+  
+  filter: {
+    name: 'Filter Items',
+    category: 'transform',
+    color: 'from-orange-500 to-amber-400',
+    icon: 'Filter',
+    description: 'Filtrer un tableau selon une condition',
     configFields: [
-      { key: 'condition', label: 'Condition', type: 'code', placeholder: 'input.value > 100' },
-      { key: 'trueLabel', label: 'True Branch Label', type: 'text', defaultValue: 'Yes' },
-      { key: 'falseLabel', label: 'False Branch Label', type: 'text', defaultValue: 'No' }
+      // Mode
+      { key: 'filterMode', label: 'Mode', type: 'select', options: ['simple', 'expression', 'code'], defaultValue: 'simple', section: 'filter' },
+      
+      // Simple
+      { key: 'field', label: 'Champ', type: 'text', placeholder: 'status', section: 'filter', showWhen: { field: 'filterMode', value: 'simple' } },
+      { key: 'operator', label: 'Opérateur', type: 'select', options: [
+        { value: 'eq', label: '= Égal' },
+        { value: 'neq', label: '≠ Différent' },
+        { value: 'gt', label: '> Supérieur' },
+        { value: 'gte', label: '≥ Sup ou égal' },
+        { value: 'lt', label: '< Inférieur' },
+        { value: 'lte', label: '≤ Inf ou égal' },
+        { value: 'contains', label: 'Contient' },
+        { value: 'in', label: 'Dans la liste' },
+        { value: 'not_in', label: 'Pas dans la liste' },
+        { value: 'is_empty', label: 'Est vide' },
+        { value: 'is_not_empty', label: 'N\'est pas vide' },
+      ], defaultValue: 'eq', section: 'filter', showWhen: { field: 'filterMode', value: 'simple' } },
+      { key: 'value', label: 'Valeur', type: 'text', section: 'filter', showWhen: { field: 'filterMode', value: 'simple' }, expressionEnabled: true },
+      
+      // Expression
+      { key: 'filterExpression', label: 'Expression', type: 'textarea', placeholder: 'item.amount > 100 && item.status === "active"', section: 'filter', showWhen: { field: 'filterMode', value: 'expression' } },
+      
+      // Code
+      { key: 'filterCode', label: 'Code (item => boolean)', type: 'code', placeholder: 'return item.score >= 80;', section: 'filter', showWhen: { field: 'filterMode', value: 'code' } },
+      
+      // Input/Output
+      { key: 'inputField', label: 'Tableau d\'entrée', type: 'text', defaultValue: '{{ $input }}', section: 'io', expressionEnabled: true },
+      { key: 'keepFiltered', label: 'Garder les filtrés (2e sortie)', type: 'boolean', defaultValue: false, section: 'io' },
     ],
     outputs: 2,
     allowMultipleOutputs: true
   },
-  control_loop: {
-    name: 'Loop',
-    category: 'control',
-    color: 'from-orange-500 to-red-400',
-    icon: 'Repeat',
-    description: 'Loop over array items',
+  
+  map: {
+    name: 'Map / Transform',
+    category: 'transform',
+    color: 'from-purple-500 to-violet-400',
+    icon: 'Shuffle',
+    description: 'Transformer chaque item d\'un tableau',
     configFields: [
-      { key: 'arrayField', label: 'Array Field', type: 'text', placeholder: 'items' },
-      { key: 'maxIterations', label: 'Max Iterations', type: 'number', defaultValue: 100 },
-      { key: 'parallelism', label: 'Parallelism', type: 'number', defaultValue: 1 }
+      // Mode
+      { key: 'mapMode', label: 'Mode', type: 'select', options: ['fields', 'expression', 'code'], defaultValue: 'fields', section: 'map' },
+      
+      // Fields mode
+      { key: 'fieldMappings', label: 'Mappings (JSON)', type: 'json', placeholder: '{\n  "newField": "{{ item.oldField }}",\n  "computed": "{{ item.a + item.b }}"\n}', section: 'map', showWhen: { field: 'mapMode', value: 'fields' }, expressionEnabled: true },
+      { key: 'keepOriginal', label: 'Conserver champs originaux', type: 'boolean', defaultValue: false, section: 'map', showWhen: { field: 'mapMode', value: 'fields' } },
+      
+      // Expression
+      { key: 'mapExpression', label: 'Expression', type: 'textarea', placeholder: '{ ...item, processed: true, score: item.value * 2 }', section: 'map', showWhen: { field: 'mapMode', value: 'expression' } },
+      
+      // Code
+      { key: 'mapCode', label: 'Code (item, index => result)', type: 'code', placeholder: 'return {\n  ...item,\n  index,\n  processed: true\n};', section: 'map', showWhen: { field: 'mapMode', value: 'code' } },
+      
+      // Input
+      { key: 'inputField', label: 'Tableau d\'entrée', type: 'text', defaultValue: '{{ $input }}', section: 'io', expressionEnabled: true },
     ]
   },
-  control_delay: {
-    name: 'Delay',
-    category: 'control',
-    color: 'from-gray-500 to-slate-400',
-    icon: 'Timer',
-    description: 'Wait before continuing',
+  
+  aggregate: {
+    name: 'Aggregate',
+    category: 'transform',
+    color: 'from-indigo-500 to-purple-400',
+    icon: 'BarChart3',
+    description: 'Agréger des données (sum, avg, count...)',
     configFields: [
-      { key: 'duration', label: 'Duration (seconds)', type: 'number', defaultValue: 5 },
-      { key: 'random', label: 'Randomize', type: 'boolean' }
+      // Operation
+      { key: 'operation', label: 'Opération', type: 'select', options: [
+        { value: 'count', label: 'Compter' },
+        { value: 'sum', label: 'Somme' },
+        { value: 'avg', label: 'Moyenne' },
+        { value: 'min', label: 'Minimum' },
+        { value: 'max', label: 'Maximum' },
+        { value: 'first', label: 'Premier' },
+        { value: 'last', label: 'Dernier' },
+        { value: 'concat', label: 'Concaténer' },
+        { value: 'unique', label: 'Valeurs uniques' },
+        { value: 'group_by', label: 'Grouper par' },
+        { value: 'custom', label: 'Personnalisé' },
+      ], defaultValue: 'count', section: 'aggregate' },
+      
+      // Field
+      { key: 'field', label: 'Champ à agréger', type: 'text', placeholder: 'amount', section: 'aggregate' },
+      
+      // Group by
+      { key: 'groupByField', label: 'Grouper par', type: 'text', placeholder: 'category', section: 'aggregate', showWhen: { field: 'operation', value: 'group_by' } },
+      { key: 'groupAggregation', label: 'Agrégation par groupe', type: 'select', options: ['count', 'sum', 'avg', 'list'], defaultValue: 'count', section: 'aggregate', showWhen: { field: 'operation', value: 'group_by' } },
+      
+      // Custom
+      { key: 'reducer', label: 'Reducer (acc, item => acc)', type: 'code', placeholder: 'return acc + item.value;', section: 'aggregate', showWhen: { field: 'operation', value: 'custom' } },
+      { key: 'initialValue', label: 'Valeur initiale', type: 'json', placeholder: '0', section: 'aggregate', showWhen: { field: 'operation', value: 'custom' } },
+      
+      // Input
+      { key: 'inputField', label: 'Tableau d\'entrée', type: 'text', defaultValue: '{{ $input }}', section: 'io', expressionEnabled: true },
+      { key: 'outputField', label: 'Nom du résultat', type: 'text', defaultValue: 'result', section: 'io' },
     ]
   },
-  control_parallel: {
-    name: 'Parallel',
-    category: 'control',
-    color: 'from-blue-500 to-indigo-400',
-    icon: 'GitFork',
-    description: 'Run branches in parallel',
+  
+  sort: {
+    name: 'Sort',
+    category: 'transform',
+    color: 'from-sky-500 to-cyan-400',
+    icon: 'ArrowUpDown',
+    description: 'Trier un tableau',
     configFields: [
-      { key: 'waitAll', label: 'Wait for All', type: 'boolean', defaultValue: true },
-      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000 }
-    ],
-    outputs: 2,
-    allowMultipleOutputs: true
+      // Sort field
+      { key: 'sortField', label: 'Champ de tri', type: 'text', placeholder: 'date', section: 'sort' },
+      { key: 'sortOrder', label: 'Ordre', type: 'select', options: ['asc', 'desc'], defaultValue: 'asc', section: 'sort' },
+      { key: 'sortType', label: 'Type', type: 'select', options: ['auto', 'string', 'number', 'date'], defaultValue: 'auto', section: 'sort' },
+      
+      // Multiple
+      { key: 'multipleFields', label: 'Tri multiple', type: 'boolean', defaultValue: false, section: 'sort' },
+      { key: 'sortFields', label: 'Champs de tri (JSON)', type: 'json', placeholder: '[{"field": "date", "order": "desc"}, {"field": "name", "order": "asc"}]', section: 'sort', showWhen: { field: 'multipleFields', value: true } },
+      
+      // Custom
+      { key: 'customComparator', label: 'Comparateur personnalisé', type: 'code', placeholder: 'return a.value - b.value;', section: 'sort', advanced: true },
+      
+      // Input
+      { key: 'inputField', label: 'Tableau d\'entrée', type: 'text', defaultValue: '{{ $input }}', section: 'io', expressionEnabled: true },
+    ]
   },
-  control_branch: {
-    name: 'Branch',
-    category: 'control',
-    color: 'from-orange-500 to-yellow-400',
-    icon: 'GitBranch',
-    description: 'Create multiple workflow branches',
+  
+  limit: {
+    name: 'Limit / Slice',
+    category: 'transform',
+    color: 'from-rose-500 to-pink-400',
+    icon: 'Scissors',
+    description: 'Limiter le nombre d\'items',
     configFields: [
-      { key: 'branchCount', label: 'Number of Branches', type: 'number', defaultValue: 2 },
-      { key: 'branchNames', label: 'Branch Names (comma-separated)', type: 'text', placeholder: 'Branch A, Branch B' }
-    ],
-    outputs: 4,
-    allowMultipleOutputs: true
+      // Limit
+      { key: 'limit', label: 'Limite', type: 'number', defaultValue: 10, section: 'limit' },
+      { key: 'offset', label: 'Offset (skip)', type: 'number', defaultValue: 0, section: 'limit' },
+      
+      // Mode
+      { key: 'mode', label: 'Mode', type: 'select', options: [
+        { value: 'first', label: 'Premiers N' },
+        { value: 'last', label: 'Derniers N' },
+        { value: 'random', label: 'N aléatoires' },
+        { value: 'slice', label: 'Slice (offset + limit)' },
+      ], defaultValue: 'first', section: 'limit' },
+      
+      // Input
+      { key: 'inputField', label: 'Tableau d\'entrée', type: 'text', defaultValue: '{{ $input }}', section: 'io', expressionEnabled: true },
+    ]
   },
-  control_merge: {
-    name: 'Merge',
-    category: 'control',
-    color: 'from-teal-500 to-green-400',
-    icon: 'Combine',
-    description: 'Merge multiple branches into one',
+  
+  merge_data: {
+    name: 'Merge Data',
+    category: 'transform',
+    color: 'from-violet-500 to-purple-400',
+    icon: 'Merge',
+    description: 'Fusionner des objets ou tableaux',
     configFields: [
-      { key: 'mergeStrategy', label: 'Merge Strategy', type: 'select', options: ['wait_all', 'first_complete', 'combine_results'] },
-      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 60000 }
-    ],
-    inputs: 4
+      // Mode
+      { key: 'mergeMode', label: 'Mode', type: 'select', options: [
+        { value: 'shallow', label: 'Fusion superficielle' },
+        { value: 'deep', label: 'Fusion profonde' },
+        { value: 'concat', label: 'Concaténer tableaux' },
+        { value: 'zip', label: 'Zip (combiner par index)' },
+      ], defaultValue: 'shallow', section: 'merge' },
+      
+      // Sources
+      { key: 'source1', label: 'Source 1', type: 'textarea', placeholder: '{{ $input.data1 }}', section: 'sources', expressionEnabled: true },
+      { key: 'source2', label: 'Source 2', type: 'textarea', placeholder: '{{ $input.data2 }}', section: 'sources', expressionEnabled: true },
+      { key: 'additionalSources', label: 'Sources additionnelles (JSON array)', type: 'json', placeholder: '["{{ $input.data3 }}"]', section: 'sources' },
+      
+      // Conflict resolution
+      { key: 'conflictResolution', label: 'En cas de conflit', type: 'select', options: ['last_wins', 'first_wins', 'keep_both', 'error'], defaultValue: 'last_wins', section: 'options' },
+    ]
+  },
+  
+  split_text: {
+    name: 'Split Text',
+    category: 'transform',
+    color: 'from-amber-500 to-yellow-400',
+    icon: 'SplitSquareVertical',
+    description: 'Découper du texte en morceaux',
+    configFields: [
+      // Mode
+      { key: 'splitMode', label: 'Mode', type: 'select', options: [
+        { value: 'delimiter', label: 'Par délimiteur' },
+        { value: 'regex', label: 'Par regex' },
+        { value: 'lines', label: 'Par lignes' },
+        { value: 'chunks', label: 'Par chunks (taille fixe)' },
+        { value: 'sentences', label: 'Par phrases' },
+        { value: 'paragraphs', label: 'Par paragraphes' },
+      ], defaultValue: 'delimiter', section: 'split' },
+      
+      // Delimiter
+      { key: 'delimiter', label: 'Délimiteur', type: 'text', placeholder: ',', section: 'split', showWhen: { field: 'splitMode', value: 'delimiter' } },
+      { key: 'regex', label: 'Expression régulière', type: 'text', placeholder: '\\s+', section: 'split', showWhen: { field: 'splitMode', value: 'regex' } },
+      { key: 'chunkSize', label: 'Taille des chunks', type: 'number', defaultValue: 1000, section: 'split', showWhen: { field: 'splitMode', value: 'chunks' } },
+      { key: 'chunkOverlap', label: 'Chevauchement', type: 'number', defaultValue: 100, section: 'split', showWhen: { field: 'splitMode', value: 'chunks' } },
+      
+      // Options
+      { key: 'trimParts', label: 'Trim les parties', type: 'boolean', defaultValue: true, section: 'options' },
+      { key: 'removeEmpty', label: 'Supprimer les vides', type: 'boolean', defaultValue: true, section: 'options' },
+      { key: 'maxParts', label: 'Max parties', type: 'number', section: 'options' },
+      
+      // Input
+      { key: 'inputField', label: 'Texte d\'entrée', type: 'text', defaultValue: '{{ $input.text }}', section: 'io', expressionEnabled: true },
+    ]
+  },
+  
+  template: {
+    name: 'Template',
+    category: 'transform',
+    color: 'from-green-500 to-teal-400',
+    icon: 'FileCode',
+    description: 'Générer du texte avec un template',
+    configFields: [
+      // Template
+      { key: 'template', label: 'Template', type: 'textarea', placeholder: 'Bonjour {{ name }},\n\nVotre commande #{{ orderId }} a été expédiée.', required: true, section: 'template', expressionEnabled: true },
+      
+      // Format
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['text', 'html', 'markdown', 'json'], defaultValue: 'text', section: 'format' },
+      
+      // Engine
+      { key: 'templateEngine', label: 'Moteur', type: 'select', options: ['simple', 'handlebars', 'ejs'], defaultValue: 'simple', section: 'format', helpText: 'simple = {{ var }}, handlebars = plus avancé' },
+      
+      // Variables
+      { key: 'variables', label: 'Variables additionnelles (JSON)', type: 'json', placeholder: '{"company": "AETHER"}', section: 'variables' },
+    ]
+  },
+  
+  date_time: {
+    name: 'Date / Time',
+    category: 'transform',
+    color: 'from-blue-500 to-sky-400',
+    icon: 'Calendar',
+    description: 'Manipulation de dates et heures',
+    configFields: [
+      // Operation
+      { key: 'operation', label: 'Opération', type: 'select', options: [
+        { value: 'now', label: 'Date actuelle' },
+        { value: 'parse', label: 'Parser une date' },
+        { value: 'format', label: 'Formater une date' },
+        { value: 'add', label: 'Ajouter du temps' },
+        { value: 'subtract', label: 'Soustraire du temps' },
+        { value: 'diff', label: 'Différence entre dates' },
+        { value: 'start_of', label: 'Début de période' },
+        { value: 'end_of', label: 'Fin de période' },
+      ], defaultValue: 'now', section: 'operation' },
+      
+      // Input
+      { key: 'inputDate', label: 'Date d\'entrée', type: 'text', placeholder: '{{ $input.date }}', section: 'input', expressionEnabled: true },
+      { key: 'inputFormat', label: 'Format d\'entrée', type: 'text', placeholder: 'YYYY-MM-DD', section: 'input' },
+      
+      // Add/Subtract
+      { key: 'amount', label: 'Quantité', type: 'number', defaultValue: 1, section: 'operation' },
+      { key: 'unit', label: 'Unité', type: 'select', options: ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'], defaultValue: 'days', section: 'operation' },
+      
+      // Format output
+      { key: 'outputFormat', label: 'Format de sortie', type: 'text', placeholder: 'DD/MM/YYYY HH:mm', section: 'output' },
+      
+      // Timezone
+      { key: 'timezone', label: 'Fuseau horaire', type: 'select', options: ['UTC', 'Europe/Paris', 'America/New_York', 'Asia/Tokyo', 'local'], defaultValue: 'UTC', section: 'timezone' },
+    ]
+  },
+  
+  crypto: {
+    name: 'Crypto / Hash',
+    category: 'transform',
+    color: 'from-gray-600 to-gray-500',
+    icon: 'Lock',
+    description: 'Hachage, chiffrement, signatures',
+    configFields: [
+      // Operation
+      { key: 'operation', label: 'Opération', type: 'select', options: [
+        { value: 'hash', label: 'Hash (MD5, SHA...)' },
+        { value: 'hmac', label: 'HMAC' },
+        { value: 'encrypt', label: 'Chiffrer (AES)' },
+        { value: 'decrypt', label: 'Déchiffrer' },
+        { value: 'random', label: 'Générer aléatoire' },
+        { value: 'uuid', label: 'Générer UUID' },
+      ], defaultValue: 'hash', section: 'crypto' },
+      
+      // Hash
+      { key: 'algorithm', label: 'Algorithme', type: 'select', options: ['md5', 'sha1', 'sha256', 'sha512'], defaultValue: 'sha256', section: 'crypto' },
+      
+      // Input
+      { key: 'inputData', label: 'Données', type: 'textarea', placeholder: '{{ $input.data }}', section: 'input', expressionEnabled: true },
+      
+      // Key (for HMAC/Encrypt)
+      { key: 'secretKey', label: 'Clé secrète', type: 'password', section: 'crypto' },
+      
+      // Random
+      { key: 'randomLength', label: 'Longueur', type: 'number', defaultValue: 32, section: 'crypto', showWhen: { field: 'operation', value: 'random' } },
+      { key: 'randomEncoding', label: 'Encodage', type: 'select', options: ['hex', 'base64', 'alphanumeric'], defaultValue: 'hex', section: 'crypto', showWhen: { field: 'operation', value: 'random' } },
+    ]
+  },
+  
+  base64: {
+    name: 'Base64 Encode/Decode',
+    category: 'transform',
+    color: 'from-slate-500 to-gray-400',
+    icon: 'Binary',
+    description: 'Encodage et décodage Base64',
+    configFields: [
+      { key: 'operation', label: 'Opération', type: 'select', options: ['encode', 'decode'], defaultValue: 'encode', section: 'base64' },
+      { key: 'inputData', label: 'Données', type: 'textarea', placeholder: '{{ $input.data }}', section: 'input', expressionEnabled: true },
+      { key: 'urlSafe', label: 'URL-safe', type: 'boolean', defaultValue: false, section: 'options' },
+    ]
   },
 
-  // ===== WORKFLOW =====
-  workflow_call: {
-    name: 'Call Workflow',
-    category: 'control',
-    color: 'from-purple-600 to-violet-400',
-    icon: 'Play',
-    description: 'Execute another workflow as a sub-workflow',
-    configFields: [
-      { key: 'workflowId', label: 'Workflow ID', type: 'text', placeholder: 'Select a workflow', required: true },
-      { key: 'workflowName', label: 'Workflow Name', type: 'text', placeholder: 'Workflow name (display only)' },
-      { key: 'passInput', label: 'Pass Current Input', type: 'boolean', defaultValue: true },
-      { key: 'customInput', label: 'Custom Input (JSON)', type: 'json', placeholder: '{}' },
-      { key: 'waitForCompletion', label: 'Wait for Completion', type: 'boolean', defaultValue: true },
-      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 300000 }
-    ]
-  },
-
-  // ===== HTTP =====
+  // ===================================================================
+  // HTTP / API
+  // ===================================================================
+  
   http_request: {
     name: 'HTTP Request',
-    category: 'integration',
-    color: 'from-blue-600 to-blue-400',
-    icon: 'Globe',
-    description: 'Make HTTP API calls (ACTION RÉELLE)',
-    isRealAction: true,
-    configFields: [
-      { key: 'method', label: 'Method', type: 'select', options: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] },
-      { key: 'url', label: 'URL', type: 'text', placeholder: 'https://api.example.com/endpoint', required: true },
-      { key: 'authType', label: 'Authentification', type: 'select', options: ['none', 'bearer_token', 'api_key', 'basic_auth', 'oauth2'], defaultValue: 'none', helpText: 'Type d\'authentification pour l\'API' },
-      { key: 'apiKey', label: 'API Key / Token', type: 'text', placeholder: 'Votre clé API ou Bearer token' },
-      { key: 'apiKeyHeader', label: 'Header pour API Key', type: 'text', placeholder: 'Authorization', defaultValue: 'Authorization' },
-      { key: 'username', label: 'Username (Basic Auth)', type: 'text', placeholder: 'Nom d\'utilisateur' },
-      { key: 'password', label: 'Password (Basic Auth)', type: 'text', placeholder: '***' },
-      { key: 'headers', label: 'Headers additionnels (JSON)', type: 'json', placeholder: '{"Content-Type": "application/json"}' },
-      { key: 'body', label: 'Body (JSON)', type: 'json' },
-      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000 }
-    ]
-  },
-  http_webhook: {
-    name: 'Send Webhook',
-    category: 'integration',
-    color: 'from-indigo-600 to-indigo-400',
-    icon: 'Send',
-    description: 'Send data to a webhook (ACTION RÉELLE)',
-    isRealAction: true,
-    configFields: [
-      { key: 'url', label: 'Webhook URL', type: 'text', placeholder: 'https://hooks.example.com/webhook', required: true },
-      { key: 'authType', label: 'Authentification', type: 'select', options: ['none', 'bearer_token', 'secret_header'], defaultValue: 'none' },
-      { key: 'secretKey', label: 'Secret / Token', type: 'text', placeholder: 'Clé secrète pour signature' },
-      { key: 'payload', label: 'Payload Template', type: 'json' },
-      { key: 'retry', label: 'Retry on Failure', type: 'boolean', defaultValue: true }
-    ]
-  },
-
-  // ===== MESSAGING INTEGRATIONS =====
-  integration_telegram: {
-    name: 'Telegram',
-    category: 'integration',
-    color: 'from-sky-500 to-blue-400',
-    icon: 'Send',
-    description: 'Send via Telegram (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'botToken', label: 'Bot Token', type: 'text', placeholder: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11', required: true, helpText: 'Obtenez-le via @BotFather sur Telegram' },
-      { key: 'chatId', label: 'Chat ID', type: 'text', placeholder: '123456789', required: true },
-      { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Hello!' },
-      { key: 'parseMode', label: 'Format', type: 'select', options: ['text', 'HTML', 'Markdown'], defaultValue: 'text' }
-    ]
-  },
-  integration_slack: {
-    name: 'Slack',
-    category: 'integration',
-    color: 'from-purple-500 to-violet-400',
-    icon: 'MessageSquare',
-    description: 'Post to Slack (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'authMethod', label: 'Méthode d\'auth', type: 'select', options: ['webhook_url', 'bot_token'], defaultValue: 'webhook_url', helpText: 'Webhook pour messages simples, Bot Token pour fonctionnalités avancées' },
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', placeholder: 'https://hooks.slack.com/services/T.../B.../...' },
-      { key: 'botToken', label: 'Bot Token (xoxb-...)', type: 'text', placeholder: 'xoxb-your-token' },
-      { key: 'channel', label: 'Channel', type: 'text', placeholder: '#general', required: true },
-      { key: 'message', label: 'Message', type: 'textarea' },
-      { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Bot' },
-      { key: 'iconEmoji', label: 'Icon Emoji', type: 'text', placeholder: ':robot_face:' }
-    ]
-  },
-  integration_discord: {
-    name: 'Discord',
-    category: 'integration',
-    color: 'from-indigo-500 to-purple-400',
-    icon: 'MessageCircle',
-    description: 'Send to Discord (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', placeholder: 'https://discord.com/api/webhooks/...', required: true, helpText: 'Créez un webhook dans les paramètres du channel Discord' },
-      { key: 'message', label: 'Message', type: 'textarea', required: true },
-      { key: 'username', label: 'Bot Username', type: 'text', placeholder: 'AETHER Flow' },
-      { key: 'avatarUrl', label: 'Avatar URL', type: 'text', placeholder: 'URL de l\'image de profil du bot' },
-      { key: 'embedTitle', label: 'Embed Title', type: 'text' },
-      { key: 'embedColor', label: 'Embed Color (hex)', type: 'text', placeholder: '#5865F2' }
-    ]
-  },
-  integration_whatsapp: {
-    name: 'WhatsApp Business',
-    category: 'integration',
-    color: 'from-green-500 to-emerald-400',
-    icon: 'MessageCircle',
-    description: 'Send WhatsApp message',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'accessToken', label: 'Access Token', type: 'text', placeholder: 'Token d\'accès WhatsApp Business API', required: true },
-      { key: 'phoneNumberId', label: 'Phone Number ID', type: 'text', placeholder: 'ID du numéro WhatsApp Business', required: true },
-      { key: 'to', label: 'Phone Number', type: 'text', placeholder: '+33612345678', required: true },
-      { key: 'templateName', label: 'Template Name', type: 'text', placeholder: 'Nom du template approuvé' },
-      { key: 'message', label: 'Message (si pas de template)', type: 'textarea' }
-    ]
-  },
-  integration_teams: {
-    name: 'Microsoft Teams',
-    category: 'integration',
-    color: 'from-violet-600 to-purple-500',
-    icon: 'MessageSquare',
-    description: 'Post to Teams',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true, helpText: 'Créez un connecteur Webhook dans Teams' },
-      { key: 'title', label: 'Message Title', type: 'text' },
-      { key: 'message', label: 'Message', type: 'textarea' },
-      { key: 'themeColor', label: 'Theme Color (hex)', type: 'text', placeholder: '#0078D4' }
-    ]
-  },
-  integration_intercom: {
-    name: 'Intercom',
-    category: 'integration',
-    color: 'from-blue-500 to-blue-400',
-    icon: 'MessageSquare',
-    description: 'Send via Intercom',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['send_message', 'create_contact'] },
-      { key: 'userId', label: 'User ID', type: 'text' },
-      { key: 'message', label: 'Message', type: 'textarea' }
-    ]
-  },
-  integration_zendesk: {
-    name: 'Zendesk',
-    category: 'integration',
-    color: 'from-green-600 to-teal-500',
-    icon: 'Headphones',
-    description: 'Create Zendesk tickets',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_ticket', 'update_ticket'] },
-      { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['low', 'normal', 'high', 'urgent'] }
-    ]
-  },
-  integration_freshdesk: {
-    name: 'Freshdesk',
-    category: 'integration',
-    color: 'from-green-500 to-lime-400',
-    icon: 'Headphones',
-    description: 'Create Freshdesk tickets',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'subject', label: 'Subject', type: 'text', required: true },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'email', label: 'Requester Email', type: 'text' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['1', '2', '3', '4'] }
-    ]
-  },
-  integration_crisp: {
-    name: 'Crisp',
-    category: 'integration',
-    color: 'from-purple-600 to-pink-500',
-    icon: 'MessageCircle',
-    description: 'Send via Crisp',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'websiteId', label: 'Website ID', type: 'text', required: true },
-      { key: 'sessionId', label: 'Session ID', type: 'text' },
-      { key: 'message', label: 'Message', type: 'textarea' }
-    ]
-  },
-
-  // ===== EMAIL INTEGRATIONS =====
-  integration_sendgrid: {
-    name: 'SendGrid',
-    category: 'integration',
-    color: 'from-blue-500 to-cyan-400',
-    icon: 'Mail',
-    description: 'Send via SendGrid (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'SG.xxxxxxxxxxxxx', required: true, helpText: 'Clé API SendGrid (commence par SG.)' },
-      { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'from', label: 'From', type: 'text', required: true },
-      { key: 'fromName', label: 'From Name', type: 'text', placeholder: 'AETHER' },
-      { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'message', label: 'Body (Text)', type: 'textarea' },
-      { key: 'htmlContent', label: 'Body (HTML)', type: 'textarea' },
-      { key: 'templateId', label: 'Template ID (optionnel)', type: 'text', placeholder: 'd-xxxxxxxx' }
-    ]
-  },
-  integration_mailchimp: {
-    name: 'Mailchimp',
-    category: 'integration',
-    color: 'from-yellow-500 to-amber-400',
-    icon: 'Mail',
-    description: 'Mailchimp operations',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'xxxxx-us1', required: true, helpText: 'Format: apikey-datacenter (ex: abc123-us1)' },
-      { key: 'action', label: 'Action', type: 'select', options: ['add_subscriber', 'update_subscriber', 'send_campaign'] },
-      { key: 'listId', label: 'List/Audience ID', type: 'text', required: true },
-      { key: 'email', label: 'Email', type: 'text' },
-      { key: 'mergeFields', label: 'Merge Fields (JSON)', type: 'json', placeholder: '{"FNAME": "John", "LNAME": "Doe"}' },
-      { key: 'tags', label: 'Tags (virgules)', type: 'text', placeholder: 'newsletter, prospect' }
-    ]
-  },
-  integration_brevo: {
-    name: 'Brevo',
-    category: 'integration',
-    color: 'from-blue-600 to-indigo-500',
-    icon: 'Mail',
-    description: 'Brevo email',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'xkeysib-xxxxx', required: true },
-      { key: 'action', label: 'Action', type: 'select', options: ['send_email', 'create_contact', 'send_sms'] },
-      { key: 'to', label: 'To (email ou phone)', type: 'text' },
-      { key: 'senderEmail', label: 'Sender Email', type: 'text' },
-      { key: 'senderName', label: 'Sender Name', type: 'text' },
-      { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'htmlContent', label: 'HTML', type: 'textarea' },
-      { key: 'templateId', label: 'Template ID', type: 'number' }
-    ]
-  },
-  integration_mailgun: {
-    name: 'Mailgun',
-    category: 'integration',
-    color: 'from-red-600 to-red-400',
-    icon: 'Mail',
-    description: 'Send via Mailgun',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'key-xxxxxxx', required: true },
-      { key: 'domain', label: 'Domain', type: 'text', placeholder: 'mg.yourdomain.com', required: true },
-      { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'from', label: 'From', type: 'text', required: true },
-      { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'text', label: 'Text', type: 'textarea' },
-      { key: 'html', label: 'HTML', type: 'textarea' }
-    ]
-  },
-  integration_resend: {
-    name: 'Resend',
-    category: 'integration',
-    color: 'from-gray-800 to-gray-600',
-    icon: 'Mail',
-    description: 'Send via Resend (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 're_xxxxxxxxx', required: true, helpText: 'Clé API Resend (commence par re_)' },
-      { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'from', label: 'From', type: 'text', required: true, placeholder: 'you@yourdomaine.com' },
-      { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'html', label: 'HTML', type: 'textarea' },
-      { key: 'text', label: 'Text fallback', type: 'textarea' }
-    ]
-  },
-  integration_convertkit: {
-    name: 'ConvertKit',
-    category: 'integration',
-    color: 'from-rose-500 to-pink-400',
-    icon: 'Mail',
-    description: 'ConvertKit operations',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['add_subscriber', 'add_tag'] },
-      { key: 'email', label: 'Email', type: 'text', required: true },
-      { key: 'formId', label: 'Form ID', type: 'text' },
-      { key: 'tagId', label: 'Tag ID', type: 'text' }
-    ]
-  },
-
-  // ===== SMS =====
-  integration_twilio_sms: {
-    name: 'Twilio SMS',
-    category: 'integration',
-    color: 'from-red-500 to-pink-400',
-    icon: 'Phone',
-    description: 'Send SMS (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'from', label: 'From', type: 'text', required: true },
-      { key: 'message', label: 'Message', type: 'textarea' }
-    ]
-  },
-  integration_twilio_voice: {
-    name: 'Twilio Voice',
-    category: 'integration',
-    color: 'from-red-600 to-rose-500',
-    icon: 'Phone',
-    description: 'Make calls',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'from', label: 'From', type: 'text', required: true },
-      { key: 'twiml', label: 'TwiML', type: 'textarea' }
-    ]
-  },
-
-  // ===== AI PROVIDERS =====
-  integration_openai: {
-    name: 'OpenAI',
-    category: 'integration',
-    color: 'from-emerald-600 to-teal-500',
-    icon: 'Brain',
-    description: 'OpenAI GPT',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'sk-xxxxxxxxxxxxxxx', required: true, helpText: 'Votre clé API OpenAI (commence par sk-)' },
-      { key: 'model', label: 'Model', type: 'select', options: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo', 'o1-preview', 'o1-mini'] },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
-      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea', placeholder: 'Instructions pour le modèle...' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 },
-      { key: 'temperature', label: 'Temperature (0-2)', type: 'number', defaultValue: 0.7 }
-    ]
-  },
-  integration_anthropic: {
-    name: 'Anthropic Claude',
-    category: 'integration',
-    color: 'from-orange-500 to-amber-400',
-    icon: 'Brain',
-    description: 'Claude AI',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'sk-ant-xxxxxxxx', required: true, helpText: 'Votre clé API Anthropic' },
-      { key: 'model', label: 'Model', type: 'select', options: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'] },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
-      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
-    ]
-  },
-  integration_google_ai: {
-    name: 'Google AI (Gemini)',
-    category: 'integration',
-    color: 'from-blue-500 to-sky-400',
-    icon: 'Brain',
-    description: 'Gemini Pro',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', placeholder: 'AIzaSyxxxxxxxx', required: true, helpText: 'Clé API Google AI Studio' },
-      { key: 'model', label: 'Model', type: 'select', options: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro', 'gemini-pro-vision'] },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
-      { key: 'maxTokens', label: 'Max Output Tokens', type: 'number', defaultValue: 2048 }
-    ]
-  },
-  integration_mistral: {
-    name: 'Mistral AI',
-    category: 'integration',
-    color: 'from-orange-600 to-red-500',
-    icon: 'Brain',
-    description: 'Mistral models',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API Mistral' },
-      { key: 'model', label: 'Model', type: 'select', options: ['mistral-large-latest', 'mistral-medium-latest', 'mistral-small-latest', 'open-mixtral-8x22b'] },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000 }
-    ]
-  },
-  integration_huggingface: {
-    name: 'Hugging Face',
-    category: 'integration',
-    color: 'from-yellow-500 to-orange-400',
-    icon: 'Brain',
-    description: 'HF Inference',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiToken', label: 'API Token', type: 'text', placeholder: 'hf_xxxxxxxxx', required: true, helpText: 'Token d\'accès Hugging Face' },
-      { key: 'modelId', label: 'Model ID', type: 'text', required: true, placeholder: 'meta-llama/Llama-2-70b-chat-hf' },
-      { key: 'inputs', label: 'Inputs', type: 'textarea' },
-      { key: 'parameters', label: 'Parameters (JSON)', type: 'json', placeholder: '{"max_new_tokens": 500}' }
-    ]
-  },
-  integration_replicate: {
-    name: 'Replicate',
-    category: 'integration',
-    color: 'from-gray-700 to-gray-500',
-    icon: 'Brain',
-    description: 'Run ML models',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiToken', label: 'API Token', type: 'text', placeholder: 'r8_xxxxxxxxx', required: true, helpText: 'Token API Replicate' },
-      { key: 'model', label: 'Model', type: 'text', required: true, placeholder: 'stability-ai/sdxl:xxx' },
-      { key: 'input', label: 'Input (JSON)', type: 'json', required: true }
-    ]
-  },
-  integration_stability: {
-    name: 'Stability AI',
-    category: 'integration',
-    color: 'from-purple-600 to-indigo-500',
-    icon: 'Image',
-    description: 'Stable Diffusion',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Clé API Stability AI' },
-      { key: 'prompt', label: 'Prompt', type: 'textarea', required: true },
-      { key: 'negativePrompt', label: 'Negative Prompt', type: 'textarea' },
-      { key: 'width', label: 'Width', type: 'number', defaultValue: 1024 },
-      { key: 'height', label: 'Height', type: 'number', defaultValue: 1024 },
-      { key: 'steps', label: 'Steps', type: 'number', defaultValue: 30 }
-    ]
-  },
-  integration_elevenlabs: {
-    name: 'ElevenLabs',
-    category: 'integration',
-    color: 'from-gray-800 to-gray-600',
-    icon: 'Volume2',
-    description: 'Text-to-speech',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API ElevenLabs' },
-      { key: 'voiceId', label: 'Voice ID', type: 'text', placeholder: 'ID de la voix (ex: 21m00Tcm4TlvDq8ikWAM)' },
-      { key: 'text', label: 'Text', type: 'textarea', required: true },
-      { key: 'modelId', label: 'Model', type: 'select', options: ['eleven_multilingual_v2', 'eleven_monolingual_v1', 'eleven_turbo_v2'], defaultValue: 'eleven_multilingual_v2' },
-      { key: 'stability', label: 'Stability (0-1)', type: 'number', defaultValue: 0.5 },
-      { key: 'similarityBoost', label: 'Similarity Boost (0-1)', type: 'number', defaultValue: 0.75 }
-    ]
-  },
-  integration_deepgram: {
-    name: 'Deepgram',
-    category: 'integration',
-    color: 'from-green-600 to-emerald-500',
-    icon: 'Mic',
-    description: 'Speech-to-text',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API Deepgram' },
-      { key: 'audioUrl', label: 'Audio URL', type: 'text', required: true },
-      { key: 'language', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl', 'ja', 'zh'] },
-      { key: 'model', label: 'Model', type: 'select', options: ['nova-2', 'nova', 'enhanced', 'base'], defaultValue: 'nova-2' },
-      { key: 'punctuate', label: 'Punctuate', type: 'boolean', defaultValue: true },
-      { key: 'diarize', label: 'Speaker Diarization', type: 'boolean', defaultValue: false }
-    ]
-  },
-  integration_assemblyai: {
-    name: 'AssemblyAI',
-    category: 'integration',
-    color: 'from-blue-700 to-blue-500',
-    icon: 'Mic',
-    description: 'Speech recognition',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'apiKey', label: 'API Key', type: 'text', required: true, helpText: 'Votre clé API AssemblyAI' },
-      { key: 'audioUrl', label: 'Audio URL', type: 'text', required: true },
-      { key: 'languageCode', label: 'Language', type: 'select', options: ['en', 'fr', 'es', 'de', 'it', 'pt', 'nl', 'ja', 'zh'] },
-      { key: 'speakerLabels', label: 'Speaker Labels', type: 'boolean', defaultValue: false },
-      { key: 'autoChapters', label: 'Auto Chapters', type: 'boolean', defaultValue: false }
-    ]
-  },
-
-  // ===== CRM EXTERNAL =====
-  integration_hubspot: {
-    name: 'HubSpot',
-    category: 'integration',
+    category: 'http',
     color: 'from-orange-500 to-red-400',
-    icon: 'Users',
-    description: 'HubSpot CRM (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'accessToken', label: 'Access Token', type: 'text', required: true, helpText: 'Token d\'accès HubSpot (Private App ou OAuth)' },
-      { key: 'action', label: 'Action', type: 'select', options: ['create_contact', 'update_contact', 'create_deal', 'create_company', 'search'] },
-      { key: 'objectId', label: 'Object ID (pour update)', type: 'text' },
-      { key: 'properties', label: 'Properties (JSON)', type: 'json', placeholder: '{"email": "contact@example.com", "firstname": "John"}' }
-    ]
-  },
-  integration_salesforce: {
-    name: 'Salesforce',
-    category: 'integration',
-    color: 'from-blue-600 to-sky-500',
-    icon: 'Cloud',
-    description: 'Salesforce CRM (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'object', label: 'Object', type: 'select', options: ['Lead', 'Contact', 'Account', 'Opportunity'] },
-      { key: 'action', label: 'Action', type: 'select', options: ['create', 'update', 'query'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' }
-    ]
-  },
-  integration_pipedrive: {
-    name: 'Pipedrive',
-    category: 'integration',
-    color: 'from-green-600 to-emerald-500',
-    icon: 'TrendingUp',
-    description: 'Pipedrive CRM',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_deal', 'update_deal', 'create_person'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' }
-    ]
-  },
-  integration_zoho: {
-    name: 'Zoho CRM',
-    category: 'integration',
-    color: 'from-red-500 to-orange-400',
-    icon: 'Database',
-    description: 'Zoho CRM',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'module', label: 'Module', type: 'select', options: ['Leads', 'Contacts', 'Deals'] },
-      { key: 'action', label: 'Action', type: 'select', options: ['create', 'update'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' }
-    ]
-  },
-
-  // ===== PRODUCTIVITY =====
-  integration_notion: {
-    name: 'Notion',
-    category: 'integration',
-    color: 'from-gray-800 to-gray-600',
-    icon: 'FileText',
-    description: 'Notion pages (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'databaseId', label: 'Database ID', type: 'text', required: true },
-      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
-    ]
-  },
-  integration_airtable: {
-    name: 'Airtable',
-    category: 'integration',
-    color: 'from-blue-500 to-cyan-400',
-    icon: 'Table',
-    description: 'Airtable records (ACTION RÉELLE)',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'baseId', label: 'Base ID', type: 'text', required: true },
-      { key: 'tableId', label: 'Table ID', type: 'text', required: true },
-      { key: 'fields', label: 'Fields (JSON)', type: 'json' }
-    ]
-  },
-  integration_google_sheets: {
-    name: 'Google Sheets',
-    category: 'integration',
-    color: 'from-green-500 to-emerald-400',
-    icon: 'Table',
-    description: 'Google Sheets',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'spreadsheetId', label: 'Spreadsheet ID', type: 'text', required: true },
-      { key: 'range', label: 'Range', type: 'text', placeholder: 'Sheet1!A:D' },
-      { key: 'action', label: 'Action', type: 'select', options: ['read', 'append', 'update'] }
-    ]
-  },
-  integration_google_calendar: {
-    name: 'Google Calendar',
-    category: 'integration',
-    color: 'from-blue-500 to-indigo-400',
-    icon: 'Calendar',
-    description: 'Calendar events',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_event', 'list_events'] },
-      { key: 'summary', label: 'Event Title', type: 'text' },
-      { key: 'start', label: 'Start', type: 'text', placeholder: 'ISO datetime' },
-      { key: 'end', label: 'End', type: 'text' }
-    ]
-  },
-  integration_trello: {
-    name: 'Trello',
-    category: 'integration',
-    color: 'from-blue-600 to-blue-400',
-    icon: 'Columns',
-    description: 'Trello cards',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_card', 'move_card'] },
-      { key: 'listId', label: 'List ID', type: 'text', required: true },
-      { key: 'name', label: 'Card Name', type: 'text' },
-      { key: 'desc', label: 'Description', type: 'textarea' }
-    ]
-  },
-  integration_asana: {
-    name: 'Asana',
-    category: 'integration',
-    color: 'from-rose-500 to-pink-400',
-    icon: 'CheckSquare',
-    description: 'Asana tasks',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_task', 'update_task'] },
-      { key: 'projectId', label: 'Project ID', type: 'text', required: true },
-      { key: 'name', label: 'Task Name', type: 'text' },
-      { key: 'notes', label: 'Notes', type: 'textarea' }
-    ]
-  },
-  integration_monday: {
-    name: 'Monday.com',
-    category: 'integration',
-    color: 'from-orange-500 to-yellow-400',
-    icon: 'Layout',
-    description: 'Monday.com items',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'boardId', label: 'Board ID', type: 'text', required: true },
-      { key: 'itemName', label: 'Item Name', type: 'text' },
-      { key: 'columnValues', label: 'Column Values (JSON)', type: 'json' }
-    ]
-  },
-  integration_clickup: {
-    name: 'ClickUp',
-    category: 'integration',
-    color: 'from-purple-500 to-violet-400',
-    icon: 'CheckCircle',
-    description: 'ClickUp tasks',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'listId', label: 'List ID', type: 'text', required: true },
-      { key: 'name', label: 'Task Name', type: 'text' },
-      { key: 'description', label: 'Description', type: 'textarea' }
-    ]
-  },
-  integration_jira: {
-    name: 'Jira',
-    category: 'integration',
-    color: 'from-blue-600 to-blue-400',
-    icon: 'Bug',
-    description: 'Jira issues',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'projectKey', label: 'Project Key', type: 'text', required: true },
-      { key: 'issueType', label: 'Issue Type', type: 'select', options: ['Task', 'Bug', 'Story', 'Epic'] },
-      { key: 'summary', label: 'Summary', type: 'text' },
-      { key: 'description', label: 'Description', type: 'textarea' }
-    ]
-  },
-  integration_linear: {
-    name: 'Linear',
-    category: 'integration',
-    color: 'from-indigo-600 to-violet-500',
-    icon: 'Zap',
-    description: 'Linear issues',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'teamId', label: 'Team ID', type: 'text', required: true },
-      { key: 'title', label: 'Title', type: 'text' },
-      { key: 'description', label: 'Description', type: 'textarea' }
-    ]
-  },
-  integration_calendly: {
-    name: 'Calendly',
-    category: 'integration',
-    color: 'from-blue-500 to-cyan-400',
-    icon: 'Calendar',
-    description: 'Calendly scheduling',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['list_events', 'get_event'] },
-      { key: 'eventUri', label: 'Event URI', type: 'text' }
-    ]
-  },
-
-  // ===== STORAGE =====
-  integration_google_drive: {
-    name: 'Google Drive',
-    category: 'integration',
-    color: 'from-yellow-500 to-amber-400',
-    icon: 'HardDrive',
-    description: 'Google Drive files',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list'] },
-      { key: 'folderId', label: 'Folder ID', type: 'text' },
-      { key: 'fileName', label: 'File Name', type: 'text' }
-    ]
-  },
-  integration_dropbox: {
-    name: 'Dropbox',
-    category: 'integration',
-    color: 'from-blue-500 to-blue-400',
-    icon: 'Box',
-    description: 'Dropbox files',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list'] },
-      { key: 'path', label: 'Path', type: 'text', placeholder: '/folder/file.pdf' }
-    ]
-  },
-  integration_onedrive: {
-    name: 'OneDrive',
-    category: 'integration',
-    color: 'from-blue-600 to-sky-500',
-    icon: 'Cloud',
-    description: 'OneDrive files',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list'] },
-      { key: 'path', label: 'Path', type: 'text' }
-    ]
-  },
-  integration_box: {
-    name: 'Box',
-    category: 'integration',
-    color: 'from-blue-500 to-indigo-400',
-    icon: 'Box',
-    description: 'Box files',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['upload', 'download', 'list'] },
-      { key: 'folderId', label: 'Folder ID', type: 'text' }
-    ]
-  },
-  integration_aws_s3: {
-    name: 'AWS S3',
-    category: 'integration',
-    color: 'from-orange-500 to-yellow-400',
-    icon: 'Database',
-    description: 'S3 buckets',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'bucket', label: 'Bucket', type: 'text', required: true },
-      { key: 'key', label: 'Object Key', type: 'text' },
-      { key: 'action', label: 'Action', type: 'select', options: ['put', 'get', 'delete', 'list'] }
-    ]
-  },
-
-  // ===== PAYMENTS =====
-  integration_stripe: {
-    name: 'Stripe',
-    category: 'integration',
-    color: 'from-indigo-600 to-purple-500',
-    icon: 'CreditCard',
-    description: 'Stripe payments',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_customer', 'create_payment_intent', 'create_invoice'] },
-      { key: 'amount', label: 'Amount (cents)', type: 'number' },
-      { key: 'currency', label: 'Currency', type: 'select', options: ['eur', 'usd', 'gbp'] },
-      { key: 'metadata', label: 'Metadata (JSON)', type: 'json' }
-    ]
-  },
-  integration_paypal: {
-    name: 'PayPal',
-    category: 'integration',
-    color: 'from-blue-600 to-blue-400',
-    icon: 'DollarSign',
-    description: 'PayPal payments',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_order', 'capture_order'] },
-      { key: 'amount', label: 'Amount', type: 'number' },
-      { key: 'currency', label: 'Currency', type: 'text', defaultValue: 'EUR' }
-    ]
-  },
-  integration_shopify: {
-    name: 'Shopify',
-    category: 'integration',
-    color: 'from-green-500 to-lime-400',
-    icon: 'ShoppingBag',
-    description: 'Shopify store',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_order', 'update_product', 'list_products'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' }
-    ]
-  },
-  integration_quickbooks: {
-    name: 'QuickBooks',
-    category: 'integration',
-    color: 'from-green-600 to-emerald-500',
-    icon: 'Calculator',
-    description: 'QuickBooks accounting',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_invoice', 'create_customer', 'create_expense'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' }
-    ]
-  },
-
-  // ===== SOCIAL =====
-  integration_twitter: {
-    name: 'Twitter/X',
-    category: 'integration',
-    color: 'from-gray-800 to-gray-600',
-    icon: 'Twitter',
-    description: 'Post to Twitter',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['post_tweet', 'search_tweets'] },
-      { key: 'text', label: 'Tweet Text', type: 'textarea' }
-    ]
-  },
-  integration_linkedin: {
-    name: 'LinkedIn',
-    category: 'integration',
-    color: 'from-blue-700 to-blue-600',
-    icon: 'Linkedin',
-    description: 'LinkedIn posts',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_post', 'get_profile'] },
-      { key: 'text', label: 'Post Content', type: 'textarea' }
-    ]
-  },
-  integration_facebook: {
-    name: 'Facebook',
-    category: 'integration',
-    color: 'from-blue-600 to-blue-500',
-    icon: 'Facebook',
-    description: 'Facebook pages',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_post', 'get_insights'] },
-      { key: 'pageId', label: 'Page ID', type: 'text' },
-      { key: 'message', label: 'Message', type: 'textarea' }
-    ]
-  },
-  integration_instagram: {
-    name: 'Instagram',
-    category: 'integration',
-    color: 'from-pink-500 to-purple-500',
-    icon: 'Instagram',
-    description: 'Instagram posts',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_media', 'get_insights'] },
-      { key: 'imageUrl', label: 'Image URL', type: 'text' },
-      { key: 'caption', label: 'Caption', type: 'textarea' }
-    ]
-  },
-  integration_youtube: {
-    name: 'YouTube',
-    category: 'integration',
-    color: 'from-red-600 to-red-500',
-    icon: 'Youtube',
-    description: 'YouTube videos',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['upload_video', 'search_videos', 'get_analytics'] },
-      { key: 'videoId', label: 'Video ID', type: 'text' }
-    ]
-  },
-  integration_tiktok: {
-    name: 'TikTok',
-    category: 'integration',
-    color: 'from-gray-900 to-gray-700',
-    icon: 'Video',
-    description: 'TikTok content',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['post_video', 'get_analytics'] },
-      { key: 'videoUrl', label: 'Video URL', type: 'text' }
-    ]
-  },
-
-  // ===== DEV =====
-  integration_github: {
-    name: 'GitHub',
-    category: 'integration',
-    color: 'from-gray-800 to-gray-600',
-    icon: 'Github',
-    description: 'GitHub repos',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_issue', 'create_pr', 'list_repos'] },
-      { key: 'owner', label: 'Owner', type: 'text' },
-      { key: 'repo', label: 'Repository', type: 'text' },
-      { key: 'title', label: 'Title', type: 'text' },
-      { key: 'body', label: 'Body', type: 'textarea' }
-    ]
-  },
-  integration_gitlab: {
-    name: 'GitLab',
-    category: 'integration',
-    color: 'from-orange-600 to-red-500',
-    icon: 'Gitlab',
-    description: 'GitLab projects',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_issue', 'create_mr', 'list_projects'] },
-      { key: 'projectId', label: 'Project ID', type: 'text' },
-      { key: 'title', label: 'Title', type: 'text' }
-    ]
-  },
-  integration_vercel: {
-    name: 'Vercel',
-    category: 'integration',
-    color: 'from-gray-900 to-gray-700',
-    icon: 'Triangle',
-    description: 'Vercel deployments',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['trigger_deploy', 'list_deployments'] },
-      { key: 'projectId', label: 'Project ID', type: 'text' }
-    ]
-  },
-  integration_supabase: {
-    name: 'Supabase',
-    category: 'integration',
-    color: 'from-emerald-600 to-green-500',
-    icon: 'Database',
-    description: 'Supabase DB',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'table', label: 'Table', type: 'text', required: true },
-      { key: 'action', label: 'Action', type: 'select', options: ['select', 'insert', 'update', 'delete'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' },
-      { key: 'filters', label: 'Filters (JSON)', type: 'json' }
-    ]
-  },
-  integration_firebase: {
-    name: 'Firebase',
-    category: 'integration',
-    color: 'from-yellow-500 to-orange-400',
-    icon: 'Flame',
-    description: 'Firebase/Firestore',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'collection', label: 'Collection', type: 'text', required: true },
-      { key: 'action', label: 'Action', type: 'select', options: ['get', 'add', 'update', 'delete'] },
-      { key: 'data', label: 'Data (JSON)', type: 'json' }
-    ]
-  },
-
-  // ===== ANALYTICS =====
-  integration_google_analytics: {
-    name: 'Google Analytics',
-    category: 'integration',
-    color: 'from-orange-500 to-yellow-400',
-    icon: 'BarChart',
-    description: 'GA4 data',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'propertyId', label: 'Property ID', type: 'text', required: true },
-      { key: 'metrics', label: 'Metrics', type: 'text', placeholder: 'sessions,pageviews' },
-      { key: 'dateRange', label: 'Date Range', type: 'text', placeholder: '7daysAgo,today' }
-    ]
-  },
-  integration_mixpanel: {
-    name: 'Mixpanel',
-    category: 'integration',
-    color: 'from-purple-600 to-violet-500',
-    icon: 'Activity',
-    description: 'Mixpanel events',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['track_event', 'query_events'] },
-      { key: 'event', label: 'Event Name', type: 'text' },
-      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
-    ]
-  },
-  integration_segment: {
-    name: 'Segment',
-    category: 'integration',
-    color: 'from-green-500 to-teal-400',
-    icon: 'Activity',
-    description: 'Segment tracking',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'type', label: 'Type', type: 'select', options: ['track', 'identify', 'page'] },
-      { key: 'event', label: 'Event/Page Name', type: 'text' },
-      { key: 'properties', label: 'Properties (JSON)', type: 'json' }
-    ]
-  },
-  integration_amplitude: {
-    name: 'Amplitude',
-    category: 'integration',
-    color: 'from-blue-600 to-indigo-500',
-    icon: 'TrendingUp',
-    description: 'Amplitude analytics',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['track_event', 'identify_user'] },
-      { key: 'eventType', label: 'Event Type', type: 'text' },
-      { key: 'eventProperties', label: 'Event Properties (JSON)', type: 'json' }
-    ]
-  },
-
-  // ===== AUTOMATION =====
-  integration_zapier: {
-    name: 'Zapier Webhook',
-    category: 'integration',
-    color: 'from-orange-500 to-amber-400',
-    icon: 'Zap',
-    description: 'Trigger Zapier',
-    isRealAction: true,
-    configFields: [
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
-      { key: 'payload', label: 'Payload (JSON)', type: 'json' }
-    ]
-  },
-  integration_make: {
-    name: 'Make (Integromat)',
-    category: 'integration',
-    color: 'from-purple-600 to-violet-500',
-    icon: 'Cog',
-    description: 'Trigger Make',
-    isRealAction: true,
-    configFields: [
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
-      { key: 'payload', label: 'Payload (JSON)', type: 'json' }
-    ]
-  },
-  integration_n8n: {
-    name: 'n8n Webhook',
-    category: 'integration',
-    color: 'from-red-500 to-orange-400',
-    icon: 'Workflow',
-    description: 'Trigger n8n',
-    isRealAction: true,
-    configFields: [
-      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true },
-      { key: 'payload', label: 'Payload (JSON)', type: 'json' }
-    ]
-  },
-
-  // ===== VIDEO =====
-  integration_zoom: {
-    name: 'Zoom',
-    category: 'integration',
-    color: 'from-blue-600 to-blue-500',
-    icon: 'Video',
-    description: 'Zoom meetings',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['create_meeting', 'list_meetings', 'get_recording'] },
-      { key: 'topic', label: 'Meeting Topic', type: 'text' },
-      { key: 'startTime', label: 'Start Time', type: 'text', placeholder: 'ISO datetime' }
-    ]
-  },
-  integration_loom: {
-    name: 'Loom',
-    category: 'integration',
-    color: 'from-purple-500 to-indigo-400',
-    icon: 'Video',
-    description: 'Loom videos',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      { key: 'action', label: 'Action', type: 'select', options: ['list_videos', 'get_video'] },
-      { key: 'videoId', label: 'Video ID', type: 'text' }
-    ]
-  },
-
-  // ===== SYSTEM ACTIONS =====
-  system_email: {
-    name: 'Send Email',
-    category: 'system',
-    color: 'from-rose-500 to-pink-400',
-    icon: 'Mail',
-    description: 'Send email notification',
-    configFields: [
-      { key: 'to', label: 'To', type: 'text', required: true },
-      { key: 'subject', label: 'Subject', type: 'text' },
-      { key: 'template', label: 'Template', type: 'select', options: ['plain', 'html', 'markdown'] }
-    ]
-  },
-  system_webhook: {
-    name: 'Call Webhook',
-    category: 'system',
-    color: 'from-indigo-500 to-purple-400',
     icon: 'Globe',
-    description: 'Call external webhook',
+    description: 'Requête HTTP vers une API externe',
     isRealAction: true,
     configFields: [
-      { key: 'url', label: 'Webhook URL', type: 'text', required: true },
-      { key: 'method', label: 'Method', type: 'select', options: ['POST', 'PUT', 'GET'] }
+      // URL & Method
+      { key: 'url', label: 'URL', type: 'text', placeholder: 'https://api.example.com/endpoint', required: true, section: 'request', expressionEnabled: true },
+      { key: 'method', label: 'Méthode', type: 'select', options: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'], defaultValue: 'GET', section: 'request' },
+      
+      // Headers
+      { key: 'headers', label: 'Headers (JSON)', type: 'json', placeholder: '{"Content-Type": "application/json", "Authorization": "Bearer {{ $env.API_KEY }}"}', section: 'headers', expressionEnabled: true },
+      { key: 'contentType', label: 'Content-Type', type: 'select', options: ['application/json', 'application/x-www-form-urlencoded', 'multipart/form-data', 'text/plain', 'custom'], defaultValue: 'application/json', section: 'headers' },
+      
+      // Body
+      { key: 'bodyType', label: 'Type de body', type: 'select', options: ['none', 'json', 'form', 'raw', 'binary'], defaultValue: 'json', section: 'body' },
+      { key: 'body', label: 'Body', type: 'json', placeholder: '{"key": "{{ $input.value }}"}', section: 'body', showWhen: { field: 'bodyType', value: 'json' }, expressionEnabled: true },
+      { key: 'formData', label: 'Form Data (JSON)', type: 'json', placeholder: '{"field1": "value1"}', section: 'body', showWhen: { field: 'bodyType', value: 'form' }, expressionEnabled: true },
+      { key: 'rawBody', label: 'Raw Body', type: 'textarea', section: 'body', showWhen: { field: 'bodyType', value: 'raw' }, expressionEnabled: true },
+      
+      // Query params
+      { key: 'queryParams', label: 'Query Parameters (JSON)', type: 'json', placeholder: '{"page": 1, "limit": 10}', section: 'query', expressionEnabled: true },
+      
+      // Auth
+      { key: 'authType', label: 'Authentification', type: 'select', options: ['none', 'basic', 'bearer', 'api_key', 'oauth2'], defaultValue: 'none', section: 'auth' },
+      { key: 'authToken', label: 'Token / API Key', type: 'password', section: 'auth', showWhen: { field: 'authType', notValue: 'none' }, expressionEnabled: true },
+      { key: 'authUsername', label: 'Username', type: 'text', section: 'auth', showWhen: { field: 'authType', value: 'basic' } },
+      { key: 'authPassword', label: 'Password', type: 'password', section: 'auth', showWhen: { field: 'authType', value: 'basic' } },
+      { key: 'apiKeyHeader', label: 'Header name', type: 'text', placeholder: 'X-API-Key', section: 'auth', showWhen: { field: 'authType', value: 'api_key' } },
+      
+      // Response
+      { key: 'responseType', label: 'Type de réponse', type: 'select', options: ['auto', 'json', 'text', 'binary', 'stream'], defaultValue: 'auto', section: 'response' },
+      { key: 'fullResponse', label: 'Réponse complète (headers, status)', type: 'boolean', defaultValue: false, section: 'response' },
+      
+      // Error handling
+      { key: 'throwOnError', label: 'Erreur sur status >= 400', type: 'boolean', defaultValue: true, section: 'errors' },
+      { key: 'allowedStatusCodes', label: 'Status codes autorisés', type: 'text', placeholder: '200,201,204', section: 'errors' },
+      
+      // Timeout & Retry
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000, section: 'timeout' },
+      { key: 'retries', label: 'Retries', type: 'number', defaultValue: 0, section: 'timeout' },
+      { key: 'retryDelay', label: 'Délai retry (ms)', type: 'number', defaultValue: 1000, section: 'timeout' },
+      
+      // Proxy
+      { key: 'proxyUrl', label: 'Proxy URL', type: 'text', section: 'proxy', advanced: true },
+      
+      // SSL
+      { key: 'rejectUnauthorized', label: 'Vérifier SSL', type: 'boolean', defaultValue: true, section: 'ssl', advanced: true },
     ]
   },
-  system_save: {
-    name: 'Save to Database',
-    category: 'system',
+  
+  http_response: {
+    name: 'HTTP Response',
+    category: 'http',
+    color: 'from-green-500 to-emerald-400',
+    icon: 'ArrowRightLeft',
+    description: 'Réponse HTTP pour webhook',
+    outputs: 0,
+    configFields: [
+      // Status
+      { key: 'statusCode', label: 'Status Code', type: 'number', defaultValue: 200, section: 'response' },
+      
+      // Headers
+      { key: 'headers', label: 'Headers (JSON)', type: 'json', placeholder: '{"Content-Type": "application/json"}', section: 'response' },
+      
+      // Body
+      { key: 'bodyType', label: 'Type de body', type: 'select', options: ['json', 'text', 'html', 'binary', 'stream'], defaultValue: 'json', section: 'body' },
+      { key: 'body', label: 'Body', type: 'json', placeholder: '{"success": true, "data": {{ $input }}}', section: 'body', expressionEnabled: true },
+    ]
+  },
+  
+  graphql: {
+    name: 'GraphQL Request',
+    category: 'http',
+    color: 'from-pink-500 to-rose-400',
+    icon: 'Braces',
+    description: 'Requête GraphQL',
+    isRealAction: true,
+    configFields: [
+      // Endpoint
+      { key: 'endpoint', label: 'Endpoint GraphQL', type: 'text', placeholder: 'https://api.example.com/graphql', required: true, section: 'graphql', expressionEnabled: true },
+      
+      // Query
+      { key: 'operationType', label: 'Type', type: 'select', options: ['query', 'mutation', 'subscription'], defaultValue: 'query', section: 'graphql' },
+      { key: 'query', label: 'Query', type: 'code', placeholder: 'query GetUser($id: ID!) {\n  user(id: $id) {\n    id\n    name\n    email\n  }\n}', required: true, section: 'graphql' },
+      { key: 'variables', label: 'Variables (JSON)', type: 'json', placeholder: '{"id": "{{ $input.userId }}"}', section: 'graphql', expressionEnabled: true },
+      { key: 'operationName', label: 'Operation Name', type: 'text', section: 'graphql' },
+      
+      // Headers
+      { key: 'headers', label: 'Headers', type: 'json', placeholder: '{"Authorization": "Bearer ..."}', section: 'auth', expressionEnabled: true },
+      
+      // Options
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000, section: 'options' },
+    ]
+  },
+  
+  soap: {
+    name: 'SOAP Request',
+    category: 'http',
+    color: 'from-gray-600 to-gray-500',
+    icon: 'FileCode',
+    description: 'Appel SOAP/WSDL',
+    isRealAction: true,
+    configFields: [
+      // WSDL
+      { key: 'wsdlUrl', label: 'URL WSDL', type: 'text', placeholder: 'https://service.example.com?wsdl', required: true, section: 'soap' },
+      { key: 'operation', label: 'Opération', type: 'text', placeholder: 'GetData', required: true, section: 'soap' },
+      
+      // Parameters
+      { key: 'parameters', label: 'Paramètres (JSON)', type: 'json', placeholder: '{"param1": "value1"}', section: 'soap', expressionEnabled: true },
+      
+      // Headers
+      { key: 'soapHeaders', label: 'SOAP Headers (JSON)', type: 'json', section: 'soap' },
+      
+      // Auth
+      { key: 'username', label: 'Username (WS-Security)', type: 'text', section: 'auth' },
+      { key: 'password', label: 'Password', type: 'password', section: 'auth' },
+    ]
+  },
+  
+  websocket: {
+    name: 'WebSocket',
+    category: 'http',
+    color: 'from-indigo-500 to-blue-400',
+    icon: 'Radio',
+    description: 'Communication WebSocket',
+    isRealAction: true,
+    configFields: [
+      // Connection
+      { key: 'wsUrl', label: 'WebSocket URL', type: 'text', placeholder: 'wss://socket.example.com', required: true, section: 'connection', expressionEnabled: true },
+      
+      // Mode
+      { key: 'mode', label: 'Mode', type: 'select', options: ['send', 'receive', 'send_receive'], defaultValue: 'send', section: 'mode' },
+      
+      // Message
+      { key: 'message', label: 'Message à envoyer', type: 'json', placeholder: '{"type": "subscribe", "channel": "updates"}', section: 'message', expressionEnabled: true },
+      
+      // Receive
+      { key: 'waitForMessage', label: 'Attendre une réponse', type: 'boolean', defaultValue: false, section: 'receive' },
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000, section: 'receive' },
+      { key: 'messageFilter', label: 'Filtre message (expression)', type: 'text', placeholder: 'msg.type === "response"', section: 'receive' },
+      
+      // Headers
+      { key: 'headers', label: 'Headers', type: 'json', section: 'headers' },
+    ]
+  },
+
+  // ===================================================================
+  // EMAIL
+  // ===================================================================
+  
+  email_imap: {
+    name: 'Email IMAP',
+    category: 'email',
+    color: 'from-blue-500 to-indigo-400',
+    icon: 'Inbox',
+    description: 'Lire des emails via IMAP',
+    isRealAction: true,
+    requiresAuth: true,
+    configFields: [
+      // Server
+      { key: 'host', label: 'Serveur IMAP', type: 'text', placeholder: 'imap.gmail.com', required: true, section: 'server' },
+      { key: 'port', label: 'Port', type: 'number', defaultValue: 993, section: 'server' },
+      { key: 'secure', label: 'SSL/TLS', type: 'boolean', defaultValue: true, section: 'server' },
+      
+      // Auth
+      { key: 'username', label: 'Email / Username', type: 'text', required: true, section: 'auth' },
+      { key: 'password', label: 'Password / App Password', type: 'password', required: true, section: 'auth' },
+      
+      // Folder
+      { key: 'folder', label: 'Dossier', type: 'text', defaultValue: 'INBOX', section: 'folder' },
+      
+      // Filters
+      { key: 'unreadOnly', label: 'Non lus uniquement', type: 'boolean', defaultValue: true, section: 'filters' },
+      { key: 'since', label: 'Depuis (date)', type: 'text', placeholder: '{{ $now.subtract(7, "days") }}', section: 'filters', expressionEnabled: true },
+      { key: 'from', label: 'De (expéditeur)', type: 'text', section: 'filters', expressionEnabled: true },
+      { key: 'subject', label: 'Sujet (contient)', type: 'text', section: 'filters', expressionEnabled: true },
+      { key: 'searchQuery', label: 'Recherche IMAP', type: 'text', placeholder: 'FROM "boss@company.com" SUBJECT "urgent"', section: 'filters', helpText: 'Syntaxe IMAP SEARCH' },
+      
+      // Options
+      { key: 'limit', label: 'Limite', type: 'number', defaultValue: 10, section: 'options' },
+      { key: 'markAsRead', label: 'Marquer comme lu', type: 'boolean', defaultValue: false, section: 'options' },
+      { key: 'includeAttachments', label: 'Inclure pièces jointes', type: 'boolean', defaultValue: false, section: 'options' },
+      { key: 'bodyFormat', label: 'Format du corps', type: 'select', options: ['text', 'html', 'both'], defaultValue: 'text', section: 'options' },
+    ]
+  },
+  
+  email_smtp: {
+    name: 'Email SMTP',
+    category: 'email',
+    color: 'from-red-500 to-orange-400',
+    icon: 'Send',
+    description: 'Envoyer un email via SMTP',
+    isRealAction: true,
+    requiresAuth: true,
+    configFields: [
+      // Server
+      { key: 'host', label: 'Serveur SMTP', type: 'text', placeholder: 'smtp.gmail.com', required: true, section: 'server' },
+      { key: 'port', label: 'Port', type: 'number', defaultValue: 587, section: 'server' },
+      { key: 'secure', label: 'SSL/TLS', type: 'boolean', defaultValue: false, section: 'server' },
+      { key: 'requireTLS', label: 'STARTTLS', type: 'boolean', defaultValue: true, section: 'server' },
+      
+      // Auth
+      { key: 'username', label: 'Username', type: 'text', required: true, section: 'auth' },
+      { key: 'password', label: 'Password', type: 'password', required: true, section: 'auth' },
+      
+      // Message
+      { key: 'from', label: 'De', type: 'text', placeholder: 'you@example.com', required: true, section: 'message', expressionEnabled: true },
+      { key: 'fromName', label: 'Nom expéditeur', type: 'text', section: 'message', expressionEnabled: true },
+      { key: 'to', label: 'À', type: 'text', placeholder: 'recipient@example.com', required: true, section: 'message', expressionEnabled: true, helpText: 'Virgules pour multiples' },
+      { key: 'cc', label: 'CC', type: 'text', section: 'message', expressionEnabled: true },
+      { key: 'bcc', label: 'BCC', type: 'text', section: 'message', expressionEnabled: true },
+      { key: 'replyTo', label: 'Reply-To', type: 'text', section: 'message', expressionEnabled: true },
+      { key: 'subject', label: 'Sujet', type: 'text', required: true, section: 'message', expressionEnabled: true },
+      
+      // Body
+      { key: 'bodyType', label: 'Type de contenu', type: 'select', options: ['text', 'html', 'both'], defaultValue: 'text', section: 'body' },
+      { key: 'textBody', label: 'Corps texte', type: 'textarea', section: 'body', expressionEnabled: true },
+      { key: 'htmlBody', label: 'Corps HTML', type: 'textarea', section: 'body', expressionEnabled: true },
+      
+      // Attachments
+      { key: 'attachments', label: 'Pièces jointes (JSON)', type: 'json', placeholder: '[{"filename": "file.pdf", "content": "{{ $input.fileBase64 }}"}]', section: 'attachments', expressionEnabled: true },
+      { key: 'attachFromPrevious', label: 'Joindre données précédentes', type: 'boolean', defaultValue: false, section: 'attachments' },
+      
+      // Options
+      { key: 'priority', label: 'Priorité', type: 'select', options: ['low', 'normal', 'high'], defaultValue: 'normal', section: 'options' },
+    ]
+  },
+  
+  email_oauth: {
+    name: 'Email OAuth',
+    category: 'email',
+    color: 'from-red-500 to-pink-400',
+    icon: 'Mail',
+    description: 'Email via OAuth (Gmail, Outlook...)',
+    isRealAction: true,
+    requiresAuth: true,
+    configFields: [
+      // Provider
+      { key: 'provider', label: 'Provider', type: 'select', options: ['gmail', 'outlook', 'custom'], defaultValue: 'gmail', section: 'connection' },
+      
+      // OAuth Credentials
+      { key: 'clientId', label: 'Client ID', type: 'text', required: true, section: 'connection', helpText: 'Depuis la console développeur' },
+      { key: 'clientSecret', label: 'Client Secret', type: 'password', required: true, section: 'connection' },
+      { key: 'oauthButton', label: 'Connecter le compte', type: 'oauth_button', section: 'connection' },
+      
+      // Action
+      { key: 'action', label: 'Action', type: 'select', options: [
+        { value: 'read', label: 'Lire emails' },
+        { value: 'send', label: 'Envoyer email' },
+        { value: 'reply', label: 'Répondre' },
+        { value: 'forward', label: 'Transférer' },
+        { value: 'label', label: 'Gérer labels' },
+        { value: 'search', label: 'Rechercher' },
+      ], defaultValue: 'read', section: 'action' },
+      
+      // Read options
+      { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com', section: 'read', showWhen: { field: 'action', value: 'read' }, expressionEnabled: true },
+      { key: 'maxResults', label: 'Max résultats', type: 'number', defaultValue: 10, section: 'read', showWhen: { field: 'action', value: 'read' } },
+      { key: 'markAsRead', label: 'Marquer comme lu', type: 'boolean', defaultValue: false, section: 'read', showWhen: { field: 'action', value: 'read' } },
+      
+      // Send options
+      { key: 'to', label: 'À', type: 'text', section: 'send', showWhen: { field: 'action', value: 'send' }, expressionEnabled: true },
+      { key: 'cc', label: 'CC', type: 'text', section: 'send', showWhen: { field: 'action', value: 'send' }, expressionEnabled: true },
+      { key: 'subject', label: 'Sujet', type: 'text', section: 'send', showWhen: { field: 'action', value: 'send' }, expressionEnabled: true },
+      { key: 'body', label: 'Corps', type: 'textarea', section: 'send', showWhen: { field: 'action', value: 'send' }, expressionEnabled: true },
+      { key: 'isHtml', label: 'HTML', type: 'boolean', defaultValue: false, section: 'send', showWhen: { field: 'action', value: 'send' } },
+      
+      // Reply options
+      { key: 'messageId', label: 'ID du message', type: 'text', section: 'reply', showWhen: { field: 'action', value: 'reply' }, expressionEnabled: true },
+      { key: 'replyBody', label: 'Réponse', type: 'textarea', section: 'reply', showWhen: { field: 'action', value: 'reply' }, expressionEnabled: true },
+      { key: 'replyAll', label: 'Répondre à tous', type: 'boolean', defaultValue: false, section: 'reply', showWhen: { field: 'action', value: 'reply' } },
+      
+      // Labels
+      { key: 'addLabels', label: 'Ajouter labels', type: 'text', placeholder: 'IMPORTANT, STARRED', section: 'labels', showWhen: { field: 'action', value: 'label' } },
+      { key: 'removeLabels', label: 'Retirer labels', type: 'text', placeholder: 'UNREAD', section: 'labels', showWhen: { field: 'action', value: 'label' } },
+    ]
+  },
+
+  // ===================================================================
+  // DATABASE
+  // ===================================================================
+  
+  db_query: {
+    name: 'Database Query',
+    category: 'database',
     color: 'from-emerald-500 to-green-400',
     icon: 'Database',
-    description: 'Save data to database (ACTION RÉELLE)',
+    description: 'Query SQL générique (SELECT)',
     isRealAction: true,
     configFields: [
-      { key: 'table', label: 'Table Name', type: 'text', required: true },
-      { key: 'operation', label: 'Operation', type: 'select', options: ['insert', 'upsert', 'update'] },
-      { key: 'conflictColumn', label: 'Conflict Column (for upsert)', type: 'text' }
+      // Connection
+      { key: 'connectionType', label: 'Type de connexion', type: 'select', options: ['supabase', 'postgres', 'mysql', 'sqlite', 'custom'], defaultValue: 'supabase', section: 'connection' },
+      { key: 'connectionString', label: 'Connection String', type: 'password', section: 'connection', showWhen: { field: 'connectionType', notValue: 'supabase' }, helpText: 'postgresql://user:pass@host:5432/db' },
+      
+      // Query mode
+      { key: 'queryMode', label: 'Mode', type: 'select', options: ['builder', 'raw'], defaultValue: 'builder', section: 'query' },
+      
+      // Builder mode
+      { key: 'table', label: 'Table', type: 'text', placeholder: 'users', section: 'query', showWhen: { field: 'queryMode', value: 'builder' } },
+      { key: 'columns', label: 'Colonnes', type: 'text', placeholder: '* ou id, name, email', defaultValue: '*', section: 'query', showWhen: { field: 'queryMode', value: 'builder' } },
+      { key: 'where', label: 'Where (JSON)', type: 'json', placeholder: '{"status": "active", "age.gt": 18}', section: 'query', showWhen: { field: 'queryMode', value: 'builder' }, expressionEnabled: true },
+      { key: 'orderBy', label: 'Order By', type: 'text', placeholder: 'created_at desc', section: 'query', showWhen: { field: 'queryMode', value: 'builder' } },
+      { key: 'limit', label: 'Limit', type: 'number', section: 'query', showWhen: { field: 'queryMode', value: 'builder' } },
+      { key: 'offset', label: 'Offset', type: 'number', section: 'query', showWhen: { field: 'queryMode', value: 'builder' } },
+      
+      // Raw mode
+      { key: 'sql', label: 'SQL Query', type: 'code', placeholder: 'SELECT * FROM users WHERE status = $1', section: 'query', showWhen: { field: 'queryMode', value: 'raw' } },
+      { key: 'parameters', label: 'Paramètres (JSON array)', type: 'json', placeholder: '["active"]', section: 'query', showWhen: { field: 'queryMode', value: 'raw' }, expressionEnabled: true },
+      
+      // Options
+      { key: 'singleRow', label: 'Résultat unique', type: 'boolean', defaultValue: false, section: 'options' },
+      { key: 'throwIfEmpty', label: 'Erreur si vide', type: 'boolean', defaultValue: false, section: 'options' },
     ]
   },
-  system_download: {
-    name: 'Télécharger / Exporter',
-    category: 'system',
+  
+  db_insert: {
+    name: 'Database Insert',
+    category: 'database',
+    color: 'from-green-500 to-teal-400',
+    icon: 'Plus',
+    description: 'Insérer des données',
+    isRealAction: true,
+    configFields: [
+      // Connection
+      { key: 'connectionType', label: 'Type', type: 'select', options: ['supabase', 'postgres', 'mysql', 'custom'], defaultValue: 'supabase', section: 'connection' },
+      { key: 'connectionString', label: 'Connection String', type: 'password', section: 'connection', showWhen: { field: 'connectionType', notValue: 'supabase' } },
+      
+      // Insert
+      { key: 'table', label: 'Table', type: 'text', required: true, section: 'insert' },
+      { key: 'data', label: 'Données (JSON)', type: 'json', placeholder: '{"name": "{{ $input.name }}", "email": "{{ $input.email }}"}', required: true, section: 'insert', expressionEnabled: true },
+      { key: 'batchInsert', label: 'Insert batch (array)', type: 'boolean', defaultValue: false, section: 'insert' },
+      
+      // Options
+      { key: 'returning', label: 'Retourner les données', type: 'boolean', defaultValue: true, section: 'options' },
+      { key: 'returningColumns', label: 'Colonnes à retourner', type: 'text', placeholder: '*', section: 'options' },
+      { key: 'onConflict', label: 'On Conflict', type: 'select', options: ['error', 'ignore', 'update'], defaultValue: 'error', section: 'options' },
+      { key: 'conflictColumns', label: 'Colonnes de conflit', type: 'text', placeholder: 'email', section: 'options', showWhen: { field: 'onConflict', notValue: 'error' } },
+    ]
+  },
+  
+  db_update: {
+    name: 'Database Update',
+    category: 'database',
+    color: 'from-amber-500 to-orange-400',
+    icon: 'Edit',
+    description: 'Mettre à jour des données',
+    isRealAction: true,
+    configFields: [
+      // Connection
+      { key: 'connectionType', label: 'Type', type: 'select', options: ['supabase', 'postgres', 'mysql', 'custom'], defaultValue: 'supabase', section: 'connection' },
+      { key: 'connectionString', label: 'Connection String', type: 'password', section: 'connection', showWhen: { field: 'connectionType', notValue: 'supabase' } },
+      
+      // Update
+      { key: 'table', label: 'Table', type: 'text', required: true, section: 'update' },
+      { key: 'data', label: 'Données à modifier (JSON)', type: 'json', placeholder: '{"status": "updated", "updated_at": "{{ $now }}"}', required: true, section: 'update', expressionEnabled: true },
+      { key: 'where', label: 'Where (JSON)', type: 'json', placeholder: '{"id": "{{ $input.id }}"}', required: true, section: 'update', expressionEnabled: true },
+      
+      // Options
+      { key: 'returning', label: 'Retourner les données', type: 'boolean', defaultValue: true, section: 'options' },
+      { key: 'limit', label: 'Limite', type: 'number', section: 'options' },
+    ]
+  },
+  
+  db_delete: {
+    name: 'Database Delete',
+    category: 'database',
+    color: 'from-red-500 to-rose-400',
+    icon: 'Trash',
+    description: 'Supprimer des données',
+    isRealAction: true,
+    configFields: [
+      // Connection
+      { key: 'connectionType', label: 'Type', type: 'select', options: ['supabase', 'postgres', 'mysql', 'custom'], defaultValue: 'supabase', section: 'connection' },
+      { key: 'connectionString', label: 'Connection String', type: 'password', section: 'connection', showWhen: { field: 'connectionType', notValue: 'supabase' } },
+      
+      // Delete
+      { key: 'table', label: 'Table', type: 'text', required: true, section: 'delete' },
+      { key: 'where', label: 'Where (JSON)', type: 'json', placeholder: '{"id": "{{ $input.id }}"}', required: true, section: 'delete', expressionEnabled: true },
+      
+      // Safety
+      { key: 'requireWhere', label: 'Where obligatoire', type: 'boolean', defaultValue: true, section: 'safety', helpText: 'Empêche DELETE sans condition' },
+      { key: 'returning', label: 'Retourner les données supprimées', type: 'boolean', defaultValue: false, section: 'options' },
+      { key: 'limit', label: 'Limite', type: 'number', section: 'options' },
+    ]
+  },
+  
+  db_upsert: {
+    name: 'Database Upsert',
+    category: 'database',
+    color: 'from-violet-500 to-purple-400',
+    icon: 'RefreshCw',
+    description: 'Insert ou Update (upsert)',
+    isRealAction: true,
+    configFields: [
+      // Connection
+      { key: 'connectionType', label: 'Type', type: 'select', options: ['supabase', 'postgres', 'mysql', 'custom'], defaultValue: 'supabase', section: 'connection' },
+      { key: 'connectionString', label: 'Connection String', type: 'password', section: 'connection', showWhen: { field: 'connectionType', notValue: 'supabase' } },
+      
+      // Upsert
+      { key: 'table', label: 'Table', type: 'text', required: true, section: 'upsert' },
+      { key: 'data', label: 'Données (JSON)', type: 'json', required: true, section: 'upsert', expressionEnabled: true },
+      { key: 'onConflictColumns', label: 'Colonnes de conflit', type: 'text', placeholder: 'id ou email', required: true, section: 'upsert' },
+      { key: 'updateColumns', label: 'Colonnes à mettre à jour', type: 'text', placeholder: 'Vide = toutes', section: 'upsert' },
+      
+      // Options
+      { key: 'returning', label: 'Retourner les données', type: 'boolean', defaultValue: true, section: 'options' },
+      { key: 'ignoreDuplicates', label: 'Ignorer les doublons', type: 'boolean', defaultValue: false, section: 'options' },
+    ]
+  },
+
+  // ===================================================================
+  // FILES / STORAGE
+  // ===================================================================
+  
+  file_read: {
+    name: 'File Read',
+    category: 'files',
     color: 'from-blue-500 to-cyan-400',
-    icon: 'Download',
-    description: 'Télécharger les résultats dans différents formats',
-    isRealAction: true,
+    icon: 'FileText',
+    description: 'Lire un fichier',
     configFields: [
-      // Section: Format de téléchargement
-      { key: 'format', label: 'Format de fichier', type: 'select', options: ['pdf', 'docx', 'xlsx', 'csv', 'json', 'txt', 'html', 'md'], defaultValue: 'pdf', helpText: 'Choisissez le format de sortie', section: 'format' },
-      { key: 'filename', label: 'Nom du fichier', type: 'text', placeholder: 'document_{{date}}', helpText: 'Utilisez {{date}}, {{timestamp}} pour des noms dynamiques', section: 'format' },
-      { key: 'includeMetadata', label: 'Inclure métadonnées', type: 'boolean', defaultValue: true, helpText: 'Ajoute la date, source, et autres infos au document', section: 'format' },
-      // Section: Destinations
-      { key: 'saveToAether', label: '💾 Sauvegarder dans Aether', type: 'boolean', defaultValue: true, helpText: 'Enregistre automatiquement dans AETHER Doc (recommandé)', section: 'destinations' },
-      { key: 'aetherFolder', label: 'Dossier Aether', type: 'text', placeholder: 'Workflows / Exports', helpText: 'Dossier de destination dans AETHER Doc', section: 'destinations', showWhen: { field: 'saveToAether', value: true } },
-      { key: 'aetherTags', label: 'Tags Aether', type: 'text', placeholder: 'workflow, auto-généré', section: 'destinations', showWhen: { field: 'saveToAether', value: true } },
-      { key: 'downloadBrowser', label: '📥 Télécharger dans le navigateur', type: 'boolean', defaultValue: true, helpText: 'Déclenche un téléchargement direct', section: 'destinations' },
-      { key: 'sendByEmail', label: '📧 Envoyer par email', type: 'boolean', defaultValue: false, section: 'destinations' },
-      { key: 'emailTo', label: 'Destinataire email', type: 'text', placeholder: 'email@example.com', section: 'destinations', showWhen: { field: 'sendByEmail', value: true } },
-      // Section: Options avancées
-      { key: 'compression', label: 'Compresser (ZIP)', type: 'boolean', defaultValue: false, helpText: 'Compresse le fichier en ZIP', section: 'advanced' },
-      { key: 'password', label: 'Mot de passe (PDF/ZIP)', type: 'password', placeholder: 'Optionnel', section: 'advanced' },
-      { key: 'watermark', label: 'Filigrane', type: 'text', placeholder: 'CONFIDENTIEL', section: 'advanced' }
+      // Source
+      { key: 'source', label: 'Source', type: 'select', options: ['input', 'url', 'path', 'base64'], defaultValue: 'input', section: 'source' },
+      { key: 'url', label: 'URL du fichier', type: 'text', section: 'source', showWhen: { field: 'source', value: 'url' }, expressionEnabled: true },
+      { key: 'path', label: 'Chemin du fichier', type: 'text', section: 'source', showWhen: { field: 'source', value: 'path' }, expressionEnabled: true },
+      { key: 'base64Data', label: 'Données Base64', type: 'textarea', section: 'source', showWhen: { field: 'source', value: 'base64' }, expressionEnabled: true },
+      
+      // Parsing
+      { key: 'parseAs', label: 'Parser comme', type: 'select', options: ['auto', 'text', 'json', 'csv', 'xml', 'binary', 'lines'], defaultValue: 'auto', section: 'parsing' },
+      { key: 'encoding', label: 'Encodage', type: 'select', options: ['utf-8', 'latin1', 'ascii', 'base64'], defaultValue: 'utf-8', section: 'parsing' },
+      
+      // CSV options
+      { key: 'csvDelimiter', label: 'Délimiteur CSV', type: 'text', defaultValue: ',', section: 'csv', showWhen: { field: 'parseAs', value: 'csv' } },
+      { key: 'csvHeaders', label: 'Première ligne = headers', type: 'boolean', defaultValue: true, section: 'csv', showWhen: { field: 'parseAs', value: 'csv' } },
     ]
   },
-  system_notify: {
-    name: 'Send Notification',
-    category: 'system',
+  
+  file_write: {
+    name: 'File Write',
+    category: 'files',
+    color: 'from-green-500 to-emerald-400',
+    icon: 'FileOutput',
+    description: 'Écrire un fichier',
+    configFields: [
+      // Content
+      { key: 'content', label: 'Contenu', type: 'textarea', section: 'content', expressionEnabled: true },
+      { key: 'contentType', label: 'Type de contenu', type: 'select', options: ['text', 'json', 'csv', 'binary'], defaultValue: 'text', section: 'content' },
+      
+      // Filename
+      { key: 'filename', label: 'Nom du fichier', type: 'text', placeholder: 'output_{{ $timestamp }}.txt', section: 'file', expressionEnabled: true },
+      { key: 'mimeType', label: 'MIME Type', type: 'text', placeholder: 'text/plain', section: 'file' },
+      
+      // CSV options
+      { key: 'csvDelimiter', label: 'Délimiteur', type: 'text', defaultValue: ',', section: 'csv', showWhen: { field: 'contentType', value: 'csv' } },
+      { key: 'csvHeaders', label: 'Inclure headers', type: 'boolean', defaultValue: true, section: 'csv', showWhen: { field: 'contentType', value: 'csv' } },
+      
+      // Output
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['base64', 'buffer', 'dataurl', 'path'], defaultValue: 'base64', section: 'output' },
+    ]
+  },
+  
+  file_convert: {
+    name: 'File Convert',
+    category: 'files',
+    color: 'from-amber-500 to-yellow-400',
+    icon: 'FileSymlink',
+    description: 'Convertir un format de fichier',
+    configFields: [
+      // Input
+      { key: 'inputFormat', label: 'Format d\'entrée', type: 'select', options: ['auto', 'pdf', 'docx', 'xlsx', 'csv', 'json', 'xml', 'html', 'md', 'txt'], defaultValue: 'auto', section: 'conversion' },
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['pdf', 'docx', 'xlsx', 'csv', 'json', 'xml', 'html', 'md', 'txt'], defaultValue: 'pdf', section: 'conversion' },
+      
+      // Options
+      { key: 'pageSize', label: 'Taille de page (PDF)', type: 'select', options: ['A4', 'Letter', 'Legal'], defaultValue: 'A4', section: 'options', showWhen: { field: 'outputFormat', value: 'pdf' } },
+      { key: 'orientation', label: 'Orientation', type: 'select', options: ['portrait', 'landscape'], defaultValue: 'portrait', section: 'options', showWhen: { field: 'outputFormat', value: 'pdf' } },
+    ]
+  },
+  
+  file_compress: {
+    name: 'Compress / Decompress',
+    category: 'files',
+    color: 'from-slate-500 to-gray-400',
+    icon: 'Archive',
+    description: 'Compresser ou décompresser',
+    configFields: [
+      // Operation
+      { key: 'operation', label: 'Opération', type: 'select', options: ['compress', 'decompress'], defaultValue: 'compress', section: 'operation' },
+      { key: 'format', label: 'Format', type: 'select', options: ['zip', 'gzip', 'tar', 'tar.gz'], defaultValue: 'zip', section: 'operation' },
+      
+      // Compress options
+      { key: 'files', label: 'Fichiers (JSON array)', type: 'json', placeholder: '[{"name": "file.txt", "content": "..."}]', section: 'compress', showWhen: { field: 'operation', value: 'compress' }, expressionEnabled: true },
+      { key: 'compressionLevel', label: 'Niveau de compression', type: 'number', defaultValue: 6, section: 'compress', showWhen: { field: 'operation', value: 'compress' }, validation: { min: 1, max: 9 } },
+      { key: 'password', label: 'Mot de passe (optionnel)', type: 'password', section: 'compress' },
+      
+      // Output
+      { key: 'outputFilename', label: 'Nom du fichier', type: 'text', placeholder: 'archive.zip', section: 'output', expressionEnabled: true },
+    ]
+  },
+  
+  storage_upload: {
+    name: 'Storage Upload',
+    category: 'files',
+    color: 'from-indigo-500 to-blue-400',
+    icon: 'CloudUpload',
+    description: 'Upload vers stockage cloud',
+    isRealAction: true,
+    configFields: [
+      // Provider
+      { key: 'provider', label: 'Provider', type: 'select', options: ['supabase', 's3', 'gcs', 'azure', 'cloudflare'], defaultValue: 'supabase', section: 'provider' },
+      
+      // S3 config
+      { key: 'accessKeyId', label: 'Access Key ID', type: 'text', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      { key: 'secretAccessKey', label: 'Secret Access Key', type: 'password', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      { key: 'region', label: 'Région', type: 'text', placeholder: 'eu-west-1', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      { key: 'endpoint', label: 'Endpoint (optionnel)', type: 'text', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      
+      // Upload
+      { key: 'bucket', label: 'Bucket', type: 'text', required: true, section: 'upload', expressionEnabled: true },
+      { key: 'path', label: 'Chemin / Nom du fichier', type: 'text', placeholder: 'uploads/{{ $timestamp }}_{{ $input.filename }}', required: true, section: 'upload', expressionEnabled: true },
+      { key: 'contentType', label: 'Content-Type', type: 'text', placeholder: 'auto', section: 'upload' },
+      
+      // Options
+      { key: 'public', label: 'Accès public', type: 'boolean', defaultValue: false, section: 'options' },
+      { key: 'overwrite', label: 'Écraser si existe', type: 'boolean', defaultValue: true, section: 'options' },
+      { key: 'metadata', label: 'Métadonnées (JSON)', type: 'json', section: 'options', expressionEnabled: true },
+    ]
+  },
+  
+  storage_download: {
+    name: 'Storage Download',
+    category: 'files',
+    color: 'from-cyan-500 to-teal-400',
+    icon: 'CloudDownload',
+    description: 'Download depuis stockage cloud',
+    isRealAction: true,
+    configFields: [
+      // Provider
+      { key: 'provider', label: 'Provider', type: 'select', options: ['supabase', 's3', 'gcs', 'azure', 'cloudflare'], defaultValue: 'supabase', section: 'provider' },
+      
+      // Credentials (same as upload)
+      { key: 'accessKeyId', label: 'Access Key ID', type: 'text', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      { key: 'secretAccessKey', label: 'Secret Access Key', type: 'password', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      { key: 'region', label: 'Région', type: 'text', section: 'credentials', showWhen: { field: 'provider', value: 's3' } },
+      
+      // Download
+      { key: 'bucket', label: 'Bucket', type: 'text', required: true, section: 'download', expressionEnabled: true },
+      { key: 'path', label: 'Chemin du fichier', type: 'text', required: true, section: 'download', expressionEnabled: true },
+      
+      // Output
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['buffer', 'base64', 'text', 'json', 'stream'], defaultValue: 'buffer', section: 'output' },
+      { key: 'encoding', label: 'Encodage (pour text)', type: 'select', options: ['utf-8', 'latin1', 'base64'], defaultValue: 'utf-8', section: 'output' },
+    ]
+  },
+
+  // ===================================================================
+  // MESSAGING
+  // ===================================================================
+  
+  message_send: {
+    name: 'Send Message',
+    category: 'messaging',
+    color: 'from-purple-500 to-violet-400',
+    icon: 'MessageSquare',
+    description: 'Envoyer un message (Slack, Discord, Teams...)',
+    isRealAction: true,
+    configFields: [
+      // Platform
+      { key: 'platform', label: 'Plateforme', type: 'select', options: [
+        { value: 'slack', label: 'Slack' },
+        { value: 'discord', label: 'Discord' },
+        { value: 'teams', label: 'Microsoft Teams' },
+        { value: 'telegram', label: 'Telegram' },
+        { value: 'whatsapp', label: 'WhatsApp Business' },
+        { value: 'custom_webhook', label: 'Webhook personnalisé' },
+      ], defaultValue: 'slack', section: 'platform' },
+      
+      // Connection
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', required: true, section: 'connection', expressionEnabled: true },
+      { key: 'botToken', label: 'Bot Token (optionnel)', type: 'password', section: 'connection', helpText: 'Pour fonctionnalités avancées' },
+      
+      // Target
+      { key: 'channel', label: 'Channel / Chat ID', type: 'text', section: 'target', expressionEnabled: true },
+      { key: 'threadId', label: 'Thread ID (réponse)', type: 'text', section: 'target', expressionEnabled: true },
+      
+      // Message
+      { key: 'messageType', label: 'Type de message', type: 'select', options: ['text', 'rich', 'card', 'blocks'], defaultValue: 'text', section: 'message' },
+      { key: 'text', label: 'Texte', type: 'textarea', section: 'message', expressionEnabled: true },
+      { key: 'richContent', label: 'Contenu riche (JSON)', type: 'json', section: 'message', showWhen: { field: 'messageType', notValue: 'text' }, expressionEnabled: true, helpText: 'Format spécifique à la plateforme' },
+      
+      // Options
+      { key: 'username', label: 'Nom d\'affichage', type: 'text', section: 'options', expressionEnabled: true },
+      { key: 'iconUrl', label: 'URL de l\'icône', type: 'text', section: 'options', expressionEnabled: true },
+      { key: 'mentionUsers', label: 'Mentionner utilisateurs', type: 'text', placeholder: '@user1, @user2', section: 'options', expressionEnabled: true },
+    ]
+  },
+  
+  message_receive: {
+    name: 'Receive Message',
+    category: 'messaging',
+    color: 'from-pink-500 to-rose-400',
+    icon: 'MessageCircle',
+    description: 'Recevoir des messages (trigger)',
+    isRealAction: true,
+    configFields: [
+      // Platform
+      { key: 'platform', label: 'Plateforme', type: 'select', options: ['slack', 'discord', 'telegram', 'custom_webhook'], defaultValue: 'slack', section: 'platform' },
+      
+      // Connection
+      { key: 'signingSecret', label: 'Signing Secret', type: 'password', section: 'connection', helpText: 'Pour vérifier l\'origine des messages' },
+      { key: 'botToken', label: 'Bot Token', type: 'password', section: 'connection' },
+      
+      // Filters
+      { key: 'channelFilter', label: 'Filtrer par channel', type: 'text', section: 'filters' },
+      { key: 'userFilter', label: 'Filtrer par utilisateur', type: 'text', section: 'filters' },
+      { key: 'messageFilter', label: 'Filtrer par contenu (regex)', type: 'text', section: 'filters' },
+      { key: 'eventTypes', label: 'Types d\'événements', type: 'multiselect', options: ['message', 'reaction', 'mention', 'command'], section: 'filters' },
+    ]
+  },
+
+  // ===================================================================
+  // MEMORY / STATE
+  // ===================================================================
+  
+  memory_read: {
+    name: 'Memory Read',
+    category: 'memory',
+    color: 'from-indigo-500 to-purple-400',
+    icon: 'Database',
+    description: 'Lire depuis mémoire/cache',
+    configFields: [
+      // Storage
+      { key: 'storageType', label: 'Type de stockage', type: 'select', options: ['workflow', 'session', 'global', 'redis', 'database'], defaultValue: 'workflow', section: 'storage' },
+      
+      // Key
+      { key: 'key', label: 'Clé', type: 'text', required: true, section: 'read', expressionEnabled: true },
+      { key: 'keyPattern', label: 'Pattern (pour liste)', type: 'text', placeholder: 'user:*', section: 'read', helpText: 'Pour récupérer plusieurs clés' },
+      
+      // Options
+      { key: 'defaultValue', label: 'Valeur par défaut', type: 'json', section: 'options' },
+      { key: 'parseJson', label: 'Parser comme JSON', type: 'boolean', defaultValue: true, section: 'options' },
+      
+      // Redis config
+      { key: 'redisUrl', label: 'Redis URL', type: 'text', placeholder: 'redis://localhost:6379', section: 'redis', showWhen: { field: 'storageType', value: 'redis' } },
+    ]
+  },
+  
+  memory_write: {
+    name: 'Memory Write',
+    category: 'memory',
+    color: 'from-violet-500 to-indigo-400',
+    icon: 'Save',
+    description: 'Écrire dans mémoire/cache',
+    configFields: [
+      // Storage
+      { key: 'storageType', label: 'Type de stockage', type: 'select', options: ['workflow', 'session', 'global', 'redis', 'database'], defaultValue: 'workflow', section: 'storage' },
+      
+      // Key/Value
+      { key: 'key', label: 'Clé', type: 'text', required: true, section: 'write', expressionEnabled: true },
+      { key: 'value', label: 'Valeur', type: 'json', required: true, section: 'write', expressionEnabled: true },
+      
+      // TTL
+      { key: 'ttl', label: 'TTL (secondes)', type: 'number', section: 'ttl', helpText: '0 = pas d\'expiration' },
+      
+      // Options
+      { key: 'overwrite', label: 'Écraser si existe', type: 'boolean', defaultValue: true, section: 'options' },
+      
+      // Redis config
+      { key: 'redisUrl', label: 'Redis URL', type: 'text', section: 'redis', showWhen: { field: 'storageType', value: 'redis' } },
+    ]
+  },
+  
+  memory_delete: {
+    name: 'Memory Delete',
+    category: 'memory',
+    color: 'from-red-500 to-rose-400',
+    icon: 'Trash2',
+    description: 'Supprimer de la mémoire/cache',
+    configFields: [
+      // Storage
+      { key: 'storageType', label: 'Type de stockage', type: 'select', options: ['workflow', 'session', 'global', 'redis', 'database'], defaultValue: 'workflow', section: 'storage' },
+      
+      // Key
+      { key: 'key', label: 'Clé', type: 'text', section: 'delete', expressionEnabled: true },
+      { key: 'keyPattern', label: 'Pattern', type: 'text', placeholder: 'temp:*', section: 'delete', helpText: 'Supprimer plusieurs clés' },
+      { key: 'deleteAll', label: 'Tout supprimer', type: 'boolean', defaultValue: false, section: 'delete' },
+      
+      // Redis config
+      { key: 'redisUrl', label: 'Redis URL', type: 'text', section: 'redis', showWhen: { field: 'storageType', value: 'redis' } },
+    ]
+  },
+
+  // ===================================================================
+  // TOOLS / FUNCTION CALLING
+  // ===================================================================
+  
+  tool_call: {
+    name: 'Tool Call',
+    category: 'tools',
+    color: 'from-amber-500 to-orange-400',
+    icon: 'Wrench',
+    description: 'Appeler un outil/fonction externe',
+    isRealAction: true,
+    configFields: [
+      // Tool selection
+      { key: 'toolType', label: 'Type d\'outil', type: 'select', options: [
+        { value: 'http', label: 'API HTTP' },
+        { value: 'function', label: 'Fonction interne' },
+        { value: 'workflow', label: 'Sous-workflow' },
+        { value: 'custom', label: 'Personnalisé' },
+      ], defaultValue: 'http', section: 'tool' },
+      
+      // HTTP Tool
+      { key: 'toolUrl', label: 'URL de l\'outil', type: 'text', section: 'tool', showWhen: { field: 'toolType', value: 'http' }, expressionEnabled: true },
+      { key: 'toolMethod', label: 'Méthode', type: 'select', options: ['POST', 'GET'], defaultValue: 'POST', section: 'tool', showWhen: { field: 'toolType', value: 'http' } },
+      
+      // Function
+      { key: 'functionName', label: 'Nom de la fonction', type: 'text', section: 'tool', showWhen: { field: 'toolType', value: 'function' } },
+      
+      // Workflow
+      { key: 'workflowId', label: 'ID du workflow', type: 'text', section: 'tool', showWhen: { field: 'toolType', value: 'workflow' }, expressionEnabled: true },
+      
+      // Parameters
+      { key: 'parameters', label: 'Paramètres (JSON)', type: 'json', section: 'parameters', expressionEnabled: true },
+      
+      // Timeout
+      { key: 'timeout', label: 'Timeout (ms)', type: 'number', defaultValue: 30000, section: 'options' },
+    ]
+  },
+  
+  tool_define: {
+    name: 'Tool Define',
+    category: 'tools',
+    color: 'from-violet-500 to-purple-400',
+    icon: 'PenTool',
+    description: 'Définir un outil pour agents IA',
+    configFields: [
+      // Tool definition
+      { key: 'toolName', label: 'Nom de l\'outil', type: 'text', required: true, section: 'definition', placeholder: 'search_database' },
+      { key: 'description', label: 'Description', type: 'textarea', required: true, section: 'definition', helpText: 'Description pour l\'IA' },
+      
+      // Parameters schema
+      { key: 'parametersSchema', label: 'Schéma des paramètres (JSON Schema)', type: 'json', section: 'definition', placeholder: '{\n  "type": "object",\n  "properties": {\n    "query": {"type": "string", "description": "Search query"}\n  },\n  "required": ["query"]\n}' },
+      
+      // Implementation
+      { key: 'implementation', label: 'Implémentation', type: 'select', options: ['inline_code', 'http', 'workflow'], defaultValue: 'inline_code', section: 'implementation' },
+      { key: 'code', label: 'Code', type: 'code', section: 'implementation', showWhen: { field: 'implementation', value: 'inline_code' } },
+      { key: 'httpConfig', label: 'Config HTTP (JSON)', type: 'json', section: 'implementation', showWhen: { field: 'implementation', value: 'http' } },
+      { key: 'workflowId', label: 'Workflow ID', type: 'text', section: 'implementation', showWhen: { field: 'implementation', value: 'workflow' } },
+    ]
+  },
+
+  // ===================================================================
+  // OUTPUT
+  // ===================================================================
+  
+  output_json: {
+    name: 'Output JSON',
+    category: 'output',
+    color: 'from-emerald-500 to-green-400',
+    icon: 'FileJson',
+    description: 'Sortie JSON structurée',
+    outputs: 0,
+    configFields: [
+      // Data
+      { key: 'data', label: 'Données', type: 'json', section: 'output', expressionEnabled: true },
+      { key: 'schema', label: 'Schéma de validation (optionnel)', type: 'json', section: 'output' },
+      
+      // Options
+      { key: 'pretty', label: 'Formatage lisible', type: 'boolean', defaultValue: false, section: 'options' },
+    ]
+  },
+  
+  output_file: {
+    name: 'Output File',
+    category: 'output',
+    color: 'from-blue-500 to-cyan-400',
+    icon: 'FileDown',
+    description: 'Générer un fichier de sortie',
+    outputs: 0,
+    isRealAction: true,
+    configFields: [
+      // File type
+      { key: 'fileType', label: 'Type de fichier', type: 'select', options: ['pdf', 'docx', 'xlsx', 'csv', 'json', 'txt', 'html', 'md', 'zip'], defaultValue: 'pdf', section: 'file' },
+      { key: 'filename', label: 'Nom du fichier', type: 'text', placeholder: 'report_{{ $timestamp }}.pdf', section: 'file', expressionEnabled: true },
+      
+      // Content
+      { key: 'content', label: 'Contenu', type: 'textarea', section: 'content', expressionEnabled: true },
+      { key: 'template', label: 'Template (optionnel)', type: 'textarea', section: 'content', helpText: 'Template avec variables {{ }}' },
+      
+      // PDF options
+      { key: 'pageSize', label: 'Taille de page', type: 'select', options: ['A4', 'Letter', 'Legal'], defaultValue: 'A4', section: 'pdf', showWhen: { field: 'fileType', value: 'pdf' } },
+      { key: 'orientation', label: 'Orientation', type: 'select', options: ['portrait', 'landscape'], defaultValue: 'portrait', section: 'pdf', showWhen: { field: 'fileType', value: 'pdf' } },
+      { key: 'margins', label: 'Marges (mm)', type: 'json', placeholder: '{"top": 20, "right": 20, "bottom": 20, "left": 20}', section: 'pdf', showWhen: { field: 'fileType', value: 'pdf' } },
+      
+      // Save options
+      { key: 'saveToStorage', label: 'Sauvegarder dans stockage', type: 'boolean', defaultValue: false, section: 'save' },
+      { key: 'storageBucket', label: 'Bucket', type: 'text', section: 'save', showWhen: { field: 'saveToStorage', value: true } },
+      { key: 'storagePath', label: 'Chemin', type: 'text', section: 'save', showWhen: { field: 'saveToStorage', value: true }, expressionEnabled: true },
+    ]
+  },
+  
+  output_display: {
+    name: 'Output Display',
+    category: 'output',
+    color: 'from-purple-500 to-violet-400',
+    icon: 'Eye',
+    description: 'Afficher dans l\'interface',
+    outputs: 0,
+    configFields: [
+      // Display type
+      { key: 'displayType', label: 'Type d\'affichage', type: 'select', options: ['text', 'markdown', 'html', 'json', 'table', 'chart'], defaultValue: 'text', section: 'display' },
+      
+      // Content
+      { key: 'content', label: 'Contenu', type: 'textarea', section: 'content', expressionEnabled: true },
+      { key: 'title', label: 'Titre', type: 'text', section: 'content', expressionEnabled: true },
+      
+      // Table options
+      { key: 'tableColumns', label: 'Colonnes (JSON)', type: 'json', placeholder: '[{"key": "name", "label": "Nom"}, ...]', section: 'table', showWhen: { field: 'displayType', value: 'table' } },
+      
+      // Chart options
+      { key: 'chartType', label: 'Type de graphique', type: 'select', options: ['bar', 'line', 'pie', 'area'], defaultValue: 'bar', section: 'chart', showWhen: { field: 'displayType', value: 'chart' } },
+      { key: 'chartConfig', label: 'Config graphique (JSON)', type: 'json', section: 'chart', showWhen: { field: 'displayType', value: 'chart' } },
+    ]
+  },
+  
+  output_notify: {
+    name: 'Notification',
+    category: 'output',
     color: 'from-yellow-500 to-amber-400',
     icon: 'Bell',
-    description: 'Send push notification',
+    description: 'Envoyer une notification',
+    outputs: 0,
+    isRealAction: true,
     configFields: [
-      { key: 'channel', label: 'Channel', type: 'select', options: ['push', 'email', 'sms', 'slack'] },
-      { key: 'message', label: 'Message', type: 'textarea' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['low', 'normal', 'high', 'urgent'] }
+      // Channel
+      { key: 'channel', label: 'Canal', type: 'select', options: ['toast', 'email', 'push', 'sms', 'slack', 'webhook'], defaultValue: 'toast', section: 'channel' },
+      
+      // Message
+      { key: 'title', label: 'Titre', type: 'text', section: 'message', expressionEnabled: true },
+      { key: 'message', label: 'Message', type: 'textarea', required: true, section: 'message', expressionEnabled: true },
+      { key: 'type', label: 'Type', type: 'select', options: ['info', 'success', 'warning', 'error'], defaultValue: 'info', section: 'message' },
+      
+      // Email specific
+      { key: 'emailTo', label: 'Destinataire email', type: 'text', section: 'email', showWhen: { field: 'channel', value: 'email' }, expressionEnabled: true },
+      { key: 'emailSubject', label: 'Sujet', type: 'text', section: 'email', showWhen: { field: 'channel', value: 'email' }, expressionEnabled: true },
+      
+      // Webhook
+      { key: 'webhookUrl', label: 'Webhook URL', type: 'text', section: 'webhook', showWhen: { field: 'channel', value: 'webhook' }, expressionEnabled: true },
+      { key: 'webhookPayload', label: 'Payload', type: 'json', section: 'webhook', showWhen: { field: 'channel', value: 'webhook' }, expressionEnabled: true },
     ]
   },
-  system_log: {
+  
+  output_log: {
     name: 'Log Entry',
-    category: 'system',
+    category: 'output',
     color: 'from-gray-500 to-slate-400',
     icon: 'FileText',
-    description: 'Create audit log entry',
+    description: 'Créer une entrée de log/audit',
+    outputs: 0,
     configFields: [
-      { key: 'level', label: 'Level', type: 'select', options: ['debug', 'info', 'warn', 'error'] },
-      { key: 'message', label: 'Message Template', type: 'textarea' },
-      { key: 'includeContext', label: 'Include Context', type: 'boolean', defaultValue: true }
+      // Log level
+      { key: 'level', label: 'Niveau', type: 'select', options: ['debug', 'info', 'warn', 'error'], defaultValue: 'info', section: 'log' },
+      
+      // Message
+      { key: 'message', label: 'Message', type: 'textarea', required: true, section: 'log', expressionEnabled: true },
+      { key: 'data', label: 'Données additionnelles (JSON)', type: 'json', section: 'log', expressionEnabled: true },
+      
+      // Context
+      { key: 'includeContext', label: 'Inclure contexte workflow', type: 'boolean', defaultValue: true, section: 'context' },
+      { key: 'includeTimestamp', label: 'Inclure timestamp', type: 'boolean', defaultValue: true, section: 'context' },
+      
+      // Storage
+      { key: 'saveToDatabase', label: 'Sauvegarder en base', type: 'boolean', defaultValue: false, section: 'storage' },
+      { key: 'tableName', label: 'Table', type: 'text', defaultValue: 'workflow_logs', section: 'storage', showWhen: { field: 'saveToDatabase', value: true } },
     ]
   }
 };
 
-// Block categories for UI organization
+// ==========================================
+// CATEGORY DEFINITIONS
+// ==========================================
+
 export const BLOCK_CATEGORIES: { id: BlockCategory; name: string; description: string; icon: string }[] = [
-  { id: 'trigger', name: 'Triggers', description: 'Start workflows', icon: 'Zap' },
-  { id: 'aether', name: 'AETHER', description: 'Actions internes (CRM, Gmail, Documents)', icon: 'Star' },
-  { id: 'ai', name: 'AI Actions', description: 'Intelligence artificielle', icon: 'Sparkles' },
-  { id: 'transform', name: 'Transform', description: 'Data manipulation', icon: 'Shuffle' },
-  { id: 'control', name: 'Control Flow', description: 'Logic and routing', icon: 'GitBranch' },
-  { id: 'integration', name: 'Integrations', description: 'Third-party services', icon: 'Plug' },
-  { id: 'system', name: 'System', description: 'Internal actions', icon: 'Settings' }
+  { id: 'trigger', name: 'Triggers', description: 'Déclencheurs de workflow', icon: 'Zap' },
+  { id: 'ai', name: 'AI / LLM', description: 'Appels IA et modèles de langage', icon: 'Brain' },
+  { id: 'logic', name: 'Logic / Control', description: 'Conditions, boucles, contrôle de flux', icon: 'GitBranch' },
+  { id: 'transform', name: 'Data Transform', description: 'Transformation et manipulation de données', icon: 'Shuffle' },
+  { id: 'http', name: 'HTTP / API', description: 'Requêtes HTTP et webhooks', icon: 'Globe' },
+  { id: 'email', name: 'Email', description: 'Envoi et réception d\'emails', icon: 'Mail' },
+  { id: 'database', name: 'Database', description: 'Opérations base de données', icon: 'Database' },
+  { id: 'files', name: 'Files / Storage', description: 'Fichiers et stockage cloud', icon: 'FileText' },
+  { id: 'messaging', name: 'Messaging', description: 'Slack, Discord, Teams...', icon: 'MessageSquare' },
+  { id: 'memory', name: 'Memory / Cache', description: 'Stockage temporaire et cache', icon: 'HardDrive' },
+  { id: 'tools', name: 'Tools', description: 'Outils et fonctions pour agents', icon: 'Wrench' },
+  { id: 'output', name: 'Output', description: 'Sorties et notifications', icon: 'FileOutput' },
 ];
 
-// Helper to check if a block performs real actions
+export const CATEGORY_INFO: Record<BlockCategory, { name: string; color: string; icon: string }> = {
+  trigger: { name: 'Triggers', color: 'bg-blue-500', icon: 'Zap' },
+  ai: { name: 'AI / LLM', color: 'bg-violet-500', icon: 'Brain' },
+  logic: { name: 'Logic', color: 'bg-amber-500', icon: 'GitBranch' },
+  transform: { name: 'Transform', color: 'bg-emerald-500', icon: 'Shuffle' },
+  http: { name: 'HTTP', color: 'bg-orange-500', icon: 'Globe' },
+  email: { name: 'Email', color: 'bg-red-500', icon: 'Mail' },
+  database: { name: 'Database', color: 'bg-green-500', icon: 'Database' },
+  files: { name: 'Files', color: 'bg-cyan-500', icon: 'FileText' },
+  messaging: { name: 'Messaging', color: 'bg-purple-500', icon: 'MessageSquare' },
+  memory: { name: 'Memory', color: 'bg-indigo-500', icon: 'HardDrive' },
+  tools: { name: 'Tools', color: 'bg-amber-500', icon: 'Wrench' },
+  output: { name: 'Output', color: 'bg-gray-500', icon: 'FileOutput' },
+};
+
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+
 export function isRealActionBlock(type: BlockType): boolean {
   return BLOCK_DEFINITIONS[type]?.isRealAction === true;
 }
 
-// Helper to check if a block requires authentication
 export function requiresAuthentication(type: BlockType): boolean {
   return BLOCK_DEFINITIONS[type]?.requiresAuth === true;
 }
 
-// Category info for UI display
-export const CATEGORY_INFO: Record<BlockCategory, { name: string; color: string; icon: string }> = {
-  trigger: { name: 'Triggers', color: 'bg-blue-500', icon: 'Zap' },
-  aether: { name: 'AETHER', color: 'bg-violet-500', icon: 'Star' },
-  ai: { name: 'IA', color: 'bg-purple-500', icon: 'Brain' },
-  transform: { name: 'Transform', color: 'bg-amber-500', icon: 'Braces' },
-  control: { name: 'Control Flow', color: 'bg-green-500', icon: 'GitBranch' },
-  integration: { name: 'Intégrations', color: 'bg-cyan-500', icon: 'Plug' },
-  system: { name: 'Système', color: 'bg-gray-500', icon: 'Settings' }
-};
+// ==========================================
+// WORKFLOW TEMPLATES (Exemples de compositions)
+// ==========================================
 
-// Workflow template interface
 export interface WorkflowTemplate {
   id: string;
   name: string;
@@ -2149,116 +2130,47 @@ export interface WorkflowTemplate {
   connections: BlockConnection[];
 }
 
-// Pre-built workflow templates
 export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
   {
-    id: 'invoice-processor',
-    name: 'Traitement de Factures',
-    description: 'Analyser les factures PDF reçues par email, extraire les données et les enregistrer dans le CRM',
-    category: 'Finance',
-    difficulty: 'intermediate',
-    estimatedTime: '5 min',
-    icon: 'Receipt',
-    color: 'from-emerald-500 to-green-400',
-    useCases: ['Comptabilité', 'Facturation', 'Automatisation finance'],
-    blocks: [
-      { id: 'trigger-1', type: 'trigger_email', name: 'Email Reçu', config: { subjectFilter: 'Facture*' }, position: { x: 100, y: 50 } },
-      { id: 'extract-1', type: 'ai_extract', name: 'Extraire Données', config: { fields: 'vendor, amount, date, invoice_number' }, position: { x: 100, y: 200 } },
-      { id: 'classify-1', type: 'ai_classify', name: 'Classifier', config: { categories: 'Fournisseur, Service, Produit' }, position: { x: 100, y: 350 } },
-      { id: 'save-1', type: 'system_save', name: 'Sauvegarder', config: { table: 'invoices', operation: 'insert' }, position: { x: 100, y: 500 } }
-    ],
-    connections: [
-      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'extract-1' },
-      { id: 'conn-2', sourceBlockId: 'extract-1', targetBlockId: 'classify-1' },
-      { id: 'conn-3', sourceBlockId: 'classify-1', targetBlockId: 'save-1' }
-    ]
-  },
-  {
-    id: 'lead-enrichment',
-    name: 'Enrichissement Leads',
-    description: 'Enrichir automatiquement les nouveaux leads avec des données entreprise et les scorer',
-    category: 'Sales',
+    id: 'email-processor',
+    name: 'Email Processor',
+    description: 'Lire emails, extraire données avec IA, sauvegarder en base',
+    category: 'Automation',
     difficulty: 'intermediate',
     estimatedTime: '10 min',
-    icon: 'Users',
-    color: 'from-blue-500 to-indigo-400',
-    useCases: ['CRM', 'Prospection', 'Lead scoring'],
+    icon: 'Mail',
+    color: 'from-red-500 to-orange-400',
+    useCases: ['Traitement emails', 'Extraction données', 'Automatisation'],
     blocks: [
-      { id: 'trigger-1', type: 'trigger_webhook', name: 'Nouveau Lead', config: { method: 'POST' }, position: { x: 100, y: 50 } },
-      { id: 'http-1', type: 'http_request', name: 'Enrichir Données', config: { method: 'GET', url: 'https://api.clearbit.com/...' }, position: { x: 100, y: 200 } },
-      { id: 'ai-1', type: 'ai_generate', name: 'Scorer Lead', config: { prompt: 'Analyse this lead data and provide a score from 1-100' }, position: { x: 100, y: 350 } },
-      { id: 'crm-1', type: 'aether_crm_create_lead', name: 'Créer dans CRM', config: {}, position: { x: 100, y: 500 } }
+      { id: 't1', type: 'email_oauth', name: 'Lire Emails', config: { action: 'read' }, position: { x: 100, y: 100 } },
+      { id: 'ai1', type: 'llm_structured', name: 'Extraire Données', config: { fields: 'sender, subject, amount, date' }, position: { x: 100, y: 250 } },
+      { id: 'db1', type: 'db_insert', name: 'Sauvegarder', config: { table: 'processed_emails' }, position: { x: 100, y: 400 } },
     ],
     connections: [
-      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'http-1' },
-      { id: 'conn-2', sourceBlockId: 'http-1', targetBlockId: 'ai-1' },
-      { id: 'conn-3', sourceBlockId: 'ai-1', targetBlockId: 'crm-1' }
+      { id: 'c1', sourceBlockId: 't1', targetBlockId: 'ai1' },
+      { id: 'c2', sourceBlockId: 'ai1', targetBlockId: 'db1' },
     ]
   },
   {
-    id: 'support-triage',
-    name: 'Triage Support',
-    description: 'Classifier et router automatiquement les tickets support avec réponse IA',
-    category: 'Support',
+    id: 'api-integration',
+    name: 'API Integration',
+    description: 'Appeler une API, transformer les données, notifier',
+    category: 'Integration',
     difficulty: 'beginner',
-    estimatedTime: '3 min',
-    icon: 'Headphones',
-    color: 'from-purple-500 to-pink-400',
-    useCases: ['Service client', 'Helpdesk', 'Automatisation support'],
+    estimatedTime: '5 min',
+    icon: 'Globe',
+    color: 'from-blue-500 to-cyan-400',
+    useCases: ['Intégration API', 'Synchronisation', 'Webhooks'],
     blocks: [
-      { id: 'trigger-1', type: 'trigger_text', name: 'Ticket Reçu', config: { placeholder: 'Décrivez votre problème...' }, position: { x: 100, y: 50 } },
-      { id: 'sentiment-1', type: 'ai_sentiment', name: 'Analyser Sentiment', config: {}, position: { x: 100, y: 200 } },
-      { id: 'classify-1', type: 'ai_classify', name: 'Classifier Ticket', config: { categories: 'Technique, Facturation, Commercial, Autre' }, position: { x: 100, y: 350 } },
-      { id: 'generate-1', type: 'ai_generate', name: 'Générer Réponse', config: { prompt: 'Generate a helpful response', tone: 'professional' }, position: { x: 100, y: 500 } }
+      { id: 't1', type: 'trigger_schedule', name: 'Toutes les heures', config: { cronExpression: '0 * * * *' }, position: { x: 100, y: 100 } },
+      { id: 'h1', type: 'http_request', name: 'Appel API', config: { method: 'GET' }, position: { x: 100, y: 250 } },
+      { id: 'm1', type: 'map', name: 'Transformer', config: { mapMode: 'fields' }, position: { x: 100, y: 400 } },
+      { id: 'n1', type: 'output_notify', name: 'Notifier', config: { channel: 'slack' }, position: { x: 100, y: 550 } },
     ],
     connections: [
-      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'sentiment-1' },
-      { id: 'conn-2', sourceBlockId: 'sentiment-1', targetBlockId: 'classify-1' },
-      { id: 'conn-3', sourceBlockId: 'classify-1', targetBlockId: 'generate-1' }
+      { id: 'c1', sourceBlockId: 't1', targetBlockId: 'h1' },
+      { id: 'c2', sourceBlockId: 'h1', targetBlockId: 'm1' },
+      { id: 'c3', sourceBlockId: 'm1', targetBlockId: 'n1' },
     ]
   },
-  {
-    id: 'content-summarizer',
-    name: 'Résumeur de Contenu',
-    description: 'Résumer des documents longs et générer des points clés',
-    category: 'Content',
-    difficulty: 'beginner',
-    estimatedTime: '2 min',
-    icon: 'FileText',
-    color: 'from-amber-500 to-orange-400',
-    useCases: ['Documentation', 'Veille', 'Recherche'],
-    blocks: [
-      { id: 'trigger-1', type: 'trigger_file', name: 'Document Uploadé', config: { acceptedTypes: '.pdf,.docx,.txt' }, position: { x: 100, y: 50 } },
-      { id: 'summary-1', type: 'ai_summary', name: 'Résumer', config: { style: 'executive', maxLength: 500 }, position: { x: 100, y: 200 } },
-      { id: 'extract-1', type: 'ai_extract', name: 'Points Clés', config: { fields: 'key_points, action_items, decisions' }, position: { x: 100, y: 350 } }
-    ],
-    connections: [
-      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'summary-1' },
-      { id: 'conn-2', sourceBlockId: 'summary-1', targetBlockId: 'extract-1' }
-    ]
-  },
-  {
-    id: 'data-sync',
-    name: 'Synchronisation Données',
-    description: 'Récupérer des données API, transformer et stocker dans la base',
-    category: 'Data',
-    difficulty: 'advanced',
-    estimatedTime: '15 min',
-    icon: 'Database',
-    color: 'from-cyan-500 to-teal-400',
-    useCases: ['ETL', 'Intégration données', 'Synchronisation'],
-    blocks: [
-      { id: 'trigger-1', type: 'trigger_schedule', name: 'Toutes les heures', config: { cron: '0 * * * *' }, position: { x: 100, y: 50 } },
-      { id: 'http-1', type: 'http_request', name: 'Fetch API', config: { method: 'GET', url: 'https://api.example.com/data' }, position: { x: 100, y: 200 } },
-      { id: 'transform-1', type: 'transform_map', name: 'Transformer', config: { mapping: '{ "id": "$.id", "name": "$.attributes.name" }' }, position: { x: 100, y: 350 } },
-      { id: 'filter-1', type: 'transform_filter', name: 'Filtrer Actifs', config: { condition: 'item.status === "active"' }, position: { x: 100, y: 500 } },
-      { id: 'save-1', type: 'system_save', name: 'Sauvegarder', config: { table: 'synced_data', operation: 'upsert' }, position: { x: 100, y: 650 } }
-    ],
-    connections: [
-      { id: 'conn-1', sourceBlockId: 'trigger-1', targetBlockId: 'http-1' },
-      { id: 'conn-2', sourceBlockId: 'http-1', targetBlockId: 'transform-1' },
-      { id: 'conn-3', sourceBlockId: 'transform-1', targetBlockId: 'filter-1' },
-      { id: 'conn-4', sourceBlockId: 'filter-1', targetBlockId: 'save-1' }
-    ]
-  }
 ];
