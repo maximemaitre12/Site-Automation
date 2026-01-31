@@ -180,7 +180,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   Ce workflow récupère automatiquement les données depuis {
-                    ['email_trigger', 'email_oauth', 'email_imap', 'trigger_gmail'].includes(triggerBlock.type)
+                    ['email_trigger', 'email_oauth', 'trigger_gmail'].includes(triggerBlock.type)
                       ? 'votre boîte mail'
                       : triggerBlock.type.includes('webhook')
                         ? 'le webhook externe'

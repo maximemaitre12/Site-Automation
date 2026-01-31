@@ -87,7 +87,6 @@ export async function executeBlock(
       case 'trigger_webhook':
       case 'trigger_schedule':
       case 'trigger_event':
-      case 'email_imap':
       case 'email_oauth':
         output = context.input;
         break;
@@ -241,23 +240,21 @@ export async function executeBlock(
         break;
       }
 
-      case 'email_smtp': {
-        // Email requires Resend integration - return info without failing
+      case 'email_oauth': {
+        // Email via OAuth (Gmail/Outlook) - handled via OAuth tokens
         const to = block.config?.to;
         const subject = block.config?.subject || 'Workflow Notification';
         if (!to) {
           output = { sent: false, warning: 'No recipient email configured', requiresSetup: true };
         } else {
-          // Check if email edge function exists by trying to call it
           try {
             const { data, error } = await supabase.functions.invoke('send-workflow-email', {
-              body: { to, subject, body: inputText }
+              body: { to, subject, body: inputText, useOAuth: true }
             });
             if (error) {
-              // Function doesn't exist or failed - don't block workflow
               output = { 
                 sent: false, 
-                warning: 'Email integration not configured. Configure Resend to enable real email sending.',
+                warning: 'Gmail OAuth not connected. Connect your Gmail account in the block settings.',
                 to, 
                 subject,
                 body: inputText,
@@ -268,10 +265,9 @@ export async function executeBlock(
               output = { sent: true, to, subject, timestamp: new Date().toISOString() };
             }
           } catch (err) {
-            // Don't fail workflow - just indicate email not configured
             output = { 
               sent: false, 
-              warning: 'Email integration not configured',
+              warning: 'Gmail OAuth not connected',
               to, 
               subject,
               requiresSetup: true,

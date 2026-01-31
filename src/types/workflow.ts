@@ -62,8 +62,6 @@ export type BlockType =
   | 'websocket'           // WebSocket send/receive
   
   // === EMAIL ===
-  | 'email_imap'          // Lire emails IMAP
-  | 'email_smtp'          // Envoyer email SMTP
   | 'email_oauth'         // Email via OAuth (Gmail, Outlook)
   
   // === DATABASE ===
@@ -1415,86 +1413,8 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   },
 
   // ===================================================================
-  // EMAIL
+  // EMAIL (OAuth only - no IMAP/SMTP)
   // ===================================================================
-  
-  email_imap: {
-    name: 'Email IMAP',
-    category: 'email',
-    color: 'from-blue-500 to-indigo-400',
-    icon: 'Inbox',
-    description: 'Lire des emails via IMAP',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Server
-      { key: 'host', label: 'Serveur IMAP', type: 'text', placeholder: 'imap.gmail.com', required: true, section: 'server' },
-      { key: 'port', label: 'Port', type: 'number', defaultValue: 993, section: 'server' },
-      { key: 'secure', label: 'SSL/TLS', type: 'boolean', defaultValue: true, section: 'server' },
-      
-      // Auth
-      { key: 'username', label: 'Email / Username', type: 'text', required: true, section: 'auth' },
-      { key: 'password', label: 'Password / App Password', type: 'password', required: true, section: 'auth' },
-      
-      // Folder
-      { key: 'folder', label: 'Dossier', type: 'text', defaultValue: 'INBOX', section: 'folder' },
-      
-      // Filters
-      { key: 'unreadOnly', label: 'Non lus uniquement', type: 'boolean', defaultValue: true, section: 'filters' },
-      { key: 'since', label: 'Depuis (date)', type: 'text', placeholder: '{{ $now.subtract(7, "days") }}', section: 'filters', expressionEnabled: true },
-      { key: 'from', label: 'De (expéditeur)', type: 'text', section: 'filters', expressionEnabled: true },
-      { key: 'subject', label: 'Sujet (contient)', type: 'text', section: 'filters', expressionEnabled: true },
-      { key: 'searchQuery', label: 'Recherche IMAP', type: 'text', placeholder: 'FROM "boss@company.com" SUBJECT "urgent"', section: 'filters', helpText: 'Syntaxe IMAP SEARCH' },
-      
-      // Options
-      { key: 'limit', label: 'Limite', type: 'number', defaultValue: 10, section: 'options' },
-      { key: 'markAsRead', label: 'Marquer comme lu', type: 'boolean', defaultValue: false, section: 'options' },
-      { key: 'includeAttachments', label: 'Inclure pièces jointes', type: 'boolean', defaultValue: false, section: 'options' },
-      { key: 'bodyFormat', label: 'Format du corps', type: 'select', options: ['text', 'html', 'both'], defaultValue: 'text', section: 'options' },
-    ]
-  },
-  
-  email_smtp: {
-    name: 'Email SMTP',
-    category: 'email',
-    color: 'from-red-500 to-orange-400',
-    icon: 'Send',
-    description: 'Envoyer un email via SMTP',
-    isRealAction: true,
-    requiresAuth: true,
-    configFields: [
-      // Server
-      { key: 'host', label: 'Serveur SMTP', type: 'text', placeholder: 'smtp.gmail.com', required: true, section: 'server' },
-      { key: 'port', label: 'Port', type: 'number', defaultValue: 587, section: 'server' },
-      { key: 'secure', label: 'SSL/TLS', type: 'boolean', defaultValue: false, section: 'server' },
-      { key: 'requireTLS', label: 'STARTTLS', type: 'boolean', defaultValue: true, section: 'server' },
-      
-      // Auth
-      { key: 'username', label: 'Username', type: 'text', required: true, section: 'auth' },
-      { key: 'password', label: 'Password', type: 'password', required: true, section: 'auth' },
-      
-      // Message
-      { key: 'from', label: 'De', type: 'text', placeholder: 'you@example.com', required: true, section: 'message', expressionEnabled: true },
-      { key: 'fromName', label: 'Nom expéditeur', type: 'text', section: 'message', expressionEnabled: true },
-      { key: 'to', label: 'À', type: 'text', placeholder: 'recipient@example.com', required: true, section: 'message', expressionEnabled: true, helpText: 'Virgules pour multiples' },
-      { key: 'cc', label: 'CC', type: 'text', section: 'message', expressionEnabled: true },
-      { key: 'bcc', label: 'BCC', type: 'text', section: 'message', expressionEnabled: true },
-      { key: 'replyTo', label: 'Reply-To', type: 'text', section: 'message', expressionEnabled: true },
-      { key: 'subject', label: 'Sujet', type: 'text', required: true, section: 'message', expressionEnabled: true },
-      
-      // Body
-      { key: 'bodyType', label: 'Type de contenu', type: 'select', options: ['text', 'html', 'both'], defaultValue: 'text', section: 'body' },
-      { key: 'textBody', label: 'Corps texte', type: 'textarea', section: 'body', expressionEnabled: true },
-      { key: 'htmlBody', label: 'Corps HTML', type: 'textarea', section: 'body', expressionEnabled: true },
-      
-      // Attachments
-      { key: 'attachments', label: 'Pièces jointes (JSON)', type: 'json', placeholder: '[{"filename": "file.pdf", "content": "{{ $input.fileBase64 }}"}]', section: 'attachments', expressionEnabled: true },
-      { key: 'attachFromPrevious', label: 'Joindre données précédentes', type: 'boolean', defaultValue: false, section: 'attachments' },
-      
-      // Options
-      { key: 'priority', label: 'Priorité', type: 'select', options: ['low', 'normal', 'high'], defaultValue: 'normal', section: 'options' },
-    ]
-  },
   
   email_oauth: {
     name: 'Email OAuth',
