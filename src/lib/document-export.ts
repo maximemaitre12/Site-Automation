@@ -53,7 +53,7 @@ function isHeader(text: string): boolean {
   return false;
 }
 
-// Generate professional PDF
+// Generate professional PDF with impeccable layout
 export async function generatePDF(
   doc: DocumentData,
   branding: BrandingSettings
@@ -66,14 +66,18 @@ export async function generatePDF(
 
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 25;
-  const contentWidth = pageWidth - margin * 2;
-  let yPosition = margin;
+  const marginLeft = 20;
+  const marginRight = 20;
+  const marginTop = 25;
+  const marginBottom = 25;
+  const contentWidth = pageWidth - marginLeft - marginRight;
+  const maxY = pageHeight - marginBottom;
+  let yPosition = marginTop;
 
   const primaryRgb = hexToRgb(branding.primaryColor);
   const secondaryRgb = hexToRgb(branding.secondaryColor);
 
-  // Determine font (jsPDF has limited fonts, we'll use the closest)
+  // Font mapping
   const fontMapping: Record<string, string> = {
     "Calibri": "helvetica",
     "Arial": "helvetica",
@@ -85,48 +89,66 @@ export async function generatePDF(
   const pdfFont = fontMapping[branding.fontFamily] || "helvetica";
   pdf.setFont(pdfFont);
 
-  // Header bar
+  // --- COVER PAGE HEADER ---
+  // Top colored bar
   pdf.setFillColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
-  pdf.rect(0, 0, pageWidth, 12, "F");
+  pdf.rect(0, 0, pageWidth, 10, "F");
 
-  // Company name in header if provided
+  // Company name in header
   if (branding.companyName) {
-    pdf.setFontSize(8);
+    pdf.setFontSize(9);
     pdf.setTextColor(255, 255, 255);
-    pdf.text(branding.companyName.toUpperCase(), margin, 8);
+    pdf.text(branding.companyName.toUpperCase(), marginLeft, 7);
+    
+    // Date on the right
+    const dateStr = format(new Date(doc.createdAt), "d MMMM yyyy", { locale: fr });
+    pdf.setFontSize(8);
+    const dateWidth = pdf.getTextWidth(dateStr);
+    pdf.text(dateStr, pageWidth - marginRight - dateWidth, 7);
   }
 
-  yPosition = 30;
+  yPosition = 35;
 
-  // Document title
-  pdf.setFontSize(24);
+  // --- DOCUMENT TITLE ---
+  pdf.setFontSize(22);
   pdf.setFont(pdfFont, "bold");
   pdf.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
   
   const titleLines = pdf.splitTextToSize(doc.title, contentWidth);
-  pdf.text(titleLines, margin, yPosition);
-  yPosition += titleLines.length * 10 + 5;
+  titleLines.forEach((line: string) => {
+    pdf.text(line, marginLeft, yPosition);
+    yPosition += 9;
+  });
+  yPosition += 3;
 
-  // Date subtitle
-  pdf.setFontSize(10);
-  pdf.setFont(pdfFont, "italic");
-  pdf.setTextColor(128, 128, 128);
-  const dateStr = format(new Date(doc.createdAt), "d MMMM yyyy", { locale: fr });
-  pdf.text(dateStr, margin, yPosition);
-  yPosition += 8;
-
-  // Title underline
-  pdf.setDrawColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
-  pdf.setLineWidth(0.8);
-  pdf.line(margin, yPosition, margin + 50, yPosition);
+  // Title underline (accent)
+  pdf.setDrawColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
+  pdf.setLineWidth(1);
+  pdf.line(marginLeft, yPosition, marginLeft + 60, yPosition);
   yPosition += 15;
 
-  // Content
+  // --- PROCESS CONTENT ---
   const lines = doc.content.split("\n");
-  pdf.setTextColor(51, 51, 51);
+  pdf.setTextColor(40, 40, 40);
+
+  const checkPageBreak = (neededSpace: number) => {
+    if (yPosition + neededSpace > maxY) {
+      addNewPage();
+    }
+  };
+
+  const addNewPage = () => {
+    pdf.addPage();
+    // Subtle header bar on continuation pages
+    pdf.setFillColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+    pdf.rect(0, 0, pageWidth, 6, "F");
+    yPosition = 20;
+  };
 
   for (const line of lines) {
     const trimmed = line.trim();
+    
+    // Empty line = small spacing
     if (!trimmed) {
       yPosition += 4;
       continue;
@@ -135,81 +157,83 @@ export async function generatePDF(
     const cleaned = cleanContent(trimmed);
     if (!cleaned) continue;
 
-    // Check if we need a new page
-    if (yPosition > pageHeight - 30) {
-      pdf.addPage();
-      yPosition = margin;
-
-      // Add header to new page
-      pdf.setFillColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
-      pdf.rect(0, 0, pageWidth, 8, "F");
-      yPosition = 20;
-    }
-
+    // Check if this is a section header
     if (isHeader(cleaned)) {
-      // Section header
-      yPosition += 6;
-      pdf.setFontSize(13);
+      checkPageBreak(18);
+      yPosition += 8;
+      
+      pdf.setFontSize(12);
       pdf.setFont(pdfFont, "bold");
       pdf.setTextColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
-      pdf.text(cleaned.replace(/:$/, ""), margin, yPosition);
-      yPosition += 2;
       
-      // Underline for headers
+      const headerText = cleaned.replace(/:$/, "");
+      pdf.text(headerText, marginLeft, yPosition);
+      
+      // Subtle underline for section headers
+      const headerWidth = Math.min(pdf.getTextWidth(headerText), contentWidth * 0.6);
       pdf.setDrawColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
       pdf.setLineWidth(0.3);
-      const headerWidth = pdf.getTextWidth(cleaned.replace(/:$/, ""));
-      pdf.line(margin, yPosition + 1, margin + headerWidth, yPosition + 1);
-      yPosition += 8;
-    } else if (cleaned.startsWith("•")) {
-      // Bullet point
+      pdf.line(marginLeft, yPosition + 2, marginLeft + headerWidth, yPosition + 2);
+      
+      yPosition += 10;
+      pdf.setTextColor(40, 40, 40);
+    }
+    // Bullet point
+    else if (cleaned.startsWith("•") || cleaned.startsWith("-")) {
+      const bulletText = cleaned.replace(/^[•\-]\s*/, "").trim();
+      const wrappedText = pdf.splitTextToSize(bulletText, contentWidth - 8);
+      
+      checkPageBreak(wrappedText.length * 5 + 2);
+      
       pdf.setFontSize(10);
       pdf.setFont(pdfFont, "normal");
-      pdf.setTextColor(51, 51, 51);
+      pdf.setTextColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
+      pdf.text("•", marginLeft + 2, yPosition);
+      pdf.setTextColor(40, 40, 40);
       
-      const bulletText = cleaned.substring(1).trim();
-      const wrappedText = pdf.splitTextToSize(bulletText, contentWidth - 10);
-      
-      pdf.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
-      pdf.text("•", margin + 3, yPosition);
-      pdf.setTextColor(51, 51, 51);
-      pdf.text(wrappedText, margin + 8, yPosition);
-      yPosition += wrappedText.length * 5 + 2;
-    } else {
-      // Regular paragraph
+      wrappedText.forEach((textLine: string, i: number) => {
+        pdf.text(textLine, marginLeft + 8, yPosition + i * 5);
+      });
+      yPosition += wrappedText.length * 5 + 3;
+    }
+    // Regular paragraph
+    else {
       pdf.setFontSize(10);
       pdf.setFont(pdfFont, "normal");
-      pdf.setTextColor(51, 51, 51);
       
       const wrappedText = pdf.splitTextToSize(cleaned, contentWidth);
-      pdf.text(wrappedText, margin, yPosition);
-      yPosition += wrappedText.length * 5 + 3;
+      checkPageBreak(wrappedText.length * 5 + 2);
+      
+      wrappedText.forEach((textLine: string, i: number) => {
+        pdf.text(textLine, marginLeft, yPosition + i * 5);
+      });
+      yPosition += wrappedText.length * 5 + 4;
     }
   }
 
-  // Footer on each page
+  // --- ADD FOOTERS TO ALL PAGES ---
   const totalPages = pdf.internal.pages.length - 1;
   for (let i = 1; i <= totalPages; i++) {
     pdf.setPage(i);
     
-    // Footer line
+    // Footer separator line
     pdf.setDrawColor(200, 200, 200);
-    pdf.setLineWidth(0.3);
-    pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+    pdf.setLineWidth(0.2);
+    pdf.line(marginLeft, pageHeight - 15, pageWidth - marginRight, pageHeight - 15);
     
     // Footer text
     pdf.setFontSize(8);
     pdf.setFont(pdfFont, "normal");
-    pdf.setTextColor(128, 128, 128);
+    pdf.setTextColor(120, 120, 120);
     
     const footerLeft = branding.companyName 
       ? `${branding.companyName} • Document généré par AETHER`
       : "Document généré par AETHER";
-    pdf.text(footerLeft, margin, pageHeight - 10);
+    pdf.text(footerLeft, marginLeft, pageHeight - 10);
     
-    const pageText = `Page ${i} sur ${totalPages}`;
+    const pageText = `Page ${i}/${totalPages}`;
     const pageTextWidth = pdf.getTextWidth(pageText);
-    pdf.text(pageText, pageWidth - margin - pageTextWidth, pageHeight - 10);
+    pdf.text(pageText, pageWidth - marginRight - pageTextWidth, pageHeight - 10);
   }
 
   return pdf.output("blob");
