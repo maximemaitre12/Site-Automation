@@ -464,13 +464,39 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
               const headers = msgData.payload?.headers || [];
               const getHeader = (name: string) => headers.find((h: any) => h.name.toLowerCase() === name.toLowerCase())?.value || '';
               
-              // Extract body
+              // Extract body with proper UTF-8 decoding
               let body = '';
+              const decodeBase64Utf8 = (base64: string): string => {
+                try {
+                  // Convert URL-safe base64 to standard base64
+                  const standardBase64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+                  // Decode base64 to binary string
+                  const binary = atob(standardBase64);
+                  // Convert binary string to Uint8Array
+                  const bytes = new Uint8Array(binary.length);
+                  for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                  }
+                  // Decode as UTF-8
+                  return new TextDecoder('utf-8').decode(bytes);
+                } catch (e) {
+                  console.error('Base64 decode error:', e);
+                  return base64; // Return original on error
+                }
+              };
+              
               const extractBody = (part: any): string => {
                 if (part.body?.data) {
-                  return atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                  return decodeBase64Utf8(part.body.data);
                 }
                 if (part.parts) {
+                  // Prefer text/plain over text/html for cleaner output
+                  const textPart = part.parts.find((p: any) => p.mimeType === 'text/plain');
+                  if (textPart) {
+                    const text = extractBody(textPart);
+                    if (text) return text;
+                  }
+                  // Fallback to any part with content
                   for (const subpart of part.parts) {
                     const text = extractBody(subpart);
                     if (text) return text;
