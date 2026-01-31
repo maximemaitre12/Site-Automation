@@ -53,6 +53,36 @@ function isHeader(text: string): boolean {
   return false;
 }
 
+// Remove duplicate paragraphs from content
+function removeDuplicateParagraphs(content: string): string {
+  const paragraphs = content.split(/\n{2,}/);
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  
+  for (const para of paragraphs) {
+    const normalized = para.trim().toLowerCase().replace(/\s+/g, ' ');
+    if (normalized.length > 20 && seen.has(normalized)) {
+      continue; // Skip duplicate
+    }
+    if (normalized.length > 20) {
+      seen.add(normalized);
+    }
+    unique.push(para);
+  }
+  
+  return unique.join('\n\n');
+}
+
+// Detect email format content
+function isEmailContent(content: string): boolean {
+  const emailIndicators = [
+    /^(cher|chère|bonjour|madame|monsieur)/im,
+    /cordialement|sincèrement|bien à vous|salutations/im,
+    /je vous (prie|invite|informe|écris)/im,
+  ];
+  return emailIndicators.some(regex => regex.test(content));
+}
+
 // Generate professional PDF with impeccable layout
 export async function generatePDF(
   doc: DocumentData,
@@ -89,6 +119,10 @@ export async function generatePDF(
   const pdfFont = fontMapping[branding.fontFamily] || "helvetica";
   pdf.setFont(pdfFont);
 
+  // --- DEDUPLICATE CONTENT ---
+  const cleanedContent = removeDuplicateParagraphs(doc.content);
+  const isEmail = isEmailContent(cleanedContent);
+
   // --- COVER PAGE HEADER ---
   // Top colored bar
   pdf.setFillColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
@@ -107,28 +141,31 @@ export async function generatePDF(
     pdf.text(dateStr, pageWidth - marginRight - dateWidth, 7);
   }
 
-  yPosition = 35;
+  yPosition = 30;
 
-  // --- DOCUMENT TITLE ---
-  pdf.setFontSize(22);
-  pdf.setFont(pdfFont, "bold");
-  pdf.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
-  
-  const titleLines = pdf.splitTextToSize(doc.title, contentWidth);
-  titleLines.forEach((line: string) => {
-    pdf.text(line, marginLeft, yPosition);
-    yPosition += 9;
-  });
-  yPosition += 3;
+  // --- DOCUMENT TITLE (only if not a generic email title) ---
+  const isGenericTitle = doc.title.toLowerCase() === 'document' || doc.title.toLowerCase() === 'email';
+  if (!isGenericTitle) {
+    pdf.setFontSize(18);
+    pdf.setFont(pdfFont, "bold");
+    pdf.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
+    
+    const titleLines = pdf.splitTextToSize(doc.title, contentWidth);
+    titleLines.forEach((line: string) => {
+      pdf.text(line, marginLeft, yPosition);
+      yPosition += 8;
+    });
+    yPosition += 5;
 
-  // Title underline (accent)
-  pdf.setDrawColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
-  pdf.setLineWidth(1);
-  pdf.line(marginLeft, yPosition, marginLeft + 60, yPosition);
-  yPosition += 15;
+    // Title underline (accent)
+    pdf.setDrawColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
+    pdf.setLineWidth(0.8);
+    pdf.line(marginLeft, yPosition, marginLeft + 50, yPosition);
+    yPosition += 12;
+  }
 
-  // --- PROCESS CONTENT ---
-  const lines = doc.content.split("\n");
+  // --- PROCESS CONTENT (use deduplicated content) ---
+  const lines = cleanedContent.split("\n");
   pdf.setTextColor(40, 40, 40);
 
   const checkPageBreak = (neededSpace: number) => {
