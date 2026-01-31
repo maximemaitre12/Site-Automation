@@ -542,9 +542,50 @@ Output ONLY valid JSON. No markdown, no explanations.`;
       position: block.position || { x: 300, y: 50 + index * 150 }
     }));
 
+    // Identify main flow blocks vs sub-nodes (for typed ports)
+    const subNodeTypes = ['openai_chat_model', 'gemini_chat_model', 'simple_memory', 'postgres_memory', 
+      'http_tool', 'code_tool', 'workflow_tool', 'simple_vector_store', 'supabase_vector_store',
+      'openai_embeddings', 'document_loader'];
+    
+    const mainBlocks = workflow.blocks.filter((b: any) => !subNodeTypes.includes(b.type));
+    const subNodes = workflow.blocks.filter((b: any) => subNodeTypes.includes(b.type));
+
+    // Build set of connected block IDs
+    const connectedBlockIds = new Set<string>();
+    for (const conn of workflow.connections) {
+      connectedBlockIds.add(conn.sourceBlockId);
+      connectedBlockIds.add(conn.targetBlockId);
+    }
+
+    // Find disconnected main blocks and connect them to the flow
+    const disconnectedMainBlocks = mainBlocks.filter((b: any) => !connectedBlockIds.has(b.id));
+    
+    if (disconnectedMainBlocks.length > 0 && mainBlocks.length > 1) {
+      // Find the last connected main block in the flow
+      const connectedMainBlocks = mainBlocks.filter((b: any) => connectedBlockIds.has(b.id));
+      
+      for (const disconnectedBlock of disconnectedMainBlocks) {
+        // Find a suitable connection point - prefer blocks that don't already have outgoing connections
+        const blocksWithOutgoing = new Set(workflow.connections.map((c: any) => c.sourceBlockId));
+        const endBlocks = connectedMainBlocks.filter((b: any) => !blocksWithOutgoing.has(b.id));
+        
+        const targetBlock = endBlocks.length > 0 ? endBlocks[endBlocks.length - 1] : connectedMainBlocks[connectedMainBlocks.length - 1];
+        
+        if (targetBlock && targetBlock.id !== disconnectedBlock.id) {
+          workflow.connections.push({
+            id: `auto-conn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            sourceBlockId: targetBlock.id,
+            targetBlockId: disconnectedBlock.id,
+            sourceHandle: 'main',
+            targetHandle: 'main'
+          });
+          connectedBlockIds.add(disconnectedBlock.id);
+        }
+      }
+    }
+
     // If no connections were generated but we have multiple blocks, create linear connections for main blocks
-    if (workflow.connections.length === 0 && workflow.blocks.length > 1) {
-      const mainBlocks = workflow.blocks.filter((b: any) => !b.type.includes('_model') && !b.type.includes('_memory') && !b.type.includes('_tool') && !b.type.includes('_embeddings'));
+    if (workflow.connections.length === 0 && mainBlocks.length > 1) {
       workflow.connections = mainBlocks.slice(0, -1).map((block: any, index: number) => ({
         id: `conn-${index + 1}`,
         sourceBlockId: block.id,

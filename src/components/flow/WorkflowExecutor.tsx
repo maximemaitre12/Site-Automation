@@ -41,7 +41,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
   
   const requiresManualInput = triggerBlock ? manualTriggerTypes.includes(triggerBlock.type) : false;
 
-  const downloadFile = async (filename: string, content: unknown, mimeType?: string, format?: string) => {
+  const downloadFile = async (filename: string, content: unknown, mimeType?: string, format?: string, title?: string) => {
     if (!filename) return;
 
     try {
@@ -51,20 +51,81 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
       const resolvedFormat = (format || '').toLowerCase();
       const resolvedMime = mimeType || (resolvedFormat === 'docx'
         ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : resolvedFormat === 'pdf'
+        ? 'application/pdf'
         : 'application/octet-stream');
 
-      // If backend returns plain text for a DOCX, generate a real DOCX on the client.
+      // Generate real DOCX on the client
       if (resolvedFormat === 'docx' || resolvedMime.includes('officedocument.wordprocessingml.document')) {
-        const { Document, Packer, Paragraph } = await import('docx');
+        const { Document, Packer, Paragraph, TextRun } = await import('docx');
         const paragraphs = safeContent
           .split(/\r?\n/)
-          .map((line) => new Paragraph({ text: line || ' ' }));
+          .map((line) => new Paragraph({ 
+            children: [new TextRun({ text: line || ' ', font: 'Calibri', size: 22 })] 
+          }));
 
         const doc = new Document({
+          title: title || 'Document',
           sections: [{ children: paragraphs }],
         });
 
         blob = await Packer.toBlob(doc);
+      } 
+      // Generate real PDF on the client using jsPDF
+      else if (resolvedFormat === 'pdf' || resolvedMime === 'application/pdf') {
+        const { jsPDF } = await import('jspdf');
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 25;
+        const contentWidth = pageWidth - margin * 2;
+        let yPosition = margin;
+        
+        // Title
+        if (title) {
+          pdf.setFontSize(20);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(10, 26, 60); // Dark blue
+          const titleLines = pdf.splitTextToSize(title, contentWidth);
+          pdf.text(titleLines, margin, yPosition);
+          yPosition += titleLines.length * 8 + 10;
+          
+          // Underline
+          pdf.setDrawColor(60, 77, 254);
+          pdf.setLineWidth(0.8);
+          pdf.line(margin, yPosition, margin + 50, yPosition);
+          yPosition += 15;
+        }
+        
+        // Content
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(51, 51, 51);
+        
+        const lines = safeContent.split('\n');
+        for (const line of lines) {
+          if (yPosition > pageHeight - 30) {
+            pdf.addPage();
+            yPosition = margin;
+          }
+          
+          const wrappedText = pdf.splitTextToSize(line || ' ', contentWidth);
+          pdf.text(wrappedText, margin, yPosition);
+          yPosition += wrappedText.length * 5 + 2;
+        }
+        
+        // Footer
+        const totalPages = pdf.internal.pages.length - 1;
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.setFontSize(8);
+          pdf.setTextColor(128, 128, 128);
+          pdf.text(`Page ${i} sur ${totalPages}`, pageWidth - margin - 20, pageHeight - 10);
+          pdf.text('AETHER AI Suite', margin, pageHeight - 10);
+        }
+        
+        blob = pdf.output('blob');
       } else {
         blob = new Blob([safeContent], { type: resolvedMime });
       }
@@ -87,10 +148,14 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
   const maybeAutoDownload = async (execution: any) => {
     const out = execution?.output;
-    if (!out || out.type !== 'download') return;
+    if (!out) return;
+    
+    // Handle various document types from the backend
+    const downloadableTypes = ['download', 'pdf_document', 'word_document'];
+    if (!downloadableTypes.includes(out.type)) return;
 
     const payload = out._downloadData || out;
-    await downloadFile(payload.filename, payload.content, payload.mimeType, payload.format);
+    await downloadFile(payload.filename, payload.content, payload.mimeType, payload.format, payload.title);
   };
 
   const handleRun = async (autoInput?: string) => {
