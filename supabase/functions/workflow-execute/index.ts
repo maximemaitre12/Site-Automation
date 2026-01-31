@@ -2920,6 +2920,94 @@ Only output JSON, no other text.`;
         break;
       }
 
+      // ===== Send Email Block (via Resend) =====
+      case 'send_email': {
+        const userId = context.variables?._userId;
+        
+        // Interpolate template values from previous block outputs
+        const rawTo = block.config?.to || '';
+        const rawSubject = block.config?.subject || 'Notification AETHER';
+        const rawBody = block.config?.body || '';
+        const rawCc = block.config?.cc || '';
+        const fromName = block.config?.from_name || 'AETHER Flow';
+        const isHtml = block.config?.isHtml === true;
+        
+        const to = String(interpolateTemplate(rawTo, context.input));
+        const subject = String(interpolateTemplate(rawSubject, context.input));
+        const body = String(interpolateTemplate(rawBody, context.input));
+        const cc = rawCc ? String(interpolateTemplate(rawCc, context.input)) : undefined;
+
+        console.log(`[send_email] Attempting to send email to: ${to}, subject: ${subject}`);
+
+        if (!userId) {
+          output = { sent: false, error: 'User ID required for email sending' };
+          break;
+        }
+
+        if (!to || !to.includes('@')) {
+          output = { sent: false, error: `Adresse email invalide: "${to}". Vérifiez la configuration du bloc.` };
+          break;
+        }
+
+        if (!body || body.trim().length < 10) {
+          output = { sent: false, error: 'Le corps de l\'email est vide ou trop court.' };
+          break;
+        }
+
+        try {
+          const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          
+          // Call the dedicated send-workflow-email edge function
+          const { data, error } = await supabase.functions.invoke('send-workflow-email', {
+            body: { 
+              to, 
+              subject, 
+              body: isHtml ? body : body.replace(/\n/g, '<br>'),
+              from_name: fromName,
+              cc
+            },
+            headers: {
+              Authorization: `Bearer ${context.variables?._accessToken || ''}`
+            }
+          });
+
+          if (error) {
+            console.error('[send_email] Function invoke error:', error);
+            output = { 
+              sent: false, 
+              error: error.message || 'Erreur lors de l\'envoi de l\'email',
+              to,
+              subject
+            };
+          } else if (data?.success) {
+            console.log('[send_email] Email sent successfully:', data);
+            output = { 
+              sent: true, 
+              emailId: data.id,
+              to,
+              subject,
+              message: 'Email envoyé avec succès'
+            };
+          } else {
+            output = { 
+              sent: false, 
+              error: data?.error || 'Échec de l\'envoi de l\'email',
+              to,
+              subject
+            };
+          }
+        } catch (e) {
+          console.error('[send_email] Exception:', e);
+          output = { 
+            sent: false, 
+            error: e instanceof Error ? e.message : 'Erreur lors de l\'envoi de l\'email',
+            to,
+            subject
+          };
+        }
+        break;
+      }
+
       default:
         output = context.input;
     }
@@ -3076,8 +3164,12 @@ serve(async (req) => {
 
     console.log(`Executing workflow ${workflowId || 'unnamed'} with ${blocks.length} blocks for user ${userId}`);
 
-    // Pass userId in variables so blocks can access user's API keys
-    const enrichedVariables = { ...variables, _userId: userId };
+    // Pass userId and accessToken in variables so blocks can access user's API keys and send emails
+    const enrichedVariables = { 
+      ...variables, 
+      _userId: userId,
+      _accessToken: token  // For email sending via user's Resend key
+    };
     const result = await executeWorkflow(blocks, input || '', enrichedVariables);
 
     // Important: a workflow can fail for business reasons (bad URL, auth, bad data)
