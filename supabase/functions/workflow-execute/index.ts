@@ -162,6 +162,7 @@ function safeGetPath(data: any, path: string): any {
 
 // Minimal n8n-style template interpolation.
 // Supports: "{{ $json }}" and "{{ $json.some.path[0] }}".
+// Also detects and fixes malformed email templates like "{{ $json.email@domain.com }}"
 function interpolateTemplate(value: unknown, input: any): unknown {
   if (typeof value !== 'string') return value;
   if (!value.includes('{{')) return value;
@@ -203,7 +204,23 @@ function interpolateTemplate(value: unknown, input: any): unknown {
     }
   };
 
-  return value.replace(/{{\s*\$json(?:\.([^}]+))?\s*}}/g, (_match, rawExpr) => {
+  // First, detect and fix malformed email templates like "{{ $json.email@domain.com }}"
+  // This happens when the AI incorrectly wraps a literal email address in template syntax
+  const malformedEmailPattern = /{{\s*\$json\.([a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s*}}/g;
+  let processedValue = value.replace(malformedEmailPattern, (_match, email) => {
+    console.log(`[interpolate] Detected malformed email template, extracting literal: ${email}`);
+    return email;
+  });
+
+  // Also handle case where email is just wrapped without $json prefix
+  const simpleEmailPattern = /{{\s*([a-zA-Z0-9._+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s*}}/g;
+  processedValue = processedValue.replace(simpleEmailPattern, (_match, email) => {
+    console.log(`[interpolate] Detected simple email in template, extracting: ${email}`);
+    return email;
+  });
+
+  // Now process normal templates
+  return processedValue.replace(/{{\s*\$json(?:\.([^}]+))?\s*}}/g, (_match, rawExpr) => {
     const expr = typeof rawExpr === 'string' ? rawExpr.trim() : '';
     const parts = expr
       ? expr.split('|').map((p) => p.trim()).filter(Boolean)
