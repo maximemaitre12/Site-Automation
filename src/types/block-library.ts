@@ -1023,7 +1023,8 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
       { key: 'subject', label: 'Subject', type: 'expression', required: true, expressionEnabled: true, section: 'main' },
       { key: 'body', label: 'Body', type: 'text', required: true, expressionEnabled: true, section: 'main' },
       { key: 'cc', label: 'CC', type: 'expression', expressionEnabled: true, section: 'settings' },
-      { key: 'isHtml', label: 'HTML Format', type: 'boolean', defaultValue: false, section: 'settings' }
+      { key: 'isHtml', label: 'HTML Format', type: 'boolean', defaultValue: false, section: 'settings' },
+      { key: 'attachDocument', label: 'Attach generated document', type: 'boolean', defaultValue: false, helpText: 'Attach PDF/Word document from previous block', section: 'settings' }
     ],
     inputs: 1,
     outputs: 1
