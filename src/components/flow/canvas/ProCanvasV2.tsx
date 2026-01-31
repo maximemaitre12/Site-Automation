@@ -217,22 +217,38 @@ function ProCanvasV2Component({
     const containerRect = containerRef.current.getBoundingClientRect();
     const positions = blocks.map(b => b.position);
     
-    const minX = Math.min(...positions.map(p => p.x)) - 100;
-    const minY = Math.min(...positions.map(p => p.y)) - 100;
-    const maxX = Math.max(...positions.map(p => p.x + NODE_WIDTH)) + 100;
-    const maxY = Math.max(...positions.map(p => p.y + NODE_TOTAL_HEIGHT)) + 100;
+    // Calculate bounding box of all blocks
+    const minX = Math.min(...positions.map(p => p.x));
+    const minY = Math.min(...positions.map(p => p.y));
+    const maxX = Math.max(...positions.map(p => p.x + NODE_WIDTH));
+    const maxY = Math.max(...positions.map(p => p.y + NODE_TOTAL_HEIGHT));
     
     const contentWidth = maxX - minX;
     const contentHeight = maxY - minY;
     
-    const scaleX = containerRect.width / contentWidth;
-    const scaleY = containerRect.height / contentHeight;
-    const newZoom = Math.min(scaleX, scaleY, 1.5) * 0.9;
+    // Calculate center of the content
+    const contentCenterX = minX + contentWidth / 2;
+    const contentCenterY = minY + contentHeight / 2;
+    
+    // Calculate zoom to fit content with padding
+    const padding = 100;
+    const availableWidth = containerRect.width - padding * 2;
+    const availableHeight = containerRect.height - padding * 2;
+    
+    const scaleX = availableWidth / contentWidth;
+    const scaleY = availableHeight / contentHeight;
+    
+    // Use the smaller scale, but cap at 1.5 for readability and min at 0.3
+    const newZoom = Math.max(0.3, Math.min(scaleX, scaleY, 1.5));
+    
+    // Calculate pan to center the content in viewport
+    const viewportCenterX = containerRect.width / 2;
+    const viewportCenterY = containerRect.height / 2;
     
     setZoom(newZoom);
     setPan({
-      x: -minX * newZoom + (containerRect.width - contentWidth * newZoom) / 2,
-      y: -minY * newZoom + (containerRect.height - contentHeight * newZoom) / 2,
+      x: viewportCenterX - contentCenterX * newZoom,
+      y: viewportCenterY - contentCenterY * newZoom,
     });
   }, [blocks]);
 
