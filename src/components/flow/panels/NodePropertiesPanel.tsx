@@ -100,9 +100,19 @@ function NodePropertiesPanelComponent({
 
   const handleOAuthConnect = async (provider: string) => {
     if (provider.toLowerCase() === 'google') {
+      // Get credentials from block config
+      const clientId = block?.config?.googleClientId;
+      const clientSecret = block?.config?.googleClientSecret;
+      
       // Determine scopes based on block type
       const scopes = ['gmail.readonly', 'gmail.send'];
-      await connectGoogle(scopes);
+      
+      // Pass user-provided credentials if available
+      const credentials = clientId && clientSecret 
+        ? { clientId, clientSecret } 
+        : undefined;
+        
+      await connectGoogle(scopes, credentials);
     } else {
       toast.info(`Connexion OAuth ${provider}`, {
         description: 'Ce fournisseur n\'est pas encore supporté.',
@@ -186,6 +196,9 @@ function NodePropertiesPanelComponent({
         );
       
       case 'oauth_button':
+        // Check if user has provided credentials in the block config
+        const hasCredentials = block?.config?.googleClientId && block?.config?.googleClientSecret;
+        
         // Show connected state if Google OAuth is connected
         if (googleOAuthStatus?.connected && googleOAuthStatus.email) {
           return (
@@ -215,16 +228,20 @@ function NodePropertiesPanelComponent({
           );
         }
         
-        // Show connect button
+        // Show message if credentials are not configured
+        if (!hasCredentials) {
+          return (
+            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <p className="text-[10px] text-amber-700">
+                Renseignez d'abord votre Google Client ID et Client Secret ci-dessus pour activer la connexion OAuth.
+              </p>
+            </div>
+          );
+        }
+        
+        // Show connect button when credentials are available
         return (
           <div className="space-y-2">
-            {!googleOAuthStatus?.configured && (
-              <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <p className="text-[10px] text-amber-700">
-                  OAuth non configuré. Ajoutez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans Cloud → Secrets.
-                </p>
-              </div>
-            )}
             <Button
               variant="outline"
               size="sm"
@@ -237,8 +254,11 @@ function NodePropertiesPanelComponent({
               ) : (
                 <ExternalLink className="w-4 h-4" />
               )}
-              Connecter via Google OAuth
+              Connecter votre compte Google
             </Button>
+            <p className="text-[10px] text-muted-foreground">
+              Vous serez redirigé vers Google pour autoriser l'accès.
+            </p>
           </div>
         );
       

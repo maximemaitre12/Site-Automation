@@ -351,8 +351,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      // Section: Connexion OAuth
-      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail pour accéder à vos emails', section: 'connection' },
+      // Section: Configuration API Google
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
+      // Section: Connexion compte
+      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
       // Section: Filtres
       { key: 'subjectFilter', label: 'Filtre sujet', type: 'text', placeholder: 'Invoice* ou *Facture*', section: 'filters' },
       { key: 'fromFilter', label: 'Filtre expéditeur', type: 'text', placeholder: 'client@exemple.com', section: 'filters' },
@@ -373,8 +376,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      // Section: Connexion OAuth
-      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
+      // Section: Configuration API Google
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
+      // Section: Connexion compte
+      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
       // Section: Filtres de lecture
       { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com', section: 'filters' },
       { key: 'folder', label: 'Dossier', type: 'select', options: ['INBOX', 'SENT', 'DRAFTS', 'SPAM', 'TRASH', 'ALL'], defaultValue: 'INBOX', section: 'filters' },
@@ -394,8 +400,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      // Section: Connexion OAuth
-      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
+      // Section: Configuration API Google
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
+      // Section: Connexion compte
+      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
       // Section: Message
       { key: 'to', label: 'Destinataire(s)', type: 'text', placeholder: 'email@example.com', required: true, section: 'message' },
       { key: 'cc', label: 'CC', type: 'text', placeholder: 'cc@email.com', section: 'message' },
@@ -416,8 +425,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      // Section: Connexion OAuth
-      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
+      // Section: Configuration API Google
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
+      // Section: Connexion compte
+      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
       // Section: Réponse
       { key: 'messageId', label: 'ID du message (auto si précédent)', type: 'text', placeholder: 'Laissez vide pour répondre au dernier email lu', section: 'reply' },
       { key: 'body', label: 'Réponse', type: 'textarea', required: true, section: 'reply' },
@@ -435,8 +447,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      // Section: Connexion OAuth
-      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
+      // Section: Configuration API Google
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
+      // Section: Connexion compte
+      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
       // Section: Actions
       { key: 'messageId', label: 'ID du message', type: 'text', required: true },
       { key: 'addLabels', label: 'Ajouter libellés', type: 'text', placeholder: 'IMPORTANT, STARRED' },
@@ -453,8 +468,11 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     isRealAction: true,
     requiresAuth: true,
     configFields: [
-      // Section: Connexion OAuth
-      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
+      // Section: Configuration API Google
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', placeholder: 'Votre Client ID depuis Google Cloud Console', required: true, section: 'connection', helpText: 'Obtenez-le sur console.cloud.google.com → Credentials' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', placeholder: 'Votre Client Secret', required: true, section: 'connection', helpText: 'Gardez cette valeur secrète' },
+      // Section: Connexion compte
+      { key: 'googleOAuth', label: 'Connecter votre compte', type: 'oauth_button', helpText: 'Une fois les credentials configurés, connectez votre Gmail', section: 'connection' },
       // Section: Recherche
       { key: 'query', label: 'Requête', type: 'text', placeholder: 'from:boss@company.com subject:urgent', required: true, section: 'search' },
       { key: 'maxResults', label: 'Résultats max', type: 'number', defaultValue: 20, section: 'search' },

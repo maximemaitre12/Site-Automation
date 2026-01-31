@@ -35,10 +35,9 @@ serve(async (req) => {
       );
     }
 
-    // Check if Google OAuth is configured at platform level
-    const clientId = Deno.env.get('GOOGLE_CLIENT_ID');
-    const clientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET');
-    const isConfigured = !!(clientId && clientSecret);
+    // No longer check for platform-level configuration since users provide their own credentials
+    // configured is always true in this new model
+    const isConfigured = true;
 
     // Check if user has connected their Google account
     const { data: tokenData, error: tokenError } = await supabase

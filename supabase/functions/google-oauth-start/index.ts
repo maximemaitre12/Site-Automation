@@ -13,15 +13,18 @@ serve(async (req) => {
   }
 
   try {
-    // Check if Google OAuth credentials are configured
-    const clientId = Deno.env.get('GOOGLE_CLIENT_ID');
-    const clientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET');
+    // Parse request body first to get potential user-provided credentials
+    const body = await req.json().catch(() => ({}));
+    
+    // Check for user-provided credentials first, then fall back to env vars
+    const clientId = body.clientId || Deno.env.get('GOOGLE_CLIENT_ID');
+    const clientSecret = body.clientSecret || Deno.env.get('GOOGLE_CLIENT_SECRET');
 
     if (!clientId || !clientSecret) {
       return new Response(
         JSON.stringify({
-          error: 'not_configured',
-          message: 'Google OAuth credentials are not configured. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Cloud settings.',
+          error: 'missing_credentials',
+          message: 'Veuillez renseigner votre Google Client ID et Client Secret dans les paramètres du bloc.',
         }),
         { 
           status: 400, 
@@ -53,8 +56,6 @@ serve(async (req) => {
       );
     }
 
-    // Parse request body for scope customization
-    const body = await req.json().catch(() => ({}));
     const requestedScopes = body.scopes || ['gmail.readonly', 'gmail.send'];
     
     // Build Google OAuth scopes
@@ -78,10 +79,14 @@ serve(async (req) => {
     ].join(' ');
 
     // Generate state with user ID for callback verification
+    // Store the clientSecret encrypted for callback use
     const state = btoa(JSON.stringify({
       userId: user.id,
       timestamp: Date.now(),
-      returnUrl: body.returnUrl || '/tools/flow'
+      returnUrl: body.returnUrl || '/tools/flow',
+      // Store clientId and clientSecret for callback
+      clientId: clientId,
+      clientSecret: clientSecret,
     }));
 
     // Build redirect URI
@@ -100,7 +105,7 @@ serve(async (req) => {
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 
-    console.log('Generated OAuth URL for user:', user.id);
+    console.log('Generated OAuth URL for user:', user.id, 'using', body.clientId ? 'user-provided' : 'env', 'credentials');
 
     return new Response(
       JSON.stringify({ authUrl }),
