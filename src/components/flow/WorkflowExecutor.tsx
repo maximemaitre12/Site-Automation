@@ -147,15 +147,29 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
   };
 
   const maybeAutoDownload = async (execution: any) => {
-    const out = execution?.output;
-    if (!out) return;
-    
-    // Handle various document types from the backend
     const downloadableTypes = ['download', 'pdf_document', 'word_document'];
-    if (!downloadableTypes.includes(out.type)) return;
-
-    const payload = out._downloadData || out;
-    await downloadFile(payload.filename, payload.content, payload.mimeType, payload.format, payload.title);
+    
+    // First, check the final output
+    const out = execution?.output;
+    if (out && downloadableTypes.includes(out.type)) {
+      const payload = out._downloadData || out;
+      await downloadFile(payload.filename, payload.content, payload.mimeType, payload.format, payload.title);
+      return;
+    }
+    
+    // If final output is not a document, search through execution logs for document blocks
+    const executionLogs = execution?.logs || [];
+    for (const log of executionLogs) {
+      const logOutput = log?.output;
+      if (logOutput && downloadableTypes.includes(logOutput.type)) {
+        const payload = logOutput._downloadData || logOutput;
+        if (payload.content && payload.content.length > 0) {
+          console.log('Found downloadable document in logs:', payload.filename);
+          await downloadFile(payload.filename, payload.content, payload.mimeType, payload.format, payload.title);
+          return; // Download only the first document found
+        }
+      }
+    }
   };
 
   const handleRun = async (autoInput?: string) => {
