@@ -202,18 +202,36 @@ function NodePropertiesPanelComponent({
         // Show connected state if Google OAuth is connected
         if (googleOAuthStatus?.connected && googleOAuthStatus.email) {
           return (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="flex items-center gap-2 p-2 rounded-lg bg-green-500/10 border border-green-500/20">
                 <CheckCircle2 className="w-4 h-4 text-green-600" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-green-700">Connecté</p>
+                  <p className="text-xs font-medium text-green-700">Compte connecté</p>
                   <p className="text-[10px] text-green-600 truncate">{googleOAuthStatus.email}</p>
                 </div>
               </div>
+              
+              {/* Switch account button */}
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full h-8 gap-2 text-xs text-muted-foreground"
+                className="w-full h-8 gap-2 text-xs"
+                onClick={() => handleOAuthConnect('Google')}
+                disabled={googleOAuthLoading || !hasCredentials}
+              >
+                {googleOAuthLoading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3 h-3" />
+                )}
+                Changer de compte
+              </Button>
+              
+              {/* Disconnect button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full h-7 gap-2 text-[10px] text-muted-foreground hover:text-destructive"
                 onClick={disconnectGoogle}
                 disabled={googleOAuthLoading}
               >
@@ -222,7 +240,7 @@ function NodePropertiesPanelComponent({
                 ) : (
                   <LogOut className="w-3 h-3" />
                 )}
-                Déconnecter
+                Déconnecter ce compte
               </Button>
             </div>
           );
