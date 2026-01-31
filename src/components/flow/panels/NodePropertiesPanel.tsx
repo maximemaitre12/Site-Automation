@@ -29,6 +29,7 @@ interface NodePropertiesPanelProps {
 
 // Section labels for better UX
 const SECTION_LABELS: Record<string, { label: string; icon: typeof Settings }> = {
+  connection: { label: 'Connexion Email', icon: Mail },
   auth: { label: 'Authentification', icon: Key },
   filters: { label: 'Filtres', icon: Settings },
   message: { label: 'Message', icon: Mail },
@@ -47,7 +48,7 @@ function NodePropertiesPanelComponent({
   onClose,
 }: NodePropertiesPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['config', 'auth', 'filters', 'message', 'format', 'destinations'])
+    new Set(['config', 'connection', 'auth', 'filters', 'message', 'format', 'destinations'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
   
@@ -401,9 +402,9 @@ function NodePropertiesPanelComponent({
     );
   };
 
-  // Get ordered sections (auth first, then others, default last)
+  // Get ordered sections (connection first, then others, default last)
   const orderedSections = useMemo(() => {
-    const order = ['auth', 'filters', 'message', 'reply', 'search', 'format', 'destinations', 'advanced', 'default'];
+    const order = ['connection', 'auth', 'filters', 'message', 'reply', 'search', 'format', 'destinations', 'advanced', 'default'];
     return order.filter(s => fieldsBySection[s]?.length > 0);
   }, [fieldsBySection]);
 
