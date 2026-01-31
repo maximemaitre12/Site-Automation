@@ -62,7 +62,7 @@ function ProWorkflowNodeComponent({
   const n8nDef = N8N_BLOCK_DEFINITIONS[block.type as keyof typeof N8N_BLOCK_DEFINITIONS];
   const definition = legacyDef || n8nDef;
   const category = definition?.category || 'system';
-  const colors = categoryColors[category];
+  const colors = categoryColors[category] || categoryColors.system;
   const status = statusConfig[visualState.executionStatus] || statusConfig.idle;
 
   const IconComponent = useMemo(() => {
