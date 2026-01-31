@@ -14,7 +14,7 @@ import {
   X, ChevronRight, Settings, RefreshCw, 
   FileJson, Zap, AlertCircle, CheckCircle2,
   Eye, EyeOff, ExternalLink, Key, Shield, Copy,
-  Mail, FolderOpen, Tag, Loader2, LogOut
+  Mail, FolderOpen, Tag, Loader2, LogOut, Brain
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGoogleOAuth } from '@/hooks/useGoogleOAuth';
@@ -31,13 +31,15 @@ interface NodePropertiesPanelProps {
 const SECTION_LABELS: Record<string, { label: string; icon: typeof Settings }> = {
   connection: { label: 'Connexion Google OAuth', icon: Mail },
   auth: { label: 'Authentification', icon: Key },
+  ai_model: { label: '🤖 Modèle IA', icon: Zap },
   filters: { label: 'Filtres', icon: Settings },
   message: { label: 'Message', icon: Mail },
   reply: { label: 'Réponse', icon: Mail },
   search: { label: 'Recherche', icon: Settings },
   format: { label: 'Format', icon: FileJson },
+  general: { label: '⚙️ Paramètres', icon: Settings },
   destinations: { label: 'Destinations', icon: FolderOpen },
-  advanced: { label: 'Options avancées', icon: Settings },
+  advanced: { label: '🔧 Options avancées', icon: Settings },
 };
 
 function NodePropertiesPanelComponent({
@@ -48,7 +50,7 @@ function NodePropertiesPanelComponent({
   onClose,
 }: NodePropertiesPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['config', 'connection', 'auth', 'filters', 'message', 'format', 'destinations'])
+    new Set(['config', 'connection', 'auth', 'ai_model', 'general', 'filters', 'message', 'format', 'destinations'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
   const [showOAuthConfig, setShowOAuthConfig] = useState(false);
@@ -578,9 +580,9 @@ function NodePropertiesPanelComponent({
     );
   };
 
-  // Get ordered sections (connection first, then others, default last)
+  // Get ordered sections (connection first, then AI model, then others, default last)
   const orderedSections = useMemo(() => {
-    const order = ['connection', 'auth', 'filters', 'message', 'reply', 'search', 'format', 'destinations', 'advanced', 'default'];
+    const order = ['connection', 'auth', 'ai_model', 'general', 'filters', 'message', 'reply', 'search', 'format', 'destinations', 'advanced', 'default'];
     return order.filter(s => fieldsBySection[s]?.length > 0);
   }, [fieldsBySection]);
 
