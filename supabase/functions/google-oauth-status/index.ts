@@ -47,7 +47,7 @@ serve(async (req) => {
       .eq('provider', 'google')
       .single();
 
-    const isConnected = !tokenError && tokenData;
+    const isConnected = !tokenError && !!tokenData;
     const isExpired = tokenData?.expires_at 
       ? new Date(tokenData.expires_at) < new Date()
       : false;
