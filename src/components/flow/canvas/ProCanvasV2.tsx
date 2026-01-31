@@ -264,32 +264,29 @@ function ProCanvasV2Component({
 
   // Auto-fit view when fitViewKey changes (workflow selection)
   const previousFitViewKeyRef = useRef<string | null | undefined>(undefined);
+  const pendingFitViewRef = useRef(false);
+  
+  // Track when fitViewKey changes
   useEffect(() => {
-    // Skip initial mount (undefined) and when key hasn't actually changed
-    if (previousFitViewKeyRef.current === undefined) {
+    if (previousFitViewKeyRef.current !== fitViewKey) {
       previousFitViewKeyRef.current = fitViewKey;
-      // Still fit on initial load if there are blocks
-      if (fitViewKey && blocks.length > 0) {
-        // Small delay to ensure container is sized
-        const timer = setTimeout(() => {
-          handleFitView();
-        }, 50);
-        return () => clearTimeout(timer);
-      }
-      return;
-    }
-    
-    if (fitViewKey !== previousFitViewKeyRef.current) {
-      previousFitViewKeyRef.current = fitViewKey;
-      if (fitViewKey && blocks.length > 0) {
-        // Small delay to ensure blocks are rendered
-        const timer = setTimeout(() => {
-          handleFitView();
-        }, 50);
-        return () => clearTimeout(timer);
+      if (fitViewKey) {
+        pendingFitViewRef.current = true;
       }
     }
-  }, [fitViewKey, blocks.length, handleFitView]);
+  }, [fitViewKey]);
+  
+  // Execute fit view when blocks are available
+  useEffect(() => {
+    if (pendingFitViewRef.current && blocks.length > 0 && containerRef.current) {
+      pendingFitViewRef.current = false;
+      // Small delay to ensure container is sized and blocks rendered
+      const timer = setTimeout(() => {
+        handleFitView();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [blocks.length, handleFitView]);
 
   const handleAutoLayout = useCallback(() => {
     const layout = autoLayoutBlocks(blocks, connections, { direction: 'horizontal' });
