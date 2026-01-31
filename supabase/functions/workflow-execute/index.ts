@@ -657,7 +657,31 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
           block.config?.filename || defaultFilename,
           inputData
         ) as string) || defaultFilename;
-        const resolvedContent = interpolateTemplate(block.config?.content || '', inputData) as string;
+        
+        // Try to resolve content from config, or fallback to common content fields from input
+        let resolvedContent = interpolateTemplate(block.config?.content || '', inputData) as string;
+        
+        // If content is empty, try to extract from common input fields (ai_generate outputs "generated")
+        if (!resolvedContent || resolvedContent.trim() === '') {
+          if (typeof inputData === 'string') {
+            resolvedContent = inputData;
+          } else if (inputData && typeof inputData === 'object') {
+            // Check common content fields from AI generation blocks
+            resolvedContent = inputData.generated || 
+                             inputData.text_content || 
+                             inputData.content || 
+                             inputData.text || 
+                             inputData.output ||
+                             inputData.result ||
+                             '';
+            // If still object, stringify it
+            if (typeof resolvedContent === 'object') {
+              resolvedContent = JSON.stringify(resolvedContent, null, 2);
+            }
+          }
+        }
+        
+        console.log(`Generate document: format=${format}, title="${resolvedTitle}", contentLength=${(resolvedContent || '').length}`);
 
         if (format === 'pdf') {
           // PDF document - provide structured data for frontend PDF generation
