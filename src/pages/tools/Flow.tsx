@@ -499,6 +499,10 @@ export default function Flow() {
                         workflowId={selectedWorkflow.id}
                         workflowName={selectedWorkflow.name}
                         onRunCreated={(runId, logs, output) => handleRunCompleted(selectedWorkflow.id, logs, output)}
+                        onFocusBlock={(blockId) => {
+                          setIsPaletteOpen(false);
+                          setSelectedBlockId(blockId);
+                        }}
                       />
                     </div>
                   </div>

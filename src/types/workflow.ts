@@ -124,6 +124,20 @@ export type BlockCategory =
 export type ExecutionStatus = 'idle' | 'pending' | 'running' | 'success' | 'error' | 'skipped' | 'cancelled';
 export type ActionType = 'real' | 'simulated' | 'ai';
 
+export interface WorkflowErrorField {
+  field: string;
+  message: string;
+  value?: any;
+  resolvedValue?: any;
+}
+
+export interface WorkflowErrorDetails {
+  code?: string;
+  message: string;
+  hint?: string;
+  fields?: WorkflowErrorField[];
+}
+
 export interface BlockConnection {
   id: string;
   sourceBlockId: string;
@@ -188,6 +202,7 @@ export interface WorkflowRunLog {
   timestamp: string;
   retryCount?: number;
   error?: string;
+  errorDetails?: WorkflowErrorDetails;
   actionType?: ActionType;
   isLive?: boolean;
 }

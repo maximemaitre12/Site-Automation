@@ -1,4 +1,4 @@
-import { WorkflowBlock, WorkflowRunLog, BLOCK_DEFINITIONS, BlockConnection } from '@/types/workflow';
+import { WorkflowBlock, WorkflowRunLog, WorkflowErrorDetails, BLOCK_DEFINITIONS, BlockConnection } from '@/types/workflow';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ExecutionContext {
@@ -22,7 +22,16 @@ export async function executeWorkflowViaServer(
   initialInput: any,
   workflowId?: string,
   variables?: Record<string, any>
-): Promise<{ success: boolean; output: any; error?: string; logs: WorkflowRunLog[] }> {
+): Promise<{
+  success: boolean;
+  output: any;
+  error?: string;
+  errorDetails?: WorkflowErrorDetails;
+  failedBlockId?: string;
+  failedBlockName?: string;
+  failedBlockType?: string;
+  logs: WorkflowRunLog[];
+}> {
   try {
     // Get user session for authentication
     const { data: { session } } = await supabase.auth.getSession();
@@ -55,6 +64,10 @@ export async function executeWorkflowViaServer(
       success: result.success,
       output: result.output,
       error: result.error,
+      errorDetails: result.errorDetails,
+      failedBlockId: result.failedBlockId,
+      failedBlockName: result.failedBlockName,
+      failedBlockType: result.failedBlockType,
       logs: result.logs || [],
     };
   } catch (error) {

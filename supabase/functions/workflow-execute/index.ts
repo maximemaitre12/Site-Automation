@@ -300,6 +300,21 @@ interface ExecutionLog {
   timestamp: string;
   retryCount?: number;
   error?: string;
+  errorDetails?: ExecutionErrorDetails;
+}
+
+interface ExecutionErrorField {
+  field: string;
+  message: string;
+  value?: any;
+  resolvedValue?: any;
+}
+
+interface ExecutionErrorDetails {
+  code?: string;
+  message: string;
+  hint?: string;
+  fields?: ExecutionErrorField[];
 }
 
 interface ExecutionContext {
@@ -344,13 +359,17 @@ async function callLovableAI(prompt: string, systemPrompt?: string): Promise<str
 }
 
 // Execute a single block
-async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Promise<{ output: any; error?: string }> {
+async function executeBlock(
+  block: WorkflowBlock,
+  context: ExecutionContext
+): Promise<{ output: any; error?: string; errorDetails?: ExecutionErrorDetails }> {
   const inputText = typeof context.input === 'string' 
     ? context.input 
     : JSON.stringify(context.input, null, 2);
 
   try {
     let output: any;
+    let errorDetails: ExecutionErrorDetails | undefined;
 
     switch (block.type) {
       // ===== TRIGGERS - Real Data Capture =====
@@ -3002,17 +3021,50 @@ Only output JSON, no other text.`;
         console.log(`[send_email] Attempting to send email to: ${to}, subject: ${subject}`);
 
         if (!userId) {
-          output = { sent: false, error: 'User ID required for email sending' };
+          const message = 'User ID required for email sending';
+          output = {
+            sent: false,
+            error: message,
+            errorDetails: {
+              code: 'AUTH_REQUIRED',
+              message,
+              hint: 'Connectez-vous puis relancez le workflow.'
+            }
+          };
           break;
         }
 
         if (!to || !to.includes('@')) {
-          output = { sent: false, error: `Adresse email invalide: "${to}". Vérifiez la configuration du bloc.` };
+          const message = `Adresse email invalide: "${to}". Vérifiez la configuration du bloc.`;
+          output = {
+            sent: false,
+            error: message,
+            errorDetails: {
+              code: 'INVALID_EMAIL',
+              message,
+              hint: 'Ouvrez le bloc “Send Email” et vérifiez le champ “To” (expression). Il doit retourner une adresse email valide.',
+              fields: [
+                { field: 'to', message: 'Adresse email invalide ou vide après interpolation.', value: rawTo, resolvedValue: to }
+              ]
+            }
+          };
           break;
         }
 
         if (!body || body.trim().length < 10) {
-          output = { sent: false, error: 'Le corps de l\'email est vide ou trop court.' };
+          const message = 'Le corps de l\'email est vide ou trop court.';
+          output = {
+            sent: false,
+            error: message,
+            errorDetails: {
+              code: 'EMAIL_BODY_TOO_SHORT',
+              message,
+              hint: 'Ouvrez le bloc “Send Email” et vérifiez le champ “Body”. Assurez-vous que l\'interpolation renvoie du texte non vide.',
+              fields: [
+                { field: 'body', message: 'Le contenu final est vide ou trop court après interpolation.', value: rawBody, resolvedValue: body }
+              ]
+            }
+          };
           break;
         }
 
@@ -3269,12 +3321,31 @@ Only output JSON, no other text.`;
         output = context.input;
     }
 
-    return { output };
+    // If a block chose to return an error inside its output, treat it as a blocking error.
+    // Non-blocking situations should use `warning` instead of `error`.
+    const outputError =
+      output && typeof output === 'object' && typeof output.error === 'string' && output.error.trim().length > 0
+        ? output.error
+        : undefined;
+
+    const outputErrorDetails =
+      output && typeof output === 'object' && output.errorDetails
+        ? (output.errorDetails as ExecutionErrorDetails)
+        : undefined;
+
+    return outputError
+      ? { output, error: outputError, errorDetails: outputErrorDetails ?? errorDetails }
+      : { output };
   } catch (error) {
     console.error(`Block ${block.name} (${block.type}) error:`, error);
     return { 
       output: null, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      errorDetails: {
+        code: 'UNHANDLED_EXCEPTION',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        hint: 'Vérifiez les paramètres du bloc et relancez. Si le problème persiste, simplifiez les expressions et testez bloc par bloc.'
+      }
     };
   }
 }
@@ -3284,7 +3355,16 @@ async function executeWorkflow(
   blocks: WorkflowBlock[],
   initialInput: any,
   variables: Record<string, any> = {}
-): Promise<{ success: boolean; output: any; error?: string; logs: ExecutionLog[] }> {
+): Promise<{
+  success: boolean;
+  output: any;
+  error?: string;
+  errorDetails?: ExecutionErrorDetails;
+  failedBlockId?: string;
+  failedBlockName?: string;
+  failedBlockType?: string;
+  logs: ExecutionLog[];
+}> {
   const logs: ExecutionLog[] = [];
   let currentInput = initialInput;
   const outputs: Record<string, any> = {};
@@ -3315,7 +3395,7 @@ async function executeWorkflow(
 
     try {
       // Retry logic
-      let result: { output: any; error?: string } = { output: null };
+      let result: { output: any; error?: string; errorDetails?: ExecutionErrorDetails } = { output: null };
       const maxRetries = block.retryConfig?.enabled ? (block.retryConfig.maxRetries || 3) : 1;
       const backoffMs = block.retryConfig?.backoffMs || 1000;
 
@@ -3341,10 +3421,20 @@ async function executeWorkflow(
         log.status = 'error';
         log.error = result.error;
         log.output = { error: result.error };
+        log.errorDetails = result.errorDetails;
         logs.push(log);
         
         console.error(`Block ${block.name} failed:`, result.error);
-        return { success: false, output: null, error: result.error, logs };
+        return {
+          success: false,
+          output: null,
+          error: result.error,
+          errorDetails: result.errorDetails,
+          failedBlockId: block.id,
+          failedBlockName: block.name,
+          failedBlockType: block.type,
+          logs
+        };
       }
 
       log.status = 'success';
@@ -3364,10 +3454,24 @@ async function executeWorkflow(
       log.status = 'error';
       log.error = error instanceof Error ? error.message : 'Unknown error';
       log.output = { error: log.error };
+      log.errorDetails = {
+        code: 'UNHANDLED_EXCEPTION',
+        message: log.error,
+        hint: 'Vérifiez les paramètres du bloc et relancez. Si le problème persiste, simplifiez les expressions et testez bloc par bloc.'
+      };
       logs.push(log);
       
       console.error(`Block ${block.name} exception:`, error);
-      return { success: false, output: null, error: log.error, logs };
+      return {
+        success: false,
+        output: null,
+        error: log.error,
+        errorDetails: log.errorDetails,
+        failedBlockId: block.id,
+        failedBlockName: block.name,
+        failedBlockType: block.type,
+        logs
+      };
     }
 
     logs.push(log);
