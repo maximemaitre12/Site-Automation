@@ -267,22 +267,48 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
     inputs: 0,
     outputs: 1
   },
+  // Gmail Trigger (OAuth) - aligned with backend workflow-execute
+  {
+    type: 'trigger_gmail',
+    name: 'Gmail Trigger',
+    category: 'trigger',
+    icon: 'Mail',
+    color: '#ef4444',
+    description: 'Récupère le dernier email via Gmail OAuth',
+    isRealAction: true,
+    requiresAuth: true,
+    popular: true,
+    params: [
+      { key: 'provider', label: 'Provider', type: 'select', options: [
+        { label: 'Gmail (OAuth)', value: 'gmail' }
+      ], defaultValue: 'gmail', section: 'main' },
+      { key: 'query', label: 'Requête Gmail', type: 'string', placeholder: 'in:inbox', defaultValue: 'in:inbox', section: 'main', helpText: 'Syntaxe Gmail (ex: in:inbox is:unread)' },
+      { key: 'maxResults', label: 'Nombre max d\'emails', type: 'number', defaultValue: 1, section: 'settings' },
+      // OAuth credentials (needed for BYOK flow)
+      { key: 'clientId', label: 'Google Client ID', type: 'string', section: 'advanced', helpText: 'Requis pour la connexion OAuth' },
+      { key: 'clientSecret', label: 'Google Client Secret', type: 'string', section: 'advanced', helpText: 'Requis pour la connexion OAuth' }
+    ],
+    inputs: 0,
+    outputs: 1
+  },
+  // Legacy alias
   {
     type: 'email_trigger',
     name: 'Email Received',
     category: 'trigger',
     icon: 'Mail',
     color: '#ef4444',
-    description: 'Trigger when email is received',
+    description: 'Trigger when email is received (alias for trigger_gmail)',
     isRealAction: true,
     requiresAuth: true,
     params: [
       { key: 'provider', label: 'Email Provider', type: 'select', options: [
-        { label: 'Gmail (OAuth)', value: 'gmail' },
-        { label: 'Outlook (OAuth)', value: 'outlook' }
+        { label: 'Gmail (OAuth)', value: 'gmail' }
       ], defaultValue: 'gmail', section: 'main' },
-      { key: 'query', label: 'Filter Query', type: 'string', placeholder: 'is:unread', section: 'main' },
-      { key: 'maxResults', label: 'Max Emails', type: 'number', defaultValue: 10, section: 'settings' }
+      { key: 'query', label: 'Filter Query', type: 'string', placeholder: 'in:inbox', defaultValue: 'in:inbox', section: 'main' },
+      { key: 'maxResults', label: 'Max Emails', type: 'number', defaultValue: 1, section: 'settings' },
+      { key: 'clientId', label: 'Google Client ID', type: 'string', section: 'advanced' },
+      { key: 'clientSecret', label: 'Google Client Secret', type: 'string', section: 'advanced' }
     ],
     inputs: 0,
     outputs: 1

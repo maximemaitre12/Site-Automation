@@ -276,7 +276,7 @@ function NodePropertiesPanelComponent({
   };
 
   // ===== Gmail OAuth section (for email_trigger/trigger_gmail/email_oauth) =====
-  const isEmailTrigger = ['email_trigger', 'trigger_gmail', 'email_oauth'].includes(block.type);
+  const isEmailTrigger = ['email_trigger', 'trigger_gmail', 'email_oauth', 'trigger_email'].includes(block.type);
   const selectedProvider = block.config?.provider || 'gmail';
   const isGmailProvider = selectedProvider === 'gmail';
   const showOAuthSection = isEmailTrigger && isGmailProvider;
