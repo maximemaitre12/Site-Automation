@@ -511,6 +511,7 @@ export default function Flow() {
                         hasUnsavedChanges={hasUnsavedChanges}
                         onAutoLayout={handleAutoLayout}
                         onAddBlock={() => setIsBlockPickerOpen(true)}
+                        fitViewKey={selectedWorkflowId}
                       />
                     </div>
                     

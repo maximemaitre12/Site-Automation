@@ -67,6 +67,8 @@ interface ProCanvasV2Props {
   className?: string;
   onAutoLayout?: () => void;
   onAddBlock?: () => void;
+  /** Unique key to trigger auto-fit when workflow changes (e.g. workflow ID) */
+  fitViewKey?: string | null;
 }
 
 function ProCanvasV2Component({
@@ -96,6 +98,7 @@ function ProCanvasV2Component({
   className,
   onAutoLayout,
   onAddBlock,
+  fitViewKey,
 }: ProCanvasV2Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -259,7 +262,35 @@ function ProCanvasV2Component({
     });
   }, [blocks]);
 
-  // Auto layout
+  // Auto-fit view when fitViewKey changes (workflow selection)
+  const previousFitViewKeyRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    // Skip initial mount (undefined) and when key hasn't actually changed
+    if (previousFitViewKeyRef.current === undefined) {
+      previousFitViewKeyRef.current = fitViewKey;
+      // Still fit on initial load if there are blocks
+      if (fitViewKey && blocks.length > 0) {
+        // Small delay to ensure container is sized
+        const timer = setTimeout(() => {
+          handleFitView();
+        }, 50);
+        return () => clearTimeout(timer);
+      }
+      return;
+    }
+    
+    if (fitViewKey !== previousFitViewKeyRef.current) {
+      previousFitViewKeyRef.current = fitViewKey;
+      if (fitViewKey && blocks.length > 0) {
+        // Small delay to ensure blocks are rendered
+        const timer = setTimeout(() => {
+          handleFitView();
+        }, 50);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [fitViewKey, blocks.length, handleFitView]);
+
   const handleAutoLayout = useCallback(() => {
     const layout = autoLayoutBlocks(blocks, connections, { direction: 'horizontal' });
     const newBlocks = applyLayoutToBlocks(blocks, layout);
