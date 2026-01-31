@@ -295,6 +295,33 @@ function NodePropertiesPanelComponent({
       connectGoogle(['gmail.readonly', 'gmail.send'], clientId && clientSecret ? { clientId, clientSecret } : undefined);
     };
 
+    const renderGoogleCredentialsFields = (variant: 'compact' | 'full' = 'full') => (
+      <div className={cn(
+        "space-y-2 rounded-lg border border-border bg-muted/30",
+        variant === 'compact' ? 'p-2' : 'p-3'
+      )}>
+        <p className="text-[10px] text-muted-foreground font-medium">
+          Identifiants Google Cloud (Client ID / Secret)
+        </p>
+        <Input
+          value={block.config?.clientId || block.config?.googleClientId || ''}
+          onChange={(e) => handleConfigChange('clientId', e.target.value)}
+          placeholder="Client ID"
+          className={cn('text-xs', variant === 'compact' ? 'h-7' : 'h-8')}
+        />
+        <Input
+          type="password"
+          value={block.config?.clientSecret || block.config?.googleClientSecret || ''}
+          onChange={(e) => handleConfigChange('clientSecret', e.target.value)}
+          placeholder="Client Secret"
+          className={cn('text-xs', variant === 'compact' ? 'h-7' : 'h-8')}
+        />
+        <p className="text-[10px] text-muted-foreground">
+          Si vous voyez l’erreur “missing_credentials”, renseignez ces champs puis cliquez sur “Connecter/Reconnecter”.
+        </p>
+      </div>
+    );
+
     return (
       <Collapsible
         open={expandedSections.has('connection')}
@@ -342,6 +369,10 @@ function NodePropertiesPanelComponent({
                 <p className="text-xs text-muted-foreground mb-2">
                   Votre connexion Gmail a expiré. Reconnectez-vous pour continuer.
                 </p>
+
+                {/* Credentials are required for BYOK refresh/reconnect flows */}
+                {renderGoogleCredentialsFields('compact')}
+
                 <Button
                   variant="default"
                   size="sm"
@@ -358,23 +389,7 @@ function NodePropertiesPanelComponent({
                 <p className="text-xs text-muted-foreground">
                   Connectez votre compte Google pour accéder à Gmail.
                 </p>
-                {/* Optional: User-provided credentials for BYOK */}
-                <div className="space-y-2 p-2 rounded-lg bg-muted/30">
-                  <p className="text-[10px] text-muted-foreground font-medium">Credentials Google Cloud (optionnel)</p>
-                  <Input
-                    value={block.config?.clientId || block.config?.googleClientId || ''}
-                    onChange={(e) => handleConfigChange('clientId', e.target.value)}
-                    placeholder="Client ID"
-                    className="h-7 text-xs"
-                  />
-                  <Input
-                    type="password"
-                    value={block.config?.clientSecret || block.config?.googleClientSecret || ''}
-                    onChange={(e) => handleConfigChange('clientSecret', e.target.value)}
-                    placeholder="Client Secret"
-                    className="h-7 text-xs"
-                  />
-                </div>
+                {renderGoogleCredentialsFields('full')}
                 <Button
                   variant="default"
                   size="sm"
