@@ -1,5 +1,6 @@
 import { memo, useState, useMemo, useEffect } from 'react';
-import { WorkflowBlock, BLOCK_DEFINITIONS, ExecutionStatus, ConfigField } from '@/types/workflow';
+import { WorkflowBlock, ExecutionStatus } from '@/types/workflow';
+import { getBlockByType, BlockDefinition, BlockParam, BLOCK_LIBRARY } from '@/types/block-library';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import {
   X, ChevronRight, Settings, RefreshCw, 
   FileJson, Zap, AlertCircle, CheckCircle2,
   Eye, EyeOff, ExternalLink, Key, Shield, Copy,
-  Mail, FolderOpen, Tag, Loader2, LogOut, Brain
+  Mail, FolderOpen, Tag, Loader2, LogOut, Brain, Code, Box
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGoogleOAuth } from '@/hooks/useGoogleOAuth';
@@ -29,17 +30,10 @@ interface NodePropertiesPanelProps {
 
 // Section labels for better UX
 const SECTION_LABELS: Record<string, { label: string; icon: typeof Settings }> = {
-  connection: { label: 'Connexion Google OAuth', icon: Mail },
-  auth: { label: 'Authentification', icon: Key },
-  ai_model: { label: '🤖 Modèle IA', icon: Zap },
-  filters: { label: 'Filtres', icon: Settings },
-  message: { label: 'Message', icon: Mail },
-  reply: { label: 'Réponse', icon: Mail },
-  search: { label: 'Recherche', icon: Settings },
-  format: { label: 'Format', icon: FileJson },
-  general: { label: '⚙️ Paramètres', icon: Settings },
-  destinations: { label: 'Destinations', icon: FolderOpen },
-  advanced: { label: '🔧 Options avancées', icon: Settings },
+  main: { label: '⚙️ Paramètres', icon: Settings },
+  settings: { label: '🔧 Options', icon: Settings },
+  advanced: { label: '🔬 Avancé', icon: Code },
+  connection: { label: 'Connexion', icon: Mail },
 };
 
 function NodePropertiesPanelComponent({
@@ -50,27 +44,22 @@ function NodePropertiesPanelComponent({
   onClose,
 }: NodePropertiesPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['config', 'connection', 'auth', 'ai_model', 'general', 'filters', 'message', 'format', 'destinations'])
+    new Set(['main', 'settings', 'connection'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
-  const [showOAuthConfig, setShowOAuthConfig] = useState(false);
   
   // Google OAuth hook
   const { status: googleOAuthStatus, loading: googleOAuthLoading, connect: connectGoogle, disconnect: disconnectGoogle } = useGoogleOAuth();
 
-  // Reset showOAuthConfig when user becomes connected (after OAuth redirect)
-  useEffect(() => {
-    if (googleOAuthStatus?.connected) {
-      setShowOAuthConfig(false);
-    }
-  }, [googleOAuthStatus?.connected]);
-
   if (!block) return null;
 
-  const definition = BLOCK_DEFINITIONS[block.type];
+  // Get definition from BLOCK_LIBRARY (single source of truth)
+  const definition = getBlockByType(block.type);
+  
+  // Get icon component
   const Icon = definition?.icon 
-    ? (LucideIcons as any)[definition.icon] || LucideIcons.Box 
-    : LucideIcons.Box;
+    ? (LucideIcons as any)[definition.icon] || Box 
+    : Box;
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => {
@@ -108,257 +97,67 @@ function NodePropertiesPanelComponent({
     });
   };
 
-  const handleOAuthConnect = async (provider: string) => {
-    if (provider.toLowerCase() === 'google') {
-      // Get credentials from block config
-      const clientId = block?.config?.googleClientId;
-      const clientSecret = block?.config?.googleClientSecret;
-      
-      // Determine scopes based on block type
-      const scopes = ['gmail.readonly', 'gmail.send'];
-      
-      // Pass user-provided credentials if available
-      const credentials = clientId && clientSecret 
-        ? { clientId, clientSecret } 
-        : undefined;
-        
-      await connectGoogle(scopes, credentials);
-    } else {
-      toast.info(`Connexion OAuth ${provider}`, {
-        description: 'Ce fournisseur n\'est pas encore supporté.',
-      });
-    }
-  };
-
-  // Returns the effective config value for a key, falling back to the field defaultValue.
-  // This is important for conditional fields (showWhen) so defaults are respected even
-  // before the user manually touches the controlling field.
+  // Get effective config value with fallback to default
   const getEffectiveConfigValue = (key: string) => {
     const raw = block.config?.[key];
     if (raw !== undefined) return raw;
-    const fieldDef = definition?.configFields?.find((f) => f.key === key);
-    return fieldDef?.defaultValue;
+    const paramDef = definition?.params?.find((p) => p.key === key);
+    return paramDef?.defaultValue;
   };
 
-  // Check if field should be visible based on showWhen condition
-  const isFieldVisible = (field: ConfigField): boolean => {
-    if (!field.showWhen) return true;
-    const conditionValue = getEffectiveConfigValue(field.showWhen.field);
-    // Handle both value and notValue conditions
-    if ('value' in field.showWhen) {
-      return conditionValue === field.showWhen.value;
-    }
-    if ('notValue' in field.showWhen) {
-      return conditionValue !== field.showWhen.notValue;
-    }
-    return true;
+  // Check if param should be visible based on showWhen condition
+  const isParamVisible = (param: BlockParam): boolean => {
+    if (!param.showWhen) return true;
+    const conditionValue = getEffectiveConfigValue(param.showWhen.field);
+    return conditionValue === param.showWhen.value;
   };
 
-  // Group fields by section
-  const fieldsBySection = useMemo(() => {
-    const sections: Record<string, ConfigField[]> = { default: [] };
+  // Group params by section
+  const paramsBySection = useMemo(() => {
+    const sections: Record<string, BlockParam[]> = { main: [], settings: [], advanced: [] };
     
-    definition?.configFields.forEach((field) => {
-      if (!isFieldVisible(field)) return;
+    definition?.params?.forEach((param) => {
+      if (!isParamVisible(param)) return;
       
-      const sectionKey = field.section || 'default';
+      const sectionKey = param.section || 'main';
       if (!sections[sectionKey]) {
         sections[sectionKey] = [];
       }
-      sections[sectionKey].push(field);
+      sections[sectionKey].push(param);
     });
     
     return sections;
-  }, [definition?.configFields, block.config]);
+  }, [definition?.params, block.config]);
 
-  const renderField = (field: ConfigField) => {
-    const value = block.config[field.key];
-    const defaultVal = field.defaultValue;
+  const renderParam = (param: BlockParam) => {
+    const value = block.config?.[param.key];
+    const defaultVal = param.defaultValue;
 
-    switch (field.type) {
-      case 'text':
+    switch (param.type) {
+      case 'string':
+      case 'expression':
         return (
-          <Input
-            value={value || ''}
-            onChange={(e) => handleConfigChange(field.key, e.target.value)}
-            placeholder={field.placeholder}
-            className="h-8 text-sm"
-          />
-        );
-      
-      case 'password':
-        return (
-          <div className="relative">
+          <div className="space-y-1">
             <Input
-              type={showPasswords.has(field.key) ? 'text' : 'password'}
               value={value || ''}
-              onChange={(e) => handleConfigChange(field.key, e.target.value)}
-              placeholder={field.placeholder || '••••••••'}
-              className="h-8 text-sm pr-10"
+              onChange={(e) => handleConfigChange(param.key, e.target.value)}
+              placeholder={param.placeholder}
+              className={cn("h-8 text-sm", param.expressionEnabled && "font-mono")}
             />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-8 w-8 p-0"
-              onClick={() => togglePasswordVisibility(field.key)}
-            >
-              {showPasswords.has(field.key) ? (
-                <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />
-              ) : (
-                <Eye className="w-3.5 h-3.5 text-muted-foreground" />
-              )}
-            </Button>
-          </div>
-        );
-      
-      case 'oauth_button':
-        // Check if user has provided credentials in the block config
-        const hasCredentials = block?.config?.googleClientId && block?.config?.googleClientSecret;
-        
-        // Show connected state if Google OAuth is connected
-        if (googleOAuthStatus?.connected && googleOAuthStatus.email) {
-          return (
-            <div className="space-y-3">
-              {/* Account selector dropdown */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Compte à utiliser</Label>
-                <Select
-                  value={showOAuthConfig ? '__add_new__' : googleOAuthStatus.email}
-                  onValueChange={(val) => {
-                    if (val === '__add_new__') {
-                      setShowOAuthConfig(true);
-                    } else if (val === '__disconnect__') {
-                      disconnectGoogle();
-                    } else {
-                      setShowOAuthConfig(false);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="h-9 text-sm">
-                    <SelectValue>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                        <span className="truncate">{showOAuthConfig ? 'Nouveau compte...' : googleOAuthStatus.email}</span>
-                      </div>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {/* Current connected account */}
-                    <SelectItem value={googleOAuthStatus.email}>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                        <div className="flex flex-col">
-                          <span className="text-sm">{googleOAuthStatus.email}</span>
-                          <span className="text-[10px] text-muted-foreground">Google</span>
-                        </div>
-                      </div>
-                    </SelectItem>
-                    
-                    {/* Divider and add new account option */}
-                    <div className="h-px bg-border my-1" />
-                    <SelectItem value="__add_new__">
-                      <div className="flex items-center gap-2 text-primary">
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>Connecter un autre compte</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {/* Show config fields when adding a new account */}
-              {showOAuthConfig && (
-                <div className="space-y-3 pt-2 border-t">
-                  {hasCredentials ? (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full h-9 gap-2"
-                        onClick={() => handleOAuthConnect('Google')}
-                        disabled={googleOAuthLoading}
-                      >
-                        {googleOAuthLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <ExternalLink className="w-4 h-4" />
-                        )}
-                        Connecter le nouveau compte
-                      </Button>
-                      <p className="text-[10px] text-muted-foreground">
-                        Vous serez redirigé vers Google pour autoriser l'accès.
-                      </p>
-                    </>
-                  ) : (
-                    <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                      <p className="text-[10px] text-amber-700">
-                        Renseignez d'abord votre Google Client ID et Client Secret ci-dessous.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {/* Disconnect option - subtle at the bottom */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full h-7 gap-2 text-[10px] text-muted-foreground hover:text-destructive"
-                onClick={disconnectGoogle}
-                disabled={googleOAuthLoading}
-              >
-                {googleOAuthLoading ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <LogOut className="w-3 h-3" />
-                )}
-                Déconnecter ce compte
-              </Button>
-            </div>
-          );
-        }
-        
-        // Show message if credentials are not configured
-        if (!hasCredentials) {
-          return (
-            <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <p className="text-[10px] text-amber-700">
-                Renseignez d'abord votre Google Client ID et Client Secret ci-dessous pour activer la connexion OAuth.
+            {param.expressionEnabled && (
+              <p className="text-[9px] text-muted-foreground">
+                💡 Utilisez {'{{ $json.field }}'} pour les expressions
               </p>
-            </div>
-          );
-        }
-        
-        // Show connect button when credentials are available but not connected
-        return (
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full h-9 gap-2"
-              onClick={() => handleOAuthConnect('Google')}
-              disabled={googleOAuthLoading}
-            >
-              {googleOAuthLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ExternalLink className="w-4 h-4" />
-              )}
-              Connecter votre compte Google
-            </Button>
-            <p className="text-[10px] text-muted-foreground">
-              Vous serez redirigé vers Google pour autoriser l'accès.
-            </p>
+            )}
           </div>
         );
       
-      case 'textarea':
+      case 'text':
         return (
           <Textarea
             value={value || ''}
-            onChange={(e) => handleConfigChange(field.key, e.target.value)}
-            placeholder={field.placeholder}
+            onChange={(e) => handleConfigChange(param.key, e.target.value)}
+            placeholder={param.placeholder}
             className="text-sm min-h-[80px]"
           />
         );
@@ -368,8 +167,8 @@ function NodePropertiesPanelComponent({
           <Input
             type="number"
             value={value ?? defaultVal ?? ''}
-            onChange={(e) => handleConfigChange(field.key, Number(e.target.value))}
-            placeholder={field.placeholder}
+            onChange={(e) => handleConfigChange(param.key, Number(e.target.value))}
+            placeholder={param.placeholder}
             className="h-8 text-sm"
           />
         );
@@ -382,7 +181,7 @@ function NodePropertiesPanelComponent({
             </span>
             <Switch
               checked={value ?? defaultVal ?? false}
-              onCheckedChange={(checked) => handleConfigChange(field.key, checked)}
+              onCheckedChange={(checked) => handleConfigChange(param.key, checked)}
             />
           </div>
         );
@@ -390,18 +189,22 @@ function NodePropertiesPanelComponent({
       case 'select':
         return (
           <Select
-            value={value || defaultVal}
-            onValueChange={(val) => handleConfigChange(field.key, val)}
+            value={value || defaultVal || ''}
+            onValueChange={(val) => handleConfigChange(param.key, val)}
           >
             <SelectTrigger className="h-8 text-sm">
               <SelectValue placeholder="Sélectionner..." />
             </SelectTrigger>
             <SelectContent>
-              {field.options?.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {formatOptionLabel(option)}
-                </SelectItem>
-              ))}
+              {param.options?.map((option) => {
+                const optValue = typeof option === 'string' ? option : option.value;
+                const optLabel = typeof option === 'string' ? option : option.label;
+                return (
+                  <SelectItem key={optValue} value={optValue}>
+                    {optLabel}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         );
@@ -413,13 +216,50 @@ function NodePropertiesPanelComponent({
             onChange={(e) => {
               try {
                 const parsed = JSON.parse(e.target.value);
-                handleConfigChange(field.key, parsed);
+                handleConfigChange(param.key, parsed);
               } catch {
-                handleConfigChange(field.key, e.target.value);
+                handleConfigChange(param.key, e.target.value);
               }
             }}
-            placeholder={field.placeholder}
+            placeholder={param.placeholder}
             className="text-sm min-h-[60px] font-mono text-xs"
+          />
+        );
+      
+      case 'code':
+        return (
+          <Textarea
+            value={value || ''}
+            onChange={(e) => handleConfigChange(param.key, e.target.value)}
+            placeholder={param.placeholder || '// Your code here'}
+            className="text-sm min-h-[100px] font-mono text-xs"
+          />
+        );
+
+      case 'keyvalue':
+        return (
+          <Textarea
+            value={typeof value === 'string' ? value : JSON.stringify(value || {}, null, 2)}
+            onChange={(e) => {
+              try {
+                const parsed = JSON.parse(e.target.value);
+                handleConfigChange(param.key, parsed);
+              } catch {
+                handleConfigChange(param.key, e.target.value);
+              }
+            }}
+            placeholder='{"key": "value"}'
+            className="text-sm min-h-[60px] font-mono text-xs"
+          />
+        );
+
+      case 'cron':
+        return (
+          <Input
+            value={value || ''}
+            onChange={(e) => handleConfigChange(param.key, e.target.value)}
+            placeholder={param.placeholder || '0 9 * * 1-5'}
+            className="h-8 text-sm font-mono"
           />
         );
       
@@ -427,58 +267,20 @@ function NodePropertiesPanelComponent({
         return (
           <Input
             value={value || ''}
-            onChange={(e) => handleConfigChange(field.key, e.target.value)}
-            placeholder={field.placeholder}
+            onChange={(e) => handleConfigChange(param.key, e.target.value)}
+            placeholder={param.placeholder}
             className="h-8 text-sm"
           />
         );
     }
   };
 
-  const formatOptionLabel = (option: string): string => {
-    const labels: Record<string, string> = {
-      'oauth_google': '🔐 Google OAuth (recommandé)',
-      'api_key': '🔑 Clé API',
-      'imap': '📬 IMAP (tout fournisseur)',
-      'smtp': '📤 SMTP (tout fournisseur)',
-      'service_account': '🤖 Service Account',
-      'pdf': '📄 PDF',
-      'docx': '📝 Word (.docx)',
-      'xlsx': '📊 Excel (.xlsx)',
-      'csv': '📋 CSV',
-      'json': '🔧 JSON',
-      'txt': '📃 Texte brut',
-      'html': '🌐 HTML',
-      'md': '📝 Markdown',
-    };
-    return labels[option] || option;
-  };
-
-  const renderSection = (sectionKey: string, fields: ConfigField[]) => {
-    if (fields.length === 0) return null;
+  const renderSection = (sectionKey: string, params: BlockParam[]) => {
+    if (!params || params.length === 0) return null;
     
     const sectionInfo = SECTION_LABELS[sectionKey];
     const SectionIcon = sectionInfo?.icon || Settings;
     
-    if (sectionKey === 'default') {
-      // Render fields without section grouping
-      return fields.map((field) => (
-        <div key={field.key} className="space-y-1.5">
-          <Label className="text-xs font-medium flex items-center gap-1">
-            {field.label}
-            {field.required && <span className="text-red-500">*</span>}
-          </Label>
-          {renderField(field)}
-          {field.helpText && (
-            <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
-          )}
-        </div>
-      ));
-    }
-
-    // Redirect URI for Google OAuth configuration - use the custom domain
-    const GOOGLE_REDIRECT_URI = `https://aether-connect.com/oauth/google/callback`;
-
     return (
       <Collapsible
         key={sectionKey}
@@ -489,7 +291,7 @@ function NodePropertiesPanelComponent({
           <div className="flex items-center gap-2">
             <SectionIcon className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium">{sectionInfo?.label || sectionKey}</span>
-            <span className="text-xs text-muted-foreground">({fields.length})</span>
+            <span className="text-xs text-muted-foreground">({params.length})</span>
           </div>
           <ChevronRight className={cn(
             "w-4 h-4 text-muted-foreground transition-transform",
@@ -498,86 +300,15 @@ function NodePropertiesPanelComponent({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="p-3 space-y-4 border-l-2 border-muted ml-2">
-            {/* For connection section: check if we should show config fields */}
-            {sectionKey === 'connection' && (() => {
-              const isConnected = googleOAuthStatus?.connected && googleOAuthStatus.email;
-              const shouldShowConfigFields = !isConnected || showOAuthConfig;
-              
-              return (
-                <>
-                  {/* Show config instructions only when not connected or switching accounts */}
-                  {shouldShowConfigFields && (
-                    <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-blue-600" />
-                        <span className="text-xs font-medium text-blue-700">Configuration Google Cloud</span>
-                      </div>
-                      <p className="text-[10px] text-blue-600">
-                        Ajoutez cette URI de redirection dans votre{' '}
-                        <a 
-                          href="https://console.cloud.google.com/apis/credentials" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="underline hover:text-blue-800"
-                        >
-                          Google Cloud Console
-                        </a>
-                        {' '}→ OAuth Client ID → URIs de redirection autorisées :
-                      </p>
-                      <div className="flex items-center gap-1">
-                        <code className="flex-1 text-[9px] bg-blue-500/10 px-2 py-1.5 rounded font-mono break-all text-blue-800">
-                          {GOOGLE_REDIRECT_URI}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0 shrink-0"
-                          onClick={() => {
-                            navigator.clipboard.writeText(GOOGLE_REDIRECT_URI);
-                            toast.success('URI copiée !');
-                          }}
-                        >
-                          <Copy className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Render fields - filter out Client ID and Secret when connected and not showing config */}
-                  {fields.map((field) => {
-                    // Hide Client ID and Client Secret fields when connected and not in config mode
-                    const isCredentialField = field.key === 'googleClientId' || field.key === 'googleClientSecret';
-                    if (isCredentialField && isConnected && !showOAuthConfig) {
-                      return null;
-                    }
-                    
-                    return (
-                      <div key={field.key} className="space-y-1.5">
-                        <Label className="text-xs font-medium flex items-center gap-1">
-                          {field.label}
-                          {field.required && <span className="text-red-500">*</span>}
-                        </Label>
-                        {renderField(field)}
-                        {field.helpText && (
-                          <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </>
-              );
-            })()}
-            
-            {/* Non-connection sections render normally */}
-            {sectionKey !== 'connection' && fields.map((field) => (
-              <div key={field.key} className="space-y-1.5">
+            {params.map((param) => (
+              <div key={param.key} className="space-y-1.5">
                 <Label className="text-xs font-medium flex items-center gap-1">
-                  {field.label}
-                  {field.required && <span className="text-red-500">*</span>}
+                  {param.label}
+                  {param.required && <span className="text-red-500">*</span>}
                 </Label>
-                {renderField(field)}
-                {field.helpText && (
-                  <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
+                {renderParam(param)}
+                {param.helpText && (
+                  <p className="text-[10px] text-muted-foreground">{param.helpText}</p>
                 )}
               </div>
             ))}
@@ -587,11 +318,14 @@ function NodePropertiesPanelComponent({
     );
   };
 
-  // Get ordered sections (connection first, then AI model, then others, default last)
+  // Get ordered sections
   const orderedSections = useMemo(() => {
-    const order = ['connection', 'auth', 'ai_model', 'general', 'filters', 'message', 'reply', 'search', 'format', 'destinations', 'advanced', 'default'];
-    return order.filter(s => fieldsBySection[s]?.length > 0);
-  }, [fieldsBySection]);
+    const order = ['main', 'settings', 'advanced'];
+    return order.filter(s => paramsBySection[s]?.length > 0);
+  }, [paramsBySection]);
+
+  // Show warning if no definition found
+  const noDefinition = !definition;
 
   return (
     <div className="w-80 h-full min-h-0 border-l border-border bg-card flex flex-col overflow-hidden">
@@ -599,10 +333,10 @@ function NodePropertiesPanelComponent({
       <div className="p-4 border-b border-border shrink-0">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className={cn(
-              "w-10 h-10 rounded-lg flex items-center justify-center",
-              `bg-gradient-to-br ${definition?.color || 'from-gray-500 to-gray-400'}`
-            )}>
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: definition?.color || '#6b7280' }}
+            >
               <Icon className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -611,13 +345,18 @@ function NodePropertiesPanelComponent({
                 onChange={(e) => onUpdate(block.id, { name: e.target.value })}
                 className="h-7 text-sm font-semibold border-none p-0 focus-visible:ring-0"
               />
-              <p className="text-xs text-muted-foreground">{definition?.name}</p>
+              <p className="text-xs text-muted-foreground">{definition?.name || block.type}</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
+
+        {/* Description */}
+        {definition?.description && (
+          <p className="text-xs text-muted-foreground mb-2">{definition.description}</p>
+        )}
 
         {/* Status badge */}
         {executionStatus !== 'idle' && (
@@ -633,15 +372,73 @@ function NodePropertiesPanelComponent({
             <span className="capitalize">{executionStatus}</span>
           </div>
         )}
-
       </div>
 
       {/* Content */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
         <div className="p-3 space-y-2 pb-8">
+          {/* Warning if no definition */}
+          {noDefinition && (
+            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertCircle className="w-4 h-4 text-amber-600" />
+                <span className="text-xs font-medium text-amber-700">Block type non reconnu</span>
+              </div>
+              <p className="text-[10px] text-amber-600">
+                Le type "{block.type}" n'est pas dans la bibliothèque. 
+                Ce block peut avoir été créé par une ancienne version.
+              </p>
+            </div>
+          )}
+
+          {/* No params message */}
+          {definition && (!definition.params || definition.params.length === 0) && (
+            <div className="p-4 text-center text-muted-foreground">
+              <Settings className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <p className="text-xs">Ce block n'a pas de paramètres configurables.</p>
+            </div>
+          )}
+
           {/* Render sections in order */}
           {orderedSections.map(sectionKey => 
-            renderSection(sectionKey, fieldsBySection[sectionKey])
+            renderSection(sectionKey, paramsBySection[sectionKey])
+          )}
+
+          {/* Typed Ports Info */}
+          {definition?.inputPorts && definition.inputPorts.length > 0 && (
+            <Collapsible
+              open={expandedSections.has('ports')}
+              onOpenChange={() => toggleSection('ports')}
+            >
+              <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-secondary/50 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Ports d'entrée</span>
+                </div>
+                <ChevronRight className={cn(
+                  "w-4 h-4 text-muted-foreground transition-transform",
+                  expandedSections.has('ports') && "rotate-90"
+                )} />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="p-3 space-y-2 border-l-2 border-muted ml-2">
+                  {definition.inputPorts.map((port) => (
+                    <div key={port.id} className="flex items-center gap-2 p-2 bg-secondary/30 rounded-lg">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: definition.color }} />
+                      <div className="flex-1">
+                        <p className="text-xs font-medium">{port.label}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Type: {port.type} {port.required && '(requis)'} {port.multiple && '(multiple)'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-[10px] text-muted-foreground">
+                    💡 Connectez des sub-nodes aux ports typés depuis le canvas.
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           )}
 
           {/* Retry & Timeout Section */}
@@ -660,7 +457,7 @@ function NodePropertiesPanelComponent({
               )} />
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <div className="p-3 space-y-4">
+              <div className="p-3 space-y-4 border-l-2 border-muted ml-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-medium">Retry automatique</Label>
                   <Switch
@@ -737,6 +534,37 @@ function NodePropertiesPanelComponent({
               </CollapsibleContent>
             </Collapsible>
           )}
+
+          {/* Debug: show raw config */}
+          <Collapsible
+            open={expandedSections.has('debug')}
+            onOpenChange={() => toggleSection('debug')}
+          >
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-secondary/50 transition-colors opacity-50">
+              <div className="flex items-center gap-2">
+                <Code className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Debug</span>
+              </div>
+              <ChevronRight className={cn(
+                "w-4 h-4 text-muted-foreground transition-transform",
+                expandedSections.has('debug') && "rotate-90"
+              )} />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-3 space-y-2">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Block Type</Label>
+                  <code className="block text-[10px] bg-secondary/50 p-1 rounded">{block.type}</code>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Config (JSON)</Label>
+                  <pre className="text-[10px] bg-secondary/50 p-2 rounded-lg overflow-auto max-h-32">
+                    {JSON.stringify(block.config, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </div>
     </div>
