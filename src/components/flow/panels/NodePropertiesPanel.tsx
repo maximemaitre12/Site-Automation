@@ -201,29 +201,90 @@ function NodePropertiesPanelComponent({
         const hasCredentials = block?.config?.googleClientId && block?.config?.googleClientSecret;
         
         // Show connected state if Google OAuth is connected
-        if (googleOAuthStatus?.connected && googleOAuthStatus.email && !showOAuthConfig) {
+        if (googleOAuthStatus?.connected && googleOAuthStatus.email) {
           return (
             <div className="space-y-3">
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-green-500/10 border border-green-500/20">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-green-700">Compte connecté</p>
-                  <p className="text-[10px] text-green-600 truncate">{googleOAuthStatus.email}</p>
-                </div>
+              {/* Account selector dropdown */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Compte à utiliser</Label>
+                <Select
+                  value={showOAuthConfig ? '__add_new__' : googleOAuthStatus.email}
+                  onValueChange={(val) => {
+                    if (val === '__add_new__') {
+                      setShowOAuthConfig(true);
+                    } else if (val === '__disconnect__') {
+                      disconnectGoogle();
+                    } else {
+                      setShowOAuthConfig(false);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-9 text-sm">
+                    <SelectValue>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        <span className="truncate">{showOAuthConfig ? 'Nouveau compte...' : googleOAuthStatus.email}</span>
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* Current connected account */}
+                    <SelectItem value={googleOAuthStatus.email}>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        <div className="flex flex-col">
+                          <span className="text-sm">{googleOAuthStatus.email}</span>
+                          <span className="text-[10px] text-muted-foreground">Google</span>
+                        </div>
+                      </div>
+                    </SelectItem>
+                    
+                    {/* Divider and add new account option */}
+                    <div className="h-px bg-border my-1" />
+                    <SelectItem value="__add_new__">
+                      <div className="flex items-center gap-2 text-primary">
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Connecter un autre compte</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
-              {/* Switch account button - shows config fields */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full h-8 gap-2 text-xs"
-                onClick={() => setShowOAuthConfig(true)}
-              >
-                <RefreshCw className="w-3 h-3" />
-                Changer de compte
-              </Button>
+              {/* Show config fields when adding a new account */}
+              {showOAuthConfig && (
+                <div className="space-y-3 pt-2 border-t">
+                  {hasCredentials ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full h-9 gap-2"
+                        onClick={() => handleOAuthConnect('Google')}
+                        disabled={googleOAuthLoading}
+                      >
+                        {googleOAuthLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ExternalLink className="w-4 h-4" />
+                        )}
+                        Connecter le nouveau compte
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground">
+                        Vous serez redirigé vers Google pour autoriser l'accès.
+                      </p>
+                    </>
+                  ) : (
+                    <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <p className="text-[10px] text-amber-700">
+                        Renseignez d'abord votre Google Client ID et Client Secret ci-dessous.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
               
-              {/* Disconnect button */}
+              {/* Disconnect option - subtle at the bottom */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -242,7 +303,7 @@ function NodePropertiesPanelComponent({
           );
         }
         
-        // Show message if credentials are not configured (when not connected or showOAuthConfig is true)
+        // Show message if credentials are not configured
         if (!hasCredentials) {
           return (
             <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
@@ -253,15 +314,9 @@ function NodePropertiesPanelComponent({
           );
         }
         
-        // Show connect button when credentials are available (for new connection or switching account)
+        // Show connect button when credentials are available but not connected
         return (
           <div className="space-y-2">
-            {showOAuthConfig && googleOAuthStatus?.connected && (
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border mb-2">
-                <span className="text-[10px] text-muted-foreground">Compte actuel :</span>
-                <span className="text-[10px] font-medium truncate">{googleOAuthStatus.email}</span>
-              </div>
-            )}
             <Button
               variant="outline"
               size="sm"
@@ -274,18 +329,8 @@ function NodePropertiesPanelComponent({
               ) : (
                 <ExternalLink className="w-4 h-4" />
               )}
-              {showOAuthConfig ? 'Connecter un autre compte' : 'Connecter votre compte Google'}
+              Connecter votre compte Google
             </Button>
-            {showOAuthConfig && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full h-7 text-[10px] text-muted-foreground"
-                onClick={() => setShowOAuthConfig(false)}
-              >
-                Annuler
-              </Button>
-            )}
             <p className="text-[10px] text-muted-foreground">
               Vous serez redirigé vers Google pour autoriser l'accès.
             </p>
