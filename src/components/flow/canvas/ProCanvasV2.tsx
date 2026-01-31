@@ -104,6 +104,10 @@ function ProCanvasV2Component({
   const svgRef = useRef<SVGSVGElement>(null);
   const suppressCanvasClickRef = useRef(false);
 
+  // Keep latest blocks accessible to delayed callbacks (fit view on workflow switch)
+  const blocksRef = useRef<WorkflowBlock[]>(blocks);
+  blocksRef.current = blocks;
+
   // Canvas state
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 100, y: 100 });
@@ -215,10 +219,11 @@ function ProCanvasV2Component({
   }, []);
 
   const handleFitView = useCallback(() => {
-    if (blocks.length === 0 || !containerRef.current) return;
+    const currentBlocks = blocksRef.current;
+    if (currentBlocks.length === 0 || !containerRef.current) return;
     
     const containerRect = containerRef.current.getBoundingClientRect();
-    const positions = blocks.map(b => b.position);
+    const positions = currentBlocks.map(b => b.position);
     
     // Calculate bounding box of all blocks
     const minX = Math.min(...positions.map(p => p.x));
@@ -260,7 +265,7 @@ function ProCanvasV2Component({
       x: viewportCenterX - contentCenterX * newZoom,
       y: viewportCenterY - contentCenterY * newZoom,
     });
-  }, [blocks]);
+  }, []);
 
   // Auto-fit view when fitViewKey changes (workflow selection)
   const previousFitViewKeyRef = useRef<string | null | undefined>(undefined);
@@ -272,23 +277,26 @@ function ProCanvasV2Component({
       
       // Wait for blocks to be loaded and container to be sized
       const attemptFitView = () => {
-        if (blocks.length > 0 && containerRef.current) {
+        if (blocksRef.current.length > 0 && containerRef.current) {
           handleFitView();
         }
       };
       
       // Try immediately, then with delays to handle async block loading
+      attemptFitView();
       const timer1 = setTimeout(attemptFitView, 50);
       const timer2 = setTimeout(attemptFitView, 150);
       const timer3 = setTimeout(attemptFitView, 300);
+      const timer4 = setTimeout(attemptFitView, 700);
       
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
         clearTimeout(timer3);
+        clearTimeout(timer4);
       };
     }
-  }, [fitViewKey, blocks.length, handleFitView]);
+  }, [fitViewKey, handleFitView]);
 
   const handleAutoLayout = useCallback(() => {
     const layout = autoLayoutBlocks(blocks, connections, { direction: 'horizontal' });

@@ -49,6 +49,7 @@ interface HistoryState {
 export default function Flow() {
   const { workflows, loading, createWorkflow, updateWorkflow, deleteWorkflow, duplicateWorkflow } = useWorkflows();
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
+  const [fitViewNonce, setFitViewNonce] = useState(0);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
@@ -76,6 +77,12 @@ export default function Flow() {
 
   const selectedWorkflow = workflows.find(w => w.id === selectedWorkflowId);
   const { runs, loading: runsLoading, createRun, updateRun } = useWorkflowRuns(selectedWorkflowId || undefined);
+
+  // Always trigger fit view when user clicks a workflow in the list (even if it's already selected)
+  const handleSelectWorkflow = useCallback((workflowId: string) => {
+    setSelectedWorkflowId(prev => (prev === workflowId ? prev : workflowId));
+    setFitViewNonce(n => n + 1);
+  }, []);
 
   // Initialize history when workflow changes
   useEffect(() => {
@@ -420,13 +427,19 @@ export default function Flow() {
                     {workflows.map((workflow) => (
                       <div
                         key={workflow.id}
-                        onClick={() => setSelectedWorkflowId(workflow.id)}
+                        onClick={() => handleSelectWorkflow(workflow.id)}
                         className={`p-2 md:p-2.5 rounded-lg cursor-pointer transition-all flex-shrink-0 min-w-[140px] md:min-w-0 ${selectedWorkflowId === workflow.id ? 'bg-agent-flow/10 border border-agent-flow/30' : 'hover:bg-secondary border border-transparent'}`}
                       >
                         <div className="flex items-start justify-between mb-1">
                           <span className="font-medium text-foreground text-xs md:text-sm truncate flex-1">{workflow.name}</span>
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenuTrigger
+                              asChild
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSelectWorkflow(workflow.id);
+                              }}
+                            >
                               <Button variant="ghost" size="sm" className="h-5 w-5 md:h-6 md:w-6 p-0 shrink-0">
                                 <MoreVertical className="w-3 h-3 md:w-4 md:h-4" />
                               </Button>
@@ -511,7 +524,7 @@ export default function Flow() {
                         hasUnsavedChanges={hasUnsavedChanges}
                         onAutoLayout={handleAutoLayout}
                         onAddBlock={() => setIsBlockPickerOpen(true)}
-                        fitViewKey={selectedWorkflowId}
+                        fitViewKey={selectedWorkflowId ? `${selectedWorkflowId}:${fitViewNonce}` : null}
                       />
                     </div>
                     
