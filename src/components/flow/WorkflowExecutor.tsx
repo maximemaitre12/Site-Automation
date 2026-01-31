@@ -26,21 +26,20 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
   const [result, setResult] = useState<any>(null);
 
-  const triggerBlock = blocks.find(b => b.type.startsWith('trigger_'));
+  const triggerBlock = blocks.find(b => b.type.startsWith('trigger_') || b.type.startsWith('manual_') || b.type.startsWith('webhook_') || b.type.startsWith('schedule_') || b.type.startsWith('email_') || b.type.startsWith('form_'));
   const hasBlocks = blocks.length > 0;
 
-  // Triggers that fetch their own data automatically (real integrations)
-  const autoTriggerTypes = [
-    'trigger_gmail',
-    'email_oauth',
-    'email_imap', 
-    'trigger_webhook', 
-    'trigger_schedule',
-    'trigger_event'
+  // Only MANUAL triggers require user input; all others fetch data automatically
+  const manualTriggerTypes = [
+    'trigger_manual',
+    'manual_trigger', // block-library.ts naming
+    'trigger_text',
+    'trigger_file',
+    'trigger_form',
+    'form_trigger',
   ];
   
-  const isAutoTrigger = triggerBlock && autoTriggerTypes.includes(triggerBlock.type);
-  const requiresManualInput = !isAutoTrigger;
+  const requiresManualInput = triggerBlock ? manualTriggerTypes.includes(triggerBlock.type) : false;
 
   const downloadFile = async (filename: string, content: unknown, mimeType?: string, format?: string) => {
     if (!filename) return;
@@ -108,8 +107,8 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
     setResult(null);
 
     try {
-      // For auto-triggers (ex: Gmail), do not require any user-provided input.
-      const executionInput = isAutoTrigger ? '' : inputData;
+      // For auto-triggers (Gmail, Webhook, Schedule, etc.), do not require any user-provided input.
+      const executionInput = requiresManualInput ? inputData : '';
       
       // Execute via server-side Edge Function for proper AI access
       const execution = await executeWorkflowViaServer(blocks, executionInput, workflowId);
@@ -173,14 +172,22 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
           <div className="flex-1 overflow-y-auto space-y-6 py-4">
             {/* Auto-trigger info */}
-            {isAutoTrigger && (
+            {!requiresManualInput && triggerBlock && (
               <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
                 <div className="flex items-center gap-2 text-primary">
                   <Play className="w-4 h-4" />
                   <span className="font-medium">Trigger automatique</span>
                 </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                  Ce workflow récupère automatiquement les données depuis {triggerBlock?.type === 'email_oauth' || triggerBlock?.type === 'email_imap' || triggerBlock?.type === 'trigger_gmail' ? 'votre boîte mail' : 'la source configurée'}.
+                <p className="text-sm text-muted-foreground mt-1">
+                  Ce workflow récupère automatiquement les données depuis {
+                    ['email_trigger', 'email_oauth', 'email_imap', 'trigger_gmail'].includes(triggerBlock.type)
+                      ? 'votre boîte mail'
+                      : triggerBlock.type.includes('webhook')
+                        ? 'le webhook externe'
+                        : triggerBlock.type.includes('schedule')
+                          ? 'le déclencheur planifié'
+                          : 'la source configurée'
+                  }.
                 </p>
               </div>
             )}
@@ -318,7 +325,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
               ) : (
                 <>
                   <Play className="w-4 h-4 mr-2" />
-                  {isAutoTrigger ? 'Lancer' : 'Execute'}
+                  {!requiresManualInput ? 'Lancer' : 'Execute'}
                 </>
               )}
             </Button>
