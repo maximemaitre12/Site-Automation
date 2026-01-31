@@ -496,19 +496,26 @@ function ProCanvasV2Component({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isInputFocused = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA';
+      const isInputFocused = document.activeElement?.tagName === 'INPUT' || 
+                              document.activeElement?.tagName === 'TEXTAREA' ||
+                              document.activeElement?.getAttribute('contenteditable') === 'true';
       
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (!isInputFocused) {
           e.preventDefault();
-          // Delete multiple selected blocks
+          console.log('[Canvas] Delete key pressed, selectedBlockIds:', selectedBlockIds.size, 'selectedBlockId:', selectedBlockId);
+          
+          // Delete multiple selected blocks (from rectangle selection)
           if (selectedBlockIds.size > 0) {
             const idsToDelete = Array.from(selectedBlockIds);
+            console.log('[Canvas] Deleting multiple blocks:', idsToDelete);
             setSelectedBlockIds(new Set());
             setSelectionRect(null);
             idsToDelete.forEach(id => onBlockDelete(id));
           } else if (selectedBlockId) {
-            // Delete single selected block
+            // Delete single selected block (from click selection)
+            console.log('[Canvas] Deleting single block:', selectedBlockId);
+            onBlockSelect(null);
             onBlockDelete(selectedBlockId);
           }
         }
@@ -548,7 +555,7 @@ function ProCanvasV2Component({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedBlockId, selectedBlockIds, onBlockDelete, onUndo, onRedo, onSave, onBlockDuplicate, handleZoomIn, handleZoomOut, handleFitView]);
+  }, [selectedBlockId, selectedBlockIds, onBlockDelete, onBlockSelect, onUndo, onRedo, onSave, onBlockDuplicate, handleZoomIn, handleZoomOut, handleFitView]);
 
   // Build visual states
   const blockVisualStates: Record<string, BlockVisualState> = {};
