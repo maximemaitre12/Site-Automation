@@ -275,6 +275,124 @@ function NodePropertiesPanelComponent({
     }
   };
 
+  // ===== Gmail OAuth section (for email_trigger/trigger_gmail/email_oauth) =====
+  const isEmailTrigger = ['email_trigger', 'trigger_gmail', 'email_oauth'].includes(block.type);
+  const selectedProvider = block.config?.provider || 'gmail';
+  const isGmailProvider = selectedProvider === 'gmail';
+  const showOAuthSection = isEmailTrigger && isGmailProvider;
+
+  const renderGmailOAuthSection = () => {
+    if (!showOAuthSection) return null;
+
+    const isConnected = googleOAuthStatus?.connected && !googleOAuthStatus?.expired;
+    const isExpired = googleOAuthStatus?.expired;
+    const email = googleOAuthStatus?.email;
+
+    const handleConnect = () => {
+      const clientId = block.config?.clientId || block.config?.googleClientId;
+      const clientSecret = block.config?.clientSecret || block.config?.googleClientSecret;
+      
+      connectGoogle(['gmail.readonly', 'gmail.send'], clientId && clientSecret ? { clientId, clientSecret } : undefined);
+    };
+
+    return (
+      <Collapsible
+        open={expandedSections.has('connection')}
+        onOpenChange={() => toggleSection('connection')}
+      >
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-secondary/50 transition-colors">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium">🔗 Connexion Gmail</span>
+            {isConnected && <span className="w-2 h-2 rounded-full bg-green-500" />}
+            {isExpired && <span className="w-2 h-2 rounded-full bg-orange-500" />}
+          </div>
+          <ChevronRight className={cn(
+            "w-4 h-4 text-muted-foreground transition-transform",
+            expandedSections.has('connection') && "rotate-90"
+          )} />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="p-3 space-y-3 border-l-2 border-muted ml-2">
+            {/* Status */}
+            {isConnected ? (
+              <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <div className="flex items-center gap-2 text-green-600 mb-1">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Compte connecté</span>
+                </div>
+                {email && <p className="text-xs text-muted-foreground">{email}</p>}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={disconnectGoogle}
+                  disabled={googleOAuthLoading}
+                  className="mt-2 text-xs h-7"
+                >
+                  <LogOut className="w-3 h-3 mr-1" />
+                  Déconnecter
+                </Button>
+              </div>
+            ) : isExpired ? (
+              <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                <div className="flex items-center gap-2 text-orange-600 mb-1">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">Token expiré</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Votre connexion Gmail a expiré. Reconnectez-vous pour continuer.
+                </p>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleConnect}
+                  disabled={googleOAuthLoading}
+                  className="text-xs h-7"
+                >
+                  {googleOAuthLoading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Mail className="w-3 h-3 mr-1" />}
+                  Reconnecter Gmail
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  Connectez votre compte Google pour accéder à Gmail.
+                </p>
+                {/* Optional: User-provided credentials for BYOK */}
+                <div className="space-y-2 p-2 rounded-lg bg-muted/30">
+                  <p className="text-[10px] text-muted-foreground font-medium">Credentials Google Cloud (optionnel)</p>
+                  <Input
+                    value={block.config?.clientId || block.config?.googleClientId || ''}
+                    onChange={(e) => handleConfigChange('clientId', e.target.value)}
+                    placeholder="Client ID"
+                    className="h-7 text-xs"
+                  />
+                  <Input
+                    type="password"
+                    value={block.config?.clientSecret || block.config?.googleClientSecret || ''}
+                    onChange={(e) => handleConfigChange('clientSecret', e.target.value)}
+                    placeholder="Client Secret"
+                    className="h-7 text-xs"
+                  />
+                </div>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleConnect}
+                  disabled={googleOAuthLoading}
+                  className="w-full text-xs h-8"
+                >
+                  {googleOAuthLoading ? <Loader2 className="w-3 h-3 mr-2 animate-spin" /> : <Mail className="w-3 h-3 mr-2" />}
+                  Connecter Gmail
+                </Button>
+              </div>
+            )}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  };
+
   const renderSection = (sectionKey: string, params: BlockParam[]) => {
     if (!params || params.length === 0) return null;
     
@@ -398,6 +516,9 @@ function NodePropertiesPanelComponent({
               <p className="text-xs">Ce block n'a pas de paramètres configurables.</p>
             </div>
           )}
+
+          {/* Gmail OAuth Section (for email_trigger, trigger_gmail, email_oauth blocks) */}
+          {renderGmailOAuthSection()}
 
           {/* Render sections in order */}
           {orderedSections.map(sectionKey => 
