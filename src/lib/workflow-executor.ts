@@ -82,23 +82,21 @@ export async function executeBlock(
       : JSON.stringify(context.input);
 
     switch (block.type) {
-      case 'trigger_text':
-      case 'trigger_file':
+      // Triggers - pass through input
+      case 'trigger_manual':
       case 'trigger_webhook':
-      case 'trigger_form':
       case 'trigger_schedule':
-      case 'trigger_email':
+      case 'trigger_event':
+      case 'email_imap':
+      case 'email_oauth':
         output = context.input;
         break;
 
       // AI blocks are handled server-side - return placeholder for client fallback
-      case 'ai_summary':
-      case 'ai_extract':
-      case 'ai_classify':
-      case 'ai_generate':
-      case 'ai_decision':
-      case 'ai_sentiment':
-      case 'ai_translate':
+      case 'llm_call':
+      case 'llm_structured':
+      case 'llm_vision':
+      case 'llm_embeddings':
         // These should be executed via executeWorkflowViaServer, not locally
         output = { 
           error: 'AI blocks must be executed via server. Use executeWorkflowViaServer instead.',
@@ -107,19 +105,19 @@ export async function executeBlock(
         break;
 
       // Control flow blocks
-      case 'control_condition': {
-        const condition = block.config?.condition || 'true';
+      case 'condition': {
+        const conditionExpr = block.config?.condition || 'true';
         // Simple condition evaluation
         let result = false;
         try {
           // Safe evaluation with context
           const evalContext = { input: context.input, ...context.previousOutputs };
-          result = new Function('ctx', `with(ctx) { return ${condition}; }`)(evalContext);
+          result = new Function('ctx', `with(ctx) { return ${conditionExpr}; }`)(evalContext);
         } catch {
           result = false;
         }
         output = { 
-          condition, 
+          condition: conditionExpr, 
           result, 
           branch: result ? 'true' : 'false',
           input: context.input 
@@ -127,14 +125,14 @@ export async function executeBlock(
         break;
       }
 
-      case 'control_delay': {
-        const duration = (block.config?.duration || 5) * 1000;
+      case 'wait': {
+        const duration = (block.config?.duration || block.config?.seconds || 5) * 1000;
         await new Promise(resolve => setTimeout(resolve, Math.min(duration, 30000)));
         output = { delayed: true, duration, input: context.input };
         break;
       }
 
-      case 'control_loop': {
+      case 'loop': {
         const arrayField = block.config?.arrayField || 'items';
         const inputData = context.input;
         const items = inputData?.[arrayField] || (Array.isArray(inputData) ? inputData : [inputData]);
@@ -146,7 +144,7 @@ export async function executeBlock(
         break;
       }
 
-      case 'control_branch': {
+      case 'switch': {
         const branchCount = block.config?.branchCount || 2;
         const branchNames = (block.config?.branchNames || 'Branch A, Branch B')
           .split(',')
@@ -163,7 +161,7 @@ export async function executeBlock(
         break;
       }
 
-      case 'control_parallel': {
+      case 'split': {
         output = {
           parallel: true,
           input: context.input,
@@ -175,7 +173,8 @@ export async function executeBlock(
         break;
       }
 
-      case 'control_merge': {
+      case 'merge':
+      case 'merge_data': {
         const mergeStrategy = block.config?.mergeStrategy || 'combine_results';
         const branchOutputs = context.previousOutputs;
         let mergedOutput: any;
@@ -195,8 +194,8 @@ export async function executeBlock(
         break;
       }
 
-      // Sub-workflow call
-      case 'workflow_call': {
+      // Sub-workflow call via tool_call
+      case 'tool_call': {
         const workflowId = block.config?.workflowId;
         const passInput = block.config?.passInput !== false;
         const customInput = block.config?.customInput;
@@ -242,7 +241,7 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_email': {
+      case 'email_smtp': {
         // Email requires Resend integration - return info without failing
         const to = block.config?.to;
         const subject = block.config?.subject || 'Workflow Notification';
@@ -283,8 +282,8 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_webhook':
-      case 'http_webhook': {
+      case 'http_response':
+      case 'http_request': {
         // Real webhook POST
         const webhookUrl = block.config?.url;
         if (!webhookUrl || webhookUrl === 'https://webhook.example.com' || webhookUrl.includes('YOUR_')) {
@@ -374,7 +373,7 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_save': {
+      case 'db_insert': {
         // Real save to Supabase
         const tableName = block.config?.table;
         if (!tableName) {
@@ -406,7 +405,7 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_notify': {
+      case 'message_send': {
         // Real notification via Slack webhook or similar
         const channel = block.config?.channel || 'slack';
         const webhookUrl = block.config?.webhookUrl;
@@ -450,7 +449,7 @@ export async function executeBlock(
         break;
       }
 
-      case 'system_log':
+      case 'output_log':
         console.log(`[Workflow Log - ${block.config?.level || 'info'}]`, block.config?.message || inputText);
         output = {
           logged: true,
@@ -460,8 +459,8 @@ export async function executeBlock(
         };
         break;
 
-      // ===== AETHER DOCUMENT CREATION (PDF GENERATION) =====
-      case 'aether_doc_create': {
+      // ===== FILE GENERATION (PDF/DOCX) =====
+      case 'file_write': {
         const title = block.config?.title;
         const content = block.config?.content;
         const prompt = block.config?.prompt;
@@ -629,8 +628,8 @@ export async function executeWorkflow(
         return { success: true, output: result.output };
       }
 
-      // Handle conditional branching (ai_decision, control_condition)
-      if (block.type === 'ai_decision' || block.type === 'control_condition') {
+      // Handle conditional branching (condition block)
+      if (block.type === 'condition') {
         const decision = result.output?.decision || result.output?.result;
         const isTrue = decision === 'yes' || decision === true || decision === 'true';
         const targetHandle = isTrue ? 'true' : 'false';

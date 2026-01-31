@@ -144,7 +144,14 @@ function NodePropertiesPanelComponent({
   const isFieldVisible = (field: ConfigField): boolean => {
     if (!field.showWhen) return true;
     const conditionValue = getEffectiveConfigValue(field.showWhen.field);
-    return conditionValue === field.showWhen.value;
+    // Handle both value and notValue conditions
+    if ('value' in field.showWhen) {
+      return conditionValue === field.showWhen.value;
+    }
+    if ('notValue' in field.showWhen) {
+      return conditionValue !== field.showWhen.notValue;
+    }
+    return true;
   };
 
   // Group fields by section

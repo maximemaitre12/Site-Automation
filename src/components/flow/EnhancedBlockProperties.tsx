@@ -42,7 +42,14 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
   const shouldShowField = (field: ConfigField): boolean => {
     if (!field.showWhen) return true;
     const currentValue = block.config?.[field.showWhen.field];
-    return currentValue === field.showWhen.value;
+    // Handle both value and notValue conditions
+    if ('value' in field.showWhen) {
+      return currentValue === field.showWhen.value;
+    }
+    if ('notValue' in field.showWhen) {
+      return currentValue !== field.showWhen.notValue;
+    }
+    return true;
   };
 
   const renderConfigField = (field: ConfigField) => {
@@ -368,11 +375,14 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground">{def?.name}</h4>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
                     def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' :
                     def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' :
                     def?.category === 'transform' ? 'bg-emerald-500/20 text-emerald-400' :
-                    def?.category === 'control' ? 'bg-amber-500/20 text-amber-400' :
+                    def?.category === 'logic' ? 'bg-amber-500/20 text-amber-400' :
+                    def?.category === 'http' ? 'bg-green-500/20 text-green-400' :
+                    def?.category === 'email' ? 'bg-red-500/20 text-red-400' :
+                    def?.category === 'database' ? 'bg-orange-500/20 text-orange-400' :
                     'bg-slate-500/20 text-slate-400'
                   }`}>
                     {def?.category}
