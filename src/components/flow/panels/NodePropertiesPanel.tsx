@@ -385,6 +385,9 @@ function NodePropertiesPanelComponent({
       ));
     }
 
+    // Redirect URI for Google OAuth configuration
+    const GOOGLE_REDIRECT_URI = 'https://gydrpmetswrkrjcbkgqd.supabase.co/functions/v1/google-oauth-callback';
+
     return (
       <Collapsible
         key={sectionKey}
@@ -404,6 +407,44 @@ function NodePropertiesPanelComponent({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="p-3 space-y-4 border-l-2 border-muted ml-2">
+            {/* Show redirect URI info for connection section */}
+            {sectionKey === 'connection' && (
+              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-medium text-blue-700">Configuration Google Cloud</span>
+                </div>
+                <p className="text-[10px] text-blue-600">
+                  Ajoutez cette URI de redirection dans votre{' '}
+                  <a 
+                    href="https://console.cloud.google.com/apis/credentials" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="underline hover:text-blue-800"
+                  >
+                    Google Cloud Console
+                  </a>
+                  {' '}→ OAuth Client ID → URIs de redirection autorisées :
+                </p>
+                <div className="flex items-center gap-1">
+                  <code className="flex-1 text-[9px] bg-blue-500/10 px-2 py-1.5 rounded font-mono break-all text-blue-800">
+                    {GOOGLE_REDIRECT_URI}
+                  </code>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 shrink-0"
+                    onClick={() => {
+                      navigator.clipboard.writeText(GOOGLE_REDIRECT_URI);
+                      toast.success('URI copiée !');
+                    }}
+                  >
+                    <Download className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            
             {fields.map((field) => (
               <div key={field.key} className="space-y-1.5">
                 <Label className="text-xs font-medium flex items-center gap-1">
