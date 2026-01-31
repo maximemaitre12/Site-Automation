@@ -385,8 +385,8 @@ function NodePropertiesPanelComponent({
       ));
     }
 
-    // Redirect URI for Google OAuth configuration
-    const GOOGLE_REDIRECT_URI = 'https://gydrpmetswrkrjcbkgqd.supabase.co/functions/v1/google-oauth-callback';
+    // Redirect URI for Google OAuth configuration - now uses the app domain, not Supabase
+    const GOOGLE_REDIRECT_URI = `${window.location.origin}/oauth/google/callback`;
 
     return (
       <Collapsible

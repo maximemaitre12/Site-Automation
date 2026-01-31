@@ -44,6 +44,9 @@ import Security from "./pages/legal/Security";
 // Product Tour
 import ProductTour from "./pages/ProductTour";
 
+// OAuth callbacks
+import GoogleCallback from "./pages/oauth/GoogleCallback";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -103,6 +106,9 @@ const App = () => {
             <Route path="/legal/privacy" element={<Privacy />} />
             <Route path="/legal/terms" element={<Terms />} />
             <Route path="/legal/security" element={<Security />} />
+            
+            {/* OAuth callbacks - receive code from Google and exchange via backend */}
+            <Route path="/oauth/google/callback" element={<GoogleCallback />} />
 
             {/* Legacy short paths (avoid 404s from old links) */}
             <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
