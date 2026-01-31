@@ -71,6 +71,29 @@ export interface BlockParam {
 }
 
 // ==========================================
+// TYPED PORTS (n8n-style connections)
+// ==========================================
+
+export type PortType = 
+  | 'main'           // Default data flow
+  | 'ai_model'       // LLM/Chat model connection
+  | 'ai_memory'      // Memory/context connection
+  | 'ai_tool'        // Tool for agent
+  | 'ai_embeddings'  // Embeddings model
+  | 'ai_retriever'   // Vector store retriever
+  | 'ai_output_parser' // Output parser
+  | 'document'       // Document input
+  | 'file';          // File input
+
+export interface BlockPort {
+  id: string;
+  label: string;
+  type: PortType;
+  required?: boolean;
+  multiple?: boolean;  // Can accept multiple connections
+}
+
+// ==========================================
 // BLOCK DEFINITION
 // ==========================================
 
@@ -85,10 +108,16 @@ export interface BlockDefinition {
   params: BlockParam[];
   inputs: number;
   outputs: number;
+  // Typed ports for n8n-style connections
+  inputPorts?: BlockPort[];
+  outputPorts?: BlockPort[];
   outputLabels?: string[];
   isRealAction?: boolean;
   requiresAuth?: boolean;
   popular?: boolean;
+  // For sub-nodes (auxiliary blocks)
+  isSubNode?: boolean;
+  subNodeType?: PortType;
 }
 
 // ==========================================
@@ -447,29 +476,32 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   // =====================================================
   // AI
   // =====================================================
-  {
+{
     type: 'ai_agent',
     name: 'AI Agent',
     category: 'ai',
     subcategory: 'ai_models',
     icon: 'Bot',
     color: '#a855f7',
-    description: 'AI Agent with tools and memory',
+    description: 'AI Agent with tools and memory - connect sub-nodes for Chat Model, Memory, and Tools',
     popular: true,
     params: [
-      { key: 'model', label: 'Model', type: 'select', options: [
-        { label: 'GPT-5', value: 'openai/gpt-5' },
-        { label: 'GPT-5 Mini', value: 'openai/gpt-5-mini' },
-        { label: 'Gemini 2.5 Pro', value: 'google/gemini-2.5-pro' },
-        { label: 'Gemini 2.5 Flash', value: 'google/gemini-2.5-flash' }
-      ], defaultValue: 'openai/gpt-5-mini', section: 'main' },
       { key: 'systemPrompt', label: 'System Prompt', type: 'text', placeholder: 'You are a helpful assistant...', required: true, section: 'main' },
       { key: 'userPrompt', label: 'User Message', type: 'expression', placeholder: '{{ $json.message }}', expressionEnabled: true, section: 'main' },
-      { key: 'temperature', label: 'Temperature', type: 'number', defaultValue: 0.7, section: 'settings' },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'settings' }
+      { key: 'outputMode', label: 'Output Mode', type: 'select', options: [
+        { label: 'Text', value: 'text' },
+        { label: 'JSON', value: 'json' },
+        { label: 'Streaming', value: 'stream' }
+      ], defaultValue: 'text', section: 'settings' }
     ],
     inputs: 1,
-    outputs: 1
+    outputs: 1,
+    // n8n-style typed input ports
+    inputPorts: [
+      { id: 'ai_model', label: 'Chat Model', type: 'ai_model', required: true },
+      { id: 'ai_memory', label: 'Memory', type: 'ai_memory' },
+      { id: 'ai_tool', label: 'Tool', type: 'ai_tool', multiple: true }
+    ]
   },
   {
     type: 'ai_prompt',
@@ -1154,6 +1186,251 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
     ],
     inputs: 1,
     outputs: 1
+  },
+
+  // =====================================================
+  // SUB-NODES (Auxiliary nodes for typed connections)
+  // These connect to specific ports on main nodes
+  // =====================================================
+  
+  // AI Model Sub-nodes
+  {
+    type: 'openai_chat_model',
+    name: 'OpenAI Chat Model',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Bot',
+    color: '#10a37f',
+    description: 'OpenAI GPT model for chat',
+    isSubNode: true,
+    subNodeType: 'ai_model',
+    params: [
+      { key: 'model', label: 'Model', type: 'select', options: [
+        { label: 'GPT-5', value: 'gpt-5' },
+        { label: 'GPT-5 Mini', value: 'gpt-5-mini' },
+        { label: 'GPT-5 Nano', value: 'gpt-5-nano' }
+      ], defaultValue: 'gpt-5-mini', section: 'main' },
+      { key: 'temperature', label: 'Temperature', type: 'number', defaultValue: 0.7, section: 'settings' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'settings' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'model', label: 'Model', type: 'ai_model' }]
+  },
+  {
+    type: 'gemini_chat_model',
+    name: 'Gemini Chat Model',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Sparkles',
+    color: '#4285f4',
+    description: 'Google Gemini model for chat',
+    isSubNode: true,
+    subNodeType: 'ai_model',
+    params: [
+      { key: 'model', label: 'Model', type: 'select', options: [
+        { label: 'Gemini 2.5 Pro', value: 'gemini-2.5-pro' },
+        { label: 'Gemini 2.5 Flash', value: 'gemini-2.5-flash' },
+        { label: 'Gemini 3 Flash Preview', value: 'gemini-3-flash-preview' }
+      ], defaultValue: 'gemini-2.5-flash', section: 'main' },
+      { key: 'temperature', label: 'Temperature', type: 'number', defaultValue: 0.7, section: 'settings' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'model', label: 'Model', type: 'ai_model' }]
+  },
+  
+  // Memory Sub-nodes
+  {
+    type: 'simple_memory',
+    name: 'Simple Memory',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Brain',
+    color: '#8b5cf6',
+    description: 'In-memory conversation buffer',
+    isSubNode: true,
+    subNodeType: 'ai_memory',
+    params: [
+      { key: 'maxMessages', label: 'Max Messages', type: 'number', defaultValue: 10, section: 'main' },
+      { key: 'sessionKey', label: 'Session Key', type: 'expression', placeholder: '{{ $json.sessionId }}', expressionEnabled: true, section: 'settings' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'memory', label: 'Memory', type: 'ai_memory' }]
+  },
+  {
+    type: 'postgres_memory',
+    name: 'Postgres Memory',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Database',
+    color: '#336791',
+    description: 'Persistent memory in PostgreSQL',
+    isSubNode: true,
+    subNodeType: 'ai_memory',
+    params: [
+      { key: 'tableName', label: 'Table Name', type: 'string', defaultValue: 'chat_memory', section: 'main' },
+      { key: 'sessionKey', label: 'Session Key', type: 'expression', placeholder: '{{ $json.sessionId }}', expressionEnabled: true, section: 'main' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'memory', label: 'Memory', type: 'ai_memory' }]
+  },
+  
+  // Vector Store / Retriever Sub-nodes
+  {
+    type: 'simple_vector_store',
+    name: 'Simple Vector Store',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Database',
+    color: '#22c55e',
+    description: 'In-memory vector store for RAG',
+    isSubNode: true,
+    subNodeType: 'ai_retriever',
+    params: [
+      { key: 'topK', label: 'Top K Results', type: 'number', defaultValue: 4, section: 'main' },
+      { key: 'similarityThreshold', label: 'Similarity Threshold', type: 'number', defaultValue: 0.7, section: 'settings' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    inputPorts: [{ id: 'embeddings', label: 'Embeddings', type: 'ai_embeddings' }],
+    outputPorts: [{ id: 'retriever', label: 'Retriever', type: 'ai_retriever' }]
+  },
+  {
+    type: 'supabase_vector_store',
+    name: 'Supabase Vector Store',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Database',
+    color: '#3ecf8e',
+    description: 'Vector store using Supabase pgvector',
+    isSubNode: true,
+    subNodeType: 'ai_retriever',
+    params: [
+      { key: 'tableName', label: 'Table Name', type: 'string', defaultValue: 'documents', section: 'main' },
+      { key: 'contentColumn', label: 'Content Column', type: 'string', defaultValue: 'content', section: 'main' },
+      { key: 'embeddingColumn', label: 'Embedding Column', type: 'string', defaultValue: 'embedding', section: 'main' },
+      { key: 'topK', label: 'Top K Results', type: 'number', defaultValue: 4, section: 'settings' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    inputPorts: [{ id: 'embeddings', label: 'Embeddings', type: 'ai_embeddings' }],
+    outputPorts: [{ id: 'retriever', label: 'Retriever', type: 'ai_retriever' }]
+  },
+  
+  // Embeddings Sub-nodes
+  {
+    type: 'openai_embeddings',
+    name: 'OpenAI Embeddings',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Sparkles',
+    color: '#10a37f',
+    description: 'OpenAI text embeddings',
+    isSubNode: true,
+    subNodeType: 'ai_embeddings',
+    params: [
+      { key: 'model', label: 'Model', type: 'select', options: [
+        { label: 'text-embedding-3-small', value: 'text-embedding-3-small' },
+        { label: 'text-embedding-3-large', value: 'text-embedding-3-large' }
+      ], defaultValue: 'text-embedding-3-small', section: 'main' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'embeddings', label: 'Embeddings', type: 'ai_embeddings' }]
+  },
+  
+  // Tool Sub-nodes
+  {
+    type: 'http_tool',
+    name: 'HTTP Request Tool',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Globe',
+    color: '#3b82f6',
+    description: 'HTTP request as agent tool',
+    isSubNode: true,
+    subNodeType: 'ai_tool',
+    params: [
+      { key: 'name', label: 'Tool Name', type: 'string', placeholder: 'search_api', required: true, section: 'main' },
+      { key: 'description', label: 'Tool Description', type: 'text', placeholder: 'Search for information...', required: true, section: 'main' },
+      { key: 'method', label: 'HTTP Method', type: 'select', options: [
+        { label: 'GET', value: 'GET' },
+        { label: 'POST', value: 'POST' }
+      ], defaultValue: 'GET', section: 'main' },
+      { key: 'url', label: 'URL', type: 'expression', required: true, expressionEnabled: true, section: 'main' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'tool', label: 'Tool', type: 'ai_tool' }]
+  },
+  {
+    type: 'code_tool',
+    name: 'Code Tool',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'Code',
+    color: '#f59e0b',
+    description: 'JavaScript function as agent tool',
+    isSubNode: true,
+    subNodeType: 'ai_tool',
+    params: [
+      { key: 'name', label: 'Tool Name', type: 'string', placeholder: 'calculate', required: true, section: 'main' },
+      { key: 'description', label: 'Tool Description', type: 'text', placeholder: 'Perform calculations...', required: true, section: 'main' },
+      { key: 'parameters', label: 'Parameters Schema', type: 'json', placeholder: '{"expression": {"type": "string"}}', section: 'main' },
+      { key: 'code', label: 'Code', type: 'code', placeholder: 'return eval(input.expression);', section: 'main' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'tool', label: 'Tool', type: 'ai_tool' }]
+  },
+  {
+    type: 'workflow_tool',
+    name: 'Workflow Tool',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'GitBranch',
+    color: '#8b5cf6',
+    description: 'Another workflow as agent tool',
+    isSubNode: true,
+    subNodeType: 'ai_tool',
+    params: [
+      { key: 'name', label: 'Tool Name', type: 'string', required: true, section: 'main' },
+      { key: 'description', label: 'Tool Description', type: 'text', required: true, section: 'main' },
+      { key: 'workflowId', label: 'Workflow ID', type: 'string', required: true, section: 'main' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'tool', label: 'Tool', type: 'ai_tool' }]
+  },
+  
+  // Document Loaders
+  {
+    type: 'document_loader',
+    name: 'Document Loader',
+    category: 'ai',
+    subcategory: 'ai_models',
+    icon: 'FileText',
+    color: '#64748b',
+    description: 'Load and parse documents',
+    isSubNode: true,
+    subNodeType: 'document',
+    params: [
+      { key: 'source', label: 'Source', type: 'select', options: [
+        { label: 'File Input', value: 'file' },
+        { label: 'URL', value: 'url' },
+        { label: 'Text', value: 'text' }
+      ], defaultValue: 'file', section: 'main' },
+      { key: 'url', label: 'URL', type: 'expression', expressionEnabled: true, showWhen: { field: 'source', value: 'url' }, section: 'main' },
+      { key: 'text', label: 'Text Content', type: 'expression', expressionEnabled: true, showWhen: { field: 'source', value: 'text' }, section: 'main' },
+      { key: 'chunkSize', label: 'Chunk Size', type: 'number', defaultValue: 1000, section: 'settings' },
+      { key: 'chunkOverlap', label: 'Chunk Overlap', type: 'number', defaultValue: 200, section: 'settings' }
+    ],
+    inputs: 0,
+    outputs: 1,
+    outputPorts: [{ id: 'document', label: 'Document', type: 'document' }]
   }
 ];
 
@@ -1177,6 +1454,18 @@ export function getPopularBlocks(): BlockDefinition[] {
   return BLOCK_LIBRARY.filter(b => b.popular);
 }
 
+export function getMainBlocks(): BlockDefinition[] {
+  return BLOCK_LIBRARY.filter(b => !b.isSubNode);
+}
+
+export function getSubNodes(): BlockDefinition[] {
+  return BLOCK_LIBRARY.filter(b => b.isSubNode);
+}
+
+export function getSubNodesByType(portType: PortType): BlockDefinition[] {
+  return BLOCK_LIBRARY.filter(b => b.isSubNode && b.subNodeType === portType);
+}
+
 export function getAllBlockTypes(): string[] {
   return BLOCK_LIBRARY.map(b => b.type);
 }
@@ -1190,23 +1479,32 @@ export function searchBlocks(query: string): BlockDefinition[] {
   );
 }
 
-// Export for AI prompt generation
+// Export for AI prompt generation - includes typed ports
 export function getBlockTypesForAI(): string {
-  const byCategory: Record<string, string[]> = {};
+  const mainBlocks: string[] = [];
+  const subNodes: string[] = [];
   
   BLOCK_LIBRARY.forEach(block => {
-    const cat = block.category;
-    if (!byCategory[cat]) byCategory[cat] = [];
-    
     const requiredParams = block.params
       .filter(p => p.required)
       .map(p => `${p.key}: ${p.type}`)
       .join(', ');
     
-    byCategory[cat].push(`- ${block.type}: ${block.description}${requiredParams ? ` (required: ${requiredParams})` : ''}`);
+    const inputPorts = block.inputPorts?.map(p => p.type).join(', ');
+    const outputPorts = block.outputPorts?.map(p => p.type).join(', ');
+    
+    let portInfo = '';
+    if (inputPorts) portInfo += ` [inputs: ${inputPorts}]`;
+    if (outputPorts) portInfo += ` [outputs: ${outputPorts}]`;
+    
+    const line = `- ${block.type}: ${block.description}${requiredParams ? ` (required: ${requiredParams})` : ''}${portInfo}`;
+    
+    if (block.isSubNode) {
+      subNodes.push(line);
+    } else {
+      mainBlocks.push(line);
+    }
   });
   
-  return Object.entries(byCategory)
-    .map(([cat, blocks]) => `=== ${cat.toUpperCase()} ===\n${blocks.join('\n')}`)
-    .join('\n\n');
+  return `=== MAIN BLOCKS ===\n${mainBlocks.join('\n')}\n\n=== SUB-NODES (connect to typed ports) ===\n${subNodes.join('\n')}`;
 }

@@ -10,10 +10,11 @@ const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 // ==========================================
 // BLOCK LIBRARY - Single Source of Truth
 // L'IA ne peut utiliser QUE ces blocs
+// Inclut les sub-nodes et connexions typées
 // ==========================================
 
 const ALLOWED_BLOCKS = `
-=== TRIGGERS (use ONE to start the workflow) ===
+=== TRIGGERS (start the workflow) ===
 - manual_trigger: Start workflow manually (no params)
 - webhook_trigger: Start when webhook is called
     params: method (GET|POST|PUT|DELETE), path (string), authentication (none|basic|bearer|apikey)
@@ -45,9 +46,11 @@ const ALLOWED_BLOCKS = `
     params: errorMessage (string)
 - no_op: Pass through without changes (no params)
 
-=== AI PROCESSING ===
-- ai_agent: AI Agent with custom prompts
-    params: model (openai/gpt-5-mini|openai/gpt-5|google/gemini-2.5-flash), systemPrompt (REQUIRED), userPrompt (expression), temperature, maxTokens
+=== AI MAIN NODES ===
+- ai_agent: AI Agent with typed ports for Model, Memory, Tools
+    params: systemPrompt (REQUIRED), userPrompt (expression), outputMode (text|json|stream)
+    TYPED INPUTS: ai_model (required), ai_memory (optional), ai_tool (multiple)
+    NOTE: Connect sub-nodes to typed ports, not just main flow!
 - ai_prompt: Send prompt to LLM
     params: model, prompt (expression, REQUIRED), temperature, maxTokens
 - ai_summarize: Summarize text content
@@ -64,6 +67,45 @@ const ALLOWED_BLOCKS = `
     params: prompt (expression, REQUIRED), style (professional|casual|creative|technical), length (short|medium|long)
 - ai_vision: Analyze images with AI
     params: imageUrl (expression, REQUIRED), task (describe|ocr|objects|custom), customPrompt
+
+=== AI SUB-NODES (connect to typed ports) ===
+These are auxiliary nodes that connect to specific TYPED PORTS on main nodes (like ai_agent).
+
+Chat Model Sub-nodes (output: ai_model):
+- openai_chat_model: OpenAI GPT model
+    params: model (gpt-5|gpt-5-mini|gpt-5-nano), temperature, maxTokens
+- gemini_chat_model: Google Gemini model  
+    params: model (gemini-2.5-pro|gemini-2.5-flash|gemini-3-flash-preview), temperature
+
+Memory Sub-nodes (output: ai_memory):
+- simple_memory: In-memory conversation buffer
+    params: maxMessages, sessionKey (expression)
+- postgres_memory: Persistent memory in PostgreSQL
+    params: tableName, sessionKey (expression)
+
+Vector Store / Retriever Sub-nodes (output: ai_retriever):
+- simple_vector_store: In-memory vector store for RAG
+    params: topK, similarityThreshold
+    TYPED INPUT: ai_embeddings
+- supabase_vector_store: Vector store using Supabase pgvector
+    params: tableName, contentColumn, embeddingColumn, topK
+    TYPED INPUT: ai_embeddings
+
+Embeddings Sub-nodes (output: ai_embeddings):
+- openai_embeddings: OpenAI text embeddings
+    params: model (text-embedding-3-small|text-embedding-3-large)
+
+Tool Sub-nodes (output: ai_tool):
+- http_tool: HTTP request as agent tool
+    params: name (REQUIRED), description (REQUIRED), method, url
+- code_tool: JavaScript function as agent tool
+    params: name (REQUIRED), description (REQUIRED), parameters (JSON), code
+- workflow_tool: Another workflow as agent tool
+    params: name (REQUIRED), description (REQUIRED), workflowId
+
+Document Sub-nodes (output: document):
+- document_loader: Load and parse documents
+    params: source (file|url|text), url, text, chunkSize, chunkOverlap
 
 === DATA TRANSFORMATION ===
 - set: Modify, add or remove item fields
@@ -143,7 +185,9 @@ const WORKFLOW_SCHEMA = `
     {
       "id": "unique-uuid",
       "sourceBlockId": "block-id",
-      "targetBlockId": "block-id"
+      "targetBlockId": "block-id",
+      "sourceHandle": "main | ai_model | ai_memory | ai_tool | ai_embeddings | ai_retriever | document",
+      "targetHandle": "main | ai_model | ai_memory | ai_tool | ai_embeddings | ai_retriever | document"
     }
   ],
   "description": "Workflow description"
@@ -155,14 +199,54 @@ CRITICAL RULES:
 3. Use expression syntax {{ $json.field }} to reference data from previous blocks
 4. Start every workflow with exactly ONE trigger block
 5. Connect blocks in a logical sequence: trigger → process → output
-6. Keep workflows simple: 3-6 blocks is ideal
-7. NEVER use placeholder URLs like "api.example.com" - they will FAIL
-8. For email tasks, use email_trigger (requires OAuth) and send_email
+6. Keep workflows simple: 3-8 blocks is ideal
+
+TYPED CONNECTIONS (n8n-style):
+- For AI Agent (ai_agent), you MUST connect sub-nodes to typed ports:
+  * Connect openai_chat_model or gemini_chat_model to the "ai_model" port
+  * Optionally connect simple_memory or postgres_memory to the "ai_memory" port  
+  * Optionally connect tool sub-nodes (http_tool, code_tool) to the "ai_tool" port
+- Use sourceHandle/targetHandle to specify the port type
+- Regular data flow uses "main" as the handle (default if omitted)
 
 POSITIONING:
-- Start at x=100, y=50
-- Increment y by 150 for each block
-- For branches, offset x by 200
+- Main flow: x=300, y increments by 150
+- Sub-nodes: position to the LEFT of the main node (x=50-200)
+- Sub-nodes should be at similar y-level as the node they connect to
+`;
+
+const EXAMPLE_WORKFLOW = `
+EXAMPLE - AI Agent with Chat Model and Memory:
+{
+  "blocks": [
+    { "id": "trigger-1", "type": "manual_trigger", "name": "Start", "config": {}, "position": { "x": 300, "y": 50 } },
+    { "id": "model-1", "type": "openai_chat_model", "name": "OpenAI Chat Model", "config": { "model": "gpt-5-mini", "temperature": 0.7 }, "position": { "x": 50, "y": 200 } },
+    { "id": "memory-1", "type": "simple_memory", "name": "Simple Memory", "config": { "maxMessages": 10 }, "position": { "x": 50, "y": 320 } },
+    { "id": "agent-1", "type": "ai_agent", "name": "AI Agent", "config": { "systemPrompt": "You are a helpful assistant.", "userPrompt": "{{ $json.message }}" }, "position": { "x": 300, "y": 200 } },
+    { "id": "output-1", "type": "log", "name": "Log Response", "config": { "level": "info", "message": "{{ $json.response }}" }, "position": { "x": 300, "y": 380 } }
+  ],
+  "connections": [
+    { "id": "c1", "sourceBlockId": "trigger-1", "targetBlockId": "agent-1", "sourceHandle": "main", "targetHandle": "main" },
+    { "id": "c2", "sourceBlockId": "model-1", "targetBlockId": "agent-1", "sourceHandle": "ai_model", "targetHandle": "ai_model" },
+    { "id": "c3", "sourceBlockId": "memory-1", "targetBlockId": "agent-1", "sourceHandle": "ai_memory", "targetHandle": "ai_memory" },
+    { "id": "c4", "sourceBlockId": "agent-1", "targetBlockId": "output-1", "sourceHandle": "main", "targetHandle": "main" }
+  ],
+  "description": "AI Agent with OpenAI model and conversation memory"
+}
+
+EXAMPLE - Simple email summary (no sub-nodes needed):
+{
+  "blocks": [
+    { "id": "trigger-1", "type": "email_trigger", "name": "Get Email", "config": { "provider": "gmail", "query": "is:unread", "maxResults": 1 }, "position": { "x": 300, "y": 50 } },
+    { "id": "summarize-1", "type": "ai_summarize", "name": "Summarize", "config": { "input": "{{ $json.body }}", "style": "brief" }, "position": { "x": 300, "y": 200 } },
+    { "id": "save-1", "type": "database_insert", "name": "Save", "config": { "table": "email_summaries", "data": { "summary": "{{ $json.summary }}" } }, "position": { "x": 300, "y": 350 } }
+  ],
+  "connections": [
+    { "id": "c1", "sourceBlockId": "trigger-1", "targetBlockId": "summarize-1" },
+    { "id": "c2", "sourceBlockId": "summarize-1", "targetBlockId": "save-1" }
+  ],
+  "description": "Summarize incoming emails and save to database"
+}
 `;
 
 serve(async (req) => {
@@ -178,7 +262,6 @@ serve(async (req) => {
     
     const { objective, context, constraints, existingWorkflow, modificationRequest, stream } = body;
 
-    // Mode: modification d'un workflow existant
     const isModification = existingWorkflow && modificationRequest;
 
     if (!isModification && !objective) {
@@ -216,7 +299,8 @@ RULES FOR MODIFICATIONS:
 3. Keep existing connections unless explicitly asked to change them
 4. When adding blocks, position them logically (increment y by 150)
 5. When removing blocks, also remove their connections
-6. Return the COMPLETE modified workflow, not just the changes`;
+6. Use sourceHandle/targetHandle for typed port connections
+7. Return the COMPLETE modified workflow, not just the changes`;
 
       userPrompt = `Here is the CURRENT workflow:
 ${JSON.stringify(existingWorkflow, null, 2)}
@@ -227,7 +311,7 @@ Apply the modification and output the COMPLETE modified workflow as JSON.
 IMPORTANT: Use ONLY block types from the allowed list. Do not invent new block types.`;
 
     } else {
-      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates SIMPLE, FUNCTIONAL automation workflows.
+      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows like n8n.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
 ALLOWED BLOCK TYPES (USE ONLY THESE):
@@ -236,36 +320,26 @@ ${ALLOWED_BLOCKS}
 WORKFLOW SCHEMA:
 ${WORKFLOW_SCHEMA}
 
+${EXAMPLE_WORKFLOW}
+
 CRITICAL RULES:
 1. Use ONLY the block types listed above - you CANNOT invent new ones
-2. Create the MINIMUM number of blocks needed (usually 3-6 blocks)
+2. Create the MINIMUM number of blocks needed (usually 3-8 blocks)
 3. NEVER use placeholder URLs like "api.example.com" - these will FAIL
 4. Use expression syntax {{ $json.field }} to reference data from previous blocks
 5. Start with exactly ONE trigger block
-6. Connect blocks in a logical sequence
+6. For AI Agent workflows, ALWAYS connect sub-nodes for Chat Model (required) and optionally Memory/Tools
+7. Use typed connections (sourceHandle/targetHandle) when connecting to typed ports`;
 
-EXAMPLE - Summarize email and save to database:
-{
-  "blocks": [
-    { "id": "trigger-1", "type": "email_trigger", "name": "Get Latest Email", "config": { "provider": "gmail", "query": "is:unread", "maxResults": 1 }, "position": { "x": 100, "y": 50 } },
-    { "id": "extract-1", "type": "ai_extract", "name": "Extract Info", "config": { "input": "{{ $json.body }}", "fields": ["subject", "sender", "summary"], "description": "Extract email information" }, "position": { "x": 100, "y": 200 } },
-    { "id": "save-1", "type": "database_insert", "name": "Save to DB", "config": { "table": "email_summaries", "data": { "subject": "{{ $json.subject }}", "sender": "{{ $json.sender }}", "summary": "{{ $json.summary }}" } }, "position": { "x": 100, "y": 350 } }
-  ],
-  "connections": [
-    { "id": "c1", "sourceBlockId": "trigger-1", "targetBlockId": "extract-1" },
-    { "id": "c2", "sourceBlockId": "extract-1", "targetBlockId": "save-1" }
-  ],
-  "description": "Fetches latest email, extracts key information, and saves to database"
-}`;
-
-      userPrompt = `Create a SIMPLE, FUNCTIONAL workflow for: ${objective}
+      userPrompt = `Create a workflow for: ${objective}
 
 ${context ? `Context: ${context}` : ''}
 ${constraints ? `Constraints: ${constraints}` : ''}
 
 IMPORTANT:
 - Use ONLY block types from the allowed list (no custom blocks)
-- Create the minimum blocks needed (3-6 typically)
+- Create the minimum blocks needed (3-8 typically)
+- For AI agents, connect the required Chat Model sub-node
 - Use expression syntax {{ $json.field }} to pass data between blocks
 - Do NOT use http_request with fake URLs
 
@@ -274,7 +348,7 @@ Output ONLY valid JSON. No markdown, no explanations.`;
 
     console.log('Calling AI Gateway for:', isModification ? 'modification' : 'generation');
 
-    // Streaming mode for real-time block display
+    // Streaming mode
     if (stream) {
       console.log('Using streaming mode...');
       const controller = new AbortController();
@@ -427,7 +501,7 @@ Output ONLY valid JSON. No markdown, no explanations.`;
             type: 'manual_trigger',
             name: 'Start',
             config: {},
-            position: { x: 100, y: 50 }
+            position: { x: 300, y: 50 }
           },
           {
             id: 'ai-1',
@@ -438,7 +512,7 @@ Output ONLY valid JSON. No markdown, no explanations.`;
               prompt: objective,
               temperature: 0.7
             },
-            position: { x: 100, y: 200 }
+            position: { x: 300, y: 200 }
           }
         ],
         connections: [
@@ -465,15 +539,18 @@ Output ONLY valid JSON. No markdown, no explanations.`;
     workflow.blocks = workflow.blocks.map((block: any, index: number) => ({
       ...block,
       id: block.id || `block-${index + 1}`,
-      position: block.position || { x: 100, y: 50 + index * 150 }
+      position: block.position || { x: 300, y: 50 + index * 150 }
     }));
 
-    // If no connections were generated but we have multiple blocks, create linear connections
+    // If no connections were generated but we have multiple blocks, create linear connections for main blocks
     if (workflow.connections.length === 0 && workflow.blocks.length > 1) {
-      workflow.connections = workflow.blocks.slice(0, -1).map((block: any, index: number) => ({
+      const mainBlocks = workflow.blocks.filter((b: any) => !b.type.includes('_model') && !b.type.includes('_memory') && !b.type.includes('_tool') && !b.type.includes('_embeddings'));
+      workflow.connections = mainBlocks.slice(0, -1).map((block: any, index: number) => ({
         id: `conn-${index + 1}`,
         sourceBlockId: block.id,
-        targetBlockId: workflow.blocks[index + 1].id
+        targetBlockId: mainBlocks[index + 1].id,
+        sourceHandle: 'main',
+        targetHandle: 'main'
       }));
     }
 
