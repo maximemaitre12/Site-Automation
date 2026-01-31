@@ -2992,6 +2992,7 @@ Only output JSON, no other text.`;
         const rawCc = block.config?.cc || '';
         const fromName = block.config?.from_name || 'AETHER Flow';
         const isHtml = block.config?.isHtml === true;
+        const attachDocument = block.config?.attachDocument === true;
         
         const to = String(interpolateTemplate(rawTo, context.input));
         const subject = String(interpolateTemplate(rawSubject, context.input));
@@ -3041,21 +3042,27 @@ Only output JSON, no other text.`;
           return null;
         };
 
-        // Check current input and previousOutputs for documents
-        let attachment = findDocumentData(context.input);
+        // Check current input and previousOutputs for documents - ONLY if attachDocument is enabled
+        let attachment: { filename: string; content: string; mimeType: string } | null = null;
         
-        if (!attachment && context.previousOutputs) {
-          for (const key of Object.keys(context.previousOutputs)) {
-            const found = findDocumentData(context.previousOutputs[key]);
-            if (found && found.content) {
-              attachment = found;
-              console.log(`[send_email] Found attachment from block: ${key}, filename: ${found.filename}`);
-              break;
+        if (attachDocument) {
+          attachment = findDocumentData(context.input);
+          
+          if (!attachment && context.previousOutputs) {
+            for (const key of Object.keys(context.previousOutputs)) {
+              const found = findDocumentData(context.previousOutputs[key]);
+              if (found && found.content) {
+                attachment = found;
+                console.log(`[send_email] Found attachment from block: ${key}, filename: ${found.filename}`);
+                break;
+              }
             }
           }
+          
+          console.log(`[send_email] Attachment search enabled, found: ${attachment ? attachment.filename : 'none'}`);
+        } else {
+          console.log(`[send_email] Attachment disabled (attachDocument=${attachDocument})`);
         }
-
-        console.log(`[send_email] Attachment found: ${attachment ? attachment.filename : 'none'}`);
 
         try {
           const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
