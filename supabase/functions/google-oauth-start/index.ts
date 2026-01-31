@@ -78,9 +78,10 @@ serve(async (req) => {
       ...requestedScopes.map((s: string) => scopeMap[s] || s)
     ].join(' ');
 
-    // Build redirect URI - use the app domain, not Supabase
-    // This bypasses Google's restriction on shared hosting domains like supabase.co
-    const appBaseUrl = body.appBaseUrl || Deno.env.get('SITE_URL') || 'https://aether-ai-company.lovable.app';
+    // Build redirect URI - ALWAYS use the stable published app URL.
+    // If we use the preview URL, Google will often fail with an immediate error unless
+    // the user also whitelists that exact preview domain.
+    const appBaseUrl = Deno.env.get('SITE_URL') || 'https://aether-ai-company.lovable.app';
     const redirectUri = `${appBaseUrl}/oauth/google/callback`;
 
     // Generate state with user ID for callback verification

@@ -55,7 +55,17 @@ export default function GoogleCallback() {
         
         const returnUrl = data?.returnUrl || '/tools/flow';
         const email = data?.email ? `&email=${encodeURIComponent(data.email)}` : '';
-        setTimeout(() => navigate(`${returnUrl}?oauth_success=google${email}`), 1500);
+        const target = `${returnUrl}${returnUrl.includes('?') ? '&' : '?'}oauth_success=google${email}`;
+
+        // If returnUrl is absolute (e.g., preview URL), do a hard navigation.
+        // Otherwise, use the SPA router.
+        setTimeout(() => {
+          if (/^https?:\/\//i.test(returnUrl)) {
+            window.location.assign(target);
+          } else {
+            navigate(target);
+          }
+        }, 1500);
 
       } catch (err) {
         console.error('Callback error:', err);
