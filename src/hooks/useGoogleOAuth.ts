@@ -57,12 +57,11 @@ export function useGoogleOAuth() {
       }
 
       // Build request body with optional user-provided credentials
-      const requestBody: Record<string, any> = { 
+      // NOTE: returnUrl is absolute so the callback page (which may run on another domain)
+      // can reliably send the user back to the exact place they started.
+      const requestBody: Record<string, any> = {
         scopes,
-        returnUrl: window.location.pathname,
-        // Pass the app base URL so the backend uses it as redirect_uri
-        // This bypasses Google's restriction on shared hosting domains (supabase.co)
-        appBaseUrl: window.location.origin
+        returnUrl: `${window.location.origin}${window.location.pathname}`,
       };
 
       // If user provided their own credentials, pass them

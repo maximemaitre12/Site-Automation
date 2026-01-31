@@ -385,8 +385,10 @@ function NodePropertiesPanelComponent({
       ));
     }
 
-    // Redirect URI for Google OAuth configuration - now uses the app domain, not Supabase
-    const GOOGLE_REDIRECT_URI = `${window.location.origin}/oauth/google/callback`;
+    // Redirect URI for Google OAuth configuration - use the stable published URL.
+    // (The OAuth flow is initiated from preview too, but we still redirect through the
+    // stable domain to avoid Google rejecting ever-changing preview URLs.)
+    const GOOGLE_REDIRECT_URI = `https://aether-ai-company.lovable.app/oauth/google/callback`;
 
     return (
       <Collapsible
