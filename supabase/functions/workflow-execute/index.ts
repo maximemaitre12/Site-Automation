@@ -2964,7 +2964,7 @@ Only output JSON, no other text.`;
         break;
       }
 
-      // ===== Send Email Block (via Resend) =====
+      // ===== Send Email Block (via Gmail OAuth or Resend fallback) =====
       case 'send_email': {
         const userId = context.variables?._userId;
         
@@ -3001,7 +3001,115 @@ Only output JSON, no other text.`;
         try {
           const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
           
-          // Call the dedicated send-workflow-email edge function
+          // First, try to use Gmail OAuth if user has connected their Google account
+          const { data: tokenData, error: tokenError } = await supabase
+            .from('user_oauth_tokens')
+            .select('access_token, refresh_token, expires_at, client_id, client_secret, email')
+            .eq('user_id', userId)
+            .eq('provider', 'google')
+            .maybeSingle();
+
+          if (tokenData?.access_token) {
+            console.log('[send_email] Using Gmail OAuth for sending');
+            
+            let accessToken = tokenData.access_token;
+            
+            // Check if token is expired and refresh if needed
+            const expiresAt = tokenData.expires_at ? new Date(tokenData.expires_at) : null;
+            if (expiresAt && expiresAt < new Date() && tokenData.refresh_token) {
+              console.log('[send_email] Token expired, refreshing...');
+              
+              const clientId = tokenData.client_id || Deno.env.get('GOOGLE_CLIENT_ID');
+              const clientSecret = tokenData.client_secret || Deno.env.get('GOOGLE_CLIENT_SECRET');
+              
+              if (clientId && clientSecret) {
+                const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: new URLSearchParams({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    refresh_token: tokenData.refresh_token,
+                    grant_type: 'refresh_token',
+                  }),
+                });
+                
+                if (refreshResponse.ok) {
+                  const refreshData = await refreshResponse.json();
+                  accessToken = refreshData.access_token;
+                  
+                  // Update stored token
+                  const newExpiresAt = new Date(Date.now() + (refreshData.expires_in * 1000)).toISOString();
+                  await supabase
+                    .from('user_oauth_tokens')
+                    .update({
+                      access_token: refreshData.access_token,
+                      expires_at: newExpiresAt,
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq('user_id', userId)
+                    .eq('provider', 'google');
+                  console.log('[send_email] Token refreshed successfully');
+                } else {
+                  console.error('[send_email] Token refresh failed');
+                }
+              }
+            }
+            
+            // Build the email in RFC 2822 format for Gmail API
+            const senderEmail = tokenData.email || 'me';
+            const fromHeader = fromName ? `${fromName} <${senderEmail}>` : senderEmail;
+            
+            let emailContent = [
+              `From: ${fromHeader}`,
+              `To: ${to}`,
+              cc ? `Cc: ${cc}` : null,
+              `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+              `MIME-Version: 1.0`,
+              `Content-Type: ${isHtml ? 'text/html' : 'text/plain'}; charset=UTF-8`,
+              ``,
+              isHtml ? body : body
+            ].filter(Boolean).join('\r\n');
+
+            // Base64url encode the email
+            const base64Email = btoa(unescape(encodeURIComponent(emailContent)))
+              .replace(/\+/g, '-')
+              .replace(/\//g, '_')
+              .replace(/=+$/, '');
+
+            // Send via Gmail API
+            const sendResponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ raw: base64Email }),
+            });
+
+            if (sendResponse.ok) {
+              const sendResult = await sendResponse.json();
+              console.log('[send_email] Gmail API: Email sent successfully:', sendResult.id);
+              output = { 
+                sent: true, 
+                emailId: sendResult.id,
+                threadId: sendResult.threadId,
+                to,
+                subject,
+                via: 'gmail',
+                from: senderEmail,
+                message: `Email envoyé avec succès depuis ${senderEmail}`
+              };
+              break;
+            } else {
+              const errorText = await sendResponse.text();
+              console.error('[send_email] Gmail API error:', errorText);
+              // Fall through to Resend fallback
+            }
+          }
+
+          // Fallback to Resend if Gmail OAuth is not available or failed
+          console.log('[send_email] Falling back to Resend');
           const { data, error } = await supabase.functions.invoke('send-workflow-email', {
             body: { 
               to, 
@@ -3016,26 +3124,27 @@ Only output JSON, no other text.`;
           });
 
           if (error) {
-            console.error('[send_email] Function invoke error:', error);
+            console.error('[send_email] Resend function invoke error:', error);
             output = { 
               sent: false, 
-              error: error.message || 'Erreur lors de l\'envoi de l\'email',
+              error: error.message || 'Erreur lors de l\'envoi de l\'email. Vérifiez que vous avez connecté votre compte Gmail dans les paramètres du workflow.',
               to,
               subject
             };
           } else if (data?.success) {
-            console.log('[send_email] Email sent successfully:', data);
+            console.log('[send_email] Resend: Email sent successfully:', data);
             output = { 
               sent: true, 
               emailId: data.id,
               to,
               subject,
-              message: 'Email envoyé avec succès'
+              via: 'resend',
+              message: 'Email envoyé avec succès via Resend'
             };
           } else {
             output = { 
               sent: false, 
-              error: data?.error || 'Échec de l\'envoi de l\'email',
+              error: data?.error || 'Échec de l\'envoi. Connectez votre compte Gmail OAuth pour envoyer des emails.',
               to,
               subject
             };
