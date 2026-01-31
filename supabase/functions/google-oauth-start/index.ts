@@ -78,19 +78,21 @@ serve(async (req) => {
       ...requestedScopes.map((s: string) => scopeMap[s] || s)
     ].join(' ');
 
+    // Build redirect URI - use the app domain, not Supabase
+    // This bypasses Google's restriction on shared hosting domains like supabase.co
+    const appBaseUrl = body.appBaseUrl || Deno.env.get('SITE_URL') || 'https://aether-ai-company.lovable.app';
+    const redirectUri = `${appBaseUrl}/oauth/google/callback`;
+
     // Generate state with user ID for callback verification
-    // Store the clientSecret encrypted for callback use
+    // Include clientId/clientSecret for the exchange step
     const state = btoa(JSON.stringify({
       userId: user.id,
       timestamp: Date.now(),
       returnUrl: body.returnUrl || '/tools/flow',
-      // Store clientId and clientSecret for callback
       clientId: clientId,
       clientSecret: clientSecret,
+      redirectUri: redirectUri, // Include the redirect URI for token exchange
     }));
-
-    // Build redirect URI
-    const redirectUri = `${supabaseUrl}/functions/v1/google-oauth-callback`;
 
     // Build Google OAuth URL
     const params = new URLSearchParams({
