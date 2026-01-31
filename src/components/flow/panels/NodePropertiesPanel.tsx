@@ -51,6 +51,7 @@ function NodePropertiesPanelComponent({
     new Set(['config', 'connection', 'auth', 'filters', 'message', 'format', 'destinations'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
+  const [showOAuthConfig, setShowOAuthConfig] = useState(false);
   
   // Google OAuth hook
   const { status: googleOAuthStatus, loading: googleOAuthLoading, connect: connectGoogle, disconnect: disconnectGoogle } = useGoogleOAuth();
@@ -200,7 +201,7 @@ function NodePropertiesPanelComponent({
         const hasCredentials = block?.config?.googleClientId && block?.config?.googleClientSecret;
         
         // Show connected state if Google OAuth is connected
-        if (googleOAuthStatus?.connected && googleOAuthStatus.email) {
+        if (googleOAuthStatus?.connected && googleOAuthStatus.email && !showOAuthConfig) {
           return (
             <div className="space-y-3">
               <div className="flex items-center gap-2 p-2 rounded-lg bg-green-500/10 border border-green-500/20">
@@ -211,19 +212,14 @@ function NodePropertiesPanelComponent({
                 </div>
               </div>
               
-              {/* Switch account button */}
+              {/* Switch account button - shows config fields */}
               <Button
                 variant="outline"
                 size="sm"
                 className="w-full h-8 gap-2 text-xs"
-                onClick={() => handleOAuthConnect('Google')}
-                disabled={googleOAuthLoading || !hasCredentials}
+                onClick={() => setShowOAuthConfig(true)}
               >
-                {googleOAuthLoading ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <RefreshCw className="w-3 h-3" />
-                )}
+                <RefreshCw className="w-3 h-3" />
                 Changer de compte
               </Button>
               
@@ -246,20 +242,26 @@ function NodePropertiesPanelComponent({
           );
         }
         
-        // Show message if credentials are not configured
+        // Show message if credentials are not configured (when not connected or showOAuthConfig is true)
         if (!hasCredentials) {
           return (
             <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <p className="text-[10px] text-amber-700">
-                Renseignez d'abord votre Google Client ID et Client Secret ci-dessus pour activer la connexion OAuth.
+                Renseignez d'abord votre Google Client ID et Client Secret ci-dessous pour activer la connexion OAuth.
               </p>
             </div>
           );
         }
         
-        // Show connect button when credentials are available
+        // Show connect button when credentials are available (for new connection or switching account)
         return (
           <div className="space-y-2">
+            {showOAuthConfig && googleOAuthStatus?.connected && (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border mb-2">
+                <span className="text-[10px] text-muted-foreground">Compte actuel :</span>
+                <span className="text-[10px] font-medium truncate">{googleOAuthStatus.email}</span>
+              </div>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -272,8 +274,18 @@ function NodePropertiesPanelComponent({
               ) : (
                 <ExternalLink className="w-4 h-4" />
               )}
-              Connecter votre compte Google
+              {showOAuthConfig ? 'Connecter un autre compte' : 'Connecter votre compte Google'}
             </Button>
+            {showOAuthConfig && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full h-7 text-[10px] text-muted-foreground"
+                onClick={() => setShowOAuthConfig(false)}
+              >
+                Annuler
+              </Button>
+            )}
             <p className="text-[10px] text-muted-foreground">
               Vous serez redirigé vers Google pour autoriser l'accès.
             </p>
@@ -425,45 +437,78 @@ function NodePropertiesPanelComponent({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="p-3 space-y-4 border-l-2 border-muted ml-2">
-            {/* Show redirect URI info for connection section */}
-            {sectionKey === 'connection' && (
-              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-medium text-blue-700">Configuration Google Cloud</span>
-                </div>
-                <p className="text-[10px] text-blue-600">
-                  Ajoutez cette URI de redirection dans votre{' '}
-                  <a 
-                    href="https://console.cloud.google.com/apis/credentials" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="underline hover:text-blue-800"
-                  >
-                    Google Cloud Console
-                  </a>
-                  {' '}→ OAuth Client ID → URIs de redirection autorisées :
-                </p>
-                <div className="flex items-center gap-1">
-                  <code className="flex-1 text-[9px] bg-blue-500/10 px-2 py-1.5 rounded font-mono break-all text-blue-800">
-                    {GOOGLE_REDIRECT_URI}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0 shrink-0"
-                    onClick={() => {
-                      navigator.clipboard.writeText(GOOGLE_REDIRECT_URI);
-                      toast.success('URI copiée !');
-                    }}
-                  >
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-            )}
+            {/* For connection section: check if we should show config fields */}
+            {sectionKey === 'connection' && (() => {
+              const isConnected = googleOAuthStatus?.connected && googleOAuthStatus.email;
+              const shouldShowConfigFields = !isConnected || showOAuthConfig;
+              
+              return (
+                <>
+                  {/* Show config instructions only when not connected or switching accounts */}
+                  {shouldShowConfigFields && (
+                    <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-blue-600" />
+                        <span className="text-xs font-medium text-blue-700">Configuration Google Cloud</span>
+                      </div>
+                      <p className="text-[10px] text-blue-600">
+                        Ajoutez cette URI de redirection dans votre{' '}
+                        <a 
+                          href="https://console.cloud.google.com/apis/credentials" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="underline hover:text-blue-800"
+                        >
+                          Google Cloud Console
+                        </a>
+                        {' '}→ OAuth Client ID → URIs de redirection autorisées :
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <code className="flex-1 text-[9px] bg-blue-500/10 px-2 py-1.5 rounded font-mono break-all text-blue-800">
+                          {GOOGLE_REDIRECT_URI}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 shrink-0"
+                          onClick={() => {
+                            navigator.clipboard.writeText(GOOGLE_REDIRECT_URI);
+                            toast.success('URI copiée !');
+                          }}
+                        >
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Render fields - filter out Client ID and Secret when connected and not showing config */}
+                  {fields.map((field) => {
+                    // Hide Client ID and Client Secret fields when connected and not in config mode
+                    const isCredentialField = field.key === 'googleClientId' || field.key === 'googleClientSecret';
+                    if (isCredentialField && isConnected && !showOAuthConfig) {
+                      return null;
+                    }
+                    
+                    return (
+                      <div key={field.key} className="space-y-1.5">
+                        <Label className="text-xs font-medium flex items-center gap-1">
+                          {field.label}
+                          {field.required && <span className="text-red-500">*</span>}
+                        </Label>
+                        {renderField(field)}
+                        {field.helpText && (
+                          <p className="text-[10px] text-muted-foreground">{field.helpText}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              );
+            })()}
             
-            {fields.map((field) => (
+            {/* Non-connection sections render normally */}
+            {sectionKey !== 'connection' && fields.map((field) => (
               <div key={field.key} className="space-y-1.5">
                 <Label className="text-xs font-medium flex items-center gap-1">
                   {field.label}
