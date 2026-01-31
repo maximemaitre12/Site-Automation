@@ -426,10 +426,16 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
           }
         }
 
-        // Fetch emails from Gmail API
+        // Fetch emails from Gmail API - sorted by most recent (internalDate desc is default)
         try {
+          // Build query - Gmail API returns newest first by default when no specific order is set
+          // Adding 'newer_than:1d' can help but we want ALL emails, just the most recent
+          const finalQuery = query || 'in:inbox';
+          
+          console.log(`Gmail query: "${finalQuery}", maxResults: ${maxResults}`);
+          
           const messagesResponse = await fetch(
-            `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=${maxResults}`,
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(finalQuery)}&maxResults=${maxResults}`,
             { headers: { 'Authorization': `Bearer ${accessToken}` } }
           );
 
@@ -519,11 +525,16 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
             }
           }
 
+          // Log the most recent email for debugging
+          if (emails.length > 0) {
+            console.log(`Most recent email: From="${emails[0].from}", Subject="${emails[0].subject}", Date="${emails[0].date}"`);
+          }
+
           output = { 
             type: 'gmail', 
             emails,
             count: emails.length,
-            query,
+            query: finalQuery,
             timestamp: new Date().toISOString()
           };
         } catch (gmailError) {
