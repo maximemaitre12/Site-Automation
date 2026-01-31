@@ -31,6 +31,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
   // Triggers that fetch their own data automatically (real integrations)
   const autoTriggerTypes = [
+    'trigger_gmail',
     'email_oauth',
     'email_imap', 
     'trigger_webhook', 
@@ -179,7 +180,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                   <span className="font-medium">Trigger automatique</span>
                 </div>
               <p className="text-sm text-muted-foreground mt-1">
-                  Ce workflow récupère automatiquement les données depuis {triggerBlock?.type === 'email_oauth' || triggerBlock?.type === 'email_imap' ? 'votre boîte mail' : 'la source configurée'}.
+                  Ce workflow récupère automatiquement les données depuis {triggerBlock?.type === 'email_oauth' || triggerBlock?.type === 'email_imap' || triggerBlock?.type === 'trigger_gmail' ? 'votre boîte mail' : 'la source configurée'}.
                 </p>
               </div>
             )}
