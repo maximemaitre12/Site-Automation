@@ -71,61 +71,29 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
         blob = await Packer.toBlob(doc);
       } 
-      // Generate real PDF on the client using jsPDF
+      // Generate professional PDF using the document-export library
       else if (resolvedFormat === 'pdf' || resolvedMime === 'application/pdf') {
-        const { jsPDF } = await import('jspdf');
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const { generatePDF } = await import('@/lib/document-export');
         
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 25;
-        const contentWidth = pageWidth - margin * 2;
-        let yPosition = margin;
+        // Default professional branding
+        const branding = {
+          primaryColor: '#0A1A3C',
+          secondaryColor: '#3C4DFE',
+          accentColor: '#6366F1',
+          fontFamily: 'Calibri',
+          companyName: 'AETHER',
+          logoUrl: '',
+          tagline: 'AI Suite'
+        };
         
-        // Title
-        if (title) {
-          pdf.setFontSize(20);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(10, 26, 60); // Dark blue
-          const titleLines = pdf.splitTextToSize(title, contentWidth);
-          pdf.text(titleLines, margin, yPosition);
-          yPosition += titleLines.length * 8 + 10;
-          
-          // Underline
-          pdf.setDrawColor(60, 77, 254);
-          pdf.setLineWidth(0.8);
-          pdf.line(margin, yPosition, margin + 50, yPosition);
-          yPosition += 15;
-        }
+        const docData = {
+          title: title || 'Document',
+          content: safeContent,
+          createdAt: new Date().toISOString(),
+          version: 1
+        };
         
-        // Content
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(51, 51, 51);
-        
-        const lines = safeContent.split('\n');
-        for (const line of lines) {
-          if (yPosition > pageHeight - 30) {
-            pdf.addPage();
-            yPosition = margin;
-          }
-          
-          const wrappedText = pdf.splitTextToSize(line || ' ', contentWidth);
-          pdf.text(wrappedText, margin, yPosition);
-          yPosition += wrappedText.length * 5 + 2;
-        }
-        
-        // Footer
-        const totalPages = pdf.internal.pages.length - 1;
-        for (let i = 1; i <= totalPages; i++) {
-          pdf.setPage(i);
-          pdf.setFontSize(8);
-          pdf.setTextColor(128, 128, 128);
-          pdf.text(`Page ${i} sur ${totalPages}`, pageWidth - margin - 20, pageHeight - 10);
-          pdf.text('AETHER AI Suite', margin, pageHeight - 10);
-        }
-        
-        blob = pdf.output('blob');
+        blob = await generatePDF(docData, branding);
       } else {
         blob = new Blob([safeContent], { type: resolvedMime });
       }
