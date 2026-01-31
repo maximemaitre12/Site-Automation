@@ -633,16 +633,23 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   },
 
   // ===== AI ACTIONS =====
+  // Tous les blocs AI ont maintenant des paramètres complets comme N8N
   ai_summary: {
     name: 'AI Summary',
     category: 'ai',
     color: 'from-indigo-500 to-blue-400',
     icon: 'Sparkles',
-    description: 'Summarize text with AI',
+    description: 'Résumer du texte avec l\'IA',
     configFields: [
-      { key: 'style', label: 'Style', type: 'select', options: ['short', 'detailed', 'bullet_points', 'executive'] },
-      { key: 'maxLength', label: 'Max Words', type: 'number', defaultValue: 200 },
-      { key: 'language', label: 'Output Language', type: 'text', placeholder: 'Same as input' }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model', helpText: 'Modèle utilisé pour le résumé' },
+      { key: 'temperature', label: 'Température (Créativité)', type: 'number', defaultValue: 0.3, section: 'ai_model', helpText: '0 = précis, 1 = créatif' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'style', label: 'Style de résumé', type: 'select', options: ['short', 'detailed', 'bullet_points', 'executive'], defaultValue: 'short', section: 'general' },
+      { key: 'maxLength', label: 'Longueur max (mots)', type: 'number', defaultValue: 200, section: 'general' },
+      { key: 'language', label: 'Langue de sortie', type: 'text', placeholder: 'Même que l\'entrée', section: 'general' },
+      { key: 'customPrompt', label: 'Instructions personnalisées', type: 'textarea', placeholder: 'Ajoutez des instructions spécifiques...', section: 'advanced' }
     ]
   },
   ai_extract: {
@@ -650,11 +657,17 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-yellow-500 to-orange-400',
     icon: 'FileSearch',
-    description: 'Extract structured data from text',
+    description: 'Extraire des données structurées du texte',
     configFields: [
-      { key: 'fields', label: 'Fields to Extract', type: 'textarea', placeholder: 'name, email, date, amount, company' },
-      { key: 'outputFormat', label: 'Output Format', type: 'select', options: ['json', 'table', 'list'] },
-      { key: 'strict', label: 'Strict Mode', type: 'boolean', helpText: 'Return null for missing fields' }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model', helpText: 'Modèle utilisé pour l\'extraction' },
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.1, section: 'ai_model', helpText: 'Plus bas = plus précis pour l\'extraction' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'fields', label: 'Champs à extraire', type: 'textarea', placeholder: 'nom, email, date, montant, entreprise', required: true, section: 'general', helpText: 'Liste des champs séparés par des virgules' },
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['json', 'table', 'list'], defaultValue: 'json', section: 'general' },
+      { key: 'strict', label: 'Mode strict', type: 'boolean', helpText: 'Retourne null pour les champs manquants', section: 'general' },
+      { key: 'customPrompt', label: 'Instructions personnalisées', type: 'textarea', placeholder: 'Contexte ou règles spécifiques...', section: 'advanced' }
     ]
   },
   ai_classify: {
@@ -662,11 +675,16 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-teal-500 to-cyan-400',
     icon: 'Tags',
-    description: 'Classify into categories',
+    description: 'Classifier dans des catégories',
     configFields: [
-      { key: 'categories', label: 'Categories', type: 'textarea', placeholder: 'Category1, Category2, Category3' },
-      { key: 'multiLabel', label: 'Allow Multiple', type: 'boolean' },
-      { key: 'confidenceThreshold', label: 'Min Confidence', type: 'number', defaultValue: 0.7 }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model' },
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.2, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'categories', label: 'Catégories', type: 'textarea', placeholder: 'Catégorie1, Catégorie2, Catégorie3', required: true, section: 'general', helpText: 'Catégories possibles séparées par virgule' },
+      { key: 'multiLabel', label: 'Multi-catégorie', type: 'boolean', section: 'general', helpText: 'Permet plusieurs catégories par item' },
+      { key: 'confidenceThreshold', label: 'Seuil de confiance', type: 'number', defaultValue: 0.7, section: 'general' },
+      { key: 'customPrompt', label: 'Critères personnalisés', type: 'textarea', placeholder: 'Définissez les critères de classification...', section: 'advanced' }
     ]
   },
   ai_generate: {
@@ -674,12 +692,17 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-violet-500 to-purple-400',
     icon: 'Wand2',
-    description: 'Generate text content with AI',
+    description: 'Générer du contenu avec l\'IA',
     configFields: [
-      { key: 'prompt', label: 'Generation Prompt', type: 'textarea', placeholder: 'Generate a professional email response...' },
-      { key: 'tone', label: 'Tone', type: 'select', options: ['professional', 'casual', 'formal', 'creative', 'technical'] },
-      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 500 },
-      { key: 'temperature', label: 'Creativity (0-1)', type: 'number', defaultValue: 0.7 }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'openai/gpt-5.2', 'google/gemini-2.5-pro', 'google/gemini-3-pro-preview', 'google/gemini-2.5-flash'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model', helpText: 'Choisissez le modèle selon vos besoins' },
+      { key: 'temperature', label: 'Température (Créativité)', type: 'number', defaultValue: 0.7, section: 'ai_model', helpText: '0 = factuel, 1 = créatif' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 2000, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'systemPrompt', label: 'System Prompt', type: 'textarea', placeholder: 'Tu es un assistant professionnel spécialisé dans...', section: 'general', helpText: 'Définit le comportement et le contexte de l\'IA' },
+      { key: 'prompt', label: 'Prompt de génération', type: 'textarea', placeholder: 'Génère un email professionnel pour...', required: true, section: 'general' },
+      { key: 'tone', label: 'Ton', type: 'select', options: ['professional', 'casual', 'formal', 'creative', 'technical', 'friendly', 'persuasive'], defaultValue: 'professional', section: 'general' },
+      { key: 'format', label: 'Format de sortie', type: 'select', options: ['text', 'markdown', 'html', 'json'], defaultValue: 'text', section: 'general' }
     ]
   },
   ai_decision: {
@@ -687,10 +710,16 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-rose-500 to-pink-400',
     icon: 'GitBranch',
-    description: 'Make intelligent decisions with branching',
+    description: 'Décision intelligente avec branchement',
     configFields: [
-      { key: 'question', label: 'Decision Question', type: 'textarea', placeholder: 'Should this request be approved?' },
-      { key: 'criteria', label: 'Decision Criteria', type: 'textarea', placeholder: 'Approve if amount < 1000€ and customer is verified' }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model' },
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.1, section: 'ai_model', helpText: 'Plus bas pour des décisions cohérentes' },
+      // Section: Paramètres
+      { key: 'question', label: 'Question de décision', type: 'textarea', placeholder: 'Est-ce que cette demande doit être approuvée ?', required: true, section: 'general' },
+      { key: 'criteria', label: 'Critères de décision', type: 'textarea', placeholder: 'Approuver si montant < 1000€ ET client vérifié', section: 'general', helpText: 'Règles pour guider la décision' },
+      { key: 'outputTrue', label: 'Libellé sortie Vrai', type: 'text', defaultValue: 'Approuvé', section: 'general' },
+      { key: 'outputFalse', label: 'Libellé sortie Faux', type: 'text', defaultValue: 'Refusé', section: 'general' }
     ],
     outputs: 2,
     allowMultipleOutputs: true
@@ -700,10 +729,16 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-cyan-500 to-blue-400',
     icon: 'Languages',
-    description: 'Translate text to any language',
+    description: 'Traduire du texte dans n\'importe quelle langue',
     configFields: [
-      { key: 'targetLanguage', label: 'Target Language', type: 'select', options: ['English', 'French', 'Spanish', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Arabic'] },
-      { key: 'preserveFormatting', label: 'Preserve Formatting', type: 'boolean', defaultValue: true }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash'], defaultValue: 'google/gemini-2.5-flash', section: 'ai_model', helpText: 'Gemini excellent pour la traduction' },
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.3, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'sourceLanguage', label: 'Langue source', type: 'select', options: ['auto', 'English', 'French', 'Spanish', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Korean'], defaultValue: 'auto', section: 'general', helpText: 'Auto-détection par défaut' },
+      { key: 'targetLanguage', label: 'Langue cible', type: 'select', options: ['English', 'French', 'Spanish', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Arabic', 'Russian', 'Korean'], required: true, section: 'general' },
+      { key: 'preserveFormatting', label: 'Conserver le formatage', type: 'boolean', defaultValue: true, section: 'general' },
+      { key: 'formalityLevel', label: 'Niveau de formalité', type: 'select', options: ['default', 'informal', 'formal', 'very_formal'], defaultValue: 'default', section: 'advanced' }
     ]
   },
   ai_sentiment: {
@@ -711,10 +746,16 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-pink-500 to-rose-400',
     icon: 'Heart',
-    description: 'Analyze sentiment and emotions',
+    description: 'Analyser le sentiment et les émotions',
     configFields: [
-      { key: 'detailed', label: 'Detailed Analysis', type: 'boolean', defaultValue: true },
-      { key: 'emotions', label: 'Detect Emotions', type: 'boolean', defaultValue: true }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'openai/gpt-5-mini', 'google/gemini-2.5-flash'], defaultValue: 'openai/gpt-5-mini', section: 'ai_model' },
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.2, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'detailed', label: 'Analyse détaillée', type: 'boolean', defaultValue: true, section: 'general' },
+      { key: 'emotions', label: 'Détecter les émotions', type: 'boolean', defaultValue: true, section: 'general', helpText: 'Joie, tristesse, colère, peur, etc.' },
+      { key: 'aspects', label: 'Analyse par aspect', type: 'boolean', defaultValue: false, section: 'general', helpText: 'Sentiment par thème/aspect mentionné' },
+      { key: 'outputFormat', label: 'Format de sortie', type: 'select', options: ['simple', 'detailed', 'scores'], defaultValue: 'detailed', section: 'general' }
     ]
   },
   ai_vision: {
@@ -722,10 +763,16 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'ai',
     color: 'from-amber-500 to-yellow-400',
     icon: 'Eye',
-    description: 'Analyze images with AI',
+    description: 'Analyser des images avec l\'IA',
     configFields: [
-      { key: 'task', label: 'Task', type: 'select', options: ['describe', 'extract_text', 'detect_objects', 'analyze'] },
-      { key: 'prompt', label: 'Custom Prompt', type: 'textarea', placeholder: 'What do you see in this image?' }
+      // Section: Modèle IA
+      { key: 'model', label: 'Modèle IA', type: 'select', options: ['openai/gpt-5', 'google/gemini-2.5-pro', 'google/gemini-2.5-flash'], defaultValue: 'google/gemini-2.5-flash', section: 'ai_model', helpText: 'Modèles avec capacité vision' },
+      { key: 'temperature', label: 'Température', type: 'number', defaultValue: 0.3, section: 'ai_model' },
+      { key: 'maxTokens', label: 'Max Tokens', type: 'number', defaultValue: 1000, section: 'ai_model' },
+      // Section: Paramètres
+      { key: 'task', label: 'Tâche', type: 'select', options: ['describe', 'extract_text', 'detect_objects', 'analyze', 'compare'], defaultValue: 'describe', section: 'general' },
+      { key: 'prompt', label: 'Prompt personnalisé', type: 'textarea', placeholder: 'Que voyez-vous dans cette image ?', section: 'general', helpText: 'Instructions spécifiques pour l\'analyse' },
+      { key: 'detailLevel', label: 'Niveau de détail', type: 'select', options: ['low', 'medium', 'high'], defaultValue: 'medium', section: 'general' }
     ]
   },
 
