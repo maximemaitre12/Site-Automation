@@ -32,10 +32,16 @@ const categoryConfig: Record<BlockCategory, CategoryConfig> = {
     bgColor: 'bg-violet-500/10',
   },
   ai: {
-    name: 'Actions IA',
+    name: 'Intelligence IA',
     icon: <Sparkles className="w-4 h-4" />,
     color: 'text-blue-500',
     bgColor: 'bg-gradient-to-r from-violet-500/10 to-blue-500/10',
+  },
+  logic: {
+    name: 'Logique / Contrôle',
+    icon: <GitBranch className="w-4 h-4" />,
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-500/10',
   },
   transform: {
     name: 'Transformations',
@@ -43,27 +49,51 @@ const categoryConfig: Record<BlockCategory, CategoryConfig> = {
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-500/10',
   },
-  control: {
-    name: 'Contrôle de flux',
-    icon: <GitBranch className="w-4 h-4" />,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10',
-  },
-  integration: {
-    name: 'Intégrations',
+  http: {
+    name: 'HTTP / API',
     icon: <Plug className="w-4 h-4" />,
-    color: 'text-emerald-500',
-    bgColor: 'bg-emerald-500/10',
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
   },
-  system: {
-    name: 'Système',
+  email: {
+    name: 'Email',
+    icon: <Zap className="w-4 h-4" />,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+  },
+  database: {
+    name: 'Base de données',
+    icon: <Database className="w-4 h-4" />,
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-500/10',
+  },
+  files: {
+    name: 'Fichiers / Stockage',
+    icon: <Settings className="w-4 h-4" />,
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-500/10',
+  },
+  messaging: {
+    name: 'Messagerie',
+    icon: <Plug className="w-4 h-4" />,
+    color: 'text-pink-500',
+    bgColor: 'bg-pink-500/10',
+  },
+  memory: {
+    name: 'Mémoire / État',
+    icon: <Database className="w-4 h-4" />,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-500/10',
+  },
+  tools: {
+    name: 'Outils',
     icon: <Settings className="w-4 h-4" />,
     color: 'text-slate-500',
     bgColor: 'bg-slate-500/10',
   },
-  aether: {
-    name: 'Aether Interne',
-    icon: <Database className="w-4 h-4" />,
+  output: {
+    name: 'Sorties',
+    icon: <ArrowRightLeft className="w-4 h-4" />,
     color: 'text-emerald-500',
     bgColor: 'bg-emerald-500/10',
   },
@@ -76,7 +106,7 @@ function DraggablePaletteComponent({
 }: DraggablePaletteProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<Set<BlockCategory>>(
-    new Set(['trigger', 'ai', 'aether'])
+    new Set(['trigger', 'ai', 'logic'])
   );
 
   // Group blocks by category
@@ -84,11 +114,16 @@ function DraggablePaletteComponent({
     const grouped: Record<BlockCategory, { type: BlockType; def: typeof BLOCK_DEFINITIONS[BlockType] }[]> = {
       trigger: [],
       ai: [],
+      logic: [],
       transform: [],
-      control: [],
-      integration: [],
-      system: [],
-      aether: [],
+      http: [],
+      email: [],
+      database: [],
+      files: [],
+      messaging: [],
+      memory: [],
+      tools: [],
+      output: [],
     };
 
     Object.entries(BLOCK_DEFINITIONS).forEach(([type, def]) => {
@@ -109,11 +144,16 @@ function DraggablePaletteComponent({
     const filtered: typeof blocksByCategory = {
       trigger: [],
       ai: [],
+      logic: [],
       transform: [],
-      control: [],
-      integration: [],
-      system: [],
-      aether: [],
+      http: [],
+      email: [],
+      database: [],
+      files: [],
+      messaging: [],
+      memory: [],
+      tools: [],
+      output: [],
     };
 
     Object.entries(blocksByCategory).forEach(([category, blocks]) => {

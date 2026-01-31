@@ -18,34 +18,49 @@ interface WorkflowNodeProps {
 // Category border colors (left accent)
 const categoryBorderColors: Record<BlockCategory, string> = {
   trigger: 'border-l-violet-500',
-  ai: 'border-l-gradient-purple', // We'll use a solid fallback
+  ai: 'border-l-blue-500',
+  logic: 'border-l-amber-500',
   transform: 'border-l-cyan-500',
-  control: 'border-l-amber-500',
-  integration: 'border-l-emerald-500',
-  system: 'border-l-slate-500',
-  aether: 'border-l-emerald-500',
+  http: 'border-l-green-500',
+  email: 'border-l-red-500',
+  database: 'border-l-orange-500',
+  files: 'border-l-teal-500',
+  messaging: 'border-l-pink-500',
+  memory: 'border-l-indigo-500',
+  tools: 'border-l-slate-500',
+  output: 'border-l-emerald-500',
 };
 
 // Category background tints
 const categoryBgTints: Record<BlockCategory, string> = {
   trigger: 'bg-violet-500/5',
   ai: 'bg-blue-500/5',
+  logic: 'bg-amber-500/5',
   transform: 'bg-cyan-500/5',
-  control: 'bg-amber-500/5',
-  integration: 'bg-emerald-500/5',
-  system: 'bg-slate-500/5',
-  aether: 'bg-emerald-500/5',
+  http: 'bg-green-500/5',
+  email: 'bg-red-500/5',
+  database: 'bg-orange-500/5',
+  files: 'bg-teal-500/5',
+  messaging: 'bg-pink-500/5',
+  memory: 'bg-indigo-500/5',
+  tools: 'bg-slate-500/5',
+  output: 'bg-emerald-500/5',
 };
 
 // Category icon bg
 const categoryIconBg: Record<BlockCategory, string> = {
   trigger: 'bg-violet-500/20 text-violet-500',
   ai: 'bg-gradient-to-br from-violet-500/20 to-blue-500/20 text-blue-500',
+  logic: 'bg-amber-500/20 text-amber-500',
   transform: 'bg-cyan-500/20 text-cyan-500',
-  control: 'bg-amber-500/20 text-amber-500',
-  integration: 'bg-emerald-500/20 text-emerald-500',
-  system: 'bg-slate-500/20 text-slate-500',
-  aether: 'bg-emerald-500/20 text-emerald-500',
+  http: 'bg-green-500/20 text-green-500',
+  email: 'bg-red-500/20 text-red-500',
+  database: 'bg-orange-500/20 text-orange-500',
+  files: 'bg-teal-500/20 text-teal-500',
+  messaging: 'bg-pink-500/20 text-pink-500',
+  memory: 'bg-indigo-500/20 text-indigo-500',
+  tools: 'bg-slate-500/20 text-slate-500',
+  output: 'bg-emerald-500/20 text-emerald-500',
 };
 
 const statusConfig: Record<ExecutionStatus, { 

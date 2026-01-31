@@ -137,7 +137,9 @@ export function WorkflowCanvas({
                   absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide
                   ${def?.category === 'trigger' ? 'bg-blue-500/20 text-blue-400' : ''}
                   ${def?.category === 'ai' ? 'bg-violet-500/20 text-violet-400' : ''}
-                  ${def?.category === 'system' ? 'bg-emerald-500/20 text-emerald-400' : ''}
+                  ${def?.category === 'output' ? 'bg-emerald-500/20 text-emerald-400' : ''}
+                  ${def?.category === 'logic' ? 'bg-amber-500/20 text-amber-400' : ''}
+                  ${def?.category === 'http' ? 'bg-green-500/20 text-green-400' : ''}
                 `}>
                   {def?.category}
                 </div>

@@ -31,12 +31,11 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
   // Triggers that fetch their own data automatically (real integrations)
   const autoTriggerTypes = [
-    'trigger_gmail',
-    'trigger_email', 
+    'email_oauth',
+    'email_imap', 
     'trigger_webhook', 
     'trigger_schedule',
-    'trigger_database',
-    'trigger_api'
+    'trigger_event'
   ];
   
   const isAutoTrigger = triggerBlock && autoTriggerTypes.includes(triggerBlock.type);
@@ -179,8 +178,8 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
                   <Play className="w-4 h-4" />
                   <span className="font-medium">Trigger automatique</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Ce workflow récupère automatiquement les données depuis {triggerBlock?.type === 'trigger_email' ? 'votre boîte mail' : 'la source configurée'}.
+              <p className="text-sm text-muted-foreground mt-1">
+                  Ce workflow récupère automatiquement les données depuis {triggerBlock?.type === 'email_oauth' || triggerBlock?.type === 'email_imap' ? 'votre boîte mail' : 'la source configurée'}.
                 </p>
               </div>
             )}
@@ -189,13 +188,13 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
             {requiresManualInput && (
               <div className="space-y-2">
                 <Label>Input Data</Label>
-                <Textarea
+              <Textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={
-                    triggerBlock?.type === 'trigger_text' 
+                    triggerBlock?.type === 'trigger_manual' 
                       ? 'Enter text to process...'
-                      : triggerBlock?.type === 'trigger_form'
+                      : triggerBlock?.type === 'trigger_webhook'
                       ? 'Enter form data (JSON or plain text)...'
                       : 'Enter input data for the workflow...'
                   }

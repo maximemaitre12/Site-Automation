@@ -105,10 +105,12 @@ export function WorkflowBuilder({
   const categories: { key: BlockCategory; label: string; icon: React.ReactNode; color: string }[] = [
     { key: 'trigger', label: 'Déclencheurs', icon: <Zap className="w-4 h-4" />, color: 'bg-blue-500' },
     { key: 'ai', label: 'Intelligence IA', icon: <Sparkles className="w-4 h-4" />, color: 'bg-violet-500' },
+    { key: 'logic', label: 'Contrôle', icon: <GitBranch className="w-4 h-4" />, color: 'bg-amber-500' },
     { key: 'transform', label: 'Transformation', icon: <Braces className="w-4 h-4" />, color: 'bg-emerald-500' },
-    { key: 'control', label: 'Contrôle', icon: <GitBranch className="w-4 h-4" />, color: 'bg-amber-500' },
-    { key: 'integration', label: 'Intégrations', icon: <Globe className="w-4 h-4" />, color: 'bg-blue-600' },
-    { key: 'system', label: 'Actions', icon: <Send className="w-4 h-4" />, color: 'bg-slate-500' },
+    { key: 'http', label: 'API/HTTP', icon: <Globe className="w-4 h-4" />, color: 'bg-green-500' },
+    { key: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, color: 'bg-red-500' },
+    { key: 'database', label: 'Base de données', icon: <Database className="w-4 h-4" />, color: 'bg-orange-500' },
+    { key: 'output', label: 'Sorties', icon: <Send className="w-4 h-4" />, color: 'bg-slate-500' },
   ];
 
   return (
@@ -239,8 +241,8 @@ export function WorkflowBuilder({
 // Empty state component
 function EmptyState({ onAddBlock }: { onAddBlock: () => void }) {
   const quickStartBlocks: { type: BlockType; label: string; description: string }[] = [
-    { type: 'trigger_text', label: 'Entrée texte', description: 'Commencez avec du texte' },
-    { type: 'trigger_file', label: 'Upload fichier', description: 'Traitez un document' },
+    { type: 'trigger_manual', label: 'Entrée texte', description: 'Commencez avec du texte' },
+    { type: 'trigger_event', label: 'Événement', description: 'Déclenché par un événement' },
     { type: 'trigger_webhook', label: 'Webhook', description: 'Recevez des données externes' },
   ];
 
@@ -460,16 +462,20 @@ function BlockCard({
           def?.category === 'trigger' && 'bg-blue-500 text-white',
           def?.category === 'ai' && 'bg-violet-500 text-white',
           def?.category === 'transform' && 'bg-emerald-500 text-white',
-          def?.category === 'control' && 'bg-amber-500 text-white',
-          def?.category === 'integration' && 'bg-blue-600 text-white',
-          def?.category === 'system' && 'bg-slate-500 text-white'
+          def?.category === 'logic' && 'bg-amber-500 text-white',
+          def?.category === 'http' && 'bg-green-500 text-white',
+          def?.category === 'email' && 'bg-red-500 text-white',
+          def?.category === 'database' && 'bg-orange-500 text-white',
+          def?.category === 'output' && 'bg-slate-500 text-white'
         )}>
           {def?.category === 'trigger' && 'Déclencheur'}
           {def?.category === 'ai' && 'IA'}
           {def?.category === 'transform' && 'Transform'}
-          {def?.category === 'control' && 'Contrôle'}
-          {def?.category === 'integration' && 'API'}
-          {def?.category === 'system' && 'Action'}
+          {def?.category === 'logic' && 'Contrôle'}
+          {def?.category === 'http' && 'API'}
+          {def?.category === 'email' && 'Email'}
+          {def?.category === 'database' && 'DB'}
+          {def?.category === 'output' && 'Sortie'}
         </div>
 
         {/* Click to configure hint */}
