@@ -362,6 +362,216 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
         break;
       }
 
+      case 'trigger_gmail': {
+        // Gmail trigger - fetch emails using OAuth tokens
+        const userId = context.variables?._userId;
+        const query = block.config?.query || 'is:inbox';
+        const maxResults = block.config?.maxResults || 1;
+        
+        if (!userId) {
+          return { output: null, error: 'Utilisateur non authentifié. Veuillez vous connecter.' };
+        }
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        
+        // Get user's OAuth tokens
+        const { data: tokenData, error: tokenError } = await supabase
+          .from('user_oauth_tokens')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('provider', 'google')
+          .maybeSingle();
+
+        if (tokenError || !tokenData) {
+          return { 
+            output: null, 
+            error: 'Gmail non connecté. Connectez votre compte Google dans Agent Flow → Bloc Gmail → Paramètres OAuth.' 
+          };
+        }
+
+        let accessToken = tokenData.access_token;
+        const refreshToken = tokenData.refresh_token;
+        const clientId = tokenData.client_id;
+        const clientSecret = tokenData.client_secret;
+        const expiresAt = new Date(tokenData.expires_at);
+
+        // Refresh token if expired
+        if (expiresAt <= new Date() && refreshToken && clientId && clientSecret) {
+          try {
+            const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({
+                client_id: clientId,
+                client_secret: clientSecret,
+                refresh_token: refreshToken,
+                grant_type: 'refresh_token',
+              }),
+            });
+
+            if (refreshResponse.ok) {
+              const newTokens = await refreshResponse.json();
+              accessToken = newTokens.access_token;
+              
+              await supabase
+                .from('user_oauth_tokens')
+                .update({
+                  access_token: newTokens.access_token,
+                  expires_at: new Date(Date.now() + newTokens.expires_in * 1000).toISOString(),
+                })
+                .eq('id', tokenData.id);
+            }
+          } catch (refreshErr) {
+            console.error('Token refresh failed:', refreshErr);
+          }
+        }
+
+        // Fetch emails from Gmail API
+        try {
+          const messagesResponse = await fetch(
+            `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=${maxResults}`,
+            { headers: { 'Authorization': `Bearer ${accessToken}` } }
+          );
+
+          if (!messagesResponse.ok) {
+            const errorText = await messagesResponse.text();
+            return { output: null, error: `Gmail API error: ${errorText}` };
+          }
+
+          const messagesData = await messagesResponse.json();
+          const messages = messagesData.messages || [];
+
+          if (messages.length === 0) {
+            output = { 
+              type: 'gmail', 
+              emails: [], 
+              count: 0, 
+              message: 'Aucun email trouvé pour cette requête.' 
+            };
+            break;
+          }
+
+          // Fetch full details for each message
+          const emails = [];
+          for (const msg of messages) {
+            const msgResponse = await fetch(
+              `https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=full`,
+              { headers: { 'Authorization': `Bearer ${accessToken}` } }
+            );
+
+            if (msgResponse.ok) {
+              const msgData = await msgResponse.json();
+              const headers = msgData.payload?.headers || [];
+              const getHeader = (name: string) => headers.find((h: any) => h.name.toLowerCase() === name.toLowerCase())?.value || '';
+              
+              // Extract body
+              let body = '';
+              const extractBody = (part: any): string => {
+                if (part.body?.data) {
+                  return atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+                }
+                if (part.parts) {
+                  for (const subpart of part.parts) {
+                    const text = extractBody(subpart);
+                    if (text) return text;
+                  }
+                }
+                return '';
+              };
+              body = extractBody(msgData.payload);
+
+              emails.push({
+                id: msgData.id,
+                threadId: msgData.threadId,
+                subject: getHeader('Subject'),
+                from: getHeader('From'),
+                to: getHeader('To'),
+                date: getHeader('Date'),
+                body: body,
+                snippet: msgData.snippet,
+              });
+            }
+          }
+
+          output = { 
+            type: 'gmail', 
+            emails,
+            count: emails.length,
+            query,
+            timestamp: new Date().toISOString()
+          };
+        } catch (gmailError) {
+          return { output: null, error: `Erreur Gmail: ${gmailError instanceof Error ? gmailError.message : 'Erreur inconnue'}` };
+        }
+        break;
+      }
+
+      // ===== DOCUMENT GENERATION =====
+      case 'doc_generate_word': {
+        // Generate Word document from input text
+        const filename = block.config?.filename || 'document.docx';
+        const title = block.config?.title || 'Generated Document';
+        const inputData = typeof context.input === 'object' ? context.input : { content: context.input };
+        
+        // Extract text content
+        let content = '';
+        if (inputData.body) content = inputData.body;
+        else if (inputData.content) content = inputData.content;
+        else if (inputData.text) content = inputData.text;
+        else if (inputData.summary) content = inputData.summary;
+        else if (inputData.emails && Array.isArray(inputData.emails) && inputData.emails.length > 0) {
+          const email = inputData.emails[0];
+          content = `Subject: ${email.subject}\nFrom: ${email.from}\nDate: ${email.date}\n\n${email.body || email.snippet}`;
+        }
+        else content = typeof inputData === 'string' ? inputData : JSON.stringify(inputData, null, 2);
+
+        output = {
+          type: 'word_document',
+          filename,
+          title,
+          content,
+          contentLength: content.length,
+          ready: true,
+          timestamp: new Date().toISOString()
+        };
+        break;
+      }
+
+      // ===== SYSTEM DOWNLOAD =====
+      case 'system_download': {
+        const filename = block.config?.filename || 'output.txt';
+        const format = block.config?.format || 'txt';
+        const inputData = context.input;
+        
+        let content = '';
+        let downloadFilename = filename;
+        
+        if (inputData?.type === 'word_document') {
+          content = inputData.content || '';
+          downloadFilename = inputData.filename || filename;
+        } else if (typeof inputData === 'string') {
+          content = inputData;
+        } else {
+          content = JSON.stringify(inputData, null, 2);
+        }
+
+        output = {
+          type: 'download',
+          filename: downloadFilename,
+          format,
+          content,
+          contentLength: content.length,
+          downloadReady: true,
+          _downloadData: {
+            filename: downloadFilename,
+            content,
+            mimeType: format === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'text/plain'
+          },
+          timestamp: new Date().toISOString()
+        };
+        break;
+      }
+
       // ===== AI ACTIONS =====
       case 'ai_summary': {
         const style = block.config?.style || 'detailed';

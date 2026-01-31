@@ -11,7 +11,7 @@ const WORKFLOW_SCHEMA = `
 {
   "blocks": [
     {
-      "id": "unique-uuid",
+      "id": "unique-id",
       "type": "block_type (see allowed types below)",
       "name": "Human readable name",
       "config": { /* block-specific configuration */ },
@@ -28,23 +28,35 @@ const WORKFLOW_SCHEMA = `
   "description": "Workflow description"
 }
 
-ALLOWED BLOCK TYPES:
-- Triggers: trigger_text, trigger_file, trigger_webhook, trigger_form, trigger_schedule, trigger_email
-- AI Actions: ai_summary, ai_extract, ai_classify, ai_generate, ai_decision, ai_translate, ai_sentiment
-- Transform: transform_json, transform_filter, transform_map, transform_merge
-- Control: control_condition, control_loop, control_delay
-- Integrations: http_request, http_webhook
-- System: system_email, system_save, system_notify, system_log
+ALLOWED BLOCK TYPES (USE ONLY THESE):
 
-BLOCK CONFIG EXAMPLES:
-- ai_extract: { "fields": "name, email, amount, date" }
-- ai_classify: { "categories": "Category1, Category2, Category3" }
-- ai_generate: { "prompt": "Generate...", "tone": "professional" }
-- ai_decision: { "question": "Should...?", "criteria": "Approve if..." }
-- ai_summary: { "style": "executive", "maxLength": 200 }
-- http_request: { "method": "GET", "url": "https://...", "headers": "{}" }
-- control_condition: { "condition": "input.value > 100" }
-- system_save: { "table": "table_name", "operation": "insert" }
+=== TRIGGERS (use ONE to start) ===
+- trigger_text: Manual text input
+- trigger_gmail: Fetch emails from Gmail (REQUIRES OAUTH - user must have connected Gmail in Flow settings)
+  config: { "query": "is:unread", "maxResults": 10 }
+- trigger_file: File upload
+- trigger_schedule: Scheduled execution (hourly, daily, etc.)
+
+=== AI PROCESSING ===
+- ai_summary: Summarize text { "style": "executive|bullet|brief", "maxLength": 200 }
+- ai_extract: Extract structured data { "fields": "name, email, date", "description": "Extract from email" }
+- ai_generate: Generate content { "prompt": "Write a summary of..." }
+- ai_translate: Translate text { "targetLanguage": "French" }
+
+=== DOCUMENT GENERATION ===
+- doc_generate_word: Generate Word document from text
+  config: { "filename": "document.docx", "title": "Document Title" }
+
+=== OUTPUT ===
+- system_download: Download file to browser
+  config: { "filename": "output.docx", "format": "docx" }
+- system_save: Save to database { "table": "table_name", "operation": "insert" }
+- system_log: Log message { "level": "INFO", "message": "..." }
+
+=== TRANSFORM ===
+- transform_json: Transform JSON data
+- transform_filter: Filter data by condition
+- transform_map: Map/transform fields
 `;
 
 serve(async (req) => {
@@ -92,12 +104,9 @@ ${WORKFLOW_SCHEMA}
 RULES FOR MODIFICATIONS:
 1. Preserve block IDs when possible to maintain references
 2. Keep existing connections unless explicitly asked to change them
-3. When adding blocks, position them logically (increment y by 120, spread x for parallel blocks)
+3. When adding blocks, position them logically (increment y by 120)
 4. When removing blocks, also remove their connections
-5. Update configurations as needed while preserving unrelated settings
-6. For parallel branches, spread blocks horizontally (x: 0, 250, 500, etc.)
-7. Maintain the overall workflow logic unless asked to change it
-8. Return the COMPLETE modified workflow, not just the changes`;
+5. Return the COMPLETE modified workflow, not just the changes`;
 
       userPrompt = `Here is the CURRENT workflow:
 ${JSON.stringify(existingWorkflow, null, 2)}
@@ -107,51 +116,57 @@ MODIFICATION REQUEST: ${modificationRequest}
 Apply the modification and output the COMPLETE modified workflow as JSON. Preserve what should stay, modify what needs to change.`;
 
     } else {
-      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates comprehensive, production-ready automation workflows.
+      systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates SIMPLE, FUNCTIONAL automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
 WORKFLOW SCHEMA:
 ${WORKFLOW_SCHEMA}
 
-CRITICAL RULES FOR COMPREHENSIVE WORKFLOWS:
-1. Always start with one or more trigger blocks
-2. Create MINIMUM 20 blocks for comprehensive automation - this is mandatory!
-3. Use logical flow: triggers -> validation -> enrichment -> processing -> decisions -> actions -> logging
-4. Include error handling branches with control_condition blocks
-5. Add logging blocks (system_log) at key checkpoints for audit trail
-6. Use AI blocks strategically: ai_extract for parsing, ai_classify for routing, ai_decision for complex logic
-7. Include notification blocks (system_notify, system_email) for important events
-8. Add control_delay blocks between external API calls to prevent rate limiting
-9. Use transform_merge to combine data from parallel branches
-10. Always end with system_save to persist results and system_log for final audit
+CRITICAL RULES - READ CAREFULLY:
+1. Create the MINIMUM number of blocks needed (usually 3-6 blocks)
+2. NEVER use placeholder URLs like "api.example.com" or "cache.example.com" - these will FAIL
+3. NEVER use http_request blocks unless the user specifically provides a real API URL
+4. For Gmail/email tasks: use trigger_gmail block (user has OAuth configured)
+5. For document generation: use doc_generate_word block
+6. For downloads: use system_download block
+7. Keep it SIMPLE - only add blocks that directly fulfill the user's request
+8. Connect blocks in a logical sequence: trigger → process → output
 
-POSITIONING FOR COMPLEX WORKFLOWS:
-- Main flow: x=300, y increments by 100 per block
-- Parallel branch left: x=50
-- Parallel branch right: x=550  
-- Error handling branch: x=800
-- Start y at 50, increment by 100 for each row
+POSITIONING:
+- Start at x=100, y=50
+- Increment y by 150 for each block
+- Keep x=100 for linear flows
 
-MANDATORY BLOCK STRUCTURE (follow this pattern):
-1. TRIGGERS (1-2 blocks): trigger_email, trigger_webhook, trigger_file, trigger_form
-2. VALIDATION (2-3 blocks): ai_extract to parse input, transform_filter for validation
-3. ENRICHMENT (2-3 blocks): http_request for external data, ai_generate for context
-4. CLASSIFICATION (2-3 blocks): ai_classify for routing, ai_sentiment for tone
-5. CORE PROCESSING (4-6 blocks): ai_summary, ai_decision, transform_json, ai_translate
-6. DECISION BRANCHING (2-3 blocks): control_condition for routing logic
-7. ACTIONS PER BRANCH (4-6 blocks): system_email, http_webhook, system_notify
-8. PERSISTENCE & LOGGING (2-3 blocks): system_save, system_log
+EXAMPLE - Email to Word document:
+{
+  "blocks": [
+    { "id": "gmail-1", "type": "trigger_gmail", "name": "Récupérer dernier email", "config": { "query": "is:inbox", "maxResults": 1 }, "position": { "x": 100, "y": 50 } },
+    { "id": "extract-1", "type": "ai_extract", "name": "Extraire le texte", "config": { "fields": "subject, body, from", "description": "Extraire le contenu de l'email" }, "position": { "x": 100, "y": 200 } },
+    { "id": "doc-1", "type": "doc_generate_word", "name": "Générer Word", "config": { "filename": "email.docx", "title": "Email Content" }, "position": { "x": 100, "y": 350 } },
+    { "id": "download-1", "type": "system_download", "name": "Télécharger", "config": { "filename": "email.docx", "format": "docx" }, "position": { "x": 100, "y": 500 } }
+  ],
+  "connections": [
+    { "id": "c1", "sourceBlockId": "gmail-1", "targetBlockId": "extract-1" },
+    { "id": "c2", "sourceBlockId": "extract-1", "targetBlockId": "doc-1" },
+    { "id": "c3", "sourceBlockId": "doc-1", "targetBlockId": "download-1" }
+  ],
+  "description": "Récupère le dernier email Gmail, extrait le contenu et génère un fichier Word téléchargeable"
+}`;
 
-Generate unique IDs using patterns like "trigger-1", "validate-1", "enrich-1", "classify-1", "process-1", "decide-1", "action-1", "log-1"`;
+      userPrompt = `Create a SIMPLE, FUNCTIONAL workflow for: ${objective}
 
-      userPrompt = `Create a COMPREHENSIVE workflow with MINIMUM 20 BLOCKS for this objective: ${objective}
-
-${context ? `Additional context: ${context}` : ''}
+${context ? `Context: ${context}` : ''}
 ${constraints ? `Constraints: ${constraints}` : ''}
 
-IMPORTANT: Generate at least 20 blocks following the mandatory structure pattern. Include validation, enrichment, classification, processing, decision branching, actions, and logging.
+IMPORTANT:
+- Use ONLY the block types listed in the schema
+- Do NOT use http_request with fake URLs
+- Create the minimum blocks needed (3-6 typically)
+- For email tasks, use trigger_gmail (OAuth is configured)
+- For document generation, use doc_generate_word
+- For downloads, use system_download
 
-Output ONLY the JSON workflow object with blocks AND connections. No explanations.`;
+Output ONLY valid JSON. No markdown, no explanations.`;
     }
 
     console.log('Calling AI Gateway for:', isModification ? 'modification' : 'generation');
