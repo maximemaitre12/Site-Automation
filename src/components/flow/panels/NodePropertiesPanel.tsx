@@ -385,10 +385,8 @@ function NodePropertiesPanelComponent({
       ));
     }
 
-    // Redirect URI for Google OAuth configuration - use the stable published URL.
-    // (The OAuth flow is initiated from preview too, but we still redirect through the
-    // stable domain to avoid Google rejecting ever-changing preview URLs.)
-    const GOOGLE_REDIRECT_URI = `https://aether-ai-company.lovable.app/oauth/google/callback`;
+    // Redirect URI for Google OAuth configuration - use the custom domain
+    const GOOGLE_REDIRECT_URI = `https://aether-connect.com/oauth/google/callback`;
 
     return (
       <Collapsible
