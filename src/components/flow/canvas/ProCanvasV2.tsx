@@ -230,18 +230,23 @@ function ProCanvasV2Component({
     const contentCenterX = minX + contentWidth / 2;
     const contentCenterY = minY + contentHeight / 2;
     
-    // Calculate zoom to fit content with padding
-    const padding = 100;
+    // Calculate zoom to fit content with padding.
+    // Use a dynamic padding so small flows don't look too far away,
+    // while still keeping breathing room for large flows.
+    const padding = Math.round(
+      Math.max(24, Math.min(96, Math.min(containerRect.width, containerRect.height) * 0.05))
+    );
     const availableWidth = containerRect.width - padding * 2;
     const availableHeight = containerRect.height - padding * 2;
     
     const scaleX = availableWidth / contentWidth;
     const scaleY = availableHeight / contentHeight;
     
-    // Use the smaller scale to fit everything
-    // Cap at 1.0 max so small workflows stay at normal size (not zoomed in)
-    // Allow going down to 0.1 for very large workflows
-    const newZoom = Math.max(0.1, Math.min(scaleX, scaleY, 1.0));
+    // Use the smaller scale to fit everything.
+    // Allow zooming in a bit for small flows (so they aren't tiny),
+    // but still allow going down to 0.1 for very large workflows.
+    const maxFitZoom = Math.min(DEFAULT_CANVAS_CONFIG.maxZoom, 2);
+    const newZoom = Math.max(0.1, Math.min(scaleX, scaleY, maxFitZoom));
     
     // Calculate pan to center the content in viewport
     const viewportCenterX = containerRect.width / 2;
