@@ -31,6 +31,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
 
   // Triggers that fetch their own data automatically (real integrations)
   const autoTriggerTypes = [
+    'trigger_gmail',
     'trigger_email', 
     'trigger_webhook', 
     'trigger_schedule',
@@ -40,6 +41,58 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
   
   const isAutoTrigger = triggerBlock && autoTriggerTypes.includes(triggerBlock.type);
   const requiresManualInput = !isAutoTrigger;
+
+  const downloadFile = async (filename: string, content: unknown, mimeType?: string, format?: string) => {
+    if (!filename) return;
+
+    try {
+      const safeContent = typeof content === 'string' ? content : JSON.stringify(content ?? '', null, 2);
+
+      let blob: Blob;
+      const resolvedFormat = (format || '').toLowerCase();
+      const resolvedMime = mimeType || (resolvedFormat === 'docx'
+        ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : 'application/octet-stream');
+
+      // If backend returns plain text for a DOCX, generate a real DOCX on the client.
+      if (resolvedFormat === 'docx' || resolvedMime.includes('officedocument.wordprocessingml.document')) {
+        const { Document, Packer, Paragraph } = await import('docx');
+        const paragraphs = safeContent
+          .split(/\r?\n/)
+          .map((line) => new Paragraph({ text: line || ' ' }));
+
+        const doc = new Document({
+          sections: [{ children: paragraphs }],
+        });
+
+        blob = await Packer.toBlob(doc);
+      } else {
+        blob = new Blob([safeContent], { type: resolvedMime });
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // Release memory
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch (err) {
+      console.error('Download failed:', err);
+      toast.error("Le téléchargement a échoué");
+    }
+  };
+
+  const maybeAutoDownload = async (execution: any) => {
+    const out = execution?.output;
+    if (!out || out.type !== 'download') return;
+
+    const payload = out._downloadData || out;
+    await downloadFile(payload.filename, payload.content, payload.mimeType, payload.format);
+  };
 
   const handleRun = async (autoInput?: string) => {
     const inputData = autoInput ?? input;
@@ -55,10 +108,8 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
     setResult(null);
 
     try {
-      // For auto-triggers, pass empty string or trigger type as context
-      const executionInput = isAutoTrigger 
-        ? JSON.stringify({ autoTrigger: true, triggerType: triggerBlock?.type })
-        : inputData;
+      // For auto-triggers (ex: Gmail), do not require any user-provided input.
+      const executionInput = isAutoTrigger ? '' : inputData;
       
       // Execute via server-side Edge Function for proper AI access
       const execution = await executeWorkflowViaServer(blocks, executionInput, workflowId);
@@ -72,6 +123,7 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
       
       if (execution.success) {
         toast.success('Workflow completed successfully');
+        await maybeAutoDownload(execution);
       } else {
         toast.error((execution as any).error || 'Workflow failed');
       }
@@ -113,7 +165,9 @@ export function WorkflowExecutor({ blocks, connections = [], workflowId, workflo
           <DialogHeader>
             <DialogTitle>Execute: {workflowName}</DialogTitle>
             <DialogDescription>
-              Provide input data to run your workflow
+              {requiresManualInput
+                ? 'Provide input data to run your workflow'
+                : 'Ce workflow se lance sans saisie (il récupère ses données automatiquement).'}
             </DialogDescription>
           </DialogHeader>
 
