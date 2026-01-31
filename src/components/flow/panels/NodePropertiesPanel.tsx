@@ -1,4 +1,4 @@
-import { memo, useState, useMemo } from 'react';
+import { memo, useState, useMemo, useEffect } from 'react';
 import { WorkflowBlock, BLOCK_DEFINITIONS, ExecutionStatus, ConfigField } from '@/types/workflow';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -55,6 +55,13 @@ function NodePropertiesPanelComponent({
   
   // Google OAuth hook
   const { status: googleOAuthStatus, loading: googleOAuthLoading, connect: connectGoogle, disconnect: disconnectGoogle } = useGoogleOAuth();
+
+  // Reset showOAuthConfig when user becomes connected (after OAuth redirect)
+  useEffect(() => {
+    if (googleOAuthStatus?.connected) {
+      setShowOAuthConfig(false);
+    }
+  }, [googleOAuthStatus?.connected]);
 
   if (!block) return null;
 
