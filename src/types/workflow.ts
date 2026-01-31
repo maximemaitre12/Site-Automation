@@ -14,12 +14,17 @@ export type BlockType =
   | 'trigger_webhook'     // Webhook HTTP entrant
   | 'trigger_schedule'    // Planification CRON
   | 'trigger_event'       // Événement système/database
+  // Legacy / compat (workflows IA existants)
+  | 'trigger_gmail'       // Trigger Gmail (OAuth)
   
   // === AI / LLM (Appels IA) ===
   | 'llm_call'            // Appel LLM générique (toutes actions IA)
   | 'llm_structured'      // Extraction structurée avec schema
   | 'llm_vision'          // Analyse d'images
   | 'llm_embeddings'      // Génération d'embeddings
+
+  // Legacy / compat (workflows IA existants)
+  | 'ai_extract'          // Extraction de champs (JSON)
   
   // === LOGIC / CONTROL FLOW ===
   | 'condition'           // If/Else
@@ -94,7 +99,11 @@ export type BlockType =
   | 'output_file'         // Sortie fichier
   | 'output_display'      // Affichage dans UI
   | 'output_notify'       // Notification
-  | 'output_log';         // Log/Audit
+  | 'output_log'          // Log/Audit
+
+  // Legacy / compat (workflows IA existants)
+  | 'doc_generate_word'   // Génération doc Word (préparation)
+  | 'system_download';    // Téléchargement navigateur
 
 export type BlockCategory = 
   | 'trigger' 
@@ -360,6 +369,31 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   },
 
   // ===================================================================
+  // LEGACY COMPAT - Trigger Gmail (workflows IA existants)
+  // NOTE: exposer 100% des paramètres utiles et la connexion OAuth.
+  // ===================================================================
+  trigger_gmail: {
+    name: 'Get Latest Email (Gmail)',
+    category: 'trigger',
+    color: 'from-rose-500 to-orange-400',
+    icon: 'Mail',
+    description: 'Déclenche le workflow en récupérant le(s) dernier(s) email(s) via Google OAuth.',
+    isRealAction: true,
+    requiresAuth: true,
+    configFields: [
+      // OAuth connection
+      { key: 'oauth', label: 'Connexion Google OAuth', type: 'oauth_button', section: 'connection', helpText: 'Connectez votre compte Google pour accéder à Gmail.' },
+      // Optional user-provided credentials (advanced)
+      { key: 'googleClientId', label: 'Google Client ID', type: 'text', section: 'connection', helpText: 'Requis si aucun credential Google n’est configuré au niveau plateforme.' },
+      { key: 'googleClientSecret', label: 'Google Client Secret', type: 'password', section: 'connection', helpText: 'Requis si aucun credential Google n’est configuré au niveau plateforme.' },
+
+      // Gmail query
+      { key: 'query', label: 'Requête Gmail', type: 'text', placeholder: 'in:inbox', defaultValue: 'in:inbox', section: 'filters', expressionEnabled: true, helpText: 'Syntaxe Gmail (ex: in:inbox is:unread newer_than:7d)' },
+      { key: 'maxResults', label: 'Nombre max d’emails', type: 'number', defaultValue: 1, section: 'filters', helpText: 'Limite de messages à récupérer.' },
+    ],
+  },
+
+  // ===================================================================
   // AI / LLM - Appels IA 100% configurables
   // ===================================================================
   
@@ -415,6 +449,52 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
       { key: 'cacheEnabled', label: 'Cache activé', type: 'boolean', defaultValue: false, section: 'advanced' },
       { key: 'cacheTtl', label: 'Durée cache (secondes)', type: 'number', defaultValue: 3600, section: 'advanced', showWhen: { field: 'cacheEnabled', value: true } },
     ]
+  },
+
+  // ===================================================================
+  // LEGACY COMPAT - AI Extract (workflows IA existants)
+  // ===================================================================
+  ai_extract: {
+    name: 'AI Extract (JSON)',
+    category: 'ai',
+    color: 'from-violet-500 to-purple-400',
+    icon: 'ScanSearch',
+    description: 'Extrait des champs depuis un texte et renvoie un objet JSON.',
+    configFields: [
+      { key: 'fields', label: 'Champs à extraire', type: 'text', placeholder: 'name, email, date, amount', defaultValue: 'body', section: 'general', helpText: 'Liste séparée par des virgules (ou un seul champ).' },
+      { key: 'strict', label: 'Strict (null si absent)', type: 'boolean', defaultValue: true, section: 'advanced', helpText: 'Si désactivé, le modèle peut "deviner" ou mettre "unknown".' },
+    ],
+  },
+
+  // ===================================================================
+  // LEGACY COMPAT - Word document preparation
+  // ===================================================================
+  doc_generate_word: {
+    name: 'Generate Word Content',
+    category: 'files',
+    color: 'from-sky-500 to-blue-400',
+    icon: 'FileText',
+    description: 'Prépare un document Word à partir des données en entrée (titre + contenu).',
+    configFields: [
+      { key: 'title', label: 'Titre', type: 'text', placeholder: 'Generated Document', defaultValue: 'Generated Document', section: 'general' },
+      { key: 'filename', label: 'Nom du fichier', type: 'text', placeholder: 'document.docx', defaultValue: 'document.docx', section: 'general', helpText: 'Nom proposé au téléchargement.' },
+    ],
+  },
+
+  // ===================================================================
+  // LEGACY COMPAT - Browser download
+  // ===================================================================
+  system_download: {
+    name: 'Download',
+    category: 'output',
+    color: 'from-slate-600 to-slate-400',
+    icon: 'Download',
+    description: 'Déclenche le téléchargement du contenu reçu en entrée.',
+    isRealAction: true,
+    configFields: [
+      { key: 'format', label: 'Format', type: 'select', options: ['txt', 'json', 'docx'], defaultValue: 'txt', section: 'format' },
+      { key: 'filename', label: 'Nom du fichier', type: 'text', placeholder: 'output.txt', defaultValue: 'output.txt', section: 'format' },
+    ],
   },
   
   llm_structured: {
