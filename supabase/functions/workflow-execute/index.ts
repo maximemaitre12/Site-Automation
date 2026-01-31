@@ -647,34 +647,58 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
         break;
       }
 
-      // ===== BLOCK-LIBRARY COMPAT: Generate Document =====
+      // ===== BLOCK-LIBRARY COMPAT: Generate Document (Word & PDF) =====
       case 'generate_document': {
         const format = (block.config?.format || 'docx').toString().toLowerCase();
-        if (format !== 'docx') {
-          return {
-            output: null,
-            error: 'Génération PDF pas encore supportée dans l’exécution (utilisez Word .docx pour le moment).',
-          };
-        }
-
         const inputData = context.input;
         const resolvedTitle = interpolateTemplate(block.config?.title || 'Generated Document', inputData) as string;
+        const defaultFilename = format === 'pdf' ? 'document.pdf' : 'document.docx';
         const resolvedFilename = (interpolateTemplate(
-          block.config?.filename || 'document.docx',
+          block.config?.filename || defaultFilename,
           inputData
-        ) as string) || 'document.docx';
+        ) as string) || defaultFilename;
         const resolvedContent = interpolateTemplate(block.config?.content || '', inputData) as string;
 
-        // Keep same shape as legacy doc_generate_word so downstream system_download can auto-download.
-        output = {
-          type: 'word_document',
-          filename: resolvedFilename,
-          title: resolvedTitle,
-          content: resolvedContent,
-          contentLength: (resolvedContent || '').length,
-          ready: true,
-          timestamp: new Date().toISOString(),
-        };
+        if (format === 'pdf') {
+          // PDF document - provide structured data for frontend PDF generation
+          const finalFilename = resolvedFilename.endsWith('.pdf') ? resolvedFilename : `${resolvedFilename.replace(/\.[^.]+$/, '')}.pdf`;
+          output = {
+            type: 'pdf_document',
+            filename: finalFilename,
+            title: resolvedTitle,
+            content: resolvedContent,
+            contentLength: (resolvedContent || '').length,
+            ready: true,
+            format: 'pdf',
+            _downloadData: {
+              filename: finalFilename,
+              content: resolvedContent,
+              title: resolvedTitle,
+              mimeType: 'application/pdf',
+              format: 'pdf'
+            },
+            timestamp: new Date().toISOString(),
+          };
+        } else {
+          // Word document (docx) - default
+          output = {
+            type: 'word_document',
+            filename: resolvedFilename,
+            title: resolvedTitle,
+            content: resolvedContent,
+            contentLength: (resolvedContent || '').length,
+            ready: true,
+            format: 'docx',
+            _downloadData: {
+              filename: resolvedFilename,
+              content: resolvedContent,
+              title: resolvedTitle,
+              mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              format: 'docx'
+            },
+            timestamp: new Date().toISOString(),
+          };
+        }
         break;
       }
 
