@@ -238,8 +238,8 @@ function ProCanvasV2Component({
     const scaleX = availableWidth / contentWidth;
     const scaleY = availableHeight / contentHeight;
     
-    // Use the smaller scale, but cap at 1.5 for readability and min at 0.3
-    const newZoom = Math.max(0.3, Math.min(scaleX, scaleY, 1.5));
+    // Use the smaller scale to fit everything, cap at 1.5 max but allow going down to 0.1 for large workflows
+    const newZoom = Math.max(0.1, Math.min(scaleX, scaleY, 1.5));
     
     // Calculate pan to center the content in viewport
     const viewportCenterX = containerRect.width / 2;
