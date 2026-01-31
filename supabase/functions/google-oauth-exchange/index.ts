@@ -109,6 +109,8 @@ serve(async (req) => {
         expires_at: expiresAt,
         scope: tokens.scope,
         email: email,
+        client_id: clientId,
+        client_secret: clientSecret,
         updated_at: new Date().toISOString(),
       }, {
         onConflict: 'user_id,provider'

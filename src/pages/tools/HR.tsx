@@ -26,7 +26,6 @@ import { DisputeCard } from "@/components/hr/DisputeCard";
 import { InterviewCard } from "@/components/hr/InterviewCard";
 import { InterviewCalendar } from "@/components/hr/InterviewCalendar";
 import { EmailInbox } from "@/components/hr/email/EmailInbox";
-import { EmailAccountConnect } from "@/components/hr/email/EmailAccountConnect";
 import { useHREmails } from "@/hooks/useHREmails";
 import { 
   AgentLayout, 
@@ -361,10 +360,13 @@ export default function HR() {
                     <AgentSectionHeader
                       icon={Mail}
                       title="Messagerie RH"
-                      description="Gérez vos emails de recrutement"
-                      action={<EmailAccountConnect />}
+                      description="Recherchez et gérez vos emails de recrutement"
                     />
-                    <EmailInbox />
+                    <EmailInbox 
+                      candidates={candidates}
+                      jobs={jobs}
+                      onCreateCandidate={createCandidate}
+                    />
                   </div>
                 )}
               </>

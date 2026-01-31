@@ -3571,6 +3571,8 @@ export type Database = {
       user_oauth_tokens: {
         Row: {
           access_token: string
+          client_id: string | null
+          client_secret: string | null
           created_at: string
           email: string | null
           expires_at: string | null
@@ -3584,6 +3586,8 @@ export type Database = {
         }
         Insert: {
           access_token: string
+          client_id?: string | null
+          client_secret?: string | null
           created_at?: string
           email?: string | null
           expires_at?: string | null
@@ -3597,6 +3601,8 @@ export type Database = {
         }
         Update: {
           access_token?: string
+          client_id?: string | null
+          client_secret?: string | null
           created_at?: string
           email?: string | null
           expires_at?: string | null
