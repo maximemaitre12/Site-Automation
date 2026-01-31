@@ -172,14 +172,26 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
     return sections;
   };
 
+  // Define section order - connection first!
+  const sectionOrder = ['connection', 'auth', 'message', 'reply', 'filters', 'search', 'general'];
+
   const sectionLabels: Record<string, string> = {
-    connection: '🔗 Connexion',
+    connection: '🔗 Connexion Email',
     auth: '🔐 Authentification',
     filters: '🔍 Filtres',
     message: '✉️ Message',
     reply: '↩️ Réponse',
     search: '🔎 Recherche',
-    general: '⚙️ Général',
+    general: '⚙️ Paramètres',
+  };
+
+  // Sort sections according to order
+  const sortedSections = (sections: Record<string, ConfigField[]>) => {
+    return Object.entries(sections).sort(([a], [b]) => {
+      const indexA = sectionOrder.indexOf(a);
+      const indexB = sectionOrder.indexOf(b);
+      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
   };
 
   return (
@@ -244,7 +256,7 @@ export function EnhancedBlockProperties({ block, onUpdate, onClose }: EnhancedBl
             {/* Config fields grouped by section */}
             {def?.configFields && def.configFields.length > 0 && (
               <div className="space-y-6">
-                {Object.entries(groupFieldsBySection(def.configFields)).map(([section, fields]) => (
+              {sortedSections(groupFieldsBySection(def.configFields)).map(([section, fields]) => (
                   <div key={section} className="space-y-4">
                     <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
                       {sectionLabels[section] || section}
