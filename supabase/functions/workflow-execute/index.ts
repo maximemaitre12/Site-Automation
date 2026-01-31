@@ -395,8 +395,19 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
         const clientSecret = tokenData.client_secret;
         const expiresAt = new Date(tokenData.expires_at);
 
-        // Refresh token if expired
-        if (expiresAt <= new Date() && refreshToken && clientId && clientSecret) {
+        // Refresh token if expired (with 5min buffer)
+        const tokenExpired = expiresAt <= new Date(Date.now() + 5 * 60 * 1000);
+        
+        if (tokenExpired) {
+          console.log('Token expired or expiring soon, attempting refresh...');
+          
+          if (!refreshToken || !clientId || !clientSecret) {
+            return { 
+              output: null, 
+              error: 'Token expiré et rafraîchissement impossible. Veuillez reconnecter votre compte Google dans les paramètres du bloc Gmail.' 
+            };
+          }
+          
           try {
             const refreshResponse = await fetch('https://oauth2.googleapis.com/token', {
               method: 'POST',
@@ -409,20 +420,33 @@ async function executeBlock(block: WorkflowBlock, context: ExecutionContext): Pr
               }),
             });
 
-            if (refreshResponse.ok) {
-              const newTokens = await refreshResponse.json();
-              accessToken = newTokens.access_token;
-              
-              await supabase
-                .from('user_oauth_tokens')
-                .update({
-                  access_token: newTokens.access_token,
-                  expires_at: new Date(Date.now() + newTokens.expires_in * 1000).toISOString(),
-                })
-                .eq('id', tokenData.id);
+            const refreshResult = await refreshResponse.json();
+            
+            if (!refreshResponse.ok) {
+              console.error('Token refresh failed:', refreshResult);
+              return { 
+                output: null, 
+                error: `Échec du rafraîchissement du token Google: ${refreshResult.error_description || refreshResult.error || 'Erreur inconnue'}. Veuillez reconnecter votre compte Gmail.` 
+              };
             }
+            
+            accessToken = refreshResult.access_token;
+            console.log('Token refreshed successfully');
+            
+            await supabase
+              .from('user_oauth_tokens')
+              .update({
+                access_token: refreshResult.access_token,
+                expires_at: new Date(Date.now() + refreshResult.expires_in * 1000).toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', tokenData.id);
           } catch (refreshErr) {
-            console.error('Token refresh failed:', refreshErr);
+            console.error('Token refresh exception:', refreshErr);
+            return { 
+              output: null, 
+              error: `Erreur réseau lors du rafraîchissement du token: ${refreshErr instanceof Error ? refreshErr.message : 'Erreur inconnue'}. Veuillez réessayer.` 
+            };
           }
         }
 
