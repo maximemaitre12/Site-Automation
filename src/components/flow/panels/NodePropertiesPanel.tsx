@@ -29,7 +29,7 @@ interface NodePropertiesPanelProps {
 
 // Section labels for better UX
 const SECTION_LABELS: Record<string, { label: string; icon: typeof Settings }> = {
-  connection: { label: 'Connexion Email', icon: Mail },
+  connection: { label: 'Connexion Google OAuth', icon: Mail },
   auth: { label: 'Authentification', icon: Key },
   filters: { label: 'Filtres', icon: Settings },
   message: { label: 'Message', icon: Mail },

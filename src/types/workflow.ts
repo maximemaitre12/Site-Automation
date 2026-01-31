@@ -347,17 +347,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     category: 'trigger',
     color: 'from-red-500 to-pink-400',
     icon: 'Mail',
-    description: 'Déclencher quand un email est reçu (Gmail, Outlook, Yahoo, etc.)',
+    description: 'Déclencher quand un email est reçu via Google OAuth',
     isRealAction: true,
-    requiresAuth: false,
+    requiresAuth: true,
     configFields: [
-      // Section: Connexion - Tout est configuré directement ici
-      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['gmail', 'outlook', 'yahoo', 'custom'], defaultValue: 'gmail', helpText: 'Sélectionnez votre fournisseur email', section: 'connection' },
-      { key: 'email', label: 'Adresse email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'connection' },
-      { key: 'password', label: 'Mot de passe d\'application', type: 'password', placeholder: 'Mot de passe d\'application (pas votre mot de passe principal)', required: true, helpText: 'Gmail/Outlook: créez un "App Password" dans vos paramètres de sécurité', section: 'connection' },
-      // Custom server (for custom provider)
-      { key: 'imapHost', label: 'Serveur IMAP', type: 'text', placeholder: 'imap.votreserveur.com', section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
-      { key: 'imapPort', label: 'Port IMAP', type: 'number', defaultValue: 993, section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
+      // Section: Connexion OAuth
+      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail pour accéder à vos emails', section: 'connection' },
       // Section: Filtres
       { key: 'subjectFilter', label: 'Filtre sujet', type: 'text', placeholder: 'Invoice* ou *Facture*', section: 'filters' },
       { key: 'fromFilter', label: 'Filtre expéditeur', type: 'text', placeholder: 'client@exemple.com', section: 'filters' },
@@ -367,24 +362,19 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     ]
   },
 
-  // ===== EMAIL BLOCKS (Direct credentials - no external OAuth) =====
+  // ===== EMAIL BLOCKS (Google OAuth Only) =====
   gmail_read: {
     name: 'Lire Emails',
     category: 'aether',
     subCategory: 'gmail',
     color: 'from-red-500 to-red-400',
     icon: 'Inbox',
-    description: 'Lire les emails (Gmail, Outlook, Yahoo, etc.)',
+    description: 'Lire les emails via Google OAuth',
     isRealAction: true,
-    requiresAuth: false,
+    requiresAuth: true,
     configFields: [
-      // Section: Connexion - Tout configuré directement
-      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['gmail', 'outlook', 'yahoo', 'custom'], defaultValue: 'gmail', helpText: 'Sélectionnez votre fournisseur email', section: 'connection' },
-      { key: 'email', label: 'Adresse email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'connection' },
-      { key: 'password', label: 'Mot de passe d\'application', type: 'password', placeholder: 'Votre App Password', required: true, helpText: 'Créez un mot de passe d\'application dans les paramètres de sécurité de votre compte', section: 'connection' },
-      // Custom server settings
-      { key: 'imapHost', label: 'Serveur IMAP', type: 'text', placeholder: 'imap.votreserveur.com', section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
-      { key: 'imapPort', label: 'Port IMAP', type: 'number', defaultValue: 993, section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
+      // Section: Connexion OAuth
+      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
       // Section: Filtres de lecture
       { key: 'query', label: 'Recherche', type: 'text', placeholder: 'is:unread from:important@email.com', section: 'filters' },
       { key: 'folder', label: 'Dossier', type: 'select', options: ['INBOX', 'SENT', 'DRAFTS', 'SPAM', 'TRASH', 'ALL'], defaultValue: 'INBOX', section: 'filters' },
@@ -400,17 +390,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     subCategory: 'gmail',
     color: 'from-red-500 to-orange-400',
     icon: 'Send',
-    description: 'Envoyer un email (Gmail, Outlook, Yahoo, etc.)',
+    description: 'Envoyer un email via Google OAuth',
     isRealAction: true,
-    requiresAuth: false,
+    requiresAuth: true,
     configFields: [
-      // Section: Connexion
-      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['gmail', 'outlook', 'yahoo', 'custom'], defaultValue: 'gmail', section: 'connection' },
-      { key: 'email', label: 'Adresse email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'connection' },
-      { key: 'password', label: 'Mot de passe d\'application', type: 'password', placeholder: 'Votre App Password', required: true, helpText: 'Créez un mot de passe d\'application dans les paramètres de sécurité', section: 'connection' },
-      // Custom server settings
-      { key: 'smtpHost', label: 'Serveur SMTP', type: 'text', placeholder: 'smtp.votreserveur.com', section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
-      { key: 'smtpPort', label: 'Port SMTP', type: 'number', defaultValue: 587, section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
+      // Section: Connexion OAuth
+      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
       // Section: Message
       { key: 'to', label: 'Destinataire(s)', type: 'text', placeholder: 'email@example.com', required: true, section: 'message' },
       { key: 'cc', label: 'CC', type: 'text', placeholder: 'cc@email.com', section: 'message' },
@@ -427,16 +412,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     subCategory: 'gmail',
     color: 'from-red-600 to-pink-500',
     icon: 'Reply',
-    description: 'Répondre à un email existant',
+    description: 'Répondre à un email via Google OAuth',
     isRealAction: true,
-    requiresAuth: false,
+    requiresAuth: true,
     configFields: [
-      // Section: Connexion
-      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['gmail', 'outlook', 'yahoo', 'custom'], defaultValue: 'gmail', section: 'connection' },
-      { key: 'email', label: 'Adresse email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'connection' },
-      { key: 'password', label: 'Mot de passe d\'application', type: 'password', required: true, section: 'connection' },
-      { key: 'smtpHost', label: 'Serveur SMTP', type: 'text', placeholder: 'smtp.votreserveur.com', section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
-      { key: 'smtpPort', label: 'Port SMTP', type: 'number', defaultValue: 587, section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
+      // Section: Connexion OAuth
+      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
       // Section: Réponse
       { key: 'messageId', label: 'ID du message (auto si précédent)', type: 'text', placeholder: 'Laissez vide pour répondre au dernier email lu', section: 'reply' },
       { key: 'body', label: 'Réponse', type: 'textarea', required: true, section: 'reply' },
@@ -450,16 +431,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     subCategory: 'gmail',
     color: 'from-amber-500 to-yellow-400',
     icon: 'Tag',
-    description: 'Ajouter/Retirer des libellés aux emails (IMAP)',
+    description: 'Ajouter/Retirer des libellés via Google OAuth',
     isRealAction: true,
-    requiresAuth: false,
+    requiresAuth: true,
     configFields: [
-      // Section: Connexion
-      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['gmail', 'outlook', 'yahoo', 'custom'], defaultValue: 'gmail', section: 'connection' },
-      { key: 'email', label: 'Adresse email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'connection' },
-      { key: 'password', label: 'Mot de passe d\'application', type: 'password', required: true, section: 'connection' },
-      { key: 'imapHost', label: 'Serveur IMAP', type: 'text', section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
-      { key: 'imapPort', label: 'Port IMAP', type: 'number', defaultValue: 993, section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
+      // Section: Connexion OAuth
+      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
       // Section: Actions
       { key: 'messageId', label: 'ID du message', type: 'text', required: true },
       { key: 'addLabels', label: 'Ajouter libellés', type: 'text', placeholder: 'IMPORTANT, STARRED' },
@@ -472,16 +449,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     subCategory: 'gmail',
     color: 'from-blue-500 to-indigo-400',
     icon: 'Search',
-    description: 'Rechercher des emails avec filtres avancés',
+    description: 'Rechercher des emails via Google OAuth',
     isRealAction: true,
-    requiresAuth: false,
+    requiresAuth: true,
     configFields: [
-      // Section: Connexion
-      { key: 'provider', label: 'Fournisseur', type: 'select', options: ['gmail', 'outlook', 'yahoo', 'custom'], defaultValue: 'gmail', section: 'connection' },
-      { key: 'email', label: 'Adresse email', type: 'text', placeholder: 'votre@email.com', required: true, section: 'connection' },
-      { key: 'password', label: 'Mot de passe d\'application', type: 'password', required: true, section: 'connection' },
-      { key: 'imapHost', label: 'Serveur IMAP', type: 'text', section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
-      { key: 'imapPort', label: 'Port IMAP', type: 'number', defaultValue: 993, section: 'connection', showWhen: { field: 'provider', value: 'custom' } },
+      // Section: Connexion OAuth
+      { key: 'googleOAuth', label: 'Connexion Google', type: 'oauth_button', helpText: 'Connectez votre compte Gmail', section: 'connection' },
       // Section: Recherche
       { key: 'query', label: 'Requête', type: 'text', placeholder: 'from:boss@company.com subject:urgent', required: true, section: 'search' },
       { key: 'maxResults', label: 'Résultats max', type: 'number', defaultValue: 20, section: 'search' },
