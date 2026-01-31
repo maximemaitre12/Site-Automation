@@ -966,7 +966,7 @@ Only output JSON, no other text.`;
       }
 
       case 'ai_generate': {
-        const userPrompt = block.config?.prompt || 'Generate a professional response';
+        const rawPrompt = block.config?.prompt || 'Generate a professional response';
         const tone = block.config?.tone || block.config?.style || 'professional';
         const maxTokens = block.config?.maxTokens || 500;
         const lengthPreset = (block.config?.length || '').toString().toLowerCase();
@@ -977,30 +977,59 @@ Only output JSON, no other text.`;
         const workflowId = context.variables?.workflowId || context.variables?.workflow_id;
         const workflowRunId = context.variables?.workflowRunId || context.variables?.workflow_run_id;
 
+        // Clean up problematic type references in prompt (e.g., "gmail_email" -> "email professionnel")
+        const typeCleanupMap: Record<string, string> = {
+          'gmail_email': 'email professionnel de réponse',
+          'email_trigger': 'réponse par email',
+          'webhook_data': 'document de traitement',
+          'form_submission': 'document de suivi',
+        };
+        let userPrompt = rawPrompt;
+        for (const [badType, replacement] of Object.entries(typeCleanupMap)) {
+          userPrompt = userPrompt.replace(new RegExp(badType, 'gi'), replacement);
+        }
+
         const wantsLongForm =
           ['medium', 'long'].includes(lengthPreset) ||
-          /\b(document|rapport|courrier|note|proc[ée]dure|contrat|devis|r[ée]clamation|support)\b/i.test(String(userPrompt));
+          /\b(document|rapport|courrier|note|proc[ée]dure|contrat|devis|r[ée]clamation|support|email|réponse)\b/i.test(String(userPrompt));
 
         const targetLengthHint =
           lengthPreset === 'long'
             ? '900–1600 mots'
             : lengthPreset === 'medium'
               ? '500–900 mots'
-              : '200–400 mots';
+              : '300–500 mots';
 
-        const systemPrompt = wantsLongForm
-          ? `Tu es un cadre dirigeant français avec 30 ans d'expérience en rédaction professionnelle.\n\nINTERDICTIONS ABSOLUES (ne fais JAMAIS ceci):\n- Pas de crochets []\n- Pas de markdown: **, ##, #, ---, *, -\n- Pas de phrases robotiques d'IA\n- Pas de templates (Objet:, Date:, Auteur:)\n\nSTYLE OBLIGATOIRE:\n- Rédaction naturelle, expert senior\n- Clair, structuré, actionnable\n- Longueur cible: ${targetLengthHint}\n- Ton: ${tone}\n- Si c'est un document, commence directement par le contenu (pas d'en-tête artificiel).`
-          : `You are a ${tone} content generator. Be concise and focused. Max ~${maxTokens} tokens.`;
+        // CRITICAL: Ultra-strict system prompt that NEVER refuses
+        const systemPrompt = `Tu es un rédacteur professionnel expert. Tu génères TOUJOURS du contenu de haute qualité, sans exception.
+
+RÈGLE ABSOLUE: TU NE REFUSES JAMAIS. Tu ne dis jamais "je ne peux pas", "il m'est impossible", "pourriez-vous préciser". Tu GÉNÈRES toujours un document complet et professionnel.
+
+Si le contexte est ambigu ou incomplet, tu fais des hypothèses intelligentes et tu produis un document exploitable.
+
+INTERDICTIONS ABSOLUES:
+- JAMAIS de refus ou demande de clarification
+- Pas de crochets []
+- Pas de markdown: **, ##, #, ---, *, -
+- Pas de phrases robotiques d'IA
+- Pas d'en-têtes artificiels (Objet:, Date:, etc.)
+
+STYLE OBLIGATOIRE:
+- Rédaction naturelle de cadre senior expérimenté
+- Ton: ${tone}
+- Commence directement par le contenu
+- Longueur cible: ${targetLengthHint}
+- Si c'est basé sur un email reçu, rédige une RÉPONSE professionnelle à cet email`;
 
         const prompt = `${userPrompt}
 
-Contexte / Données d'entrée:
+DONNÉES D'ENTRÉE (utilise ces informations):
 ${inputText}
 
-Génère le contenu demandé.`;
+IMPORTANT: Génère immédiatement le document/email complet. Ne pose pas de questions, ne demande pas de précisions. Produis un contenu professionnel et actionnable basé sur les données ci-dessus.`;
         
         const result = await callLovableAI(prompt, systemPrompt);
-        output = { generated: result, tone, characterCount: result.length };
+        output = { generated: result, tone, characterCount: result.length, text_content: result };
         
         // If output format is PDF, delegate to workflow-generate-document so layout & PDF metadata are consistent with AETHER Doc
         if (outputFormat === 'PDF' || outputFormat === 'pdf') {
