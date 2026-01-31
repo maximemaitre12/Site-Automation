@@ -13,7 +13,7 @@ import * as LucideIcons from 'lucide-react';
 import { 
   X, ChevronRight, Settings, RefreshCw, 
   FileJson, Zap, AlertCircle, CheckCircle2,
-  Eye, EyeOff, ExternalLink, Key, Shield, Download,
+  Eye, EyeOff, ExternalLink, Key, Shield, Copy,
   Mail, FolderOpen, Tag, Loader2, LogOut
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -457,7 +457,7 @@ function NodePropertiesPanelComponent({
                       toast.success('URI copiée !');
                     }}
                   >
-                    <Download className="w-3 h-3" />
+                    <Copy className="w-3 h-3" />
                   </Button>
                 </div>
               </div>
