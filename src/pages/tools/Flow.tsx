@@ -5,14 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useWorkflows, useWorkflowRuns } from '@/hooks/useWorkflows';
-import { Workflow, WorkflowBlock, BlockType, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
+import { Workflow, WorkflowBlock, BlockType, BlockConnection } from '@/types/workflow';
+import { getBlockByType, BlockDefinition } from '@/types/block-library';
 import { WorkflowBuilder } from '@/components/flow/WorkflowBuilder';
 import { ProCanvasV2 } from '@/components/flow/canvas/ProCanvasV2';
 import { WorkflowExecutor } from '@/components/flow/WorkflowExecutor';
 import { WorkflowHistory } from '@/components/flow/WorkflowHistory';
 import { AIWorkflowGenerator } from '@/components/flow/AIWorkflowGenerator';
 import { TemplateGallery } from '@/components/flow/TemplateGallery';
-import { BlockPickerDialog } from '@/components/flow/BlockPickerDialog';
+import { BlockPaletteN8N } from '@/components/flow/palette/BlockPaletteN8N';
 import { AIAutomationRules } from '@/components/flow/AIAutomationRules';
 import { NodePropertiesPanel } from '@/components/flow/panels/NodePropertiesPanel';
 import { autoLayoutBlocks, applyLayoutToBlocks, suggestNewBlockPosition } from '@/lib/workflow-layout';
@@ -54,7 +55,7 @@ export default function Flow() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
-  const [isBlockPickerOpen, setIsBlockPickerOpen] = useState(false);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [newWorkflowName, setNewWorkflowName] = useState('');
   const [newWorkflowDesc, setNewWorkflowDesc] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -245,9 +246,9 @@ export default function Flow() {
     }
   };
 
-  const handleAddBlock = (type: BlockType) => {
+  const handleAddBlock = (type: string, definition?: BlockDefinition) => {
     if (!selectedWorkflowId) return;
-    const def = BLOCK_DEFINITIONS[type];
+    const def = definition || getBlockByType(type);
     
     // Use intelligent position suggestion based on graph structure
     const sourceBlockId = selectedBlockId || (localBlocks.length > 0 
@@ -258,8 +259,8 @@ export default function Flow() {
     
     const newBlock: WorkflowBlock = {
       id: crypto.randomUUID(),
-      type,
-      name: def.name,
+      type: type as BlockType,
+      name: def?.name || type,
       config: {},
       position: newPosition
     };
@@ -281,6 +282,7 @@ export default function Flow() {
     setLocalConnections(updatedConnections);
     setHasUnsavedChanges(true);
     setSelectedBlockId(newBlock.id);
+    setIsPaletteOpen(false);
   };
 
   // Auto-layout function - reorganize all blocks algorithmically
@@ -523,13 +525,21 @@ export default function Flow() {
                         canRedo={canRedo}
                         hasUnsavedChanges={hasUnsavedChanges}
                         onAutoLayout={handleAutoLayout}
-                        onAddBlock={() => setIsBlockPickerOpen(true)}
+                        onAddBlock={() => setIsPaletteOpen(!isPaletteOpen)}
                         fitViewKey={selectedWorkflowId ? `${selectedWorkflowId}:${fitViewNonce}` : null}
                       />
                     </div>
                     
-                    {/* Properties Panel - Shows when a block is selected */}
-                    {selectedBlock && (
+                    {/* Block Palette - N8N Style (slide in from right) */}
+                    {isPaletteOpen && (
+                      <BlockPaletteN8N
+                        onAddBlock={handleAddBlock}
+                        className="flex-shrink-0"
+                      />
+                    )}
+                    
+                    {/* Properties Panel - Shows when a block is selected and palette is closed */}
+                    {selectedBlock && !isPaletteOpen && (
                       <NodePropertiesPanel
                         block={selectedBlock}
                         onUpdate={handleUpdateBlock}
@@ -617,12 +627,6 @@ export default function Flow() {
         onSelect={handleTemplateSelect}
       />
 
-      {/* Block Picker */}
-      <BlockPickerDialog
-        isOpen={isBlockPickerOpen}
-        onClose={() => setIsBlockPickerOpen(false)}
-        onAddBlock={handleAddBlock}
-      />
 
       {/* Delete Confirmation */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
