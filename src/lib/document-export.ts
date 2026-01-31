@@ -53,24 +53,55 @@ function isHeader(text: string): boolean {
   return false;
 }
 
-// Remove duplicate paragraphs from content
-function removeDuplicateParagraphs(content: string): string {
+// Remove duplicate content - aggressive deduplication
+function removeDuplicateContent(content: string): string {
+  // First, check if the content is duplicated as a whole (repeated twice)
+  const halfLength = Math.floor(content.length / 2);
+  const firstHalf = content.substring(0, halfLength).trim();
+  const secondHalf = content.substring(halfLength).trim();
+  
+  // If the two halves are very similar (>80% overlap), keep only the second (usually more complete)
+  const similarity = calculateSimilarity(firstHalf, secondHalf);
+  if (similarity > 0.8 && content.length > 500) {
+    console.log('[PDF] Detected duplicated content, keeping second half');
+    return secondHalf;
+  }
+  
+  // Otherwise, do paragraph-level deduplication
   const paragraphs = content.split(/\n{2,}/);
   const seen = new Set<string>();
   const unique: string[] = [];
   
   for (const para of paragraphs) {
     const normalized = para.trim().toLowerCase().replace(/\s+/g, ' ');
-    if (normalized.length > 20 && seen.has(normalized)) {
-      continue; // Skip duplicate
+    if (normalized.length > 50 && seen.has(normalized)) {
+      continue; // Skip duplicate paragraph
     }
-    if (normalized.length > 20) {
+    if (normalized.length > 50) {
       seen.add(normalized);
     }
     unique.push(para);
   }
   
   return unique.join('\n\n');
+}
+
+// Calculate similarity between two strings (0-1)
+function calculateSimilarity(a: string, b: string): number {
+  const wordsA = a.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  const wordsB = b.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  
+  if (wordsA.length === 0 || wordsB.length === 0) return 0;
+  
+  const setA = new Set(wordsA);
+  const setB = new Set(wordsB);
+  
+  let intersection = 0;
+  for (const word of setA) {
+    if (setB.has(word)) intersection++;
+  }
+  
+  return intersection / Math.max(setA.size, setB.size);
 }
 
 // Detect email format content
@@ -99,9 +130,9 @@ export async function generatePDF(
   const marginLeft = 20;
   const marginRight = 20;
   const marginTop = 25;
-  const marginBottom = 25;
+  const marginBottom = 30; // Increased for footer space
   const contentWidth = pageWidth - marginLeft - marginRight;
-  const maxY = pageHeight - marginBottom;
+  const maxY = pageHeight - marginBottom - 10; // Extra safety margin for footer
   let yPosition = marginTop;
 
   const primaryRgb = hexToRgb(branding.primaryColor);
@@ -119,9 +150,12 @@ export async function generatePDF(
   const pdfFont = fontMapping[branding.fontFamily] || "helvetica";
   pdf.setFont(pdfFont);
 
-  // --- DEDUPLICATE CONTENT ---
-  const cleanedContent = removeDuplicateParagraphs(doc.content);
+  // --- DEDUPLICATE CONTENT (aggressive) ---
+  const cleanedContent = removeDuplicateContent(doc.content);
   const isEmail = isEmailContent(cleanedContent);
+  
+  // For emails, skip the big title header completely
+  const skipTitleSection = isEmail || doc.title.toLowerCase() === 'document' || doc.title.toLowerCase() === 'email';
 
   // --- COVER PAGE HEADER ---
   // Top colored bar
@@ -141,27 +175,26 @@ export async function generatePDF(
     pdf.text(dateStr, pageWidth - marginRight - dateWidth, 7);
   }
 
-  yPosition = 30;
+  yPosition = 20;
 
-  // --- DOCUMENT TITLE (only if not a generic email title) ---
-  const isGenericTitle = doc.title.toLowerCase() === 'document' || doc.title.toLowerCase() === 'email';
-  if (!isGenericTitle) {
-    pdf.setFontSize(18);
+  // --- DOCUMENT TITLE (skip for emails/generic) ---
+  if (!skipTitleSection) {
+    pdf.setFontSize(14); // Reduced from 18
     pdf.setFont(pdfFont, "bold");
     pdf.setTextColor(primaryRgb.r, primaryRgb.g, primaryRgb.b);
     
     const titleLines = pdf.splitTextToSize(doc.title, contentWidth);
     titleLines.forEach((line: string) => {
       pdf.text(line, marginLeft, yPosition);
-      yPosition += 8;
+      yPosition += 6;
     });
-    yPosition += 5;
+    yPosition += 3;
 
     // Title underline (accent)
     pdf.setDrawColor(secondaryRgb.r, secondaryRgb.g, secondaryRgb.b);
-    pdf.setLineWidth(0.8);
-    pdf.line(marginLeft, yPosition, marginLeft + 50, yPosition);
-    yPosition += 12;
+    pdf.setLineWidth(0.5);
+    pdf.line(marginLeft, yPosition, marginLeft + 40, yPosition);
+    yPosition += 8;
   }
 
   // --- PROCESS CONTENT (use deduplicated content) ---
@@ -239,12 +272,20 @@ export async function generatePDF(
       pdf.setFont(pdfFont, "normal");
       
       const wrappedText = pdf.splitTextToSize(cleaned, contentWidth);
-      checkPageBreak(wrappedText.length * 5 + 2);
+      const lineHeight = 5;
+      const paragraphHeight = wrappedText.length * lineHeight + 4;
+      
+      // Check page break BEFORE drawing
+      checkPageBreak(paragraphHeight);
       
       wrappedText.forEach((textLine: string, i: number) => {
-        pdf.text(textLine, marginLeft, yPosition + i * 5);
+        // Double-check we're not going past maxY
+        if (yPosition + i * lineHeight > maxY) {
+          addNewPage();
+        }
+        pdf.text(textLine, marginLeft, yPosition + i * lineHeight);
       });
-      yPosition += wrappedText.length * 5 + 4;
+      yPosition += paragraphHeight;
     }
   }
 
