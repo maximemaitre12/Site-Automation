@@ -7,14 +7,135 @@ const corsHeaders = {
 
 const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
+// ==========================================
+// BLOCK LIBRARY - Single Source of Truth
+// L'IA ne peut utiliser QUE ces blocs
+// ==========================================
+
+const ALLOWED_BLOCKS = `
+=== TRIGGERS (use ONE to start the workflow) ===
+- manual_trigger: Start workflow manually (no params)
+- webhook_trigger: Start when webhook is called
+    params: method (GET|POST|PUT|DELETE), path (string), authentication (none|basic|bearer|apikey)
+- schedule_trigger: Run on a schedule
+    params: rule (everyMinute|everyHour|everyDay9am|cron), cronExpression (string), timezone (string)
+- email_trigger: Trigger when email is received
+    params: provider (gmail|outlook|imap), query (string), maxResults (number)
+- form_trigger: Trigger when form is submitted
+    params: formId (string), fields (JSON array)
+
+=== FLOW CONTROL ===
+- if: Route items based on condition (2 outputs: true/false)
+    params: condition (expression, REQUIRED), combineWith (and|or)
+- switch: Route to multiple outputs based on rules
+    params: mode (rules|expression), rules (JSON), fallbackOutput (number)
+- merge: Merge data from multiple inputs
+    params: mode (append|combine|combineByField), joinField (string)
+- loop: Split data into batches and iterate (2 outputs: loop/done)
+    params: batchSize (number), maxIterations (number)
+- filter: Remove items matching a condition
+    params: condition (expression, REQUIRED)
+- limit: Restrict the number of items
+    params: maxItems (number)
+- split_out: Turn array into separate items
+    params: fieldToSplit (string)
+- wait: Wait before continuing
+    params: amount (number), unit (seconds|minutes|hours)
+- stop_and_error: Throw an error
+    params: errorMessage (string)
+- no_op: Pass through without changes (no params)
+
+=== AI PROCESSING ===
+- ai_agent: AI Agent with custom prompts
+    params: model (openai/gpt-5-mini|openai/gpt-5|google/gemini-2.5-flash), systemPrompt (REQUIRED), userPrompt (expression), temperature, maxTokens
+- ai_prompt: Send prompt to LLM
+    params: model, prompt (expression, REQUIRED), temperature, maxTokens
+- ai_summarize: Summarize text content
+    params: input (expression, REQUIRED), style (brief|bullets|executive|detailed), maxLength
+- ai_extract: Extract structured data from text
+    params: input (expression, REQUIRED), fields (JSON array, REQUIRED), description
+- ai_classify: Classify items into categories (multiple outputs)
+    params: input (expression, REQUIRED), categories (JSON array, REQUIRED), routeByCategory
+- ai_sentiment: Analyze sentiment and emotions
+    params: input (expression, REQUIRED), detailed
+- ai_translate: Translate text to another language
+    params: input (expression, REQUIRED), targetLanguage (en|fr|es|de|it|pt|zh|ja|ko|ar, REQUIRED)
+- ai_generate: Generate content with AI
+    params: prompt (expression, REQUIRED), style (professional|casual|creative|technical), length (short|medium|long)
+- ai_vision: Analyze images with AI
+    params: imageUrl (expression, REQUIRED), task (describe|ocr|objects|custom), customPrompt
+
+=== DATA TRANSFORMATION ===
+- set: Modify, add or remove item fields
+    params: mode (manual|json), fields (keyvalue), json (JSON)
+- code: Run custom JavaScript code
+    params: language (javascript), code (REQUIRED)
+- aggregate: Combine field from many items into a list
+    params: field, outputField
+- summarize: Sum, count, max, etc.
+    params: operation (sum|count|avg|min|max), field
+- sort: Change items order
+    params: field, direction (asc|desc)
+- remove_duplicates: Delete items with matching field values
+    params: field
+- rename_keys: Update item field names
+    params: mappings (keyvalue)
+- date_time: Manipulate date and time
+    params: operation (format|add|subtract|now), inputField, format
+- html: Work with HTML content
+    params: operation (extractText|parse|generate), html (expression)
+- markdown: Convert Markdown/HTML
+    params: direction (toHtml|toMarkdown), input (expression)
+- xml: Convert XML/JSON
+    params: direction (toJson|toXml), input (expression)
+- crypto: Hash, encrypt or decrypt
+    params: operation (md5|sha256|hmac|encrypt|decrypt), input (expression)
+
+=== HTTP & FILES ===
+- http_request: Make HTTP API requests
+    params: method (GET|POST|PUT|PATCH|DELETE, REQUIRED), url (REQUIRED), headers (JSON), body (JSON), timeout
+- respond_webhook: Send response to webhook caller
+    params: statusCode, body (JSON), headers (JSON)
+- read_file: Read file contents
+    params: source (url|storage|input), url (expression), encoding (utf8|base64|binary)
+- write_file: Create or write content to file
+    params: fileName (expression, REQUIRED), content (expression, REQUIRED), mimeType
+
+=== INTEGRATIONS ===
+- send_email: Send email message
+    params: to (expression, REQUIRED), subject (expression, REQUIRED), body (REQUIRED), cc, isHtml
+- slack: Post message to Slack
+    params: channel (REQUIRED), message (REQUIRED), username
+- discord: Post message to Discord
+    params: webhookUrl (REQUIRED), message (REQUIRED), username
+- telegram: Send Telegram message
+    params: chatId (REQUIRED), message (REQUIRED)
+- database_query: Query database records
+    params: table (REQUIRED), select, filter (JSON), limit, orderBy
+- database_insert: Insert records
+    params: table (REQUIRED), data (JSON, REQUIRED)
+- database_update: Update records
+    params: table (REQUIRED), filter (JSON, REQUIRED), data (JSON, REQUIRED)
+
+=== OUTPUT ===
+- generate_document: Generate Word/PDF document
+    params: format (docx|pdf), title (expression), content (expression, REQUIRED), filename (expression)
+- download_file: Trigger file download in browser
+    params: filename (expression, REQUIRED), mimeType
+- send_notification: Send push notification
+    params: title (REQUIRED), message (REQUIRED), channel (inapp|email|both)
+- log: Log message for debugging
+    params: level (info|warn|error|debug), message (REQUIRED)
+`;
+
 const WORKFLOW_SCHEMA = `
 {
   "blocks": [
     {
       "id": "unique-id",
-      "type": "block_type (see allowed types below)",
+      "type": "block_type (from ALLOWED BLOCKS list)",
       "name": "Human readable name",
-      "config": { /* block-specific configuration */ },
+      "config": { /* block-specific parameters */ },
       "position": { "x": number, "y": number }
     }
   ],
@@ -28,35 +149,20 @@ const WORKFLOW_SCHEMA = `
   "description": "Workflow description"
 }
 
-ALLOWED BLOCK TYPES (USE ONLY THESE):
+CRITICAL RULES:
+1. You can ONLY use block types from the ALLOWED BLOCKS list above
+2. You CANNOT invent new block types or parameters
+3. Use expression syntax {{ $json.field }} to reference data from previous blocks
+4. Start every workflow with exactly ONE trigger block
+5. Connect blocks in a logical sequence: trigger → process → output
+6. Keep workflows simple: 3-6 blocks is ideal
+7. NEVER use placeholder URLs like "api.example.com" - they will FAIL
+8. For email tasks, use email_trigger (requires OAuth) and send_email
 
-=== TRIGGERS (use ONE to start) ===
-- trigger_text: Manual text input
-- trigger_gmail: Fetch emails from Gmail (REQUIRES OAUTH - user must have connected Gmail in Flow settings)
-  config: { "query": "is:unread", "maxResults": 10 }
-- trigger_file: File upload
-- trigger_schedule: Scheduled execution (hourly, daily, etc.)
-
-=== AI PROCESSING ===
-- ai_summary: Summarize text { "style": "executive|bullet|brief", "maxLength": 200 }
-- ai_extract: Extract structured data { "fields": "name, email, date", "description": "Extract from email" }
-- ai_generate: Generate content { "prompt": "Write a summary of..." }
-- ai_translate: Translate text { "targetLanguage": "French" }
-
-=== DOCUMENT GENERATION ===
-- doc_generate_word: Generate Word document from text
-  config: { "filename": "document.docx", "title": "Document Title" }
-
-=== OUTPUT ===
-- system_download: Download file to browser
-  config: { "filename": "output.docx", "format": "docx" }
-- system_save: Save to database { "table": "table_name", "operation": "insert" }
-- system_log: Log message { "level": "INFO", "message": "..." }
-
-=== TRANSFORM ===
-- transform_json: Transform JSON data
-- transform_filter: Filter data by condition
-- transform_map: Map/transform fields
+POSITIONING:
+- Start at x=100, y=50
+- Increment y by 150 for each block
+- For branches, offset x by 200
 `;
 
 serve(async (req) => {
@@ -98,59 +204,58 @@ serve(async (req) => {
       systemPrompt = `You are "AETHER Flow Designer", an expert AI that modifies automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
+ALLOWED BLOCK TYPES (USE ONLY THESE):
+${ALLOWED_BLOCKS}
+
 WORKFLOW SCHEMA:
 ${WORKFLOW_SCHEMA}
 
 RULES FOR MODIFICATIONS:
-1. Preserve block IDs when possible to maintain references
-2. Keep existing connections unless explicitly asked to change them
-3. When adding blocks, position them logically (increment y by 120)
-4. When removing blocks, also remove their connections
-5. Return the COMPLETE modified workflow, not just the changes`;
+1. ONLY use block types from the ALLOWED BLOCKS list - you CANNOT invent new ones
+2. Preserve block IDs when possible to maintain references
+3. Keep existing connections unless explicitly asked to change them
+4. When adding blocks, position them logically (increment y by 150)
+5. When removing blocks, also remove their connections
+6. Return the COMPLETE modified workflow, not just the changes`;
 
       userPrompt = `Here is the CURRENT workflow:
 ${JSON.stringify(existingWorkflow, null, 2)}
 
 MODIFICATION REQUEST: ${modificationRequest}
 
-Apply the modification and output the COMPLETE modified workflow as JSON. Preserve what should stay, modify what needs to change.`;
+Apply the modification and output the COMPLETE modified workflow as JSON. 
+IMPORTANT: Use ONLY block types from the allowed list. Do not invent new block types.`;
 
     } else {
       systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates SIMPLE, FUNCTIONAL automation workflows.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
+ALLOWED BLOCK TYPES (USE ONLY THESE):
+${ALLOWED_BLOCKS}
+
 WORKFLOW SCHEMA:
 ${WORKFLOW_SCHEMA}
 
-CRITICAL RULES - READ CAREFULLY:
-1. Create the MINIMUM number of blocks needed (usually 3-6 blocks)
-2. NEVER use placeholder URLs like "api.example.com" or "cache.example.com" - these will FAIL
-3. NEVER use http_request blocks unless the user specifically provides a real API URL
-4. For Gmail/email tasks: use trigger_gmail block (user has OAuth configured)
-5. For document generation: use doc_generate_word block
-6. For downloads: use system_download block
-7. Keep it SIMPLE - only add blocks that directly fulfill the user's request
-8. Connect blocks in a logical sequence: trigger → process → output
+CRITICAL RULES:
+1. Use ONLY the block types listed above - you CANNOT invent new ones
+2. Create the MINIMUM number of blocks needed (usually 3-6 blocks)
+3. NEVER use placeholder URLs like "api.example.com" - these will FAIL
+4. Use expression syntax {{ $json.field }} to reference data from previous blocks
+5. Start with exactly ONE trigger block
+6. Connect blocks in a logical sequence
 
-POSITIONING:
-- Start at x=100, y=50
-- Increment y by 150 for each block
-- Keep x=100 for linear flows
-
-EXAMPLE - Email to Word document:
+EXAMPLE - Summarize email and save to database:
 {
   "blocks": [
-    { "id": "gmail-1", "type": "trigger_gmail", "name": "Récupérer dernier email", "config": { "query": "is:inbox", "maxResults": 1 }, "position": { "x": 100, "y": 50 } },
-    { "id": "extract-1", "type": "ai_extract", "name": "Extraire le texte", "config": { "fields": "subject, body, from", "description": "Extraire le contenu de l'email" }, "position": { "x": 100, "y": 200 } },
-    { "id": "doc-1", "type": "doc_generate_word", "name": "Générer Word", "config": { "filename": "email.docx", "title": "Email Content" }, "position": { "x": 100, "y": 350 } },
-    { "id": "download-1", "type": "system_download", "name": "Télécharger", "config": { "filename": "email.docx", "format": "docx" }, "position": { "x": 100, "y": 500 } }
+    { "id": "trigger-1", "type": "email_trigger", "name": "Get Latest Email", "config": { "provider": "gmail", "query": "is:unread", "maxResults": 1 }, "position": { "x": 100, "y": 50 } },
+    { "id": "extract-1", "type": "ai_extract", "name": "Extract Info", "config": { "input": "{{ $json.body }}", "fields": ["subject", "sender", "summary"], "description": "Extract email information" }, "position": { "x": 100, "y": 200 } },
+    { "id": "save-1", "type": "database_insert", "name": "Save to DB", "config": { "table": "email_summaries", "data": { "subject": "{{ $json.subject }}", "sender": "{{ $json.sender }}", "summary": "{{ $json.summary }}" } }, "position": { "x": 100, "y": 350 } }
   ],
   "connections": [
-    { "id": "c1", "sourceBlockId": "gmail-1", "targetBlockId": "extract-1" },
-    { "id": "c2", "sourceBlockId": "extract-1", "targetBlockId": "doc-1" },
-    { "id": "c3", "sourceBlockId": "doc-1", "targetBlockId": "download-1" }
+    { "id": "c1", "sourceBlockId": "trigger-1", "targetBlockId": "extract-1" },
+    { "id": "c2", "sourceBlockId": "extract-1", "targetBlockId": "save-1" }
   ],
-  "description": "Récupère le dernier email Gmail, extrait le contenu et génère un fichier Word téléchargeable"
+  "description": "Fetches latest email, extracts key information, and saves to database"
 }`;
 
       userPrompt = `Create a SIMPLE, FUNCTIONAL workflow for: ${objective}
@@ -159,12 +264,10 @@ ${context ? `Context: ${context}` : ''}
 ${constraints ? `Constraints: ${constraints}` : ''}
 
 IMPORTANT:
-- Use ONLY the block types listed in the schema
-- Do NOT use http_request with fake URLs
+- Use ONLY block types from the allowed list (no custom blocks)
 - Create the minimum blocks needed (3-6 typically)
-- For email tasks, use trigger_gmail (OAuth is configured)
-- For document generation, use doc_generate_word
-- For downloads, use system_download
+- Use expression syntax {{ $json.field }} to pass data between blocks
+- Do NOT use http_request with fake URLs
 
 Output ONLY valid JSON. No markdown, no explanations.`;
     }
@@ -175,7 +278,7 @@ Output ONLY valid JSON. No markdown, no explanations.`;
     if (stream) {
       console.log('Using streaming mode...');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout for complex workflows
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
       
       try {
         const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -220,7 +323,6 @@ Output ONLY valid JSON. No markdown, no explanations.`;
           );
         }
 
-        // Return the stream directly
         return new Response(response.body, {
           headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
         });
@@ -234,14 +336,14 @@ Output ONLY valid JSON. No markdown, no explanations.`;
       }
     }
 
-    // Non-streaming mode (more reliable)
+    // Non-streaming mode
     console.log('Making AI request (non-streaming)...');
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       console.log('Request timeout after 120s');
       controller.abort();
-    }, 120000); // 120s timeout for complex workflows
+    }, 120000);
     
     let response;
     try {
@@ -303,7 +405,6 @@ Output ONLY valid JSON. No markdown, no explanations.`;
     // Parse the JSON from the response
     let workflow;
     try {
-      // Try to extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || content.match(/(\{[\s\S]*\})/);
       const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
       workflow = JSON.parse(jsonStr);
@@ -323,18 +424,19 @@ Output ONLY valid JSON. No markdown, no explanations.`;
         blocks: [
           {
             id: 'trigger-1',
-            type: 'trigger_text',
-            name: 'Input',
-            config: { placeholder: 'Enter data...' },
+            type: 'manual_trigger',
+            name: 'Start',
+            config: {},
             position: { x: 100, y: 50 }
           },
           {
-            id: 'process-1',
-            type: 'ai_generate',
+            id: 'ai-1',
+            type: 'ai_prompt',
             name: 'Process with AI',
             config: { 
+              model: 'openai/gpt-5-mini',
               prompt: objective,
-              tone: 'professional'
+              temperature: 0.7
             },
             position: { x: 100, y: 200 }
           }
@@ -343,7 +445,7 @@ Output ONLY valid JSON. No markdown, no explanations.`;
           {
             id: 'conn-1',
             sourceBlockId: 'trigger-1',
-            targetBlockId: 'process-1'
+            targetBlockId: 'ai-1'
           }
         ],
         description: objective
@@ -359,57 +461,12 @@ Output ONLY valid JSON. No markdown, no explanations.`;
       workflow.connections = [];
     }
 
-    // Intelligent positioning function for complex workflows
-    function calculateBlockPositions(blocks: any[]): any[] {
-      const VERTICAL_SPACING = 100;
-      const HORIZONTAL_SPACING = 280;
-      const START_Y = 50;
-      const MAIN_X = 300;
-      
-      // Group blocks by type prefix for logical layout
-      const getGroupPriority = (type: string): number => {
-        if (type?.startsWith('trigger_')) return 0;
-        if (['ai_extract', 'transform_filter', 'transform_json'].includes(type)) return 1;
-        if (type?.startsWith('http_') || type === 'ai_generate') return 2;
-        if (['ai_classify', 'ai_sentiment'].includes(type)) return 3;
-        if (['ai_summary', 'ai_decision', 'ai_translate'].includes(type)) return 4;
-        if (['control_condition', 'control_loop', 'control_branch'].includes(type)) return 5;
-        if (['system_email', 'system_notify', 'http_webhook'].includes(type)) return 6;
-        if (['system_save', 'system_log'].includes(type)) return 7;
-        return 4; // Default to processing group
-      };
-      
-      // Sort blocks by group priority
-      const sortedBlocks = [...blocks].sort((a, b) => 
-        getGroupPriority(a.type) - getGroupPriority(b.type)
-      );
-      
-      // Position blocks
-      let currentY = START_Y;
-      let lastGroup = -1;
-      
-      return sortedBlocks.map((block, index) => {
-        const currentGroup = getGroupPriority(block.type);
-        
-        // Add extra spacing between groups
-        if (lastGroup !== -1 && currentGroup !== lastGroup) {
-          currentY += 30; // Extra gap between groups
-        }
-        lastGroup = currentGroup;
-        
-        const position = { x: MAIN_X, y: currentY };
-        currentY += VERTICAL_SPACING;
-        
-        return {
-          ...block,
-          id: block.id || `block-${index + 1}`,
-          position: block.position || position
-        };
-      });
-    }
-
-    // Apply intelligent positioning
-    workflow.blocks = calculateBlockPositions(workflow.blocks);
+    // Position blocks properly
+    workflow.blocks = workflow.blocks.map((block: any, index: number) => ({
+      ...block,
+      id: block.id || `block-${index + 1}`,
+      position: block.position || { x: 100, y: 50 + index * 150 }
+    }));
 
     // If no connections were generated but we have multiple blocks, create linear connections
     if (workflow.connections.length === 0 && workflow.blocks.length > 1) {
