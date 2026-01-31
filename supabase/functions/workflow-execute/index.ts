@@ -977,10 +977,14 @@ Only output JSON, no other text.`;
         const workflowId = context.variables?.workflowId || context.variables?.workflow_id;
         const workflowRunId = context.variables?.workflowRunId || context.variables?.workflow_run_id;
 
+        // Detect if this is for a DOCUMENT (PDF/summary) or an EMAIL body
+        const isForDocument = /\b(document|pdf|rapport|résumé|summary|analyse|report|compte[- ]rendu)\b/i.test(String(rawPrompt) + ' ' + block.name);
+        const isForEmail = /\b(email|mail|envoyer|send|notification|message)\b/i.test(String(rawPrompt) + ' ' + block.name);
+
         // Clean up problematic type references in prompt (e.g., "gmail_email" -> "email professionnel")
         const typeCleanupMap: Record<string, string> = {
-          'gmail_email': 'email professionnel de réponse',
-          'email_trigger': 'réponse par email',
+          'gmail_email': isForDocument ? 'document de synthèse' : 'email professionnel de réponse',
+          'email_trigger': isForDocument ? 'données d\'entrée' : 'réponse par email',
           'webhook_data': 'document de traitement',
           'form_submission': 'document de suivi',
         };
@@ -1000,10 +1004,50 @@ Only output JSON, no other text.`;
               ? '500–900 mots'
               : '300–500 mots';
 
-        // CRITICAL: Ultra-strict system prompt that NEVER refuses
-        const systemPrompt = `Tu es un rédacteur professionnel expert. Tu génères TOUJOURS du contenu de haute qualité, sans exception.
+        // CRITICAL: Different system prompts for DOCUMENT vs EMAIL
+        let systemPrompt: string;
+        
+        if (isForDocument) {
+          systemPrompt = `Tu es un rédacteur expert qui génère des DOCUMENTS PROFESSIONNELS (rapports, résumés, analyses, notes de synthèse).
 
-RÈGLE ABSOLUE: TU NE REFUSES JAMAIS. Tu ne dis jamais "je ne peux pas", "il m'est impossible", "pourriez-vous préciser". Tu GÉNÈRES toujours un document complet et professionnel.
+RÈGLE ABSOLUE: TU NE REFUSES JAMAIS. Génère TOUJOURS un document complet.
+
+FORMAT DOCUMENT:
+- Structure claire avec sections thématiques
+- Contenu analytique et synthétique
+- Pas de formules de politesse (Cher client, Cordialement, etc.)
+- Pas de format "lettre" ou "email"
+- Commence directement par le contenu substantiel
+
+INTERDICTIONS:
+- Pas de markdown: **, ##, #, ---
+- Pas de phrases robotiques
+- Pas de demandes de clarification
+
+Ton: ${tone}
+Longueur cible: ${targetLengthHint}`;
+        } else if (isForEmail) {
+          systemPrompt = `Tu es un rédacteur expert qui génère des EMAILS PROFESSIONNELS courts et efficaces.
+
+RÈGLE ABSOLUE: TU NE REFUSES JAMAIS. Génère TOUJOURS un email complet.
+
+FORMAT EMAIL:
+- Court et concis (max 150 mots)
+- Formule d'ouverture simple (Bonjour,)
+- Corps du message direct et actionnable
+- Formule de clôture (Cordialement,)
+- Pas de signature détaillée (elle sera ajoutée automatiquement)
+
+INTERDICTIONS:
+- Pas de markdown: **, ##, #, ---
+- Pas de longs paragraphes
+- Pas d'analyse détaillée (c'est pour le document)
+
+Ton: ${tone}`;
+        } else {
+          systemPrompt = `Tu es un rédacteur professionnel expert. Tu génères TOUJOURS du contenu de haute qualité, sans exception.
+
+RÈGLE ABSOLUE: TU NE REFUSES JAMAIS. Tu ne dis jamais "je ne peux pas", "il m'est impossible", "pourriez-vous préciser". Tu GÉNÈRES toujours un contenu complet et professionnel.
 
 Si le contexte est ambigu ou incomplet, tu fais des hypothèses intelligentes et tu produis un document exploitable.
 
@@ -1018,18 +1062,18 @@ STYLE OBLIGATOIRE:
 - Rédaction naturelle de cadre senior expérimenté
 - Ton: ${tone}
 - Commence directement par le contenu
-- Longueur cible: ${targetLengthHint}
-- Si c'est basé sur un email reçu, rédige une RÉPONSE professionnelle à cet email`;
+- Longueur cible: ${targetLengthHint}`;
+        }
 
         const prompt = `${userPrompt}
 
 DONNÉES D'ENTRÉE (utilise ces informations):
 ${inputText}
 
-IMPORTANT: Génère immédiatement le document/email complet. Ne pose pas de questions, ne demande pas de précisions. Produis un contenu professionnel et actionnable basé sur les données ci-dessus.`;
+IMPORTANT: Génère immédiatement le contenu complet. Ne pose pas de questions, ne demande pas de précisions. Produis un contenu professionnel et actionnable basé sur les données ci-dessus.`;
         
         const result = await callLovableAI(prompt, systemPrompt);
-        output = { generated: result, tone, characterCount: result.length, text_content: result };
+        output = { generated: result, tone, characterCount: result.length, text_content: result, contentType: isForDocument ? 'document' : isForEmail ? 'email' : 'generic' };
         
         // If output format is PDF, delegate to workflow-generate-document so layout & PDF metadata are consistent with AETHER Doc
         if (outputFormat === 'PDF' || outputFormat === 'pdf') {

@@ -300,7 +300,19 @@ RULES FOR MODIFICATIONS:
 4. When adding blocks, position them logically (increment y by 150)
 5. When removing blocks, also remove their connections
 6. Use sourceHandle/targetHandle for typed port connections
-7. Return the COMPLETE modified workflow, not just the changes`;
+7. Return the COMPLETE modified workflow, not just the changes
+
+STATIC VALUES vs INTERPOLATION:
+- If user gives you a LITERAL email address like "john@example.com", use it DIRECTLY: "to": "john@example.com"
+- ONLY use {{ $json.field }} when referencing data FROM PREVIOUS BLOCKS
+- WRONG: "to": "{{ $json.john@example.com }}" (this is INVALID syntax)
+- CORRECT: "to": "john@example.com" (literal value)
+- CORRECT: "to": "{{ $json.sender_email }}" (dynamic from previous block)
+
+EMAIL vs DOCUMENT - NEVER MIX THEM:
+- Document = formal PDF/Word content (summary, report, analysis) - use generate_document
+- Email = short notification message sent to a person - use send_email
+- Generate DIFFERENT content for each purpose!`;
 
       userPrompt = `Here is the CURRENT workflow:
 ${JSON.stringify(existingWorkflow, null, 2)}
@@ -308,7 +320,10 @@ ${JSON.stringify(existingWorkflow, null, 2)}
 MODIFICATION REQUEST: ${modificationRequest}
 
 Apply the modification and output the COMPLETE modified workflow as JSON. 
-IMPORTANT: Use ONLY block types from the allowed list. Do not invent new block types.`;
+IMPORTANT: 
+- Use ONLY block types from the allowed list. Do not invent new block types.
+- If the user provides a literal email address, use it directly WITHOUT {{ }} template syntax.
+- Ensure email and document content are generated separately for their respective purposes.`;
 
     } else {
       systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows like n8n.
@@ -329,7 +344,22 @@ CRITICAL RULES:
 4. Use expression syntax {{ $json.field }} to reference data from previous blocks
 5. Start with exactly ONE trigger block
 6. For AI Agent workflows, ALWAYS connect sub-nodes for Chat Model (required) and optionally Memory/Tools
-7. Use typed connections (sourceHandle/targetHandle) when connecting to typed ports`;
+7. Use typed connections (sourceHandle/targetHandle) when connecting to typed ports
+
+CRITICAL UNDERSTANDING - EMAIL vs DOCUMENT:
+- If user wants to SEND AN EMAIL: use "send_email" block with proper email body
+- If user wants to CREATE A DOCUMENT (PDF, summary, report): use "ai_generate" for content + "generate_document" for output
+- These are DIFFERENT outputs! Do NOT mix them:
+  * EMAIL = short message sent to a recipient (use send_email block)
+  * DOCUMENT = PDF/Word file with formal content (use generate_document block)
+- When both are needed: generate DIFFERENT content for each! The document should be a summary/analysis, the email should be a brief notification.
+
+STATIC VALUES vs INTERPOLATION:
+- If user gives you a LITERAL email address like "john@example.com", use it DIRECTLY: "to": "john@example.com"
+- ONLY use {{ $json.field }} when referencing data FROM PREVIOUS BLOCKS
+- WRONG: "to": "{{ $json.john@example.com }}" (this is INVALID)
+- CORRECT: "to": "john@example.com" (literal value)
+- CORRECT: "to": "{{ $json.sender_email }}" (dynamic from previous block)`;
 
       userPrompt = `Create a workflow for: ${objective}
 
@@ -340,8 +370,10 @@ IMPORTANT:
 - Use ONLY block types from the allowed list (no custom blocks)
 - Create the minimum blocks needed (3-8 typically)
 - For AI agents, connect the required Chat Model sub-node
-- Use expression syntax {{ $json.field }} to pass data between blocks
+- Use expression syntax {{ $json.field }} ONLY to reference data from previous block outputs
+- If user provides a literal email address, use it directly WITHOUT {{ }} template syntax
 - Do NOT use http_request with fake URLs
+- SEPARATE email content from document content - they serve different purposes!
 
 Output ONLY valid JSON. No markdown, no explanations.`;
     }
