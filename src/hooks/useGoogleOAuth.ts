@@ -43,7 +43,10 @@ export function useGoogleOAuth() {
     }
   }, []);
 
-  const connect = useCallback(async (scopes: string[] = ['gmail.readonly', 'gmail.send']) => {
+  const connect = useCallback(async (
+    scopes: string[] = ['gmail.readonly', 'gmail.send'],
+    clientCredentials?: { clientId: string; clientSecret: string }
+  ) => {
     try {
       setLoading(true);
       
@@ -53,18 +56,27 @@ export function useGoogleOAuth() {
         return;
       }
 
+      // Build request body with optional user-provided credentials
+      const requestBody: Record<string, any> = { 
+        scopes,
+        returnUrl: window.location.pathname 
+      };
+
+      // If user provided their own credentials, pass them
+      if (clientCredentials?.clientId && clientCredentials?.clientSecret) {
+        requestBody.clientId = clientCredentials.clientId;
+        requestBody.clientSecret = clientCredentials.clientSecret;
+      }
+
       const response = await supabase.functions.invoke('google-oauth-start', {
-        body: { 
-          scopes,
-          returnUrl: window.location.pathname 
-        }
+        body: requestBody
       });
 
       if (response.error) {
         const errorData = response.error;
-        if (errorData.message?.includes('not_configured')) {
-          toast.error('OAuth Google non configuré', {
-            description: 'L\'administrateur doit ajouter GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans les paramètres Cloud.',
+        if (errorData.message?.includes('missing_credentials')) {
+          toast.error('Credentials manquants', {
+            description: 'Veuillez renseigner votre Google Client ID et Client Secret dans les paramètres du bloc.',
             duration: 8000,
           });
         } else {
@@ -75,9 +87,9 @@ export function useGoogleOAuth() {
         return;
       }
 
-      if (response.data?.error === 'not_configured') {
-        toast.error('OAuth Google non configuré', {
-          description: 'Ajoutez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans Cloud → Secrets.',
+      if (response.data?.error === 'missing_credentials') {
+        toast.error('Credentials manquants', {
+          description: 'Renseignez votre Google Client ID et Client Secret dans les paramètres du bloc avant de vous connecter.',
           duration: 8000,
         });
         return;

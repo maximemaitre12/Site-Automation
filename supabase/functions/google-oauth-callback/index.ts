@@ -30,15 +30,21 @@ serve(async (req) => {
       return Response.redirect(`${baseUrl}/tools/flow?oauth_error=invalid_state`, 302);
     }
 
-    const { userId, returnUrl } = stateData;
+    const { userId, returnUrl, clientId: stateClientId, clientSecret: stateClientSecret } = stateData;
     if (!userId) {
       console.error('Missing userId in state');
       return Response.redirect(`${baseUrl}/tools/flow?oauth_error=invalid_state`, 302);
     }
 
-    // Exchange code for tokens
-    const clientId = Deno.env.get('GOOGLE_CLIENT_ID')!;
-    const clientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET')!;
+    // Use credentials from state (user-provided) or fall back to env vars
+    const clientId = stateClientId || Deno.env.get('GOOGLE_CLIENT_ID')!;
+    const clientSecret = stateClientSecret || Deno.env.get('GOOGLE_CLIENT_SECRET')!;
+    
+    if (!clientId || !clientSecret) {
+      console.error('Missing OAuth credentials');
+      return Response.redirect(`${baseUrl}/tools/flow?oauth_error=missing_credentials`, 302);
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const redirectUri = `${supabaseUrl}/functions/v1/google-oauth-callback`;
 
