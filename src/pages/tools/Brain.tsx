@@ -303,44 +303,51 @@ export default function BrainPage() {
 
           <ScrollArea className="flex-1">
             <div className="space-y-1">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-2 mb-2">
-                Conversations récentes
-              </h3>
               {conversations.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-2 py-4">
-                  Aucune conversation
-                </p>
-              ) : (
-                conversations.map((conv) => (
-                  <div
-                    key={conv.id}
-                    className={cn(
-                      "group flex items-center justify-between p-2.5 md:p-3 rounded-lg hover:bg-secondary cursor-pointer transition-colors",
-                      currentConversation?.id === conv.id && "bg-secondary"
-                    )}
-                    onClick={() => { selectConversation(conv.id); setShowMobileSidebar(false); }}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {conv.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTime(conv.updated_at)}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteConversation(conv.id);
-                      }}
-                    >
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                    </Button>
+                <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                  <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
+                    <MessageSquarePlus className="w-5 h-5 text-muted-foreground/70" />
                   </div>
-                ))
+                  <p className="text-sm text-muted-foreground">
+                    Commencez une nouvelle conversation
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-2 mb-2">
+                    Conversations récentes
+                  </h3>
+                  {conversations.map((conv) => (
+                    <div
+                      key={conv.id}
+                      className={cn(
+                        "group flex items-center justify-between p-2.5 md:p-3 rounded-lg hover:bg-secondary cursor-pointer transition-colors",
+                        currentConversation?.id === conv.id && "bg-secondary"
+                      )}
+                      onClick={() => { selectConversation(conv.id); setShowMobileSidebar(false); }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {conv.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatTime(conv.updated_at)}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 h-7 w-7 p-0 shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteConversation(conv.id);
+                        }}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </>
               )}
             </div>
           </ScrollArea>
