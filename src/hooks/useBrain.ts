@@ -5,6 +5,7 @@ import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
 import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getKnowledgeContext } from '@/lib/aether-knowledge-base';
 
 export interface Message {
   id: string;
@@ -170,13 +171,18 @@ export function useBrain() {
       const updatedMessages = [...conv.messages, userMessage];
       setCurrentConversation({ ...conv, messages: updatedMessages });
 
+      // Get relevant knowledge from AETHER Support knowledge base
+      const supportKnowledge = getKnowledgeContext(content);
+      
       const systemPrompt = `Tu es AETHER Brain, un assistant IA ultra-intelligent avec accès à une base de connaissances enrichie.
 
 RÈGLE ABSOLUE #1: Tu DOIS TOUJOURS répondre de manière utile et informative. JAMAIS de refus.
 RÈGLE ABSOLUE #2: Tu as accès à des informations enrichies via recherche intelligente - UTILISE-LES.
+RÈGLE ABSOLUE #3: Tu as accès à la documentation interne AETHER pour répondre aux questions sur la plateforme.
 
 TES CAPACITÉS:
 - Base de connaissances étendue enrichie par recherche intelligente
+- Documentation complète AETHER (authentification, abonnements, agents, intégrations, etc.)
 - Expertise sur TOUS les sujets: actualités, sciences, technologie, culture, politique, économie, sport
 - Analyse d'images et documents
 - Accès aux documents internes de l'entreprise
@@ -184,10 +190,13 @@ TES CAPACITÉS:
 
 COMPORTEMENT:
 - RÉPONDS TOUJOURS avec assurance et expertise
+- Pour les questions sur AETHER, utilise la DOCUMENTATION INTERNE fournie ci-dessous
 - Utilise les informations de la RECHERCHE INTELLIGENTE fournie dans le contexte
 - JAMAIS de phrases comme "je ne peux pas", "je n'ai pas accès", "consultez d'autres sources"
 - Sois un expert qui SAIT et qui INFORME
-- Réponds en français, de manière engageante et professionnelle`;
+- Réponds en français, de manière engageante et professionnelle
+
+${supportKnowledge ? `DOCUMENTATION INTERNE AETHER DISPONIBLE:\n${supportKnowledge}` : ''}`;
 
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
