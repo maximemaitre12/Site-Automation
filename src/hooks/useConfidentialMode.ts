@@ -205,7 +205,8 @@ export function useConfidentialMode() {
 
   // Add message to confidential session (memory only)
   const addConfidentialMessage = useCallback((role: 'user' | 'assistant', content: string) => {
-    if (!confidentialMode) return;
+    // Don't check confidentialMode here - trust the caller
+    // The mode might have race conditions during state updates
     
     setConfidentialSession(prev => {
       if (!prev) {
@@ -223,7 +224,7 @@ export function useConfidentialMode() {
     });
     
     resetSessionTimeout();
-  }, [confidentialMode, resetSessionTimeout]);
+  }, [resetSessionTimeout]);
 
   // Get session time remaining
   const getSessionTimeRemaining = useCallback((): number => {

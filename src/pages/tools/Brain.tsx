@@ -76,11 +76,12 @@ export default function BrainPage() {
   // Use documents directly when no search, or localFilteredDocs when searching
   const filteredDocs = searchQuery.trim() ? localFilteredDocs : documents;
 
+  // Scroll to bottom when messages change (both normal and confidential modes)
   useEffect(() => {
-    if (currentConversation?.messages || streamingContent) {
+    if (currentConversation?.messages || streamingContent || confidentialSession?.messages || confidentialStreamingContent) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [currentConversation?.messages?.length, streamingContent]);
+  }, [currentConversation?.messages?.length, streamingContent, confidentialSession?.messages?.length, confidentialStreamingContent]);
 
   const handleFileSelect = async (files: FileList | null) => {
     if (!files) return;
