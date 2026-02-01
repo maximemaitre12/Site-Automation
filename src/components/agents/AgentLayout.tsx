@@ -31,6 +31,7 @@ interface AgentLayoutProps {
   sidebarContent?: ReactNode;
   children: ReactNode;
   hideIcon?: boolean;
+  hideHeader?: boolean;
 }
 
 export function AgentLayout({
@@ -46,112 +47,172 @@ export function AgentLayout({
   sidebarContent,
   children,
   hideIcon,
+  hideHeader,
 }: AgentLayoutProps) {
   const activeItem = sections.find((s) => s.id === activeSection);
 
   return (
     <div className="h-full flex flex-col bg-background">
-      {/* Modern Header */}
-      <header className="shrink-0 border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-20">
-        <div className="px-4 md:px-6 py-4 md:py-5">
-          <div className="flex items-center justify-between gap-4">
-            {/* Logo & Title */}
-            <div className="flex items-center gap-3 md:gap-4 min-w-0">
-              {!hideIcon && (
-                <div
-                  className={cn(
-                    "w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg",
-                    `bg-gradient-to-br from-${accentColor.replace('bg-', '')} to-${accentColor.replace('bg-', '')}/80`
-                  )}
-                  style={{
-                    background: `linear-gradient(135deg, hsl(var(--${accentColor.replace('bg-', '')})) 0%, hsl(var(--${accentColor.replace('bg-', '')}) / 0.8) 100%)`,
-                  }}
-                >
-                  <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                </div>
-              )}
-              <div className="min-w-0">
-                <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">
-                  <span className="text-foreground">{title}</span>
-                  {titleHighlight && (
-                    <span 
-                      className="ml-1.5"
-                      style={{ color: `hsl(var(--${accentColor.replace('bg-', '')}))` }}
-                    >
-                      {titleHighlight}
-                    </span>
-                  )}
-                </h1>
-                {subtitle && (
-                  <p className="text-sm text-muted-foreground hidden md:block truncate">
-                    {subtitle}
-                  </p>
+      {/* Modern Header - conditionally hidden */}
+      {!hideHeader && (
+        <header className="shrink-0 border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-20">
+          <div className="px-4 md:px-6 py-4 md:py-5">
+            <div className="flex items-center justify-between gap-4">
+              {/* Logo & Title */}
+              <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                {!hideIcon && (
+                  <div
+                    className={cn(
+                      "w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg",
+                      `bg-gradient-to-br from-${accentColor.replace('bg-', '')} to-${accentColor.replace('bg-', '')}/80`
+                    )}
+                    style={{
+                      background: `linear-gradient(135deg, hsl(var(--${accentColor.replace('bg-', '')})) 0%, hsl(var(--${accentColor.replace('bg-', '')}) / 0.8) 100%)`,
+                    }}
+                  >
+                    <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                  </div>
                 )}
+                <div className="min-w-0">
+                  <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">
+                    <span className="text-foreground">{title}</span>
+                    {titleHighlight && (
+                      <span 
+                        className="ml-1.5"
+                        style={{ color: `hsl(var(--${accentColor.replace('bg-', '')}))` }}
+                      >
+                        {titleHighlight}
+                      </span>
+                    )}
+                  </h1>
+                  {subtitle && (
+                    <p className="text-sm text-muted-foreground hidden md:block truncate">
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 shrink-0">
+                {headerActions}
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2 shrink-0">
-              {headerActions}
-            </div>
-          </div>
-
-          {/* Mobile Section Selector - Apple style pill */}
-          <div className="mt-4 md:hidden">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between h-12 rounded-xl bg-secondary/50 border-border/50 hover:bg-secondary"
-                >
-                  <div className="flex items-center gap-3">
-                    {activeItem && (
-                      <>
-                        <activeItem.icon className="w-5 h-5 text-muted-foreground" />
-                        <span className="font-medium">{activeItem.label}</span>
-                        {activeItem.badge !== undefined && (
-                          <Badge
-                            variant={activeItem.badgeVariant || "secondary"}
-                            className="ml-1"
-                          >
-                            {activeItem.badge}
-                          </Badge>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[calc(100vw-2rem)] max-w-md" align="start">
-                {sections.map((section) => (
-                  <DropdownMenuItem
-                    key={section.id}
-                    onClick={() => onSectionChange(section.id)}
-                    className="flex items-center justify-between py-3 px-4 cursor-pointer"
+            {/* Mobile Section Selector - Apple style pill */}
+            <div className="mt-4 md:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between h-12 rounded-xl bg-secondary/50 border-border/50 hover:bg-secondary"
                   >
                     <div className="flex items-center gap-3">
-                      <section.icon className="w-5 h-5 text-muted-foreground" />
-                      <span className="font-medium">{section.label}</span>
-                      {section.badge !== undefined && (
-                        <Badge
-                          variant={section.badgeVariant || "secondary"}
-                          className="ml-1"
-                        >
-                          {section.badge}
-                        </Badge>
+                      {activeItem && (
+                        <>
+                          <activeItem.icon className="w-5 h-5 text-muted-foreground" />
+                          <span className="font-medium">{activeItem.label}</span>
+                          {activeItem.badge !== undefined && (
+                            <Badge
+                              variant={activeItem.badgeVariant || "secondary"}
+                              className="ml-1"
+                            >
+                              {activeItem.badge}
+                            </Badge>
+                          )}
+                        </>
                       )}
                     </div>
-                    {activeSection === section.id && (
-                      <Check className="w-4 h-4 text-primary" />
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[calc(100vw-2rem)] max-w-md" align="start">
+                  {sections.map((section) => (
+                    <DropdownMenuItem
+                      key={section.id}
+                      onClick={() => onSectionChange(section.id)}
+                      className="flex items-center justify-between py-3 px-4 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <section.icon className="w-5 h-5 text-muted-foreground" />
+                        <span className="font-medium">{section.label}</span>
+                        {section.badge !== undefined && (
+                          <Badge
+                            variant={section.badgeVariant || "secondary"}
+                            className="ml-1"
+                          >
+                            {section.badge}
+                          </Badge>
+                        )}
+                      </div>
+                      {activeSection === section.id && (
+                        <Check className="w-4 h-4 text-primary" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
+        </header>
+      )}
+
+      {/* Mobile Section Selector when header is hidden */}
+      {hideHeader && (
+        <div className="md:hidden px-4 py-3 border-b border-border/50 bg-background">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between h-11 rounded-xl bg-secondary/50 border-border/50 hover:bg-secondary"
+              >
+                <div className="flex items-center gap-3">
+                  {activeItem && (
+                    <>
+                      <activeItem.icon className="w-5 h-5 text-muted-foreground" />
+                      <span className="font-medium">{activeItem.label}</span>
+                      {activeItem.badge !== undefined && (
+                        <Badge
+                          variant={activeItem.badgeVariant || "secondary"}
+                          className="ml-1"
+                        >
+                          {activeItem.badge}
+                        </Badge>
+                      )}
+                    </>
+                  )}
+                </div>
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[calc(100vw-2rem)] max-w-md" align="start">
+              {sections.map((section) => (
+                <DropdownMenuItem
+                  key={section.id}
+                  onClick={() => onSectionChange(section.id)}
+                  className="flex items-center justify-between py-3 px-4 cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <section.icon className="w-5 h-5 text-muted-foreground" />
+                    <span className="font-medium">{section.label}</span>
+                    {section.badge !== undefined && (
+                      <Badge
+                        variant={section.badgeVariant || "secondary"}
+                        className="ml-1"
+                      >
+                        {section.badge}
+                      </Badge>
+                    )}
+                  </div>
+                  {activeSection === section.id && (
+                    <Check className="w-4 h-4 text-primary" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </header>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
