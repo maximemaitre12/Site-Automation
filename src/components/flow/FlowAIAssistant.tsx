@@ -95,6 +95,8 @@ const SUGGESTION_CHIPS = [
 const CACHE_KEY = 'flow-ai-assistant-messages';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
+const LEGACY_TIME_ID_RE = /^\d{10,}$/;
+
 function normalizeMessages(raw: any[]): Message[] {
   const seen = new Set<string>();
   const input = Array.isArray(raw) ? raw : [];
@@ -106,7 +108,11 @@ function normalizeMessages(raw: any[]): Message[] {
           ? String(m.id)
           : '';
 
-    const id = !currentId || seen.has(currentId) ? crypto.randomUUID() : currentId;
+    // We treat purely numeric IDs (legacy Date.now-based) as unstable and regenerate them.
+    const isLegacyTimeId = !!currentId && LEGACY_TIME_ID_RE.test(currentId);
+    const shouldRegenerate = !currentId || isLegacyTimeId || seen.has(currentId);
+
+    const id = shouldRegenerate ? crypto.randomUUID() : currentId;
     seen.add(id);
     return { ...m, id } as Message;
   });
@@ -319,6 +325,14 @@ export function FlowAIAssistant({
   useEffect(() => {
     setMessages(prev => normalizeMessages(prev));
   }, []);
+
+  // If React Fast Refresh preserved old state containing duplicate IDs, clean it up.
+  useEffect(() => {
+    const ids = messages.map(m => String(m.id ?? ''));
+    if (new Set(ids).size !== ids.length) {
+      setMessages(prev => normalizeMessages(prev));
+    }
+  }, [messages]);
 
   // Auto-analyze failures when execution result changes
   useEffect(() => {
@@ -1003,9 +1017,9 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
             </div>
           )}
 
-          {messages.map((message) => (
+          {messages.map((message, i) => (
             <div
-              key={message.id}
+              key={`${message.id}-${message.timestamp}-${i}`}
               className={cn(
                 'flex',
                 message.role === 'user' ? 'justify-end' : 'justify-start'
