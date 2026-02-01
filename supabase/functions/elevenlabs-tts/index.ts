@@ -28,8 +28,8 @@ serve(async (req) => {
       );
     }
 
-    // Use turbo model for faster generation
-    const voice = voiceId || 'EXAVITQu4vr4xnSDxMaL';
+    // Use Adina - French young female voice by default
+    const voice = voiceId || 'FvmvwvObRqIHojkEGh5N';
     
     // Use streaming endpoint for instant playback
     const response = await fetch(
