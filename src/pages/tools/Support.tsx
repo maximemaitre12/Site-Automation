@@ -441,38 +441,66 @@ export default function Support() {
                             className="min-h-[150px] rounded-xl"
                             placeholder="Modifiez la réponse si nécessaire..."
                           />
-                          <Button
-                            onClick={handleSendResponse}
-                            disabled={sendingResponse || !editedResponse.trim()}
-                            className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
-                          >
-                            {sendingResponse ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                              <Send className="w-4 h-4 mr-2" />
-                            )}
-                            Envoyer et résoudre
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={handleSendResponse}
+                              disabled={sendingResponse || !editedResponse.trim()}
+                              className="flex-1 bg-agent-support hover:bg-agent-support/90 rounded-xl"
+                            >
+                              {sendingResponse ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              ) : (
+                                <Send className="w-4 h-4 mr-2" />
+                              )}
+                              Envoyer et résoudre
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                await resolveTicket(selectedTicket.id, "Problème résolu par le client");
+                                setSelectedTicket(null);
+                                setEditedResponse('');
+                              }}
+                              className="rounded-xl border-success/30 text-success hover:bg-success/10"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Résolu
+                            </Button>
+                          </div>
                         </div>
                       ) : (
-                        <Button
-                          variant="outline"
-                          className="w-full rounded-xl"
-                          onClick={() => handleGenerateResponse(selectedTicket)}
-                          disabled={generatingResponse === selectedTicket.id}
-                        >
-                          {generatingResponse === selectedTicket.id ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Génération en cours...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="w-4 h-4 mr-2" />
-                              Générer une réponse IA
-                            </>
-                          )}
-                        </Button>
+                        <div className="space-y-2">
+                          <Button
+                            variant="outline"
+                            className="w-full rounded-xl"
+                            onClick={() => handleGenerateResponse(selectedTicket)}
+                            disabled={generatingResponse === selectedTicket.id}
+                          >
+                            {generatingResponse === selectedTicket.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Génération en cours...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                Générer une réponse IA
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              await resolveTicket(selectedTicket.id, "Problème résolu par le client");
+                              setSelectedTicket(null);
+                              setEditedResponse('');
+                            }}
+                            className="w-full rounded-xl border-success/30 text-success hover:bg-success/10"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Mon problème est résolu
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
