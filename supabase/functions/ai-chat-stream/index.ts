@@ -61,17 +61,26 @@ async function searchPerplexity(query: string): Promise<{ content: string; citat
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sonar',
+        model: 'sonar-pro', // Using sonar-pro for higher accuracy with 2x more citations
         messages: [
           { 
             role: 'system', 
-            content: 'Tu es un assistant de recherche. Fournis des informations précises, à jour et factuelles. Réponds en français de manière concise.' 
+            content: `Tu es un assistant de recherche factuel. 
+RÈGLES STRICTES:
+- Fournis UNIQUEMENT des informations VÉRIFIÉES et FACTUELLES
+- Cite TOUJOURS tes sources avec précision
+- Si une information n'est pas certaine, indique-le clairement
+- Pour les données chiffrées (météo, cours, scores), donne les valeurs exactes
+- Ne fais JAMAIS de suppositions ou d'approximations
+- Réponds en français de manière précise et concise` 
           },
           { role: 'user', content: query }
         ],
-        max_tokens: 1024,
-        temperature: 0.1,
+        max_tokens: 2048,
+        temperature: 0.1, // Very low temperature for maximum accuracy
         search_recency_filter: 'day',
+        return_citations: true,
+        return_related_questions: false,
       }),
     });
 
@@ -82,10 +91,12 @@ async function searchPerplexity(query: string): Promise<{ content: string; citat
     }
 
     const data = await response.json();
-    return {
-      content: data.choices?.[0]?.message?.content || '',
-      citations: data.citations || []
-    };
+    const content = data.choices?.[0]?.message?.content || '';
+    const citations = data.citations || [];
+    
+    console.log(`Perplexity returned ${citations.length} citations`);
+    
+    return { content, citations };
   } catch (error) {
     console.error('Error calling Perplexity:', error);
     return null;
@@ -121,11 +132,14 @@ serve(async (req) => {
       const searchResult = await searchPerplexity(msgContent);
       
       if (searchResult && searchResult.content) {
-        realtimeContext = `\n\n=== DONNÉES EN TEMPS RÉEL (Recherche Web) ===\n${searchResult.content}`;
+        realtimeContext = `\n\n=== DONNÉES VÉRIFIÉES EN TEMPS RÉEL ===\n${searchResult.content}`;
         if (searchResult.citations.length > 0) {
-          realtimeContext += `\n\nSources: ${searchResult.citations.slice(0, 3).join(', ')}`;
+          realtimeContext += `\n\n📌 SOURCES OFFICIELLES:\n`;
+          searchResult.citations.forEach((citation, i) => {
+            realtimeContext += `[${i + 1}] ${citation}\n`;
+          });
         }
-        realtimeContext += '\n=== FIN DES DONNÉES EN TEMPS RÉEL ===\n';
+        realtimeContext += '\n=== FIN DES DONNÉES VÉRIFIÉES ===\n';
       }
     }
 
@@ -197,18 +211,21 @@ serve(async (req) => {
     const enhancedSystemPrompt = `${baseSystemPrompt}${realtimeContext}${documentContext}${attachmentContext}
 
 CAPACITÉS:
-- Accéder aux informations en temps réel via recherche web (météo, actualités, cours de bourse, etc.)
+- Accéder aux informations VÉRIFIÉES en temps réel via recherche web (météo, actualités, cours de bourse, etc.)
 - Analyser des images (photos, captures d'écran, graphiques, schémas)
 - Analyser tous types de documents (PDF, Word, texte)
 - Rechercher dans la base de connaissances interne
 
-INSTRUCTIONS:
-- Si des DONNÉES EN TEMPS RÉEL sont fournies, utilise-les pour répondre avec des informations à jour
+INSTRUCTIONS CRITIQUES POUR LA PRÉCISION:
+- TOUTES les informations que tu donnes doivent être 100% EXACTES et VÉRIFIÉES
+- Si des DONNÉES VÉRIFIÉES EN TEMPS RÉEL sont fournies, utilise-les EXCLUSIVEMENT pour répondre
+- CITE TOUJOURS les sources quand tu utilises des données en temps réel
+- Si tu n'es pas CERTAIN d'une information, DIS-LE CLAIREMENT
+- Ne fais JAMAIS de suppositions ou d'approximations sur des données factuelles
+- Pour les chiffres (météo, cours, scores, prix), donne UNIQUEMENT les valeurs vérifiées
 - Utilise EN PRIORITÉ les documents internes quand pertinents
 - Si tu cites un document, mentionne son titre
-- Si tu utilises des données en temps réel, tu peux mentionner les sources
 - Pour les images: décris, analyse, extrait le texte si pertinent
-- Pour les documents: analyse, résume, réponds aux questions
 - Réponds en français, de manière professionnelle, claire et concise
 - Ne dis JAMAIS que tu n'as pas accès à internet ou aux données en temps réel`;
 
