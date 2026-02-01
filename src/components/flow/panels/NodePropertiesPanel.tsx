@@ -15,10 +15,12 @@ import {
   X, ChevronRight, Settings, RefreshCw, 
   FileJson, Zap, AlertCircle, CheckCircle2,
   Eye, EyeOff, ExternalLink, Key, Shield, Copy,
-  Mail, FolderOpen, Tag, Loader2, LogOut, Brain, Code, Box
+  Mail, FolderOpen, Tag, Loader2, LogOut, Brain, Code, Box,
+  ShieldAlert, Lock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGoogleOAuth } from '@/hooks/useGoogleOAuth';
+import { isSensitiveField, maskSensitiveValue } from '@/lib/workflow-security';
 
 interface NodePropertiesPanelProps {
   block: WorkflowBlock | null;
@@ -34,6 +36,7 @@ const SECTION_LABELS: Record<string, { label: string; icon: typeof Settings }> =
   settings: { label: '🔧 Options', icon: Settings },
   advanced: { label: '🔬 Avancé', icon: Code },
   connection: { label: 'Connexion', icon: Mail },
+  security: { label: '🔐 Sécurité', icon: Shield },
 };
 
 function NodePropertiesPanelComponent({
@@ -44,7 +47,7 @@ function NodePropertiesPanelComponent({
   onClose,
 }: NodePropertiesPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['main', 'settings', 'connection'])
+    new Set(['main', 'settings', 'connection', 'security'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
   
@@ -112,12 +115,18 @@ function NodePropertiesPanelComponent({
     return conditionValue === param.showWhen.value;
   };
 
-  // Group params by section
+  // Group params by section, with sensitive fields in security section
   const paramsBySection = useMemo(() => {
-    const sections: Record<string, BlockParam[]> = { main: [], settings: [], advanced: [] };
+    const sections: Record<string, BlockParam[]> = { main: [], settings: [], advanced: [], security: [] };
     
     definition?.params?.forEach((param) => {
       if (!isParamVisible(param)) return;
+      
+      // Auto-categorize sensitive fields
+      if (isSensitiveField(param.key)) {
+        sections.security.push(param);
+        return;
+      }
       
       const sectionKey = param.section || 'main';
       if (!sections[sectionKey]) {
@@ -132,6 +141,52 @@ function NodePropertiesPanelComponent({
   const renderParam = (param: BlockParam) => {
     const value = block.config?.[param.key];
     const defaultVal = param.defaultValue;
+    const isSensitive = isSensitiveField(param.key);
+    const showSensitiveValue = showPasswords.has(param.key);
+
+    // Special rendering for sensitive fields
+    if (isSensitive) {
+      return (
+        <div className="space-y-1">
+          <div className="relative">
+            <Input
+              type={showSensitiveValue ? 'text' : 'password'}
+              value={value || ''}
+              onChange={(e) => handleConfigChange(param.key, e.target.value)}
+              placeholder={param.placeholder || '••••••••'}
+              className="h-8 text-sm pr-20 font-mono"
+            />
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => togglePasswordVisibility(param.key)}
+              >
+                {showSensitiveValue ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+              </Button>
+              {value && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => {
+                    navigator.clipboard.writeText(value);
+                    toast.success('Copié');
+                  }}
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-[9px] text-amber-600">
+            <Lock className="h-2.5 w-2.5" />
+            <span>Donnée sensible - non visible par l'IA</span>
+          </div>
+        </div>
+      );
+    }
 
     switch (param.type) {
       case 'string':
