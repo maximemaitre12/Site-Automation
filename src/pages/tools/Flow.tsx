@@ -282,14 +282,16 @@ export default function Flow() {
       ? applyLayoutToBlocks(blocks, autoLayoutBlocks(blocks, connections))
       : blocks;
     
-    console.log('AI Modify: updating canvas with', layoutedBlocks.length, 'blocks');
+    console.log('AI Modify: applying', layoutedBlocks.length, 'blocks to canvas');
     
-    // Update local state immediately
-    setLocalBlocks(layoutedBlocks);
-    setLocalConnections(connections);
+    // Force new array references to trigger React re-render
+    setLocalBlocks([...layoutedBlocks]);
+    setLocalConnections([...connections]);
     
-    // Trigger fit view to show new blocks
-    setFitViewNonce(n => n + 1);
+    // Trigger fit view after a microtask to ensure state is updated
+    requestAnimationFrame(() => {
+      setFitViewNonce(n => n + 1);
+    });
     
     toast.success('Workflow modifié');
   }, [selectedWorkflowId]);
