@@ -509,54 +509,103 @@ Output ONLY valid JSON. No markdown, no explanations.`;
 
     console.log('AI Response received, length:', content.length);
 
+    // Helper to try completing truncated JSON
+    function tryCompleteJSON(str: string): string | null {
+      // Count open brackets/braces
+      let openBraces = 0, openBrackets = 0;
+      let inString = false, escapeNext = false;
+      
+      for (const ch of str) {
+        if (escapeNext) { escapeNext = false; continue; }
+        if (ch === '\\') { escapeNext = true; continue; }
+        if (ch === '"' && !escapeNext) { inString = !inString; continue; }
+        if (inString) continue;
+        if (ch === '{') openBraces++;
+        if (ch === '}') openBraces--;
+        if (ch === '[') openBrackets++;
+        if (ch === ']') openBrackets--;
+      }
+      
+      // If we're inside a string, close it
+      let completed = str;
+      if (inString) {
+        completed += '"';
+      }
+      
+      // Close any unclosed brackets/braces
+      while (openBrackets > 0) { completed += ']'; openBrackets--; }
+      while (openBraces > 0) { completed += '}'; openBraces--; }
+      
+      return completed;
+    }
+
     // Parse the JSON from the response
     let workflow;
     try {
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || content.match(/(\{[\s\S]*\})/);
-      const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
-      workflow = JSON.parse(jsonStr);
+      let jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+      
+      // First attempt: parse as-is
+      try {
+        workflow = JSON.parse(jsonStr);
+      } catch {
+        // Second attempt: try to complete truncated JSON
+        console.log('First parse failed, attempting to complete truncated JSON...');
+        const completed = tryCompleteJSON(jsonStr);
+        if (completed) {
+          workflow = JSON.parse(completed);
+          console.log('Successfully parsed completed JSON');
+        } else {
+          throw new Error('Could not complete JSON');
+        }
+      }
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
       console.error('Content was:', content.substring(0, 500));
       
-      if (isModification) {
-        return new Response(
-          JSON.stringify({ error: 'Failed to parse AI response. Please try rephrasing your request.' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      // Fallback: create a simple workflow
-      workflow = {
-        blocks: [
-          {
-            id: 'trigger-1',
-            type: 'manual_trigger',
-            name: 'Start',
-            config: {},
-            position: { x: 300, y: 50 }
-          },
-          {
-            id: 'ai-1',
-            type: 'ai_prompt',
-            name: 'Process with AI',
-            config: { 
-              model: 'openai/gpt-5-mini',
-              prompt: objective,
-              temperature: 0.7
+      // For modifications, use existing workflow as fallback instead of failing
+      if (isModification && existingWorkflow) {
+        console.log('Using existing workflow as fallback for failed modification parse');
+        workflow = {
+          name: existingWorkflow.name || 'Modified Workflow',
+          blocks: existingWorkflow.blocks || [],
+          connections: existingWorkflow.connections || [],
+          description: 'Modification could not be parsed - returning original workflow'
+        };
+      } else {
+        // Fallback: create a simple workflow
+        workflow = {
+          name: 'New Workflow',
+          blocks: [
+            {
+              id: 'trigger-1',
+              type: 'manual_trigger',
+              name: 'Start',
+              config: {},
+              position: { x: 300, y: 50 }
             },
-            position: { x: 300, y: 200 }
-          }
-        ],
-        connections: [
-          {
-            id: 'conn-1',
-            sourceBlockId: 'trigger-1',
-            targetBlockId: 'ai-1'
-          }
-        ],
-        description: objective
-      };
+            {
+              id: 'ai-1',
+              type: 'ai_prompt',
+              name: 'Process with AI',
+              config: { 
+                model: 'openai/gpt-5-mini',
+                prompt: objective,
+                temperature: 0.7
+              },
+              position: { x: 300, y: 200 }
+            }
+          ],
+          connections: [
+            {
+              id: 'conn-1',
+              sourceBlockId: 'trigger-1',
+              targetBlockId: 'ai-1'
+            }
+          ],
+          description: objective
+        };
+      }
     }
 
     // Validate and fix the workflow structure
