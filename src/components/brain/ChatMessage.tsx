@@ -201,7 +201,15 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
               "text-[15px]",
               role === 'user' && "text-primary-foreground"
             )}>
-              {role === 'assistant' ? formatContent(textContent) : (
+              {role === 'assistant' ? (
+                <>
+                  {formatContent(textContent)}
+                  {/* Blinking cursor for streaming effect */}
+                  {isStreaming && (
+                    <span className="inline-block w-[2px] h-[1.1em] bg-violet-500 ml-0.5 animate-pulse align-text-bottom" />
+                  )}
+                </>
+              ) : (
                 textContent.split('\n').map((line, i) => (
                   <p key={i} className="mb-1.5 last:mb-0 leading-relaxed">
                     {line || <br />}
@@ -211,15 +219,14 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             </div>
           )}
 
-          {/* Streaming indicator when content is already showing */}
+          {/* Minimal streaming indicator */}
           {isStreaming && textContent && (
-            <div className="flex items-center gap-1.5 mt-3 text-violet-500">
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              <span className="text-xs font-medium">Génération en cours...</span>
-              <span className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="flex items-center gap-1.5 mt-2 text-violet-500/70">
+              <span className="text-xs">En train d'écrire</span>
+              <span className="flex gap-0.5">
+                <span className="w-1 h-1 bg-violet-500/70 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1 h-1 bg-violet-500/70 rounded-full animate-bounce" style={{ animationDelay: '100ms' }} />
+                <span className="w-1 h-1 bg-violet-500/70 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
               </span>
             </div>
           )}
