@@ -433,12 +433,8 @@ export default function BrainPage() {
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-4 shadow-lg shadow-agent-brain/20">
                   <Database className="w-8 h-8 md:w-10 md:h-10 text-white" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                  <span>Aether</span>
-                  <span className="text-agent-brain ml-1">Brain</span>
-                </h2>
                 <p className="text-muted-foreground max-w-md text-sm md:text-base">
-                  Votre assistant IA intelligent. Posez des questions, analysez des documents, ou générez des images.
+                  Posez des questions, analysez des documents, ou générez des images.
                 </p>
               </div>
             ) : !currentConversation ? (
@@ -446,7 +442,6 @@ export default function BrainPage() {
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-4 shadow-lg">
                   <Database className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-lg font-semibold text-foreground mb-2">Nouvelle conversation</h2>
                 <p className="text-muted-foreground text-sm">Commencez à discuter ou sélectionnez une conversation.</p>
               </div>
             ) : (
