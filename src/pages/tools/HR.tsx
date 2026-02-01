@@ -163,23 +163,22 @@ export default function HR() {
     <DashboardLayout>
       <AgentLayout
         icon={Users}
-        title="HR Copilot"
-        subtitle="Recrutement et gestion des talents"
+        title="Aether"
+        titleHighlight="HR"
         accentColor="agent-hr"
         sections={sections}
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
         sidebarContent={sidebarStats}
+        hideIcon
         headerActions={
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
-            <TabsList className="h-9">
-              <TabsTrigger value="recruitment" className="gap-2 text-xs px-3">
-                <UserPlus className="w-4 h-4" />
-                <span className="hidden sm:inline">Recrutement</span>
+            <TabsList className="h-9 bg-secondary/50">
+              <TabsTrigger value="recruitment" className="text-xs px-4">
+                Recrutement
               </TabsTrigger>
-              <TabsTrigger value="team" className="gap-2 text-xs px-3">
-                <UsersRound className="w-4 h-4" />
-                <span className="hidden sm:inline">Équipe</span>
+              <TabsTrigger value="team" className="text-xs px-4">
+                Équipe
               </TabsTrigger>
             </TabsList>
           </Tabs>
