@@ -425,13 +425,6 @@ export default function BrainPage() {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          {/* Header */}
-          <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border flex items-center justify-between shrink-0">
-            <span className="text-lg md:text-xl font-bold tracking-tight">
-              <span className="text-foreground">Aether</span>
-              <span className="text-agent-brain ml-1">Brain</span>
-            </span>
-          </header>
 
           {/* Chat Messages */}
           <ScrollArea className="flex-1 min-h-0 px-4 md:px-6 py-6">
