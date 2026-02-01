@@ -427,20 +427,20 @@ export default function BrainPage() {
         >
 
           {/* Chat Messages */}
-          <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
-            {!currentConversation && conversations.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-muted-foreground text-lg md:text-xl font-medium tracking-tight">
-                  Comment puis-je vous aider aujourd'hui ?
-                </p>
-              </div>
-            ) : !currentConversation ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-muted-foreground text-base font-medium">
-                  Sélectionnez une conversation ou démarrez-en une nouvelle.
-                </p>
-              </div>
-            ) : (
+          {!currentConversation && conversations.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-muted-foreground text-lg md:text-xl font-medium tracking-tight">
+                Comment puis-je vous aider aujourd'hui ?
+              </p>
+            </div>
+          ) : !currentConversation ? (
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-muted-foreground text-base font-medium">
+                Sélectionnez une conversation ou démarrez-en une nouvelle.
+              </p>
+            </div>
+          ) : (
+            <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
               <div className="space-y-4 max-w-3xl mx-auto py-4">
                 {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
                   <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
@@ -450,8 +450,8 @@ export default function BrainPage() {
                 )}
                 <div ref={messagesEndRef} />
               </div>
-            )}
-          </ScrollArea>
+            </ScrollArea>
+          )}
 
           {/* Drag overlay */}
           {isDragging && (
