@@ -310,7 +310,7 @@ Si l'utilisateur demande de cr√©er un agent ou un workflow, propose-lui de le g√
   };
 
   return (
-    <div className="w-96 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden pb-[calc(env(safe-area-inset-bottom)+16px)]">
+    <div className="w-96 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden pb-2">
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
         <div className="space-y-4">
@@ -399,14 +399,14 @@ Si l'utilisateur demande de cr√©er un agent ou un workflow, propose-lui de le g√
             onKeyDown={handleKeyDown}
             placeholder="D√©cris ce que tu veux automatiser..."
             className={cn(
-              "min-h-[100px] max-h-[180px] resize-none",
-              "rounded-xl px-4 py-3",
-              "pr-14",
+              "min-h-[60px] max-h-[120px] resize-none",
+              "rounded-xl px-4 py-2.5",
+              "pr-12",
               "bg-background text-sm leading-relaxed",
               "shadow-sm",
             )}
             disabled={isLoading}
-            rows={4}
+            rows={2}
           />
 
           {/* Send button inside the text area (bottom-right) */}
