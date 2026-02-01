@@ -22,22 +22,47 @@ export function useGoogleOAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        setStatus(null);
+        // No session = not logged in, just return disconnected state (not an error)
+        setStatus({
+          configured: false,
+          connected: false,
+          expired: false,
+          email: null,
+          scope: null,
+          lastUpdated: null,
+        });
         return;
       }
 
       const response = await supabase.functions.invoke('google-oauth-status');
       
       if (response.error) {
-        console.error('Failed to check OAuth status:', response.error);
-        setStatus(null);
+        // OAuth status check failed - this is NOT a blocking error
+        // Just treat it as "not connected" so the UI shows the connect button
+        console.warn('OAuth status check returned error (treating as disconnected):', response.error.message || response.error);
+        setStatus({
+          configured: true,
+          connected: false,
+          expired: false,
+          email: null,
+          scope: null,
+          lastUpdated: null,
+        });
         return;
       }
 
       setStatus(response.data);
     } catch (error) {
-      console.error('Error checking OAuth status:', error);
-      setStatus(null);
+      // Network or unexpected errors - still not blocking, just show as disconnected
+      console.warn('OAuth status check exception (treating as disconnected):', error);
+      setStatus({
+        configured: true,
+        connected: false,
+        expired: false,
+        email: null,
+        scope: null,
+        lastUpdated: null,
+      });
     } finally {
       setChecking(false);
     }
@@ -122,17 +147,32 @@ export function useGoogleOAuth() {
       const response = await supabase.functions.invoke('google-oauth-disconnect');
       
       if (response.error) {
-        toast.error('Erreur de déconnexion', {
-          description: response.error.message,
-        });
-        return;
+        // Log but don't block - just update local state to disconnected
+        console.warn('Disconnect returned error (updating local state anyway):', response.error.message || response.error);
+      } else {
+        toast.success('Compte Google déconnecté');
       }
 
-      toast.success('Compte Google déconnecté');
-      setStatus(prev => prev ? { ...prev, connected: false, email: null } : null);
+      // Always update local state to disconnected
+      setStatus(prev => prev ? { ...prev, connected: false, expired: false, email: null, scope: null } : {
+        configured: true,
+        connected: false,
+        expired: false,
+        email: null,
+        scope: null,
+        lastUpdated: null,
+      });
     } catch (error) {
-      console.error('Error disconnecting:', error);
-      toast.error('Erreur de déconnexion');
+      // Network error - still update local state
+      console.warn('Disconnect exception (updating local state anyway):', error);
+      setStatus(prev => prev ? { ...prev, connected: false, expired: false, email: null, scope: null } : {
+        configured: true,
+        connected: false,
+        expired: false,
+        email: null,
+        scope: null,
+        lastUpdated: null,
+      });
     } finally {
       setLoading(false);
     }
