@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 
 interface BlockPaletteN8NProps {
   onAddBlock: (type: string, definition: BlockDefinition) => void;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -29,7 +30,7 @@ type ViewState =
   | { type: 'category'; category: BlockCategory }
   | { type: 'subcategory'; category: BlockCategory; subcategory: BlockSubcategory };
 
-export function BlockPaletteN8N({ onAddBlock, className }: BlockPaletteN8NProps) {
+export function BlockPaletteN8N({ onAddBlock, onClose, className }: BlockPaletteN8NProps) {
   const [search, setSearch] = useState('');
   const [view, setView] = useState<ViewState>({ type: 'root' });
 
@@ -195,9 +196,19 @@ export function BlockPaletteN8N({ onAddBlock, className }: BlockPaletteN8NProps)
   const renderHeader = () => {
     if (view.type === 'root' && !search) {
       return (
-        <div className="p-4 border-b border-gray-100">
-          <h3 className="text-base font-semibold text-gray-900 mb-1">Add Node</h3>
-          <p className="text-xs text-gray-500">Select a node to add to your workflow</p>
+        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 mb-1">Add Node</h3>
+            <p className="text-xs text-gray-500">Select a node to add to your workflow</p>
+          </div>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <LucideIcons.X className="w-4 h-4 text-gray-500" />
+            </button>
+          )}
         </div>
       );
     }
@@ -240,6 +251,15 @@ export function BlockPaletteN8N({ onAddBlock, className }: BlockPaletteN8NProps)
           <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
           {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
         </div>
+
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <LucideIcons.X className="w-4 h-4 text-gray-500" />
+          </button>
+        )}
       </div>
     );
   };

@@ -48,6 +48,7 @@ interface ProCanvasV2Props {
   stickyNotes?: StickyNote[];
   groups?: WorkflowGroup[];
   onBlockSelect: (blockId: string | null) => void;
+  onBlockDoubleClick?: (blockId: string) => void;
   onBlockUpdate: (blockId: string, updates: Partial<WorkflowBlock>) => void;
   onBlockDelete: (blockId: string) => void;
   onBlockDuplicate: (blockId: string) => void;
@@ -79,6 +80,7 @@ function ProCanvasV2Component({
   stickyNotes = [],
   groups = [],
   onBlockSelect,
+  onBlockDoubleClick,
   onBlockUpdate,
   onBlockDelete,
   onBlockDuplicate,
@@ -866,9 +868,7 @@ function ProCanvasV2Component({
               visualState={blockVisualStates[block.id]}
               zoomLevel={zoomLevel}
               onSelect={onBlockSelect}
-              onDoubleClick={(id) => {
-                // Could open properties panel or sub-workflow
-              }}
+              onDoubleClick={onBlockDoubleClick}
               onDragStart={handleBlockDragStart}
               zoom={zoom}
             />
