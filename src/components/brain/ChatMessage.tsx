@@ -90,10 +90,10 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
     )}>
       {/* Avatar */}
       <Avatar className={cn(
-        "h-10 w-10 flex-shrink-0 ring-2 ring-offset-2 ring-offset-background transition-all",
+        "h-9 w-9 flex-shrink-0 shadow-sm",
         role === 'assistant' 
-          ? "ring-violet-500/30" 
-          : "ring-primary/30"
+          ? "ring-1 ring-violet-500/20" 
+          : "ring-1 ring-primary/20"
       )}>
         <AvatarFallback className={cn(
           "text-white",
@@ -102,8 +102,8 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             : "bg-gradient-to-br from-primary to-primary/80"
         )}>
           {role === 'assistant' 
-            ? <Brain className="w-5 h-5" />
-            : <User className="w-5 h-5" />
+            ? <Brain className="w-4 h-4" />
+            : <User className="w-4 h-4" />
           }
         </AvatarFallback>
       </Avatar>
