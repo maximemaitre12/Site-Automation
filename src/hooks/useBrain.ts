@@ -353,6 +353,26 @@ ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
     return true;
   };
 
+  const clearAllConversations = async (): Promise<boolean> => {
+    if (!user) return false;
+    
+    const { error } = await supabase
+      .from('conversations')
+      .delete()
+      .eq('user_id', user.id);
+    
+    if (error) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      return false;
+    }
+    
+    setCurrentConversation(null);
+    setStreamingContent('');
+    invalidateBrain();
+    toast({ title: 'Historique effacé', description: 'Toutes les conversations ont été supprimées' });
+    return true;
+  };
+
   const selectConversation = (id: string) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -486,6 +506,7 @@ ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
     sendMessage,
     cancelGeneration,
     deleteConversation,
+    clearAllConversations,
     selectConversation,
     uploadDocument,
     deleteDocument,
