@@ -6,11 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { 
   MessageSquare, Sparkles, AlertCircle, CheckCircle, Clock, 
-  Plus, Loader2, Trash2, Send, RefreshCw, X, Headphones, TrendingUp
+  Loader2, Trash2, Send, RefreshCw, X, TrendingUp
 } from "lucide-react";
 import { useSupport, SupportTicket } from "@/hooks/useSupport";
 import { cn } from "@/lib/utils";
@@ -117,14 +116,7 @@ export default function Support() {
         {/* Modern Header */}
         <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-agent-support/20 to-agent-support/5 border border-agent-support/20 flex items-center justify-center shrink-0 shadow-lg shadow-agent-support/10">
-                <Headphones className="w-6 h-6 md:w-7 md:h-7 text-agent-support" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-xl md:text-2xl font-bold text-foreground">Aether Support</h1>
-              </div>
-            </div>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">Aether Support</h1>
           </div>
         </header>
 
@@ -196,71 +188,9 @@ export default function Support() {
                 }
               }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Tickets ({tickets.length})
-                </h2>
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="bg-gradient-to-r from-agent-support to-agent-support/80 hover:from-agent-support/90 hover:to-agent-support/70 rounded-xl shadow-lg shadow-agent-support/20">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Nouveau ticket
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-lg">
-                    <DialogHeader>
-                      <DialogTitle>Créer un ticket</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label>Sujet *</Label>
-                        <Input
-                          placeholder="Ex: Problème de connexion"
-                          value={newTicket.subject}
-                          onChange={(e) => setNewTicket(t => ({ ...t, subject: e.target.value }))}
-                          className="rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Email client</Label>
-                        <Input
-                          type="email"
-                          placeholder="client@example.com"
-                          value={newTicket.customerEmail}
-                          onChange={(e) => setNewTicket(t => ({ ...t, customerEmail: e.target.value }))}
-                          className="rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Description *</Label>
-                        <Textarea
-                          placeholder="Décrivez le problème en détail..."
-                          className="min-h-[120px] rounded-xl"
-                          value={newTicket.content}
-                          onChange={(e) => setNewTicket(t => ({ ...t, content: e.target.value }))}
-                        />
-                      </div>
-                      <Button 
-                        onClick={handleCreateTicket} 
-                        disabled={creating || !newTicket.subject.trim() || !newTicket.content.trim()}
-                        className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
-                      >
-                        {creating ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Création & classification IA...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Créer et classifier
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <h2 className="text-lg font-semibold text-foreground mb-4">
+                Tickets ({tickets.length})
+              </h2>
 
               {tickets.length === 0 ? (
                 <div className="text-center py-16">
@@ -268,11 +198,7 @@ export default function Support() {
                     <MessageSquare className="w-8 h-8 text-muted-foreground" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">Aucun ticket</h3>
-                  <p className="text-muted-foreground mb-4">Créez votre premier ticket support</p>
-                  <Button onClick={() => setIsCreateOpen(true)} className="bg-agent-support hover:bg-agent-support/90 rounded-xl">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nouveau ticket
-                  </Button>
+                  <p className="text-muted-foreground">Créez votre premier ticket support</p>
                 </div>
               ) : (
                 <div className="space-y-3">
