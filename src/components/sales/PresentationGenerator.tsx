@@ -235,7 +235,7 @@ export function PresentationGenerator() {
   const { 
     presentations, 
     generating, 
-    generatePresentation, 
+    generateWithCompliance, 
     downloadPPTX, 
     deletePresentation,
     updatePresentationCompliance 
@@ -246,6 +246,7 @@ export function PresentationGenerator() {
   const [selectedDeal, setSelectedDeal] = useState<SalesDeal | null>(null);
   const [generatedPresentation, setGeneratedPresentation] = useState<PresentationType | null>(null);
   const [complianceResult, setComplianceResult] = useState<any>(null);
+  const [regenerationAttempt, setRegenerationAttempt] = useState(0);
   
   const [form, setForm] = useState({
     clientName: '',
@@ -257,40 +258,37 @@ export function PresentationGenerator() {
   });
 
   const handleGenerate = async () => {
-    const result = await generatePresentation({
-      clientName: form.clientName || selectedDeal?.contact_name || 'Client',
-      productName: form.productName,
-      objective: form.objective,
-      keyPoints: form.keyPoints,
-      slideCount: form.slideCount,
-      style: form.style,
-      dealId: selectedDeal?.id
-    });
+    setRegenerationAttempt(0);
+    setComplianceResult(null);
+    
+    // Use the new auto-compliance generation loop
+    const { presentation, complianceResult: compliance } = await generateWithCompliance(
+      {
+        clientName: form.clientName || selectedDeal?.contact_name || 'Client',
+        productName: form.productName,
+        objective: form.objective,
+        keyPoints: form.keyPoints,
+        slideCount: form.slideCount,
+        style: form.style,
+        dealId: selectedDeal?.id
+      },
+      checkCompliance,
+      updatePresentationCompliance,
+      3 // Max 3 attempts
+    );
 
-    if (result) {
-      setGeneratedPresentation(result);
+    if (presentation) {
+      setGeneratedPresentation({
+        ...presentation,
+        compliance_status: compliance?.status || 'pending',
+        compliance_score: compliance?.score,
+        compliance_issues: compliance?.issues
+      });
+      setComplianceResult(compliance);
       
-      // Auto-check compliance
-      if (result.presentation_json) {
-        const contentToCheck = JSON.stringify(result.presentation_json);
-        const compliance = await checkCompliance(contentToCheck, 'presentation', result.id);
-        setComplianceResult(compliance);
-        
-        // Update presentation with compliance status
-        await updatePresentationCompliance(
-          result.id,
-          compliance.status,
-          compliance.score,
-          compliance.issues
-        );
-        
-        // Update local state
-        setGeneratedPresentation(prev => prev ? {
-          ...prev,
-          compliance_status: compliance.status,
-          compliance_score: compliance.score,
-          compliance_issues: compliance.issues
-        } : null);
+      // Show attempt count if there were retries
+      if (compliance?.attempt > 1) {
+        setRegenerationAttempt(compliance.attempt);
       }
     }
   };
@@ -465,11 +463,16 @@ export function PresentationGenerator() {
       </Card>
 
       {/* Compliance check loading */}
-      {checking && (
+      {(checking || generating) && (
         <Card className="border-amber-500/30 bg-amber-500/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Loader2 className="w-5 h-5 animate-spin text-amber-500" />
-            <span className="text-sm">Vérification de conformité en cours...</span>
+            <span className="text-sm">
+              {generating 
+                ? 'Génération et vérification de conformité en cours...' 
+                : 'Vérification de conformité en cours...'}
+              {regenerationAttempt > 0 && ` (Tentative ${regenerationAttempt}/3)`}
+            </span>
           </CardContent>
         </Card>
       )}
