@@ -61,31 +61,8 @@ export function ConfidentialModeToggle({
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-xs bg-background/95 backdrop-blur-sm border-red-500/30">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-red-500" />
-                <span className="font-semibold text-red-500">
-                  Mode Ultra-Confidentiel {enabled ? 'ACTIVÉ' : 'désactivé'}
-                </span>
-              </div>
-              {enabled ? (
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs">
-                    <EyeOff className="w-3 h-3" />
-                    <span>Aucun stockage en base de données</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <Clock className="w-3 h-3" />
-                    <span>Session: {formatTime(timeLeft)} restant</span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Activez pour une protection maximale des données sensibles.
-                </p>
-              )}
-            </div>
+          <TooltipContent side="bottom">
+            {enabled ? "Mode Confidentiel ACTIVÉ" : "Activer le mode confidentiel"}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
