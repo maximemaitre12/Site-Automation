@@ -252,10 +252,18 @@ export default function Support() {
         <div className="flex-1 flex overflow-hidden px-4 md:px-8">
           <div className="max-w-6xl mx-auto w-full flex gap-6">
             {/* Tickets List */}
-            <div className={cn(
-              "flex-1 overflow-y-auto pb-6",
-              selectedTicket && "hidden md:block md:w-1/2"
-            )}>
+            <div 
+              className={cn(
+                "flex-1 overflow-y-auto pb-6",
+                selectedTicket && "hidden md:block md:w-1/2"
+              )}
+              onClick={(e) => {
+                if (e.target === e.currentTarget && selectedTicket) {
+                  setSelectedTicket(null);
+                  setEditedResponse('');
+                }
+              }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-foreground">
                   Tickets ({tickets.length})
@@ -284,8 +292,13 @@ export default function Support() {
                         selectedTicket?.id === ticket.id && "border-agent-support ring-2 ring-agent-support/20"
                       )}
                       onClick={() => {
-                        setSelectedTicket(ticket);
-                        setEditedResponse(ticket.ai_suggested_response || '');
+                        if (selectedTicket?.id === ticket.id) {
+                          setSelectedTicket(null);
+                          setEditedResponse('');
+                        } else {
+                          setSelectedTicket(ticket);
+                          setEditedResponse(ticket.ai_suggested_response || '');
+                        }
                       }}
                     >
                       <CardContent className="p-4">
