@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { useToast } from './use-toast';
+
 import { callAI } from '@/lib/ai';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext, getSupportAISystemPrompt, SUPPORT_EMAIL } from '@/lib/aether-knowledge-base';
@@ -25,7 +25,7 @@ export interface SupportTicket {
 
 export function useSupport() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
 
   const { data: tickets = [], isLoading: loading } = useQuery({
@@ -79,10 +79,10 @@ export function useSupport() {
 
       await classifyTicket(ticket.id, data.subject + '\n' + data.content);
       
-      toast({ title: 'Succès', description: 'Ticket créé et classifié', duration: 2000 });
+      
       return ticket;
     } catch (err) {
-      toast({ title: 'Erreur', description: 'Erreur lors de la création', variant: 'destructive' });
+      
       return null;
     }
   };
@@ -169,10 +169,10 @@ Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu
         .eq('id', ticketId);
 
       invalidateTickets();
-      toast({ title: 'Succès', description: 'Réponse générée avec la documentation interne' });
+      
       return response.content;
     } catch (err) {
-      toast({ title: 'Erreur', description: 'Erreur lors de la génération', variant: 'destructive' });
+      
       return null;
     }
   };
@@ -191,10 +191,10 @@ Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu
         .eq('id', ticketId);
 
       invalidateTickets();
-      toast({ title: 'Succès', description: 'Ticket résolu' });
+      
       return true;
     } catch (err) {
-      toast({ title: 'Erreur', description: 'Erreur lors de la résolution', variant: 'destructive' });
+      
       return false;
     }
   };
@@ -216,11 +216,11 @@ Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu
   const deleteTicket = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('support_tickets').delete().eq('id', id);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      
       return false;
     }
     invalidateTickets();
-    toast({ title: 'Succès', description: 'Ticket supprimé' });
+    
     return true;
   };
 
