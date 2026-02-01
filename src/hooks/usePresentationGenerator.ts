@@ -6,15 +6,16 @@ import { useToast } from '@/hooks/use-toast';
 import PptxGenJS from 'pptxgenjs';
 import { repairPresentationJson, tryCompleteJSON } from '@/lib/pptx-repair';
 import {
-  applyFuturisticStyles,
+  initConsultingPresentation,
   buildTitleSlide,
-  buildSectionSlide,
-  buildProofSlide,
+  buildExecutiveSummarySlide,
+  buildContextSlide,
+  buildFrameworkSlide,
+  buildMetricsSlide,
   buildRoadmapSlide,
+  buildContentSlide,
   buildCTASlide,
-  type FuturisticStyle,
-  type FuturisticPalette,
-} from '@/lib/pptx-futuristic';
+} from '@/lib/pptx-consulting';
 
 export interface PresentationSlide {
   type: 'title' | 'executive_summary' | 'context' | 'problem' | 'solution' | 'benefits' | 'proof' | 'financials' | 'roadmap' | 'risks' | 'team' | 'cta' | 'contact' | 'appendix';
@@ -462,8 +463,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
     try {
       const pptx = new PptxGenJS();
-      const styleKey = (presentation.style || 'professional') as FuturisticStyle;
-      const colors = applyFuturisticStyles(pptx, styleKey);
+      initConsultingPresentation(pptx);
       
       pptx.title = presentation.title;
       pptx.subject = `Présentation stratégique pour ${presentation.client_name}`;
@@ -472,63 +472,130 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
       const data = presentation.presentation_json as PresentationData;
       const totalSlides = data.slides.length;
       const clientName = presentation.client_name || 'Client';
+      const currentDate = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
       
-      // Build each slide using futuristic templates
+      // Build each slide using McKinsey-style consulting templates
       data.slides.forEach((slideData, index) => {
         const slideNum = index + 1;
         
         switch (slideData.type) {
           case 'title':
-            buildTitleSlide(pptx, colors, slideData.title, slideData.subtitle || '', clientName, slideData.keyMessage);
+            buildTitleSlide(pptx, slideData.title, slideData.subtitle || '', clientName, currentDate);
+            break;
+            
+          case 'executive_summary':
+            // Convert sections to key points format
+            const keyPoints = (slideData.sections || []).flatMap(section => 
+              section.points.slice(0, 2).map(point => ({
+                heading: section.heading,
+                text: point
+              }))
+            ).slice(0, 4);
+            
+            buildExecutiveSummarySlide(pptx, slideData.title, keyPoints, slideNum, totalSlides);
+            break;
+            
+          case 'context':
+            // Left column: Q&A format
+            const leftQA = (slideData.sections || []).slice(0, 4).map(section => ({
+              question: section.heading,
+              answer: section.points.slice(0, 2).join('. ')
+            }));
+            
+            // Right column: Additional points
+            const rightPoints = (slideData.sections || []).flatMap(s => s.points).slice(0, 5);
+            
+            buildContextSlide(pptx, slideData.title, slideData.subtitle, leftQA, rightPoints, slideData.keyMessage, slideNum, totalSlides);
+            break;
+            
+          case 'solution':
+          case 'benefits':
+            // Convert to framework/funnel format if we have structured sections
+            if (slideData.sections && slideData.sections.length >= 2) {
+              const stages = slideData.sections.slice(0, 5).map(section => ({
+                label: section.heading,
+                description: section.points[0] || '',
+                subPoints: section.points.slice(1, 4)
+              }));
+              
+              buildFrameworkSlide(pptx, slideData.title, slideData.subtitle, stages, slideData.keyMessage, slideNum, totalSlides);
+            } else {
+              buildContentSlide(pptx, slideData.title, slideData.subtitle, slideData.sections || [], slideData.keyMessage, slideNum, totalSlides);
+            }
             break;
             
           case 'proof':
           case 'financials':
-            buildProofSlide(
-              pptx, colors, slideData.title,
-              slideData.stats || [],
-              slideData.testimonial,
-              slideData.keyMessage,
-              slideNum, totalSlides,
-              slideData.sections // Pass sections for hypotheses
-            );
+            // Convert stats to metrics format
+            const metrics = (slideData.stats || []).slice(0, 6).map(stat => {
+              // Extract numeric value
+              const numMatch = stat.value.match(/[\d,.]+/);
+              const numValue = numMatch ? parseFloat(numMatch[0].replace(',', '.')) : 0;
+              const unit = stat.value.replace(/[\d,.]+/g, '').trim();
+              
+              return {
+                label: stat.label,
+                value: numValue || 50, // Fallback value for chart
+                unit: stat.value // Keep original formatted value
+              };
+            });
+            
+            // Extract insights from sections or testimonial
+            const insights = slideData.sections?.flatMap(s => s.points).slice(0, 4) || 
+              (slideData.testimonial ? [slideData.testimonial.quote] : []);
+            
+            buildMetricsSlide(pptx, slideData.title, slideData.subtitle, metrics, insights, slideData.keyMessage, slideNum, totalSlides);
             break;
             
           case 'roadmap':
-            buildRoadmapSlide(
-              pptx, colors, slideData.title,
-              slideData.timeline || [],
-              slideData.sections,
-              slideData.keyMessage,
-              slideNum, totalSlides
-            );
+            // Convert timeline to phases format
+            const phases = (slideData.timeline || []).slice(0, 4).map(item => ({
+              name: item.phase,
+              duration: item.duration,
+              activities: [item.description, ...(slideData.sections?.find(s => s.heading.includes(item.phase))?.points || [])]
+            }));
+            
+            // If no timeline, use sections as phases
+            if (phases.length === 0 && slideData.sections) {
+              slideData.sections.slice(0, 4).forEach(section => {
+                phases.push({
+                  name: section.heading,
+                  duration: '',
+                  activities: section.points.slice(0, 5)
+                });
+              });
+            }
+            
+            buildRoadmapSlide(pptx, slideData.title, phases, slideData.keyMessage, slideNum, totalSlides);
             break;
             
           case 'cta':
-            buildCTASlide(
-              pptx, colors, slideData.title,
-              slideData.sections,
-              slideData.keyMessage,
-              slideData.content,
-              slideNum, totalSlides
-            );
+            // Convert to action items format
+            const actions = (slideData.sections || []).flatMap(section =>
+              section.points.map(point => ({
+                label: point,
+                owner: '',
+                deadline: ''
+              }))
+            ).slice(0, 5);
+            
+            // If no sections, create from bullets
+            if (actions.length === 0 && slideData.bullets) {
+              slideData.bullets.slice(0, 5).forEach(bullet => {
+                actions.push({ label: bullet, owner: '', deadline: '' });
+              });
+            }
+            
+            buildCTASlide(pptx, slideData.title, actions, undefined, slideNum, totalSlides);
             break;
             
-          case 'executive_summary':
-          case 'context':
           case 'problem':
-          case 'solution':
-          case 'benefits':
           case 'risks':
           case 'team':
           case 'appendix':
           default:
-            buildSectionSlide(
-              pptx, colors, slideData.title, slideData.subtitle,
-              slideData.sections || [],
-              slideData.keyMessage,
-              slideNum, totalSlides
-            );
+            // Standard content slide
+            buildContentSlide(pptx, slideData.title, slideData.subtitle, slideData.sections || [], slideData.keyMessage, slideNum, totalSlides);
             break;
         }
       });
