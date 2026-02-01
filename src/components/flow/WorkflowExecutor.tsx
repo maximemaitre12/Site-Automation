@@ -476,7 +476,7 @@ export function WorkflowExecutor({
                         return (
                           <div 
                             key={`summary-${log.blockId}-${idx}`}
-                            className={`flex items-center gap-2 text-xs p-2 rounded ${
+                            className={`text-xs p-2 rounded ${
                               log.status === 'success' && hasRealOutput
                                 ? 'bg-success/5'
                                 : log.status === 'error'
@@ -484,16 +484,19 @@ export function WorkflowExecutor({
                                   : 'bg-amber-500/10'
                             }`}
                           >
-                            {log.status === 'success' && hasRealOutput ? (
-                              <CheckCircle className="w-3 h-3 text-success shrink-0" />
-                            ) : log.status === 'error' ? (
-                              <XCircle className="w-3 h-3 text-destructive shrink-0" />
-                            ) : (
-                              <Clock className="w-3 h-3 text-amber-500 shrink-0" />
-                            )}
-                            <span className="font-medium truncate max-w-[120px]">{log.blockName}</span>
-                            <span className="text-muted-foreground">→</span>
-                            <span className="truncate flex-1">{outputPreview}</span>
+                            <div className="flex items-center gap-2 min-w-0">
+                              {log.status === 'success' && hasRealOutput ? (
+                                <CheckCircle className="w-3 h-3 text-success shrink-0" />
+                              ) : log.status === 'error' ? (
+                                <XCircle className="w-3 h-3 text-destructive shrink-0" />
+                              ) : (
+                                <Clock className="w-3 h-3 text-amber-500 shrink-0" />
+                              )}
+                              <span className="font-medium truncate max-w-[100px]">{log.blockName}</span>
+                            </div>
+                            <div className="mt-1 text-muted-foreground break-words pl-5">
+                              {outputPreview}
+                            </div>
                           </div>
                         );
                       })}
@@ -502,8 +505,9 @@ export function WorkflowExecutor({
                 )}
                 
                 {!result.success && (result as any).error && (
-                  <div className="text-sm text-destructive mb-2">
-                    <span className="font-medium">Erreur:</span> {(result as any).error}
+                  <div className="text-sm text-destructive mb-2 break-words">
+                    <span className="font-medium">Erreur:</span>{' '}
+                    <span className="break-all">{(result as any).error}</span>
                   </div>
                 )}
 
@@ -512,12 +516,16 @@ export function WorkflowExecutor({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onFocusBlock((result as any).failedBlockId)}
+                      onClick={() => {
+                        // Close dialog and focus on the failed block
+                        setIsOpen(false);
+                        onFocusBlock((result as any).failedBlockId);
+                      }}
                     >
                       Ouvrir le bloc en erreur
                     </Button>
                     {(result as any).failedBlockName && (
-                      <span className="text-xs text-muted-foreground truncate">
+                      <span className="text-xs text-muted-foreground truncate max-w-[150px]">
                         {(result as any).failedBlockName}
                       </span>
                     )}
