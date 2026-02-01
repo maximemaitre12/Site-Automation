@@ -67,13 +67,6 @@ export function DocSidebar({
 
   return (
     <div className="w-64 border-r border-border bg-secondary flex flex-col">
-      <div className="p-4 border-b border-border">
-        <h2 className="font-semibold text-lg flex items-center gap-2">
-          <FileText className="w-5 h-5 text-primary" />
-          AETHER Doc
-        </h2>
-      </div>
-
       <ScrollArea className="flex-1">
         <div className="p-3 space-y-6">
           {/* Quick Access */}
