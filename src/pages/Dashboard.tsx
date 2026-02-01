@@ -90,12 +90,15 @@ export default function Dashboard() {
     sheetsLoading || dataLoading;
 
   // Filter by period
+  // Filter by period - uses rolling windows to ensure month >= week
   const filterByPeriod = <T extends { created_at: string }>(data: T[] | undefined): T[] => {
     if (!data?.length) return [];
     if (period === "all") return data;
     
     const now = new Date();
-    const startDate = period === "week" ? startOfWeek(now, { weekStartsOn: 1 }) : startOfMonth(now);
+    // Use rolling windows: 7 days for week, 30 days for month
+    const daysAgo = period === "week" ? 7 : 30;
+    const startDate = subDays(now, daysAgo);
     
     return data.filter(item => isAfter(new Date(item.created_at), startDate));
   };
