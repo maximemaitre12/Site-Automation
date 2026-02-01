@@ -433,22 +433,13 @@ export default function BrainPage() {
                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-6 shadow-lg shadow-agent-brain/20">
                   <Database className="w-10 h-10 md:w-12 md:h-12 text-white" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">AETHER Brain</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                  <span>Aether</span>
+                  <span className="text-agent-brain ml-1">Brain</span>
+                </h2>
                 <p className="text-muted-foreground max-w-md text-base md:text-lg">
                   Votre assistant IA intelligent. Posez des questions, analysez des documents, ou générez des images.
                 </p>
-                <div className="flex flex-wrap justify-center gap-2 mt-8">
-                  {[
-                    { emoji: '💬', label: 'Chat' },
-                    { emoji: '🖼️', label: 'Images' },
-                    { emoji: '📊', label: 'Charts' },
-                    { emoji: '📄', label: 'Documents' },
-                  ].map(tag => (
-                    <span key={tag.label} className="px-4 py-2 rounded-full bg-secondary text-foreground text-sm font-medium">
-                      {tag.emoji} {tag.label}
-                    </span>
-                  ))}
-                </div>
               </div>
             ) : !currentConversation ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-4 py-20">
