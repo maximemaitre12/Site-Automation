@@ -39,6 +39,14 @@ serve(async (req) => {
 
     console.log(`Processing ${type} request with ${messages.length} messages`);
 
+    // Use better model for generation tasks, standard for chat
+    const isGenerationTask = type === 'generate' || type === 'analyze';
+    const model = isGenerationTask ? 'google/gemini-2.5-pro' : 'google/gemini-2.5-flash';
+    const maxTokens = isGenerationTask ? 8192 : 4096;
+    const temp = isGenerationTask ? 0.8 : 0.7;
+
+    console.log(`Using model: ${model} for ${type} task`);
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -46,13 +54,13 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model,
         messages: [
           { role: 'system', content: finalSystemPrompt },
           ...messages,
         ],
-        temperature: 0.7,
-        max_tokens: 4096,
+        temperature: temp,
+        max_tokens: maxTokens,
       }),
     });
 
