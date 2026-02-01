@@ -458,7 +458,7 @@ export default function Support() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <Label className="text-xs text-muted-foreground">Réponse IA</Label>
-                        {selectedTicket.status !== 'resolved' && (
+                        {selectedTicket.status !== 'resolved' && selectedTicket.ai_suggested_response && (
                           <Button
                             variant="outline"
                             size="sm"
