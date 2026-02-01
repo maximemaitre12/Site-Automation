@@ -515,8 +515,11 @@ export default function Flow() {
                         workflowName={selectedWorkflow.name}
                         onRunCreated={(runId, logs, output) => handleRunCompleted(selectedWorkflow.id, logs, output)}
                         onFocusBlock={(blockId) => {
+                          // Close all panels and open properties for the failed block
                           setIsPaletteOpen(false);
+                          setIsAIAssistantOpen(false);
                           setSelectedBlockId(blockId);
+                          setIsPropertiesPanelOpen(true);
                         }}
                       />
                     </div>
