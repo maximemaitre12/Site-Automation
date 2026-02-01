@@ -62,7 +62,8 @@ export default function Flow() {
   const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
   const [localBlocks, setLocalBlocks] = useState<WorkflowBlock[]>([]);
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [viewMode, setViewMode] = useState<'canvas' | 'builder'>('canvas');
   
   
@@ -92,7 +93,6 @@ export default function Flow() {
       const connections = selectedWorkflow.connections || [];
       setLocalBlocks(blocks);
       setLocalConnections(connections);
-      setHasUnsavedChanges(false);
       // Reset history with initial state
       const initialState = { blocks: JSON.parse(JSON.stringify(blocks)), connections: JSON.parse(JSON.stringify(connections)) };
       setHistory([initialState]);
@@ -105,6 +105,43 @@ export default function Flow() {
     }
     setSelectedBlockId(null);
   }, [selectedWorkflowId, selectedWorkflow?.id]);
+
+  // Auto-save when blocks or connections change
+  useEffect(() => {
+    if (!selectedWorkflowId || isUndoRedoAction.current) return;
+    
+    // Compare with saved state
+    const savedBlocks = selectedWorkflow?.blocks || [];
+    const savedConnections = selectedWorkflow?.connections || [];
+    const hasChanges = JSON.stringify(localBlocks) !== JSON.stringify(savedBlocks) || 
+                       JSON.stringify(localConnections) !== JSON.stringify(savedConnections);
+    
+    if (!hasChanges) return;
+
+    // Clear previous timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+    }
+
+    // Debounce auto-save (500ms after last change)
+    autoSaveTimeoutRef.current = setTimeout(async () => {
+      setIsSaving(true);
+      const success = await updateWorkflow(selectedWorkflowId, { 
+        blocks: localBlocks,
+        connections: localConnections 
+      });
+      setIsSaving(false);
+      if (!success) {
+        toast.error('Échec de la sauvegarde automatique');
+      }
+    }, 500);
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [localBlocks, localConnections, selectedWorkflowId]);
 
   // Push to history when blocks/connections change (except during undo/redo)
   // Uses debounce to avoid capturing every micro-movement during drag
@@ -165,7 +202,6 @@ export default function Flow() {
       setLocalBlocks(JSON.parse(JSON.stringify(prevState.blocks)));
       setLocalConnections(JSON.parse(JSON.stringify(prevState.connections)));
       setHistoryIndex(prevIndex);
-      setHasUnsavedChanges(true);
       toast.info('Action annulée');
     }
   }, [history, historyIndex]);
@@ -180,7 +216,6 @@ export default function Flow() {
       setLocalBlocks(JSON.parse(JSON.stringify(nextState.blocks)));
       setLocalConnections(JSON.parse(JSON.stringify(nextState.connections)));
       setHistoryIndex(nextIndex);
-      setHasUnsavedChanges(true);
       toast.info('Action rétablie');
     }
   }, [history, historyIndex]);
@@ -227,8 +262,7 @@ export default function Flow() {
     
     setLocalBlocks(layoutedBlocks);
     setLocalConnections(connections);
-    setHasUnsavedChanges(true);
-    toast.success('Workflow modified by AI - save to apply changes');
+    toast.success('Workflow modifié par l\'IA');
   };
 
   const handleTemplateSelect = async (blocks: WorkflowBlock[], name: string, description: string) => {
@@ -280,7 +314,7 @@ export default function Flow() {
     
     setLocalBlocks(updatedBlocks);
     setLocalConnections(updatedConnections);
-    setHasUnsavedChanges(true);
+    setSelectedBlockId(newBlock.id);
     setSelectedBlockId(newBlock.id);
     setIsPaletteOpen(false);
   };
@@ -293,13 +327,11 @@ export default function Flow() {
     const repositionedBlocks = applyLayoutToBlocks(localBlocks, layout);
     
     setLocalBlocks(repositionedBlocks);
-    setHasUnsavedChanges(true);
     toast.success('Layout optimisé automatiquement');
   }, [localBlocks, localConnections]);
 
   const handleUpdateBlock = (blockId: string, updates: Partial<WorkflowBlock>) => {
     setLocalBlocks(prev => prev.map(b => b.id === blockId ? { ...b, ...updates } : b));
-    setHasUnsavedChanges(true);
   };
 
   const handleDeleteBlock = (blockId: string) => {
@@ -307,17 +339,14 @@ export default function Flow() {
     // Also remove any connections involving this block
     setLocalConnections(prev => prev.filter(c => c.sourceBlockId !== blockId && c.targetBlockId !== blockId));
     if (selectedBlockId === blockId) setSelectedBlockId(null);
-    setHasUnsavedChanges(true);
   };
 
   const handleAddConnection = (connection: BlockConnection) => {
     setLocalConnections(prev => [...prev, connection]);
-    setHasUnsavedChanges(true);
   };
 
   const handleRemoveConnection = (connectionId: string) => {
     setLocalConnections(prev => prev.filter(c => c.id !== connectionId));
-    setHasUnsavedChanges(true);
   };
 
   const handleDuplicateBlock = (blockId: string) => {
@@ -334,7 +363,6 @@ export default function Flow() {
       position: { x: newPosition.x, y: newPosition.y + 40 }
     };
     setLocalBlocks(prev => [...prev, newBlock]);
-    setHasUnsavedChanges(true);
   };
 
   const handleMoveBlock = (blockId: string, direction: 'up' | 'down') => {
@@ -349,18 +377,19 @@ export default function Flow() {
       sorted[newIndex].position.y = temp;
       return sorted;
     });
-    setHasUnsavedChanges(true);
   };
 
+  // Manual save is no longer needed - auto-save handles everything
   const handleSaveWorkflow = async () => {
     if (!selectedWorkflowId) return;
+    setIsSaving(true);
     const success = await updateWorkflow(selectedWorkflowId, { 
       blocks: localBlocks,
       connections: localConnections 
     });
+    setIsSaving(false);
     if (success) {
-      setHasUnsavedChanges(false);
-      toast.success('Workflow saved');
+      toast.success('Workflow sauvegardé');
     }
   };
 
@@ -488,11 +517,12 @@ export default function Flow() {
                         <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         <span className="hidden sm:inline">IA</span>
                       </Button>
-                      <Button variant="outline" size="sm" onClick={handleSaveWorkflow} disabled={!hasUnsavedChanges} className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm">
-                        <Save className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline">Save</span>
-                        {hasUnsavedChanges && <span className="w-1.5 h-1.5 bg-warning rounded-full" />}
-                      </Button>
+                      {isSaving && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <span className="hidden sm:inline">Saving...</span>
+                        </div>
+                      )}
                       <WorkflowExecutor
                         blocks={localBlocks}
                         connections={localConnections}
@@ -527,7 +557,7 @@ export default function Flow() {
                         onRedo={handleRedo}
                         canUndo={canUndo}
                         canRedo={canRedo}
-                        hasUnsavedChanges={hasUnsavedChanges}
+                        isSaving={isSaving}
                         onAutoLayout={handleAutoLayout}
                         onAddBlock={() => setIsPaletteOpen(!isPaletteOpen)}
                         fitViewKey={selectedWorkflowId ? `${selectedWorkflowId}:${fitViewNonce}` : null}
