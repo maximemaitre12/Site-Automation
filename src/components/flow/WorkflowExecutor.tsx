@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { WorkflowBlock, WorkflowRunLog, BlockConnection, BLOCK_DEFINITIONS } from '@/types/workflow';
 import { executeWorkflowViaServer } from '@/lib/workflow-executor';
+import { runPreflightValidation, PreflightResult, PreflightIssue } from '@/lib/workflow-preflight';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Play, Loader2, CheckCircle, XCircle, Clock, ChevronDown, ChevronRight, GitBranch } from 'lucide-react';
+import { Play, Loader2, CheckCircle, XCircle, Clock, ChevronDown, ChevronRight, GitBranch, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface WorkflowExecutorProps {
   blocks: WorkflowBlock[];
@@ -29,10 +31,32 @@ export function WorkflowExecutor({
 }: WorkflowExecutorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [preflightResult, setPreflightResult] = useState<PreflightResult | null>(null);
   const [input, setInput] = useState('');
   const [logs, setLogs] = useState<WorkflowRunLog[]>([]);
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
   const [result, setResult] = useState<any>(null);
+
+  // Run preflight validation when dialog opens
+  useEffect(() => {
+    if (isOpen && blocks.length > 0) {
+      setIsValidating(true);
+      setPreflightResult(null);
+      runPreflightValidation(blocks)
+        .then(result => {
+          setPreflightResult(result);
+        })
+        .catch(err => {
+          console.error('Preflight validation error:', err);
+          // Don't block on validation errors, just log them
+          setPreflightResult({ valid: true, issues: [], canProceed: true });
+        })
+        .finally(() => {
+          setIsValidating(false);
+        });
+    }
+  }, [isOpen, blocks]);
 
   // Helper to get a human-readable preview of output
   const getOutputPreview = (output: any): string => {
@@ -202,6 +226,12 @@ export function WorkflowExecutor({
   const handleRun = async (autoInput?: string) => {
     const inputData = autoInput ?? input;
     
+    // Block execution if preflight failed with errors
+    if (preflightResult && !preflightResult.canProceed) {
+      toast.error('Corrigez les problèmes avant d\'exécuter le workflow');
+      return;
+    }
+    
     // Only require input for manual trigger types
     if (requiresManualInput && !inputData.trim()) {
       toast.error('Please provide input data');
@@ -279,6 +309,70 @@ export function WorkflowExecutor({
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto space-y-6 py-4">
+            {/* Preflight Validation Status */}
+            {isValidating && (
+              <div className="flex items-center gap-2 text-muted-foreground p-3 rounded-lg bg-muted/50">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span className="text-sm">Vérification des prérequis...</span>
+              </div>
+            )}
+
+            {/* Preflight Errors - Block execution */}
+            {preflightResult && !preflightResult.canProceed && (
+              <Alert variant="destructive" className="border-destructive/50 bg-destructive/10">
+                <ShieldAlert className="h-4 w-4" />
+                <AlertDescription className="ml-2">
+                  <div className="font-medium mb-2">
+                    Prérequis manquants ({preflightResult.issues.filter(i => i.severity === 'error').length})
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {preflightResult.issues
+                      .filter(i => i.severity === 'error')
+                      .map((issue, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <XCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                          <div>
+                            <span className="font-medium">{issue.blockName}:</span>{' '}
+                            <span>{issue.message}</span>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              → {issue.fix}
+                            </div>
+                            {issue.requiresBlockConfig && onFocusBlock && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="mt-1 h-6 text-xs"
+                                onClick={() => {
+                                  setIsOpen(false);
+                                  setTimeout(() => onFocusBlock(issue.blockId), 100);
+                                }}
+                              >
+                                Ouvrir le bloc
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Preflight Warnings */}
+            {preflightResult && preflightResult.canProceed && preflightResult.issues.length > 0 && (
+              <Alert className="border-amber-500/50 bg-amber-500/10">
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                <AlertDescription className="ml-2 text-amber-700 dark:text-amber-400">
+                  <div className="font-medium mb-1">Avertissements</div>
+                  <div className="space-y-1 text-sm">
+                    {preflightResult.issues.map((issue, idx) => (
+                      <div key={idx}>• {issue.blockName}: {issue.message}</div>
+                    ))}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Auto-trigger info */}
             {!requiresManualInput && triggerBlock && (
               <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
@@ -560,12 +654,27 @@ export function WorkflowExecutor({
             <Button
               variant="hero"
               onClick={() => handleRun()}
-              disabled={isRunning || (requiresManualInput && !input.trim())}
+              disabled={
+                isRunning || 
+                isValidating ||
+                (requiresManualInput && !input.trim()) ||
+                (preflightResult && !preflightResult.canProceed)
+              }
             >
               {isRunning ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Running...
+                </>
+              ) : isValidating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Vérification...
+                </>
+              ) : preflightResult && !preflightResult.canProceed ? (
+                <>
+                  <ShieldAlert className="w-4 h-4 mr-2" />
+                  Prérequis manquants
                 </>
               ) : (
                 <>
