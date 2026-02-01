@@ -294,7 +294,7 @@ Réponds de façon concise et utile en français.`;
   };
 
   return (
-    <div className="w-80 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden">
+    <div className="w-96 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden">
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
         <div className="space-y-4">
@@ -375,22 +375,34 @@ Réponds de façon concise et utile en français.`;
 
       {/* Input - Fixed at bottom, always visible */}
       <div className="shrink-0 p-3 border-t border-border bg-card/30">
-        <div className="flex items-end gap-2">
+        <div className="relative">
           <Textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Décrivez ce que vous voulez..."
-            className="min-h-[220px] max-h-[45vh] resize-none bg-background text-sm"
+            className={cn(
+              "min-h-[220px] max-h-[45vh] resize-none",
+              "rounded-xl px-4 py-3",
+              "pr-12 pb-12",
+              "bg-background text-sm leading-relaxed",
+              "shadow-sm",
+            )}
             disabled={isLoading}
             rows={8}
           />
-          <Button 
-            size="icon" 
+
+          {/* Send button inside the text area (bottom-right) */}
+          <Button
+            size="icon"
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="shrink-0 bg-agent-flow hover:bg-agent-flow/90"
+            className={cn(
+              "absolute bottom-2 right-2",
+              "h-9 w-9 rounded-lg",
+              "bg-agent-flow hover:bg-agent-flow/90",
+            )}
           >
             <Send className="w-4 h-4" />
           </Button>

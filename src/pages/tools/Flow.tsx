@@ -485,7 +485,14 @@ export default function Flow() {
                       <Button 
                         variant={isAIAssistantOpen ? "default" : "outline"}
                         size="sm" 
-                        onClick={() => setIsAIAssistantOpen(!isAIAssistantOpen)} 
+                         onClick={() =>
+                           setIsAIAssistantOpen(prev => {
+                             const next = !prev;
+                             // When opening the AI panel, the canvas viewport changes; re-fit the view.
+                             if (!prev && next) setFitViewNonce(n => n + 1);
+                             return next;
+                           })
+                         }
                         className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm"
                       >
                         <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
