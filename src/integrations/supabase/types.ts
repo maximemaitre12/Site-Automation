@@ -3738,6 +3738,158 @@ export type Database = {
           },
         ]
       }
+      workflow_distributed_metrics: {
+        Row: {
+          avg_chunk_size: number | null
+          created_at: string | null
+          id: string
+          parallel_execution_ms: number | null
+          parallel_jobs: number | null
+          peak_concurrent_jobs: number | null
+          run_id: string | null
+          sequential_execution_ms: number | null
+          sequential_jobs: number | null
+          speedup_factor: number | null
+          total_chunks: number | null
+          total_execution_ms: number | null
+          total_jobs: number | null
+          user_id: string
+          workers_used: number | null
+        }
+        Insert: {
+          avg_chunk_size?: number | null
+          created_at?: string | null
+          id?: string
+          parallel_execution_ms?: number | null
+          parallel_jobs?: number | null
+          peak_concurrent_jobs?: number | null
+          run_id?: string | null
+          sequential_execution_ms?: number | null
+          sequential_jobs?: number | null
+          speedup_factor?: number | null
+          total_chunks?: number | null
+          total_execution_ms?: number | null
+          total_jobs?: number | null
+          user_id: string
+          workers_used?: number | null
+        }
+        Update: {
+          avg_chunk_size?: number | null
+          created_at?: string | null
+          id?: string
+          parallel_execution_ms?: number | null
+          parallel_jobs?: number | null
+          peak_concurrent_jobs?: number | null
+          run_id?: string | null
+          sequential_execution_ms?: number | null
+          sequential_jobs?: number | null
+          speedup_factor?: number | null
+          total_chunks?: number | null
+          total_execution_ms?: number | null
+          total_jobs?: number | null
+          user_id?: string
+          workers_used?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_distributed_metrics_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_job_queue: {
+        Row: {
+          block_config: Json | null
+          block_id: string
+          block_type: string
+          chunk_index: number | null
+          claimed_at: string | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          input_data: Json | null
+          max_retries: number | null
+          output_data: Json | null
+          priority: number | null
+          retry_count: number | null
+          run_id: string | null
+          started_at: string | null
+          status: string | null
+          timeout_seconds: number | null
+          total_chunks: number | null
+          user_id: string
+          worker_id: string | null
+          workflow_id: string | null
+        }
+        Insert: {
+          block_config?: Json | null
+          block_id: string
+          block_type: string
+          chunk_index?: number | null
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json | null
+          max_retries?: number | null
+          output_data?: Json | null
+          priority?: number | null
+          retry_count?: number | null
+          run_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          timeout_seconds?: number | null
+          total_chunks?: number | null
+          user_id: string
+          worker_id?: string | null
+          workflow_id?: string | null
+        }
+        Update: {
+          block_config?: Json | null
+          block_id?: string
+          block_type?: string
+          chunk_index?: number | null
+          claimed_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          input_data?: Json | null
+          max_retries?: number | null
+          output_data?: Json | null
+          priority?: number | null
+          retry_count?: number | null
+          run_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          timeout_seconds?: number | null
+          total_chunks?: number | null
+          user_id?: string
+          worker_id?: string | null
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_job_queue_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_job_queue_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_runs: {
         Row: {
           blocks_status: Json | null
@@ -3822,6 +3974,65 @@ export type Database = {
             columns: ["workflow_id"]
             isOneToOne: false
             referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_workers: {
+        Row: {
+          avg_execution_ms: number | null
+          created_at: string | null
+          current_job_id: string | null
+          id: string
+          jobs_completed: number | null
+          jobs_failed: number | null
+          last_heartbeat: string | null
+          last_job_at: string | null
+          max_concurrent_jobs: number | null
+          status: string | null
+          supported_block_types: string[] | null
+          total_execution_ms: number | null
+          user_id: string
+          worker_id: string
+        }
+        Insert: {
+          avg_execution_ms?: number | null
+          created_at?: string | null
+          current_job_id?: string | null
+          id?: string
+          jobs_completed?: number | null
+          jobs_failed?: number | null
+          last_heartbeat?: string | null
+          last_job_at?: string | null
+          max_concurrent_jobs?: number | null
+          status?: string | null
+          supported_block_types?: string[] | null
+          total_execution_ms?: number | null
+          user_id: string
+          worker_id: string
+        }
+        Update: {
+          avg_execution_ms?: number | null
+          created_at?: string | null
+          current_job_id?: string | null
+          id?: string
+          jobs_completed?: number | null
+          jobs_failed?: number | null
+          last_heartbeat?: string | null
+          last_job_at?: string | null
+          max_concurrent_jobs?: number | null
+          status?: string | null
+          supported_block_types?: string[] | null
+          total_execution_ms?: number | null
+          user_id?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_workers_current_job_id_fkey"
+            columns: ["current_job_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_job_queue"
             referencedColumns: ["id"]
           },
         ]
