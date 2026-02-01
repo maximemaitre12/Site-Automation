@@ -32,36 +32,55 @@ export async function executeWorkflowViaServer(
   failedBlockType?: string;
   logs: WorkflowRunLog[];
 }> {
+  // IMPORTANT: This must never throw for “expected” runtime failures (OAuth disconnected,
+  // missing credentials, 401, etc.). Those should be represented as a failed workflow run,
+  // not as an app-level exception.
   try {
-    // Get user session for authentication
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) {
-      throw new Error('Authentication required to execute workflow');
+    if (!session) {
+      return {
+        success: false,
+        output: null,
+        error: 'Authentification requise pour exécuter le workflow',
+        errorDetails: {
+          code: 'auth_required',
+          message: 'Authentification requise pour exécuter le workflow',
+          hint: 'Connectez-vous puis relancez l’exécution.',
+        },
+        logs: [],
+      };
     }
 
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/workflow-execute`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      },
-      body: JSON.stringify({
+    const { data, error } = await supabase.functions.invoke('workflow-execute', {
+      body: {
         blocks,
         input: initialInput,
         workflowId,
-        variables: variables || {}
-      })
+        variables: variables || {},
+      },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Server error' }));
-      throw new Error(errorData.error || `Server error: ${response.status}`);
+    if (error) {
+      const msg = error.message || 'Échec de l’exécution du workflow';
+      const looksLikeOAuth = /oauth|google|gmail|token/i.test(msg);
+      return {
+        success: false,
+        output: null,
+        error: msg,
+        errorDetails: {
+          code: looksLikeOAuth ? 'oauth_disconnected' : 'server_error',
+          message: msg,
+          hint: looksLikeOAuth
+            ? 'Votre compte Google est probablement déconnecté/expiré. Reconnectez-le dans le bloc puis relancez le workflow.'
+            : 'Réessayez. Si le problème persiste, vérifiez la configuration du bloc qui échoue.',
+        },
+        logs: [],
+      };
     }
 
-    const result = await response.json();
+    const result = (data || {}) as any;
     return {
-      success: result.success,
+      success: !!result.success,
       output: result.output,
       error: result.error,
       errorDetails: result.errorDetails,
@@ -71,8 +90,19 @@ export async function executeWorkflowViaServer(
       logs: result.logs || [],
     };
   } catch (error) {
-    console.error('Workflow execution via server failed:', error);
-    throw error;
+    const msg = error instanceof Error ? error.message : 'Erreur réseau / exécution';
+    console.error('Workflow execution via server failed (non-throwing):', error);
+    return {
+      success: false,
+      output: null,
+      error: msg,
+      errorDetails: {
+        code: 'network_error',
+        message: msg,
+        hint: 'Vérifiez votre connexion puis réessayez.',
+      },
+      logs: [],
+    };
   }
 }
 
