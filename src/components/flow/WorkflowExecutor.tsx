@@ -34,6 +34,57 @@ export function WorkflowExecutor({
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
   const [result, setResult] = useState<any>(null);
 
+  // Helper to get a human-readable preview of output
+  const getOutputPreview = (output: any): string => {
+    if (!output) return 'Aucune sortie';
+    if (typeof output === 'string') return output.slice(0, 80) + (output.length > 80 ? '...' : '');
+    
+    // Handle common output types
+    if (output.type === 'email' && output.subject) return `📧 ${output.subject}`;
+    if (output.type === 'document' && output.title) return `📄 ${output.title}`;
+    if (output.type === 'download' && output.filename) return `💾 ${output.filename}`;
+    if (output.type === 'webhook') return `🔗 Webhook reçu`;
+    if (output.type === 'generated') return `✨ ${output.title || 'Document généré'}`;
+    
+    // Check for AI/text outputs
+    if (output.result && typeof output.result === 'string') {
+      return output.result.slice(0, 80) + (output.result.length > 80 ? '...' : '');
+    }
+    if (output.text && typeof output.text === 'string') {
+      return output.text.slice(0, 80) + (output.text.length > 80 ? '...' : '');
+    }
+    if (output.content && typeof output.content === 'string') {
+      return output.content.slice(0, 80) + (output.content.length > 80 ? '...' : '');
+    }
+    if (output.response && typeof output.response === 'string') {
+      return output.response.slice(0, 80) + (output.response.length > 80 ? '...' : '');
+    }
+    if (output.message && typeof output.message === 'string') {
+      return output.message.slice(0, 80) + (output.message.length > 80 ? '...' : '');
+    }
+    
+    // For arrays, show count
+    if (Array.isArray(output)) return `📋 ${output.length} élément(s)`;
+    
+    // For objects, show key count or first meaningful value
+    if (typeof output === 'object') {
+      const keys = Object.keys(output).filter(k => !k.startsWith('_'));
+      if (keys.length === 0) return 'Objet vide';
+      
+      // Try to find a meaningful string value
+      for (const key of keys) {
+        const val = output[key];
+        if (typeof val === 'string' && val.length > 0 && val.length < 100) {
+          return val.slice(0, 80) + (val.length > 80 ? '...' : '');
+        }
+      }
+      
+      return `{${keys.slice(0, 3).join(', ')}${keys.length > 3 ? '...' : ''}}`;
+    }
+    
+    return String(output).slice(0, 80);
+  };
+
   const triggerBlock = blocks.find(b => b.type.startsWith('trigger_') || b.type.startsWith('manual_') || b.type.startsWith('webhook_') || b.type.startsWith('schedule_') || b.type.startsWith('email_') || b.type.startsWith('form_'));
   const hasBlocks = blocks.length > 0;
 
@@ -392,22 +443,67 @@ export function WorkflowExecutor({
               </div>
             )}
 
-            {/* Final result */}
+            {/* Final result - Enhanced summary */}
             {result && (
               <div className={`p-4 rounded-lg ${result.success ? 'bg-success/10 border border-success/20' : 'bg-destructive/10 border border-destructive/20'}`}>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-3">
                   {result.success ? (
                     <CheckCircle className="w-5 h-5 text-success" />
                   ) : (
                     <XCircle className="w-5 h-5 text-destructive" />
                   )}
                   <span className="font-semibold">
-                    {result.success ? 'Workflow Completed' : 'Workflow Failed'}
+                    {result.success ? 'Workflow terminé' : 'Workflow échoué'}
                   </span>
                 </div>
+
+                {/* Execution Summary - Show what actually happened */}
+                {logs.length > 0 && (
+                  <div className="mb-3 space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Résumé d'exécution :</div>
+                    <div className="grid gap-1.5">
+                      {logs.map((log, idx) => {
+                        const hasRealOutput = log.output && 
+                          typeof log.output === 'object' && 
+                          !log.output.error &&
+                          Object.keys(log.output).length > 0;
+                        const outputPreview = hasRealOutput 
+                          ? getOutputPreview(log.output)
+                          : log.status === 'error' 
+                            ? `❌ ${log.error || 'Erreur'}` 
+                            : '⚠️ Aucune donnée produite';
+                        
+                        return (
+                          <div 
+                            key={`summary-${log.blockId}-${idx}`}
+                            className={`flex items-center gap-2 text-xs p-2 rounded ${
+                              log.status === 'success' && hasRealOutput
+                                ? 'bg-success/5'
+                                : log.status === 'error'
+                                  ? 'bg-destructive/10'
+                                  : 'bg-amber-500/10'
+                            }`}
+                          >
+                            {log.status === 'success' && hasRealOutput ? (
+                              <CheckCircle className="w-3 h-3 text-success shrink-0" />
+                            ) : log.status === 'error' ? (
+                              <XCircle className="w-3 h-3 text-destructive shrink-0" />
+                            ) : (
+                              <Clock className="w-3 h-3 text-amber-500 shrink-0" />
+                            )}
+                            <span className="font-medium truncate max-w-[120px]">{log.blockName}</span>
+                            <span className="text-muted-foreground">→</span>
+                            <span className="truncate flex-1">{outputPreview}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                
                 {!result.success && (result as any).error && (
-                  <div className="text-sm text-destructive">
-                    {(result as any).error}
+                  <div className="text-sm text-destructive mb-2">
+                    <span className="font-medium">Erreur:</span> {(result as any).error}
                   </div>
                 )}
 
@@ -433,10 +529,16 @@ export function WorkflowExecutor({
                     <span className="font-medium">Conseil :</span> {(result as any).errorDetails.hint}
                   </div>
                 )}
+                
                 {result.output && (
-                  <pre className="text-xs bg-background/50 p-3 rounded mt-2 overflow-x-auto max-h-48">
-                    {typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2)}
-                  </pre>
+                  <details className="mt-3">
+                    <summary className="text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground">
+                      Voir la sortie brute
+                    </summary>
+                    <pre className="text-xs bg-background/50 p-3 rounded mt-2 overflow-x-auto max-h-48">
+                      {typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2)}
+                    </pre>
+                  </details>
                 )}
               </div>
             )}
