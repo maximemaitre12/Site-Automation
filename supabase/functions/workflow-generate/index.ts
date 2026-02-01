@@ -327,6 +327,12 @@ IMPORTANT:
 - Ensure email and document content are generated separately for their respective purposes.`;
 
     } else {
+      // Detect if user wants a complex workflow (many steps)
+      const wantsComplex = /(\d{2,})\s*(etape|step|bloc|node)/i.test(objective) || 
+                           /(complex|complet|avancé|advanced|elabor|enterprise|production)/i.test(objective);
+      const requestedSteps = objective.match(/(\d{2,})\s*(etape|step|bloc|node)/i);
+      const targetSteps = requestedSteps ? parseInt(requestedSteps[1], 10) : (wantsComplex ? 15 : 6);
+      
       systemPrompt = `You are "AETHER Flow Designer", an expert AI that creates automation workflows like n8n.
 You MUST output ONLY valid JSON matching the workflow schema. No explanations, no markdown, just JSON.
 
@@ -340,12 +346,13 @@ ${EXAMPLE_WORKFLOW}
 
 CRITICAL RULES:
 1. Use ONLY the block types listed above - you CANNOT invent new ones
-2. Create the MINIMUM number of blocks needed (usually 3-8 blocks)
+2. Create workflows with the APPROPRIATE complexity for the task - simple tasks need 3-6 blocks, complex tasks can have 10-30+ blocks
 3. NEVER use placeholder URLs like "api.example.com" - these will FAIL
 4. Use expression syntax {{ $json.field }} to reference data from previous blocks
 5. Start with exactly ONE trigger block
 6. For AI Agent workflows, ALWAYS connect sub-nodes for Chat Model (required) and optionally Memory/Tools
 7. Use typed connections (sourceHandle/targetHandle) when connecting to typed ports
+8. If user explicitly asks for many steps/blocks, CREATE THAT MANY - do not simplify their request
 
 CRITICAL UNDERSTANDING - EMAIL vs DOCUMENT:
 - If user wants to SEND AN EMAIL: use "send_email" block with proper email body
@@ -366,10 +373,11 @@ STATIC VALUES vs INTERPOLATION:
 
 ${context ? `Context: ${context}` : ''}
 ${constraints ? `Constraints: ${constraints}` : ''}
+${targetSteps > 8 ? `\nIMPORTANT: The user wants a COMPLEX workflow. Create approximately ${targetSteps} blocks/steps. Include error handling, conditional logic, loops, AI processing, logging, and multiple integrations as appropriate.` : ''}
 
 IMPORTANT:
 - Use ONLY block types from the allowed list (no custom blocks)
-- Create the minimum blocks needed (3-8 typically)
+${targetSteps > 8 ? `- Create a COMPLEX workflow with ~${targetSteps} blocks as requested` : '- Create the appropriate number of blocks for the task'}
 - For AI agents, connect the required Chat Model sub-node
 - Use expression syntax {{ $json.field }} ONLY to reference data from previous block outputs
 - If user provides a literal email address, use it directly WITHOUT {{ }} template syntax
