@@ -416,28 +416,17 @@ export default function Support() {
                     <p className="text-xs text-muted-foreground font-mono">{selectedTicket.ticket_number}</p>
                     <h3 className="font-semibold text-foreground truncate">{selectedTicket.subject}</h3>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        await deleteTicket(selectedTicket.id);
-                        setSelectedTicket(null);
-                        setEditedResponse('');
-                      }}
-                      className="h-8 w-8 p-0 text-destructive rounded-lg"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedTicket(null)}
-                      className="h-8 w-8 p-0 md:hidden rounded-lg"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedTicket(null);
+                      setEditedResponse('');
+                    }}
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground rounded-lg"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
                 </div>
 
                 <ScrollArea className="flex-1 p-4">
