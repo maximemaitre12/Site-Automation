@@ -44,72 +44,50 @@ export function ConfidentialModeToggle({
   if (compact) {
     return (
       <TooltipProvider>
-        <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => onToggle(!enabled)}
-                className={cn(
-                  "p-2 rounded-lg transition-all relative",
-                  enabled 
-                    ? "bg-red-500/10 text-red-500 ring-1 ring-red-500/30 animate-pulse" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                )}
-              >
-                {enabled ? <ShieldAlert className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
-                {enabled && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs bg-background/95 backdrop-blur-sm border-red-500/30">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-red-500" />
-                  <span className="font-semibold text-red-500">
-                    Mode Ultra-Confidentiel {enabled ? 'ACTIVÉ' : 'désactivé'}
-                  </span>
-                </div>
-                {enabled ? (
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs">
-                      <EyeOff className="w-3 h-3" />
-                      <span>Aucun stockage en base de données</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs">
-                      <Clock className="w-3 h-3" />
-                      <span>Session: {formatTime(timeLeft)} restant</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs">
-                      <Trash2 className="w-3 h-3" />
-                      <span>Effacement auto si inactivité</span>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    Activez pour une protection maximale des données sensibles.
-                  </p>
-                )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => onToggle(!enabled)}
+              className={cn(
+                "p-2 rounded-lg transition-all relative",
+                enabled 
+                  ? "bg-red-500/10 text-red-500 ring-1 ring-red-500/30" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              )}
+            >
+              {enabled ? <ShieldAlert className="w-5 h-5" /> : <Shield className="w-5 h-5" />}
+              {enabled && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs bg-background/95 backdrop-blur-sm border-red-500/30">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-red-500" />
+                <span className="font-semibold text-red-500">
+                  Mode Ultra-Confidentiel {enabled ? 'ACTIVÉ' : 'désactivé'}
+                </span>
               </div>
-            </TooltipContent>
-          </Tooltip>
-          
-          {enabled && onWipe && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={onWipe}
-                  className="p-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <span>Effacer la mémoire maintenant</span>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
+              {enabled ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs">
+                    <EyeOff className="w-3 h-3" />
+                    <span>Aucun stockage en base de données</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <Clock className="w-3 h-3" />
+                    <span>Session: {formatTime(timeLeft)} restant</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Activez pour une protection maximale des données sensibles.
+                </p>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
       </TooltipProvider>
     );
   }
