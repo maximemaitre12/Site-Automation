@@ -51,6 +51,7 @@ import {
   generateN8NComparison,
   checkRateLimit,
 } from '@/lib/workflow-security';
+import { runPreflightValidation, formatPreflightMessage } from '@/lib/workflow-preflight';
 import { useAuth } from '@/hooks/useAuth';
 
 interface Message {
@@ -450,29 +451,38 @@ export function FlowAIAssistant({
   }, []);
 
   // Post-action diagnostic after workflow creation/modification
-  const generatePostActionDiagnostic = useCallback((actionBlocks: WorkflowBlock[], actionType: 'generate' | 'modify'): string => {
+  const generatePostActionDiagnostic = useCallback(async (actionBlocks: WorkflowBlock[], actionType: 'generate' | 'modify'): Promise<string> => {
     const issues = analyzeWorkflowConfig(actionBlocks);
     const guidance = generateConfigGuidance(actionBlocks);
-    
-    if (issues.length === 0 && !guidance.trim()) {
-      return actionType === 'generate' 
-        ? `\n\nTon workflow est prêt à être exécuté ! Tous les blocs sont configurés.`
-        : `\n\nLes modifications ont été appliquées. Tout est configuré !`;
+
+    // Real preflight (OAuth/key/required fields) to avoid false “Tout est configuré”
+    const preflight = await runPreflightValidation(actionBlocks);
+
+    const hasAnyIssues = issues.length > 0 || !!guidance.trim() || !preflight.valid;
+    if (!hasAnyIssues) {
+      return actionType === 'generate'
+        ? `\n\nPréflight OK. Ton workflow est prêt à être exécuté.`
+        : `\n\nPréflight OK. Les modifications ont été appliquées.`;
     }
-    
+
     let diagnostic = `\n\n---\n\n🔧 Configuration nécessaire\n\n`;
-    
+
+    if (!preflight.valid) {
+      diagnostic += `${formatPreflightMessage(preflight)}\n\n`;
+    }
+
     if (issues.length > 0) {
-      diagnostic += `Voici ce qu'il faut configurer pour que ton workflow fonctionne :\n\n`;
+      diagnostic += `Autres points à vérifier :\n`;
       diagnostic += issues.map(i => `• ${i}`).join('\n');
+      diagnostic += `\n\n`;
     }
-    
+
     if (guidance.trim()) {
-      diagnostic += `\n${guidance}`;
+      diagnostic += `${guidance}\n\n`;
     }
-    
-    diagnostic += `\n\nDouble-clique sur chaque bloc concerné pour le paramétrer.`;
-    
+
+    diagnostic += `Double-clique sur chaque bloc concerné pour le paramétrer.`;
+
     return diagnostic;
   }, [analyzeWorkflowConfig]);
 
@@ -573,12 +583,19 @@ export function FlowAIAssistant({
       if (isDiagnosticRequest && blocks.length > 0) {
         const issues = analyzeWorkflowConfig(blocks);
         const guidance = generateConfigGuidance(blocks);
+        const preflight = await runPreflightValidation(blocks);
         let response: string;
         
-        if (issues.length === 0 && !guidance.trim()) {
-          response = `Workflow prêt !\n\nTous les blocs sont correctement configurés et connectés. Tu peux lancer l'exécution.`;
+        if (issues.length === 0 && !guidance.trim() && preflight.valid) {
+          response = `Préflight OK.\n\nTu peux lancer l'exécution.`;
         } else {
-          response = `Configuration requise\n\nPour que ton workflow fonctionne, voici ce qu'il faut configurer :\n\n${issues.map(i => `• ${i}`).join('\n')}`;
+          response = `Configuration requise\n\n`;
+          if (!preflight.valid) {
+            response += `${formatPreflightMessage(preflight)}\n\n`;
+          }
+          if (issues.length > 0) {
+            response += `Autres points à vérifier :\n\n${issues.map(i => `• ${i}`).join('\n')}\n\n`;
+          }
           if (guidance.trim()) {
             response += `\n${guidance}`;
           }
@@ -634,7 +651,7 @@ export function FlowAIAssistant({
           const layoutedBlocks = applyLayoutToBlocks(workflow.blocks, autoLayoutBlocks(workflow.blocks, workflow.connections || []));
           
           // Generate diagnostic for the new workflow
-          const diagnostic = generatePostActionDiagnostic(layoutedBlocks, isModifyRequest ? 'modify' : 'generate');
+          const diagnostic = await generatePostActionDiagnostic(layoutedBlocks, isModifyRequest ? 'modify' : 'generate');
           
           // Build compact block summary (just names, no verbose descriptions)
           const blockSummary = layoutedBlocks.slice(0, 6).map((b: WorkflowBlock) => b.name).join(' → ');
@@ -695,14 +712,14 @@ export function FlowAIAssistant({
 
             if (workflow?.blocks?.length > 0) {
               const layoutedBlocks = applyLayoutToBlocks(workflow.blocks, autoLayoutBlocks(workflow.blocks, workflow.connections || []));
-              const diagnostic = generatePostActionDiagnostic(layoutedBlocks, hasExistingBlocks ? 'modify' : 'generate');
+              const diagnostic = await generatePostActionDiagnostic(layoutedBlocks, hasExistingBlocks ? 'modify' : 'generate');
               const blockSummary = layoutedBlocks.slice(0, 6).map((b: WorkflowBlock) => b.name).join(' → ');
               const extraBlocks = layoutedBlocks.length > 6 ? ` +${layoutedBlocks.length - 6}` : '';
               
               const actionMessage: Message = {
                 id: crypto.randomUUID(),
                 role: 'assistant',
-                content: `Workflow "${workflow.name || 'Nouveau workflow'}" prêt.\n\n${blockSummary}${extraBlocks}`,
+                 content: `Workflow "${workflow.name || 'Nouveau workflow'}" prêt.\n\n${blockSummary}${extraBlocks}${diagnostic}`,
                 timestamp: Date.now(),
                 action: {
                   type: hasExistingBlocks ? 'modify' : 'generate',
