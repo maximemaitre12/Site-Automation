@@ -97,7 +97,11 @@ export function usePresentationGenerator() {
     queryClient.invalidateQueries({ queryKey: ['sales-presentations'] });
   };
 
-  const generatePresentation = async (params: GeneratePresentationParams): Promise<Presentation | null> => {
+  // Generate a presentation with compliance feedback loop
+  const generatePresentation = async (
+    params: GeneratePresentationParams,
+    complianceFeedback?: { issues: any[]; attempt: number }
+  ): Promise<Presentation | null> => {
     setGenerating(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -105,8 +109,31 @@ export function usePresentationGenerator() {
 
       const slideCount = params.slideCount || 5;
       const style = params.style || 'professional';
+      const attemptNum = complianceFeedback?.attempt || 1;
 
-      // PROMPT NIVEAU PARTNER McKINSEY - CONTENU ULTRA-DENSE
+      // Build compliance correction instructions if this is a retry
+      let complianceCorrections = '';
+      if (complianceFeedback && complianceFeedback.issues.length > 0) {
+        complianceCorrections = `
+⚠️ CORRECTIONS OBLIGATOIRES - TENTATIVE ${attemptNum}:
+La version précédente a été REJETÉE pour les raisons suivantes. Tu DOIS corriger TOUS ces problèmes:
+
+${complianceFeedback.issues.map((issue, i) => `
+${i + 1}. [${issue.severity?.toUpperCase() || 'WARNING'}] ${issue.message}
+   → Correction requise: ${issue.suggestion || 'Reformuler de manière plus factuelle et mesurée'}
+`).join('')}
+
+RÈGLES DE CONFORMITÉ STRICTES:
+- PAS de superlatifs ("le meilleur", "leader mondial", "incontesté", "sans égal")
+- PAS de promesses non vérifiables ("100% garanti", "résultats instantanés")
+- Toutes les projections financières doivent être présentées comme des "objectifs" ou "estimations"
+- Inclure les hypothèses et risques pour chaque projection majeure
+- Ton factuel et analytique, pas conquérant ou agressif
+- Éviter les tactiques de peur ("dernière chance", "risque de marginalisation")
+`;
+      }
+
+      // PROMPT NIVEAU PARTNER McKINSEY - CONTENU ULTRA-DENSE ET CONFORME
       const prompt = `Tu es un PARTNER SENIOR chez McKinsey & Company avec 35 ans d'expérience. Tu prépares un deck stratégique pour le COMEX d'un groupe du CAC40.
 
 CONTEXTE DE LA MISSION:
@@ -115,6 +142,7 @@ CONTEXTE DE LA MISSION:
 - Objectif stratégique: ${params.objective}
 - Éléments clés à mettre en avant: ${params.keyPoints || 'Créer de la valeur à long terme'}
 - Nombre de slides demandé: ${slideCount}
+${complianceCorrections}
 
 EXIGENCES McKINSEY - NIVEAU PARTNER:
 
@@ -123,31 +151,38 @@ EXIGENCES McKINSEY - NIVEAU PARTNER:
 2. DONNÉES CHIFFRÉES OBLIGATOIRES: 
    - Chaque bullet point DOIT contenir au moins un chiffre (%, €, x fois, années)
    - Les stats doivent être spécifiques et crédibles (ex: "23.4%" pas "environ 20%")
-   - Sources implicites (études de marché, analyses internes)
+   - PRÉSENTER les chiffres comme des "estimations" ou "objectifs cibles" avec hypothèses
 
 3. STRUCTURE PAR SECTIONS:
    - Chaque slide de contenu doit avoir 2-3 sections avec des headings
    - Chaque section contient 3-5 points détaillés
 
-4. LANGAGE C-LEVEL:
+4. LANGAGE C-LEVEL PROFESSIONNEL:
    - Vocabulaire stratégique (synergies, EBITDA, TSR, capex, optionalité)
-   - Formulations directes sans fioritures
-   - Impact business quantifié
+   - Formulations directes mais FACTUELLES et MESURÉES
+   - Impact business quantifié avec HYPOTHÈSES mentionnées
+   - ÉVITER: superlatifs, promesses absolues, ton conquérant
 
-5. MESSAGE CLÉ: Chaque slide a un "keyMessage" en bas qui résume l'insight principal en une phrase.
+5. MESSAGE CLÉ: Chaque slide a un "keyMessage" en bas qui résume l'insight principal en une phrase FACTUELLE.
+
+6. CONFORMITÉ STRICTE:
+   - Jamais "leader mondial", "le meilleur", "incontesté", "sans égal"
+   - Projections = "objectif cible", "estimation base case", "hypothèse de travail"
+   - Inclure les risques et conditions de réalisation
+   - Ton analytique et objectif, pas marketing
 
 GÉNÈRE EXACTEMENT ${slideCount} slides en JSON:
 
 {
-  "title": "Titre stratégique avec angle différenciant",
-  "subtitle": "Sous-titre avec proposition de valeur chiffrée",
-  "executiveSummary": "2-3 phrases résumant la recommandation stratégique",
+  "title": "Titre stratégique factuel",
+  "subtitle": "Sous-titre avec proposition de valeur (objectif: X€ de synergies)",
+  "executiveSummary": "2-3 phrases résumant la recommandation stratégique de manière factuelle",
   "slides": [
     {
       "type": "title",
-      "title": "Titre principal impactant",
-      "subtitle": "Proposition de valeur en une phrase avec chiffre clé",
-      "keyMessage": "Synthèse stratégique de l'opportunité"
+      "title": "Titre principal impactant mais factuel",
+      "subtitle": "Proposition de valeur avec objectif chiffré et hypothèses",
+      "keyMessage": "Synthèse stratégique factuelle de l'opportunité"
     },
     {
       "type": "executive_summary",
@@ -156,94 +191,106 @@ GÉNÈRE EXACTEMENT ${slideCount} slides en JSON:
         {
           "heading": "Contexte et Opportunité",
           "points": [
-            "Le marché X représente Y€ avec une croissance de Z% CAGR 2024-2028",
-            "Point stratégique avec données chiffrées",
-            "Troisième insight avec impact quantifié"
+            "Le marché X représente Y€ avec une croissance estimée de Z% CAGR 2024-2028 (source: [analyse interne])",
+            "Point stratégique avec données et hypothèses",
+            "Insight avec impact quantifié et conditions de réalisation"
           ]
         },
         {
           "heading": "Notre Recommandation",
           "points": [
-            "Action recommandée avec ROI attendu de X%",
-            "Deuxième élément de la recommandation avec timeline",
-            "Troisième point avec impact P&L"
+            "Action recommandée avec ROI cible de X% (scénario base)",
+            "Deuxième élément avec timeline estimée",
+            "Troisième point avec impact P&L projeté"
           ]
         }
       ],
-      "keyMessage": "Message synthétique de la recommandation"
+      "keyMessage": "Message factuel de la recommandation avec conditions clés"
     },
     {
-      "type": "context|problem",
+      "type": "context",
       "title": "Diagnostic Stratégique: [Sujet Spécifique]",
-      "subtitle": "Analyse des forces en présence",
+      "subtitle": "Analyse des dynamiques de marché",
       "sections": [
         {
           "heading": "Dynamiques de Marché",
           "points": [
-            "Tendance 1 avec chiffres de marché (taille, croissance, parts)",
-            "Tendance 2 avec impact sur les acteurs",
-            "Tendance 3 avec projection"
+            "Tendance 1 avec chiffres de marché vérifiables",
+            "Tendance 2 avec impact analysé",
+            "Tendance 3 avec projection et hypothèses"
           ]
         },
         {
           "heading": "Position Concurrentielle",
           "points": [
-            "Notre position: X% de PDM vs leader à Y%",
-            "Gap à combler: détail avec chiffres",
-            "Fenêtre d'opportunité: timing et urgence"
+            "Position actuelle: X% de PDM estimée",
+            "Écart à combler: analyse factuelle",
+            "Fenêtre d'opportunité: timing et facteurs clés"
           ]
         },
         {
-          "heading": "Impératifs Stratégiques",
+          "heading": "Enjeux Stratégiques",
           "points": [
-            "Impératif 1 avec enjeu chiffré",
-            "Impératif 2 avec conséquence si inaction",
-            "Impératif 3 avec délai"
+            "Enjeu 1 avec impact quantifié",
+            "Enjeu 2 avec analyse risque/opportunité",
+            "Enjeu 3 avec délai et conditions"
           ]
         }
       ],
-      "keyMessage": "Le statu quo n'est pas une option: [impact chiffré de l'inaction]"
+      "keyMessage": "Analyse factuelle des enjeux et opportunités"
     },
     {
       "type": "solution",
       "title": "Notre Proposition: [Nom de l'Initiative]",
-      "subtitle": "Création de valeur estimée à X€ sur Y ans",
+      "subtitle": "Création de valeur estimée à X€ sur Y ans (scénario base)",
       "sections": [
         {
           "heading": "Pilier 1: [Nom]",
           "points": [
-            "Action spécifique avec investissement requis",
-            "Bénéfice attendu quantifié",
-            "Timeline de mise en œuvre"
+            "Action spécifique avec investissement estimé",
+            "Bénéfice attendu quantifié (hypothèses: ...)",
+            "Timeline de mise en œuvre prévue"
           ]
         },
         {
           "heading": "Pilier 2: [Nom]",
           "points": [
             "Deuxième axe stratégique détaillé",
-            "Synergies attendues en €",
-            "KPIs de suivi"
+            "Synergies estimées en € avec conditions de réalisation",
+            "KPIs de suivi proposés"
+          ]
+        },
+        {
+          "heading": "Risques et Mitigations",
+          "points": [
+            "Risque d'exécution principal et plan de mitigation",
+            "Risque réglementaire/politique et approche",
+            "Risque d'intégration et gouvernance proposée"
           ]
         }
       ],
-      "keyMessage": "Cette approche génère [X€] de valeur avec un risque maîtrisé"
+      "keyMessage": "Cette approche vise [X€] de valeur avec un profil risque/rendement maîtrisé"
     },
     {
-      "type": "proof|financials",
+      "type": "proof",
       "title": "Business Case et Création de Valeur",
       "stats": [
-        {"value": "+XX%", "label": "Métrique clé", "subtext": "vs situation actuelle ou benchmark"},
-        {"value": "X.X€Mds", "label": "Valeur créée", "subtext": "horizon temporel"},
-        {"value": "<X ans", "label": "Payback", "subtext": "sur investissement de Y€"},
-        {"value": "XX%", "label": "TRI projeté", "subtext": "scénario base"}
+        {"value": "+XX%", "label": "Métrique clé (cible)", "subtext": "vs situation actuelle - scénario base"},
+        {"value": "X.X€Mds", "label": "Valeur estimée", "subtext": "horizon Y ans - hypothèse H1"},
+        {"value": "~X ans", "label": "Payback estimé", "subtext": "sur investissement de Y€"},
+        {"value": "XX%", "label": "TRI cible", "subtext": "scénario base - sensibilité ±5%"}
       ],
-      "testimonial": {
-        "quote": "Citation pertinente et spécifique d'un dirigeant crédible",
-        "author": "Prénom Nom",
-        "role": "Fonction",
-        "company": "Entreprise comparable"
-      },
-      "keyMessage": "Le business case est robuste avec des hypothèses conservatrices"
+      "sections": [
+        {
+          "heading": "Hypothèses Clés",
+          "points": [
+            "Hypothèse 1: [description et source]",
+            "Hypothèse 2: [description et sensibilité]",
+            "Hypothèse 3: [description et risque associé]"
+          ]
+        }
+      ],
+      "keyMessage": "Le business case repose sur des hypothèses conservatrices avec marge de sécurité"
     },
     {
       "type": "roadmap",
@@ -261,43 +308,32 @@ GÉNÈRE EXACTEMENT ${slideCount} slides en JSON:
         {
           "heading": "Décisions Requises",
           "points": ["Validation budget de X€", "Nomination équipe projet", "Go/No-go sur [sujet]"]
-        }
-      ],
-      "keyMessage": "Démarrage immédiat recommandé pour capturer la fenêtre d'opportunité"
-    },
-    {
-      "type": "cta",
-      "title": "Recommandation et Appel à l'Action",
-      "sections": [
+        },
         {
-          "heading": "Notre Recommandation",
-          "points": [
-            "Approuver l'initiative avec budget de X€",
-            "Lancer la phase 1 dès [date]",
-            "Constituer l'équipe projet sous 2 semaines"
-          ]
+          "heading": "Points de Vigilance",
+          "points": ["Risque à surveiller 1", "Condition de succès 2", "Dépendance externe 3"]
         }
       ],
-      "keyMessage": "Chaque mois de retard représente Y€ de valeur non captée",
-      "content": "Fenêtre stratégique: les 6 prochains mois sont critiques"
+      "keyMessage": "Démarrage recommandé pour optimiser la fenêtre d'opportunité identifiée"
     }
   ]
 }
 
 RÈGLES ABSOLUES:
 1. EXACTEMENT ${slideCount} slides
-2. Chaque slide DOIT avoir un "keyMessage" 
+2. Chaque slide DOIT avoir un "keyMessage" FACTUEL (pas de superlatifs)
 3. Les slides de contenu DOIVENT avoir des "sections" avec "heading" et "points"
 4. MINIMUM 8-12 points de contenu par slide (répartis en sections)
-5. TOUS les chiffres doivent être réalistes et spécifiques
-6. Le slide "proof" DOIT avoir "stats" (4 items) et "testimonial"
-7. Vocabulaire: synergies, EBITDA, TSR, capex, quick wins, go-to-market, time-to-value
+5. TOUS les chiffres = "estimation", "cible", "objectif" avec hypothèses
+6. Le slide "proof" DOIT avoir "stats" (4 items) ET une section "Hypothèses Clés"
+7. JAMAIS: "leader mondial", "le meilleur", "incontesté", "100% garanti", "sans risque"
+8. TOUJOURS: ton analytique, projections conditionnelles, risques mentionnés
 
 RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
       const response = await callAI({
         messages: [{ role: 'user', content: prompt }],
-        systemPrompt: 'Tu es un Partner McKinsey créant des decks stratégiques pour des COMEX du CAC40. Tu génères UNIQUEMENT du JSON valide ultra-dense en contenu. Chaque slide doit impressionner par sa densité et sa rigueur analytique.',
+        systemPrompt: 'Tu es un Partner McKinsey créant des decks stratégiques conformes pour des COMEX du CAC40. Tu génères UNIQUEMENT du JSON valide ultra-dense mais FACTUEL et MESURÉ. Aucun superlatif, projections toujours conditionnelles.',
         type: 'generate'
       });
 
@@ -305,20 +341,16 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
       let presentationData: PresentationData;
       try {
-        // Try to extract and repair JSON
         let jsonString = response.content;
         const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
         if (!jsonMatch) throw new Error('JSON non trouvé');
         
-        // Complete truncated JSON if needed
         jsonString = tryCompleteJSON(jsonMatch[0]);
         
         const rawData = JSON.parse(jsonString);
-        
-        // Repair and validate the presentation data
         presentationData = repairPresentationJson(rawData, slideCount);
         
-        console.log(`Generated ${presentationData.slides.length} slides (requested: ${slideCount})`);
+        console.log(`Generated ${presentationData.slides.length} slides (requested: ${slideCount}), attempt: ${attemptNum}`);
       } catch (e) {
         console.error('Parse error:', e);
         throw new Error('Erreur de parsing de la présentation générée');
@@ -346,8 +378,8 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
       invalidatePresentations();
       toast({
-        title: 'Présentation générée',
-        description: `${presentationData.slides.length} slides stratégiques créés`
+        title: attemptNum > 1 ? 'Présentation corrigée' : 'Présentation générée',
+        description: `${presentationData.slides.length} slides stratégiques créés${attemptNum > 1 ? ` (tentative ${attemptNum})` : ''}`
       });
 
       return data as unknown as Presentation;
@@ -362,6 +394,64 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
     } finally {
       setGenerating(false);
     }
+  };
+
+  // Generate with auto-compliance loop (max 3 attempts)
+  const generateWithCompliance = async (
+    params: GeneratePresentationParams,
+    checkComplianceFn: (content: string, type: string, id?: string) => Promise<any>,
+    updateComplianceFn: (id: string, status: string, score?: number, issues?: any[]) => Promise<boolean>,
+    maxAttempts: number = 3
+  ): Promise<{ presentation: Presentation | null; complianceResult: any }> => {
+    let attempt = 1;
+    let presentation: Presentation | null = null;
+    let complianceResult: any = null;
+    let previousIssues: any[] = [];
+
+    while (attempt <= maxAttempts) {
+      // Generate (with feedback from previous attempt if any)
+      presentation = await generatePresentation(
+        params,
+        attempt > 1 ? { issues: previousIssues, attempt } : undefined
+      );
+
+      if (!presentation || !presentation.presentation_json) {
+        return { presentation: null, complianceResult: null };
+      }
+
+      // Check compliance
+      const contentToCheck = JSON.stringify(presentation.presentation_json);
+      complianceResult = await checkComplianceFn(contentToCheck, 'presentation', presentation.id);
+
+      // Update presentation with compliance status
+      await updateComplianceFn(
+        presentation.id,
+        complianceResult.status,
+        complianceResult.score,
+        complianceResult.issues
+      );
+
+      // If approved or review (not blocked), we're done
+      if (complianceResult.status === 'approved' || complianceResult.status === 'review') {
+        console.log(`Presentation approved/review on attempt ${attempt} with score ${complianceResult.score}`);
+        break;
+      }
+
+      // If blocked and we have more attempts, regenerate
+      if (complianceResult.status === 'blocked' && attempt < maxAttempts) {
+        console.log(`Presentation blocked on attempt ${attempt}, regenerating...`);
+        previousIssues = complianceResult.issues || [];
+        
+        // Delete the blocked presentation
+        await supabase.from('sales_presentations').delete().eq('id', presentation.id);
+        attempt++;
+      } else {
+        // Max attempts reached or not blocked
+        break;
+      }
+    }
+
+    return { presentation, complianceResult };
   };
 
   const downloadPPTX = async (presentation: Presentation) => {
@@ -508,6 +598,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
     loading: isLoading,
     generating,
     generatePresentation,
+    generateWithCompliance,
     downloadPPTX,
     deletePresentation,
     updatePresentationCompliance,
