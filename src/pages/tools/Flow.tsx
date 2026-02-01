@@ -453,14 +453,14 @@ export default function Flow() {
 
   return (
     <DashboardLayout headerActions={headerActions}>
-      <div className="flex flex-col h-full workflow-canvas-container" style={{ height: '100%', minHeight: '600px' }}>
+      <div className="flex flex-col h-full min-h-0 workflow-canvas-container">
 
         {/* Main Content */}
             {/* Main Content */}
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
               {/* Workflow Builder - Full width when workflow is selected */}
               {selectedWorkflow ? (
-                <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ minHeight: '400px' }}>
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                   <div className="flex items-center justify-between gap-2 px-3 md:px-6 py-2 md:py-3 border-b border-border bg-card/30 flex-shrink-0">
                     {/* Left side: Home button + Workflow name */}
                     <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -519,7 +519,7 @@ export default function Flow() {
                   </div>
                   
                   {/* Pro Canvas V2 - N8N Style */}
-                  <div className="flex-1 flex overflow-hidden min-h-0 workflow-canvas-area" style={{ minHeight: '500px' }}>
+                  <div className="flex-1 flex overflow-hidden min-h-0 workflow-canvas-area">
                     {/* Canvas */}
                     <div className="flex-1 min-w-0 overflow-hidden min-h-0">
                       <ProCanvasV2
