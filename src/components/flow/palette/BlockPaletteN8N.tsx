@@ -1,6 +1,7 @@
 // ==========================================
 // Block Palette - N8N Style Navigation
 // Hierarchical categories with search
+// Supports custom blocks from database
 // ==========================================
 
 import { useState, useMemo } from 'react';
@@ -15,8 +16,11 @@ import {
   searchBlocks,
   getPopularBlocks
 } from '@/types/block-library';
+import { useBlockLibraryOptional } from '@/contexts/BlockLibraryContext';
+import { ExtendedBlockDefinition, searchExtendedBlocks } from '@/lib/block-library-extended';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface BlockPaletteN8NProps {
@@ -28,57 +32,69 @@ interface BlockPaletteN8NProps {
 type ViewState = 
   | { type: 'root' }
   | { type: 'category'; category: BlockCategory }
-  | { type: 'subcategory'; category: BlockCategory; subcategory: BlockSubcategory };
+  | { type: 'subcategory'; category: BlockCategory; subcategory: BlockSubcategory }
+  | { type: 'custom' }; // New view for custom blocks
 
 export function BlockPaletteN8N({ onAddBlock, onClose, className }: BlockPaletteN8NProps) {
   const [search, setSearch] = useState('');
   const [view, setView] = useState<ViewState>({ type: 'root' });
+  
+  // Use extended block library if available
+  const blockLibrary = useBlockLibraryOptional();
+  const allBlocks = blockLibrary?.allBlocks || BLOCK_LIBRARY;
+  const customBlocks = blockLibrary?.getCustomBlocks() || [];
 
   // Get blocks based on current view and search
   const displayBlocks = useMemo(() => {
     if (search) {
-      return searchBlocks(search);
+      return blockLibrary 
+        ? searchExtendedBlocks(allBlocks as ExtendedBlockDefinition[], search)
+        : searchBlocks(search);
+    }
+    
+    if (view.type === 'custom') {
+      return customBlocks;
     }
     
     if (view.type === 'subcategory') {
-      return BLOCK_LIBRARY.filter(b => b.subcategory === view.subcategory);
+      return allBlocks.filter(b => b.subcategory === view.subcategory);
     }
     
     if (view.type === 'category') {
-      return BLOCK_LIBRARY.filter(b => b.category === view.category);
+      return allBlocks.filter(b => b.category === view.category);
     }
     
     return [];
-  }, [search, view]);
+  }, [search, view, allBlocks, customBlocks, blockLibrary]);
 
   // Get subcategories for current category
   const subcategories = useMemo(() => {
     if (view.type !== 'category') return [];
     
     const subs = new Set<BlockSubcategory>();
-    BLOCK_LIBRARY
+    allBlocks
       .filter(b => b.category === view.category && b.subcategory)
       .forEach(b => subs.add(b.subcategory!));
     
     return Array.from(subs);
-  }, [view]);
+  }, [view, allBlocks]);
 
   // Get popular blocks for current category
   const popularBlocks = useMemo(() => {
     if (view.type !== 'category') return [];
-    return BLOCK_LIBRARY.filter(b => b.category === view.category && b.popular);
-  }, [view]);
+    return allBlocks.filter(b => b.category === view.category && b.popular);
+  }, [view, allBlocks]);
 
   // Blocks without subcategory in current category
   const uncategorizedBlocks = useMemo(() => {
     if (view.type !== 'category') return [];
-    return BLOCK_LIBRARY.filter(b => b.category === view.category && !b.subcategory);
-  }, [view]);
+    return allBlocks.filter(b => b.category === view.category && !b.subcategory);
+  }, [view, allBlocks]);
 
   const goBack = () => {
     if (view.type === 'subcategory') {
       setView({ type: 'category', category: view.category });
-    } else if (view.type === 'category') {
+    } else if (view.type === 'category' || view.type === 'custom') {
       setView({ type: 'root' });
     }
   };
@@ -88,43 +104,55 @@ export function BlockPaletteN8N({ onAddBlock, onClose, className }: BlockPalette
     return <IconComponent className="shrink-0" style={{ color }} size={size} strokeWidth={1.5} />;
   };
 
-  const renderBlockItem = (block: BlockDefinition) => (
-    <button
-      key={block.type}
-      onClick={() => onAddBlock(block.type, block)}
-      className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-lg",
-        "bg-white border border-gray-100 hover:border-gray-200",
-        "hover:shadow-sm transition-all group text-left"
-      )}
-    >
-      <div 
-        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-        style={{ backgroundColor: block.color + '15' }}
+  const renderBlockItem = (block: BlockDefinition | ExtendedBlockDefinition) => {
+    const isCustom = 'isCustom' in block && block.isCustom;
+    
+    return (
+      <button
+        key={block.type}
+        onClick={() => onAddBlock(block.type, block)}
+        className={cn(
+          "w-full flex items-center gap-3 p-3 rounded-lg",
+          "bg-white border border-gray-100 hover:border-gray-200",
+          "hover:shadow-sm transition-all group text-left",
+          isCustom && "border-l-2 border-l-purple-500"
+        )}
       >
-        {renderIcon(block.icon, block.color, 18)}
-      </div>
-      
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">
-          {block.name}
-        </p>
-        <p className="text-xs text-gray-500 truncate">
-          {block.description}
-        </p>
-      </div>
+        <div 
+          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+          style={{ backgroundColor: block.color + '15' }}
+        >
+          {renderIcon(block.icon, block.color, 18)}
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {block.name}
+            </p>
+            {isCustom && (
+              <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4 bg-purple-100 text-purple-700">
+                Personnalisé
+              </Badge>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 truncate">
+            {block.description}
+          </p>
+        </div>
 
-      {block.requiresAuth && (
-        <LucideIcons.Key className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-      )}
-      
-      <LucideIcons.ChevronRight className="w-4 h-4 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-    </button>
-  );
+        {block.requiresAuth && (
+          <LucideIcons.Key className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+        )}
+        
+        <LucideIcons.ChevronRight className="w-4 h-4 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+      </button>
+    );
+  };
 
   const renderCategoryItem = (category: BlockCategory) => {
     const config = CATEGORY_CONFIG[category];
-    const count = BLOCK_LIBRARY.filter(b => b.category === category).length;
+    const count = allBlocks.filter(b => b.category === category).length;
     
     return (
       <button
@@ -309,6 +337,38 @@ export function BlockPaletteN8N({ onAddBlock, onClose, className }: BlockPalette
           {/* Root view - show categories */}
           {!search && view.type === 'root' && (
             <>
+              {/* Custom blocks section */}
+              {customBlocks.length > 0 && (
+                <button
+                  onClick={() => setView({ type: 'custom' })}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-4 rounded-lg mb-3",
+                    "bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200",
+                    "hover:border-purple-300 transition-all group text-left"
+                  )}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-purple-100">
+                    <LucideIcons.Sparkles className="w-5 h-5 text-purple-600" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-purple-900">
+                      Blocs Personnalisés
+                    </p>
+                    <p className="text-xs text-purple-600">
+                      Blocs créés et améliorés par l'IA
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full font-medium">
+                      {customBlocks.length}
+                    </span>
+                    <LucideIcons.ChevronRight className="w-4 h-4 text-purple-400" />
+                  </div>
+                </button>
+              )}
+
               {/* Add another trigger hint */}
               <div className="mb-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 text-purple-700 text-xs font-medium">
@@ -324,6 +384,23 @@ export function BlockPaletteN8N({ onAddBlock, onClose, className }: BlockPalette
                 renderCategoryItem(cat as BlockCategory)
               )}
             </>
+          )}
+
+          {/* Custom blocks view */}
+          {!search && view.type === 'custom' && (
+            <div className="space-y-1">
+              {customBlocks.length > 0 ? (
+                customBlocks.map(block => renderBlockItem(block))
+              ) : (
+                <div className="text-center py-12 px-4">
+                  <LucideIcons.Sparkles className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Aucun bloc personnalisé</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Demandez à l'IA de créer ou améliorer des blocs
+                  </p>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Category view - show subcategories and popular blocks */}

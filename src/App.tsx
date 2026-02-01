@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, RequireAuth, RequireSubscription } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { BlockLibraryProvider } from "@/contexts/BlockLibraryContext";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -85,58 +86,60 @@ const App = () => {
       <BrowserRouter>
         <ScrollToTop />
         <AuthProvider>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/product-tour" element={<ProductTour />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
-            <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
-            
-            {/* Company pages */}
-            <Route path="/about" element={<Navigate to="/" replace />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/contact" element={<Contact />} />
-            
-            {/* Resources pages */}
-            <Route path="/resources/documentation" element={<Documentation />} />
-            
-            {/* Legal pages */}
-            <Route path="/legal/privacy" element={<Privacy />} />
-            <Route path="/legal/terms" element={<Terms />} />
-            <Route path="/legal/security" element={<Security />} />
-            
-            {/* OAuth callbacks - receive code from Google and exchange via backend */}
-            <Route path="/oauth/google/callback" element={<GoogleCallback />} />
+          <BlockLibraryProvider>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/demo" element={<Demo />} />
+              <Route path="/product-tour" element={<ProductTour />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
+              <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
+              
+              {/* Company pages */}
+              <Route path="/about" element={<Navigate to="/" replace />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/contact" element={<Contact />} />
+              
+              {/* Resources pages */}
+              <Route path="/resources/documentation" element={<Documentation />} />
+              
+              {/* Legal pages */}
+              <Route path="/legal/privacy" element={<Privacy />} />
+              <Route path="/legal/terms" element={<Terms />} />
+              <Route path="/legal/security" element={<Security />} />
+              
+              {/* OAuth callbacks - receive code from Google and exchange via backend */}
+              <Route path="/oauth/google/callback" element={<GoogleCallback />} />
 
-            {/* Legacy short paths (avoid 404s from old links) */}
-            <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
-            <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
-            <Route path="/security" element={<Navigate to="/legal/security" replace />} />
-            <Route path="/docs" element={<Navigate to="/resources/documentation" replace />} />
-            {/* Protected routes - require subscription */}
-            <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
-            <Route path="/tools/flow" element={<RequireSubscription><Flow /></RequireSubscription>} />
-            <Route path="/tools/doc" element={<RequireSubscription><DocPage /></RequireSubscription>} />
-            <Route path="/tools/sales" element={<RequireSubscription><Sales /></RequireSubscription>} />
-            <Route path="/tools/hr" element={<RequireSubscription><HR /></RequireSubscription>} />
-            <Route path="/tools/support" element={<RequireSubscription><Support /></RequireSubscription>} />
-            <Route path="/tools/brain" element={<RequireSubscription><BrainPage /></RequireSubscription>} />
-            <Route path="/tools/compliance" element={<RequireSubscription><Compliance /></RequireSubscription>} />
-            <Route path="/tools/data" element={<RequireSubscription><Data /></RequireSubscription>} />
-            <Route path="/onboarding" element={<RequireSubscription><Onboarding /></RequireSubscription>} />
-            <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
-            <Route path="/settings/company" element={<RequireSubscription><CompanySettings /></RequireSubscription>} />
-            <Route path="/settings/api-keys" element={<RequireSubscription><ApiKeys /></RequireSubscription>} />
-            <Route path="/settings/integrations" element={<RequireSubscription><Integrations /></RequireSubscription>} />
-            
-            {/* Admin routes */}
-            <Route path="/admin/demo-requests" element={<RequireAuth><DemoRequests /></RequireAuth>} />
-            
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Legacy short paths (avoid 404s from old links) */}
+              <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
+              <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
+              <Route path="/security" element={<Navigate to="/legal/security" replace />} />
+              <Route path="/docs" element={<Navigate to="/resources/documentation" replace />} />
+              {/* Protected routes - require subscription */}
+              <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
+              <Route path="/tools/flow" element={<RequireSubscription><Flow /></RequireSubscription>} />
+              <Route path="/tools/doc" element={<RequireSubscription><DocPage /></RequireSubscription>} />
+              <Route path="/tools/sales" element={<RequireSubscription><Sales /></RequireSubscription>} />
+              <Route path="/tools/hr" element={<RequireSubscription><HR /></RequireSubscription>} />
+              <Route path="/tools/support" element={<RequireSubscription><Support /></RequireSubscription>} />
+              <Route path="/tools/brain" element={<RequireSubscription><BrainPage /></RequireSubscription>} />
+              <Route path="/tools/compliance" element={<RequireSubscription><Compliance /></RequireSubscription>} />
+              <Route path="/tools/data" element={<RequireSubscription><Data /></RequireSubscription>} />
+              <Route path="/onboarding" element={<RequireSubscription><Onboarding /></RequireSubscription>} />
+              <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
+              <Route path="/settings/company" element={<RequireSubscription><CompanySettings /></RequireSubscription>} />
+              <Route path="/settings/api-keys" element={<RequireSubscription><ApiKeys /></RequireSubscription>} />
+              <Route path="/settings/integrations" element={<RequireSubscription><Integrations /></RequireSubscription>} />
+              
+              {/* Admin routes */}
+              <Route path="/admin/demo-requests" element={<RequireAuth><DemoRequests /></RequireAuth>} />
+              
+              {/* Catch-all */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BlockLibraryProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

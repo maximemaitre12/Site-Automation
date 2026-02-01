@@ -1418,6 +1418,93 @@ export type Database = {
           },
         ]
       }
+      custom_block_definitions: {
+        Row: {
+          category: string
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string
+          icon: string
+          id: string
+          input_ports: Json | null
+          inputs: number
+          is_global: boolean
+          is_real_action: boolean | null
+          is_sub_node: boolean | null
+          modification_reason: string | null
+          name: string
+          output_labels: Json | null
+          output_ports: Json | null
+          outputs: number
+          params: Json
+          popular: boolean | null
+          requires_auth: boolean | null
+          source_block_type: string | null
+          sub_node_type: string | null
+          subcategory: string | null
+          type: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          category?: string
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          icon?: string
+          id?: string
+          input_ports?: Json | null
+          inputs?: number
+          is_global?: boolean
+          is_real_action?: boolean | null
+          is_sub_node?: boolean | null
+          modification_reason?: string | null
+          name: string
+          output_labels?: Json | null
+          output_ports?: Json | null
+          outputs?: number
+          params?: Json
+          popular?: boolean | null
+          requires_auth?: boolean | null
+          source_block_type?: string | null
+          sub_node_type?: string | null
+          subcategory?: string | null
+          type: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          category?: string
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          input_ports?: Json | null
+          inputs?: number
+          is_global?: boolean
+          is_real_action?: boolean | null
+          is_sub_node?: boolean | null
+          modification_reason?: string | null
+          name?: string
+          output_labels?: Json | null
+          output_ports?: Json | null
+          outputs?: number
+          params?: Json
+          popular?: boolean | null
+          requires_auth?: boolean | null
+          source_block_type?: string | null
+          sub_node_type?: string | null
+          subcategory?: string | null
+          type?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
       data_catalog: {
         Row: {
           column_count: number | null

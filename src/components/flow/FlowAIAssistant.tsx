@@ -10,12 +10,15 @@ import {
   Wrench,
   CheckCircle,
   Shield,
+  Blocks,
+  Plus,
+  Settings2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { WorkflowBlock, BlockConnection, WorkflowRunLog } from '@/types/workflow';
-import { getBlockByType } from '@/types/block-library';
+import { getBlockByType, BlockParam } from '@/types/block-library';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { autoLayoutBlocks, applyLayoutToBlocks } from '@/lib/workflow-layout';
@@ -31,6 +34,14 @@ import {
   analyzeExecution, 
   generateAIContext 
 } from '@/lib/workflow-ai-context';
+import { useBlockLibrary } from '@/contexts/BlockLibraryContext';
+import {
+  AIBlockOperation,
+  validateAIOperation,
+  parseAIBlockOperations,
+  summarizeOperations,
+  getBlockLibraryContext,
+} from '@/lib/ai-block-operations';
 
 interface Message {
   id: string;
@@ -38,7 +49,7 @@ interface Message {
   content: string;
   timestamp: number;
   action?: {
-    type: 'generate' | 'modify' | 'recommendation' | 'diagnostic' | 'repair';
+    type: 'generate' | 'modify' | 'recommendation' | 'diagnostic' | 'repair' | 'block_operation';
     data?: any;
   };
 }
@@ -61,6 +72,7 @@ const SUGGESTION_CHIPS = [
   { label: 'Optimiser', icon: RefreshCw, prompt: 'Analyse et optimise mon workflow actuel' },
   { label: 'Diagnostiquer', icon: AlertTriangle, prompt: 'Quels blocs dois-je configurer pour que ce workflow fonctionne ?' },
   { label: 'Auto-réparer', icon: Wrench, prompt: 'Analyse les erreurs et propose des corrections' },
+  { label: 'Améliorer les blocs', icon: Blocks, prompt: 'Propose des améliorations pour les définitions de blocs' },
 ];
 
 // Cache key for localStorage
@@ -186,11 +198,15 @@ export function FlowAIAssistant({
   onModifyWorkflow,
   onApplyRepair,
 }: FlowAIAssistantProps) {
+  // Block library context for custom blocks
+  const blockLibrary = useBlockLibrary();
+  
   // Initialize messages from cache
   const [messages, setMessages] = useState<Message[]>(() => getCachedMessages());
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [pendingRepairs, setPendingRepairs] = useState<RepairSuggestion[]>([]);
+  const [pendingOperations, setPendingOperations] = useState<AIBlockOperation[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -487,7 +503,7 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
     }
   };
 
-  const handleApplyAction = (action: Message['action'], data: any) => {
+  const handleApplyAction = async (action: Message['action'], data: any) => {
     if (!action) return;
 
     if (action.type === 'generate' && data) {
@@ -549,7 +565,91 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
       } catch (error) {
         toast.error('Échec de l\'application des corrections');
       }
+    } else if (action.type === 'block_operation' && data?.operations) {
+      // Apply block operations (create, update, delete)
+      await handleApplyBlockOperations(data.operations as AIBlockOperation[]);
     }
+  };
+
+  // Handle applying block operations
+  const handleApplyBlockOperations = async (operations: AIBlockOperation[]) => {
+    const results: string[] = [];
+    const errors: string[] = [];
+
+    for (const op of operations) {
+      // Validate before applying
+      const validation = validateAIOperation(op, blockLibrary.allBlocks);
+      if (!validation.valid) {
+        errors.push(`${op.type}: ${validation.errors.join(', ')}`);
+        continue;
+      }
+
+      try {
+        switch (op.type) {
+          case 'create_block': {
+            const newType = op.block.type || blockLibrary.generateBlockType(op.block.name || 'custom');
+            await blockLibrary.createBlock({
+              definition: { ...op.block, type: newType },
+              reason: op.reason,
+            });
+            results.push(`✨ Bloc "${op.block.name}" créé`);
+            break;
+          }
+          case 'update_block': {
+            const block = blockLibrary.allBlocks.find(b => b.type === op.blockType);
+            if (block?.isCustom && (block as any).customId) {
+              await blockLibrary.updateBlock({
+                id: (block as any).customId,
+                updates: op.updates,
+                reason: op.reason,
+              });
+              results.push(`📝 Bloc "${op.blockType}" mis à jour`);
+            }
+            break;
+          }
+          case 'delete_block': {
+            const block = blockLibrary.allBlocks.find(b => b.type === op.blockType);
+            if (block?.isCustom && (block as any).customId) {
+              await blockLibrary.deleteBlock((block as any).customId);
+              results.push(`🗑️ Bloc "${op.blockType}" supprimé`);
+            }
+            break;
+          }
+          case 'add_param': {
+            await blockLibrary.addParameter(op.blockType, op.param, op.reason);
+            results.push(`➕ Paramètre "${op.param.label}" ajouté`);
+            break;
+          }
+          case 'update_param': {
+            await blockLibrary.updateParameter(op.blockType, op.paramKey, op.updates, op.reason);
+            results.push(`📝 Paramètre "${op.paramKey}" modifié`);
+            break;
+          }
+          case 'remove_param': {
+            await blockLibrary.removeParameter(op.blockType, op.paramKey, op.reason);
+            results.push(`➖ Paramètre "${op.paramKey}" supprimé`);
+            break;
+          }
+        }
+      } catch (err: any) {
+        errors.push(`${op.type}: ${err.message}`);
+      }
+    }
+
+    // Add result message
+    const content = [
+      results.length > 0 ? `Opérations réussies :\n${results.join('\n')}` : '',
+      errors.length > 0 ? `\n\nErreurs :\n${errors.join('\n')}` : '',
+    ].filter(Boolean).join('');
+
+    const resultMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: content || 'Aucune opération effectuée',
+      timestamp: Date.now(),
+    };
+    setMessages(prev => [...prev, resultMessage]);
+    setPendingOperations([]);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
