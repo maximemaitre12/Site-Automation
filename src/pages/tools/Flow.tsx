@@ -110,6 +110,7 @@ export default function Flow() {
       const connections = selectedWorkflow.connections || [];
       setLocalBlocks(blocks);
       setLocalConnections(connections);
+      setLastExecutionResult(null);
       // Reset history with initial state
       const initialState = { blocks: JSON.parse(JSON.stringify(blocks)), connections: JSON.parse(JSON.stringify(connections)) };
       setHistory([initialState]);
@@ -119,6 +120,7 @@ export default function Flow() {
       setLocalConnections([]);
       setHistory([]);
       setHistoryIndex(-1);
+      setLastExecutionResult(null);
     }
     setSelectedBlockId(null);
   }, [selectedWorkflowId, selectedWorkflow?.id]);
@@ -452,13 +454,26 @@ export default function Flow() {
     }
   };
 
-  const handleRunCompleted = async (workflowId: string, logs: any[], output: any) => {
+  const handleRunCompleted = async (
+    workflowId: string,
+    logs: any[],
+    output: any,
+    executionMeta?: { success: boolean; error?: string; failedBlockId?: string }
+  ) => {
+    // Keep the latest execution available for the AI assistant diagnostics
+    setLastExecutionResult({
+      success: executionMeta?.success ?? !!output,
+      error: executionMeta?.error,
+      failedBlockId: executionMeta?.failedBlockId,
+      logs,
+    });
+
     const run = await createRun(workflowId, localBlocks.length > 0 ? 'User input' : null);
     if (run) {
       await updateRun(run.id, {
-        status: output ? 'completed' : 'failed',
+        status: (executionMeta?.success ?? !!output) ? 'completed' : 'failed',
         output_data: output,
-        completed_at: new Date().toISOString()
+        completed_at: new Date().toISOString(),
       });
     }
   };
@@ -528,7 +543,7 @@ export default function Flow() {
                         connections={localConnections}
                         workflowId={selectedWorkflow.id}
                         workflowName={selectedWorkflow.name}
-                        onRunCreated={(runId, logs, output) => handleRunCompleted(selectedWorkflow.id, logs, output)}
+                        onRunCreated={(runId, logs, output, executionMeta) => handleRunCompleted(selectedWorkflow.id, logs, output, executionMeta)}
                         onFocusBlock={(blockId) => {
                           // Close all panels and open properties for the failed block
                           setIsPaletteOpen(false);

@@ -17,7 +17,18 @@ interface WorkflowExecutorProps {
   connections?: BlockConnection[];
   workflowId: string;
   workflowName: string;
-  onRunCreated?: (runId: string, logs: WorkflowRunLog[], output: any) => void;
+  onRunCreated?: (
+    runId: string,
+    logs: WorkflowRunLog[],
+    output: any,
+    executionMeta?: {
+      success: boolean;
+      error?: string;
+      failedBlockId?: string;
+      failedBlockName?: string;
+      failedBlockType?: string;
+    }
+  ) => void;
   onFocusBlock?: (blockId: string) => void;
 }
 
@@ -265,12 +276,22 @@ export function WorkflowExecutor({
         toast.error(failedBlockName ? `Blocage dans “${failedBlockName}” : ${err}` : err);
       }
 
-      onRunCreated?.(workflowId, execution.logs, execution.output);
+      onRunCreated?.(workflowId, execution.logs || [], execution.output, {
+        success: !!execution.success,
+        error: (execution as any).error,
+        failedBlockId: (execution as any).failedBlockId,
+        failedBlockName: (execution as any).failedBlockName,
+        failedBlockType: (execution as any).failedBlockType,
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Execution error';
       toast.error(errorMessage);
       console.error('Workflow execution error:', error);
       setResult({ success: false, output: null, logs: [] });
+      onRunCreated?.(workflowId, [], null, {
+        success: false,
+        error: errorMessage,
+      });
     } finally {
       setIsRunning(false);
     }

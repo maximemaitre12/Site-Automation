@@ -102,21 +102,31 @@ function checkBlockConfig(block: WorkflowBlock): PreflightIssue[] {
   
   for (const param of requiredParams) {
     const value = block.config?.[param.key];
-    
-    // Check for empty/missing values
+
+    // Missing required value (unless the block is expected to fill it dynamically via an expression)
     if (value === undefined || value === null || value === '') {
-      // Special case: some params can be filled via expressions at runtime
-      // Skip if it looks like a dynamic expression placeholder
+      issues.push({
+        blockId: block.id,
+        blockName: block.name,
+        blockType: block.type,
+        severity: 'error',
+        code: 'MISSING_REQUIRED_PARAM',
+        message: `Le champ obligatoire "${param.label}" est manquant`,
+        fix: `Renseignez le champ "${param.label}" dans les propriétés du bloc`,
+        requiresBlockConfig: true,
+      });
+      continue;
+    }
+
+    // If it's a template/expression, we can't validate it statically
+    const raw = typeof value === 'string' ? value.trim() : '';
+    if (raw && raw.includes('{{') && raw.includes('}}')) {
       continue;
     }
     
     // Check for email fields with invalid values
     if (param.key === 'to' || param.key === 'recipient' || param.key === 'email') {
       const emailValue = String(value).trim();
-      // If it's an expression, we can't validate it statically
-      if (emailValue.includes('{{') && emailValue.includes('}}')) {
-        continue;
-      }
       // Basic email validation
       if (emailValue && !emailValue.includes('@') && emailValue.length > 0) {
         issues.push({
@@ -143,6 +153,10 @@ function emailBlockUsesGmail(block: WorkflowBlock): boolean {
   // If the block has gmail_oauth explicitly set
   if (block.config?.use_gmail === true || block.config?.provider === 'gmail') {
     return true;
+  }
+  // If explicitly using a non-OAuth provider, do not require Google OAuth
+  if (block.config?.use_gmail === false || block.config?.provider === 'resend') {
+    return false;
   }
   // By default, send_email prefers Gmail if connected
   // We'll check OAuth status to determine
