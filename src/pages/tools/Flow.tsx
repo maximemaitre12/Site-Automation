@@ -18,6 +18,7 @@ import { TemplateGallery } from '@/components/flow/TemplateGallery';
 import { BlockPaletteN8N } from '@/components/flow/palette/BlockPaletteN8N';
 import { AIAutomationRules } from '@/components/flow/AIAutomationRules';
 import { NodePropertiesPanel } from '@/components/flow/panels/NodePropertiesPanel';
+import { FlowAIAssistant } from '@/components/flow/FlowAIAssistant';
 import { autoLayoutBlocks, applyLayoutToBlocks, suggestNewBlockPosition } from '@/lib/workflow-layout';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
@@ -66,6 +67,7 @@ export default function Flow() {
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [newWorkflowName, setNewWorkflowName] = useState('');
   const [newWorkflowDesc, setNewWorkflowDesc] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -481,9 +483,9 @@ export default function Flow() {
                     {/* Right side: AI, Add Block, Execute */}
                     <div className="flex items-center gap-1 md:gap-2">
                       <Button 
-                        variant="outline" 
+                        variant={isAIAssistantOpen ? "default" : "outline"}
                         size="sm" 
-                        onClick={() => setIsAIGeneratorOpen(true)} 
+                        onClick={() => setIsAIAssistantOpen(!isAIAssistantOpen)} 
                         className="gap-1 h-7 md:h-8 px-2 md:px-3 text-xs md:text-sm"
                       >
                         <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -511,6 +513,18 @@ export default function Flow() {
                   
                   {/* Pro Canvas V2 - N8N Style */}
                   <div className="flex-1 flex overflow-hidden min-h-0 workflow-canvas-area" style={{ minHeight: '500px' }}>
+                    {/* AI Assistant Panel - Left side */}
+                    <FlowAIAssistant
+                      isOpen={isAIAssistantOpen}
+                      onClose={() => setIsAIAssistantOpen(false)}
+                      blocks={localBlocks}
+                      connections={localConnections}
+                      workflowId={selectedWorkflow.id}
+                      workflowName={selectedWorkflow.name}
+                      onGenerateWorkflow={handleAIGenerate}
+                      onModifyWorkflow={handleAIModify}
+                    />
+                    
                     <div className="flex-1 overflow-hidden min-h-0">
                       <ProCanvasV2
                         blocks={localBlocks}
