@@ -79,7 +79,7 @@ export function useSupport() {
 
       await classifyTicket(ticket.id, data.subject + '\n' + data.content);
       
-      toast({ title: 'Succès', description: 'Ticket créé et classifié' });
+      toast({ title: 'Succès', description: 'Ticket créé et classifié', duration: 2000 });
       return ticket;
     } catch (err) {
       toast({ title: 'Erreur', description: 'Erreur lors de la création', variant: 'destructive' });
