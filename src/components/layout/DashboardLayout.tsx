@@ -116,10 +116,19 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* Center - Logo */}
+            {/* Center - Logo or Tool Name */}
             <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-              <AetherLogo size="md" className="sm:hidden" />
-              <AetherLogo size="lg" className="hidden sm:block" />
+              {location.pathname === '/tools/flow' ? (
+                <span className="text-lg sm:text-xl font-bold tracking-tight">
+                  <span className="text-foreground">AETHER</span>
+                  <span className="text-agent-flow ml-1">Flow</span>
+                </span>
+              ) : (
+                <>
+                  <AetherLogo size="md" className="sm:hidden" />
+                  <AetherLogo size="lg" className="hidden sm:block" />
+                </>
+              )}
             </Link>
 
             {/* Header Actions - Right side */}
