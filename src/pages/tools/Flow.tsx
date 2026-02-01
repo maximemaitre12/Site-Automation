@@ -271,16 +271,28 @@ export default function Flow() {
     }
   };
 
-  const handleAIModify = (blocks: WorkflowBlock[], connections: BlockConnection[]) => {
+  const handleAIModify = useCallback((blocks: WorkflowBlock[], connections: BlockConnection[]) => {
+    if (!selectedWorkflowId) {
+      toast.error('Aucun workflow sélectionné');
+      return;
+    }
+    
     // Apply auto-layout to modified blocks
     const layoutedBlocks = blocks.length > 0 
       ? applyLayoutToBlocks(blocks, autoLayoutBlocks(blocks, connections))
       : blocks;
     
+    console.log('AI Modify: updating canvas with', layoutedBlocks.length, 'blocks');
+    
+    // Update local state immediately
     setLocalBlocks(layoutedBlocks);
     setLocalConnections(connections);
-    toast.success('Workflow modifié par l\'IA');
-  };
+    
+    // Trigger fit view to show new blocks
+    setFitViewNonce(n => n + 1);
+    
+    toast.success('Workflow modifié');
+  }, [selectedWorkflowId]);
 
   const handleRenameWorkflow = async () => {
     if (!workflowToRename || !renameValue.trim()) return;
