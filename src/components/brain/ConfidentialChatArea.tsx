@@ -5,7 +5,7 @@ import { ShieldAlert, Lock, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ConfidentialMessage {
-  role: 'user' | 'assistant';
+  role: string;
   content: string;
 }
 
@@ -33,8 +33,10 @@ export function ConfidentialChatArea({
     return () => clearTimeout(timer);
   }, []);
 
+  const hasContent = messages.length > 0 || (streamingContent && streamingContent.length > 0);
+
   return (
-    <div className={cn("flex-1 flex flex-col relative", className)}>
+    <div className={cn("flex-1 flex flex-col relative min-h-0 overflow-hidden", className)}>
       {/* Security watermark overlay */}
       <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center opacity-[0.03]">
         <div className="text-center transform -rotate-12">
@@ -44,7 +46,7 @@ export function ConfidentialChatArea({
       </div>
 
       {/* Initial warning */}
-      {showWarning && messages.length === 0 && (
+      {showWarning && !hasContent && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 animate-fade-in">
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 max-w-md backdrop-blur-sm">
             <div className="flex items-start gap-3">
@@ -65,7 +67,7 @@ export function ConfidentialChatArea({
 
       <ScrollArea className="flex-1 px-4 md:px-6">
         <div className="space-y-4 max-w-3xl mx-auto py-4">
-          {messages.length === 0 && !streamingContent && (
+          {!hasContent && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="p-4 rounded-full bg-red-500/10 mb-4">
                 <Lock className="w-8 h-8 text-red-500" />
@@ -82,12 +84,12 @@ export function ConfidentialChatArea({
           {messages.map((msg, idx) => (
             <ChatMessage 
               key={idx} 
-              role={msg.role} 
+              role={msg.role as 'user' | 'assistant'} 
               content={msg.content}
             />
           ))}
           
-          {streamingContent && (
+          {streamingContent && streamingContent.length > 0 && (
             <ChatMessage role="assistant" content={streamingContent} isStreaming />
           )}
           
@@ -96,7 +98,7 @@ export function ConfidentialChatArea({
       </ScrollArea>
       
       {/* Bottom security indicator */}
-      <div className="px-4 py-2 flex items-center justify-center gap-2 text-xs text-muted-foreground border-t border-red-500/20 bg-red-500/5">
+      <div className="shrink-0 px-4 py-2 flex items-center justify-center gap-2 text-xs text-muted-foreground border-t border-red-500/20 bg-red-500/5">
         <Lock className="w-3 h-3 text-red-500" />
         <span>Cette conversation n'est pas enregistrée</span>
       </div>

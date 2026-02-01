@@ -476,8 +476,9 @@ export default function BrainPage() {
           {confidentialMode ? (
             // CONFIDENTIAL MODE: Use in-memory chat area
             <ConfidentialChatArea 
-              messages={(confidentialSession?.messages || []) as Array<{ role: 'user' | 'assistant'; content: string }>}
+              messages={confidentialSession?.messages || []}
               streamingContent={confidentialStreamingContent}
+              className="flex-1 min-h-0"
             />
           ) : (
             // NORMAL MODE: Use database-backed chat
