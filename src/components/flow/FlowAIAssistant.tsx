@@ -164,24 +164,25 @@ function isApplyConfirmation(text: string): boolean {
 
 // Check if the message is a workflow generation/modification request
 function isWorkflowRequest(text: string): boolean {
-  const t = text.toLowerCase();
+  const t = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   
   // Strong generation patterns
   const generatePatterns = [
-    /génère|genere|générer|generer/i,
-    /créer|crée|créé|create/i,
+    /genere|gener|generation/i,
+    /creer|cree|create|creation/i,
     /construit|construis|build/i,
-    /fais(-| )?moi|fais(-| )?le|fais(-| )?un/i,
+    /fais(-| )?(moi|le|un|ca|ça)/i,
     /nouveau workflow|new workflow/i,
     /monte(-| )?moi/i,
     /agent.*email|email.*agent/i,
     /workflow.*pour|pour.*workflow/i,
-    /automatise|automatisation/i,
+    /automatise|automatisation|automate/i,
+    /lance|execute|demarre/i,
   ];
   
   // Strong modification patterns  
   const modifyPatterns = [
-    /améliore|ameliore|améliorer/i,
+    /ameliore|ameliorer|improve/i,
     /modifie|modifier|modify/i,
     /ajoute|ajouter|add/i,
     /supprime|supprimer|remove|delete/i,
@@ -189,9 +190,18 @@ function isWorkflowRequest(text: string): boolean {
     /optimise|optimiser|optimize/i,
     /corrige|corriger|fix/i,
     /refactor|refactorise/i,
+    /update|met(s)?( |-)?a( |-)?jour/i,
   ];
   
-  return generatePatterns.some(p => p.test(t)) || modifyPatterns.some(p => p.test(t));
+  // Keywords that strongly indicate workflow intent
+  const workflowKeywords = /workflow|bloc|node|trigger|action|automation/i;
+  
+  const hasGeneratePattern = generatePatterns.some(p => p.test(t));
+  const hasModifyPattern = modifyPatterns.some(p => p.test(t));
+  const hasWorkflowKeyword = workflowKeywords.test(t);
+  
+  // If any pattern matches, it's likely a workflow request
+  return hasGeneratePattern || hasModifyPattern || hasWorkflowKeyword;
 }
 
 // Generate detailed configuration guidance for blocks
@@ -681,18 +691,22 @@ export function FlowAIAssistant({
           ? `Le workflow "${workflowName || 'Sans nom'}" contient ${blocks.length} blocs : ${blocks.map(b => `${b.name} (type: ${b.type})`).join(', ')}.`
           : 'Aucun workflow sélectionné pour l\'instant.';
         
-        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow. Tu parles comme un humain, pas un robot.
+        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow, capable de générer et modifier des workflows.
 
 CONTEXTE: ${blocksContext}
 
-RÈGLE CRITIQUE: Tu NE PEUX PAS créer de workflows par le texte. Si l'utilisateur demande de créer/améliorer un workflow, tu dois lui dire de reformuler sa demande de manière plus claire pour que le système de génération automatique le comprenne.
+TES CAPACITÉS:
+- Tu PEUX générer des workflows - le système les créera automatiquement sur le canvas
+- Tu PEUX modifier les workflows existants
+- Tu aides à configurer les blocs et résoudre les problèmes
 
-INTERDICTIONS ABSOLUES:
-- JAMAIS de listes de blocs (1. bloc X, 2. bloc Y...)  
-- JAMAIS de descriptions de workflows
-- JAMAIS de "Voici le plan", "Je vais générer"
+RÈGLES DE RÉPONSE:
+- Sois bref et direct (2-3 phrases max)
+- Ne liste JAMAIS les blocs un par un avec des descriptions
+- Ne fais pas de "plan" ou "voici ce que je vais faire"
+- Si l'utilisateur veut un workflow, dis simplement "Je génère ça maintenant" et le système s'en occupe
 
-Réponds uniquement aux questions sur l'utilisation de Flow, la configuration des blocs, ou aide à clarifier ce que l'utilisateur veut automatiser.`;
+Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou les problèmes rencontrés.`;
 
         const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
           method: 'POST',
