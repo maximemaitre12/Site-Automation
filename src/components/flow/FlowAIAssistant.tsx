@@ -789,8 +789,8 @@ Tu as accès aux blocs : IA (OpenAI, Gemini), Logique (if/else, loops), Transfor
   return (
     <div className="w-96 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden pb-2">
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
-        <div className="space-y-4">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain p-4">
+        <div className="space-y-4 overflow-hidden">
           {messages.length === 0 && (
             <div className="text-center py-8">
               <Bot className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
