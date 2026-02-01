@@ -28,8 +28,8 @@ serve(async (req) => {
       );
     }
 
-    // Use Adina - French young female voice by default
-    const voice = voiceId || 'FvmvwvObRqIHojkEGh5N';
+    // Use Nicolas Petit - French male voice by default
+    const voice = voiceId || 'AmMsHJaCw4BtwV3KoUXF';
     
     // Use streaming endpoint for instant playback
     const response = await fetch(
