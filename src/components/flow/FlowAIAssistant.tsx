@@ -417,7 +417,7 @@ export function FlowAIAssistant({
     const shouldApplyLatest = !!latestActionMessage && isApplyConfirmation(rawInput);
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       role: 'user',
       content: rawInput,
       timestamp: Date.now(),
@@ -427,7 +427,7 @@ export function FlowAIAssistant({
 
     if (shouldApplyLatest && latestActionMessage?.action?.data) {
       const ack: Message = {
-        id: (Date.now() + 1).toString(),
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: 'OK, j’applique ça sur le canvas maintenant.',
         timestamp: Date.now(),
@@ -540,8 +540,9 @@ export function FlowAIAssistant({
       // Handle generate or modify via API
       if (isGenerateRequest || isModifyRequest) {
         // Show generating state with a pending message
+        const pendingMessageId = crypto.randomUUID();
         const pendingMessage: Message = {
-          id: (Date.now() + 1).toString(),
+          id: pendingMessageId,
           role: 'assistant',
           content: '🔄 Génération du workflow en cours...',
           timestamp: Date.now(),
@@ -594,7 +595,7 @@ export function FlowAIAssistant({
           setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
           
           const actionMessage: Message = {
-            id: (Date.now() + 2).toString(),
+            id: crypto.randomUUID(),
             role: 'assistant',
             content: `✨ Workflow "${workflow.name || 'Nouveau workflow'}" prêt !\n\n${blockSummary}${extraBlocks}`,
             timestamp: Date.now(),
@@ -762,7 +763,7 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
       // Add post-action diagnostic message
       if (data.diagnostic) {
         const diagnosticMessage: Message = {
-          id: Date.now().toString(),
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: data.diagnostic,
           timestamp: Date.now(),
@@ -777,7 +778,7 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
       // Add post-action diagnostic message
       if (data.diagnostic) {
         const diagnosticMessage: Message = {
-          id: Date.now().toString(),
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: data.diagnostic,
           timestamp: Date.now(),
@@ -803,7 +804,7 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
           toast.success(`${appliedFixes.length} correction(s) appliquée(s)`);
           
           const successMessage: Message = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             role: 'assistant',
             content: `✅ Corrections appliquées :\n\n${appliedFixes.map(f => `• ${f}`).join('\n')}\n\nRelance le workflow pour vérifier.`,
             timestamp: Date.now(),
@@ -927,7 +928,7 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
     }
 
     const resultMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       role: 'assistant',
       content: contentParts.join('\n') || 'Aucune opération effectuée',
       timestamp: Date.now(),
