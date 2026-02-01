@@ -6,7 +6,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,20 +22,18 @@ serve(async (req) => {
 
     const ELEVENLABS_API_KEY = Deno.env.get('ELEVENLABS_API_KEY');
     if (!ELEVENLABS_API_KEY) {
-      console.error('ELEVENLABS_API_KEY not configured');
       return new Response(
         JSON.stringify({ error: 'ElevenLabs connector not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Default voice: Sarah (female, professional)
+    // Use turbo model for faster generation
     const voice = voiceId || 'EXAVITQu4vr4xnSDxMaL';
     
-    console.log('Generating speech for text:', text.substring(0, 50) + '...');
-
+    // Use streaming endpoint for instant playback
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voice}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voice}/stream?output_format=mp3_44100_128`,
       {
         method: 'POST',
         headers: {
@@ -45,13 +42,10 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text,
-          model_id: 'eleven_multilingual_v2',
-          output_format: 'mp3_44100_128',
+          model_id: 'eleven_turbo_v2_5', // Fastest model for real-time
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.75,
-            style: 0.5,
-            use_speaker_boost: true,
           },
         }),
       }
@@ -59,24 +53,21 @@ serve(async (req) => {
 
     if (!response.ok) {
       const error = await response.json();
-      console.error('ElevenLabs API error:', error);
       return new Response(
         JSON.stringify({ error: error.detail?.message || 'Failed to generate speech' }),
         { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const audioBuffer = await response.arrayBuffer();
-    console.log('Speech generated successfully, size:', audioBuffer.byteLength);
-
-    return new Response(audioBuffer, {
+    // Stream the audio directly for instant playback
+    return new Response(response.body, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'audio/mpeg',
+        'Transfer-Encoding': 'chunked',
       },
     });
   } catch (error) {
-    console.error('Error generating speech:', error);
     const errorMessage = error instanceof Error ? error.message : 'Failed to generate speech';
     return new Response(
       JSON.stringify({ error: errorMessage }),
