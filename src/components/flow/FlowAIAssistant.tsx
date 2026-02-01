@@ -7,15 +7,30 @@ import {
   AlertTriangle,
   Wand2,
   RefreshCw,
+  Wrench,
+  CheckCircle,
+  Shield,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { WorkflowBlock, BlockConnection } from '@/types/workflow';
+import { WorkflowBlock, BlockConnection, WorkflowRunLog } from '@/types/workflow';
 import { getBlockByType } from '@/types/block-library';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { autoLayoutBlocks, applyLayoutToBlocks } from '@/lib/workflow-layout';
+import { 
+  analyzeFailure, 
+  generateRepairMessage, 
+  applyRepairSuggestion,
+  RepairSuggestion,
+  validateInputSecurity,
+} from '@/lib/workflow-self-healing';
+import { 
+  analyzeWorkflowStructure, 
+  analyzeExecution, 
+  generateAIContext 
+} from '@/lib/workflow-ai-context';
 
 interface Message {
   id: string;
@@ -23,7 +38,7 @@ interface Message {
   content: string;
   timestamp: number;
   action?: {
-    type: 'generate' | 'modify' | 'recommendation' | 'diagnostic';
+    type: 'generate' | 'modify' | 'recommendation' | 'diagnostic' | 'repair';
     data?: any;
   };
 }
@@ -35,15 +50,17 @@ interface FlowAIAssistantProps {
   connections: BlockConnection[];
   workflowId?: string;
   workflowName?: string;
+  lastExecutionResult?: { success: boolean; error?: string; failedBlockId?: string; logs?: WorkflowRunLog[] };
   onGenerateWorkflow: (blocks: WorkflowBlock[], name: string, description: string, connections: BlockConnection[]) => void;
   onModifyWorkflow: (blocks: WorkflowBlock[], connections: BlockConnection[]) => void;
+  onApplyRepair?: (blocks: WorkflowBlock[]) => void;
 }
 
 const SUGGESTION_CHIPS = [
   { label: 'Générer un workflow', icon: Wand2, prompt: 'Génère-moi un nouveau workflow pour' },
   { label: 'Optimiser', icon: RefreshCw, prompt: 'Analyse et optimise mon workflow actuel' },
   { label: 'Diagnostiquer', icon: AlertTriangle, prompt: 'Quels blocs dois-je configurer pour que ce workflow fonctionne ?' },
-  { label: 'Recommandations', icon: Lightbulb, prompt: 'Donne-moi des recommandations pour améliorer ce workflow' },
+  { label: 'Auto-réparer', icon: Wrench, prompt: 'Analyse les erreurs et propose des corrections' },
 ];
 
 // Cache key for localStorage
@@ -164,15 +181,56 @@ export function FlowAIAssistant({
   blocks,
   connections,
   workflowName,
+  lastExecutionResult,
   onGenerateWorkflow,
   onModifyWorkflow,
+  onApplyRepair,
 }: FlowAIAssistantProps) {
   // Initialize messages from cache
   const [messages, setMessages] = useState<Message[]>(() => getCachedMessages());
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingRepairs, setPendingRepairs] = useState<RepairSuggestion[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-analyze failures when execution result changes
+  useEffect(() => {
+    if (lastExecutionResult && !lastExecutionResult.success && lastExecutionResult.failedBlockId) {
+      const failedBlock = blocks.find(b => b.id === lastExecutionResult.failedBlockId);
+      if (failedBlock) {
+        const failedLog = lastExecutionResult.logs?.find(l => l.blockId === lastExecutionResult.failedBlockId);
+        const report = analyzeFailure(
+          failedBlock,
+          failedLog?.error || lastExecutionResult.error || 'Erreur inconnue',
+          (failedLog as any)?.errorDetails,
+          lastExecutionResult.logs
+        );
+        
+        // Store auto-fixable repairs
+        const autoFixable = report.suggestions.filter(s => s.autoFixable);
+        if (autoFixable.length > 0) {
+          setPendingRepairs(autoFixable);
+        }
+        
+        // Add diagnostic message
+        const repairMessage = generateRepairMessage(report);
+        const newMessage: Message = {
+          id: `repair-${Date.now()}`,
+          role: 'assistant',
+          content: repairMessage,
+          timestamp: Date.now(),
+          action: autoFixable.length > 0 ? { type: 'repair', data: { suggestions: autoFixable, blockId: failedBlock.id } } : { type: 'diagnostic' },
+        };
+        
+        setMessages(prev => {
+          // Avoid duplicate messages
+          if (prev.some(m => m.content === repairMessage)) return prev;
+          return [...prev, newMessage];
+        });
+      }
+    }
+  }, [lastExecutionResult, blocks]);
 
   // Save messages to cache whenever they change
   useEffect(() => {
@@ -462,6 +520,35 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
         };
         setMessages(prev => [...prev, diagnosticMessage]);
       }
+    } else if (action.type === 'repair' && data?.suggestions && onApplyRepair) {
+      // Apply auto-repair suggestions
+      try {
+        let updatedBlocks = [...blocks];
+        const appliedFixes: string[] = [];
+        
+        for (const suggestion of data.suggestions as RepairSuggestion[]) {
+          if (suggestion.autoFixable && suggestion.fix) {
+            updatedBlocks = applyRepairSuggestion(updatedBlocks, suggestion);
+            appliedFixes.push(suggestion.title);
+          }
+        }
+        
+        if (appliedFixes.length > 0) {
+          onApplyRepair(updatedBlocks);
+          toast.success(`${appliedFixes.length} correction(s) appliquée(s)`);
+          
+          const successMessage: Message = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: `✅ Corrections appliquées :\n\n${appliedFixes.map(f => `• ${f}`).join('\n')}\n\nRelance le workflow pour vérifier.`,
+            timestamp: Date.now(),
+          };
+          setMessages(prev => [...prev, successMessage]);
+          setPendingRepairs([]);
+        }
+      } catch (error) {
+        toast.error('Échec de l\'application des corrections');
+      }
     }
   };
 
@@ -539,6 +626,19 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
                         : 'Appliquer les modifications'}
                     </Button>
                   )}
+                
+                {/* Auto-repair action button */}
+                {message.action?.type === 'repair' && message.action?.data?.suggestions?.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="default"
+                    className="mt-2 w-full gap-1.5 bg-amber-500 hover:bg-amber-600"
+                    onClick={() => handleApplyAction(message.action, message.action?.data)}
+                  >
+                    <Wrench className="w-3.5 h-3.5" />
+                    Appliquer les corrections ({message.action.data.suggestions.length})
+                  </Button>
+                )}
               </div>
             </div>
           ))}

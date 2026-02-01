@@ -81,6 +81,7 @@ export default function Flow() {
   const [isSaving, setIsSaving] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [viewMode, setViewMode] = useState<'canvas' | 'builder'>('canvas');
+  const [lastExecutionResult, setLastExecutionResult] = useState<{ success: boolean; error?: string; failedBlockId?: string; logs?: any[] } | null>(null);
   
   
   // Undo/Redo history
@@ -583,8 +584,12 @@ export default function Flow() {
                         connections={localConnections}
                         workflowId={selectedWorkflow.id}
                         workflowName={selectedWorkflow.name}
+                        lastExecutionResult={lastExecutionResult || undefined}
                         onGenerateWorkflow={handleAIGenerate}
                         onModifyWorkflow={handleAIModify}
+                        onApplyRepair={(repairedBlocks) => {
+                          setLocalBlocks(repairedBlocks);
+                        }}
                       />
                     )}
 
