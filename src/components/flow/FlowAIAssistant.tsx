@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { 
-  Sparkles, X, Send, Loader2, Bot, Lightbulb, 
-  AlertTriangle, Settings2, Wand2, RefreshCw
+import {
+  Send,
+  Loader2,
+  Bot,
+  Lightbulb,
+  AlertTriangle,
+  Wand2,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { WorkflowBlock, BlockConnection } from '@/types/workflow';
-import { getBlockByType, BlockDefinition } from '@/types/block-library';
+import { getBlockByType } from '@/types/block-library';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { autoLayoutBlocks, applyLayoutToBlocks } from '@/lib/workflow-layout';
@@ -44,10 +47,8 @@ const SUGGESTION_CHIPS = [
 
 export function FlowAIAssistant({
   isOpen,
-  onClose,
   blocks,
   connections,
-  workflowId,
   workflowName,
   onGenerateWorkflow,
   onModifyWorkflow,
@@ -290,31 +291,12 @@ Réponds de façon concise et utile en français.`;
 
   const handleSuggestionClick = (prompt: string) => {
     setInput(prompt + ' ');
-    textareaRef.current?.focus();
   };
 
   return (
     <div className="w-80 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-agent-flow to-agent-flow/70 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-sm">Assistant Flow</h3>
-            <p className="text-[10px] text-muted-foreground">
-              {blocks.length > 0 ? `${blocks.length} blocs` : 'Aucun workflow'}
-            </p>
-          </div>
-        </div>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
-          <X className="w-4 h-4" />
-        </Button>
-      </div>
-
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
         <div className="space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-8">
@@ -322,7 +304,7 @@ Réponds de façon concise et utile en français.`;
               <p className="text-sm text-muted-foreground mb-4">
                 Demandez-moi de générer, modifier ou diagnostiquer vos workflows !
               </p>
-              
+
               {/* Suggestion chips */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {SUGGESTION_CHIPS.map((chip, i) => (
@@ -343,32 +325,37 @@ Réponds de façon concise et utile en français.`;
             <div
               key={message.id}
               className={cn(
-                "flex",
+                'flex',
                 message.role === 'user' ? 'justify-end' : 'justify-start'
               )}
             >
               <div
                 className={cn(
-                  "max-w-[90%] rounded-2xl px-4 py-2.5",
+                  'max-w-[90%] rounded-2xl px-4 py-2.5',
                   message.role === 'user'
                     ? 'bg-agent-flow text-white rounded-br-md'
                     : 'bg-muted text-foreground rounded-bl-md'
                 )}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                
+
                 {/* Action button for generated/modified workflows */}
-                {message.action?.data && (message.action.type === 'generate' || message.action.type === 'modify') && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="mt-2 w-full gap-1.5"
-                    onClick={() => handleApplyAction(message.action, message.action?.data)}
-                  >
-                    <Wand2 className="w-3.5 h-3.5" />
-                    {message.action.type === 'generate' ? 'Créer ce workflow' : 'Appliquer les modifications'}
-                  </Button>
-                )}
+                {message.action?.data &&
+                  (message.action.type === 'generate' || message.action.type === 'modify') && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="mt-2 w-full gap-1.5"
+                      onClick={() =>
+                        handleApplyAction(message.action, message.action?.data)
+                      }
+                    >
+                      <Wand2 className="w-3.5 h-3.5" />
+                      {message.action.type === 'generate'
+                        ? 'Créer ce workflow'
+                        : 'Appliquer les modifications'}
+                    </Button>
+                  )}
               </div>
             </div>
           ))}
@@ -384,7 +371,7 @@ Réponds de façon concise et utile en français.`;
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Input */}
       <div className="p-3 border-t border-border bg-card/30">
@@ -395,9 +382,9 @@ Réponds de façon concise et utile en français.`;
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Décrivez ce que vous voulez..."
-            className="min-h-[40px] max-h-[120px] resize-none bg-background text-sm"
+            className="min-h-[88px] max-h-[240px] resize-none bg-background text-sm"
             disabled={isLoading}
-            rows={1}
+            rows={3}
           />
           <Button 
             size="icon" 
