@@ -62,7 +62,7 @@ interface ProCanvasV2Props {
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
-  hasUnsavedChanges: boolean;
+  isSaving?: boolean;
   isRunning?: boolean;
   className?: string;
   onAutoLayout?: () => void;
@@ -93,7 +93,7 @@ function ProCanvasV2Component({
   onRedo,
   canUndo,
   canRedo,
-  hasUnsavedChanges,
+  isSaving = false,
   isRunning = false,
   className,
   onAutoLayout,
@@ -726,7 +726,7 @@ function ProCanvasV2Component({
         canUndo={canUndo}
         canRedo={canRedo}
         hasSelection={!!selectedBlockId}
-        hasUnsavedChanges={hasUnsavedChanges}
+        isSaving={isSaving}
         isRunning={isRunning}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}

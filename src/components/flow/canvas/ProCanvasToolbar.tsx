@@ -54,7 +54,7 @@ interface ProCanvasToolbarProps {
   canUndo: boolean;
   canRedo: boolean;
   hasSelection: boolean;
-  hasUnsavedChanges: boolean;
+  isSaving?: boolean;
   isRunning: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -85,7 +85,7 @@ function ProCanvasToolbarComponent({
   canUndo,
   canRedo,
   hasSelection,
-  hasUnsavedChanges,
+  isSaving = false,
   isRunning,
   searchQuery,
   onSearchChange,

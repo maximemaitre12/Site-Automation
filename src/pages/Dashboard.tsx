@@ -193,23 +193,52 @@ export default function Dashboard() {
   }, [workflowRuns, aetherDocs, tickets, audits, candidates, interviews, conversations, 
       proposals, callAnalyses, negotiationSheets, pipelineRuns, period]);
 
-  // Daily chart data (last 7 days)
+  // Chart data - adapts to selected period
   const chartData = useMemo(() => {
     const now = new Date();
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const date = subDays(now, 6 - i);
-      return {
-        date: format(date, "EEE", { locale: fr }),
-        fullDate: format(date, "yyyy-MM-dd"),
-        minutes: 0,
-      };
-    });
+    
+    // Determine number of data points and granularity based on period
+    let days: { date: string; fullDate: string; minutes: number }[] = [];
+    
+    if (period === "week") {
+      // Last 7 days for week view
+      days = Array.from({ length: 7 }, (_, i) => {
+        const date = subDays(now, 6 - i);
+        return {
+          date: format(date, "EEE", { locale: fr }),
+          fullDate: format(date, "yyyy-MM-dd"),
+          minutes: 0,
+        };
+      });
+    } else if (period === "month") {
+      // Last 30 days grouped by ~5 day periods (6 data points)
+      days = Array.from({ length: 30 }, (_, i) => {
+        const date = subDays(now, 29 - i);
+        return {
+          date: format(date, "d MMM", { locale: fr }),
+          fullDate: format(date, "yyyy-MM-dd"),
+          minutes: 0,
+        };
+      });
+    } else {
+      // "all" - show monthly data for last 6 months
+      days = Array.from({ length: 6 }, (_, i) => {
+        const date = subDays(now, (5 - i) * 30);
+        return {
+          date: format(date, "MMM", { locale: fr }),
+          fullDate: format(date, "yyyy-MM"),
+          minutes: 0,
+        };
+      });
+    }
 
-    // Count actions per day
-    const countByDay = (items: any[] | undefined, estimateKey: keyof typeof TIME_ESTIMATES) => {
+    // Count actions per day/period
+    const countByPeriod = (items: any[] | undefined, estimateKey: keyof typeof TIME_ESTIMATES) => {
       if (!items) return;
       items.forEach(item => {
-        const itemDate = format(new Date(item.created_at), "yyyy-MM-dd");
+        const itemDate = period === "all" 
+          ? format(new Date(item.created_at), "yyyy-MM")
+          : format(new Date(item.created_at), "yyyy-MM-dd");
         const dayIndex = days.findIndex(d => d.fullDate === itemDate);
         if (dayIndex !== -1) {
           days[dayIndex].minutes += TIME_ESTIMATES[estimateKey];
@@ -217,15 +246,15 @@ export default function Dashboard() {
       });
     };
 
-    countByDay(workflowRuns, "workflow_run");
-    countByDay(aetherDocs?.filter(d => d.ai_summary), "document_generated");
-    countByDay(tickets?.filter(t => t.status === "resolved"), "ticket_resolved");
-    countByDay(audits, "audit_completed");
-    countByDay(conversations, "brain_conversation");
-    countByDay(proposals, "proposal_generated");
+    countByPeriod(workflowRuns, "workflow_run");
+    countByPeriod(aetherDocs?.filter(d => d.ai_summary), "document_generated");
+    countByPeriod(tickets?.filter(t => t.status === "resolved"), "ticket_resolved");
+    countByPeriod(audits, "audit_completed");
+    countByPeriod(conversations, "brain_conversation");
+    countByPeriod(proposals, "proposal_generated");
 
     return days;
-  }, [workflowRuns, aetherDocs, tickets, audits, conversations, proposals]);
+  }, [workflowRuns, aetherDocs, tickets, audits, conversations, proposals, period]);
 
   const formatTime = (minutes: number): string => {
     if (minutes < 60) return `${minutes}min`;
@@ -341,11 +370,13 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Chart - Evolution sur 7 jours */}
+          {/* Chart - Évolution adaptée à la période */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Évolution sur 7 jours</CardTitle>
-              <CardDescription>Temps économisé par jour (en minutes)</CardDescription>
+              <CardTitle className="text-lg">
+                {period === "week" ? "Évolution sur 7 jours" : period === "month" ? "Évolution sur 30 jours" : "Évolution sur 6 mois"}
+              </CardTitle>
+              <CardDescription>Temps économisé par {period === "all" ? "mois" : "jour"} (en minutes)</CardDescription>
             </CardHeader>
             <CardContent>
               {chartData.some(d => d.minutes > 0) ? (
