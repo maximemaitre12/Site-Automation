@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
   FileText, Mail, Phone, Sparkles, User, Building, 
-  Loader2, CheckCircle, Copy, History, ChevronRight, Kanban, Target,
+  Loader2, CheckCircle, Copy, ChevronRight, Kanban, Target,
   Presentation, ShieldCheck, MoreHorizontal
 } from "lucide-react";
 import { useState } from "react";
@@ -65,8 +65,6 @@ export default function Sales() {
   const [generatingEmail, setGeneratingEmail] = useState(false);
   const [generatedEmail, setGeneratedEmail] = useState<string | null>(null);
 
-  // Sidebar state
-  const [showHistory, setShowHistory] = useState(false);
 
   const handleGenerateProposal = async () => {
     if (!proposalForm.client || !proposalForm.product) {
@@ -146,33 +144,9 @@ export default function Sales() {
   return (
     <DashboardLayout>
       <div className="h-full flex flex-col overflow-hidden pb-14 md:pb-0">
-        {/* Header */}
+        {/* Header - Tabs only */}
         <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border shrink-0">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-sales/10 border border-agent-sales/20 flex items-center justify-center shrink-0">
-                <SalesIcon className="w-5 h-5 md:w-6 md:h-6 text-agent-sales" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">Sales Copilot</h1>
-                <p className="text-muted-foreground text-xs md:text-sm hidden md:block">
-                  Propositions IA, analyse d'appels, et emails personnalisés
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowHistory(!showHistory)}
-              className="gap-2 shrink-0 h-8 px-3"
-            >
-              <History className="w-4 h-4" />
-              <span className="hidden sm:inline">Historique</span>
-            </Button>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-2 mt-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
             {[
               { key: "pipeline", label: "Pipeline", icon: Kanban },
               { key: "presentation", label: "Présentation", icon: Presentation },
@@ -489,44 +463,6 @@ export default function Sales() {
             )}
           </div>
 
-          {/* History Sidebar */}
-          {showHistory && (
-            <aside className="w-72 md:w-80 border-l border-border bg-card/50 p-4 overflow-hidden hidden md:block">
-              <h3 className="font-semibold text-foreground mb-4">Historique</h3>
-              <ScrollArea className="h-[calc(100%-2rem)]">
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-xs font-medium text-muted-foreground uppercase mb-2">Propositions récentes</h4>
-                    {proposals.slice(0, 5).map(p => (
-                      <div key={p.id} className="p-3 rounded-lg bg-secondary/50 mb-2 cursor-pointer hover:bg-secondary">
-                        <p className="text-sm font-medium truncate">{p.prospect_name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{p.product_name}</p>
-                      </div>
-                    ))}
-                    {proposals.length === 0 && (
-                      <p className="text-xs text-muted-foreground">Aucune proposition</p>
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-medium text-muted-foreground uppercase mb-2">Analyses d'appels</h4>
-                    {callAnalyses.slice(0, 5).map(c => (
-                      <div 
-                        key={c.id} 
-                        className="p-3 rounded-lg bg-secondary/50 mb-2 cursor-pointer hover:bg-secondary"
-                        onClick={() => setCurrentAnalysis(c)}
-                      >
-                        <p className="text-sm font-medium truncate">{c.title}</p>
-                        <p className="text-xs text-muted-foreground">{c.sentiment}</p>
-                      </div>
-                    ))}
-                    {callAnalyses.length === 0 && (
-                      <p className="text-xs text-muted-foreground">Aucune analyse</p>
-                    )}
-                  </div>
-                </div>
-              </ScrollArea>
-            </aside>
-          )}
         </div>
         
         {/* Mobile Tab Bar */}
