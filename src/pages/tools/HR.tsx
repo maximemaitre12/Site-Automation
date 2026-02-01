@@ -160,29 +160,30 @@ export default function HR() {
   );
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      headerActions={
+        <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
+          <TabsList className="h-8 bg-secondary/50">
+            <TabsTrigger value="recruitment" className="text-xs px-3">
+              Recrutement
+            </TabsTrigger>
+            <TabsTrigger value="team" className="text-xs px-3">
+              Équipe
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      }
+    >
       <AgentLayout
         icon={Users}
-        title="Aether"
-        titleHighlight="HR"
+        title=""
         accentColor="agent-hr"
         sections={sections}
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
         sidebarContent={sidebarStats}
         hideIcon
-        headerActions={
-          <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
-            <TabsList className="h-9 bg-secondary/50">
-              <TabsTrigger value="recruitment" className="text-xs px-4">
-                Recrutement
-              </TabsTrigger>
-              <TabsTrigger value="team" className="text-xs px-4">
-                Équipe
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        }
+        hideHeader
       >
         {loading ? (
           <div className="flex items-center justify-center py-20">
