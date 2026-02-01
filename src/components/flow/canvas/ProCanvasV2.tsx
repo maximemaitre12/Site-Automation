@@ -904,15 +904,7 @@ function ProCanvasV2Component({
         />
       )}
 
-      {/* Zoom indicator */}
-      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border/50 shadow-sm">
-        {Math.round(zoom * 100)}%
-        {zoomLevel !== 'normal' && (
-          <span className="ml-2 text-muted-foreground/60">
-            ({zoomLevel === 'micro' ? 'Vue d\'ensemble' : zoomLevel === 'mini' ? 'Compact' : 'Détaillé'})
-          </span>
-        )}
-      </div>
+      {/* Zoom indicator removed for cleaner UI */}
 
       {/* Keyboard shortcuts hint */}
       <div className="absolute bottom-4 right-24 bg-white/80 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] text-muted-foreground/70 border border-border/30 hidden lg:flex items-center gap-2">
