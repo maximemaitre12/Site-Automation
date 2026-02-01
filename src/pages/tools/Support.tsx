@@ -268,10 +268,66 @@ export default function Support() {
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">Aucun ticket</h3>
                   <p className="text-muted-foreground mb-4">Créez votre premier ticket support</p>
-                  <Button onClick={() => setIsCreateOpen(true)} className="bg-agent-support hover:bg-agent-support/90 rounded-xl">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nouveau ticket
-                  </Button>
+                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-agent-support hover:bg-agent-support/90 rounded-xl">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Nouveau ticket
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-lg">
+                      <DialogHeader>
+                        <DialogTitle>Créer un ticket</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 mt-4">
+                        <div className="space-y-2">
+                          <Label>Sujet *</Label>
+                          <Input
+                            placeholder="Ex: Problème de connexion"
+                            value={newTicket.subject}
+                            onChange={(e) => setNewTicket(t => ({ ...t, subject: e.target.value }))}
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Email client</Label>
+                          <Input
+                            type="email"
+                            placeholder="client@example.com"
+                            value={newTicket.customerEmail}
+                            onChange={(e) => setNewTicket(t => ({ ...t, customerEmail: e.target.value }))}
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Description *</Label>
+                          <Textarea
+                            placeholder="Décrivez le problème en détail..."
+                            className="min-h-[120px] rounded-xl"
+                            value={newTicket.content}
+                            onChange={(e) => setNewTicket(t => ({ ...t, content: e.target.value }))}
+                          />
+                        </div>
+                        <Button 
+                          onClick={handleCreateTicket} 
+                          disabled={creating || !newTicket.subject.trim() || !newTicket.content.trim()}
+                          className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
+                        >
+                          {creating ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Création & classification IA...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Créer et classifier
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               ) : (
                 <div className="space-y-3">
