@@ -126,6 +126,14 @@ function ProCanvasV2Component({
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   
+  // Connection dragging state
+  const [connectionDrag, setConnectionDrag] = useState<{
+    sourceBlockId: string;
+    handleType: 'input' | 'output';
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+  
   // Multi-selection state
   const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(new Set());
   const [isSelecting, setIsSelecting] = useState(false);
@@ -366,6 +374,19 @@ function ProCanvasV2Component({
   }, [pan, zoom]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    // Handle connection dragging
+    if (connectionDrag) {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      
+      setConnectionDrag(prev => prev ? {
+        ...prev,
+        mouseX: (e.clientX - rect.left - pan.x) / zoom,
+        mouseY: (e.clientY - rect.top - pan.y) / zoom,
+      } : null);
+      return;
+    }
+    
     if (isSelecting && selectionRect) {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -394,7 +415,7 @@ function ProCanvasV2Component({
       
       onBlockUpdate(draggingBlockId, { position: { x: newX, y: newY } });
     }
-  }, [isSelecting, selectionRect, isPanning, panStart, draggingBlockId, dragOffset, pan, zoom, snapEnabled, onBlockUpdate]);
+  }, [connectionDrag, isSelecting, selectionRect, isPanning, panStart, draggingBlockId, dragOffset, pan, zoom, snapEnabled, onBlockUpdate]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
     // Finish selection rectangle
@@ -443,9 +464,42 @@ function ProCanvasV2Component({
       }
     }
     
+    // Finish connection drag
+    if (connectionDrag && hoveredBlockId && hoveredBlockId !== connectionDrag.sourceBlockId) {
+      // Determine source and target based on handle type
+      let sourceId: string;
+      let targetId: string;
+      
+      if (connectionDrag.handleType === 'output') {
+        // Dragging from output -> drop on target's input
+        sourceId = connectionDrag.sourceBlockId;
+        targetId = hoveredBlockId;
+      } else {
+        // Dragging from input -> drop on source's output
+        sourceId = hoveredBlockId;
+        targetId = connectionDrag.sourceBlockId;
+      }
+      
+      // Check if connection already exists
+      const exists = connections.some(
+        c => c.sourceBlockId === sourceId && c.targetBlockId === targetId
+      );
+      
+      if (!exists && sourceId !== targetId) {
+        onConnectionAdd({
+          id: crypto.randomUUID(),
+          sourceBlockId: sourceId,
+          targetBlockId: targetId,
+          sourceHandle: 'output',
+          targetHandle: 'input',
+        });
+      }
+    }
+    
+    setConnectionDrag(null);
     setIsPanning(false);
     setDraggingBlockId(null);
-  }, [isSelecting, selectionRect, blocks]);
+  }, [isSelecting, selectionRect, blocks, connectionDrag, hoveredBlockId, connections, onConnectionAdd]);
 
   // Context menu handler (right-click on selected blocks)
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
@@ -527,6 +581,28 @@ function ProCanvasV2Component({
       y: mouseY - block.position.y,
     });
     setDraggingBlockId(blockId);
+  }, [blocks, pan, zoom]);
+
+  // Connection drag start
+  const handleConnectionStart = useCallback((blockId: string, handleType: 'input' | 'output', e: React.MouseEvent) => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+    
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const mouseX = (e.clientX - rect.left - pan.x) / zoom;
+    const mouseY = (e.clientY - rect.top - pan.y) / zoom;
+    
+    setConnectionDrag({
+      sourceBlockId: blockId,
+      handleType,
+      mouseX,
+      mouseY,
+    });
+    
+    e.preventDefault();
+    e.stopPropagation();
   }, [blocks, pan, zoom]);
 
   // Add sticky note
@@ -803,6 +879,63 @@ function ProCanvasV2Component({
               />
             );
           })}
+          
+          {/* Dragging connection preview */}
+          {connectionDrag && (() => {
+            const sourceBlock = blocks.find(b => b.id === connectionDrag.sourceBlockId);
+            if (!sourceBlock) return null;
+            
+            // Calculate handle positions
+            const handleX = connectionDrag.handleType === 'output' 
+              ? sourceBlock.position.x + NODE_WIDTH 
+              : sourceBlock.position.x;
+            const handleY = sourceBlock.position.y + NODE_HEIGHT / 2;
+            
+            // Determine start and end points
+            const startX = handleX;
+            const startY = handleY;
+            const endX = connectionDrag.mouseX;
+            const endY = connectionDrag.mouseY;
+            
+            // Calculate control points for smooth bezier
+            const deltaX = Math.abs(endX - startX);
+            const curveOffset = Math.max(50, deltaX * 0.4);
+            
+            const path = connectionDrag.handleType === 'output'
+              ? `M ${startX} ${startY} C ${startX + curveOffset} ${startY}, ${endX - curveOffset} ${endY}, ${endX} ${endY}`
+              : `M ${startX} ${startY} C ${startX - curveOffset} ${startY}, ${endX + curveOffset} ${endY}, ${endX} ${endY}`;
+            
+            return (
+              <g>
+                {/* Shadow */}
+                <path
+                  d={path}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.1)"
+                  strokeWidth={4}
+                  strokeLinecap="round"
+                />
+                {/* Main line */}
+                <path
+                  d={path}
+                  fill="none"
+                  stroke={hoveredBlockId && hoveredBlockId !== connectionDrag.sourceBlockId ? '#22c55e' : '#3b82f6'}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeDasharray="6 4"
+                  className="animate-pulse"
+                />
+                {/* End dot */}
+                <circle
+                  cx={endX}
+                  cy={endY}
+                  r={6}
+                  fill={hoveredBlockId && hoveredBlockId !== connectionDrag.sourceBlockId ? '#22c55e' : '#3b82f6'}
+                  className="animate-pulse"
+                />
+              </g>
+            );
+          })()}
         </g>
 
         {/* Sticky notes layer */}
@@ -870,6 +1003,7 @@ function ProCanvasV2Component({
               onSelect={onBlockSelect}
               onDoubleClick={onBlockDoubleClick}
               onDragStart={handleBlockDragStart}
+              onConnectionStart={handleConnectionStart}
               zoom={zoom}
             />
           </div>
