@@ -95,6 +95,23 @@ const SUGGESTION_CHIPS = [
 const CACHE_KEY = 'flow-ai-assistant-messages';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
+function normalizeMessages(raw: any[]): Message[] {
+  const seen = new Set<string>();
+  const input = Array.isArray(raw) ? raw : [];
+  return input.map((m: any) => {
+    const currentId =
+      typeof m?.id === 'string'
+        ? m.id
+        : typeof m?.id === 'number'
+          ? String(m.id)
+          : '';
+
+    const id = !currentId || seen.has(currentId) ? crypto.randomUUID() : currentId;
+    seen.add(id);
+    return { ...m, id } as Message;
+  });
+}
+
 // Helper to get cached messages
 function getCachedMessages(): Message[] {
   try {
@@ -110,7 +127,7 @@ function getCachedMessages(): Message[] {
       return [];
     }
     
-    return messages || [];
+    return normalizeMessages(messages || []);
   } catch {
     return [];
   }
@@ -124,7 +141,7 @@ function setCachedMessages(messages: Message[]) {
       return;
     }
     localStorage.setItem(CACHE_KEY, JSON.stringify({
-      messages,
+      messages: normalizeMessages(messages),
       timestamp: Date.now(),
     }));
   } catch {
@@ -298,6 +315,11 @@ export function FlowAIAssistant({
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // One-time normalization in case the state still contains legacy/duplicate IDs
+  useEffect(() => {
+    setMessages(prev => normalizeMessages(prev));
+  }, []);
+
   // Auto-analyze failures when execution result changes
   useEffect(() => {
     if (lastExecutionResult && !lastExecutionResult.success && lastExecutionResult.failedBlockId) {
@@ -320,7 +342,7 @@ export function FlowAIAssistant({
         // Add diagnostic message
         const repairMessage = generateRepairMessage(report);
         const newMessage: Message = {
-          id: `repair-${Date.now()}`,
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: repairMessage,
           timestamp: Date.now(),
