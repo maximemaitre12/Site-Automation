@@ -427,100 +427,10 @@ export default function BrainPage() {
         >
           {/* Header */}
           <header className="px-4 md:px-6 py-3 md:py-4 border-b border-border flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-agent-brain/10 border border-agent-brain/20 flex items-center justify-center shrink-0">
-                <Database className="w-5 h-5 md:w-6 md:h-6 text-agent-brain" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">AETHER Brain</h1>
-                <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Assistant IA multimodal</p>
-              </div>
-              
-              <TooltipProvider>
-                <div className="hidden lg:flex items-center gap-2 ml-4">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-agent-brain/10 text-agent-brain">
-                        <DatabaseIcon className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium">{documents.length} docs</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Documents internes disponibles</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600">
-                        <Image className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium">Vision</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Analyse d'images activée</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </TooltipProvider>
-            </div>
-            
-            <div className="flex items-center gap-1 md:gap-2 shrink-0">
-              <Sheet open={showUniversalSearch} onOpenChange={setShowUniversalSearch}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 px-2 md:px-3">
-                    <Globe className="w-4 h-4 md:mr-2" />
-                    <span className="hidden md:inline">Recherche IA</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:w-[600px] md:w-[800px]">
-                  <SheetHeader>
-                    <SheetTitle>Recherche Universelle IA</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6 h-[calc(100vh-120px)]">
-                    <UniversalSearch />
-                  </div>
-                </SheetContent>
-              </Sheet>
-
-              <Sheet open={showKnowledgeHub} onOpenChange={setShowKnowledgeHub}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 px-2 md:px-3 border-agent-brain/30 hover:bg-agent-brain/10">
-                    <Building2 className="w-4 h-4 md:mr-2 text-agent-brain" />
-                    <span className="hidden md:inline">Knowledge Hub</span>
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:w-[700px] md:w-[900px] lg:w-[1000px]" side="right">
-                  <SheetHeader>
-                    <SheetTitle>Multi-Site Knowledge Hub</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6 h-[calc(100vh-120px)] overflow-y-auto">
-                    <KnowledgeHubPanel />
-                  </div>
-                </SheetContent>
-              </Sheet>
-              
-              <Sheet open={showTools} onOpenChange={setShowTools}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 px-2 md:px-3">
-                    <Wand2 className="w-4 h-4 md:mr-2" />
-                    <span className="hidden md:inline">Outils IA</span>
-                    <ChevronRight className="w-4 h-4 ml-1 hidden md:inline" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:w-[400px] md:w-[540px]">
-                  <SheetHeader>
-                    <SheetTitle>Outils IA avancés</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <AIToolsPanel 
-                      onGenerateProcedure={generateProcedure}
-                      onImproveText={improveText}
-                    />
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+            <span className="text-lg md:text-xl font-bold tracking-tight">
+              <span className="text-foreground">Aether</span>
+              <span className="text-agent-brain ml-1">Brain</span>
+            </span>
           </header>
 
           {/* Chat Messages */}
