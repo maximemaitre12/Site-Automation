@@ -498,7 +498,7 @@ export function FlowAIAssistant({
         });
 
         const comparisonMessage: Message = {
-          id: (Date.now() + 1).toString(),
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: response,
           timestamp: Date.now(),
@@ -526,7 +526,7 @@ export function FlowAIAssistant({
         }
 
         const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: response,
           timestamp: Date.now(),
@@ -621,7 +621,7 @@ export function FlowAIAssistant({
           console.log('Fallback: triggering workflow generation for:', rawInput);
           // Redirect to generate workflow anyway
           const pendingMessage: Message = {
-            id: (Date.now() + 1).toString(),
+            id: crypto.randomUUID(),
             role: 'assistant',
             content: '🔄 Génération du workflow en cours...',
             timestamp: Date.now(),
@@ -664,7 +664,7 @@ export function FlowAIAssistant({
               setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
               
               const actionMessage: Message = {
-                id: (Date.now() + 2).toString(),
+                id: crypto.randomUUID(),
                 role: 'assistant',
                 content: `✨ Workflow "${workflow.name || 'Nouveau workflow'}" prêt !\n\n${blockSummary}${extraBlocks}`,
                 timestamp: Date.now(),
@@ -731,7 +731,7 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
 
         const data = await resp.json();
         const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
+          id: crypto.randomUUID(),
           role: 'assistant',
           content: data.response || data.content || 'Je n\'ai pas pu générer de réponse.',
           timestamp: Date.now(),
@@ -742,7 +742,7 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
     } catch (error: any) {
       console.error('AI Assistant error:', error);
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: `❌ Erreur : ${error.message || 'Une erreur est survenue'}. Veuillez réessayer.`,
         timestamp: Date.now(),
