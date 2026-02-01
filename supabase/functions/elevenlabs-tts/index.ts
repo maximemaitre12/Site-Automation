@@ -28,8 +28,8 @@ serve(async (req) => {
       );
     }
 
-    // Use Nicolas Petit - French male voice by default
-    const voice = voiceId || 'AmMsHJaCw4BtwV3KoUXF';
+    // Use Daniel - Standard multilingual male voice (no custom voice limit)
+    const voice = voiceId || 'onwK4e9ZLuTAKqWW03F9';
     
     // Use streaming endpoint for instant playback
     const response = await fetch(
