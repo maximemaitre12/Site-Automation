@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-
 import { callAI } from '@/lib/ai';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext, getSupportAISystemPrompt, SUPPORT_EMAIL } from '@/lib/aether-knowledge-base';
+
 export interface SupportTicket {
   id: string;
   user_id: string;
@@ -25,7 +25,6 @@ export interface SupportTicket {
 
 export function useSupport() {
   const { user } = useAuth();
-  
   const queryClient = useQueryClient();
 
   const { data: tickets = [], isLoading: loading } = useQuery({
@@ -78,11 +77,8 @@ export function useSupport() {
       if (error) throw error;
 
       await classifyTicket(ticket.id, data.subject + '\n' + data.content);
-      
-      
       return ticket;
     } catch (err) {
-      
       return null;
     }
   };
@@ -139,7 +135,6 @@ ${content}`
     if (!ticket) return null;
 
     try {
-      // Construire le contexte avec la documentation interne
       const ticketContent = `${ticket.subject}\n${ticket.content}`;
       const knowledgeContext = getKnowledgeContext(ticketContent);
       const systemPrompt = getSupportAISystemPrompt();
@@ -169,10 +164,8 @@ Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu
         .eq('id', ticketId);
 
       invalidateTickets();
-      
       return response.content;
     } catch (err) {
-      
       return null;
     }
   };
@@ -191,10 +184,8 @@ Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu
         .eq('id', ticketId);
 
       invalidateTickets();
-      
       return true;
     } catch (err) {
-      
       return false;
     }
   };
@@ -216,11 +207,9 @@ Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu
   const deleteTicket = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('support_tickets').delete().eq('id', id);
     if (error) {
-      
       return false;
     }
     invalidateTickets();
-    
     return true;
   };
 
