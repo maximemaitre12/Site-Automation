@@ -4,7 +4,7 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { callAI } from '@/lib/ai';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-
+import { getKnowledgeContext, getSupportAISystemPrompt, SUPPORT_EMAIL } from '@/lib/aether-knowledge-base';
 export interface SupportTicket {
   id: string;
   user_id: string;
@@ -139,21 +139,26 @@ ${content}`
     if (!ticket) return null;
 
     try {
+      // Construire le contexte avec la documentation interne
+      const ticketContent = `${ticket.subject}\n${ticket.content}`;
+      const knowledgeContext = getKnowledgeContext(ticketContent);
+      const systemPrompt = getSupportAISystemPrompt();
+      
       const response = await callAI({
+        systemPrompt,
         messages: [{
           role: 'user',
-          content: `Génère une réponse professionnelle et empathique pour ce ticket support en français:
+          content: `${knowledgeContext}
 
+TICKET CLIENT À TRAITER:
 Sujet: ${ticket.subject}
 Contenu: ${ticket.content}
-Catégorie: ${ticket.category}
-Priorité: ${ticket.priority}
+Catégorie détectée: ${ticket.category || 'Non classifié'}
+Priorité: ${ticket.priority || 'Non définie'}
+${ticket.customer_email ? `Email client: ${ticket.customer_email}` : ''}
 
-La réponse doit:
-- Accuser réception du problème
-- Montrer de l'empathie
-- Proposer une solution ou les prochaines étapes
-- Rester professionnel et courtois`
+RAPPEL: Tu dois fournir une solution directe et actionnable. Utilise la documentation ci-dessus pour répondre précisément.
+Si et SEULEMENT SI aucune solution ne fonctionne après plusieurs tentatives, tu peux suggérer de contacter ${SUPPORT_EMAIL} en précisant que je réponds rapidement (sous 24h).`
         }],
         type: 'generate'
       });
@@ -164,7 +169,7 @@ La réponse doit:
         .eq('id', ticketId);
 
       invalidateTickets();
-      toast({ title: 'Succès', description: 'Réponse générée' });
+      toast({ title: 'Succès', description: 'Réponse générée avec la documentation interne' });
       return response.content;
     } catch (err) {
       toast({ title: 'Erreur', description: 'Erreur lors de la génération', variant: 'destructive' });
