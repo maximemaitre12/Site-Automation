@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Send,
   Loader2,
@@ -21,6 +21,7 @@ interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  timestamp: number;
   action?: {
     type: 'generate' | 'modify' | 'recommendation' | 'diagnostic';
     data?: any;
@@ -45,6 +46,119 @@ const SUGGESTION_CHIPS = [
   { label: 'Recommandations', icon: Lightbulb, prompt: 'Donne-moi des recommandations pour améliorer ce workflow' },
 ];
 
+// Cache key for localStorage
+const CACHE_KEY = 'flow-ai-assistant-messages';
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+// Helper to get cached messages
+function getCachedMessages(): Message[] {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return [];
+    
+    const { messages, timestamp } = JSON.parse(cached);
+    const now = Date.now();
+    
+    // Check if cache is still valid (within 1 hour)
+    if (now - timestamp > CACHE_TTL_MS) {
+      localStorage.removeItem(CACHE_KEY);
+      return [];
+    }
+    
+    return messages || [];
+  } catch {
+    return [];
+  }
+}
+
+// Helper to save messages to cache
+function setCachedMessages(messages: Message[]) {
+  try {
+    if (messages.length === 0) {
+      localStorage.removeItem(CACHE_KEY);
+      return;
+    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      messages,
+      timestamp: Date.now(),
+    }));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+// Generate detailed configuration guidance for blocks
+function generateConfigGuidance(blocks: WorkflowBlock[]): string {
+  const guidance: string[] = [];
+  
+  blocks.forEach(block => {
+    const blockType = block.type.toLowerCase();
+    
+    // Google/Gmail OAuth blocks
+    if (blockType.includes('gmail') || blockType.includes('google_') || blockType.includes('trigger_gmail')) {
+      guidance.push(`\n📧 ${block.name} - Connexion Google requise\n`);
+      guidance.push(`Pour connecter ton compte Google :`);
+      guidance.push(`1. Va sur Google Cloud Console (console.cloud.google.com)`);
+      guidance.push(`2. Crée un projet ou sélectionne un projet existant`);
+      guidance.push(`3. Active l'API Gmail dans "APIs & Services"`);
+      guidance.push(`4. Dans "Credentials", crée un ID client OAuth 2.0`);
+      guidance.push(`5. Ajoute cette URL de redirection autorisée :`);
+      guidance.push(`   https://aether-connect.com/oauth/google/callback`);
+      guidance.push(`6. Double-clique sur le bloc et entre ton Client ID et Secret`);
+      guidance.push(`7. Clique sur "Connecter avec Google"`);
+    }
+    
+    // OpenAI blocks
+    if (blockType.includes('openai')) {
+      if (!block.config?.apiKey) {
+        guidance.push(`\n🤖 ${block.name} - Clé API OpenAI requise\n`);
+        guidance.push(`Va sur platform.openai.com pour obtenir ta clé API`);
+        guidance.push(`Double-clique sur le bloc pour la configurer`);
+      }
+    }
+    
+    // Stripe blocks
+    if (blockType.includes('stripe')) {
+      if (!block.config?.apiKey) {
+        guidance.push(`\n💳 ${block.name} - Clé API Stripe requise\n`);
+        guidance.push(`Va sur dashboard.stripe.com/apikeys pour obtenir ta clé`);
+        guidance.push(`Double-clique sur le bloc pour la configurer`);
+      }
+    }
+    
+    // Slack blocks
+    if (blockType.includes('slack')) {
+      guidance.push(`\n💬 ${block.name} - Token Slack requis\n`);
+      guidance.push(`Crée une app Slack sur api.slack.com/apps`);
+      guidance.push(`Obtiens un Bot Token avec les scopes nécessaires`);
+    }
+    
+    // GitHub blocks
+    if (blockType.includes('github')) {
+      if (!block.config?.token) {
+        guidance.push(`\n🐙 ${block.name} - Token GitHub requis\n`);
+        guidance.push(`Crée un Personal Access Token sur github.com/settings/tokens`);
+      }
+    }
+    
+    // Notion blocks
+    if (blockType.includes('notion')) {
+      if (!block.config?.apiKey) {
+        guidance.push(`\n📝 ${block.name} - Clé API Notion requise\n`);
+        guidance.push(`Crée une intégration sur notion.so/my-integrations`);
+      }
+    }
+    
+    // Webhook blocks
+    if (blockType.includes('webhook') && blockType.includes('trigger')) {
+      guidance.push(`\n🔗 ${block.name} - URL de Webhook\n`);
+      guidance.push(`L'URL du webhook sera générée automatiquement à l'exécution`);
+    }
+  });
+  
+  return guidance.join('\n');
+}
+
 export function FlowAIAssistant({
   isOpen,
   blocks,
@@ -53,11 +167,17 @@ export function FlowAIAssistant({
   onGenerateWorkflow,
   onModifyWorkflow,
 }: FlowAIAssistantProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  // Initialize messages from cache
+  const [messages, setMessages] = useState<Message[]>(() => getCachedMessages());
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Save messages to cache whenever they change
+  useEffect(() => {
+    setCachedMessages(messages);
+  }, [messages]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -66,18 +186,11 @@ export function FlowAIAssistant({
     }
   }, [messages]);
 
-  // NOTE: No auto-focus here.
-  // Auto-focusing inputs can trigger browser auto-scroll inside the fixed app-shell,
-  // making top toolbars *appear* to “disappear”. Users can click the input when needed.
-  useEffect(() => {
-    // intentionally blank
-  }, [isOpen]);
-
   // Analyze workflow for missing configurations
-  const analyzeWorkflowConfig = (): string[] => {
+  const analyzeWorkflowConfig = useCallback((targetBlocks: WorkflowBlock[]): string[] => {
     const issues: string[] = [];
     
-    blocks.forEach(block => {
+    targetBlocks.forEach(block => {
       const def = getBlockByType(block.type);
       if (!def) return;
 
@@ -88,35 +201,50 @@ export function FlowAIAssistant({
       });
 
       if (missingFields.length > 0) {
-        issues.push(`**${block.name}** : ${missingFields.map(f => f.label).join(', ')} manquant(s)`);
+        issues.push(`${block.name} : ${missingFields.map(f => f.label).join(', ')} manquant(s)`);
       }
 
       // Check for API keys or credentials
       if (block.type.includes('openai') && !block.config?.apiKey) {
-        issues.push(`**${block.name}** : Clé API OpenAI requise`);
+        issues.push(`${block.name} : Clé API OpenAI requise`);
       }
       if (block.type.includes('gmail') || block.type.includes('google_')) {
-        issues.push(`**${block.name}** : Connexion Google OAuth requise`);
+        issues.push(`${block.name} : Connexion Google OAuth requise`);
       }
       if (block.type.includes('stripe') && !block.config?.apiKey) {
-        issues.push(`**${block.name}** : Clé API Stripe requise`);
+        issues.push(`${block.name} : Clé API Stripe requise`);
       }
     });
 
-    // Check for unconnected blocks
-    const connectedBlockIds = new Set([
-      ...connections.map(c => c.sourceBlockId),
-      ...connections.map(c => c.targetBlockId),
-    ]);
+    return [...new Set(issues)]; // Remove duplicates
+  }, []);
+
+  // Post-action diagnostic after workflow creation/modification
+  const generatePostActionDiagnostic = useCallback((actionBlocks: WorkflowBlock[], actionType: 'generate' | 'modify'): string => {
+    const issues = analyzeWorkflowConfig(actionBlocks);
+    const guidance = generateConfigGuidance(actionBlocks);
     
-    blocks.forEach(block => {
-      if (blocks.length > 1 && !connectedBlockIds.has(block.id)) {
-        issues.push(`**${block.name}** : Bloc non connecté au workflow`);
-      }
-    });
-
-    return issues;
-  };
+    if (issues.length === 0 && !guidance.trim()) {
+      return actionType === 'generate' 
+        ? `\n\nTon workflow est prêt à être exécuté ! Tous les blocs sont configurés.`
+        : `\n\nLes modifications ont été appliquées. Tout est configuré !`;
+    }
+    
+    let diagnostic = `\n\n---\n\n🔧 Configuration nécessaire\n\n`;
+    
+    if (issues.length > 0) {
+      diagnostic += `Voici ce qu'il faut configurer pour que ton workflow fonctionne :\n\n`;
+      diagnostic += issues.map(i => `• ${i}`).join('\n');
+    }
+    
+    if (guidance.trim()) {
+      diagnostic += `\n${guidance}`;
+    }
+    
+    diagnostic += `\n\nDouble-clique sur chaque bloc concerné pour le paramétrer.`;
+    
+    return diagnostic;
+  }, [analyzeWorkflowConfig]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -125,6 +253,7 @@ export function FlowAIAssistant({
       id: Date.now().toString(),
       role: 'user',
       content: input,
+      timestamp: Date.now(),
     };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -147,21 +276,25 @@ export function FlowAIAssistant({
 
       // Handle diagnostic locally
       if (isDiagnosticRequest && blocks.length > 0) {
-        const issues = analyzeWorkflowConfig();
+        const issues = analyzeWorkflowConfig(blocks);
+        const guidance = generateConfigGuidance(blocks);
         let response: string;
         
-        if (issues.length === 0) {
+        if (issues.length === 0 && !guidance.trim()) {
           response = `Workflow prêt !\n\nTous les blocs sont correctement configurés et connectés. Tu peux lancer l'exécution.`;
         } else {
-          // Strip markdown from issues
-          const cleanIssues = issues.map(i => i.replace(/\*\*/g, ''));
-          response = `Configuration requise\n\nPour que ton workflow fonctionne, voici ce qu'il faut configurer :\n\n${cleanIssues.map(i => `- ${i}`).join('\n')}\n\nClique sur chaque bloc concerné pour le paramétrer.`;
+          response = `Configuration requise\n\nPour que ton workflow fonctionne, voici ce qu'il faut configurer :\n\n${issues.map(i => `• ${i}`).join('\n')}`;
+          if (guidance.trim()) {
+            response += `\n${guidance}`;
+          }
+          response += `\n\nDouble-clique sur chaque bloc concerné pour le paramétrer.`;
         }
 
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
           content: response,
+          timestamp: Date.now(),
           action: { type: 'diagnostic' },
         };
         setMessages(prev => [...prev, assistantMessage]);
@@ -204,13 +337,22 @@ export function FlowAIAssistant({
         if (workflow?.blocks?.length > 0) {
           const layoutedBlocks = applyLayoutToBlocks(workflow.blocks, autoLayoutBlocks(workflow.blocks, workflow.connections || []));
           
+          // Generate diagnostic for the new workflow
+          const diagnostic = generatePostActionDiagnostic(layoutedBlocks, isModifyRequest ? 'modify' : 'generate');
+          
           const actionMessage: Message = {
             id: (Date.now() + 1).toString(),
             role: 'assistant',
-            content: `✨ **${isModifyRequest ? 'Workflow modifié' : 'Workflow généré'}** avec ${workflow.blocks.length} blocs !\n\n${workflow.blocks.slice(0, 5).map((b: WorkflowBlock, i: number) => `${i + 1}. ${b.name}`).join('\n')}${workflow.blocks.length > 5 ? `\n... et ${workflow.blocks.length - 5} autres` : ''}`,
+            content: `✨ ${isModifyRequest ? 'Workflow modifié' : 'Workflow généré'} avec ${workflow.blocks.length} blocs !\n\n${workflow.blocks.slice(0, 5).map((b: WorkflowBlock, i: number) => `${i + 1}. ${b.name}`).join('\n')}${workflow.blocks.length > 5 ? `\n... et ${workflow.blocks.length - 5} autres` : ''}`,
+            timestamp: Date.now(),
             action: {
               type: isModifyRequest ? 'modify' : 'generate',
-              data: { blocks: layoutedBlocks, connections: workflow.connections || [], name: workflow.name || input.slice(0, 50) },
+              data: { 
+                blocks: layoutedBlocks, 
+                connections: workflow.connections || [], 
+                name: workflow.name || input.slice(0, 50),
+                diagnostic, // Store diagnostic for post-apply message
+              },
             },
           };
           setMessages(prev => [...prev, actionMessage]);
@@ -219,7 +361,6 @@ export function FlowAIAssistant({
         }
       } else {
         // General chat / recommendations
-        // Build context about current workflow state
         const blocksContext = blocks.length > 0 
           ? `Le workflow "${workflowName || 'Sans nom'}" contient ${blocks.length} blocs : ${blocks.map(b => `${b.name} (type: ${b.type})`).join(', ')}.`
           : 'Aucun workflow sélectionné pour l\'instant.';
@@ -269,6 +410,7 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
           id: (Date.now() + 1).toString(),
           role: 'assistant',
           content: data.response || data.content || 'Je n\'ai pas pu générer de réponse.',
+          timestamp: Date.now(),
           action: isRecommendationRequest ? { type: 'recommendation' } : undefined,
         };
         setMessages(prev => [...prev, assistantMessage]);
@@ -279,6 +421,7 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: `❌ Erreur : ${error.message || 'Une erreur est survenue'}. Veuillez réessayer.`,
+        timestamp: Date.now(),
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -292,9 +435,33 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
     if (action.type === 'generate' && data) {
       onGenerateWorkflow(data.blocks, data.name, '', data.connections);
       toast.success('Workflow créé !');
+      
+      // Add post-action diagnostic message
+      if (data.diagnostic) {
+        const diagnosticMessage: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: data.diagnostic,
+          timestamp: Date.now(),
+          action: { type: 'diagnostic' },
+        };
+        setMessages(prev => [...prev, diagnosticMessage]);
+      }
     } else if (action.type === 'modify' && data) {
       onModifyWorkflow(data.blocks, data.connections);
       toast.success('Workflow modifié !');
+      
+      // Add post-action diagnostic message
+      if (data.diagnostic) {
+        const diagnosticMessage: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: data.diagnostic,
+          timestamp: Date.now(),
+          action: { type: 'diagnostic' },
+        };
+        setMessages(prev => [...prev, diagnosticMessage]);
+      }
     }
   };
 
