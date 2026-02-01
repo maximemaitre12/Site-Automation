@@ -7,7 +7,7 @@ interface UseVoiceAIOptions {
 }
 
 export function useVoiceAI(options: UseVoiceAIOptions = {}) {
-  const { defaultVoiceId = 'EXAVITQu4vr4xnSDxMaL' } = options; // Sarah voice
+  const { defaultVoiceId = 'FvmvwvObRqIHojkEGh5N' } = options; // Adina - French young female voice
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
