@@ -606,6 +606,13 @@ export function generateN8NComparison(): {
 } {
   const strengths: FeatureComparison[] = [
     {
+      feature: 'Exécution distribuée intelligente',
+      aetherStatus: 'superior',
+      n8nStatus: 'has',
+      description: 'Workers virtuels avec chunking parallèle automatique, load balancing basé sur les performances historiques, queue de jobs prioritaires et métriques de speedup en temps réel.',
+      implemented: true,
+    },
+    {
       feature: 'Auto-réparation IA intelligente',
       aetherStatus: 'unique',
       n8nStatus: 'missing',
@@ -694,11 +701,10 @@ export function generateN8NComparison(): {
   const improvements: FeatureComparison[] = [
     {
       feature: 'Exécution distribuée',
-      aetherStatus: 'inferior',
+      aetherStatus: 'superior',
       n8nStatus: 'has',
-      description: 'N8N supporte les workers distribués pour les gros volumes.',
-      improvementSuggestion: 'Roadmap Q2: Queue de jobs avec retry automatique via Supabase Edge Functions.',
-      implemented: false,
+      description: 'AETHER supporte désormais les workers virtuels avec chunking parallèle auto, load balancing intelligent et queue de jobs prioritaires. Métriques de speedup incluses.',
+      implemented: true,
     },
     {
       feature: 'Self-hosted',
