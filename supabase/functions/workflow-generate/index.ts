@@ -72,10 +72,10 @@ const ALLOWED_BLOCKS = `
 These are auxiliary nodes that connect to specific TYPED PORTS on main nodes (like ai_agent).
 
 Chat Model Sub-nodes (output: ai_model):
-- openai_chat_model: OpenAI GPT model
-    params: model (gpt-5|gpt-5-mini|gpt-5-nano), temperature, maxTokens
-- gemini_chat_model: Google Gemini model  
+- gemini_chat_model: Google Gemini model (PREFERRED - No API key required!)
     params: model (gemini-2.5-pro|gemini-2.5-flash|gemini-3-flash-preview), temperature
+- openai_chat_model: OpenAI GPT model (requires user API key)
+    params: model (gpt-5|gpt-5-mini|gpt-5-nano), temperature, maxTokens
 
 Memory Sub-nodes (output: ai_memory):
 - simple_memory: In-memory conversation buffer
@@ -217,11 +217,11 @@ POSITIONING:
 `;
 
 const EXAMPLE_WORKFLOW = `
-EXAMPLE - AI Agent with Chat Model and Memory:
+EXAMPLE - AI Agent with Gemini Chat Model and Memory (DEFAULT - No API Key needed):
 {
   "blocks": [
     { "id": "trigger-1", "type": "manual_trigger", "name": "Start", "config": {}, "position": { "x": 300, "y": 50 } },
-    { "id": "model-1", "type": "openai_chat_model", "name": "OpenAI Chat Model", "config": { "model": "gpt-5-mini", "temperature": 0.7 }, "position": { "x": 50, "y": 200 } },
+    { "id": "model-1", "type": "gemini_chat_model", "name": "Gemini Chat Model", "config": { "model": "gemini-2.5-flash", "temperature": 0.7 }, "position": { "x": 50, "y": 200 } },
     { "id": "memory-1", "type": "simple_memory", "name": "Simple Memory", "config": { "maxMessages": 10 }, "position": { "x": 50, "y": 320 } },
     { "id": "agent-1", "type": "ai_agent", "name": "AI Agent", "config": { "systemPrompt": "You are a helpful assistant.", "userPrompt": "{{ $json.message }}" }, "position": { "x": 300, "y": 200 } },
     { "id": "output-1", "type": "log", "name": "Log Response", "config": { "level": "info", "message": "{{ $json.response }}" }, "position": { "x": 300, "y": 380 } }
@@ -232,7 +232,7 @@ EXAMPLE - AI Agent with Chat Model and Memory:
     { "id": "c3", "sourceBlockId": "memory-1", "targetBlockId": "agent-1", "sourceHandle": "ai_memory", "targetHandle": "ai_memory" },
     { "id": "c4", "sourceBlockId": "agent-1", "targetBlockId": "output-1", "sourceHandle": "main", "targetHandle": "main" }
   ],
-  "description": "AI Agent with OpenAI model and conversation memory"
+  "description": "AI Agent with Gemini model (no API key required) and conversation memory"
 }
 
 EXAMPLE - Simple email summary (no sub-nodes needed):
@@ -351,8 +351,9 @@ CRITICAL RULES:
 4. Use expression syntax {{ $json.field }} to reference data from previous blocks
 5. Start with exactly ONE trigger block
 6. For AI Agent workflows, ALWAYS connect sub-nodes for Chat Model (required) and optionally Memory/Tools
-7. Use typed connections (sourceHandle/targetHandle) when connecting to typed ports
-8. If user explicitly asks for many steps/blocks, CREATE THAT MANY - do not simplify their request
+7. PREFER gemini_chat_model (no API key required) over openai_chat_model - use OpenAI only if user explicitly requests it
+8. Use typed connections (sourceHandle/targetHandle) when connecting to typed ports
+9. If user explicitly asks for many steps/blocks, CREATE THAT MANY - do not simplify their request
 
 CRITICAL UNDERSTANDING - EMAIL vs DOCUMENT:
 - If user wants to SEND AN EMAIL: use "send_email" block with proper email body
@@ -378,7 +379,7 @@ ${targetSteps > 8 ? `\nIMPORTANT: The user wants a COMPLEX workflow. Create appr
 IMPORTANT:
 - Use ONLY block types from the allowed list (no custom blocks)
 ${targetSteps > 8 ? `- Create a COMPLEX workflow with ~${targetSteps} blocks as requested` : '- Create the appropriate number of blocks for the task'}
-- For AI agents, connect the required Chat Model sub-node
+- For AI agents, connect the required Chat Model sub-node - USE gemini_chat_model by default (no API key required)
 - Use expression syntax {{ $json.field }} ONLY to reference data from previous block outputs
 - If user provides a literal email address, use it directly WITHOUT {{ }} template syntax
 - Do NOT use http_request with fake URLs

@@ -480,11 +480,7 @@ export function FlowAIAssistant({
     const rawInput = input;
     if (!rawInput.trim() || isLoading) return;
 
-    // If the user confirms right after a generated proposal, apply it immediately.
-    const latestActionMessage = findLatestWorkflowActionMessage(messages);
-    const latestAlreadyApplied = !!latestActionMessage?.action?.data?.applied;
-    const shouldApplyLatest = !!latestActionMessage && !latestAlreadyApplied && isApplyConfirmation(rawInput);
-
+    // User must click the "Apply" button - text confirmations are disabled per user preference
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -493,18 +489,6 @@ export function FlowAIAssistant({
     };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
-
-    if (shouldApplyLatest && latestActionMessage?.action?.data) {
-      const ack: Message = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: 'OK, j’applique ça sur le canvas maintenant.',
-        timestamp: Date.now(),
-      };
-      setMessages(prev => [...prev, ack]);
-      await handleApplyAction(latestActionMessage.action, latestActionMessage.action.data);
-      return;
-    }
 
     setIsLoading(true);
 
@@ -659,7 +643,7 @@ export function FlowAIAssistant({
           const actionMessage: Message = {
             id: crypto.randomUUID(),
             role: 'assistant',
-            content: `Workflow "${workflow.name || 'Nouveau workflow'}" prêt.\n\n${blockSummary}${extraBlocks}`,
+            content: `Workflow "${workflow.name || 'Nouveau workflow'}" prêt.\n\n${blockSummary}${extraBlocks}${diagnostic}`,
             timestamp: Date.now(),
             action: {
               type: isModifyRequest ? 'modify' : 'generate',
@@ -668,13 +652,11 @@ export function FlowAIAssistant({
                 connections: workflow.connections || [], 
                 name: workflow.name || rawInput.slice(0, 50),
                 diagnostic,
-                applied: true,
+                applied: false, // User must click to apply
               },
             },
           };
           setMessages(prev => [...prev, actionMessage]);
-          // Apply immediately so users don't have to click the button.
-          await handleApplyAction(actionMessage.action, actionMessage.action.data);
         } else {
           throw new Error('Aucun bloc généré');
         }
@@ -729,13 +711,11 @@ export function FlowAIAssistant({
                     connections: workflow.connections || [], 
                     name: workflow.name || rawInput.slice(0, 50),
                     diagnostic,
-                    applied: true,
+                    applied: false, // User must click to apply
                   },
                 },
               };
               setMessages(prev => [...prev, actionMessage]);
-              await handleApplyAction(actionMessage.action, actionMessage.action.data);
-              setIsLoading(false);
               return;
             }
           }
@@ -810,12 +790,19 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
   const handleApplyAction = async (action: Message['action'], data: any) => {
     if (!action) return;
 
+    // Mark as applied in the message to disable the button
+    setMessages(prev => prev.map(m => 
+      m.action?.data === data 
+        ? { ...m, action: { ...m.action, data: { ...m.action.data, applied: true } } }
+        : m
+    ));
+
     if (action.type === 'generate' && data) {
       onGenerateWorkflow(data.blocks, data.name, '', data.connections);
       toast.success('Workflow créé !');
       
-      // Add post-action diagnostic message
-      if (data.diagnostic) {
+      // Add post-action diagnostic message only if not already in message content
+      if (data.diagnostic && !data.diagnostic.includes('prêt à être exécuté')) {
         const diagnosticMessage: Message = {
           id: crypto.randomUUID(),
           role: 'assistant',
@@ -829,8 +816,8 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
       onModifyWorkflow(data.blocks, data.connections);
       toast.success('Workflow modifié !');
       
-      // Add post-action diagnostic message
-      if (data.diagnostic) {
+      // Add post-action diagnostic message only if not already in message content
+      if (data.diagnostic && !data.diagnostic.includes('appliquées')) {
         const diagnosticMessage: Message = {
           id: crypto.randomUUID(),
           role: 'assistant',
