@@ -142,34 +142,56 @@ function findLatestWorkflowActionMessage(messages: Message[]): Message | undefin
   return undefined;
 }
 
+// Check if user is confirming to apply a workflow action
 function isApplyConfirmation(text: string): boolean {
   const t = text.trim().toLowerCase();
   if (!t) return false;
   // Short confirmations only; avoids triggering on normal messages.
-  if (t.length > 24) return false;
+  if (t.length > 30) return false;
 
-  return (
-    t === 'fais' ||
-    t === 'fait' ||
-    t === 'ok' ||
-    t === 'okay' ||
-    t === 'go' ||
-    t === 'oui' ||
-    t === 'vas-y' ||
-    t === 'vas y' ||
-    t === "c'est parti" ||
-    t === 'cest parti' ||
-    t === 'applique' ||
-    t === 'appliquer' ||
-    t === 'génère' ||
-    t === 'genere' ||
-    t === 'génère-le' ||
-    t === 'genere-le' ||
-    t === 'génère le' ||
-    t === 'genere le' ||
-    t === 'génère la' ||
-    t === 'genere la'
-  );
+  const confirmPatterns = [
+    'fais', 'fait', 'ok', 'okay', 'go', 'oui', 'yes',
+    'vas-y', 'vas y', "c'est parti", 'cest parti',
+    'applique', 'appliquer', 'apply',
+    'génère', 'genere', 'génère-le', 'genere-le',
+    'génère le', 'genere le', 'génère la', 'genere la',
+    'lance', 'lance-le', 'execute', 'exécute',
+    'do it', 'let\'s go', 'allons-y', 'envoie'
+  ];
+  
+  return confirmPatterns.some(p => t === p || t.startsWith(p + ' ') || t.endsWith(' ' + p));
+}
+
+// Check if the message is a workflow generation/modification request
+function isWorkflowRequest(text: string): boolean {
+  const t = text.toLowerCase();
+  
+  // Strong generation patterns
+  const generatePatterns = [
+    /génère|genere|générer|generer/i,
+    /créer|crée|créé|create/i,
+    /construit|construis|build/i,
+    /fais(-| )?moi|fais(-| )?le|fais(-| )?un/i,
+    /nouveau workflow|new workflow/i,
+    /monte(-| )?moi/i,
+    /agent.*email|email.*agent/i,
+    /workflow.*pour|pour.*workflow/i,
+    /automatise|automatisation/i,
+  ];
+  
+  // Strong modification patterns  
+  const modifyPatterns = [
+    /améliore|ameliore|améliorer/i,
+    /modifie|modifier|modify/i,
+    /ajoute|ajouter|add/i,
+    /supprime|supprimer|remove|delete/i,
+    /change|changer|remplace|remplacer/i,
+    /optimise|optimiser|optimize/i,
+    /corrige|corriger|fix/i,
+    /refactor|refactorise/i,
+  ];
+  
+  return generatePatterns.some(p => p.test(t)) || modifyPatterns.some(p => p.test(t));
 }
 
 // Generate detailed configuration guidance for blocks
@@ -415,12 +437,22 @@ export function FlowAIAssistant({
         return;
       }
 
-      // Detect intent from the message
+      // Detect intent from the message using improved detection
       const lowerInput = rawInput.toLowerCase();
-      const isGenerateRequest = /génère|genere|générer|generer|créer|crée|nouveau workflow|build|create|agent|fais(-| )?moi|fais(-| )?le|construis|monte/i.test(lowerInput);
-      const isModifyRequest = /modifie|ajoute|supprime|change|remplace|optimise/i.test(lowerInput);
+      
+      // Use the improved isWorkflowRequest function for better detection
+      const shouldTriggerWorkflowGeneration = isWorkflowRequest(rawInput);
+      
+      // More specific patterns for generate vs modify
+      const hasExistingBlocks = blocks.length > 0;
+      const isModifyPattern = /améliore|ameliore|modifie|ajoute|supprime|change|remplace|optimise|corrige|refactor/i.test(lowerInput);
+      const isGeneratePattern = /génère|genere|créer|crée|nouveau|build|create|fais(-| )?(moi|le|un)|construit|monte|automatise/i.test(lowerInput);
+      
+      // Determine if it's a generate or modify request
+      const isModifyRequest = shouldTriggerWorkflowGeneration && hasExistingBlocks && isModifyPattern;
+      const isGenerateRequest = shouldTriggerWorkflowGeneration && (isGeneratePattern || (!hasExistingBlocks && isModifyPattern));
+      
       const isDiagnosticRequest = /diagnostic|configur|manque|fonctionne|initialiser|api|clé/i.test(lowerInput);
-      const isRecommendationRequest = /recommand|améliore|conseil|suggestion|idée/i.test(lowerInput);
       const isComparisonRequest = /compar|n8n|force|faiblesse|versus|vs|différence|mieux|avantage/i.test(lowerInput);
 
       // Security: Validate user input
@@ -572,33 +604,95 @@ export function FlowAIAssistant({
           throw new Error('Aucun bloc généré');
         }
       } else {
-        // General chat / recommendations
+        // If the message looks like a workflow request but didn't match above patterns,
+        // still try to generate - this is a fallback for edge cases
+        if (shouldTriggerWorkflowGeneration) {
+          console.log('Fallback: triggering workflow generation for:', rawInput);
+          // Redirect to generate workflow anyway
+          const pendingMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: '🔄 Génération du workflow en cours...',
+            timestamp: Date.now(),
+          };
+          setMessages(prev => [...prev, pendingMessage]);
+          
+          const requestBody = hasExistingBlocks
+            ? {
+                existingWorkflow: { blocks, connections },
+                modificationRequest: rawInput,
+                stream: false,
+              }
+            : {
+                objective: rawInput,
+                context: workflowName ? `Workflow: ${workflowName}` : '',
+                constraints: 'Keep the workflow focused and efficient.',
+                stream: false,
+              };
+
+          const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/workflow-generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (resp.ok) {
+            const data = await resp.json();
+            const workflow = data.workflow;
+
+            if (workflow?.blocks?.length > 0) {
+              const layoutedBlocks = applyLayoutToBlocks(workflow.blocks, autoLayoutBlocks(workflow.blocks, workflow.connections || []));
+              const diagnostic = generatePostActionDiagnostic(layoutedBlocks, hasExistingBlocks ? 'modify' : 'generate');
+              const blockSummary = layoutedBlocks.slice(0, 6).map((b: WorkflowBlock) => b.name).join(' → ');
+              const extraBlocks = layoutedBlocks.length > 6 ? ` +${layoutedBlocks.length - 6}` : '';
+              
+              setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
+              
+              const actionMessage: Message = {
+                id: (Date.now() + 2).toString(),
+                role: 'assistant',
+                content: `✨ Workflow "${workflow.name || 'Nouveau workflow'}" prêt !\n\n${blockSummary}${extraBlocks}`,
+                timestamp: Date.now(),
+                action: {
+                  type: hasExistingBlocks ? 'modify' : 'generate',
+                  data: { 
+                    blocks: layoutedBlocks, 
+                    connections: workflow.connections || [], 
+                    name: workflow.name || rawInput.slice(0, 50),
+                    diagnostic,
+                  },
+                },
+              };
+              setMessages(prev => [...prev, actionMessage]);
+              setIsLoading(false);
+              return;
+            }
+          }
+          // If fallback failed, continue to chat
+          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
+        }
+        
+        // General chat for non-workflow questions
         const blocksContext = blocks.length > 0 
           ? `Le workflow "${workflowName || 'Sans nom'}" contient ${blocks.length} blocs : ${blocks.map(b => `${b.name} (type: ${b.type})`).join(', ')}.`
           : 'Aucun workflow sélectionné pour l\'instant.';
         
-        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow, le builder d'agents IA. Tu parles comme un collègue humain, jamais comme un robot.
+        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow. Tu parles comme un humain, pas un robot.
 
 CONTEXTE: ${blocksContext}
 
-RÈGLES ABSOLUES:
-1. JAMAIS de descriptions textuelles longues de workflows
-2. JAMAIS de listes de blocs avec descriptions (1. bloc X, 2. bloc Y...)
-3. JAMAIS de "Voici le plan", "Je vais générer", "Es-tu prêt ?"
-4. Quand l'utilisateur veut un workflow, réponds UNIQUEMENT par une phrase courte et GÉNÈRE-LE directement
-5. Tutoie, sois concis (2-3 phrases max)
+RÈGLE CRITIQUE: Tu NE PEUX PAS créer de workflows par le texte. Si l'utilisateur demande de créer/améliorer un workflow, tu dois lui dire de reformuler sa demande de manière plus claire pour que le système de génération automatique le comprenne.
 
-EXEMPLES DE RÉPONSES CORRECTES:
-- "Je te génère ça tout de suite !" (puis génération auto)
-- "Parfait, workflow en cours de création." (puis génération auto)
-- "C'est parti !" (puis génération auto)
+INTERDICTIONS ABSOLUES:
+- JAMAIS de listes de blocs (1. bloc X, 2. bloc Y...)  
+- JAMAIS de descriptions de workflows
+- JAMAIS de "Voici le plan", "Je vais générer"
 
-EXEMPLES DE RÉPONSES INTERDITES:
-- "Voici le plan des blocs que je vais générer: 1. Get Email..."
-- "Super ! Générons ce workflow. Voici les étapes..."
-- Toute liste numérotée de blocs
-
-Tu as accès aux blocs : IA (OpenAI, Gemini), Logique (if/else, loops), Transform (JSON), Intégrations (Gmail, Slack, Stripe).`;
+Réponds uniquement aux questions sur l'utilisation de Flow, la configuration des blocs, ou aide à clarifier ce que l'utilisateur veut automatiser.`;
 
         const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
           method: 'POST',
@@ -611,7 +705,7 @@ Tu as accès aux blocs : IA (OpenAI, Gemini), Logique (if/else, loops), Transfor
             messages: [
               { role: 'system', content: systemPrompt },
               ...messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
-              { role: 'user', content: input },
+              { role: 'user', content: rawInput },
             ],
           }),
         });
@@ -626,7 +720,7 @@ Tu as accès aux blocs : IA (OpenAI, Gemini), Logique (if/else, loops), Transfor
           role: 'assistant',
           content: data.response || data.content || 'Je n\'ai pas pu générer de réponse.',
           timestamp: Date.now(),
-          action: isRecommendationRequest ? { type: 'recommendation' } : undefined,
+          action: undefined,
         };
         setMessages(prev => [...prev, assistantMessage]);
       }
