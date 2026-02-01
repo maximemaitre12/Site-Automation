@@ -535,10 +535,6 @@ export default function Flow() {
                   <div className="p-6 md:p-8 pb-12">
                     {/* Hero Section */}
                     <div className="text-center mb-8 md:mb-10">
-                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-agent-flow/20 to-agent-flow/5 border border-agent-flow/20 flex items-center justify-center mb-4 mx-auto shadow-lg shadow-agent-flow/10">
-                        <WorkflowIcon className="w-8 h-8 md:w-10 md:h-10 text-agent-flow" />
-                      </div>
-                      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">AETHER Flow</h2>
                       <p className="text-muted-foreground max-w-lg mb-6 text-sm md:text-base mx-auto leading-relaxed">
                         Créez des workflows automatisés pour orchestrer vos processus métier
                       </p>
