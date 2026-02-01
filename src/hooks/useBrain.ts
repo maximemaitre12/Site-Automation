@@ -130,7 +130,7 @@ export function useBrain() {
   const sendMessage = useCallback(async (
     content: string, 
     conversationId?: string, 
-    options?: { attachments?: Attachment[] }
+    options?: { attachments?: Attachment[]; confidentialMode?: boolean }
   ): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
 
@@ -218,6 +218,7 @@ ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
           systemPrompt,
           userId: user.id,
           attachments: options?.attachments,
+          confidentialMode: options?.confidentialMode,
           abortSignal: abortControllerRef.current?.signal,
           onDelta: (delta) => {
             fullContent += delta;
