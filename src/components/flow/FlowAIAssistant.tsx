@@ -310,7 +310,7 @@ Si l'utilisateur demande de crÃ©er un agent ou un workflow, propose-lui de le gÃ
   };
 
   return (
-    <div className="w-96 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden">
+    <div className="w-96 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden pb-[calc(env(safe-area-inset-bottom)+16px)]">
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4">
         <div className="space-y-4">
