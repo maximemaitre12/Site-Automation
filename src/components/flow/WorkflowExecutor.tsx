@@ -103,7 +103,7 @@ export function WorkflowExecutor({
   const downloadFile = async (filename: string, content: unknown, mimeType?: string, format?: string, title?: string) => {
     if (!filename) return;
 
-    try {
+      try {
       const safeContent = typeof content === 'string' ? content : JSON.stringify(content ?? '', null, 2);
 
       let blob: Blob;
@@ -216,8 +216,8 @@ export function WorkflowExecutor({
       // For auto-triggers (Gmail, Webhook, Schedule, etc.), do not require any user-provided input.
       const executionInput = requiresManualInput ? inputData : '';
       
-      // Execute via server-side Edge Function for proper AI access
-      const execution = await executeWorkflowViaServer(blocks, executionInput, workflowId);
+        // Execute via server-side backend function (for AI access) using the real graph connections
+        const execution = await executeWorkflowViaServer(blocks, executionInput, workflowId, undefined, connections);
       
       // Update logs progressively from server response
       if (execution.logs) {

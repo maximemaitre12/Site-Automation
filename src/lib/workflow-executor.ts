@@ -21,7 +21,8 @@ export async function executeWorkflowViaServer(
   blocks: WorkflowBlock[],
   initialInput: any,
   workflowId?: string,
-  variables?: Record<string, any>
+  variables?: Record<string, any>,
+  connections?: BlockConnection[]
 ): Promise<{
   success: boolean;
   output: any;
@@ -57,6 +58,7 @@ export async function executeWorkflowViaServer(
         input: initialInput,
         workflowId,
         variables: variables || {},
+        connections: connections || [],
       },
     });
 

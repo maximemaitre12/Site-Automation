@@ -289,6 +289,14 @@ interface WorkflowBlock {
   };
 }
 
+interface BlockConnection {
+  id: string;
+  sourceBlockId: string;
+  targetBlockId: string;
+  sourceHandle?: string;
+  targetHandle?: string;
+}
+
 interface ExecutionLog {
   blockId: string;
   blockName: string;
@@ -930,7 +938,41 @@ async function executeBlock(
         break;
       }
 
+      // ===== DATA TRANSFORM =====
+      case 'set': {
+        const mode = String(block.config?.mode || '').toLowerCase();
+
+        const base =
+          context.input && typeof context.input === 'object' && !Array.isArray(context.input)
+            ? { ...context.input }
+            : {};
+
+        const next: Record<string, any> = { ...base };
+
+        const applyObject = (obj: any) => {
+          if (!obj || typeof obj !== 'object') return;
+          for (const [k, v] of Object.entries(obj)) {
+            // Allow templates inside set values
+            next[k] = interpolateTemplate(v, { ...next });
+          }
+        };
+
+        if (mode === 'json') {
+          applyObject(block.config?.json);
+        } else if (mode === 'manual') {
+          applyObject(block.config?.fields);
+        } else {
+          // Fallback: support either config shape
+          applyObject(block.config?.fields);
+          applyObject(block.config?.json);
+        }
+
+        output = next;
+        break;
+      }
+
       // ===== AI ACTIONS =====
+      case 'ai_summarize':
       case 'ai_summary': {
         const style = block.config?.style || 'detailed';
         const maxLength = block.config?.maxLength || 200;
@@ -1109,7 +1151,25 @@ ${inputText}
 IMPORTANT: Génère immédiatement le contenu complet. Ne pose pas de questions, ne demande pas de précisions. Produis un contenu professionnel et actionnable basé sur les données ci-dessus.`;
         
         const result = await callLovableAI(prompt, systemPrompt);
-        output = { generated: result, tone, characterCount: result.length, text_content: result, contentType: isForDocument ? 'document' : isForEmail ? 'email' : 'generic' };
+
+        // n8n-like behavior: keep upstream fields available for downstream templating.
+        const base =
+          context.input && typeof context.input === 'object' && !Array.isArray(context.input)
+            ? { ...context.input }
+            : {};
+
+        // Compatibility aliases used across the app's generated templates
+        output = {
+          ...base,
+          generated: result,
+          generated_content: result,
+          generatedContent: result,
+          text_content: result,
+          response: result,
+          tone,
+          characterCount: result.length,
+          contentType: isForDocument ? 'document' : isForEmail ? 'email' : 'generic',
+        };
         
         // If output format is PDF, delegate to workflow-generate-document so layout & PDF metadata are consistent with AETHER Doc
         if (outputFormat === 'PDF' || outputFormat === 'pdf') {
@@ -3354,7 +3414,8 @@ Only output JSON, no other text.`;
 async function executeWorkflow(
   blocks: WorkflowBlock[],
   initialInput: any,
-  variables: Record<string, any> = {}
+  variables: Record<string, any> = {},
+  connections: BlockConnection[] = []
 ): Promise<{
   success: boolean;
   output: any;
@@ -3369,15 +3430,212 @@ async function executeWorkflow(
   let currentInput = initialInput;
   const outputs: Record<string, any> = {};
 
-  // Sort blocks by position (top to bottom, left to right)
-  const sortedBlocks = [...blocks].sort((a, b) => {
-    if (Math.abs(a.position.y - b.position.y) > 50) return a.position.y - b.position.y;
-    return a.position.x - b.position.x;
-  });
+  const sortByPosition = (list: WorkflowBlock[]) =>
+    [...list].sort((a, b) => {
+      if (Math.abs(a.position.y - b.position.y) > 50) return a.position.y - b.position.y;
+      return a.position.x - b.position.x;
+    });
 
-  console.log(`Starting workflow execution with ${sortedBlocks.length} blocks`);
+  const isTriggerBlock = (type: string) => {
+    const t = (type || '').toLowerCase();
+    return (
+      t.startsWith('trigger_') ||
+      t === 'manual_trigger' ||
+      t === 'trigger_manual' ||
+      t === 'form_trigger' ||
+      t === 'email_trigger' ||
+      t === 'trigger_email' ||
+      t === 'trigger_gmail' ||
+      t === 'trigger_webhook' ||
+      t === 'webhook_trigger' ||
+      t === 'schedule_trigger'
+    );
+  };
 
-  for (const block of sortedBlocks) {
+  const isExecutionEdge = (c: BlockConnection) => {
+    // Ignore typed ports like ai_model/ai_tool/etc. Only traverse data/control-flow edges.
+    const target = (c.targetHandle || 'main').toLowerCase();
+    return target === 'main' || target === 'true' || target === 'false';
+  };
+
+  const execConnections = (connections || []).filter(isExecutionEdge);
+
+  // If no connections, fall back to the legacy “position-based” execution.
+  if (execConnections.length === 0) {
+    const sortedBlocks = sortByPosition(blocks);
+    console.log(`Starting workflow execution with ${sortedBlocks.length} blocks (position-based)`);
+
+    for (const block of sortedBlocks) {
+      const startTime = Date.now();
+
+      const log: ExecutionLog = {
+        blockId: block.id,
+        blockName: block.name,
+        blockType: block.type,
+        input: currentInput,
+        output: null,
+        status: 'running',
+        duration: 0,
+        timestamp: new Date().toISOString(),
+      };
+
+      console.log(`Executing block: ${block.name} (${block.type})`);
+
+      try {
+        // Retry logic
+        let result: { output: any; error?: string; errorDetails?: ExecutionErrorDetails } = { output: null };
+        const maxRetries = block.retryConfig?.enabled ? (block.retryConfig.maxRetries || 3) : 1;
+        const backoffMs = block.retryConfig?.backoffMs || 1000;
+
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+          if (attempt > 0) {
+            console.log(`Retry attempt ${attempt + 1} for block ${block.name}`);
+            await new Promise((r) => setTimeout(r, backoffMs * Math.pow(2, attempt - 1)));
+          }
+
+          result = await executeBlock(block, {
+            input: currentInput,
+            previousOutputs: outputs,
+            variables,
+          });
+
+          if (!result.error) break;
+          log.retryCount = attempt + 1;
+        }
+
+        log.duration = Date.now() - startTime;
+
+        if (result.error) {
+          log.status = 'error';
+          log.error = result.error;
+          log.output = { error: result.error };
+          log.errorDetails = result.errorDetails;
+          logs.push(log);
+
+          console.error(`Block ${block.name} failed:`, result.error);
+          return {
+            success: false,
+            output: null,
+            error: result.error,
+            errorDetails: result.errorDetails,
+            failedBlockId: block.id,
+            failedBlockName: block.name,
+            failedBlockType: block.type,
+            logs,
+          };
+        }
+
+        log.status = 'success';
+        log.output = result.output;
+        outputs[block.id] = result.output;
+
+        // Handle conditional branching
+        if (block.type === 'control_condition' || block.type === 'ai_decision') {
+          const decision = result.output?.result ?? result.output?.decision === 'yes';
+          currentInput = { ...result.output, _branch: decision ? 'true' : 'false' };
+        } else {
+          currentInput = result.output;
+        }
+      } catch (error) {
+        log.duration = Date.now() - startTime;
+        log.status = 'error';
+        log.error = error instanceof Error ? error.message : 'Unknown error';
+        log.output = { error: log.error };
+        log.errorDetails = {
+          code: 'UNHANDLED_EXCEPTION',
+          message: log.error,
+          hint:
+            'Vérifiez les paramètres du bloc et relancez. Si le problème persiste, simplifiez les expressions et testez bloc par bloc.',
+        };
+        logs.push(log);
+
+        console.error(`Block ${block.name} exception:`, error);
+        return {
+          success: false,
+          output: null,
+          error: log.error,
+          errorDetails: log.errorDetails,
+          failedBlockId: block.id,
+          failedBlockName: block.name,
+          failedBlockType: block.type,
+          logs,
+        };
+      }
+
+      logs.push(log);
+    }
+
+    console.log('Workflow execution completed successfully');
+    return {
+      success: true,
+      output: currentInput,
+      logs,
+    };
+  }
+
+  // Connection-based execution (preferred)
+  const blockById = new Map<string, WorkflowBlock>(blocks.map((b) => [b.id, b]));
+  const outgoing = new Map<string, BlockConnection[]>();
+  const incomingCount = new Map<string, number>();
+
+  for (const c of execConnections) {
+    if (!c?.sourceBlockId || !c?.targetBlockId) continue;
+    if (!blockById.has(c.sourceBlockId) || !blockById.has(c.targetBlockId)) continue;
+
+    const arr = outgoing.get(c.sourceBlockId) || [];
+    arr.push(c);
+    outgoing.set(c.sourceBlockId, arr);
+
+    incomingCount.set(c.targetBlockId, (incomingCount.get(c.targetBlockId) || 0) + 1);
+  }
+
+  const startBlock =
+    blocks.find((b) => isTriggerBlock(b.type)) ||
+    blocks.find((b) => (incomingCount.get(b.id) || 0) === 0) ||
+    blocks[0];
+
+  let currentBlockId: string | undefined = startBlock?.id;
+  const visited = new Set<string>();
+
+  console.log(`Starting workflow execution with ${blocks.length} blocks (connection-based)`);
+
+  const pickNextConnection = (block: WorkflowBlock, out: BlockConnection[], lastOutput: any) => {
+    if (!out || out.length === 0) return undefined;
+
+    const byTargetPos = (a: BlockConnection, b: BlockConnection) => {
+      const ta = blockById.get(a.targetBlockId);
+      const tb = blockById.get(b.targetBlockId);
+      if (!ta || !tb) return 0;
+      if (Math.abs(ta.position.y - tb.position.y) > 50) return ta.position.y - tb.position.y;
+      return ta.position.x - tb.position.x;
+    };
+
+    const sorted = [...out].sort(byTargetPos);
+
+    const type = (block.type || '').toLowerCase();
+    const isCondition = type === 'control_condition' || type === 'ai_decision' || type === 'if' || type === 'condition';
+
+    if (isCondition) {
+      const rawBranch = lastOutput?._branch ?? lastOutput?.branch;
+      const branch = String(rawBranch ?? '').toLowerCase() === 'true' ? 'true' : 'false';
+      const exact = sorted.find((c) => (c.sourceHandle || '').toLowerCase() === branch);
+      if (exact) return exact;
+    }
+
+    const main = sorted.find((c) => !c.sourceHandle || (c.sourceHandle || '').toLowerCase() === 'main');
+    return main || sorted[0];
+  };
+
+  while (currentBlockId) {
+    if (visited.has(currentBlockId)) {
+      console.warn(`Detected cycle at block ${currentBlockId}; stopping execution to avoid infinite loop.`);
+      break;
+    }
+    visited.add(currentBlockId);
+
+    const block = blockById.get(currentBlockId);
+    if (!block) break;
+
     const startTime = Date.now();
     
     const log: ExecutionLog = {
@@ -3440,7 +3698,7 @@ async function executeWorkflow(
       log.status = 'success';
       log.output = result.output;
       outputs[block.id] = result.output;
-      
+
       // Handle conditional branching
       if (block.type === 'control_condition' || block.type === 'ai_decision') {
         const decision = result.output?.result ?? result.output?.decision === 'yes';
@@ -3448,6 +3706,11 @@ async function executeWorkflow(
       } else {
         currentInput = result.output;
       }
+
+      // Choose next block from connections
+      const out = outgoing.get(block.id) || [];
+      const nextConn = pickNextConnection(block, out, result.output);
+      currentBlockId = nextConn?.targetBlockId;
 
     } catch (error) {
       log.duration = Date.now() - startTime;
@@ -3478,10 +3741,10 @@ async function executeWorkflow(
   }
 
   console.log('Workflow execution completed successfully');
-  return { 
-    success: true, 
-    output: currentInput, 
-    logs 
+  return {
+    success: true,
+    output: currentInput,
+    logs,
   };
 }
 
@@ -3514,7 +3777,7 @@ serve(async (req) => {
 
     const userId = user.id;
 
-    const { blocks, input, variables, workflowId } = await req.json();
+    const { blocks, input, variables, workflowId, connections } = await req.json();
 
     if (!blocks || !Array.isArray(blocks)) {
       return new Response(
@@ -3531,7 +3794,7 @@ serve(async (req) => {
       _userId: userId,
       _accessToken: token  // For email sending via user's Resend key
     };
-    const result = await executeWorkflow(blocks, input || '', enrichedVariables);
+    const result = await executeWorkflow(blocks, input || '', enrichedVariables, Array.isArray(connections) ? connections : []);
 
     // Important: a workflow can fail for business reasons (bad URL, auth, bad data)
     // and that should NOT be treated as an HTTP 500 by the client.
