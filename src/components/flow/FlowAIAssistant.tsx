@@ -294,7 +294,7 @@ Réponds de façon concise et utile en français.`;
   };
 
   return (
-    <div className="w-80 h-full min-h-0 border-l border-border bg-card flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
+    <div className="w-80 h-full min-h-0 shrink-0 border-l border-border bg-card flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/50">
         <div className="flex items-center gap-2">
