@@ -93,92 +93,76 @@ export function usePresentationGenerator() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Non authentifié');
 
-      const slideCount = params.slideCount || 8;
+      // RESPECT EXACT SLIDE COUNT requested by user
+      const slideCount = params.slideCount || 5;
       const style = params.style || 'professional';
 
-      const prompt = `Tu es un directeur commercial senior avec 25 ans d'expérience. Tu crées des présentations PowerPoint stratégiques de niveau C-level.
+      const prompt = `Tu es un DIRECTEUR ASSOCIÉ chez McKinsey avec 30 ans d'expérience. Tu crées des présentations stratégiques pour des COMEX et conseils d'administration.
 
-CLIENT CIBLE: ${params.clientName}
-PRODUIT/SERVICE: ${params.productName}
-OBJECTIF COMMERCIAL: ${params.objective}
-ARGUMENTS CLÉS: ${params.keyPoints || 'À déterminer selon l\'analyse du contexte'}
-NOMBRE DE SLIDES: ${slideCount}
-STYLE VISUEL: ${style}
+CLIENT: ${params.clientName}
+OFFRE: ${params.productName}
+OBJECTIF: ${params.objective}
+ARGUMENTS: ${params.keyPoints || 'À déterminer'}
+NOMBRE EXACT DE SLIDES: ${slideCount}
 
-GÉNÈRE une présentation JSON ultra-professionnelle avec cette structure:
+GÉNÈRE EXACTEMENT ${slideCount} slides au format JSON. NE DÉPASSE JAMAIS ce nombre.
+
+Structure OBLIGATOIRE pour ${slideCount} slides:
+${slideCount <= 3 ? `
+- Slide 1: "title" (couverture)
+- Slide 2: "solution" ou "benefits" (proposition de valeur)
+- Slide 3: "cta" (prochaines étapes)` : ''}
+${slideCount === 4 ? `
+- Slide 1: "title" (couverture)
+- Slide 2: "problem" (enjeux client)
+- Slide 3: "solution" (notre réponse)
+- Slide 4: "cta" (prochaines étapes)` : ''}
+${slideCount === 5 ? `
+- Slide 1: "title" (couverture)
+- Slide 2: "problem" (enjeux client)
+- Slide 3: "solution" (proposition de valeur)
+- Slide 4: "proof" (résultats prouvés avec stats)
+- Slide 5: "cta" (prochaines étapes)` : ''}
+${slideCount >= 6 && slideCount <= 8 ? `
+- Slide 1: "title" (couverture)
+- Slide 2: "agenda" (feuille de route)
+- Slide 3: "problem" (enjeux client)
+- Slide 4: "solution" (proposition)
+- Slide 5: "benefits" (bénéfices concrets)
+- Slide 6: "proof" (résultats + témoignage)
+${slideCount >= 7 ? '- Slide 7: "cta" (prochaines étapes)' : ''}
+${slideCount === 8 ? '- Slide 8: "contact" (coordonnées)' : ''}` : ''}
+${slideCount > 8 ? `
+- Slide 1: "title"
+- Slides 2-${slideCount - 1}: Alterner entre "problem", "solution", "benefits", "proof"
+- Slide ${slideCount}: "cta" ou "contact"` : ''}
+
+FORMAT JSON STRICT:
 {
-  "title": "Titre accrocheur et stratégique (pas générique)",
-  "subtitle": "Proposition de valeur en une phrase",
+  "title": "Titre stratégique percutant",
+  "subtitle": "Proposition de valeur en une ligne",
   "slides": [
-    {
-      "type": "title",
-      "title": "Titre impactant",
-      "content": "Sous-titre stratégique"
-    },
-    {
-      "type": "agenda",
-      "title": "Notre approche",
-      "bullets": ["Point 1 stratégique", "Point 2", "Point 3"]
-    },
-    {
-      "type": "problem",
-      "title": "Les défis de ${params.clientName}",
-      "content": "Accroche empathique sur les enjeux",
-      "bullets": ["Défi 1 chiffré", "Défi 2 avec impact", "Défi 3"],
-      "notes": "Notes pour le présentateur"
-    },
-    {
-      "type": "solution",
-      "title": "Notre réponse sur mesure",
-      "content": "Positionnement différenciant",
-      "bullets": ["Capacité 1", "Capacité 2", "Capacité 3"]
-    },
-    {
-      "type": "benefits",
-      "title": "Vos bénéfices concrets",
-      "bullets": ["ROI chiffré", "Gain de temps", "Réduction des risques", "Avantage compétitif"]
-    },
-    {
-      "type": "proof",
-      "title": "Nos résultats prouvés",
-      "stats": [
-        {"value": "+45%", "label": "Croissance moyenne"},
-        {"value": "98%", "label": "Satisfaction client"},
-        {"value": "6 mois", "label": "Retour sur investissement"}
-      ],
-      "testimonial": {
-        "quote": "Citation client impactante et crédible",
-        "author": "Nom, Titre, Entreprise similaire"
-      }
-    },
-    {
-      "type": "pricing|cta",
-      "title": "Prochaines étapes",
-      "bullets": ["Action 1 claire", "Action 2", "Action 3"],
-      "content": "Phrase d'urgence ou offre limitée"
-    },
-    {
-      "type": "contact",
-      "title": "Construisons ensemble votre succès",
-      "content": "Coordonnées et disponibilité"
-    }
+    {"type": "title", "title": "Titre", "content": "Sous-titre"},
+    {"type": "problem|solution|benefits", "title": "Titre slide", "content": "Accroche", "bullets": ["Point 1", "Point 2", "Point 3"]},
+    {"type": "proof", "title": "Résultats", "stats": [{"value": "+XX%", "label": "Métrique"}], "testimonial": {"quote": "Citation", "author": "Nom, Poste"}},
+    {"type": "cta", "title": "Prochaines étapes", "bullets": ["Action 1", "Action 2"], "content": "Phrase d'urgence"}
   ]
 }
 
 RÈGLES ABSOLUES:
-- Slide 1 = "title", dernier slide = "contact"
-- Chiffres et données concrètes obligatoires (invente des chiffres réalistes)
-- Bullets de 6-10 mots maximum, percutants
-- Langage business senior, pas de jargon technique
-- Le slide "proof" DOIT contenir des stats et un testimonial
-- Contenu orienté bénéfices client, pas caractéristiques produit
-- Notes de présentateur stratégiques pour chaque slide content
+1. EXACTEMENT ${slideCount} slides, pas plus, pas moins
+2. Chiffres concrets et réalistes (invente si nécessaire)
+3. Bullets de 8 mots maximum, percutants
+4. Le slide "proof" DOIT avoir "stats" (array) et "testimonial" (objet)
+5. Langage senior, pas de jargon technique
+6. PAS de slide "contact" si ${slideCount} < 6
+7. PAS de slide "agenda" si ${slideCount} < 6
 
-RÉPONDS UNIQUEMENT avec le JSON valide.`;
+RÉPONDS UNIQUEMENT avec le JSON valide, rien d'autre.`;
 
       const response = await callAI({
         messages: [{ role: 'user', content: prompt }],
-        systemPrompt: 'Tu es un expert en présentations commerciales C-level. Tu génères uniquement du JSON valide, sans aucun texte avant ou après.',
+        systemPrompt: 'Tu es un expert McKinsey en présentations stratégiques C-level. Tu génères UNIQUEMENT du JSON valide sans texte avant/après. Tu respectes STRICTEMENT le nombre de slides demandé.',
         type: 'generate'
       });
 
@@ -190,6 +174,12 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (!jsonMatch) throw new Error('JSON non trouvé');
         presentationData = JSON.parse(jsonMatch[0]);
+        
+        // ENFORCE slide count - truncate if AI generated too many
+        if (presentationData.slides.length > slideCount) {
+          console.warn(`AI generated ${presentationData.slides.length} slides, truncating to ${slideCount}`);
+          presentationData.slides = presentationData.slides.slice(0, slideCount);
+        }
       } catch (e) {
         throw new Error('Erreur de parsing de la présentation générée');
       }
@@ -253,9 +243,11 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
       const totalSlides = data.slides.length;
 
       data.slides.forEach((slideData, index) => {
+        let slide: PptxGenJS.Slide;
+        
         switch (slideData.type) {
           case 'title':
-            createTitleSlide(
+            slide = createTitleSlide(
               pptx,
               colors,
               slideData.title || data.title,
@@ -265,7 +257,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
             break;
 
           case 'agenda':
-            createAgendaSlide(
+            slide = createAgendaSlide(
               pptx,
               colors,
               slideData.title,
@@ -274,7 +266,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
             break;
 
           case 'proof':
-            createProofSlide(
+            slide = createProofSlide(
               pptx,
               colors,
               slideData.title,
@@ -288,7 +280,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
             break;
 
           case 'cta':
-            createCTASlide(
+            slide = createCTASlide(
               pptx,
               colors,
               slideData.title,
@@ -298,7 +290,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
             break;
 
           case 'contact':
-            const contactSlide = createContactSlide(
+            slide = createContactSlide(
               pptx,
               colors,
               {
@@ -309,9 +301,6 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
               },
               slideData.title || 'Merci !'
             );
-            if (slideData.notes) {
-              contactSlide.addNotes(slideData.notes);
-            }
             break;
 
           case 'problem':
@@ -319,7 +308,7 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
           case 'benefits':
           case 'pricing':
           default:
-            const contentSlide = createContentSlide(
+            slide = createContentSlide(
               pptx,
               colors,
               slideData.title,
@@ -327,11 +316,14 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
               slideData.bullets,
               index + 1,
               totalSlides,
-              slideData.type as any
+              slideData.type as 'problem' | 'solution' | 'benefits' | 'pricing' | 'cta'
             );
-            if (slideData.notes) {
-              contentSlide.addNotes(slideData.notes);
-            }
+            break;
+        }
+        
+        // Add presenter notes if available
+        if (slideData.notes && slide) {
+          slide.addNotes(slideData.notes);
         }
       });
 
