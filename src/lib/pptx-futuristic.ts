@@ -297,7 +297,29 @@ export function buildTitleSlide(
 }
 
 /**
- * Build section slide with multi-column layout
+ * Truncate text intelligently to prevent overflow
+ */
+function smartTruncate(text: string, maxChars: number): string {
+  if (!text || text.length <= maxChars) return text;
+  const truncated = text.substring(0, maxChars);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > maxChars * 0.6 ? truncated.substring(0, lastSpace) : truncated) + '…';
+}
+
+/**
+ * Calculate optimal font size based on content length
+ */
+function adaptiveFontSize(text: string, baseSize: number, maxChars: number): number {
+  if (!text) return baseSize;
+  const ratio = Math.min(1, maxChars / text.length);
+  return Math.max(baseSize * 0.7, baseSize * ratio);
+}
+
+/**
+ * Build section slide with IMPROVED multi-column layout
+ * - Prevents text overlap with dynamic spacing
+ * - Limits content per section to avoid overflow
+ * - Uses smart truncation for long text
  */
 export function buildSectionSlide(
   pptx: PptxGenJS,
@@ -312,79 +334,99 @@ export function buildSectionSlide(
   const slide = pptx.addSlide();
   addFuturisticLightBg(slide, pptx, colors);
   
-  // Title
-  slide.addText(title, {
-    x: 0.5, y: 0.3, w: 9, h: 0.6,
-    fontSize: 22,
+  // Title - with size limit
+  const displayTitle = smartTruncate(title, 80);
+  slide.addText(displayTitle, {
+    x: 0.5, y: 0.25, w: 9, h: 0.55,
+    fontSize: 20,
     bold: true,
     color: colors.bg1,
-    fontFace: 'Arial'
+    fontFace: 'Arial',
+    fit: 'shrink'
   });
   
   // Subtitle
-  let contentY = 0.95;
+  let contentY = 0.85;
   if (subtitle) {
-    slide.addText(subtitle, {
-      x: 0.5, y: 0.9, w: 9, h: 0.35,
-      fontSize: 11,
+    const displaySubtitle = smartTruncate(subtitle, 120);
+    slide.addText(displaySubtitle, {
+      x: 0.5, y: 0.8, w: 9, h: 0.3,
+      fontSize: 10,
       italic: true,
       color: colors.textMuted,
       fontFace: 'Arial'
     });
-    contentY = 1.3;
+    contentY = 1.15;
   }
   
   // Title underline
   slide.addShape(pptx.ShapeType.rect, {
-    x: 0.5, y: contentY - 0.05, w: 2.5, h: 0.04,
+    x: 0.5, y: contentY - 0.05, w: 2, h: 0.03,
     fill: { color: colors.accent1 }
   });
   
-  // Sections layout
+  // IMPROVED: Sections layout with proper spacing
   const sectionColors = [colors.accent1, colors.gold, colors.accent3];
   
   if (sections && sections.length > 0) {
     const colCount = Math.min(sections.length, 3);
-    const colWidth = colCount === 1 ? 8.5 : (colCount === 2 ? 4.2 : 2.8);
-    const gap = colCount === 1 ? 0 : 0.3;
+    const totalWidth = 9.0;
+    const gap = 0.25;
+    const colWidth = (totalWidth - (colCount - 1) * gap) / colCount;
+    
+    // Available height for content (before key message)
+    const availableHeight = keyMessage ? 3.2 : 3.8;
+    const maxPointsPerSection = Math.floor(availableHeight / 0.5);
     
     sections.slice(0, 3).forEach((section, sIdx) => {
       const xPos = 0.5 + sIdx * (colWidth + gap);
-      let localY = contentY + 0.15;
+      let localY = contentY + 0.1;
       
-      // Section heading with colored accent
+      // Section heading with colored accent bar
       slide.addShape(pptx.ShapeType.rect, {
-        x: xPos, y: localY, w: 0.08, h: 0.35,
+        x: xPos, y: localY, w: 0.06, h: 0.3,
         fill: { color: sectionColors[sIdx % sectionColors.length] }
       });
       
-      slide.addText(section.heading.toUpperCase(), {
-        x: xPos + 0.15, y: localY, w: colWidth - 0.2, h: 0.35,
-        fontSize: 10,
+      const headingText = smartTruncate(section.heading.toUpperCase(), 40);
+      slide.addText(headingText, {
+        x: xPos + 0.12, y: localY, w: colWidth - 0.15, h: 0.3,
+        fontSize: 9,
         bold: true,
         color: sectionColors[sIdx % sectionColors.length],
-        fontFace: 'Arial'
+        fontFace: 'Arial',
+        fit: 'shrink'
       });
       
-      localY += 0.45;
+      localY += 0.38;
       
-      // Section points
-      section.points.slice(0, 5).forEach((point, pIdx) => {
-        const pointY = localY + pIdx * 0.42;
+      // Section points - LIMITED to prevent overflow
+      const pointsToShow = Math.min(section.points.length, maxPointsPerSection, 5);
+      const pointHeight = 0.48;
+      
+      section.points.slice(0, pointsToShow).forEach((point, pIdx) => {
+        const pointY = localY + pIdx * pointHeight;
         
-        // Bullet square
-        slide.addShape(pptx.ShapeType.rect, {
-          x: xPos + 0.15, y: pointY + 0.1, w: 0.08, h: 0.08,
+        // Check if we're going to overflow
+        if (pointY + pointHeight > (keyMessage ? 4.3 : 5.0)) return;
+        
+        // Bullet dot
+        slide.addShape(pptx.ShapeType.ellipse, {
+          x: xPos + 0.08, y: pointY + 0.12, w: 0.06, h: 0.06,
           fill: { color: colors.textMuted }
         });
         
-        // Point text
-        slide.addText(point, {
-          x: xPos + 0.35, y: pointY, w: colWidth - 0.5, h: 0.4,
-          fontSize: 10,
+        // Point text - TRUNCATED to fit
+        const maxChars = colCount === 3 ? 80 : (colCount === 2 ? 120 : 180);
+        const displayPoint = smartTruncate(point, maxChars);
+        
+        slide.addText(displayPoint, {
+          x: xPos + 0.2, y: pointY, w: colWidth - 0.25, h: pointHeight - 0.05,
+          fontSize: 9,
           color: '374151',
           fontFace: 'Arial',
-          valign: 'top'
+          valign: 'top',
+          fit: 'shrink'
         });
       });
     });
@@ -392,7 +434,8 @@ export function buildSectionSlide(
   
   // Key message
   if (keyMessage) {
-    addKeyMessageBanner(slide, pptx, colors, keyMessage, false);
+    const displayMessage = smartTruncate(keyMessage, 200);
+    addKeyMessageBanner(slide, pptx, colors, displayMessage, false);
   }
   
   addSlideFooter(slide, colors, slideNum, total, false);
@@ -400,7 +443,10 @@ export function buildSectionSlide(
 }
 
 /**
- * Build proof/financials slide with stats grid
+ * Build proof/financials slide with IMPROVED stats grid
+ * - Better spacing, no overlap
+ * - Truncates long labels/values
+ * - Adds sections for hypotheses
  */
 export function buildProofSlide(
   pptx: PptxGenJS,
@@ -410,62 +456,77 @@ export function buildProofSlide(
   testimonial: { quote: string; author: string; role?: string; company?: string } | undefined,
   keyMessage: string | undefined,
   slideNum: number,
-  total: number
+  total: number,
+  sections?: { heading: string; points: string[] }[]
 ) {
   const slide = pptx.addSlide();
   addFuturisticDarkBg(slide, pptx, colors);
   
-  // Title
-  slide.addText(title.toUpperCase(), {
-    x: 0.5, y: 0.3, w: 9, h: 0.5,
-    fontSize: 12,
+  // Title - truncated
+  const displayTitle = smartTruncate(title.toUpperCase(), 70);
+  slide.addText(displayTitle, {
+    x: 0.5, y: 0.22, w: 9, h: 0.4,
+    fontSize: 11,
     bold: true,
     color: colors.accent1,
-    fontFace: 'Arial'
+    fontFace: 'Arial',
+    fit: 'shrink'
   });
   
-  // Stats grid
+  // Stats grid - IMPROVED sizing
   const statCount = Math.min(stats?.length || 0, 4);
+  const hasTestimonial = !!testimonial;
+  const hasSections = sections && sections.length > 0;
+  
   if (statCount > 0) {
-    const statWidth = (9 - 0.3 * (statCount - 1)) / statCount;
+    const gap = 0.15;
+    const statWidth = (9 - gap * (statCount - 1)) / statCount;
+    const statHeight = hasTestimonial || hasSections ? 1.0 : 1.3;
     
     stats.slice(0, 4).forEach((stat, idx) => {
-      const x = 0.5 + idx * (statWidth + 0.3);
+      const x = 0.5 + idx * (statWidth + gap);
       
       // Stat box
       slide.addShape(pptx.ShapeType.roundRect, {
-        x, y: 0.9, w: statWidth, h: 1.5,
+        x, y: 0.7, w: statWidth, h: statHeight,
         fill: { color: colors.bg2 },
-        line: { color: colors.accent1, width: 1.5 },
-        rectRadius: 0.1
+        line: { color: colors.accent1, width: 1 },
+        rectRadius: 0.06
       });
       
-      // Value
-      slide.addText(stat.value, {
-        x, y: 1.0, w: statWidth, h: 0.7,
-        fontSize: 28,
+      // Value - truncated and sized adaptively
+      const displayValue = smartTruncate(stat.value, 12);
+      const valueFontSize = displayValue.length > 8 ? 18 : 22;
+      
+      slide.addText(displayValue, {
+        x, y: 0.75, w: statWidth, h: 0.45,
+        fontSize: valueFontSize,
         bold: true,
         color: colors.accent1,
         fontFace: 'Arial',
         align: 'center',
-        valign: 'middle'
+        valign: 'middle',
+        fit: 'shrink'
       });
       
-      // Label
-      slide.addText(stat.label, {
-        x, y: 1.7, w: statWidth, h: 0.35,
-        fontSize: 10,
+      // Label - truncated
+      const displayLabel = smartTruncate(stat.label, 25);
+      slide.addText(displayLabel, {
+        x: x + 0.03, y: 1.2, w: statWidth - 0.06, h: 0.22,
+        fontSize: 8,
         bold: true,
         color: colors.text,
         fontFace: 'Arial',
-        align: 'center'
+        align: 'center',
+        fit: 'shrink'
       });
       
-      // Subtext
-      if (stat.subtext) {
-        slide.addText(stat.subtext, {
-          x, y: 2.05, w: statWidth, h: 0.3,
-          fontSize: 8,
+      // Subtext - truncated
+      if (stat.subtext && statHeight > 1.1) {
+        const displaySubtext = smartTruncate(stat.subtext, 30);
+        slide.addText(displaySubtext, {
+          x: x + 0.03, y: 1.42, w: statWidth - 0.06, h: 0.18,
+          fontSize: 7,
           color: colors.textMuted,
           fontFace: 'Arial',
           align: 'center'
@@ -474,48 +535,94 @@ export function buildProofSlide(
     });
   }
   
-  // Testimonial
-  if (testimonial) {
-    slide.addShape(pptx.ShapeType.roundRect, {
-      x: 0.5, y: 2.7, w: 9, h: 1.4,
-      fill: { color: colors.accent1 },
-      rectRadius: 0.12
+  // Sections (e.g., Hypothèses Clés) - below stats
+  let nextY = statCount > 0 ? 1.85 : 0.7;
+  
+  if (hasSections && sections) {
+    const sectionColors = [colors.accent1, colors.gold];
+    const colCount = Math.min(sections.length, 2);
+    const colWidth = colCount === 1 ? 8.8 : 4.2;
+    const gap = 0.25;
+    
+    sections.slice(0, 2).forEach((section, sIdx) => {
+      const xPos = 0.5 + sIdx * (colWidth + gap);
+      
+      const headingText = smartTruncate(section.heading.toUpperCase(), 40);
+      slide.addText(headingText, {
+        x: xPos, y: nextY, w: colWidth, h: 0.25,
+        fontSize: 8,
+        bold: true,
+        color: sectionColors[sIdx % sectionColors.length],
+        fontFace: 'Arial'
+      });
+      
+      section.points.slice(0, 3).forEach((point, pIdx) => {
+        const displayPoint = smartTruncate(point, colCount === 1 ? 140 : 70);
+        slide.addText(`• ${displayPoint}`, {
+          x: xPos, y: nextY + 0.28 + pIdx * 0.26, w: colWidth, h: 0.26,
+          fontSize: 8,
+          color: colors.text,
+          fontFace: 'Arial'
+        });
+      });
     });
     
-    // Quote mark
-    slide.addText('"', {
-      x: 0.7, y: 2.6, w: 0.5, h: 0.6,
-      fontSize: 40,
-      color: colors.bg1,
-      fontFace: 'Georgia'
-    });
+    nextY += 0.28 + Math.min(sections[0]?.points?.length || 0, 3) * 0.26 + 0.12;
+  }
+  
+  // Testimonial - IMPROVED with better positioning
+  if (hasTestimonial && testimonial) {
+    const testimonialY = Math.max(nextY + 0.1, 2.6);
+    const testimonialH = 0.95;
     
-    // Quote text
-    slide.addText(testimonial.quote, {
-      x: 1.1, y: 2.9, w: 8, h: 0.7,
-      fontSize: 12,
-      italic: true,
-      color: colors.text,
-      fontFace: 'Arial'
-    });
-    
-    // Author
-    const authorLine = [testimonial.author, testimonial.role, testimonial.company]
-      .filter(Boolean).join(', ');
-    
-    slide.addText(`— ${authorLine}`, {
-      x: 1.1, y: 3.65, w: 8, h: 0.35,
-      fontSize: 10,
-      bold: true,
-      color: colors.text,
-      fontFace: 'Arial',
-      align: 'right'
-    });
+    // Only render if there's space
+    if (testimonialY + testimonialH < 4.6) {
+      slide.addShape(pptx.ShapeType.roundRect, {
+        x: 0.5, y: testimonialY, w: 9, h: testimonialH,
+        fill: { color: colors.accent1 },
+        rectRadius: 0.08
+      });
+      
+      // Quote mark
+      slide.addText('"', {
+        x: 0.6, y: testimonialY - 0.08, w: 0.35, h: 0.4,
+        fontSize: 28,
+        color: colors.bg1,
+        fontFace: 'Georgia'
+      });
+      
+      // Quote text - truncated
+      const displayQuote = smartTruncate(testimonial.quote, 160);
+      slide.addText(displayQuote, {
+        x: 0.9, y: testimonialY + 0.08, w: 8.2, h: 0.48,
+        fontSize: 9,
+        italic: true,
+        color: colors.text,
+        fontFace: 'Arial',
+        fit: 'shrink'
+      });
+      
+      // Author
+      const authorLine = smartTruncate(
+        [testimonial.author, testimonial.role, testimonial.company].filter(Boolean).join(', '),
+        60
+      );
+      
+      slide.addText(`— ${authorLine}`, {
+        x: 0.9, y: testimonialY + 0.6, w: 8.2, h: 0.22,
+        fontSize: 8,
+        bold: true,
+        color: colors.text,
+        fontFace: 'Arial',
+        align: 'right'
+      });
+    }
   }
   
   // Key message
   if (keyMessage) {
-    addKeyMessageBanner(slide, pptx, colors, keyMessage, true);
+    const displayMessage = smartTruncate(keyMessage, 180);
+    addKeyMessageBanner(slide, pptx, colors, displayMessage, true);
   }
   
   addSlideFooter(slide, colors, slideNum, total, true);
@@ -523,7 +630,9 @@ export function buildProofSlide(
 }
 
 /**
- * Build roadmap/timeline slide
+ * Build roadmap/timeline slide - IMPROVED
+ * - Better spacing and truncation
+ * - Prevents overflow
  */
 export function buildRoadmapSlide(
   pptx: PptxGenJS,
@@ -538,43 +647,47 @@ export function buildRoadmapSlide(
   const slide = pptx.addSlide();
   addFuturisticLightBg(slide, pptx, colors);
   
-  // Title
-  slide.addText(title, {
-    x: 0.5, y: 0.3, w: 9, h: 0.55,
-    fontSize: 22,
+  // Title - truncated
+  const displayTitle = smartTruncate(title, 70);
+  slide.addText(displayTitle, {
+    x: 0.5, y: 0.25, w: 9, h: 0.48,
+    fontSize: 18,
     bold: true,
     color: colors.bg1,
-    fontFace: 'Arial'
+    fontFace: 'Arial',
+    fit: 'shrink'
   });
   
   // Underline
   slide.addShape(pptx.ShapeType.rect, {
-    x: 0.5, y: 0.9, w: 2.5, h: 0.04,
+    x: 0.5, y: 0.78, w: 2, h: 0.03,
     fill: { color: colors.accent1 }
   });
   
-  // Timeline
+  // Timeline - IMPROVED layout
   if (timeline && timeline.length > 0) {
     const phaseCount = Math.min(timeline.length, 4);
-    const phaseWidth = 8.5 / phaseCount;
+    const totalWidth = 8.8;
+    const gap = 0.12;
+    const phaseWidth = (totalWidth - gap * (phaseCount - 1)) / phaseCount;
     
     // Timeline bar
     slide.addShape(pptx.ShapeType.rect, {
-      x: 0.75, y: 1.6, w: 8.5, h: 0.08,
+      x: 0.6, y: 1.35, w: totalWidth, h: 0.06,
       fill: { color: colors.accent1 }
     });
     
     timeline.slice(0, 4).forEach((phase, idx) => {
-      const x = 0.75 + idx * phaseWidth;
+      const x = 0.6 + idx * (phaseWidth + gap);
       
       // Phase circle
       slide.addShape(pptx.ShapeType.ellipse, {
-        x: x + phaseWidth / 2 - 0.2, y: 1.45, w: 0.4, h: 0.4,
+        x: x + phaseWidth / 2 - 0.15, y: 1.23, w: 0.3, h: 0.3,
         fill: { color: colors.accent1 }
       });
       slide.addText(`${idx + 1}`, {
-        x: x + phaseWidth / 2 - 0.2, y: 1.45, w: 0.4, h: 0.4,
-        fontSize: 12,
+        x: x + phaseWidth / 2 - 0.15, y: 1.23, w: 0.3, h: 0.3,
+        fontSize: 10,
         bold: true,
         color: colors.text,
         fontFace: 'Arial',
@@ -584,30 +697,33 @@ export function buildRoadmapSlide(
       
       // Phase box
       slide.addShape(pptx.ShapeType.roundRect, {
-        x: x + 0.1, y: 2.0, w: phaseWidth - 0.2, h: 1.4,
+        x: x, y: 1.65, w: phaseWidth, h: 1.2,
         fill: { color: 'FFFFFF' },
         line: { color: colors.accent1, width: 1 },
-        rectRadius: 0.08
+        rectRadius: 0.06
       });
       
-      // Phase name
-      slide.addText(phase.phase, {
-        x: x + 0.15, y: 2.1, w: phaseWidth - 0.3, h: 0.4,
-        fontSize: 10,
+      // Phase name - truncated
+      const phaseName = smartTruncate(phase.phase, 30);
+      slide.addText(phaseName, {
+        x: x + 0.08, y: 1.72, w: phaseWidth - 0.16, h: 0.32,
+        fontSize: 9,
         bold: true,
         color: colors.accent1,
-        fontFace: 'Arial'
+        fontFace: 'Arial',
+        fit: 'shrink'
       });
       
       // Duration badge
+      const durationText = smartTruncate(phase.duration, 12);
       slide.addShape(pptx.ShapeType.roundRect, {
-        x: x + 0.15, y: 2.5, w: 0.8, h: 0.25,
+        x: x + 0.08, y: 2.06, w: 0.7, h: 0.2,
         fill: { color: colors.gold },
-        rectRadius: 0.04
+        rectRadius: 0.03
       });
-      slide.addText(phase.duration, {
-        x: x + 0.15, y: 2.5, w: 0.8, h: 0.25,
-        fontSize: 8,
+      slide.addText(durationText, {
+        x: x + 0.08, y: 2.06, w: 0.7, h: 0.2,
+        fontSize: 7,
         bold: true,
         color: colors.bg1,
         fontFace: 'Arial',
@@ -615,37 +731,45 @@ export function buildRoadmapSlide(
         valign: 'middle'
       });
       
-      // Description
-      slide.addText(phase.description, {
-        x: x + 0.15, y: 2.85, w: phaseWidth - 0.3, h: 0.5,
-        fontSize: 9,
+      // Description - truncated based on column width
+      const maxDescChars = phaseCount >= 3 ? 60 : 100;
+      const description = smartTruncate(phase.description, maxDescChars);
+      slide.addText(description, {
+        x: x + 0.08, y: 2.32, w: phaseWidth - 0.16, h: 0.48,
+        fontSize: 8,
         color: '374151',
-        fontFace: 'Arial'
+        fontFace: 'Arial',
+        fit: 'shrink'
       });
     });
   }
   
-  // Additional sections below timeline
+  // Additional sections below timeline - IMPROVED
   if (sections && sections.length > 0) {
-    const startY = 3.6;
-    const colCount = Math.min(sections.length, 2);
-    const colWidth = colCount === 1 ? 8.5 : 4.1;
+    const startY = 3.0;
+    const colCount = Math.min(sections.length, 3);
+    const totalWidth = 9.0;
+    const gap = 0.2;
+    const colWidth = (totalWidth - gap * (colCount - 1)) / colCount;
     
-    sections.slice(0, 2).forEach((section, sIdx) => {
-      const xPos = 0.5 + sIdx * (colWidth + 0.3);
+    sections.slice(0, 3).forEach((section, sIdx) => {
+      const xPos = 0.5 + sIdx * (colWidth + gap);
       
-      slide.addText(section.heading.toUpperCase(), {
-        x: xPos, y: startY, w: colWidth, h: 0.3,
-        fontSize: 9,
+      const headingText = smartTruncate(section.heading.toUpperCase(), 35);
+      slide.addText(headingText, {
+        x: xPos, y: startY, w: colWidth, h: 0.25,
+        fontSize: 8,
         bold: true,
         color: colors.accent1,
         fontFace: 'Arial'
       });
       
       section.points.slice(0, 3).forEach((point, pIdx) => {
-        slide.addText(`• ${point}`, {
-          x: xPos, y: startY + 0.35 + pIdx * 0.25, w: colWidth, h: 0.25,
-          fontSize: 9,
+        const maxChars = colCount >= 3 ? 50 : 80;
+        const displayPoint = smartTruncate(point, maxChars);
+        slide.addText(`• ${displayPoint}`, {
+          x: xPos, y: startY + 0.28 + pIdx * 0.24, w: colWidth, h: 0.24,
+          fontSize: 8,
           color: '374151',
           fontFace: 'Arial'
         });
@@ -654,7 +778,8 @@ export function buildRoadmapSlide(
   }
   
   if (keyMessage) {
-    addKeyMessageBanner(slide, pptx, colors, keyMessage, false);
+    const displayMessage = smartTruncate(keyMessage, 180);
+    addKeyMessageBanner(slide, pptx, colors, displayMessage, false);
   }
   
   addSlideFooter(slide, colors, slideNum, total, false);
@@ -662,7 +787,9 @@ export function buildRoadmapSlide(
 }
 
 /**
- * Build CTA slide
+ * Build CTA slide - IMPROVED
+ * - Better text truncation
+ * - More compact layout
  */
 export function buildCTASlide(
   pptx: PptxGenJS,
@@ -677,68 +804,76 @@ export function buildCTASlide(
   const slide = pptx.addSlide();
   addFuturisticDarkBg(slide, pptx, colors);
   
-  // Title
-  slide.addText(title, {
-    x: 0, y: 0.8, w: W, h: 0.8,
-    fontSize: 28,
+  // Title - truncated
+  const displayTitle = smartTruncate(title, 60);
+  slide.addText(displayTitle, {
+    x: 0.5, y: 0.6, w: 9, h: 0.7,
+    fontSize: 24,
     bold: true,
     color: colors.text,
     fontFace: 'Arial',
-    align: 'center'
+    align: 'center',
+    fit: 'shrink'
   });
   
-  // Actions from sections
+  // Actions from sections - IMPROVED
   if (sections && sections.length > 0) {
-    let actionY = 1.8;
+    let actionY = 1.5;
+    const maxActions = 5;
     
-    sections[0].points.slice(0, 4).forEach((action, idx) => {
+    sections[0].points.slice(0, maxActions).forEach((action, idx) => {
       // Checkmark circle
       slide.addShape(pptx.ShapeType.ellipse, {
-        x: 2.5, y: actionY, w: 0.4, h: 0.4,
+        x: 1.8, y: actionY, w: 0.32, h: 0.32,
         fill: { color: colors.accent1 }
       });
       slide.addText('✓', {
-        x: 2.5, y: actionY, w: 0.4, h: 0.4,
-        fontSize: 14,
+        x: 1.8, y: actionY, w: 0.32, h: 0.32,
+        fontSize: 12,
         color: colors.text,
         fontFace: 'Arial',
         align: 'center',
         valign: 'middle'
       });
       
-      // Action text
-      slide.addText(action, {
-        x: 3.1, y: actionY, w: 5, h: 0.4,
-        fontSize: 14,
+      // Action text - truncated
+      const displayAction = smartTruncate(action, 80);
+      slide.addText(displayAction, {
+        x: 2.25, y: actionY, w: 6.5, h: 0.32,
+        fontSize: 11,
         color: colors.text,
         fontFace: 'Arial',
-        valign: 'middle'
+        valign: 'middle',
+        fit: 'shrink'
       });
       
-      actionY += 0.6;
+      actionY += 0.45;
     });
   }
   
-  // Content/urgency text
+  // Content/urgency text - IMPROVED
   if (content) {
+    const displayContent = smartTruncate(content, 100);
     slide.addShape(pptx.ShapeType.roundRect, {
-      x: 2, y: 4.2, w: 6, h: 0.6,
+      x: 1.5, y: 3.9, w: 7, h: 0.5,
       fill: { color: colors.gold },
-      rectRadius: 0.08
+      rectRadius: 0.06
     });
-    slide.addText(content, {
-      x: 2, y: 4.2, w: 6, h: 0.6,
-      fontSize: 12,
+    slide.addText(displayContent, {
+      x: 1.5, y: 3.9, w: 7, h: 0.5,
+      fontSize: 10,
       bold: true,
       color: colors.bg1,
       fontFace: 'Arial',
       align: 'center',
-      valign: 'middle'
+      valign: 'middle',
+      fit: 'shrink'
     });
   }
   
   if (keyMessage) {
-    addKeyMessageBanner(slide, pptx, colors, keyMessage, true);
+    const displayMessage = smartTruncate(keyMessage, 160);
+    addKeyMessageBanner(slide, pptx, colors, displayMessage, true);
   }
   
   addSlideFooter(slide, colors, slideNum, total, true);

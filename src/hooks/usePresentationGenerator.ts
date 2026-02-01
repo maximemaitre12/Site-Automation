@@ -489,7 +489,8 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
               slideData.stats || [],
               slideData.testimonial,
               slideData.keyMessage,
-              slideNum, totalSlides
+              slideNum, totalSlides,
+              slideData.sections // Pass sections for hypotheses
             );
             break;
             
