@@ -513,20 +513,6 @@ export default function Flow() {
                   
                   {/* Pro Canvas V2 - N8N Style */}
                   <div className="flex-1 flex overflow-hidden min-h-0 workflow-canvas-area" style={{ minHeight: '500px' }}>
-                    {/* AI Assistant Panel - Left side (same style as properties panel) */}
-                    {isAIAssistantOpen && (
-                      <FlowAIAssistant
-                        isOpen={isAIAssistantOpen}
-                        onClose={() => setIsAIAssistantOpen(false)}
-                        blocks={localBlocks}
-                        connections={localConnections}
-                        workflowId={selectedWorkflow.id}
-                        workflowName={selectedWorkflow.name}
-                        onGenerateWorkflow={handleAIGenerate}
-                        onModifyWorkflow={handleAIModify}
-                      />
-                    )}
-                    
                     {/* Canvas with toolbar */}
                     <div className="flex-1 overflow-hidden min-h-0 relative">
                       <ProCanvasV2
@@ -562,11 +548,25 @@ export default function Flow() {
                     )}
                     
                     {/* Properties Panel - Shows when a block is selected and palette is closed */}
-                    {selectedBlock && !isPaletteOpen && (
+                    {selectedBlock && !isPaletteOpen && !isAIAssistantOpen && (
                       <NodePropertiesPanel
                         block={selectedBlock}
                         onUpdate={handleUpdateBlock}
                         onClose={() => setSelectedBlockId(null)}
+                      />
+                    )}
+                    
+                    {/* AI Assistant Panel - Right side (same style as properties panel) */}
+                    {isAIAssistantOpen && !isPaletteOpen && (
+                      <FlowAIAssistant
+                        isOpen={isAIAssistantOpen}
+                        onClose={() => setIsAIAssistantOpen(false)}
+                        blocks={localBlocks}
+                        connections={localConnections}
+                        workflowId={selectedWorkflow.id}
+                        workflowName={selectedWorkflow.name}
+                        onGenerateWorkflow={handleAIGenerate}
+                        onModifyWorkflow={handleAIModify}
                       />
                     )}
                   </div>
