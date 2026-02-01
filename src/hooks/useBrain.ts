@@ -130,9 +130,84 @@ export function useBrain() {
   const sendMessage = useCallback(async (
     content: string, 
     conversationId?: string, 
-    options?: { attachments?: Attachment[]; confidentialMode?: boolean }
+    options?: { 
+      attachments?: Attachment[]; 
+      confidentialMode?: boolean;
+      onConfidentialMessage?: (role: 'user' | 'assistant', content: string) => void;
+      onConfidentialStream?: (content: string) => void;
+    }
   ): Promise<Message | null> => {
     if (!user || !content.trim()) return null;
+
+    // CONFIDENTIAL MODE: In-memory only, no database storage
+    if (options?.confidentialMode) {
+      abortControllerRef.current = new AbortController();
+      setSendingMessage(true);
+      
+      try {
+        // Notify about user message (memory only)
+        options.onConfidentialMessage?.('user', content);
+        
+        const systemPrompt = `Tu es AETHER Brain en MODE ULTRA-CONFIDENTIEL.
+
+🔒 SÉCURITÉ MAXIMALE:
+- Tu opères dans un environnement 100% sécurisé pour données sensibles
+- Aucune donnée n'est stockée ou envoyée à l'extérieur
+- Tu réponds uniquement à partir des documents internes fournis
+- JAMAIS de recherche web ou de données externes
+
+STYLE DE RÉPONSE:
+- Sois CONCIS et DIRECT. Maximum 3-4 paragraphes courts.
+- Jamais de markdown (*, #, -, etc.)
+- Réponds en français, de manière professionnelle`;
+
+        let fullContent = '';
+        
+        await new Promise<void>((resolve, reject) => {
+          streamAIChat({
+            messages: [{ role: 'user', content }],
+            systemPrompt,
+            userId: user.id,
+            attachments: options?.attachments,
+            confidentialMode: true,
+            abortSignal: abortControllerRef.current?.signal,
+            onDelta: (delta) => {
+              fullContent += delta;
+              options.onConfidentialStream?.(fullContent);
+            },
+            onDone: () => resolve(),
+            onError: (err) => reject(err),
+          });
+        });
+
+        // Notify about assistant message (memory only)
+        options.onConfidentialMessage?.('assistant', fullContent);
+        
+        abortControllerRef.current = null;
+        return {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: fullContent,
+          timestamp: new Date()
+        };
+      } catch (err) {
+        abortControllerRef.current = null;
+        if (err instanceof Error && err.message === 'Generation cancelled') {
+          return null;
+        }
+        toast({ 
+          title: 'Erreur', 
+          description: err instanceof Error ? err.message : "Erreur lors de l'envoi", 
+          variant: 'destructive' 
+        });
+        return null;
+      } finally {
+        setSendingMessage(false);
+        options.onConfidentialStream?.('');
+      }
+    }
+
+    // NORMAL MODE: Standard database storage
 
     abortControllerRef.current = new AbortController();
     setSendingMessage(true);

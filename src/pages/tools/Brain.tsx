@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2, Shield } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2, Shield, ShieldAlert, Lock } from "lucide-react";
 import { detectIntent } from "@/lib/intent-detector";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
@@ -12,7 +12,8 @@ import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { UniversalSearch } from "@/components/brain/UniversalSearch";
 import { KnowledgeHubPanel } from "@/components/brain/KnowledgeHubPanel";
-import { ConfidentialModeToggle } from "@/components/brain/ConfidentialModeToggle";
+import { ConfidentialModeToggle, ConfidentialBanner } from "@/components/brain/ConfidentialModeToggle";
+import { ConfidentialChatArea } from "@/components/brain/ConfidentialChatArea";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -47,9 +48,19 @@ export default function BrainPage() {
     addMessageWithoutAI
   } = useBrain();
   const { toast } = useToast();
-  const { confidentialMode, toggleConfidentialMode, logConversationEvent } = useConfidentialMode();
+  const { 
+    confidentialMode, 
+    toggleConfidentialMode, 
+    logConversationEvent,
+    confidentialSession,
+    addConfidentialMessage,
+    wipeConfidentialMemory,
+    getSessionTimeRemaining,
+    SESSION_TIMEOUT_MS
+  } = useConfidentialMode();
 
   const [message, setMessage] = useState("");
+  const [confidentialStreamingContent, setConfidentialStreamingContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showTools, setShowTools] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -154,11 +165,24 @@ export default function BrainPage() {
     e.preventDefault();
     if ((!message.trim() && attachments.length === 0) || sendingMessage || generatingImage) return;
     
-    // Auto-detect intent from message
+    // CONFIDENTIAL MODE: Block image generation (no external calls)
+    if (confidentialMode) {
+      const detectedIntent = detectIntent(message);
+      if (detectedIntent !== 'chat') {
+        toast({
+          title: "🔒 Action bloquée",
+          description: "La génération d'images est désactivée en mode confidentiel (nécessite des serveurs externes).",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+    
+    // Auto-detect intent from message (only in normal mode)
     const detectedIntent = detectIntent(message);
     
-    // Handle image/chart generation
-    if (detectedIntent !== 'chat' && message.trim()) {
+    // Handle image/chart generation (normal mode only)
+    if (!confidentialMode && detectedIntent !== 'chat' && message.trim()) {
       await handleGenerateImage(message, detectedIntent);
       setMessage("");
       setAttachments([]);
@@ -171,14 +195,20 @@ export default function BrainPage() {
     setMessage("");
     setAttachments([]);
     
-    // Log message event for audit trail
-    if (currentConversation?.id) {
-      logConversationEvent('MESSAGE_SENT', currentConversation.id, { has_attachments: currentAttachments.length > 0 });
+    // Log message event for audit trail (even in confidential mode)
+    const auditId = confidentialMode ? 'confidential-session' : currentConversation?.id;
+    if (auditId) {
+      logConversationEvent('MESSAGE_SENT', auditId, { 
+        has_attachments: currentAttachments.length > 0,
+        confidential_mode: confidentialMode 
+      });
     }
     
     await sendMessage(msg, undefined, { 
       attachments: currentAttachments.length > 0 ? currentAttachments : undefined,
-      confidentialMode 
+      confidentialMode,
+      onConfidentialMessage: addConfidentialMessage,
+      onConfidentialStream: setConfidentialStreamingContent
     });
   };
 
@@ -432,38 +462,52 @@ export default function BrainPage() {
         <div 
           className={cn(
             "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden h-full",
-            isDragging && "bg-primary/5 ring-2 ring-primary ring-inset"
+            isDragging && "bg-primary/5 ring-2 ring-primary ring-inset",
+            confidentialMode && "bg-red-500/[0.02]"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
+          {/* Confidential Mode Banner */}
+          <ConfidentialBanner enabled={confidentialMode} />
 
-          {/* Chat Messages */}
-          {!currentConversation && conversations.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-muted-foreground text-lg md:text-xl font-medium tracking-tight">
-                Comment puis-je vous aider aujourd'hui ?
-              </p>
-            </div>
-          ) : !currentConversation ? (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-muted-foreground text-base font-medium">
-                Sélectionnez une conversation ou démarrez-en une nouvelle.
-              </p>
-            </div>
+          {/* Chat Messages - CONDITIONAL BASED ON MODE */}
+          {confidentialMode ? (
+            // CONFIDENTIAL MODE: Use in-memory chat area
+            <ConfidentialChatArea 
+              messages={(confidentialSession?.messages || []) as Array<{ role: 'user' | 'assistant'; content: string }>}
+              streamingContent={confidentialStreamingContent}
+            />
           ) : (
-            <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
-              <div className="space-y-4 max-w-3xl mx-auto py-4">
-                {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
-                  <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
-                ))}
-                {streamingContent && (
-                  <ChatMessage role="assistant" content={streamingContent} isStreaming />
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
+            // NORMAL MODE: Use database-backed chat
+            <>
+              {!currentConversation && conversations.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-muted-foreground text-lg md:text-xl font-medium tracking-tight">
+                    Comment puis-je vous aider aujourd'hui ?
+                  </p>
+                </div>
+              ) : !currentConversation ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-muted-foreground text-base font-medium">
+                    Sélectionnez une conversation ou démarrez-en une nouvelle.
+                  </p>
+                </div>
+              ) : (
+                <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
+                  <div className="space-y-4 max-w-3xl mx-auto py-4">
+                    {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
+                      <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
+                    ))}
+                    {streamingContent && (
+                      <ChatMessage role="assistant" content={streamingContent} isStreaming />
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+              )}
+            </>
           )}
 
           {/* Drag overlay */}
@@ -513,21 +557,26 @@ export default function BrainPage() {
               {/* Main input container */}
               <div className={cn(
                 "bg-secondary/80 backdrop-blur-xl rounded-2xl border shadow-lg overflow-hidden transition-all",
-                confidentialMode ? "border-emerald-500/30 ring-1 ring-emerald-500/20" : "border-border/50"
+                confidentialMode ? "border-red-500/30 ring-2 ring-red-500/20 shadow-red-500/10" : "border-border/50"
               )}>
-                {/* Confidential mode indicator */}
+                {/* Confidential mode indicator - ULTRA SECURE */}
                 {confidentialMode && (
-                  <div className="px-3 py-1.5 bg-emerald-500/10 border-b border-emerald-500/20 flex items-center justify-center gap-2">
-                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-xs font-medium text-emerald-500">Mode Confidentiel activé - Aucune donnée externe</span>
+                  <div className="px-3 py-2 bg-red-500/10 border-b border-red-500/20 flex items-center justify-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-red-500 animate-pulse" />
+                    <span className="text-xs font-semibold text-red-500 uppercase tracking-wide">
+                      🔒 Mode Ultra-Confidentiel — Aucun stockage
+                    </span>
+                    <Lock className="w-3.5 h-3.5 text-red-500" />
                   </div>
                 )}
                 {/* Input row */}
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
-                  {/* Confidential mode toggle */}
+                  {/* Confidential mode toggle - ENHANCED */}
                   <ConfidentialModeToggle 
                     enabled={confidentialMode} 
                     onToggle={toggleConfidentialMode}
+                    onWipe={confidentialMode ? wipeConfidentialMemory : undefined}
+                    sessionTimeRemaining={confidentialMode ? getSessionTimeRemaining() : undefined}
                     compact
                   />
                   
