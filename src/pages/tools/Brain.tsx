@@ -429,20 +429,16 @@ export default function BrainPage() {
           {/* Chat Messages */}
           <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
             {!currentConversation && conversations.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center px-4 py-8">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-4 shadow-lg shadow-agent-brain/20">
-                  <Database className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                </div>
-                <p className="text-muted-foreground max-w-md text-sm md:text-base">
-                  Posez des questions, analysez des documents, ou générez des images.
+              <div className="flex flex-col items-center justify-center text-center px-4 py-12">
+                <p className="text-muted-foreground text-base md:text-lg">
+                  Comment puis-je vous aider aujourd'hui ?
                 </p>
               </div>
             ) : !currentConversation ? (
-              <div className="flex flex-col items-center justify-center text-center px-4 py-8">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-4 shadow-lg">
-                  <Database className="w-8 h-8 text-white" />
-                </div>
-                <p className="text-muted-foreground text-sm">Commencez à discuter ou sélectionnez une conversation.</p>
+              <div className="flex flex-col items-center justify-center text-center px-4 py-12">
+                <p className="text-muted-foreground text-sm">
+                  Sélectionnez une conversation ou démarrez-en une nouvelle.
+                </p>
               </div>
             ) : (
               <div className="space-y-4 max-w-3xl mx-auto py-4">
