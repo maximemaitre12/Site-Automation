@@ -140,7 +140,7 @@ export function FlowAIAssistant({
 
       // Detect intent from the message
       const lowerInput = input.toLowerCase();
-      const isGenerateRequest = /génère|créer|crée|nouveau workflow|build|create/i.test(lowerInput);
+      const isGenerateRequest = /génère|créer|crée|nouveau workflow|build|create|agent|fais(-| )?moi|construis|monte/i.test(lowerInput);
       const isModifyRequest = /modifie|ajoute|supprime|change|remplace|optimise/i.test(lowerInput);
       const isDiagnosticRequest = /diagnostic|configur|manque|fonctionne|initialiser|api|clé/i.test(lowerInput);
       const isRecommendationRequest = /recommand|améliore|conseil|suggestion|idée/i.test(lowerInput);
@@ -151,9 +151,11 @@ export function FlowAIAssistant({
         let response: string;
         
         if (issues.length === 0) {
-          response = `✅ **Workflow prêt !**\n\nTous les blocs sont correctement configurés et connectés. Vous pouvez lancer l'exécution.`;
+          response = `Workflow prêt !\n\nTous les blocs sont correctement configurés et connectés. Tu peux lancer l'exécution.`;
         } else {
-          response = `⚠️ **Configuration requise**\n\nPour que votre workflow fonctionne, vous devez :\n\n${issues.map(i => `• ${i}`).join('\n')}\n\nCliquez sur chaque bloc concerné pour le configurer.`;
+          // Strip markdown from issues
+          const cleanIssues = issues.map(i => i.replace(/\*\*/g, ''));
+          response = `Configuration requise\n\nPour que ton workflow fonctionne, voici ce qu'il faut configurer :\n\n${cleanIssues.map(i => `- ${i}`).join('\n')}\n\nClique sur chaque bloc concerné pour le paramétrer.`;
         }
 
         const assistantMessage: Message = {
@@ -217,16 +219,30 @@ export function FlowAIAssistant({
         }
       } else {
         // General chat / recommendations
-        const systemPrompt = `Tu es l'assistant IA d'AETHER Flow, un builder de workflows d'automatisation.
-${blocks.length > 0 ? `Le workflow actuel "${workflowName || 'Sans nom'}" contient ${blocks.length} blocs: ${blocks.map(b => b.name).join(', ')}.` : 'Aucun workflow n\'est actuellement sélectionné.'}
+        // Build context about current workflow state
+        const blocksContext = blocks.length > 0 
+          ? `Le workflow "${workflowName || 'Sans nom'}" contient ${blocks.length} blocs : ${blocks.map(b => `${b.name} (type: ${b.type})`).join(', ')}.`
+          : 'Aucun workflow sélectionné pour l\'instant.';
+        
+        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow, le builder d'agents IA et de workflows d'automatisation. Tu parles comme un collègue humain, jamais comme un robot.
 
-Tu peux:
-- Donner des conseils pour améliorer les workflows
-- Expliquer comment configurer les blocs
-- Suggérer des automatisations
-- Répondre aux questions sur AETHER Flow
+CONTEXTE ACTUEL:
+${blocksContext}
 
-Réponds de façon concise et utile en français.`;
+TES CAPACITÉS:
+- Tu peux créer des agents IA et des workflows complets à partir d'une simple description
+- Tu connais tous les types de blocs disponibles : IA (OpenAI, Gemini, Claude), Logique (conditions, boucles), Transformations (JSON, texte), Intégrations (Gmail, Slack, Stripe, GitHub, Notion, etc.)
+- Tu peux diagnostiquer les configurations manquantes et guider l'utilisateur
+- Tu connais les clés API nécessaires pour chaque intégration
+
+RÈGLES DE COMMUNICATION:
+- Écris comme un humain expert, pas comme une IA
+- INTERDIT : astérisques (*), dièses (#), tirets de liste (---), crochets []
+- Utilise des phrases naturelles et des retours à la ligne simples
+- Tutoie l'utilisateur
+- Sois direct et concis
+
+Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le générer et demande-lui de préciser son besoin si nécessaire.`;
 
         const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
           method: 'POST',
@@ -381,16 +397,16 @@ Réponds de façon concise et utile en français.`;
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Décrivez ce que vous voulez..."
+            placeholder="Décris ce que tu veux automatiser..."
             className={cn(
-              "min-h-[220px] max-h-[45vh] resize-none",
+              "min-h-[100px] max-h-[180px] resize-none",
               "rounded-xl px-4 py-3",
-              "pr-12 pb-12",
+              "pr-14",
               "bg-background text-sm leading-relaxed",
               "shadow-sm",
             )}
             disabled={isLoading}
-            rows={8}
+            rows={4}
           />
 
           {/* Send button inside the text area (bottom-right) */}
@@ -400,7 +416,7 @@ Réponds de façon concise et utile en français.`;
             disabled={!input.trim() || isLoading}
             className={cn(
               "absolute bottom-2 right-2",
-              "h-9 w-9 rounded-lg",
+              "h-8 w-8 rounded-lg",
               "bg-agent-flow hover:bg-agent-flow/90",
             )}
           >
