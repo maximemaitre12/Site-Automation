@@ -19,6 +19,7 @@ interface ProWorkflowNodeProps {
   onSelect: (blockId: string | null) => void;
   onDoubleClick?: (blockId: string) => void;
   onDragStart?: (blockId: string, e: React.MouseEvent) => void;
+  onConnectionStart?: (blockId: string, handleType: 'input' | 'output', e: React.MouseEvent) => void;
   zoom: number;
 }
 
@@ -56,6 +57,7 @@ function ProWorkflowNodeComponent({
   onSelect,
   onDoubleClick,
   onDragStart,
+  onConnectionStart,
 }: ProWorkflowNodeProps) {
   // Support both legacy and N8N block types
   const legacyDef = BLOCK_DEFINITIONS[block.type as keyof typeof BLOCK_DEFINITIONS];
@@ -159,18 +161,32 @@ function ProWorkflowNodeComponent({
         <div 
           className={cn(
             "absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2",
-            "w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-gray-300",
-            "transition-all group-hover:border-gray-400 group-hover:scale-110"
+            "w-3 h-3 rounded-full bg-white border-2 border-gray-300",
+            "transition-all cursor-crosshair",
+            "hover:border-blue-500 hover:bg-blue-100 hover:scale-125",
+            "active:scale-110"
           )}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            onConnectionStart?.(block.id, 'input', e);
+          }}
+          title="Drop une connexion ici"
         />
         
         {/* Output handle - right center */}
         <div 
           className={cn(
             "absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2",
-            "w-2.5 h-2.5 rounded-full bg-white border-[1.5px] border-gray-300",
-            "transition-all group-hover:border-gray-400 group-hover:scale-110"
+            "w-3 h-3 rounded-full bg-white border-2 border-gray-300",
+            "transition-all cursor-crosshair",
+            "hover:border-green-500 hover:bg-green-100 hover:scale-125",
+            "active:scale-110"
           )}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            onConnectionStart?.(block.id, 'output', e);
+          }}
+          title="Glisse pour créer une connexion"
         />
 
         {/* Error indicator */}
