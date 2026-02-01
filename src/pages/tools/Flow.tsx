@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { formatDistanceToNow, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +48,14 @@ interface HistoryState {
   blocks: WorkflowBlock[];
   connections: BlockConnection[];
 }
+
+const formatRelativeDate = (dateStr: string) => {
+  return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: fr });
+};
+
+const formatDate = (dateStr: string) => {
+  return format(new Date(dateStr), 'd MMMM', { locale: fr });
+};
 
 export default function Flow() {
   const { workflows, loading, createWorkflow, updateWorkflow, deleteWorkflow, duplicateWorkflow } = useWorkflows();
@@ -596,11 +606,9 @@ export default function Flow() {
                                   <h4 className="font-semibold text-foreground text-sm leading-tight truncate" title={workflow.name}>
                                     {workflow.name}
                                   </h4>
-                                  {workflow.description && (
-                                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1" title={workflow.description}>
-                                      {workflow.description}
-                                    </p>
-                                  )}
+                                  <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                    {formatRelativeDate(workflow.updated_at)} · Créé le {formatDate(workflow.created_at)}
+                                  </p>
                                 </div>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger
