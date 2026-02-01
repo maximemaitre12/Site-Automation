@@ -1,4 +1,5 @@
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat-stream`;
+const CONFIDENTIAL_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat-confidential`;
 
 export interface AIMessage {
   role: 'user' | 'assistant' | 'system';
@@ -17,6 +18,7 @@ export interface StreamAIChatOptions {
   systemPrompt?: string;
   userId?: string;
   attachments?: Attachment[];
+  confidentialMode?: boolean;
   onDelta: (deltaText: string) => void;
   onDone: () => void;
   onError?: (error: Error) => void;
@@ -28,13 +30,17 @@ export async function streamAIChat({
   systemPrompt,
   userId,
   attachments,
+  confidentialMode = false,
   onDelta,
   onDone,
   onError,
   abortSignal,
 }: StreamAIChatOptions) {
   try {
-    const resp = await fetch(CHAT_URL, {
+    // Use confidential endpoint when mode is enabled
+    const endpoint = confidentialMode ? CONFIDENTIAL_CHAT_URL : CHAT_URL;
+    
+    const resp = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

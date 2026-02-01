@@ -2,15 +2,17 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2 } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2, Shield } from "lucide-react";
 import { detectIntent } from "@/lib/intent-detector";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
+import { useConfidentialMode } from "@/hooks/useConfidentialMode";
 import { ChatMessage } from "@/components/brain/ChatMessage";
 import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { UniversalSearch } from "@/components/brain/UniversalSearch";
 import { KnowledgeHubPanel } from "@/components/brain/KnowledgeHubPanel";
+import { ConfidentialModeToggle } from "@/components/brain/ConfidentialModeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -45,6 +47,7 @@ export default function BrainPage() {
     addMessageWithoutAI
   } = useBrain();
   const { toast } = useToast();
+  const { confidentialMode, toggleConfidentialMode, logConversationEvent } = useConfidentialMode();
 
   const [message, setMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,7 +171,15 @@ export default function BrainPage() {
     setMessage("");
     setAttachments([]);
     
-    await sendMessage(msg, undefined, { attachments: currentAttachments.length > 0 ? currentAttachments : undefined });
+    // Log message event for audit trail
+    if (currentConversation?.id) {
+      logConversationEvent('MESSAGE_SENT', currentConversation.id, { has_attachments: currentAttachments.length > 0 });
+    }
+    
+    await sendMessage(msg, undefined, { 
+      attachments: currentAttachments.length > 0 ? currentAttachments : undefined,
+      confidentialMode 
+    });
   };
 
   const handleGenerateImage = async (prompt: string, type: 'image' | 'chart') => {
@@ -500,9 +511,26 @@ export default function BrainPage() {
               )}
 
               {/* Main input container */}
-              <div className="bg-secondary/80 backdrop-blur-xl rounded-2xl border border-border/50 shadow-lg overflow-hidden">
+              <div className={cn(
+                "bg-secondary/80 backdrop-blur-xl rounded-2xl border shadow-lg overflow-hidden transition-all",
+                confidentialMode ? "border-emerald-500/30 ring-1 ring-emerald-500/20" : "border-border/50"
+              )}>
+                {/* Confidential mode indicator */}
+                {confidentialMode && (
+                  <div className="px-3 py-1.5 bg-emerald-500/10 border-b border-emerald-500/20 flex items-center justify-center gap-2">
+                    <Shield className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-xs font-medium text-emerald-500">Mode Confidentiel activé - Aucune donnée externe</span>
+                  </div>
+                )}
                 {/* Input row */}
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
+                  {/* Confidential mode toggle */}
+                  <ConfidentialModeToggle 
+                    enabled={confidentialMode} 
+                    onToggle={toggleConfidentialMode}
+                    compact
+                  />
+                  
                   {/* File attach button */}
                   <input
                     type="file"
