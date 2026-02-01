@@ -531,82 +531,104 @@ export default function Flow() {
                   </div>
                 </div>
               ) : (
-                <div className="flex-1 flex flex-col p-4 md:p-8 overflow-auto">
-                  {/* Hero Section */}
-                  <div className="text-center mb-6 md:mb-8">
-                    <div className="w-14 h-14 md:w-20 md:h-20 rounded-2xl bg-agent-flow/10 border border-agent-flow/20 flex items-center justify-center mb-3 md:mb-4 mx-auto">
-                      <WorkflowIcon className="w-7 h-7 md:w-10 md:h-10 text-agent-flow" />
-                    </div>
-                    <h2 className="text-base md:text-xl font-semibold text-foreground mb-1 md:mb-2">AETHER Flow</h2>
-                    <p className="text-muted-foreground max-w-md mb-4 md:mb-6 text-xs md:text-base mx-auto">Créez des workflows automatisés pour orchestrer vos processus métier</p>
-                    <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 md:gap-3">
-                      <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-agent-flow hover:bg-agent-flow/90 text-xs md:text-sm h-9 md:h-10">
-                        <Plus className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
-                        Nouveau
-                      </Button>
-                      <Button variant="outline" onClick={() => setIsAIGeneratorOpen(true)} className="text-xs md:text-sm h-9 md:h-10">
-                        <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
-                        Générer IA
-                      </Button>
-                      <Button variant="outline" onClick={() => setIsTemplateGalleryOpen(true)} className="text-xs md:text-sm h-9 md:h-10">
-                        <LayoutTemplate className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" />
-                        Templates
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Workflows List */}
-                  {loading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <Loader2 className="w-8 h-8 animate-spin text-agent-flow" />
-                    </div>
-                  ) : workflows.length > 0 && (
-                    <div className="max-w-4xl mx-auto w-full">
-                      <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">Vos workflows ({workflows.length})</h3>
-                      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                        {workflows.map((workflow) => (
-                          <div
-                            key={workflow.id}
-                            onClick={() => handleSelectWorkflow(workflow.id)}
-                            className="p-4 rounded-xl bg-card border border-border hover:border-agent-flow/40 hover:shadow-md transition-all cursor-pointer group"
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-agent-flow/10 flex items-center justify-center">
-                                  <WorkflowIcon className="w-4 h-4 text-agent-flow" />
-                                </div>
-                                <span className="font-medium text-foreground text-sm truncate">{workflow.name}</span>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger
-                                  asChild
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <MoreVertical className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicateWorkflow(workflow); }}>
-                                    <Copy className="w-4 h-4 mr-2" />Dupliquer
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); setWorkflowToDelete(workflow.id); setDeleteDialogOpen(true); }}>
-                                    <Trash2 className="w-4 h-4 mr-2" />Supprimer
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className={`px-2 py-0.5 rounded-full ${workflow.is_active ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'}`}>
-                                {workflow.is_active ? 'Actif' : 'Pausé'}
-                              </span>
-                              <span className="text-muted-foreground">{workflow.blocks?.length || 0} blocs</span>
-                            </div>
-                          </div>
-                        ))}
+                <div className="flex-1 overflow-y-auto">
+                  <div className="p-6 md:p-8 pb-12">
+                    {/* Hero Section */}
+                    <div className="text-center mb-8 md:mb-10">
+                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-agent-flow/20 to-agent-flow/5 border border-agent-flow/20 flex items-center justify-center mb-4 mx-auto shadow-lg shadow-agent-flow/10">
+                        <WorkflowIcon className="w-8 h-8 md:w-10 md:h-10 text-agent-flow" />
+                      </div>
+                      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">AETHER Flow</h2>
+                      <p className="text-muted-foreground max-w-lg mb-6 text-sm md:text-base mx-auto leading-relaxed">
+                        Créez des workflows automatisés pour orchestrer vos processus métier
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-3">
+                        <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-agent-flow hover:bg-agent-flow/90 text-sm h-10 px-5 shadow-md shadow-agent-flow/20">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Nouveau
+                        </Button>
+                        <Button variant="outline" onClick={() => setIsAIGeneratorOpen(true)} className="text-sm h-10 px-5">
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Générer IA
+                        </Button>
+                        <Button variant="outline" onClick={() => setIsTemplateGalleryOpen(true)} className="text-sm h-10 px-5">
+                          <LayoutTemplate className="w-4 h-4 mr-2" />
+                          Templates
+                        </Button>
                       </div>
                     </div>
-                  )}
+
+                    {/* Workflows List */}
+                    {loading ? (
+                      <div className="flex items-center justify-center py-16">
+                        <Loader2 className="w-8 h-8 animate-spin text-agent-flow" />
+                      </div>
+                    ) : workflows.length > 0 ? (
+                      <div className="max-w-5xl mx-auto">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-base font-semibold text-foreground">
+                            Vos workflows
+                            <span className="ml-2 text-sm font-normal text-muted-foreground">({workflows.length})</span>
+                          </h3>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                          {workflows.map((workflow) => (
+                            <div
+                              key={workflow.id}
+                              onClick={() => handleSelectWorkflow(workflow.id)}
+                              className="p-4 rounded-xl bg-card border border-border hover:border-agent-flow/50 hover:shadow-lg hover:shadow-agent-flow/5 transition-all cursor-pointer group"
+                            >
+                              <div className="flex items-start gap-3 mb-3">
+                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-agent-flow/20 to-agent-flow/5 flex items-center justify-center flex-shrink-0">
+                                  <WorkflowIcon className="w-5 h-5 text-agent-flow" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-foreground text-sm leading-tight truncate" title={workflow.name}>
+                                    {workflow.name}
+                                  </h4>
+                                  {workflow.description && (
+                                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1" title={workflow.description}>
+                                      {workflow.description}
+                                    </p>
+                                  )}
+                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger
+                                    asChild
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicateWorkflow(workflow); }}>
+                                      <Copy className="w-4 h-4 mr-2" />Dupliquer
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive" onClick={(e) => { e.stopPropagation(); setWorkflowToDelete(workflow.id); setDeleteDialogOpen(true); }}>
+                                      <Trash2 className="w-4 h-4 mr-2" />Supprimer
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${workflow.is_active ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'}`}>
+                                  {workflow.is_active ? 'Actif' : 'Pausé'}
+                                </span>
+                                <span className="text-xs text-muted-foreground">{workflow.blocks?.length || 0} blocs</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <Zap className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                        <p className="text-muted-foreground">Aucun workflow créé</p>
+                        <p className="text-sm text-muted-foreground/70 mt-1">Commencez par créer votre premier workflow</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
