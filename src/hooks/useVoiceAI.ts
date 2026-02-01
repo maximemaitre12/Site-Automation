@@ -7,7 +7,7 @@ interface UseVoiceAIOptions {
 }
 
 export function useVoiceAI(options: UseVoiceAIOptions = {}) {
-  const { defaultVoiceId = 'FvmvwvObRqIHojkEGh5N' } = options; // Adina - French young female voice
+  const { defaultVoiceId = 'AmMsHJaCw4BtwV3KoUXF' } = options; // Nicolas Petit - French male voice
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
