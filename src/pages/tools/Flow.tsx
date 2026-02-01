@@ -513,8 +513,8 @@ export default function Flow() {
                   
                   {/* Pro Canvas V2 - N8N Style */}
                   <div className="flex-1 flex overflow-hidden min-h-0 workflow-canvas-area" style={{ minHeight: '500px' }}>
-                    {/* Canvas (full-width) + overlay panels */}
-                    <div className="flex-1 overflow-hidden min-h-0 relative">
+                    {/* Canvas */}
+                    <div className="flex-1 min-w-0 overflow-hidden min-h-0">
                       <ProCanvasV2
                         blocks={localBlocks}
                         connections={localConnections}
@@ -537,22 +537,6 @@ export default function Flow() {
                         onAddBlock={() => setIsPaletteOpen(!isPaletteOpen)}
                         fitViewKey={selectedWorkflowId ? `${selectedWorkflowId}:${fitViewNonce}` : null}
                       />
-
-                      {/* AI Assistant Panel overlays the canvas so toolbars stay visible */}
-                      {isAIAssistantOpen && !isPaletteOpen && (
-                        <div className="absolute inset-y-0 right-0 z-10">
-                          <FlowAIAssistant
-                            isOpen={isAIAssistantOpen}
-                            onClose={() => setIsAIAssistantOpen(false)}
-                            blocks={localBlocks}
-                            connections={localConnections}
-                            workflowId={selectedWorkflow.id}
-                            workflowName={selectedWorkflow.name}
-                            onGenerateWorkflow={handleAIGenerate}
-                            onModifyWorkflow={handleAIModify}
-                          />
-                        </div>
-                      )}
                     </div>
 
                     {/* Block Palette - N8N Style (slide in from right) */}
@@ -560,6 +544,20 @@ export default function Flow() {
                       <BlockPaletteN8N
                         onAddBlock={handleAddBlock}
                         className="flex-shrink-0"
+                      />
+                    )}
+
+                    {/* AI Assistant Panel - Same slot as properties panel (right side, not overlay) */}
+                    {isAIAssistantOpen && !isPaletteOpen && (
+                      <FlowAIAssistant
+                        isOpen={isAIAssistantOpen}
+                        onClose={() => setIsAIAssistantOpen(false)}
+                        blocks={localBlocks}
+                        connections={localConnections}
+                        workflowId={selectedWorkflow.id}
+                        workflowName={selectedWorkflow.name}
+                        onGenerateWorkflow={handleAIGenerate}
+                        onModifyWorkflow={handleAIModify}
                       />
                     )}
 
