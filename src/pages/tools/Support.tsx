@@ -111,15 +111,11 @@ export default function Support() {
     );
   }
 
-  const headerActions = (
-    <span className="text-lg font-semibold text-foreground flex items-center gap-2">
-      <Headphones className="w-5 h-5 text-agent-support" />
-      Aether Support
-    </span>
-  );
-
   return (
-    <DashboardLayout headerActions={headerActions}>
+    <DashboardLayout>
+      {/* Spacing below header */}
+      <div className="h-3 shrink-0" />
+      
       <div className={cn(
         "h-full flex flex-col bg-gradient-to-b from-background to-background/95",
         tickets.length === 0 ? "overflow-hidden" : "overflow-hidden"
