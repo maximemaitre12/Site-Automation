@@ -62,7 +62,7 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
 
   return (
     <div className={cn(
-      "flex gap-4 group animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
+      "flex gap-3 group",
       role === 'user' ? "flex-row-reverse" : ""
     )}>
       {/* Avatar */}
@@ -161,14 +161,12 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
           
           {/* Thinking state when no content yet */}
           {isStreaming && !textContent && !generatedImageUrl && (
-            <div className="flex items-center gap-3 py-2">
-              <div className="relative">
-                <div className="w-6 h-6 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-foreground">Je réfléchis...</span>
-                <span className="text-xs text-muted-foreground">Analyse de votre demande en cours</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="flex gap-1">
+                <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
+                <span className="w-1.5 h-1.5 bg-violet-500/70 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 bg-violet-500/50 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+              </span>
             </div>
           )}
 
@@ -196,17 +194,6 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             </div>
           )}
 
-          {/* Minimal streaming indicator */}
-          {isStreaming && textContent && (
-            <div className="flex items-center gap-1.5 mt-2 text-violet-500/70">
-              <span className="text-xs">En train d'écrire</span>
-              <span className="flex gap-0.5">
-                <span className="w-1 h-1 bg-violet-500/70 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1 h-1 bg-violet-500/70 rounded-full animate-bounce" style={{ animationDelay: '100ms' }} />
-                <span className="w-1 h-1 bg-violet-500/70 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
-              </span>
-            </div>
-          )}
           
           {/* Action Buttons for Assistant - positioned at bottom */}
           {role === 'assistant' && !isStreaming && textContent && (
