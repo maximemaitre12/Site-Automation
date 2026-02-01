@@ -111,22 +111,19 @@ export default function Support() {
     );
   }
 
+  const headerActions = (
+    <span className="text-lg font-semibold text-foreground flex items-center gap-2">
+      <Headphones className="w-5 h-5 text-agent-support" />
+      Aether Support
+    </span>
+  );
+
   return (
-    <DashboardLayout>
-      <div className="h-full flex flex-col overflow-hidden bg-gradient-to-b from-background to-background/95">
-        {/* Modern Header */}
-        <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-agent-support/20 to-agent-support/5 border border-agent-support/20 flex items-center justify-center shrink-0 shadow-lg shadow-agent-support/10">
-                <Headphones className="w-6 h-6 md:w-7 md:h-7 text-agent-support" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-xl md:text-2xl font-bold text-foreground">Aether Support</h1>
-              </div>
-            </div>
-          </div>
-        </header>
+    <DashboardLayout headerActions={headerActions}>
+      <div className={cn(
+        "h-full flex flex-col bg-gradient-to-b from-background to-background/95",
+        tickets.length === 0 ? "overflow-hidden" : "overflow-hidden"
+      )}>
 
         {/* Stats Cards */}
         <div className="px-4 md:px-8 pb-4">
@@ -181,12 +178,16 @@ export default function Support() {
       </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden px-4 md:px-8">
+        <div className={cn(
+          "flex-1 flex px-4 md:px-8",
+          tickets.length > 0 ? "overflow-hidden" : "overflow-visible"
+        )}>
           <div className="max-w-6xl mx-auto w-full flex gap-6">
             {/* Tickets List */}
             <div 
               className={cn(
-                "flex-1 overflow-y-auto pb-6",
+                "flex-1 pb-6",
+                tickets.length > 0 ? "overflow-y-auto" : "overflow-visible",
                 selectedTicket && "hidden md:block md:w-1/2"
               )}
               onClick={(e) => {
