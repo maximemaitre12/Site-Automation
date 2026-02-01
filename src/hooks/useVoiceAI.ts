@@ -7,7 +7,7 @@ interface UseVoiceAIOptions {
 }
 
 export function useVoiceAI(options: UseVoiceAIOptions = {}) {
-  const { defaultVoiceId = 'AmMsHJaCw4BtwV3KoUXF' } = options; // Nicolas Petit - French male voice
+  const { defaultVoiceId = 'onwK4e9ZLuTAKqWW03F9' } = options; // Daniel - Standard multilingual male voice
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
