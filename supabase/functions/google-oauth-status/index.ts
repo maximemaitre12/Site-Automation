@@ -27,18 +27,17 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } }
     });
 
-    // Use getClaims for better JWT validation
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
-      console.error('Auth error:', claimsError?.message || 'No claims');
+    // Use getUser for standard JWT validation
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error:', authError?.message || 'No user');
       return new Response(
         JSON.stringify({ error: 'unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const userId = claimsData.claims.sub;
+    const userId = user.id;
 
     // No longer check for platform-level configuration since users provide their own credentials
     // configured is always true in this new model
