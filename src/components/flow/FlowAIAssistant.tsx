@@ -293,12 +293,10 @@ Réponds de façon concise et utile en français.`;
     textareaRef.current?.focus();
   };
 
-  if (!isOpen) return null;
-
   return (
     <div className={cn(
-      "w-80 md:w-96 h-full border-r border-border bg-background flex flex-col",
-      "animate-in slide-in-from-left-full duration-200"
+      "w-80 md:w-96 h-full border-r border-border bg-background flex flex-col flex-shrink-0",
+      "animate-in slide-in-from-left duration-200"
     )}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/50">
