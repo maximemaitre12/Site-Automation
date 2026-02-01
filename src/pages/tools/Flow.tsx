@@ -19,7 +19,7 @@ import { NodePropertiesPanel } from '@/components/flow/panels/NodePropertiesPane
 import { autoLayoutBlocks, applyLayoutToBlocks, suggestNewBlockPosition } from '@/lib/workflow-layout';
 import { 
   Plus, Workflow as WorkflowIcon, Save, Trash2, Copy, 
-  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2, Bot, LayoutGrid, Home
+  Loader2, MoreVertical, Sparkles, LayoutTemplate, Zap, Undo2, Redo2, Bot, LayoutGrid, Home, Pencil
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -60,6 +60,9 @@ export default function Flow() {
   const [newWorkflowDesc, setNewWorkflowDesc] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [workflowToRename, setWorkflowToRename] = useState<{id: string, name: string} | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [localBlocks, setLocalBlocks] = useState<WorkflowBlock[]>([]);
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -263,6 +266,17 @@ export default function Flow() {
     setLocalBlocks(layoutedBlocks);
     setLocalConnections(connections);
     toast.success('Workflow modifié par l\'IA');
+  };
+
+  const handleRenameWorkflow = async () => {
+    if (!workflowToRename || !renameValue.trim()) return;
+    const success = await updateWorkflow(workflowToRename.id, { name: renameValue.trim() });
+    if (success) {
+      toast.success('Workflow renommé');
+    }
+    setRenameDialogOpen(false);
+    setWorkflowToRename(null);
+    setRenameValue('');
   };
 
   const handleTemplateSelect = async (blocks: WorkflowBlock[], name: string, description: string) => {
@@ -598,6 +612,9 @@ export default function Flow() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setWorkflowToRename({id: workflow.id, name: workflow.name}); setRenameValue(workflow.name); setRenameDialogOpen(true); }}>
+                                      <Pencil className="w-4 h-4 mr-2" />Renommer
+                                    </DropdownMenuItem>
                                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleDuplicateWorkflow(workflow); }}>
                                       <Copy className="w-4 h-4 mr-2" />Dupliquer
                                     </DropdownMenuItem>
@@ -607,10 +624,7 @@ export default function Flow() {
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </div>
-                              <div className="flex items-center justify-between">
-                                <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${workflow.is_active ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'}`}>
-                                  {workflow.is_active ? 'Actif' : 'Pausé'}
-                                </span>
+                              <div className="flex items-center justify-end">
                                 <span className="text-xs text-muted-foreground">{workflow.blocks?.length || 0} blocs</span>
                               </div>
                             </div>
@@ -684,19 +698,41 @@ export default function Flow() {
       />
 
 
+      {/* Rename Dialog */}
+      <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Renommer le workflow</DialogTitle>
+            <DialogDescription>Entrez un nouveau nom pour ce workflow</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              placeholder="Nom du workflow"
+              onKeyDown={(e) => e.key === 'Enter' && handleRenameWorkflow()}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setRenameDialogOpen(false)}>Annuler</Button>
+            <Button onClick={handleRenameWorkflow} className="bg-[hsl(var(--agent-flow))] hover:bg-[hsl(var(--agent-flow))]/90">Renommer</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Confirmation */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Workflow?</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer le workflow ?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the workflow and all its data.
+              Cette action est irréversible. Le workflow et toutes ses données seront supprimés définitivement.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteWorkflow} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+              Supprimer
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
