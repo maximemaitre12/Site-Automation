@@ -40,47 +40,24 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
     document.body.removeChild(link);
   };
 
-  // Format text with proper markdown-like styling
+  // Format text naturally without markdown artifacts
   const formatContent = (text: string) => {
-    return text.split('\n').map((line, i) => {
-      // Handle headers
-      if (line.startsWith('### ')) {
-        return <h3 key={i} className="text-base font-semibold mt-4 mb-2">{line.slice(4)}</h3>;
-      }
-      if (line.startsWith('## ')) {
-        return <h2 key={i} className="text-lg font-semibold mt-4 mb-2">{line.slice(3)}</h2>;
-      }
-      if (line.startsWith('# ')) {
-        return <h1 key={i} className="text-xl font-bold mt-4 mb-2">{line.slice(2)}</h1>;
-      }
-      // Handle bullet points
-      if (line.startsWith('- ') || line.startsWith('• ')) {
-        return (
-          <li key={i} className="ml-4 list-disc list-inside">
-            {line.slice(2)}
-          </li>
-        );
-      }
-      // Handle numbered lists
-      const numberedMatch = line.match(/^(\d+)\.\s/);
-      if (numberedMatch) {
-        return (
-          <li key={i} className="ml-4 list-decimal list-inside">
-            {line.slice(numberedMatch[0].length)}
-          </li>
-        );
-      }
-      // Handle bold text
-      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      // Regular paragraph
-      return (
-        <p 
-          key={i} 
-          className={cn("mb-1.5 last:mb-0 leading-relaxed", !line && "h-3")}
-          dangerouslySetInnerHTML={{ __html: formattedLine || '&nbsp;' }}
-        />
-      );
-    });
+    // Clean any remaining markdown artifacts
+    const cleanText = text
+      .replace(/\*\*/g, '')  // Remove bold markers
+      .replace(/\*/g, '')    // Remove italic markers
+      .replace(/^#+\s/gm, '') // Remove header markers
+      .replace(/^[-•]\s/gm, '') // Remove bullet markers
+      .trim();
+
+    return cleanText.split('\n').map((line, i) => (
+      <p 
+        key={i} 
+        className={cn("mb-2 last:mb-0 leading-relaxed", !line.trim() && "h-2")}
+      >
+        {line || '\u00A0'}
+      </p>
+    ));
   };
 
   return (
