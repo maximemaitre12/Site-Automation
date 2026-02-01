@@ -427,30 +427,30 @@ export default function BrainPage() {
         >
 
           {/* Chat Messages */}
-          <ScrollArea className="flex-1 min-h-0 px-4 md:px-6 py-6">
+          <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
             {!currentConversation && conversations.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center px-4 py-20">
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-6 shadow-lg shadow-agent-brain/20">
-                  <Database className="w-10 h-10 md:w-12 md:h-12 text-white" />
+              <div className="flex flex-col items-center justify-center text-center px-4 py-8">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-4 shadow-lg shadow-agent-brain/20">
+                  <Database className="w-8 h-8 md:w-10 md:h-10 text-white" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
                   <span>Aether</span>
                   <span className="text-agent-brain ml-1">Brain</span>
                 </h2>
-                <p className="text-muted-foreground max-w-md text-base md:text-lg">
+                <p className="text-muted-foreground max-w-md text-sm md:text-base">
                   Votre assistant IA intelligent. Posez des questions, analysez des documents, ou générez des images.
                 </p>
               </div>
             ) : !currentConversation ? (
-              <div className="h-full flex flex-col items-center justify-center text-center px-4 py-20">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-6 shadow-lg">
-                  <Database className="w-10 h-10 text-white" />
+              <div className="flex flex-col items-center justify-center text-center px-4 py-8">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-agent-brain to-agent-brain/60 flex items-center justify-center mb-4 shadow-lg">
+                  <Database className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-xl font-semibold text-foreground mb-2">Nouvelle conversation</h2>
-                <p className="text-muted-foreground">Commencez à discuter ou sélectionnez une conversation.</p>
+                <h2 className="text-lg font-semibold text-foreground mb-2">Nouvelle conversation</h2>
+                <p className="text-muted-foreground text-sm">Commencez à discuter ou sélectionnez une conversation.</p>
               </div>
             ) : (
-              <div className="space-y-4 max-w-3xl mx-auto pb-4">
+              <div className="space-y-4 max-w-3xl mx-auto py-4">
                 {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
                   <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
                 ))}
