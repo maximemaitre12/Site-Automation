@@ -80,23 +80,85 @@ function PresentationPreview({ presentation, onDownload, onDelete, complianceSta
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Slide Preview */}
+        {/* Slide Preview - Enhanced to show sections/stats/timeline */}
         {slides.length > 0 && (
           <div className="border border-border rounded-lg overflow-hidden">
-            <div className="bg-secondary/50 p-4 min-h-[200px]">
-              <Badge variant="outline" className="mb-2 text-xs">
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-4 min-h-[220px] text-white">
+              <Badge variant="outline" className="mb-2 text-xs border-agent-sales/50 text-agent-sales">
                 {getSlideTypeLabel(slides[currentSlide]?.type)}
               </Badge>
               <h3 className="text-lg font-semibold mb-2">{slides[currentSlide]?.title}</h3>
-              {slides[currentSlide]?.content && (
-                <p className="text-sm text-muted-foreground mb-3">{slides[currentSlide].content}</p>
+              
+              {/* Subtitle */}
+              {slides[currentSlide]?.subtitle && (
+                <p className="text-sm text-slate-400 mb-3 italic">{slides[currentSlide].subtitle}</p>
               )}
-              {slides[currentSlide]?.bullets && slides[currentSlide].bullets!.length > 0 && (
+              
+              {/* Content */}
+              {slides[currentSlide]?.content && (
+                <p className="text-sm text-slate-300 mb-3">{slides[currentSlide].content}</p>
+              )}
+              
+              {/* Sections - multi-column layout */}
+              {slides[currentSlide]?.sections && slides[currentSlide].sections!.length > 0 && (
+                <div className={`grid gap-3 mb-3 ${slides[currentSlide].sections!.length === 1 ? 'grid-cols-1' : slides[currentSlide].sections!.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                  {slides[currentSlide].sections!.slice(0, 3).map((section, sIdx) => (
+                    <div key={sIdx} className="bg-slate-800/50 rounded p-2">
+                      <p className="text-xs font-bold text-agent-sales uppercase mb-1 truncate">{section.heading}</p>
+                      <ul className="text-xs space-y-0.5">
+                        {section.points.slice(0, 3).map((point, pIdx) => (
+                          <li key={pIdx} className="text-slate-300 truncate">• {point}</li>
+                        ))}
+                        {section.points.length > 3 && (
+                          <li className="text-slate-500 text-xs">+{section.points.length - 3} autres...</li>
+                        )}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Stats grid */}
+              {slides[currentSlide]?.stats && slides[currentSlide].stats!.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {slides[currentSlide].stats!.slice(0, 4).map((stat, sIdx) => (
+                    <div key={sIdx} className="bg-slate-800/60 border border-agent-sales/30 rounded p-2 text-center">
+                      <p className="text-lg font-bold text-agent-sales">{stat.value}</p>
+                      <p className="text-xs text-slate-300 truncate">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Timeline */}
+              {slides[currentSlide]?.timeline && slides[currentSlide].timeline!.length > 0 && (
+                <div className="flex gap-2 mb-3 overflow-x-auto">
+                  {slides[currentSlide].timeline!.slice(0, 4).map((phase, tIdx) => (
+                    <div key={tIdx} className="bg-slate-800/60 border border-agent-sales/30 rounded p-2 min-w-[120px]">
+                      <div className="flex items-center gap-1 mb-1">
+                        <span className="w-5 h-5 rounded-full bg-agent-sales text-white text-xs flex items-center justify-center font-bold">{tIdx + 1}</span>
+                        <span className="text-xs text-amber-400">{phase.duration}</span>
+                      </div>
+                      <p className="text-xs font-medium truncate">{phase.phase}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Bullets fallback */}
+              {slides[currentSlide]?.bullets && slides[currentSlide].bullets!.length > 0 && !slides[currentSlide]?.sections && (
                 <ul className="list-disc list-inside text-sm space-y-1">
-                  {slides[currentSlide].bullets!.map((bullet, i) => (
-                    <li key={i} className="text-muted-foreground">{bullet}</li>
+                  {slides[currentSlide].bullets!.slice(0, 5).map((bullet, i) => (
+                    <li key={i} className="text-slate-300">{bullet}</li>
                   ))}
                 </ul>
+              )}
+              
+              {/* Key message */}
+              {slides[currentSlide]?.keyMessage && (
+                <div className="mt-3 p-2 bg-agent-sales/20 border-l-2 border-agent-sales rounded-r">
+                  <p className="text-xs text-slate-200">→ {slides[currentSlide].keyMessage}</p>
+                </div>
               )}
             </div>
             <div className="flex items-center justify-between p-2 bg-muted/50 border-t border-border">

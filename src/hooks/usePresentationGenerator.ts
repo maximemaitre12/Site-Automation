@@ -4,11 +4,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { callAI } from '@/lib/ai';
 import { useToast } from '@/hooks/use-toast';
 import PptxGenJS from 'pptxgenjs';
+import { repairPresentationJson, tryCompleteJSON } from '@/lib/pptx-repair';
 import {
-  StyleType,
-  applyMasterStyles,
-} from '@/lib/pptx-templates';
-import { buildPremiumPresentation } from '@/lib/pptx-builder';
+  applyFuturisticStyles,
+  buildTitleSlide,
+  buildSectionSlide,
+  buildProofSlide,
+  buildRoadmapSlide,
+  buildCTASlide,
+  type FuturisticStyle,
+  type FuturisticPalette,
+} from '@/lib/pptx-futuristic';
 
 export interface PresentationSlide {
   type: 'title' | 'executive_summary' | 'context' | 'problem' | 'solution' | 'benefits' | 'proof' | 'financials' | 'roadmap' | 'risks' | 'team' | 'cta' | 'contact' | 'appendix';
@@ -299,13 +305,20 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
       let presentationData: PresentationData;
       try {
-        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+        // Try to extract and repair JSON
+        let jsonString = response.content;
+        const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
         if (!jsonMatch) throw new Error('JSON non trouvé');
-        presentationData = JSON.parse(jsonMatch[0]);
         
-        if (presentationData.slides.length > slideCount) {
-          presentationData.slides = presentationData.slides.slice(0, slideCount);
-        }
+        // Complete truncated JSON if needed
+        jsonString = tryCompleteJSON(jsonMatch[0]);
+        
+        const rawData = JSON.parse(jsonString);
+        
+        // Repair and validate the presentation data
+        presentationData = repairPresentationJson(rawData, slideCount);
+        
+        console.log(`Generated ${presentationData.slides.length} slides (requested: ${slideCount})`);
       } catch (e) {
         console.error('Parse error:', e);
         throw new Error('Erreur de parsing de la présentation générée');
@@ -359,24 +372,82 @@ RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
     try {
       const pptx = new PptxGenJS();
-      const styleKey = (presentation.style || 'professional') as StyleType;
-      const colors = applyMasterStyles(pptx, styleKey);
+      const styleKey = (presentation.style || 'professional') as FuturisticStyle;
+      const colors = applyFuturisticStyles(pptx, styleKey);
       
       pptx.title = presentation.title;
       pptx.subject = `Présentation stratégique pour ${presentation.client_name}`;
       pptx.author = 'AETHER Sales Intelligence';
 
       const data = presentation.presentation_json as PresentationData;
+      const totalSlides = data.slides.length;
+      const clientName = presentation.client_name || 'Client';
       
-      // Use the premium builder
-      buildPremiumPresentation(pptx, colors, data, presentation.client_name || '');
+      // Build each slide using futuristic templates
+      data.slides.forEach((slideData, index) => {
+        const slideNum = index + 1;
+        
+        switch (slideData.type) {
+          case 'title':
+            buildTitleSlide(pptx, colors, slideData.title, slideData.subtitle || '', clientName, slideData.keyMessage);
+            break;
+            
+          case 'proof':
+          case 'financials':
+            buildProofSlide(
+              pptx, colors, slideData.title,
+              slideData.stats || [],
+              slideData.testimonial,
+              slideData.keyMessage,
+              slideNum, totalSlides
+            );
+            break;
+            
+          case 'roadmap':
+            buildRoadmapSlide(
+              pptx, colors, slideData.title,
+              slideData.timeline || [],
+              slideData.sections,
+              slideData.keyMessage,
+              slideNum, totalSlides
+            );
+            break;
+            
+          case 'cta':
+            buildCTASlide(
+              pptx, colors, slideData.title,
+              slideData.sections,
+              slideData.keyMessage,
+              slideData.content,
+              slideNum, totalSlides
+            );
+            break;
+            
+          case 'executive_summary':
+          case 'context':
+          case 'problem':
+          case 'solution':
+          case 'benefits':
+          case 'risks':
+          case 'team':
+          case 'appendix':
+          default:
+            buildSectionSlide(
+              pptx, colors, slideData.title, slideData.subtitle,
+              slideData.sections || [],
+              slideData.keyMessage,
+              slideNum, totalSlides
+            );
+            break;
+        }
+      });
 
       const fileName = `${presentation.title.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pptx`;
       await pptx.writeFile({ fileName });
 
       toast({
         title: 'Téléchargement réussi',
-        description: `Présentation stratégique téléchargée`
+        description: `Présentation stratégique téléchargée (${totalSlides} slides)`
       });
     } catch (error: any) {
       console.error('Error generating PPTX:', error);
