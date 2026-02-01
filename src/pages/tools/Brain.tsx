@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2 } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Plus, X, FileImage, File, StopCircle, Globe, Building2, Shield, ShieldAlert, Paperclip } from "lucide-react";
 import { detectIntent } from "@/lib/intent-detector";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
@@ -12,11 +12,10 @@ import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { UniversalSearch } from "@/components/brain/UniversalSearch";
 import { KnowledgeHubPanel } from "@/components/brain/KnowledgeHubPanel";
-import { ConfidentialModeToggle } from "@/components/brain/ConfidentialModeToggle";
 import { ConfidentialChatArea } from "@/components/brain/ConfidentialChatArea";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Attachment } from "@/lib/ai-stream";
@@ -322,16 +321,7 @@ export default function BrainPage() {
   }
 
   return (
-    <DashboardLayout
-      headerActions={
-        <ConfidentialModeToggle 
-          enabled={confidentialMode} 
-          onToggle={toggleConfidentialMode}
-          sessionTimeRemaining={confidentialMode ? getSessionTimeRemaining() : undefined}
-          compact
-        />
-      }
-    >
+    <DashboardLayout>
       <div className="h-full flex flex-col md:flex-row relative overflow-hidden">
         {/* Mobile toggle button */}
         <button
@@ -569,7 +559,7 @@ export default function BrainPage() {
               )}>
                 {/* Input row */}
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
-                  {/* File attach button */}
+                  {/* Plus button with menu */}
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -578,20 +568,55 @@ export default function BrainPage() {
                     accept="image/*,.txt,.md,.json,.csv"
                     className="hidden"
                   />
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className={cn(
+                          "shrink-0 p-2 rounded-lg transition-colors",
+                          confidentialMode 
+                            ? "text-red-500 hover:bg-red-500/10" 
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                        )}
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" align="start" className="w-56 p-2">
+                      <div className="space-y-1">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="shrink-0 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-background/50 transition-colors"
+                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors text-left"
                         >
-                          <Paperclip className="w-5 h-5" />
+                          <Paperclip className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">Joindre un fichier</span>
                         </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top">Joindre un fichier</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                        <button
+                          type="button"
+                          onClick={() => toggleConfidentialMode(!confidentialMode)}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left",
+                            confidentialMode 
+                              ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" 
+                              : "hover:bg-secondary"
+                          )}
+                        >
+                          {confidentialMode ? (
+                            <ShieldAlert className="w-4 h-4" />
+                          ) : (
+                            <Shield className="w-4 h-4 text-muted-foreground" />
+                          )}
+                          <div className="flex-1">
+                            <span className="text-sm">Mode Confidentiel</span>
+                            {confidentialMode && (
+                              <span className="ml-2 text-xs font-medium">ACTIF</span>
+                            )}
+                          </div>
+                        </button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                   
                   <input
                     value={message}
