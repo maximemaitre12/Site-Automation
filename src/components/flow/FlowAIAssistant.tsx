@@ -382,9 +382,9 @@ Réponds de façon concise et utile en français.`;
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Décrivez ce que vous voulez..."
-            className="min-h-[120px] max-h-[200px] resize-none bg-background text-sm"
+            className="min-h-[220px] max-h-[45vh] resize-none bg-background text-sm"
             disabled={isLoading}
-            rows={5}
+            rows={8}
           />
           <Button 
             size="icon" 
