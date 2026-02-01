@@ -138,6 +138,11 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
                   <span className="text-foreground">Aether</span>
                   <span className="text-agent-hr ml-1">HR</span>
                 </span>
+              ) : location.pathname === '/tools/sales' ? (
+                <span className="text-lg sm:text-xl font-bold tracking-tight">
+                  <span className="text-foreground">Aether</span>
+                  <span className="text-agent-sales ml-1">Sales</span>
+                </span>
               ) : (
                 <>
                   <AetherLogo size="md" className="sm:hidden" />
