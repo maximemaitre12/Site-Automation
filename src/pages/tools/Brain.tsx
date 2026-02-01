@@ -463,15 +463,12 @@ export default function BrainPage() {
         <div 
           className={cn(
             "flex-1 flex flex-col transition-colors min-w-0 overflow-hidden h-full",
-            isDragging && "bg-primary/5 ring-2 ring-primary ring-inset",
-            confidentialMode && "bg-red-500/[0.02]"
+            isDragging && "bg-primary/5 ring-2 ring-primary ring-inset"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          {/* Confidential Mode Banner */}
-          <ConfidentialBanner enabled={confidentialMode} />
 
           {/* Chat Messages - CONDITIONAL BASED ON MODE */}
           {confidentialMode ? (
