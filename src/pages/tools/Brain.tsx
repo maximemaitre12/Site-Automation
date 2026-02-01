@@ -429,14 +429,14 @@ export default function BrainPage() {
           {/* Chat Messages */}
           <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
             {!currentConversation && conversations.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center px-4 py-12">
-                <p className="text-muted-foreground text-base md:text-lg">
+              <div className="h-full flex items-center justify-center">
+                <p className="text-muted-foreground text-lg md:text-xl font-medium tracking-tight">
                   Comment puis-je vous aider aujourd'hui ?
                 </p>
               </div>
             ) : !currentConversation ? (
-              <div className="flex flex-col items-center justify-center text-center px-4 py-12">
-                <p className="text-muted-foreground text-sm">
+              <div className="h-full flex items-center justify-center">
+                <p className="text-muted-foreground text-base font-medium">
                   Sélectionnez une conversation ou démarrez-en une nouvelle.
                 </p>
               </div>
