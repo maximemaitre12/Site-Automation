@@ -4,6 +4,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { callAI } from '@/lib/ai';
 import { useToast } from '@/hooks/use-toast';
 import PptxGenJS from 'pptxgenjs';
+import {
+  COLOR_PALETTES,
+  StyleType,
+  applyMasterStyles,
+  createTitleSlide,
+  createAgendaSlide,
+  createContentSlide,
+  createProofSlide,
+  createCTASlide,
+  createContactSlide
+} from '@/lib/pptx-templates';
 
 export interface PresentationSlide {
   type: 'title' | 'agenda' | 'problem' | 'solution' | 'benefits' | 'proof' | 'pricing' | 'cta' | 'contact';
@@ -11,6 +22,8 @@ export interface PresentationSlide {
   content?: string;
   bullets?: string[];
   notes?: string;
+  stats?: { value: string; label: string }[];
+  testimonial?: { quote: string; author: string };
 }
 
 export interface PresentationData {
@@ -48,17 +61,6 @@ export interface GeneratePresentationParams {
   dealId?: string;
 }
 
-// Agent Sales colors
-const COLORS = {
-  primary: 'F59E0B',      // amber-500
-  primaryDark: 'D97706',  // amber-600
-  secondary: '1E293B',    // slate-800
-  text: '1F2937',         // gray-800
-  textLight: '6B7280',    // gray-500
-  white: 'FFFFFF',
-  background: 'FEF3C7',   // amber-100
-};
-
 export function usePresentationGenerator() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -94,53 +96,89 @@ export function usePresentationGenerator() {
       const slideCount = params.slideCount || 8;
       const style = params.style || 'professional';
 
-      const prompt = `Tu es un expert en présentations commerciales. Génère une présentation PowerPoint complète et persuasive.
+      const prompt = `Tu es un directeur commercial senior avec 25 ans d'expérience. Tu crées des présentations PowerPoint stratégiques de niveau C-level.
 
-CLIENT: ${params.clientName}
+CLIENT CIBLE: ${params.clientName}
 PRODUIT/SERVICE: ${params.productName}
-OBJECTIF: ${params.objective}
-POINTS CLÉS À INCLURE: ${params.keyPoints || 'À déterminer selon le contexte'}
+OBJECTIF COMMERCIAL: ${params.objective}
+ARGUMENTS CLÉS: ${params.keyPoints || 'À déterminer selon l\'analyse du contexte'}
 NOMBRE DE SLIDES: ${slideCount}
-STYLE: ${style}
+STYLE VISUEL: ${style}
 
-Génère une présentation au format JSON avec cette structure exacte:
+GÉNÈRE une présentation JSON ultra-professionnelle avec cette structure:
 {
-  "title": "Titre principal accrocheur",
-  "subtitle": "Sous-titre contextuel",
+  "title": "Titre accrocheur et stratégique (pas générique)",
+  "subtitle": "Proposition de valeur en une phrase",
   "slides": [
     {
-      "type": "title|agenda|problem|solution|benefits|proof|pricing|cta|contact",
-      "title": "Titre du slide",
-      "content": "Contenu principal (1-2 phrases)",
-      "bullets": ["Point 1", "Point 2", "Point 3"],
+      "type": "title",
+      "title": "Titre impactant",
+      "content": "Sous-titre stratégique"
+    },
+    {
+      "type": "agenda",
+      "title": "Notre approche",
+      "bullets": ["Point 1 stratégique", "Point 2", "Point 3"]
+    },
+    {
+      "type": "problem",
+      "title": "Les défis de ${params.clientName}",
+      "content": "Accroche empathique sur les enjeux",
+      "bullets": ["Défi 1 chiffré", "Défi 2 avec impact", "Défi 3"],
       "notes": "Notes pour le présentateur"
+    },
+    {
+      "type": "solution",
+      "title": "Notre réponse sur mesure",
+      "content": "Positionnement différenciant",
+      "bullets": ["Capacité 1", "Capacité 2", "Capacité 3"]
+    },
+    {
+      "type": "benefits",
+      "title": "Vos bénéfices concrets",
+      "bullets": ["ROI chiffré", "Gain de temps", "Réduction des risques", "Avantage compétitif"]
+    },
+    {
+      "type": "proof",
+      "title": "Nos résultats prouvés",
+      "stats": [
+        {"value": "+45%", "label": "Croissance moyenne"},
+        {"value": "98%", "label": "Satisfaction client"},
+        {"value": "6 mois", "label": "Retour sur investissement"}
+      ],
+      "testimonial": {
+        "quote": "Citation client impactante et crédible",
+        "author": "Nom, Titre, Entreprise similaire"
+      }
+    },
+    {
+      "type": "pricing|cta",
+      "title": "Prochaines étapes",
+      "bullets": ["Action 1 claire", "Action 2", "Action 3"],
+      "content": "Phrase d'urgence ou offre limitée"
+    },
+    {
+      "type": "contact",
+      "title": "Construisons ensemble votre succès",
+      "content": "Coordonnées et disponibilité"
     }
   ]
 }
 
-Types de slides à utiliser:
-- title: Slide de titre (obligatoire en premier)
-- agenda: Sommaire de la présentation
-- problem: Problématique client / points de douleur
-- solution: Votre solution / produit
-- benefits: Liste des avantages
-- proof: Preuves sociales, chiffres, témoignages
-- pricing: Options tarifaires (si pertinent)
-- cta: Appel à l'action, prochaines étapes
-- contact: Coordonnées (obligatoire en dernier)
+RÈGLES ABSOLUES:
+- Slide 1 = "title", dernier slide = "contact"
+- Chiffres et données concrètes obligatoires (invente des chiffres réalistes)
+- Bullets de 6-10 mots maximum, percutants
+- Langage business senior, pas de jargon technique
+- Le slide "proof" DOIT contenir des stats et un testimonial
+- Contenu orienté bénéfices client, pas caractéristiques produit
+- Notes de présentateur stratégiques pour chaque slide content
 
-Règles:
-- Commence TOUJOURS par un slide "title"
-- Termine TOUJOURS par un slide "contact"
-- Contenu percutant et orienté bénéfices client
-- Bullets courts (max 8 mots chacun)
-- Notes utiles pour le présentateur
-
-IMPORTANT: Réponds UNIQUEMENT avec le JSON valide, sans aucun texte avant ou après.`;
+RÉPONDS UNIQUEMENT avec le JSON valide.`;
 
       const response = await callAI({
         messages: [{ role: 'user', content: prompt }],
-        systemPrompt: 'Tu es un assistant spécialisé en génération de présentations commerciales. Tu réponds uniquement en JSON valide.',
+        systemPrompt: 'Tu es un expert en présentations commerciales C-level. Tu génères uniquement du JSON valide, sans aucun texte avant ou après.',
         type: 'generate'
       });
 
@@ -205,147 +243,95 @@ IMPORTANT: Réponds UNIQUEMENT avec le JSON valide, sans aucun texte avant ou ap
 
     try {
       const pptx = new PptxGenJS();
-      pptx.author = 'Sales Copilot';
+      const styleKey = (presentation.style || 'professional') as StyleType;
+      const colors = applyMasterStyles(pptx, styleKey);
+      
       pptx.title = presentation.title;
       pptx.subject = `Présentation pour ${presentation.client_name}`;
 
       const data = presentation.presentation_json as PresentationData;
+      const totalSlides = data.slides.length;
 
       data.slides.forEach((slideData, index) => {
-        const slide = pptx.addSlide();
-
-        // Add gradient background
-        slide.background = { color: COLORS.white };
-
-        // Add accent bar at top
-        slide.addShape(pptx.ShapeType.rect, {
-          x: 0, y: 0, w: '100%', h: 0.15,
-          fill: { color: COLORS.primary }
-        });
-
         switch (slideData.type) {
           case 'title':
-            // Title slide
-            slide.addText(slideData.title, {
-              x: 0.5, y: 2.5, w: 9, h: 1.2,
-              fontSize: 44, bold: true, color: COLORS.secondary,
-              align: 'center'
-            });
-            if (slideData.content || data.subtitle) {
-              slide.addText(slideData.content || data.subtitle || '', {
-                x: 0.5, y: 3.8, w: 9, h: 0.8,
-                fontSize: 24, color: COLORS.textLight,
-                align: 'center'
-              });
-            }
-            slide.addText(presentation.client_name || '', {
-              x: 0.5, y: 4.8, w: 9, h: 0.5,
-              fontSize: 18, color: COLORS.primary, bold: true,
-              align: 'center'
-            });
+            createTitleSlide(
+              pptx,
+              colors,
+              slideData.title || data.title,
+              slideData.content || data.subtitle || '',
+              presentation.client_name || ''
+            );
             break;
 
           case 'agenda':
-          case 'benefits':
-            // Bullet list slides
-            slide.addText(slideData.title, {
-              x: 0.5, y: 0.5, w: 9, h: 0.8,
-              fontSize: 32, bold: true, color: COLORS.secondary
-            });
-            if (slideData.bullets && slideData.bullets.length > 0) {
-              slide.addText(
-                slideData.bullets.map(b => ({ text: b, options: { bullet: true, indentLevel: 0 } })),
-                {
-                  x: 0.7, y: 1.5, w: 8.5, h: 3.5,
-                  fontSize: 20, color: COLORS.text,
-                  bullet: { type: 'bullet' },
-                  lineSpacing: 28
-                }
-              );
+            createAgendaSlide(
+              pptx,
+              colors,
+              slideData.title,
+              slideData.bullets || []
+            );
+            break;
+
+          case 'proof':
+            createProofSlide(
+              pptx,
+              colors,
+              slideData.title,
+              slideData.stats || [
+                { value: '+40%', label: 'Performance' },
+                { value: '98%', label: 'Satisfaction' },
+                { value: '<6 mois', label: 'ROI' }
+              ],
+              slideData.testimonial
+            );
+            break;
+
+          case 'cta':
+            createCTASlide(
+              pptx,
+              colors,
+              slideData.title,
+              slideData.bullets || ['Planifier un appel de suivi', 'Recevoir une proposition détaillée', 'Démarrer un pilote'],
+              slideData.content
+            );
+            break;
+
+          case 'contact':
+            const contactSlide = createContactSlide(
+              pptx,
+              colors,
+              {
+                name: presentation.client_name,
+                email: 'contact@company.com',
+                phone: '+33 1 23 45 67 89',
+                website: 'www.company.com'
+              },
+              slideData.title || 'Merci !'
+            );
+            if (slideData.notes) {
+              contactSlide.addNotes(slideData.notes);
             }
             break;
 
           case 'problem':
           case 'solution':
-          case 'proof':
+          case 'benefits':
           case 'pricing':
-          case 'cta':
-            // Content slides
-            slide.addText(slideData.title, {
-              x: 0.5, y: 0.5, w: 9, h: 0.8,
-              fontSize: 32, bold: true, color: COLORS.secondary
-            });
-            if (slideData.content) {
-              slide.addText(slideData.content, {
-                x: 0.5, y: 1.5, w: 9, h: 1,
-                fontSize: 18, color: COLORS.text,
-                align: 'left'
-              });
-            }
-            if (slideData.bullets && slideData.bullets.length > 0) {
-              slide.addText(
-                slideData.bullets.map(b => ({ text: b, options: { bullet: true, indentLevel: 0 } })),
-                {
-                  x: 0.7, y: slideData.content ? 2.7 : 1.5, w: 8.5, h: 2.5,
-                  fontSize: 18, color: COLORS.text,
-                  bullet: { type: 'bullet' },
-                  lineSpacing: 24
-                }
-              );
-            }
-            break;
-
-          case 'contact':
-            // Contact slide
-            slide.addShape(pptx.ShapeType.rect, {
-              x: 0, y: 0, w: '100%', h: '100%',
-              fill: { color: COLORS.secondary }
-            });
-            slide.addText('Merci', {
-              x: 0.5, y: 1.5, w: 9, h: 1,
-              fontSize: 48, bold: true, color: COLORS.white,
-              align: 'center'
-            });
-            slide.addText(slideData.title || "Prêts à démarrer ?", {
-              x: 0.5, y: 2.7, w: 9, h: 0.6,
-              fontSize: 24, color: COLORS.primary,
-              align: 'center'
-            });
-            if (slideData.content) {
-              slide.addText(slideData.content, {
-                x: 0.5, y: 3.5, w: 9, h: 1,
-                fontSize: 18, color: COLORS.white,
-                align: 'center'
-              });
-            }
-            break;
-
           default:
-            // Generic slide
-            slide.addText(slideData.title, {
-              x: 0.5, y: 0.5, w: 9, h: 0.8,
-              fontSize: 32, bold: true, color: COLORS.secondary
-            });
-            if (slideData.content) {
-              slide.addText(slideData.content, {
-                x: 0.5, y: 1.5, w: 9, h: 3,
-                fontSize: 18, color: COLORS.text
-              });
+            const contentSlide = createContentSlide(
+              pptx,
+              colors,
+              slideData.title,
+              slideData.content,
+              slideData.bullets,
+              index + 1,
+              totalSlides,
+              slideData.type as any
+            );
+            if (slideData.notes) {
+              contentSlide.addNotes(slideData.notes);
             }
-        }
-
-        // Add slide number (except for title and contact)
-        if (slideData.type !== 'title' && slideData.type !== 'contact') {
-          slide.addText(`${index + 1}`, {
-            x: 9, y: 5.2, w: 0.5, h: 0.3,
-            fontSize: 10, color: COLORS.textLight,
-            align: 'right'
-          });
-        }
-
-        // Add notes if present
-        if (slideData.notes) {
-          slide.addNotes(slideData.notes);
         }
       });
 
