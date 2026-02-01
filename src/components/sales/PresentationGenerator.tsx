@@ -80,37 +80,58 @@ function PresentationPreview({ presentation, onDownload, onDelete, complianceSta
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Slide Preview - Enhanced to show sections/stats/timeline */}
+        {/* Slide Preview - McKinsey/BCG Style (white bg, navy text) */}
         {slides.length > 0 && (
           <div className="border border-border rounded-lg overflow-hidden">
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-4 min-h-[220px] text-white">
-              <Badge variant="outline" className="mb-2 text-xs border-agent-sales/50 text-agent-sales">
+            {/* Consulting-style slide preview */}
+            <div className="bg-white p-4 min-h-[220px] relative">
+              {/* Navy header bar for title slides */}
+              {slides[currentSlide]?.type === 'title' && (
+                <div className="absolute top-0 left-0 right-0 h-12 bg-[#003366]" />
+              )}
+              
+              {/* Slide type badge */}
+              <Badge variant="outline" className="mb-2 text-xs border-[#003366]/30 text-[#003366] bg-white relative z-10">
                 {getSlideTypeLabel(slides[currentSlide]?.type)}
               </Badge>
-              <h3 className="text-lg font-semibold mb-2">{slides[currentSlide]?.title}</h3>
+              
+              {/* Title */}
+              <h3 className={`text-lg font-bold mb-2 ${slides[currentSlide]?.type === 'title' ? 'text-white relative z-10 mt-1' : 'text-[#003366]'}`}>
+                {slides[currentSlide]?.title}
+              </h3>
+              
+              {/* Blue accent underline */}
+              {slides[currentSlide]?.type !== 'title' && (
+                <div className="w-16 h-0.5 bg-[#0078D4] mb-3" />
+              )}
               
               {/* Subtitle */}
               {slides[currentSlide]?.subtitle && (
-                <p className="text-sm text-slate-400 mb-3 italic">{slides[currentSlide].subtitle}</p>
+                <p className={`text-sm mb-3 italic ${slides[currentSlide]?.type === 'title' ? 'text-white/80 relative z-10' : 'text-gray-500'}`}>
+                  {slides[currentSlide].subtitle}
+                </p>
               )}
               
               {/* Content */}
               {slides[currentSlide]?.content && (
-                <p className="text-sm text-slate-300 mb-3">{slides[currentSlide].content}</p>
+                <p className="text-sm text-gray-600 mb-3">{slides[currentSlide].content}</p>
               )}
               
-              {/* Sections - multi-column layout */}
+              {/* Sections - McKinsey multi-column layout */}
               {slides[currentSlide]?.sections && slides[currentSlide].sections!.length > 0 && (
                 <div className={`grid gap-3 mb-3 ${slides[currentSlide].sections!.length === 1 ? 'grid-cols-1' : slides[currentSlide].sections!.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                   {slides[currentSlide].sections!.slice(0, 3).map((section, sIdx) => (
-                    <div key={sIdx} className="bg-slate-800/50 rounded p-2">
-                      <p className="text-xs font-bold text-agent-sales uppercase mb-1 truncate">{section.heading}</p>
+                    <div key={sIdx} className="border-l-2 border-[#0078D4] pl-2">
+                      <p className="text-xs font-bold text-[#003366] uppercase mb-1 truncate">{section.heading}</p>
                       <ul className="text-xs space-y-0.5">
                         {section.points.slice(0, 3).map((point, pIdx) => (
-                          <li key={pIdx} className="text-slate-300 truncate">• {point}</li>
+                          <li key={pIdx} className="text-gray-600 truncate flex items-start gap-1">
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-sm mt-1 shrink-0" />
+                            <span>{point}</span>
+                          </li>
                         ))}
                         {section.points.length > 3 && (
-                          <li className="text-slate-500 text-xs">+{section.points.length - 3} autres...</li>
+                          <li className="text-gray-400 text-xs">+{section.points.length - 3} autres...</li>
                         )}
                       </ul>
                     </div>
@@ -118,28 +139,28 @@ function PresentationPreview({ presentation, onDownload, onDelete, complianceSta
                 </div>
               )}
               
-              {/* Stats grid */}
+              {/* Stats grid - Clean consulting style */}
               {slides[currentSlide]?.stats && slides[currentSlide].stats!.length > 0 && (
                 <div className="grid grid-cols-4 gap-2 mb-3">
                   {slides[currentSlide].stats!.slice(0, 4).map((stat, sIdx) => (
-                    <div key={sIdx} className="bg-slate-800/60 border border-agent-sales/30 rounded p-2 text-center">
-                      <p className="text-lg font-bold text-agent-sales">{stat.value}</p>
-                      <p className="text-xs text-slate-300 truncate">{stat.label}</p>
+                    <div key={sIdx} className="bg-gray-50 border border-gray-200 rounded p-2 text-center">
+                      <p className="text-lg font-bold text-[#0078D4]">{stat.value}</p>
+                      <p className="text-xs text-gray-500 truncate">{stat.label}</p>
                     </div>
                   ))}
                 </div>
               )}
               
-              {/* Timeline */}
+              {/* Timeline - Phase boxes */}
               {slides[currentSlide]?.timeline && slides[currentSlide].timeline!.length > 0 && (
                 <div className="flex gap-2 mb-3 overflow-x-auto">
                   {slides[currentSlide].timeline!.slice(0, 4).map((phase, tIdx) => (
-                    <div key={tIdx} className="bg-slate-800/60 border border-agent-sales/30 rounded p-2 min-w-[120px]">
+                    <div key={tIdx} className="bg-gray-50 border border-gray-200 rounded p-2 min-w-[100px]">
                       <div className="flex items-center gap-1 mb-1">
-                        <span className="w-5 h-5 rounded-full bg-agent-sales text-white text-xs flex items-center justify-center font-bold">{tIdx + 1}</span>
-                        <span className="text-xs text-amber-400">{phase.duration}</span>
+                        <span className="w-5 h-5 rounded-full bg-[#003366] text-white text-xs flex items-center justify-center font-bold">{tIdx + 1}</span>
+                        <span className="text-xs text-gray-400">{phase.duration}</span>
                       </div>
-                      <p className="text-xs font-medium truncate">{phase.phase}</p>
+                      <p className="text-xs font-medium text-[#003366] truncate">{phase.phase}</p>
                     </div>
                   ))}
                 </div>
@@ -147,17 +168,21 @@ function PresentationPreview({ presentation, onDownload, onDelete, complianceSta
               
               {/* Bullets fallback */}
               {slides[currentSlide]?.bullets && slides[currentSlide].bullets!.length > 0 && !slides[currentSlide]?.sections && (
-                <ul className="list-disc list-inside text-sm space-y-1">
+                <ul className="text-sm space-y-1">
                   {slides[currentSlide].bullets!.slice(0, 5).map((bullet, i) => (
-                    <li key={i} className="text-slate-300">{bullet}</li>
+                    <li key={i} className="text-gray-600 flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-[#0078D4] rounded-sm mt-1.5 shrink-0" />
+                      {bullet}
+                    </li>
                   ))}
                 </ul>
               )}
               
-              {/* Key message */}
+              {/* Key message - Gray bar at bottom */}
               {slides[currentSlide]?.keyMessage && (
-                <div className="mt-3 p-2 bg-agent-sales/20 border-l-2 border-agent-sales rounded-r">
-                  <p className="text-xs text-slate-200">→ {slides[currentSlide].keyMessage}</p>
+                <div className="mt-3 p-2 bg-gray-100 rounded flex items-center gap-2">
+                  <span className="text-[#003366] font-bold">→</span>
+                  <p className="text-xs text-[#003366] font-medium">{slides[currentSlide].keyMessage}</p>
                 </div>
               )}
             </div>
