@@ -439,6 +439,15 @@ export function FlowAIAssistant({
 
       // Handle generate or modify via API
       if (isGenerateRequest || isModifyRequest) {
+        // Show generating state with a pending message
+        const pendingMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: '🔄 Génération du workflow en cours...',
+          timestamp: Date.now(),
+        };
+        setMessages(prev => [...prev, pendingMessage]);
+        
         const requestBody = isModifyRequest && blocks.length > 0
           ? {
               existingWorkflow: { blocks, connections },
@@ -463,6 +472,8 @@ export function FlowAIAssistant({
         });
 
         if (!resp.ok) {
+          // Remove pending message and show error
+          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
           throw new Error('Échec de la génération');
         }
 
@@ -475,10 +486,17 @@ export function FlowAIAssistant({
           // Generate diagnostic for the new workflow
           const diagnostic = generatePostActionDiagnostic(layoutedBlocks, isModifyRequest ? 'modify' : 'generate');
           
+          // Build compact block summary (just names, no verbose descriptions)
+          const blockSummary = layoutedBlocks.slice(0, 6).map((b: WorkflowBlock) => b.name).join(' → ');
+          const extraBlocks = layoutedBlocks.length > 6 ? ` +${layoutedBlocks.length - 6}` : '';
+          
+          // Remove pending message and add the action message with button
+          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
+          
           const actionMessage: Message = {
-            id: (Date.now() + 1).toString(),
+            id: (Date.now() + 2).toString(),
             role: 'assistant',
-            content: `✨ ${isModifyRequest ? 'Workflow modifié' : 'Workflow généré'} avec ${workflow.blocks.length} blocs !\n\n${workflow.blocks.slice(0, 5).map((b: WorkflowBlock, i: number) => `${i + 1}. ${b.name}`).join('\n')}${workflow.blocks.length > 5 ? `\n... et ${workflow.blocks.length - 5} autres` : ''}`,
+            content: `✨ Workflow "${workflow.name || 'Nouveau workflow'}" prêt !\n\n${blockSummary}${extraBlocks}`,
             timestamp: Date.now(),
             action: {
               type: isModifyRequest ? 'modify' : 'generate',
@@ -486,12 +504,13 @@ export function FlowAIAssistant({
                 blocks: layoutedBlocks, 
                 connections: workflow.connections || [], 
                 name: workflow.name || input.slice(0, 50),
-                diagnostic, // Store diagnostic for post-apply message
+                diagnostic,
               },
             },
           };
           setMessages(prev => [...prev, actionMessage]);
         } else {
+          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
           throw new Error('Aucun bloc généré');
         }
       } else {
@@ -500,25 +519,28 @@ export function FlowAIAssistant({
           ? `Le workflow "${workflowName || 'Sans nom'}" contient ${blocks.length} blocs : ${blocks.map(b => `${b.name} (type: ${b.type})`).join(', ')}.`
           : 'Aucun workflow sélectionné pour l\'instant.';
         
-        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow, le builder d'agents IA et de workflows d'automatisation. Tu parles comme un collègue humain, jamais comme un robot.
+        const systemPrompt = `Tu es l'assistant expert d'AETHER Flow, le builder d'agents IA. Tu parles comme un collègue humain, jamais comme un robot.
 
-CONTEXTE ACTUEL:
-${blocksContext}
+CONTEXTE: ${blocksContext}
 
-TES CAPACITÉS:
-- Tu peux créer des agents IA et des workflows complets à partir d'une simple description
-- Tu connais tous les types de blocs disponibles : IA (OpenAI, Gemini, Claude), Logique (conditions, boucles), Transformations (JSON, texte), Intégrations (Gmail, Slack, Stripe, GitHub, Notion, etc.)
-- Tu peux diagnostiquer les configurations manquantes et guider l'utilisateur
-- Tu connais les clés API nécessaires pour chaque intégration
+RÈGLES ABSOLUES:
+1. JAMAIS de descriptions textuelles longues de workflows
+2. JAMAIS de listes de blocs avec descriptions (1. bloc X, 2. bloc Y...)
+3. JAMAIS de "Voici le plan", "Je vais générer", "Es-tu prêt ?"
+4. Quand l'utilisateur veut un workflow, réponds UNIQUEMENT par une phrase courte et GÉNÈRE-LE directement
+5. Tutoie, sois concis (2-3 phrases max)
 
-RÈGLES DE COMMUNICATION:
-- Écris comme un humain expert, pas comme une IA
-- INTERDIT : astérisques (*), dièses (#), tirets de liste (---), crochets []
-- Utilise des phrases naturelles et des retours à la ligne simples
-- Tutoie l'utilisateur
-- Sois direct et concis
+EXEMPLES DE RÉPONSES CORRECTES:
+- "Je te génère ça tout de suite !" (puis génération auto)
+- "Parfait, workflow en cours de création." (puis génération auto)
+- "C'est parti !" (puis génération auto)
 
-Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le générer et demande-lui de préciser son besoin si nécessaire.`;
+EXEMPLES DE RÉPONSES INTERDITES:
+- "Voici le plan des blocs que je vais générer: 1. Get Email..."
+- "Super ! Générons ce workflow. Voici les étapes..."
+- Toute liste numérotée de blocs
+
+Tu as accès aux blocs : IA (OpenAI, Gemini), Logique (if/else, loops), Transform (JSON), Intégrations (Gmail, Slack, Stripe).`;
 
         const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
           method: 'POST',
@@ -810,21 +832,21 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
-                {/* Action button for generated/modified workflows */}
+                {/* PROMINENT Action button for generated/modified workflows */}
                 {message.action?.data &&
                   (message.action.type === 'generate' || message.action.type === 'modify') && (
                     <Button
-                      size="sm"
-                      variant="secondary"
-                      className="mt-2 w-full gap-1.5"
+                      size="default"
+                      variant="hero"
+                      className="mt-3 w-full gap-2 py-3 text-base font-semibold shadow-lg"
                       onClick={() =>
                         handleApplyAction(message.action, message.action?.data)
                       }
                     >
-                      <Wand2 className="w-3.5 h-3.5" />
+                      <Wand2 className="w-5 h-5" />
                       {message.action.type === 'generate'
-                        ? 'Créer ce workflow'
-                        : 'Appliquer les modifications'}
+                        ? '🚀 Générer sur le canvas'
+                        : '✨ Appliquer les modifications'}
                     </Button>
                   )}
                 
