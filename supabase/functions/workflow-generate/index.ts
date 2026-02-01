@@ -172,6 +172,7 @@ Document Sub-nodes (output: document):
 
 const WORKFLOW_SCHEMA = `
 {
+  "name": "Short synthetic title (3-6 words max, like 'Email Triage Agent' or 'Invoice Processing Pipeline')",
   "blocks": [
     {
       "id": "unique-id",
