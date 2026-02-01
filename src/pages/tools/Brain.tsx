@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2, Shield, ShieldAlert, Lock } from "lucide-react";
+import { Send, FileText, Search, Sparkles, Trash2, Loader2, MessageSquarePlus, ChevronRight, Wand2, Database as DatabaseIcon, Image, Paperclip, X, FileImage, File, StopCircle, Globe, Building2 } from "lucide-react";
 import { detectIntent } from "@/lib/intent-detector";
 import { useState, useRef, useEffect } from "react";
 import { useBrain } from "@/hooks/useBrain";
@@ -12,7 +12,7 @@ import { DocumentUploadDialog } from "@/components/brain/DocumentUploadDialog";
 import { AIToolsPanel } from "@/components/brain/AIToolsPanel";
 import { UniversalSearch } from "@/components/brain/UniversalSearch";
 import { KnowledgeHubPanel } from "@/components/brain/KnowledgeHubPanel";
-import { ConfidentialModeToggle, ConfidentialBanner } from "@/components/brain/ConfidentialModeToggle";
+import { ConfidentialModeToggle } from "@/components/brain/ConfidentialModeToggle";
 import { ConfidentialChatArea } from "@/components/brain/ConfidentialChatArea";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -322,7 +322,16 @@ export default function BrainPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      headerActions={
+        <ConfidentialModeToggle 
+          enabled={confidentialMode} 
+          onToggle={toggleConfidentialMode}
+          sessionTimeRemaining={confidentialMode ? getSessionTimeRemaining() : undefined}
+          compact
+        />
+      }
+    >
       <div className="h-full flex flex-col md:flex-row relative overflow-hidden">
         {/* Mobile toggle button */}
         <button
@@ -558,27 +567,8 @@ export default function BrainPage() {
                 "bg-secondary/80 backdrop-blur-xl rounded-2xl border shadow-lg overflow-hidden transition-all",
                 confidentialMode ? "border-red-500/30 ring-2 ring-red-500/20 shadow-red-500/10" : "border-border/50"
               )}>
-                {/* Confidential mode indicator - ULTRA SECURE */}
-                {confidentialMode && (
-                  <div className="px-3 py-2 bg-red-500/10 border-b border-red-500/20 flex items-center justify-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-red-500 animate-pulse" />
-                    <span className="text-xs font-semibold text-red-500 uppercase tracking-wide">
-                      🔒 Mode Ultra-Confidentiel — Aucun stockage
-                    </span>
-                    <Lock className="w-3.5 h-3.5 text-red-500" />
-                  </div>
-                )}
                 {/* Input row */}
                 <form onSubmit={handleSendMessage} className="flex items-center gap-2 p-3">
-                  {/* Confidential mode toggle - ENHANCED */}
-                  <ConfidentialModeToggle 
-                    enabled={confidentialMode} 
-                    onToggle={toggleConfidentialMode}
-                    onWipe={confidentialMode ? wipeConfidentialMemory : undefined}
-                    sessionTimeRemaining={confidentialMode ? getSessionTimeRemaining() : undefined}
-                    compact
-                  />
-                  
                   {/* File attach button */}
                   <input
                     type="file"
