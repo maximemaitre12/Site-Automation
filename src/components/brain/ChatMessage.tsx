@@ -208,30 +208,31 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
             </div>
           )}
           
-          {/* Action Buttons for Assistant */}
+          {/* Action Buttons for Assistant - positioned at bottom */}
           {role === 'assistant' && !isStreaming && textContent && (
-            <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/30">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 hover:bg-muted"
+                      className="h-7 px-2 text-xs gap-1.5 hover:bg-muted text-muted-foreground hover:text-foreground"
                       onClick={() => isPlaying ? stop() : speak(textContent)}
                       disabled={isLoading}
                     >
                       {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-violet-500" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : isPlaying ? (
-                        <VolumeX className="w-4 h-4 text-violet-500" />
+                        <VolumeX className="w-3.5 h-3.5" />
                       ) : (
-                        <Volume2 className="w-4 h-4 text-muted-foreground" />
+                        <Volume2 className="w-3.5 h-3.5" />
                       )}
+                      {isPlaying ? 'Arrêter' : 'Écouter'}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{isPlaying ? 'Arrêter' : 'Écouter'}</p>
+                    <p>{isPlaying ? 'Arrêter la lecture' : 'Écouter la réponse'}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -242,18 +243,19 @@ export function ChatMessage({ role, content, timestamp, attachments, isStreaming
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 hover:bg-muted"
+                      className="h-7 px-2 text-xs gap-1.5 hover:bg-muted text-muted-foreground hover:text-foreground"
                       onClick={copyToClipboard}
                     >
                       {copied ? (
-                        <Check className="w-4 h-4 text-green-500" />
+                        <Check className="w-3.5 h-3.5 text-green-500" />
                       ) : (
-                        <Copy className="w-4 h-4 text-muted-foreground" />
+                        <Copy className="w-3.5 h-3.5" />
                       )}
+                      {copied ? 'Copié !' : 'Copier'}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{copied ? 'Copié !' : 'Copier'}</p>
+                    <p>{copied ? 'Texte copié' : 'Copier le texte'}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
