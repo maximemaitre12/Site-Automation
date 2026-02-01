@@ -167,22 +167,54 @@ function findLatestWorkflowActionMessage(messages: Message[]): Message | undefin
 
 // Check if user is confirming to apply a workflow action
 function isApplyConfirmation(text: string): boolean {
-  const t = text.trim().toLowerCase();
-  if (!t) return false;
-  // Short confirmations only; avoids triggering on normal messages.
-  if (t.length > 30) return false;
+  const raw = text.trim().toLowerCase();
+  if (!raw) return false;
+
+  // Never treat questions as a confirmation.
+  if (raw.includes('?')) return false;
+
+  const t = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    // Keep letters/numbers/spaces/hyphens only; remove punctuation that breaks matching.
+    .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Avoid accidental triggers like "ne pas appliquer".
+  if (/\b(pas|ne|n)\b/.test(t) && /\bappliqu/.test(t)) return false;
 
   const confirmPatterns = [
-    'fais', 'fait', 'ok', 'okay', 'go', 'oui', 'yes',
-    'vas-y', 'vas y', "c'est parti", 'cest parti',
+    'ok', 'okay', 'oui', 'yes', 'go',
+    'vas-y', 'vas y', 'allons-y', 'allons y',
+    'c est parti', 'cest parti',
     'applique', 'appliquer', 'apply',
-    'génère', 'genere', 'génère-le', 'genere-le',
-    'génère le', 'genere le', 'génère la', 'genere la',
-    'lance', 'lance-le', 'execute', 'exécute',
-    'do it', 'let\'s go', 'allons-y', 'envoie'
+    'genere', 'genere-le', 'genere le', 'genere la',
+    'lance', 'lance-le', 'execute', 'execute-le',
+    'do it', "lets go", 'envoie'
   ];
-  
-  return confirmPatterns.some(p => t === p || t.startsWith(p + ' ') || t.endsWith(' ' + p));
+
+  return confirmPatterns.some((p) =>
+    t === p ||
+    t.startsWith(p + ' ') ||
+    t.endsWith(' ' + p) ||
+    t.includes(' ' + p + ' ')
+  );
+}
+
+function isUserQuestion(text: string): boolean {
+  const raw = text.trim().toLowerCase();
+  if (!raw) return false;
+  if (raw.includes('?')) return true;
+
+  const t = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Typical French question starters.
+  return /^(pourquoi|comment|qu est-ce|quest-ce|qu est ce|c est quoi|cest quoi|est-ce|est ce|peux-tu|peux tu|tu peux|ou|où|quel|quelle|quels|quelles)\b/i.test(t);
 }
 
 // Check if the message is a workflow generation/modification request
@@ -450,7 +482,8 @@ export function FlowAIAssistant({
 
     // If the user confirms right after a generated proposal, apply it immediately.
     const latestActionMessage = findLatestWorkflowActionMessage(messages);
-    const shouldApplyLatest = !!latestActionMessage && isApplyConfirmation(rawInput);
+    const latestAlreadyApplied = !!latestActionMessage?.action?.data?.applied;
+    const shouldApplyLatest = !!latestActionMessage && !latestAlreadyApplied && isApplyConfirmation(rawInput);
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -485,18 +518,25 @@ export function FlowAIAssistant({
 
       // Detect intent from the message using improved detection
       const lowerInput = rawInput.toLowerCase();
+      const normalizedInput = lowerInput
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+      const hasExistingBlocks = blocks.length > 0;
+
+      // Never trigger workflow generation/modification when the user is asking a question.
+      const isQuestion = isUserQuestion(rawInput);
+      const isImplicitModify = hasExistingBlocks && /propose|suggest|idee|id(?:e|é)e|complexif|rends?.*plus/i.test(normalizedInput);
       
       // Use the improved isWorkflowRequest function for better detection
-      const shouldTriggerWorkflowGeneration = isWorkflowRequest(rawInput);
+      const shouldTriggerWorkflowGeneration = !isQuestion && (isWorkflowRequest(rawInput) || isImplicitModify);
       
       // More specific patterns for generate vs modify
-      const hasExistingBlocks = blocks.length > 0;
-      const isModifyPattern = /améliore|ameliore|modifie|ajoute|supprime|change|remplace|optimise|corrige|refactor/i.test(lowerInput);
-      const isGeneratePattern = /génère|genere|créer|crée|nouveau|build|create|fais(-| )?(moi|le|un)|construit|monte|automatise/i.test(lowerInput);
+      const isGeneratePattern = /genere|creer|cree|nouveau|build|create|fais(-| )?(moi|le|un)|construit|monte|automatise/i.test(normalizedInput);
       
       // Determine if it's a generate or modify request
-      const isModifyRequest = shouldTriggerWorkflowGeneration && hasExistingBlocks && isModifyPattern;
-      const isGenerateRequest = shouldTriggerWorkflowGeneration && (isGeneratePattern || (!hasExistingBlocks && isModifyPattern));
+      // If there is an existing workflow, default to modification unless the user explicitly asks to generate a new one.
+      const isGenerateRequest = shouldTriggerWorkflowGeneration && (!hasExistingBlocks || isGeneratePattern);
+      const isModifyRequest = shouldTriggerWorkflowGeneration && hasExistingBlocks && !isGeneratePattern;
       
       const isDiagnosticRequest = /diagnostic|configur|manque|fonctionne|initialiser|api|clé/i.test(lowerInput);
       const isComparisonRequest = /compar|n8n|force|faiblesse|versus|vs|différence|mieux|avantage/i.test(lowerInput);
@@ -619,7 +659,7 @@ export function FlowAIAssistant({
           const actionMessage: Message = {
             id: crypto.randomUUID(),
             role: 'assistant',
-            content: `✨ Workflow "${workflow.name || 'Nouveau workflow'}" prêt !\n\n${blockSummary}${extraBlocks}`,
+            content: `Workflow "${workflow.name || 'Nouveau workflow'}" prêt.\n\n${blockSummary}${extraBlocks}`,
             timestamp: Date.now(),
             action: {
               type: isModifyRequest ? 'modify' : 'generate',
@@ -628,10 +668,13 @@ export function FlowAIAssistant({
                 connections: workflow.connections || [], 
                 name: workflow.name || rawInput.slice(0, 50),
                 diagnostic,
+                applied: true,
               },
             },
           };
           setMessages(prev => [...prev, actionMessage]);
+          // Apply immediately so users don't have to click the button.
+          await handleApplyAction(actionMessage.action, actionMessage.action.data);
         } else {
           throw new Error('Aucun bloc généré');
         }
@@ -677,7 +720,7 @@ export function FlowAIAssistant({
               const actionMessage: Message = {
                 id: crypto.randomUUID(),
                 role: 'assistant',
-                content: `✨ Workflow "${workflow.name || 'Nouveau workflow'}" prêt !\n\n${blockSummary}${extraBlocks}`,
+                content: `Workflow "${workflow.name || 'Nouveau workflow'}" prêt.\n\n${blockSummary}${extraBlocks}`,
                 timestamp: Date.now(),
                 action: {
                   type: hasExistingBlocks ? 'modify' : 'generate',
@@ -686,10 +729,12 @@ export function FlowAIAssistant({
                     connections: workflow.connections || [], 
                     name: workflow.name || rawInput.slice(0, 50),
                     diagnostic,
+                    applied: true,
                   },
                 },
               };
               setMessages(prev => [...prev, actionMessage]);
+              await handleApplyAction(actionMessage.action, actionMessage.action.data);
               setIsLoading(false);
               return;
             }
@@ -1011,20 +1056,27 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
                 {/* Action button for generated/modified workflows */}
                 {message.action?.data &&
                   (message.action.type === 'generate' || message.action.type === 'modify') && (
+                    (() => {
+                      const alreadyApplied = !!message.action?.data?.applied;
+                      return (
                     <Button
                       size="sm"
                       variant="outline"
                       className="mt-3 w-full gap-2 text-sm font-medium"
+                        disabled={alreadyApplied}
                       onClick={() =>
                         handleApplyAction(message.action, message.action?.data)
                       }
                     >
                       <Wand2 className="w-4 h-4" />
-                      {message.action.type === 'generate'
-                        ? 'Appliquer sur le canvas'
-                        : 'Appliquer les modifications'}
+                        {alreadyApplied
+                          ? 'Déjà appliqué sur le canvas'
+                          : message.action.type === 'generate'
+                            ? 'Appliquer sur le canvas'
+                            : 'Appliquer les modifications'}
                     </Button>
-                  )}
+                      );
+                    })())}
                 
                 {/* Auto-repair action button */}
                 {message.action?.type === 'repair' && message.action?.data?.suggestions?.length > 0 && (
