@@ -575,15 +575,6 @@ export function FlowAIAssistant({
 
       // Handle generate or modify via API
       if (isGenerateRequest || isModifyRequest) {
-        // Show generating state with a pending message
-        const pendingMessageId = crypto.randomUUID();
-        const pendingMessage: Message = {
-          id: pendingMessageId,
-          role: 'assistant',
-          content: '🔄 Génération du workflow en cours...',
-          timestamp: Date.now(),
-        };
-        setMessages(prev => [...prev, pendingMessage]);
         
         const requestBody = isModifyRequest && blocks.length > 0
           ? {
@@ -609,8 +600,6 @@ export function FlowAIAssistant({
         });
 
         if (!resp.ok) {
-          // Remove pending message and show error
-          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
           throw new Error('Échec de la génération');
         }
 
@@ -626,9 +615,6 @@ export function FlowAIAssistant({
           // Build compact block summary (just names, no verbose descriptions)
           const blockSummary = layoutedBlocks.slice(0, 6).map((b: WorkflowBlock) => b.name).join(' → ');
           const extraBlocks = layoutedBlocks.length > 6 ? ` +${layoutedBlocks.length - 6}` : '';
-          
-          // Remove pending message and add the action message with button
-          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
           
           const actionMessage: Message = {
             id: crypto.randomUUID(),
@@ -647,7 +633,6 @@ export function FlowAIAssistant({
           };
           setMessages(prev => [...prev, actionMessage]);
         } else {
-          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
           throw new Error('Aucun bloc généré');
         }
       } else {
@@ -655,14 +640,6 @@ export function FlowAIAssistant({
         // still try to generate - this is a fallback for edge cases
         if (shouldTriggerWorkflowGeneration) {
           console.log('Fallback: triggering workflow generation for:', rawInput);
-          // Redirect to generate workflow anyway
-          const pendingMessage: Message = {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: '🔄 Génération du workflow en cours...',
-            timestamp: Date.now(),
-          };
-          setMessages(prev => [...prev, pendingMessage]);
           
           const requestBody = hasExistingBlocks
             ? {
@@ -697,8 +674,6 @@ export function FlowAIAssistant({
               const blockSummary = layoutedBlocks.slice(0, 6).map((b: WorkflowBlock) => b.name).join(' → ');
               const extraBlocks = layoutedBlocks.length > 6 ? ` +${layoutedBlocks.length - 6}` : '';
               
-              setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
-              
               const actionMessage: Message = {
                 id: crypto.randomUUID(),
                 role: 'assistant',
@@ -719,8 +694,6 @@ export function FlowAIAssistant({
               return;
             }
           }
-          // If fallback failed, continue to chat
-          setMessages(prev => prev.filter(m => m.id !== pendingMessage.id));
         }
         
         // General chat for non-workflow questions
