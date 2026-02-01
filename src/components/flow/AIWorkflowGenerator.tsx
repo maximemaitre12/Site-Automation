@@ -300,9 +300,10 @@ export function AIWorkflowGenerator({ isOpen, onClose, onGenerate, existingWorkf
         setStreamingBlocks([]);
         
         if (mode === 'create') {
-          const name = objective.length > 50 
+          // Use AI-generated name if available, otherwise fallback
+          const name = workflow.name || (objective.length > 50 
             ? objective.substring(0, 50) + '...'
-            : objective;
+            : objective);
           setGeneratedName(name);
         } else {
           setGeneratedName(existingWorkflow?.name || 'Modified Workflow');
