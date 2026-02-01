@@ -132,6 +132,46 @@ function setCachedMessages(messages: Message[]) {
   }
 }
 
+function findLatestWorkflowActionMessage(messages: Message[]): Message | undefined {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (m.role !== 'assistant') continue;
+    if (!m.action?.data) continue;
+    if (m.action.type === 'generate' || m.action.type === 'modify') return m;
+  }
+  return undefined;
+}
+
+function isApplyConfirmation(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  if (!t) return false;
+  // Short confirmations only; avoids triggering on normal messages.
+  if (t.length > 24) return false;
+
+  return (
+    t === 'fais' ||
+    t === 'fait' ||
+    t === 'ok' ||
+    t === 'okay' ||
+    t === 'go' ||
+    t === 'oui' ||
+    t === 'vas-y' ||
+    t === 'vas y' ||
+    t === "c'est parti" ||
+    t === 'cest parti' ||
+    t === 'applique' ||
+    t === 'appliquer' ||
+    t === 'génère' ||
+    t === 'genere' ||
+    t === 'génère-le' ||
+    t === 'genere-le' ||
+    t === 'génère le' ||
+    t === 'genere le' ||
+    t === 'génère la' ||
+    t === 'genere la'
+  );
+}
+
 // Generate detailed configuration guidance for blocks
 function generateConfigGuidance(blocks: WorkflowBlock[]): string {
   const guidance: string[] = [];
@@ -337,16 +377,34 @@ export function FlowAIAssistant({
   }, [analyzeWorkflowConfig]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    const rawInput = input;
+    if (!rawInput.trim() || isLoading) return;
+
+    // If the user confirms right after a generated proposal, apply it immediately.
+    const latestActionMessage = findLatestWorkflowActionMessage(messages);
+    const shouldApplyLatest = !!latestActionMessage && isApplyConfirmation(rawInput);
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: rawInput,
       timestamp: Date.now(),
     };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+
+    if (shouldApplyLatest && latestActionMessage?.action?.data) {
+      const ack: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'OK, j’applique ça sur le canvas maintenant.',
+        timestamp: Date.now(),
+      };
+      setMessages(prev => [...prev, ack]);
+      await handleApplyAction(latestActionMessage.action, latestActionMessage.action.data);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -358,15 +416,15 @@ export function FlowAIAssistant({
       }
 
       // Detect intent from the message
-      const lowerInput = input.toLowerCase();
-      const isGenerateRequest = /génère|créer|crée|nouveau workflow|build|create|agent|fais(-| )?moi|construis|monte/i.test(lowerInput);
+      const lowerInput = rawInput.toLowerCase();
+      const isGenerateRequest = /génère|genere|générer|generer|créer|crée|nouveau workflow|build|create|agent|fais(-| )?moi|fais(-| )?le|construis|monte/i.test(lowerInput);
       const isModifyRequest = /modifie|ajoute|supprime|change|remplace|optimise/i.test(lowerInput);
       const isDiagnosticRequest = /diagnostic|configur|manque|fonctionne|initialiser|api|clé/i.test(lowerInput);
       const isRecommendationRequest = /recommand|améliore|conseil|suggestion|idée/i.test(lowerInput);
       const isComparisonRequest = /compar|n8n|force|faiblesse|versus|vs|différence|mieux|avantage/i.test(lowerInput);
 
       // Security: Validate user input
-      const securityCheck = validateInputSecurity(input);
+      const securityCheck = validateInputSecurity(rawInput);
       if (!securityCheck.safe) {
         console.warn('Security threats detected in input:', securityCheck.threats);
         // Don't block, but sanitize and log
@@ -451,11 +509,11 @@ export function FlowAIAssistant({
         const requestBody = isModifyRequest && blocks.length > 0
           ? {
               existingWorkflow: { blocks, connections },
-              modificationRequest: input,
+              modificationRequest: rawInput,
               stream: false,
             }
           : {
-              objective: input,
+              objective: rawInput,
               context: workflowName ? `Workflow: ${workflowName}` : '',
               constraints: 'Keep the workflow focused and efficient.',
               stream: false,
@@ -503,7 +561,7 @@ export function FlowAIAssistant({
               data: { 
                 blocks: layoutedBlocks, 
                 connections: workflow.connections || [], 
-                name: workflow.name || input.slice(0, 50),
+                name: workflow.name || rawInput.slice(0, 50),
                 diagnostic,
               },
             },
