@@ -998,21 +998,21 @@ Réponds aux questions sur l'utilisation de Flow, la configuration des blocs, ou
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
-                {/* PROMINENT Action button for generated/modified workflows */}
+                {/* Action button for generated/modified workflows */}
                 {message.action?.data &&
                   (message.action.type === 'generate' || message.action.type === 'modify') && (
                     <Button
-                      size="default"
-                      variant="hero"
-                      className="mt-3 w-full gap-2 py-3 text-base font-semibold shadow-lg"
+                      size="sm"
+                      variant="outline"
+                      className="mt-3 w-full gap-2 text-sm font-medium"
                       onClick={() =>
                         handleApplyAction(message.action, message.action?.data)
                       }
                     >
-                      <Wand2 className="w-5 h-5" />
+                      <Wand2 className="w-4 h-4" />
                       {message.action.type === 'generate'
-                        ? '🚀 Générer sur le canvas'
-                        : '✨ Appliquer les modifications'}
+                        ? 'Appliquer sur le canvas'
+                        : 'Appliquer les modifications'}
                     </Button>
                   )}
                 
