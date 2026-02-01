@@ -193,71 +193,73 @@ export default function Support() {
                 }
               }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Tickets ({tickets.length})
-                </h2>
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" className="bg-gradient-to-r from-agent-support to-agent-support/80 hover:from-agent-support/90 hover:to-agent-support/70 rounded-xl shadow-lg shadow-agent-support/20">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Nouveau ticket
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-lg">
-                    <DialogHeader>
-                      <DialogTitle>Créer un ticket</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label>Sujet *</Label>
-                        <Input
-                          placeholder="Ex: Problème de connexion"
-                          value={newTicket.subject}
-                          onChange={(e) => setNewTicket(t => ({ ...t, subject: e.target.value }))}
-                          className="rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Email client</Label>
-                        <Input
-                          type="email"
-                          placeholder="client@example.com"
-                          value={newTicket.customerEmail}
-                          onChange={(e) => setNewTicket(t => ({ ...t, customerEmail: e.target.value }))}
-                          className="rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Description *</Label>
-                        <Textarea
-                          placeholder="Décrivez le problème en détail..."
-                          className="min-h-[120px] rounded-xl"
-                          value={newTicket.content}
-                          onChange={(e) => setNewTicket(t => ({ ...t, content: e.target.value }))}
-                        />
-                      </div>
-                      <Button 
-                        onClick={handleCreateTicket} 
-                        disabled={creating || !newTicket.subject.trim() || !newTicket.content.trim()}
-                        className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
-                      >
-                        {creating ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Création & classification IA...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Créer et classifier
-                          </>
-                        )}
+              {tickets.length > 0 && (
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    Tickets ({tickets.length})
+                  </h2>
+                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" className="bg-gradient-to-r from-agent-support to-agent-support/80 hover:from-agent-support/90 hover:to-agent-support/70 rounded-xl shadow-lg shadow-agent-support/20">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Nouveau ticket
                       </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-lg">
+                      <DialogHeader>
+                        <DialogTitle>Créer un ticket</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 mt-4">
+                        <div className="space-y-2">
+                          <Label>Sujet *</Label>
+                          <Input
+                            placeholder="Ex: Problème de connexion"
+                            value={newTicket.subject}
+                            onChange={(e) => setNewTicket(t => ({ ...t, subject: e.target.value }))}
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Email client</Label>
+                          <Input
+                            type="email"
+                            placeholder="client@example.com"
+                            value={newTicket.customerEmail}
+                            onChange={(e) => setNewTicket(t => ({ ...t, customerEmail: e.target.value }))}
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Description *</Label>
+                          <Textarea
+                            placeholder="Décrivez le problème en détail..."
+                            className="min-h-[120px] rounded-xl"
+                            value={newTicket.content}
+                            onChange={(e) => setNewTicket(t => ({ ...t, content: e.target.value }))}
+                          />
+                        </div>
+                        <Button 
+                          onClick={handleCreateTicket} 
+                          disabled={creating || !newTicket.subject.trim() || !newTicket.content.trim()}
+                          className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
+                        >
+                          {creating ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Création & classification IA...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Créer et classifier
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              )}
 
               {tickets.length === 0 ? (
                 <div className="text-center py-16">
