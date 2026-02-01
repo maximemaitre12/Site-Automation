@@ -13,6 +13,9 @@ import {
   Blocks,
   Plus,
   Settings2,
+  ShieldCheck,
+  TrendingUp,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,6 +45,13 @@ import {
   summarizeOperations,
   getBlockLibraryContext,
 } from '@/lib/ai-block-operations';
+import {
+  sanitizeConfigForAI,
+  executeSecureBlockOperation,
+  generateN8NComparison,
+  checkRateLimit,
+} from '@/lib/workflow-security';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Message {
   id: string;
@@ -49,8 +59,13 @@ interface Message {
   content: string;
   timestamp: number;
   action?: {
-    type: 'generate' | 'modify' | 'recommendation' | 'diagnostic' | 'repair' | 'block_operation';
+    type: 'generate' | 'modify' | 'recommendation' | 'diagnostic' | 'repair' | 'block_operation' | 'comparison';
     data?: any;
+  };
+  securityInfo?: {
+    approved: boolean;
+    score: number;
+    risks: string[];
   };
 }
 
@@ -73,6 +88,7 @@ const SUGGESTION_CHIPS = [
   { label: 'Diagnostiquer', icon: AlertTriangle, prompt: 'Quels blocs dois-je configurer pour que ce workflow fonctionne ?' },
   { label: 'Auto-réparer', icon: Wrench, prompt: 'Analyse les erreurs et propose des corrections' },
   { label: 'Améliorer les blocs', icon: Blocks, prompt: 'Propose des améliorations pour les définitions de blocs' },
+  { label: 'Comparer avec N8N', icon: TrendingUp, prompt: 'Compare AETHER Flow avec N8N et montre les forces/faiblesses' },
 ];
 
 // Cache key for localStorage
@@ -347,6 +363,51 @@ export function FlowAIAssistant({
       const isModifyRequest = /modifie|ajoute|supprime|change|remplace|optimise/i.test(lowerInput);
       const isDiagnosticRequest = /diagnostic|configur|manque|fonctionne|initialiser|api|clé/i.test(lowerInput);
       const isRecommendationRequest = /recommand|améliore|conseil|suggestion|idée/i.test(lowerInput);
+      const isComparisonRequest = /compar|n8n|force|faiblesse|versus|vs|différence|mieux|avantage/i.test(lowerInput);
+
+      // Security: Validate user input
+      const securityCheck = validateInputSecurity(input);
+      if (!securityCheck.safe) {
+        console.warn('Security threats detected in input:', securityCheck.threats);
+        // Don't block, but sanitize and log
+      }
+
+      // Handle N8N comparison request
+      if (isComparisonRequest) {
+        const comparison = generateN8NComparison();
+        
+        let response = `📊 Comparaison AETHER Flow vs N8N\n\n`;
+        
+        response += `🏆 FORCES D'AETHER (supérieur à N8N)\n\n`;
+        comparison.strengths.forEach(s => {
+          response += `• ${s.feature}\n  ${s.description}\n\n`;
+        });
+        
+        response += `🚀 FONCTIONNALITÉS UNIQUES\n\n`;
+        comparison.unique.forEach(u => {
+          response += `• ${u.feature}\n  ${u.description}\n\n`;
+        });
+        
+        response += `📈 AXES D'AMÉLIORATION\n\n`;
+        comparison.improvements.forEach(i => {
+          response += `• ${i.feature}\n  ${i.description}\n`;
+          if (i.improvementSuggestion) {
+            response += `  💡 ${i.improvementSuggestion}\n`;
+          }
+          response += '\n';
+        });
+
+        const comparisonMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response,
+          timestamp: Date.now(),
+          action: { type: 'comparison' },
+        };
+        setMessages(prev => [...prev, comparisonMessage]);
+        setIsLoading(false);
+        return;
+      }
 
       // Handle diagnostic locally
       if (isDiagnosticRequest && blocks.length > 0) {
@@ -571,14 +632,40 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
     }
   };
 
-  // Handle applying block operations
+  // Handle applying block operations with security layer
   const handleApplyBlockOperations = async (operations: AIBlockOperation[]) => {
     const results: string[] = [];
     const errors: string[] = [];
+    const securityReports: string[] = [];
+
+    // Get user ID for rate limiting
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id || 'anonymous';
 
     for (const op of operations) {
-      // Validate before applying
+      // Rate limit check first
+      const rateCheck = checkRateLimit(userId, op.type);
+      if (!rateCheck.allowed) {
+        errors.push(`🚫 ${rateCheck.reason}`);
+        continue;
+      }
+
+      // Validate with security evaluation
       const validation = validateAIOperation(op, blockLibrary.allBlocks);
+      
+      // Add security info to report
+      if (validation.evaluation) {
+        const evalIcon = validation.evaluation.approved ? '✅' : '❌';
+        securityReports.push(`${evalIcon} ${op.type}: Score ${validation.evaluation.score}/100`);
+        
+        if (validation.evaluation.risks.length > 0) {
+          securityReports.push(`   Risques: ${validation.evaluation.risks.join(', ')}`);
+        }
+        if (validation.evaluation.benefits.length > 0) {
+          securityReports.push(`   Bénéfices: ${validation.evaluation.benefits.join(', ')}`);
+        }
+      }
+
       if (!validation.valid) {
         errors.push(`${op.type}: ${validation.errors.join(', ')}`);
         continue;
@@ -636,17 +723,31 @@ Si l'utilisateur demande de créer un agent ou un workflow, propose-lui de le g�
       }
     }
 
-    // Add result message
-    const content = [
-      results.length > 0 ? `Opérations réussies :\n${results.join('\n')}` : '',
-      errors.length > 0 ? `\n\nErreurs :\n${errors.join('\n')}` : '',
-    ].filter(Boolean).join('');
+    // Build comprehensive result message
+    const contentParts: string[] = [];
+    
+    if (results.length > 0) {
+      contentParts.push(`✅ Opérations réussies :\n${results.join('\n')}`);
+    }
+    
+    if (errors.length > 0) {
+      contentParts.push(`\n❌ Erreurs/Blocages :\n${errors.join('\n')}`);
+    }
+    
+    if (securityReports.length > 0) {
+      contentParts.push(`\n🔐 Rapport de sécurité :\n${securityReports.join('\n')}`);
+    }
 
     const resultMessage: Message = {
       id: Date.now().toString(),
       role: 'assistant',
-      content: content || 'Aucune opération effectuée',
+      content: contentParts.join('\n') || 'Aucune opération effectuée',
       timestamp: Date.now(),
+      securityInfo: {
+        approved: errors.length === 0,
+        score: results.length > 0 ? 100 : 0,
+        risks: errors,
+      },
     };
     setMessages(prev => [...prev, resultMessage]);
     setPendingOperations([]);

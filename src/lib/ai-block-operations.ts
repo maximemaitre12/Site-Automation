@@ -1,11 +1,21 @@
 /**
  * AI Block Operations
  * Defines the operations the AI can perform on blocks
- * and validates AI requests before applying them
+ * and validates AI requests before applying them.
+ * 
+ * SECURITY: All operations are validated against:
+ * - Schema integrity (required fields, valid types)
+ * - Protection rules (system blocks, sensitive fields)
+ * - Benefit/risk evaluation (positive-only changes)
  */
 
 import { BlockDefinition, BlockParam, BlockCategory, CATEGORY_CONFIG } from '@/types/block-library';
 import { ExtendedBlockDefinition, generateCustomBlockType, validateBlockDefinition } from './block-library-extended';
+import { 
+  isSensitiveField, 
+  evaluateBlockOperation, 
+  OperationEvaluation 
+} from './workflow-security';
 
 // Types for AI operations
 export type AIBlockOperation = 
@@ -21,16 +31,47 @@ export interface AIOperationResult {
   message: string;
   operation: AIBlockOperation;
   blockType?: string;
+  evaluation?: OperationEvaluation;
 }
 
 /**
+ * Protected block types that cannot be modified or deleted by AI
+ */
+const AI_PROTECTED_TYPES = [
+  'trigger_manual',
+  'trigger_webhook', 
+  'trigger_schedule',
+  'condition_if',
+  'loop_foreach',
+  'ai_chat',
+  'ai_gemini',
+  'ai_openai',
+];
+
+/**
+ * Required fields for a valid block definition
+ */
+const REQUIRED_BLOCK_FIELDS = ['name', 'description', 'category'];
+
+/**
  * Validate an AI block operation before execution
+ * Includes security checks against destructive operations
  */
 export function validateAIOperation(
   operation: AIBlockOperation,
-  existingBlocks: ExtendedBlockDefinition[]
-): { valid: boolean; errors: string[] } {
+  existingBlocks: ExtendedBlockDefinition[],
+  usageStats?: { totalWorkflows: number; blocksInUse: Record<string, number> }
+): { valid: boolean; errors: string[]; evaluation?: OperationEvaluation } {
   const errors: string[] = [];
+
+  // First, evaluate the operation safety
+  const evaluation = evaluateBlockOperation(operation, existingBlocks, usageStats);
+  
+  if (!evaluation.approved) {
+    errors.push(`Opération non approuvée: ${evaluation.reasoning}`);
+    evaluation.risks.forEach(risk => errors.push(`⚠️ ${risk}`));
+    return { valid: false, errors, evaluation };
+  }
 
   switch (operation.type) {
     case 'create_block': {
@@ -49,6 +90,16 @@ export function validateAIOperation(
       if (!operation.reason || operation.reason.length < 10) {
         errors.push('La raison de création doit être explicite (min 10 caractères)');
       }
+
+      // Check for suspicious param names (trying to inject sensitive fields)
+      if (operation.block.params) {
+        for (const param of operation.block.params) {
+          if (isSensitiveField(param.key) && !param.type?.includes('password')) {
+            // Sensitive fields must have proper type
+            errors.push(`Paramètre sensible "${param.key}" doit être de type "password" ou explicitement sécurisé`);
+          }
+        }
+      }
       break;
     }
 
@@ -59,6 +110,21 @@ export function validateAIOperation(
         errors.push(`Bloc "${operation.blockType}" introuvable`);
       } else if (!block.isCustom) {
         errors.push(`Le bloc "${operation.blockType}" est un bloc système et ne peut pas être modifié. Créez une copie personnalisée.`);
+      } else if (AI_PROTECTED_TYPES.includes(operation.blockType)) {
+        errors.push(`Le bloc "${operation.blockType}" est protégé contre les modifications automatiques`);
+      }
+
+      // Prevent removing required fields
+      if (operation.updates.params) {
+        const originalParams = block?.params || [];
+        for (const origParam of originalParams) {
+          if (origParam.required) {
+            const updatedParam = operation.updates.params.find(p => p.key === origParam.key);
+            if (!updatedParam) {
+              errors.push(`Impossible de supprimer le paramètre requis "${origParam.label}"`);
+            }
+          }
+        }
       }
       break;
     }
@@ -69,6 +135,13 @@ export function validateAIOperation(
         errors.push(`Bloc "${operation.blockType}" introuvable`);
       } else if (!block.isCustom) {
         errors.push(`Le bloc "${operation.blockType}" est un bloc système et ne peut pas être supprimé`);
+      } else if (AI_PROTECTED_TYPES.includes(operation.blockType)) {
+        errors.push(`Le bloc "${operation.blockType}" est protégé contre la suppression`);
+      }
+
+      // Check usage - this is critical
+      if (usageStats?.blocksInUse[operation.blockType] ?? 0 > 0) {
+        errors.push(`BLOQUÉ: Le bloc est utilisé dans ${usageStats!.blocksInUse[operation.blockType]} workflows`);
       }
       break;
     }
@@ -88,6 +161,14 @@ export function validateAIOperation(
         if (!operation.param.key || !operation.param.label || !operation.param.type) {
           errors.push('Le paramètre doit avoir un key, label et type');
         }
+        // Validate sensitive field handling
+        if (isSensitiveField(operation.param.key)) {
+          if (operation.param.type !== 'string') {
+            errors.push('Les paramètres sensibles doivent être de type string');
+          }
+          // Auto-fix: Add security hint
+          operation.param.helpText = (operation.param.helpText || '') + ' ⚠️ Donnée sensible - ne sera pas affichée';
+        }
       }
       break;
     }
@@ -99,8 +180,14 @@ export function validateAIOperation(
       } else if (!block.isCustom) {
         errors.push(`Impossible de modifier un paramètre d'un bloc système`);
       } else {
-        if (!block.params?.some(p => p.key === operation.paramKey)) {
+        const param = block.params?.find(p => p.key === operation.paramKey);
+        if (!param) {
           errors.push(`Paramètre "${operation.paramKey}" introuvable`);
+        } else if (param.required && operation.updates.required === false) {
+          // Downgrading required to optional needs justification
+          if (!operation.reason.toLowerCase().includes('optional') && !operation.reason.toLowerCase().includes('optionnel')) {
+            errors.push(`Changer un paramètre requis en optionnel nécessite une justification explicite`);
+          }
         }
       }
       break;
@@ -118,13 +205,15 @@ export function validateAIOperation(
           errors.push(`Paramètre "${operation.paramKey}" introuvable`);
         } else if (param.required) {
           errors.push(`Le paramètre "${operation.paramKey}" est requis et ne peut pas être supprimé`);
+        } else if (isSensitiveField(operation.paramKey)) {
+          errors.push(`Suppression de paramètre sensible "${operation.paramKey}" bloquée pour sécurité`);
         }
       }
       break;
     }
   }
 
-  return { valid: errors.length === 0, errors };
+  return { valid: errors.length === 0, errors, evaluation };
 }
 
 /**
