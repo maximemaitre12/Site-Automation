@@ -573,45 +573,76 @@ export default function BrainPage() {
                       <button
                         type="button"
                         className={cn(
-                          "shrink-0 p-2 rounded-lg transition-colors",
+                          "shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all",
                           confidentialMode 
-                            ? "text-red-500 hover:bg-red-500/10" 
-                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                            ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 ring-1 ring-red-500/30" 
+                            : "bg-secondary/80 text-muted-foreground hover:text-foreground hover:bg-secondary"
                         )}
                       >
                         <Plus className="w-5 h-5" />
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent side="top" align="start" className="w-56 p-2">
-                      <div className="space-y-1">
+                    <PopoverContent 
+                      side="top" 
+                      align="start" 
+                      className="w-64 p-0 bg-background/95 backdrop-blur-xl border-border/50 shadow-xl rounded-xl overflow-hidden"
+                    >
+                      <div className="p-1.5">
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors text-left"
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary/80 transition-all text-left group"
                         >
-                          <Paperclip className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm">Joindre un fichier</span>
+                          <div className="w-8 h-8 rounded-lg bg-agent-brain/10 flex items-center justify-center group-hover:bg-agent-brain/20 transition-colors">
+                            <Paperclip className="w-4 h-4 text-agent-brain" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-foreground">Joindre un fichier</p>
+                            <p className="text-xs text-muted-foreground">Images, PDF, texte...</p>
+                          </div>
                         </button>
+                        
+                        <div className="h-px bg-border/50 my-1.5 mx-3" />
+                        
                         <button
                           type="button"
                           onClick={() => toggleConfidentialMode(!confidentialMode)}
                           className={cn(
-                            "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left",
+                            "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left group",
                             confidentialMode 
-                              ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" 
-                              : "hover:bg-secondary"
+                              ? "bg-red-500/10 hover:bg-red-500/15" 
+                              : "hover:bg-secondary/80"
                           )}
                         >
-                          {confidentialMode ? (
-                            <ShieldAlert className="w-4 h-4" />
-                          ) : (
-                            <Shield className="w-4 h-4 text-muted-foreground" />
-                          )}
-                          <div className="flex-1">
-                            <span className="text-sm">Mode Confidentiel</span>
-                            {confidentialMode && (
-                              <span className="ml-2 text-xs font-medium">ACTIF</span>
+                          <div className={cn(
+                            "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                            confidentialMode 
+                              ? "bg-red-500/20" 
+                              : "bg-muted group-hover:bg-muted/80"
+                          )}>
+                            {confidentialMode ? (
+                              <ShieldAlert className="w-4 h-4 text-red-500" />
+                            ) : (
+                              <Shield className="w-4 h-4 text-muted-foreground" />
                             )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className={cn(
+                                "text-sm font-medium",
+                                confidentialMode ? "text-red-500" : "text-foreground"
+                              )}>
+                                Mode Confidentiel
+                              </p>
+                              {confidentialMode && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded">
+                                  ON
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {confidentialMode ? "Cliquez pour désactiver" : "Aucun stockage de données"}
+                            </p>
                           </div>
                         </button>
                       </div>
