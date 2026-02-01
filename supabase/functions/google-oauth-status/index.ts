@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     // Verify user authentication
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
+    if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
         JSON.stringify({ error: 'unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -27,13 +27,18 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } }
     });
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Use getClaims for better JWT validation
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      console.error('Auth error:', claimsError?.message || 'No claims');
       return new Response(
         JSON.stringify({ error: 'unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const userId = claimsData.claims.sub;
 
     // No longer check for platform-level configuration since users provide their own credentials
     // configured is always true in this new model
@@ -43,7 +48,7 @@ serve(async (req) => {
     const { data: tokenData, error: tokenError } = await supabase
       .from('user_oauth_tokens')
       .select('email, scope, expires_at, updated_at')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('provider', 'google')
       .single();
 
