@@ -65,11 +65,11 @@ export function FlowAIAssistant({
     }
   }, [messages]);
 
-  // Focus textarea when opening
+  // NOTE: No auto-focus here.
+  // Auto-focusing inputs can trigger browser auto-scroll inside the fixed app-shell,
+  // making top toolbars *appear* to “disappear”. Users can click the input when needed.
   useEffect(() => {
-    if (isOpen && textareaRef.current) {
-      setTimeout(() => textareaRef.current?.focus(), 100);
-    }
+    // intentionally blank
   }, [isOpen]);
 
   // Analyze workflow for missing configurations
