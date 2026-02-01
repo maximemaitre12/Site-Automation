@@ -373,8 +373,8 @@ Réponds de façon concise et utile en français.`;
         </div>
       </div>
 
-      {/* Input */}
-      <div className="p-3 border-t border-border bg-card/30">
+      {/* Input - Fixed at bottom, always visible */}
+      <div className="shrink-0 p-3 border-t border-border bg-card/30">
         <div className="flex items-end gap-2">
           <Textarea
             ref={textareaRef}
@@ -382,9 +382,9 @@ Réponds de façon concise et utile en français.`;
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Décrivez ce que vous voulez..."
-            className="min-h-[88px] max-h-[240px] resize-none bg-background text-sm"
+            className="min-h-[120px] max-h-[200px] resize-none bg-background text-sm"
             disabled={isLoading}
-            rows={3}
+            rows={5}
           />
           <Button 
             size="icon" 
@@ -395,9 +395,6 @@ Réponds de façon concise et utile en français.`;
             <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-[10px] text-muted-foreground text-center mt-2">
-          Entrée pour envoyer • Shift+Entrée pour nouvelle ligne
-        </p>
       </div>
     </div>
   );
