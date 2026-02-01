@@ -267,8 +267,6 @@ export default function DocPage() {
                 onSearchChange={setSearchQuery}
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
-                onUploadClick={() => setUploadDialogOpen(true)}
-                onGenerateClick={() => setGenerateDialogOpen(true)}
                 onBreadcrumbClick={(id) => setCurrentFolder(id)}
               />
 
