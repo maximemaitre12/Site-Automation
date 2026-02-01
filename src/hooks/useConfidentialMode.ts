@@ -196,19 +196,12 @@ export function useConfidentialMode() {
     setConfidentialMode(enabled);
     localStorage.setItem(STORAGE_KEY, String(enabled));
     
-    // Log the change
+    // Log the change (silent, no toast)
     await logAuditEvent(
       enabled ? 'CONFIDENTIAL_MODE_ENABLED' : 'CONFIDENTIAL_MODE_DISABLED',
       { confidential_mode: enabled }
     );
-    
-    if (enabled) {
-      toast({
-        title: "🔒 Mode Ultra-Confidentiel activé",
-        description: "Aucune donnée ne sera stockée. Session timeout: 15 min.",
-      });
-    }
-  }, [logAuditEvent, confidentialMode, wipeConfidentialMemory, resetSessionTimeout, toast]);
+  }, [logAuditEvent, confidentialMode, wipeConfidentialMemory, resetSessionTimeout]);
 
   // Add message to confidential session (memory only)
   const addConfidentialMessage = useCallback((role: 'user' | 'assistant', content: string) => {
