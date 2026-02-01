@@ -117,88 +117,20 @@ export default function Support() {
         {/* Modern Header */}
         <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-agent-support/20 to-agent-support/5 border border-agent-support/20 flex items-center justify-center shrink-0 shadow-lg shadow-agent-support/10">
-                  <Headphones className="w-6 h-6 md:w-7 md:h-7 text-agent-support" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-xl md:text-2xl font-bold text-foreground">Support Agent</h1>
-                    <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-agent-support/10 text-agent-support text-xs font-medium">
-                      <Sparkles className="w-3 h-3" />
-                      Réponses IA
-                    </span>
-                  </div>
-                  <p className="text-muted-foreground text-sm mt-0.5 hidden md:block">
-                    Classification et réponses automatiques
-                  </p>
-                </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-agent-support/20 to-agent-support/5 border border-agent-support/20 flex items-center justify-center shrink-0 shadow-lg shadow-agent-support/10">
+                <Headphones className="w-6 h-6 md:w-7 md:h-7 text-agent-support" />
               </div>
-
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-agent-support to-agent-support/80 hover:from-agent-support/90 hover:to-agent-support/70 rounded-xl shadow-lg shadow-agent-support/20">
-                    <Plus className="w-4 h-4 mr-2" />
-                    <span className="hidden sm:inline">Nouveau ticket</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>Créer un ticket</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label>Sujet *</Label>
-                      <Input
-                        placeholder="Ex: Problème de connexion"
-                        value={newTicket.subject}
-                        onChange={(e) => setNewTicket(t => ({ ...t, subject: e.target.value }))}
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Email client</Label>
-                      <Input
-                        type="email"
-                        placeholder="client@example.com"
-                        value={newTicket.customerEmail}
-                        onChange={(e) => setNewTicket(t => ({ ...t, customerEmail: e.target.value }))}
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Description *</Label>
-                      <Textarea
-                        placeholder="Décrivez le problème en détail..."
-                        className="min-h-[120px] rounded-xl"
-                        value={newTicket.content}
-                        onChange={(e) => setNewTicket(t => ({ ...t, content: e.target.value }))}
-                      />
-                    </div>
-                    <Button 
-                      onClick={handleCreateTicket} 
-                      disabled={creating || !newTicket.subject.trim() || !newTicket.content.trim()}
-                      className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
-                    >
-                      {creating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Création & classification IA...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          Créer et classifier
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <div className="min-w-0">
+                <h1 className="text-xl md:text-2xl font-bold text-foreground">Aether Support</h1>
+              </div>
             </div>
+          </div>
+        </header>
 
-            {/* Stats Cards */}
+        {/* Stats Cards */}
+        <div className="px-4 md:px-8 pb-4">
+          <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="group p-4 rounded-2xl bg-card/80 backdrop-blur border border-border/50 hover:border-warning/30 transition-all">
                 <div className="flex items-center gap-3">
@@ -243,10 +175,10 @@ export default function Support() {
                     <p className="text-xs text-muted-foreground">Critiques</p>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
-        </header>
+        </div>
+      </div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden px-4 md:px-8">
@@ -268,6 +200,66 @@ export default function Support() {
                 <h2 className="text-lg font-semibold text-foreground">
                   Tickets ({tickets.length})
                 </h2>
+                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="bg-gradient-to-r from-agent-support to-agent-support/80 hover:from-agent-support/90 hover:to-agent-support/70 rounded-xl shadow-lg shadow-agent-support/20">
+                      <Plus className="w-4 h-4 mr-1" />
+                      Nouveau ticket
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-lg">
+                    <DialogHeader>
+                      <DialogTitle>Créer un ticket</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label>Sujet *</Label>
+                        <Input
+                          placeholder="Ex: Problème de connexion"
+                          value={newTicket.subject}
+                          onChange={(e) => setNewTicket(t => ({ ...t, subject: e.target.value }))}
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Email client</Label>
+                        <Input
+                          type="email"
+                          placeholder="client@example.com"
+                          value={newTicket.customerEmail}
+                          onChange={(e) => setNewTicket(t => ({ ...t, customerEmail: e.target.value }))}
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Description *</Label>
+                        <Textarea
+                          placeholder="Décrivez le problème en détail..."
+                          className="min-h-[120px] rounded-xl"
+                          value={newTicket.content}
+                          onChange={(e) => setNewTicket(t => ({ ...t, content: e.target.value }))}
+                        />
+                      </div>
+                      <Button 
+                        onClick={handleCreateTicket} 
+                        disabled={creating || !newTicket.subject.trim() || !newTicket.content.trim()}
+                        className="w-full bg-agent-support hover:bg-agent-support/90 rounded-xl"
+                      >
+                        {creating ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Création & classification IA...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Créer et classifier
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {tickets.length === 0 ? (
@@ -373,7 +365,11 @@ export default function Support() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteTicket(selectedTicket.id)}
+                      onClick={async () => {
+                        await deleteTicket(selectedTicket.id);
+                        setSelectedTicket(null);
+                        setEditedResponse('');
+                      }}
                       className="h-8 w-8 p-0 text-destructive rounded-lg"
                     >
                       <Trash2 className="w-4 h-4" />
