@@ -6,8 +6,7 @@ import { callAI } from '@/lib/ai';
 import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext } from '@/lib/aether-knowledge-base';
-import { needsPlatformContext } from '@/lib/intent-detector';
-
+import { detectDomains, isPlatformQuestion, type BrainDomain } from '@/lib/brain-domain-router';
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -272,61 +271,46 @@ STYLE DE RÉPONSE:
       // Fetch company ID for platform context
       const companyId = await fetchCompanyId();
       
-      // Check if user is asking about platform data and fetch real-time context
+      // Smart Context: Detect which domains are relevant and fetch only those
       let platformContextStr = '';
-      if (needsPlatformContext(content) && companyId) {
+      const detectedDomains = detectDomains(content);
+      
+      if (detectedDomains.length > 0 && companyId) {
         try {
-          console.log('Fetching platform context for question:', content);
-          const response = await supabase.functions.invoke('brain-platform-context', {
+          console.log('Smart context - detected domains:', detectedDomains);
+          const response = await supabase.functions.invoke('brain-smart-context', {
             body: { 
               userId: user.id, 
               companyId,
+              domains: detectedDomains,
               query: content 
             }
           });
           
-          if (response.data?.context) {
-            const ctx = response.data.context;
-            const sections: string[] = [];
-            
-            if (ctx.workflows) {
-              sections.push(`WORKFLOWS: ${ctx.workflows.total} total, ${ctx.workflows.active} actifs. Liste: ${ctx.workflows.list?.map((w: any) => `"${w.name}" (${w.active ? 'actif' : 'inactif'})`).join(', ') || 'aucun'}`);
-            }
-            if (ctx.sales?.summary) {
-              sections.push(`VENTES: ${ctx.sales.summary.total_deals} deals, pipeline total ${ctx.sales.summary.total_pipeline_value}€, probabilité moyenne ${ctx.sales.summary.average_win_probability}%`);
-            }
-            if (ctx.hr?.candidates) {
-              sections.push(`CANDIDATS: ${ctx.hr.candidates.total} candidats, score moyen ${ctx.hr.candidates.avg_match_score}%`);
-            }
-            if (ctx.hr?.employees) {
-              sections.push(`EMPLOYÉS: ${ctx.hr.employees.total} total, ${ctx.hr.employees.active} actifs`);
-            }
-            if (ctx.support?.summary) {
-              sections.push(`SUPPORT: ${ctx.support.summary.total_tickets} tickets, ${ctx.support.summary.open_tickets} ouverts`);
-            }
-            if (ctx.documents?.summary) {
-              sections.push(`DOCUMENTS: ${ctx.documents.summary.total} documents`);
-            }
-            if (ctx.compliance?.summary) {
-              sections.push(`COMPLIANCE: ${ctx.compliance.summary.total_alerts} alertes, ${ctx.compliance.summary.unresolved} non résolues`);
-            }
-            if (ctx.crm?.opportunities) {
-              sections.push(`CRM OPPORTUNITÉS: ${ctx.crm.opportunities.total}, valeur totale ${ctx.crm.opportunities.total_value}€`);
-            }
-            if (ctx.crm?.contacts) {
-              sections.push(`CRM CONTACTS: ${ctx.crm.contacts.total} contacts`);
-            }
-            if (ctx.esg) {
-              sections.push(`ESG: ${ctx.esg.total_kpis} KPIs suivis`);
-            }
-            
-            if (sections.length > 0) {
-              platformContextStr = `\n\nDONNÉES PLATEFORME EN TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${sections.join('\n')}`;
-              console.log('Platform context loaded:', sections.length, 'sections');
-            }
+          if (response.data?.contextText) {
+            platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${response.data.contextText}`;
+            console.log('Smart context loaded:', response.data.domainsProcessed?.length, 'domains');
           }
         } catch (err) {
-          console.error('Error fetching platform context:', err);
+          console.error('Error fetching smart context:', err);
+        }
+      } else if (isPlatformQuestion(content) && companyId) {
+        // Fallback: If it looks like a platform question but no specific domain detected
+        try {
+          const response = await supabase.functions.invoke('brain-smart-context', {
+            body: { 
+              userId: user.id, 
+              companyId,
+              domains: ['general'],
+              query: content 
+            }
+          });
+          
+          if (response.data?.contextText) {
+            platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${response.data.contextText}`;
+          }
+        } catch (err) {
+          console.error('Error fetching general context:', err);
         }
       }
       
