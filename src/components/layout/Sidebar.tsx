@@ -38,7 +38,7 @@ const tools = [
 
 const settingsLinks = [
   { name: "Company Settings", path: "/settings/company", icon: Building2 },
-  { name: "API Keys", path: "/settings/api-keys", icon: Settings },
+  { name: "Integrations", path: "/settings/integrations", icon: Settings },
 ];
 
 export function Sidebar() {
