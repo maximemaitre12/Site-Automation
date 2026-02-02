@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { DocFolder } from "@/hooks/useAetherDocs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import {
   Folder,
   FolderOpen,
@@ -96,7 +96,7 @@ export function DocSidebar({
 
   return (
     <div className="w-64 border-r border-border bg-card/50 flex flex-col h-full">
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-auto scrollbar-hide">
         <div className="p-4 space-y-6">
           {/* Access Levels - Main Navigation */}
           <div>
@@ -251,7 +251,7 @@ export function DocSidebar({
             </div>
           </div>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
