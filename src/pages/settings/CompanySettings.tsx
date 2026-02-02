@@ -197,22 +197,14 @@ export default function CompanySettings() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 pt-4 border-t border-border">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Subscription: <span className="font-medium text-foreground capitalize">{company.subscription_tier}</span>
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {teamMembers.length} / {company.max_users} team members
-                    </p>
-                  </div>
-                  {canEdit && (
+                {canEdit && (
+                  <div className="pt-4 border-t border-border">
                     <Button onClick={handleSaveCompany} disabled={saving} size="sm" className="w-full sm:w-auto">
                       <Save className="w-4 h-4 mr-2" />
                       {saving ? 'Saving...' : 'Save'}
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
