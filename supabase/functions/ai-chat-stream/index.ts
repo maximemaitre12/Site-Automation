@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 interface ChatRequest {
@@ -159,26 +159,43 @@ async function fetchPlatformContext(
   try {
     console.log(`Fetching platform context for company=${companyId}, user=${userId}`);
 
+    const normalizedQuery = (query || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    const wants = {
+      team: /(equipe|team|membre|utilisateur|users|colleg|collab)/.test(normalizedQuery),
+      employees: /(employ|salarie|salary|rh|ressources humaines|effectif)/.test(normalizedQuery),
+      documents: /(document|doc |docs|fichier|dossier)/.test(normalizedQuery),
+      sales: /(deal|vente|pipeline|opportunit|chiffre|revenu|ca )/.test(normalizedQuery),
+      support: /(ticket|support|incident|sav|reclamation)/.test(normalizedQuery),
+      crm: /(crm|contact|opportunit|entreprise|societ)/.test(normalizedQuery),
+      compliance: /(compliance|conformit|audit|alerte|risque)/.test(normalizedQuery),
+      esg: /(esg|kpi|indicateur|gouvernance|environnement)/.test(normalizedQuery),
+      data: /(donnee|data|enrich|siren|siret)/.test(normalizedQuery),
+    };
+
     // Parallel fetch all relevant data with company isolation
     const [
-      { data: salesDeals },
-      { data: candidates },
-      { data: employees },
-      { data: supportTickets },
-      { data: documents },
-      { data: workflows },
-      { data: complianceAlerts },
-      { data: crmOpportunities },
-      { data: crmContacts },
-      { data: enrichedCompanies },
-      { data: esgKpis },
-      { data: companyInfo },
-      { data: teamMembers }
+      { data: salesDeals, count: salesDealsCount, error: salesDealsError },
+      { data: candidates, count: candidatesCount, error: candidatesError },
+      { data: employees, count: employeesCount, error: employeesError },
+      { data: supportTickets, count: supportTicketsCount, error: supportTicketsError },
+      { data: documents, count: documentsCount, error: documentsError },
+      { data: workflows, count: workflowsCount, error: workflowsError },
+      { data: complianceAlerts, count: complianceAlertsCount, error: complianceAlertsError },
+      { data: crmOpportunities, count: crmOppCount, error: crmOppError },
+      { data: crmContacts, count: crmContactsCount, error: crmContactsError },
+      { data: enrichedCompanies, count: enrichedCompaniesCount, error: enrichedCompaniesError },
+      { data: esgKpis, count: esgKpisCount, error: esgKpisError },
+      { data: companyInfo, error: companyInfoError },
+      { data: teamRoles, count: teamRolesCount, error: teamRolesError },
     ] = await Promise.all([
       // Sales deals - company-wide
       supabase
         .from('sales_deals')
-        .select('id, company_name, contact_name, value, status, priority, win_probability, next_step, next_step_date')
+        .select('id, company_name, contact_name, value, status, priority, win_probability, next_step, next_step_date', { count: 'exact' })
         .eq('company_id', companyId)
         .order('updated_at', { ascending: false })
         .limit(30),
@@ -186,7 +203,7 @@ async function fetchPlatformContext(
       // HR Candidates - company-wide
       supabase
         .from('candidates')
-        .select('id, name, email, status, match_score, experience_years')
+        .select('id, name, email, status, match_score, experience_years', { count: 'exact' })
         .eq('company_id', companyId)
         .order('created_at', { ascending: false })
         .limit(30),
@@ -194,7 +211,7 @@ async function fetchPlatformContext(
       // HR Employees - company-wide (using correct column names)
       supabase
         .from('employees')
-        .select('id, name, email, job_title, department, is_active, salary_current')
+        .select('id, name, email, job_title, department, is_active, salary_current', { count: 'exact' })
         .eq('company_id', companyId)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
@@ -203,7 +220,7 @@ async function fetchPlatformContext(
       // Support tickets - company-wide
       supabase
         .from('support_tickets')
-        .select('id, title, status, priority, category, assignee_name, customer_name')
+        .select('id, title, status, priority, category, assignee_name, customer_name', { count: 'exact' })
         .eq('company_id', companyId)
         .order('created_at', { ascending: false })
         .limit(30),
@@ -211,7 +228,7 @@ async function fetchPlatformContext(
       // Documents - by company OR by user (since many docs don't have company_id)
       supabase
         .from('aether_documents')
-        .select('id, title, ai_summary, file_type, access_level, tags')
+        .select('id, title, ai_summary, file_type, access_level, tags', { count: 'exact' })
         .or(`company_id.eq.${companyId},user_id.eq.${userId}`)
         .order('created_at', { ascending: false })
         .limit(30),
@@ -219,7 +236,7 @@ async function fetchPlatformContext(
       // Workflows - user-specific
       supabase
         .from('workflows')
-        .select('id, name, description, is_active')
+        .select('id, name, description, is_active', { count: 'exact' })
         .eq('user_id', userId)
         .order('updated_at', { ascending: false })
         .limit(20),
@@ -227,7 +244,7 @@ async function fetchPlatformContext(
       // Compliance alerts - company-wide (unresolved only)
       supabase
         .from('compliance_alerts')
-        .select('id, title, severity, alert_type, is_resolved')
+        .select('id, title, severity, alert_type, is_resolved', { count: 'exact' })
         .eq('company_id', companyId)
         .eq('is_resolved', false)
         .order('created_at', { ascending: false })
@@ -236,7 +253,7 @@ async function fetchPlatformContext(
       // CRM Opportunities - user's
       supabase
         .from('crm_opportunities')
-        .select('id, name, value, status, probability, expected_close_date')
+        .select('id, name, value, status, probability, expected_close_date', { count: 'exact' })
         .eq('user_id', userId)
         .order('value', { ascending: false })
         .limit(30),
@@ -244,7 +261,7 @@ async function fetchPlatformContext(
       // CRM Contacts - user's
       supabase
         .from('crm_contacts')
-        .select('id, first_name, last_name, email, job_title, engagement_score')
+        .select('id, first_name, last_name, email, job_title, engagement_score', { count: 'exact' })
         .eq('user_id', userId)
         .order('engagement_score', { ascending: false })
         .limit(30),
@@ -252,7 +269,7 @@ async function fetchPlatformContext(
       // Enriched companies - user's
       supabase
         .from('enriched_companies')
-        .select('id, siren, name, headquarters_city, employee_count, revenue, sector, financial_health_score')
+        .select('id, siren, name, headquarters_city, employee_count, revenue, sector, financial_health_score', { count: 'exact' })
         .eq('user_id', userId)
         .order('revenue', { ascending: false })
         .limit(30),
@@ -260,7 +277,7 @@ async function fetchPlatformContext(
       // ESG KPIs - company-wide
       supabase
         .from('esg_kpis')
-        .select('id, name, category, value, unit, target_value, status')
+        .select('id, name, category, value, unit, target_value, status', { count: 'exact' })
         .eq('company_id', companyId)
         .limit(20),
 
@@ -271,78 +288,149 @@ async function fetchPlatformContext(
         .eq('id', companyId)
         .single(),
 
-      // Team members - user_roles + profiles for the company
+      // Team roles - robust: we fetch profiles in a second step (avoids fragile joins)
       supabase
         .from('user_roles')
-        .select('user_id, role, profiles(full_name)')
-        .eq('company_id', companyId)
+        .select('user_id, role', { count: 'exact' })
+        .eq('company_id', companyId),
     ]);
 
-    console.log(`Platform data fetched: employees=${employees?.length || 0}, team=${teamMembers?.length || 0}, docs=${documents?.length || 0}, deals=${salesDeals?.length || 0}`);
+    const errors = [
+      salesDealsError,
+      candidatesError,
+      employeesError,
+      supportTicketsError,
+      documentsError,
+      workflowsError,
+      complianceAlertsError,
+      crmOppError,
+      crmContactsError,
+      enrichedCompaniesError,
+      esgKpisError,
+      companyInfoError,
+      teamRolesError,
+    ].filter(Boolean);
+
+    if (errors.length > 0) {
+      console.warn(`Platform context query errors: ${errors.map((e: any) => e?.message || String(e)).join(' | ')}`);
+    }
+
+    // Resolve team member names from profiles
+    const teamMembers: Array<{ user_id: string; role: string; full_name: string | null }> = [];
+    const roleRows = (teamRoles || []) as Array<{ user_id: string; role: string }>;
+    if (roleRows.length > 0) {
+      const userIds = [...new Set(roleRows.map(r => r.user_id).filter(Boolean))];
+      const { data: profiles, error: profilesError } = userIds.length
+        ? await supabase
+            .from('profiles')
+            .select('user_id, full_name')
+            .in('user_id', userIds)
+        : { data: [], error: null };
+
+      if (profilesError) {
+        console.warn(`Profiles lookup error: ${profilesError.message}`);
+      }
+
+      const nameById = new Map<string, string>();
+      (profiles || []).forEach((p: any) => {
+        if (p?.user_id) nameById.set(p.user_id, p.full_name || 'Utilisateur');
+      });
+
+      roleRows.forEach((r) => {
+        teamMembers.push({
+          user_id: r.user_id,
+          role: r.role,
+          full_name: nameById.get(r.user_id) || 'Utilisateur',
+        });
+      });
+    }
+
+    console.log(`Platform data fetched: employees=${employeesCount ?? employees?.length ?? 0}, team=${teamRolesCount ?? teamMembers.length ?? 0}, docs=${documentsCount ?? documents?.length ?? 0}, deals=${salesDealsCount ?? salesDeals?.length ?? 0}`);
 
     // Build context string
     let contextParts: string[] = [];
     const companyName = companyInfo?.name || 'votre entreprise';
 
+    // Always work with safe arrays (Supabase returns null on some error cases)
+    const salesDealsList = (salesDeals || []) as any[];
+    const candidatesList = (candidates || []) as any[];
+    const employeesList = (employees || []) as any[];
+    const supportTicketsList = (supportTickets || []) as any[];
+    const documentsList = (documents || []) as any[];
+    const workflowsList = (workflows || []) as any[];
+    const complianceAlertsList = (complianceAlerts || []) as any[];
+    const crmOpportunitiesList = (crmOpportunities || []) as any[];
+    const crmContactsList = (crmContacts || []) as any[];
+    const enrichedCompaniesList = (enrichedCompanies || []) as any[];
+    const esgKpisList = (esgKpis || []) as any[];
+
     // === SALES ===
-    if (salesDeals && salesDeals.length > 0) {
-      const activeDeals = salesDeals.filter((d: any) => !['won', 'lost', 'closed'].includes(d.status?.toLowerCase() || ''));
+    if (salesDealsList.length > 0 || wants.sales) {
+      const activeDeals = salesDealsList.filter((d: any) => !['won', 'lost', 'closed'].includes(d.status?.toLowerCase() || ''));
       const totalPipeline = activeDeals.reduce((sum: number, d: any) => sum + (d.value || 0), 0);
       
       let salesContext = `\n📊 VENTES (${companyName}):\n`;
-      salesContext += `• ${salesDeals.length} deals au total, ${activeDeals.length} en cours\n`;
+      const totalDeals = salesDealsCount ?? salesDealsList.length;
+      salesContext += `• ${totalDeals} deals au total, ${activeDeals.length} en cours\n`;
       salesContext += `• Valeur du pipeline: ${formatCurrency(totalPipeline)}\n`;
-      salesContext += `Deals en cours:\n`;
-      activeDeals.slice(0, 10).forEach((d: any) => {
-        salesContext += `  - ${d.company_name}: ${formatCurrency(d.value)} (${d.status}, proba: ${d.win_probability}%)\n`;
-      });
+      if (activeDeals.length > 0) {
+        salesContext += `Deals en cours:\n`;
+        activeDeals.slice(0, 10).forEach((d: any) => {
+          salesContext += `  - ${d.company_name}: ${formatCurrency(d.value)} (${d.status}, proba: ${d.win_probability}%)\n`;
+        });
+      }
       contextParts.push(salesContext);
     }
 
     // === TEAM MEMBERS (from user_roles) ===
-    if (teamMembers && teamMembers.length > 0) {
+    if (teamMembers.length > 0 || wants.team) {
+      const totalTeam = teamRolesCount ?? teamMembers.length;
       let teamContext = `\n👥 ÉQUIPE AETHER (${companyName}):\n`;
-      teamContext += `• ${teamMembers.length} membres dans l'équipe\n`;
-      teamContext += `Membres:\n`;
-      teamMembers.forEach((m: any) => {
-        const name = m.profiles?.full_name || 'Utilisateur';
-        teamContext += `  - ${name} (${m.role})\n`;
-      });
+      teamContext += `• ${totalTeam} membres dans l'équipe\n`;
+      if (teamMembers.length > 0) {
+        teamContext += `Membres:\n`;
+        teamMembers.forEach((m: any) => {
+          teamContext += `  - ${m.full_name || 'Utilisateur'} (${m.role})\n`;
+        });
+      }
       contextParts.push(teamContext);
     }
 
     // === EMPLOYEES (HR) ===
-    if (employees && employees.length > 0) {
+    if (employeesList.length > 0 || wants.employees) {
       let hrContext = `\n🏢 EMPLOYÉS RH (${companyName}):\n`;
-      hrContext += `• ${employees.length} collaborateurs actifs\n`;
+      const totalEmployees = employeesCount ?? employeesList.length;
+      hrContext += `• ${totalEmployees} collaborateurs actifs\n`;
       
       // Group by department
       const depts: Record<string, any[]> = {};
-      employees.forEach((e: any) => {
+      employeesList.forEach((e: any) => {
         const dept = e.department || 'Non défini';
         if (!depts[dept]) depts[dept] = [];
         depts[dept].push(e);
       });
       
-      hrContext += `Répartition par département:\n`;
-      Object.entries(depts).forEach(([dept, emps]) => {
-        hrContext += `  - ${dept}: ${emps.length} personnes\n`;
-      });
-      
-      // List employees
-      hrContext += `Liste des employés:\n`;
-      employees.slice(0, 10).forEach((e: any) => {
-        hrContext += `  - ${e.name} (${e.job_title || 'N/A'}, ${e.department || 'N/A'})\n`;
-      });
+      if (employeesList.length > 0) {
+        hrContext += `Répartition par département:\n`;
+        Object.entries(depts).forEach(([dept, emps]) => {
+          hrContext += `  - ${dept}: ${emps.length} personnes\n`;
+        });
+        
+        // List employees
+        hrContext += `Liste des employés:\n`;
+        employeesList.slice(0, 10).forEach((e: any) => {
+          hrContext += `  - ${e.name} (${e.job_title || 'N/A'}, ${e.department || 'N/A'})\n`;
+        });
+      }
       contextParts.push(hrContext);
     }
 
     // === CANDIDATES ===
-    if (candidates && candidates.length > 0) {
+    if (candidatesList.length > 0) {
       let candContext = `\n🎯 RECRUTEMENT:\n`;
-      candContext += `• ${candidates.length} candidats dans le pipeline\n`;
+      candContext += `• ${(candidatesCount ?? candidatesList.length)} candidats dans le pipeline\n`;
       const byStatus: Record<string, number> = {};
-      candidates.forEach((c: any) => {
+      candidatesList.forEach((c: any) => {
         const s = c.status || 'nouveau';
         byStatus[s] = (byStatus[s] || 0) + 1;
       });
@@ -353,10 +441,10 @@ async function fetchPlatformContext(
     }
 
     // === SUPPORT ===
-    if (supportTickets && supportTickets.length > 0) {
-      const openTickets = supportTickets.filter((t: any) => t.status !== 'resolved' && t.status !== 'closed');
+    if (supportTicketsList.length > 0 || wants.support) {
+      const openTickets = supportTicketsList.filter((t: any) => t.status !== 'resolved' && t.status !== 'closed');
       let supportContext = `\n🎫 SUPPORT:\n`;
-      supportContext += `• ${supportTickets.length} tickets, ${openTickets.length} en cours\n`;
+      supportContext += `• ${(supportTicketsCount ?? supportTicketsList.length)} tickets, ${openTickets.length} en cours\n`;
       if (openTickets.length > 0) {
         supportContext += `Tickets ouverts prioritaires:\n`;
         openTickets.filter((t: any) => t.priority === 'high' || t.priority === 'urgent').slice(0, 5).forEach((t: any) => {
@@ -367,42 +455,48 @@ async function fetchPlatformContext(
     }
 
     // === DOCUMENTS ===
-    if (documents && documents.length > 0) {
+    if (documentsList.length > 0 || wants.documents) {
       let docContext = `\n📁 DOCUMENTS:\n`;
-      docContext += `• ${documents.length} documents disponibles\n`;
-      documents.slice(0, 5).forEach((d: any) => {
-        docContext += `  - ${d.title} (${d.file_type || 'doc'})\n`;
-      });
+      docContext += `• ${(documentsCount ?? documentsList.length)} documents disponibles\n`;
+      if (documentsList.length > 0) {
+        documentsList.slice(0, 5).forEach((d: any) => {
+          docContext += `  - ${d.title} (${d.file_type || 'doc'})\n`;
+        });
+      }
       contextParts.push(docContext);
     }
 
     // === CRM ===
-    if (crmOpportunities && crmOpportunities.length > 0) {
-      const totalValue = crmOpportunities.reduce((s: number, o: any) => s + (o.value || 0), 0);
+    if (crmOpportunitiesList.length > 0 || wants.crm) {
+      const totalValue = crmOpportunitiesList.reduce((s: number, o: any) => s + (o.value || 0), 0);
       let crmContext = `\n💼 CRM:\n`;
-      crmContext += `• ${crmOpportunities.length} opportunités, valeur totale: ${formatCurrency(totalValue)}\n`;
-      crmOpportunities.slice(0, 5).forEach((o: any) => {
-        crmContext += `  - ${o.name}: ${formatCurrency(o.value)} (${o.status}, ${o.probability}%)\n`;
-      });
+      crmContext += `• ${(crmOppCount ?? crmOpportunitiesList.length)} opportunités, valeur totale: ${formatCurrency(totalValue)}\n`;
+      if (crmOpportunitiesList.length > 0) {
+        crmOpportunitiesList.slice(0, 5).forEach((o: any) => {
+          crmContext += `  - ${o.name}: ${formatCurrency(o.value)} (${o.status}, ${o.probability}%)\n`;
+        });
+      }
       contextParts.push(crmContext);
     }
 
     // === COMPLIANCE ===
-    if (complianceAlerts && complianceAlerts.length > 0) {
+    if (complianceAlertsList.length > 0 || wants.compliance) {
       let compContext = `\n⚠️ ALERTES COMPLIANCE:\n`;
-      compContext += `• ${complianceAlerts.length} alertes non résolues\n`;
-      complianceAlerts.slice(0, 5).forEach((a: any) => {
-        compContext += `  - [${a.severity}] ${a.title}\n`;
-      });
+      compContext += `• ${(complianceAlertsCount ?? complianceAlertsList.length)} alertes non résolues\n`;
+      if (complianceAlertsList.length > 0) {
+        complianceAlertsList.slice(0, 5).forEach((a: any) => {
+          compContext += `  - [${a.severity}] ${a.title}\n`;
+        });
+      }
       contextParts.push(compContext);
     }
 
     // === ESG ===
-    if (esgKpis && esgKpis.length > 0) {
+    if (esgKpisList.length > 0 || wants.esg) {
       let esgContext = `\n🌱 ESG:\n`;
-      esgContext += `• ${esgKpis.length} indicateurs suivis\n`;
+      esgContext += `• ${(esgKpisCount ?? esgKpisList.length)} indicateurs suivis\n`;
       const byCategory: Record<string, any[]> = {};
-      esgKpis.forEach((k: any) => {
+      esgKpisList.forEach((k: any) => {
         const cat = k.category || 'Autre';
         if (!byCategory[cat]) byCategory[cat] = [];
         byCategory[cat].push(k);
@@ -414,17 +508,21 @@ async function fetchPlatformContext(
     }
 
     // === ENRICHED COMPANIES ===
-    if (enrichedCompanies && enrichedCompanies.length > 0) {
+    if (enrichedCompaniesList.length > 0 || wants.data) {
       let dataContext = `\n🏢 DONNÉES ENTREPRISES ENRICHIES:\n`;
-      dataContext += `• ${enrichedCompanies.length} entreprises dans la base\n`;
-      enrichedCompanies.slice(0, 5).forEach((c: any) => {
-        dataContext += `  - ${c.name} (${c.headquarters_city}): ${c.employee_count} emp., CA ${formatCurrency(c.revenue)}\n`;
-      });
+      dataContext += `• ${(enrichedCompaniesCount ?? enrichedCompaniesList.length)} entreprises dans la base\n`;
+      if (enrichedCompaniesList.length > 0) {
+        enrichedCompaniesList.slice(0, 5).forEach((c: any) => {
+          dataContext += `  - ${c.name} (${c.headquarters_city}): ${c.employee_count} emp., CA ${formatCurrency(c.revenue)}\n`;
+        });
+      }
       contextParts.push(dataContext);
     }
 
+    // If the query asks for platform data but there is currently no data in DB,
+    // return an explicit empty-state context instead of returning nothing.
     if (contextParts.length === 0) {
-      return '';
+      return `\n\n=== DONNÉES PLATEFORME AETHER (${companyName}) ===\nAucune donnée interne n'est disponible pour le moment pour votre entreprise (tout est à 0).\n=== FIN DES DONNÉES PLATEFORME ===\n`;
     }
 
     return `\n\n=== DONNÉES PLATEFORME AETHER (${companyName}) ===\nVoici les données en temps réel de votre entreprise:${contextParts.join('')}\n=== FIN DES DONNÉES PLATEFORME ===\n`;
@@ -471,17 +569,84 @@ serve(async (req) => {
       : (lastUserMessage?.content as any[])?.find(c => c.type === 'text')?.text || '';
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-    // Check if we need platform data (company context)
-    if (userId && companyId && needsPlatformData(msgContent)) {
-      console.log('Platform data triggered for:', msgContent.slice(0, 100));
-      platformContext = await fetchPlatformContext(supabase, userId, companyId, msgContent);
+    const authHeader = req.headers.get('Authorization') || '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Check if we need real-time data
-    if (needsRealtimeSearch(msgContent)) {
+    // Authenticated client (uses caller JWT)
+    const supabaseAuth = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: userData, error: userError } = await supabaseAuth.auth.getUser();
+    if (userError || !userData?.user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const effectiveUserId = userData.user.id;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    // Resolve/validate companyId to prevent cross-tenant data leakage
+    let effectiveCompanyId = companyId || null;
+    if (effectiveCompanyId) {
+      const { data: membership, error: membershipError } = await supabase
+        .from('user_roles')
+        .select('company_id')
+        .eq('user_id', effectiveUserId)
+        .eq('company_id', effectiveCompanyId)
+        .maybeSingle();
+
+      if (membershipError || !membership?.company_id) {
+        return new Response(
+          JSON.stringify({ error: 'Forbidden' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } else {
+      const { data: roleRow } = await supabase
+        .from('user_roles')
+        .select('company_id')
+        .eq('user_id', effectiveUserId)
+        .maybeSingle();
+      effectiveCompanyId = roleRow?.company_id || null;
+    }
+
+    // Detect follow-up prompts like "dit moi maintenant" after a platform question
+    const recentUserMessages = messages.filter(m => m.role === 'user');
+    const recentUserTexts = recentUserMessages.slice(-3).map((m) => {
+      if (typeof m.content === 'string') return m.content;
+      return (m.content as any[])?.find((c) => c.type === 'text')?.text || '';
+    });
+
+    const normalizedCurrent = (msgContent || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    const isShortFollowup = normalizedCurrent.trim().length <= 30 && /(maintenant|stp|svp|repond|répond|dis moi|dit moi)/.test(normalizedCurrent);
+    const previousPlatformAsked = recentUserTexts.slice(0, -1).some((t) => needsPlatformData(t));
+    const forcePlatformFollowup = isShortFollowup && previousPlatformAsked;
+
+    const shouldFetchPlatform = needsPlatformData(msgContent) || forcePlatformFollowup;
+
+    // Check if we need platform data (company context)
+    if (effectiveUserId && effectiveCompanyId && shouldFetchPlatform) {
+      console.log('Platform data triggered for:', msgContent.slice(0, 100));
+      platformContext = await fetchPlatformContext(supabase, effectiveUserId, effectiveCompanyId, msgContent);
+    }
+
+    // Check if we need real-time web data (skip if this is a forced platform follow-up)
+    if (!forcePlatformFollowup && needsRealtimeSearch(msgContent)) {
       console.log('Real-time search triggered for:', msgContent);
       const searchResult = await searchPerplexity(msgContent);
       
@@ -498,16 +663,16 @@ serve(async (req) => {
     }
 
     // Fetch user documents
-    if (userId) {
+    if (effectiveUserId) {
       const { data: internalDocs } = await supabase
         .from('internal_docs')
         .select('title, content, doc_type')
-        .eq('user_id', userId);
+        .eq('user_id', effectiveUserId);
 
       const { data: aetherDocs } = await supabase
         .from('aether_documents')
         .select('title, content, ai_summary, description')
-        .eq('user_id', userId);
+        .eq('user_id', effectiveUserId);
 
       const allDocs = [
         ...(internalDocs || []).map(d => ({ title: d.title, content: d.content || '' })),
