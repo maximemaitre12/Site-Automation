@@ -17,6 +17,7 @@ export interface StreamAIChatOptions {
   messages: AIMessage[];
   systemPrompt?: string;
   userId?: string;
+  companyId?: string;
   attachments?: Attachment[];
   confidentialMode?: boolean;
   onDelta: (deltaText: string) => void;
@@ -29,6 +30,7 @@ export async function streamAIChat({
   messages,
   systemPrompt,
   userId,
+  companyId,
   attachments,
   confidentialMode = false,
   onDelta,
@@ -50,6 +52,7 @@ export async function streamAIChat({
         messages, 
         systemPrompt,
         userId,
+        companyId,
         attachments
       }),
       signal: abortSignal,

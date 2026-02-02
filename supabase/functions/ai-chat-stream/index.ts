@@ -10,6 +10,7 @@ interface ChatRequest {
   messages: Array<{ role: string; content: string | any[] }>;
   systemPrompt?: string;
   userId?: string;
+  companyId?: string;
   attachments?: Array<{
     type: 'image' | 'document';
     content: string;
@@ -39,9 +40,43 @@ const REALTIME_KEYWORDS = [
   'direct', 'live', 'streaming'
 ];
 
+// Keywords that indicate a need for platform data
+const PLATFORM_DATA_KEYWORDS = [
+  // Sales
+  'deal', 'deals', 'vente', 'ventes', 'pipeline', 'opportunité', 'opportunités',
+  'prospect', 'prospects', 'client', 'clients', 'chiffre d\'affaires',
+  // HR
+  'employé', 'employés', 'collaborateur', 'collaborateurs', 'équipe', 'équipes',
+  'candidat', 'candidats', 'recrutement', 'embauche', 'rh', 'ressources humaines',
+  'performance', 'salaire', 'département', 'manager',
+  // Support
+  'ticket', 'tickets', 'support', 'incident', 'incidents', 'problème', 'problèmes',
+  'réclamation', 'réclamations', 'sav',
+  // Documents
+  'document', 'documents', 'fichier', 'fichiers', 'dossier', 'dossiers',
+  // Workflows
+  'workflow', 'workflows', 'automatisation', 'automation', 'processus',
+  // Compliance
+  'compliance', 'conformité', 'audit', 'alerte', 'alertes', 'risque', 'risques',
+  // CRM
+  'crm', 'contact', 'contacts', 'entreprise', 'entreprises', 'société', 'sociétés',
+  // ESG
+  'esg', 'environnement', 'social', 'gouvernance', 'kpi', 'indicateur', 'indicateurs',
+  // Data
+  'données', 'data', 'enrichissement', 'siren', 'siret',
+  // General questions
+  'combien', 'quels sont', 'quelles sont', 'liste', 'récapitulatif', 'résumé',
+  'en cours', 'actif', 'actifs', 'ouvert', 'ouverts', 'rentable', 'rentabilité'
+];
+
 function needsRealtimeSearch(message: string): boolean {
   const lowerMessage = message.toLowerCase();
   return REALTIME_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
+}
+
+function needsPlatformData(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  return PLATFORM_DATA_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
 }
 
 async function searchPerplexity(query: string): Promise<{ content: string; citations: string[] } | null> {
@@ -61,7 +96,7 @@ async function searchPerplexity(query: string): Promise<{ content: string; citat
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sonar-pro', // Using sonar-pro for higher accuracy with 2x more citations
+        model: 'sonar-pro',
         messages: [
           { 
             role: 'system', 
@@ -77,7 +112,7 @@ RÈGLES STRICTES:
           { role: 'user', content: query }
         ],
         max_tokens: 2048,
-        temperature: 0.1, // Very low temperature for maximum accuracy
+        temperature: 0.1,
         search_recency_filter: 'day',
         return_citations: true,
         return_related_questions: false,
@@ -103,13 +138,291 @@ RÈGLES STRICTES:
   }
 }
 
+async function fetchPlatformContext(
+  supabase: any, 
+  userId: string, 
+  companyId: string,
+  query: string
+): Promise<string> {
+  try {
+    console.log(`Fetching platform context for company=${companyId}, user=${userId}`);
+
+    // Parallel fetch all relevant data with company isolation
+    const [
+      { data: salesDeals },
+      { data: candidates },
+      { data: employees },
+      { data: supportTickets },
+      { data: documents },
+      { data: workflows },
+      { data: complianceAlerts },
+      { data: crmOpportunities },
+      { data: crmContacts },
+      { data: enrichedCompanies },
+      { data: esgKpis },
+      { data: companyInfo }
+    ] = await Promise.all([
+      // Sales deals - company-wide
+      supabase
+        .from('sales_deals')
+        .select('id, company_name, contact_name, value, status, priority, win_probability, next_step, next_step_date')
+        .eq('company_id', companyId)
+        .order('updated_at', { ascending: false })
+        .limit(30),
+
+      // HR Candidates - company-wide
+      supabase
+        .from('candidates')
+        .select('id, name, email, status, match_score, experience_years')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: false })
+        .limit(30),
+
+      // HR Employees - company-wide
+      supabase
+        .from('employees')
+        .select('id, first_name, last_name, department, position, status, performance_score, salary')
+        .eq('company_id', companyId)
+        .eq('status', 'active')
+        .order('performance_score', { ascending: false })
+        .limit(50),
+
+      // Support tickets - company-wide
+      supabase
+        .from('support_tickets')
+        .select('id, title, status, priority, category, assignee_name, customer_name')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: false })
+        .limit(30),
+
+      // Documents - company-wide
+      supabase
+        .from('aether_documents')
+        .select('id, title, ai_summary, file_type, access_level, tags')
+        .eq('company_id', companyId)
+        .order('created_at', { ascending: false })
+        .limit(20),
+
+      // Workflows - user-specific
+      supabase
+        .from('workflows')
+        .select('id, name, description, is_active')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(20),
+
+      // Compliance alerts - company-wide (unresolved only)
+      supabase
+        .from('compliance_alerts')
+        .select('id, title, severity, alert_type, is_resolved')
+        .eq('company_id', companyId)
+        .eq('is_resolved', false)
+        .order('created_at', { ascending: false })
+        .limit(20),
+
+      // CRM Opportunities - user's
+      supabase
+        .from('crm_opportunities')
+        .select('id, name, value, status, probability, expected_close_date')
+        .eq('user_id', userId)
+        .order('value', { ascending: false })
+        .limit(30),
+
+      // CRM Contacts - user's
+      supabase
+        .from('crm_contacts')
+        .select('id, first_name, last_name, email, job_title, engagement_score')
+        .eq('user_id', userId)
+        .order('engagement_score', { ascending: false })
+        .limit(30),
+
+      // Enriched companies - user's
+      supabase
+        .from('enriched_companies')
+        .select('id, siren, name, headquarters_city, employee_count, revenue, sector, financial_health_score')
+        .eq('user_id', userId)
+        .order('revenue', { ascending: false })
+        .limit(30),
+
+      // ESG KPIs - company-wide
+      supabase
+        .from('esg_kpis')
+        .select('id, name, category, value, unit, target_value, status')
+        .eq('company_id', companyId)
+        .limit(20),
+
+      // Company info
+      supabase
+        .from('companies')
+        .select('id, name')
+        .eq('id', companyId)
+        .single()
+    ]);
+
+    // Build context string
+    let contextParts: string[] = [];
+    const companyName = companyInfo?.name || 'votre entreprise';
+
+    // === SALES ===
+    if (salesDeals && salesDeals.length > 0) {
+      const activeDeals = salesDeals.filter((d: any) => !['won', 'lost', 'closed'].includes(d.status?.toLowerCase() || ''));
+      const totalPipeline = activeDeals.reduce((sum: number, d: any) => sum + (d.value || 0), 0);
+      
+      let salesContext = `\n📊 VENTES (${companyName}):\n`;
+      salesContext += `• ${salesDeals.length} deals au total, ${activeDeals.length} en cours\n`;
+      salesContext += `• Valeur du pipeline: ${formatCurrency(totalPipeline)}\n`;
+      salesContext += `Deals en cours:\n`;
+      activeDeals.slice(0, 10).forEach((d: any) => {
+        salesContext += `  - ${d.company_name}: ${formatCurrency(d.value)} (${d.status}, proba: ${d.win_probability}%)\n`;
+      });
+      contextParts.push(salesContext);
+    }
+
+    // === EMPLOYEES ===
+    if (employees && employees.length > 0) {
+      let hrContext = `\n👥 ÉQUIPE (${companyName}):\n`;
+      hrContext += `• ${employees.length} collaborateurs actifs\n`;
+      
+      // Group by department
+      const depts: Record<string, any[]> = {};
+      employees.forEach((e: any) => {
+        const dept = e.department || 'Non défini';
+        if (!depts[dept]) depts[dept] = [];
+        depts[dept].push(e);
+      });
+      
+      hrContext += `Répartition par département:\n`;
+      Object.entries(depts).forEach(([dept, emps]) => {
+        hrContext += `  - ${dept}: ${emps.length} personnes\n`;
+      });
+      
+      // Top performers
+      const topPerformers = employees.filter((e: any) => e.performance_score >= 4).slice(0, 5);
+      if (topPerformers.length > 0) {
+        hrContext += `Top performers:\n`;
+        topPerformers.forEach((e: any) => {
+          hrContext += `  - ${e.first_name} ${e.last_name} (${e.position}): ${e.performance_score}/5\n`;
+        });
+      }
+      contextParts.push(hrContext);
+    }
+
+    // === CANDIDATES ===
+    if (candidates && candidates.length > 0) {
+      let candContext = `\n🎯 RECRUTEMENT:\n`;
+      candContext += `• ${candidates.length} candidats dans le pipeline\n`;
+      const byStatus: Record<string, number> = {};
+      candidates.forEach((c: any) => {
+        const s = c.status || 'nouveau';
+        byStatus[s] = (byStatus[s] || 0) + 1;
+      });
+      Object.entries(byStatus).forEach(([status, count]) => {
+        candContext += `  - ${status}: ${count}\n`;
+      });
+      contextParts.push(candContext);
+    }
+
+    // === SUPPORT ===
+    if (supportTickets && supportTickets.length > 0) {
+      const openTickets = supportTickets.filter((t: any) => t.status !== 'resolved' && t.status !== 'closed');
+      let supportContext = `\n🎫 SUPPORT:\n`;
+      supportContext += `• ${supportTickets.length} tickets, ${openTickets.length} en cours\n`;
+      if (openTickets.length > 0) {
+        supportContext += `Tickets ouverts prioritaires:\n`;
+        openTickets.filter((t: any) => t.priority === 'high' || t.priority === 'urgent').slice(0, 5).forEach((t: any) => {
+          supportContext += `  - [${t.priority}] ${t.title} (${t.customer_name})\n`;
+        });
+      }
+      contextParts.push(supportContext);
+    }
+
+    // === DOCUMENTS ===
+    if (documents && documents.length > 0) {
+      let docContext = `\n📁 DOCUMENTS:\n`;
+      docContext += `• ${documents.length} documents disponibles\n`;
+      documents.slice(0, 5).forEach((d: any) => {
+        docContext += `  - ${d.title} (${d.file_type || 'doc'})\n`;
+      });
+      contextParts.push(docContext);
+    }
+
+    // === CRM ===
+    if (crmOpportunities && crmOpportunities.length > 0) {
+      const totalValue = crmOpportunities.reduce((s: number, o: any) => s + (o.value || 0), 0);
+      let crmContext = `\n💼 CRM:\n`;
+      crmContext += `• ${crmOpportunities.length} opportunités, valeur totale: ${formatCurrency(totalValue)}\n`;
+      crmOpportunities.slice(0, 5).forEach((o: any) => {
+        crmContext += `  - ${o.name}: ${formatCurrency(o.value)} (${o.status}, ${o.probability}%)\n`;
+      });
+      contextParts.push(crmContext);
+    }
+
+    // === COMPLIANCE ===
+    if (complianceAlerts && complianceAlerts.length > 0) {
+      let compContext = `\n⚠️ ALERTES COMPLIANCE:\n`;
+      compContext += `• ${complianceAlerts.length} alertes non résolues\n`;
+      complianceAlerts.slice(0, 5).forEach((a: any) => {
+        compContext += `  - [${a.severity}] ${a.title}\n`;
+      });
+      contextParts.push(compContext);
+    }
+
+    // === ESG ===
+    if (esgKpis && esgKpis.length > 0) {
+      let esgContext = `\n🌱 ESG:\n`;
+      esgContext += `• ${esgKpis.length} indicateurs suivis\n`;
+      const byCategory: Record<string, any[]> = {};
+      esgKpis.forEach((k: any) => {
+        const cat = k.category || 'Autre';
+        if (!byCategory[cat]) byCategory[cat] = [];
+        byCategory[cat].push(k);
+      });
+      Object.entries(byCategory).forEach(([cat, kpis]) => {
+        esgContext += `  ${cat}: ${kpis.length} KPIs\n`;
+      });
+      contextParts.push(esgContext);
+    }
+
+    // === ENRICHED COMPANIES ===
+    if (enrichedCompanies && enrichedCompanies.length > 0) {
+      let dataContext = `\n🏢 DONNÉES ENTREPRISES ENRICHIES:\n`;
+      dataContext += `• ${enrichedCompanies.length} entreprises dans la base\n`;
+      enrichedCompanies.slice(0, 5).forEach((c: any) => {
+        dataContext += `  - ${c.name} (${c.headquarters_city}): ${c.employee_count} emp., CA ${formatCurrency(c.revenue)}\n`;
+      });
+      contextParts.push(dataContext);
+    }
+
+    if (contextParts.length === 0) {
+      return '';
+    }
+
+    return `\n\n=== DONNÉES PLATEFORME AETHER (${companyName}) ===\nVoici les données en temps réel de votre entreprise:${contextParts.join('')}\n=== FIN DES DONNÉES PLATEFORME ===\n`;
+
+  } catch (error) {
+    console.error('Error fetching platform context:', error);
+    return '';
+  }
+}
+
+function formatCurrency(value: number | null): string {
+  if (!value) return '0 €';
+  if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(1)}M €`;
+  }
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(0)}k €`;
+  }
+  return `${value.toFixed(0)} €`;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages, systemPrompt, userId, attachments } = await req.json() as ChatRequest;
+    const { messages, systemPrompt, userId, companyId, attachments } = await req.json() as ChatRequest;
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -119,12 +432,23 @@ serve(async (req) => {
 
     let documentContext = '';
     let realtimeContext = '';
+    let platformContext = '';
 
     // Get the last user message
     const lastUserMessage = messages.filter(m => m.role === 'user').pop();
     const msgContent = typeof lastUserMessage?.content === 'string' 
       ? lastUserMessage.content 
       : (lastUserMessage?.content as any[])?.find(c => c.type === 'text')?.text || '';
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Check if we need platform data (company context)
+    if (userId && companyId && needsPlatformData(msgContent)) {
+      console.log('Platform data triggered for:', msgContent.slice(0, 100));
+      platformContext = await fetchPlatformContext(supabase, userId, companyId, msgContent);
+    }
 
     // Check if we need real-time data
     if (needsRealtimeSearch(msgContent)) {
@@ -143,12 +467,8 @@ serve(async (req) => {
       }
     }
 
-    // Fetch documents if userId is provided
+    // Fetch user documents
     if (userId) {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
       const { data: internalDocs } = await supabase
         .from('internal_docs')
         .select('title, content, doc_type')
@@ -208,28 +528,27 @@ serve(async (req) => {
     // Build enhanced system prompt
     const baseSystemPrompt = systemPrompt || `Tu es AETHER Brain, l'assistant IA interne d'une entreprise ultra-performant et polyvalent.`;
 
-    const enhancedSystemPrompt = `${baseSystemPrompt}${realtimeContext}${documentContext}${attachmentContext}
+    const enhancedSystemPrompt = `${baseSystemPrompt}${platformContext}${realtimeContext}${documentContext}${attachmentContext}
 
 CAPACITÉS:
-- Accéder aux informations VÉRIFIÉES en temps réel via recherche web (météo, actualités, cours de bourse, etc.)
+- Accéder aux DONNÉES EN TEMPS RÉEL de la plateforme AETHER (ventes, employés, tickets, documents, etc.)
+- Accéder aux informations VÉRIFIÉES via recherche web (météo, actualités, cours de bourse, etc.)
 - Analyser des images (photos, captures d'écran, graphiques, schémas)
 - Analyser tous types de documents (PDF, Word, texte)
 - Rechercher dans la base de connaissances interne
 
-INSTRUCTIONS CRITIQUES POUR LA PRÉCISION:
-- TOUTES les informations que tu donnes doivent être 100% EXACTES et VÉRIFIÉES
-- Si des DONNÉES VÉRIFIÉES EN TEMPS RÉEL sont fournies, utilise-les EXCLUSIVEMENT pour répondre
-- CITE TOUJOURS les sources quand tu utilises des données en temps réel
-- Si tu n'es pas CERTAIN d'une information, DIS-LE CLAIREMENT
-- Ne fais JAMAIS de suppositions ou d'approximations sur des données factuelles
-- Pour les chiffres (météo, cours, scores, prix), donne UNIQUEMENT les valeurs vérifiées
-- Utilise EN PRIORITÉ les documents internes quand pertinents
-- Si tu cites un document, mentionne son titre
-- Pour les images: décris, analyse, extrait le texte si pertinent
+INSTRUCTIONS CRITIQUES:
+- Si des DONNÉES PLATEFORME AETHER sont fournies, utilise-les pour répondre aux questions sur l'entreprise
+- Tu as accès aux deals, employés, tickets support, documents, workflows, alertes compliance, contacts CRM, et données ESG
+- Réponds avec les données RÉELLES de l'entreprise, jamais avec des suppositions
+- Pour les questions sur les ventes, employés, tickets, etc., base-toi UNIQUEMENT sur les données fournies
+- TOUTES les informations que tu donnes doivent être 100% EXACTES et basées sur les données
+- Si des DONNÉES EN TEMPS RÉEL (web) sont fournies, utilise-les EXCLUSIVEMENT pour ces sujets
+- CITE TOUJOURS les sources quand tu utilises des données externes
 - Réponds en français, de manière professionnelle, claire et concise
-- Ne dis JAMAIS que tu n'as pas accès à internet ou aux données en temps réel`;
+- Ne dis JAMAIS que tu n'as pas accès aux données de l'entreprise`;
 
-    console.log(`Processing request: ${messages.length} messages, attachments: ${attachments?.length || 0}, docs: ${documentContext.length > 0}, realtime: ${realtimeContext.length > 0}`);
+    console.log(`Processing request: ${messages.length} messages, attachments: ${attachments?.length || 0}, platform: ${platformContext.length > 0}, docs: ${documentContext.length > 0}, realtime: ${realtimeContext.length > 0}`);
 
     // Prepare messages with image support
     const preparedMessages = messages.map((msg, idx) => {

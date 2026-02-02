@@ -6,6 +6,7 @@ import { callAI } from '@/lib/ai';
 import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext } from '@/lib/aether-knowledge-base';
+import { useUserCompanyId } from './useUserCompanyId';
 
 export interface Message {
   id: string;
@@ -40,6 +41,7 @@ export function useBrain() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { companyId } = useUserCompanyId();
   
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -292,6 +294,7 @@ ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
           messages: cleanedMessages,
           systemPrompt,
           userId: user.id,
+          companyId: companyId || undefined,
           attachments: options?.attachments,
           confidentialMode: options?.confidentialMode,
           abortSignal: abortControllerRef.current?.signal,
