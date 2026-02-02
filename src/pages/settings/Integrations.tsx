@@ -1,418 +1,273 @@
 import { useState, useEffect, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Plug, 
   Search, 
-  Zap, 
   CheckCircle, 
   XCircle, 
   ExternalLink,
-  Brain,
-  MessageSquare,
   Key,
   Eye,
   EyeOff,
   Save,
   Trash2,
   Loader2,
-  Link2,
-  Mail,
-  Phone,
-  CreditCard,
-  Github,
-  Database,
-  Bot,
-  Cloud,
-  FileText,
-  Image,
-  Globe,
-  Send,
-  Webhook,
-  Calendar,
+  AlertTriangle,
+  // Icons for categories and connectors
   Users,
+  Megaphone,
+  MessageSquare,
+  CheckSquare,
+  CreditCard,
   ShoppingCart,
-  BarChart3,
+  BarChart,
+  Code,
+  Brain,
   HardDrive,
-  Video
+  Database,
+  Share2,
+  Briefcase,
+  HeadphonesIcon,
+  Cloud,
+  GitBranch,
+  Mail,
+  Send,
+  Zap,
+  UserPlus,
+  FileText,
+  Grid,
+  Layout,
+  Calendar,
+  CheckCircle2,
+  Phone,
+  MessageCircle,
+  Tent,
+  DollarSign,
+  BookOpen,
+  Receipt,
+  Waves,
+  Square,
+  Globe,
+  ShoppingBag,
+  Package,
+  Gift,
+  BarChart2,
+  PieChart,
+  Activity,
+  Sparkles,
+  Layers,
+  Github,
+  GitMerge,
+  Triangle,
+  Train,
+  Plane,
+  Box,
+  AlertTriangle as AlertTriangleIcon,
+  Cpu,
+  Bot,
+  Wand2,
+  Volume2,
+  Mic,
+  FileAudio,
+  Hexagon,
+  Archive,
+  Flame,
+  Twitter,
+  Linkedin,
+  Facebook,
+  Instagram,
+  Youtube,
+  Music,
+  Image,
+  Sprout,
+  LifeBuoy,
+  Inbox
 } from 'lucide-react';
 import { useUserApiKeys } from '@/hooks/useUserApiKeys';
 import { toast } from 'sonner';
+import { BUILT_IN_CONNECTORS, CONNECTOR_CATEGORIES, ConnectorCategory } from '@/lib/workflow-connectors';
 
-interface Integration {
+// Map icon names to Lucide components
+const iconMap: Record<string, React.ElementType> = {
+  Users, Megaphone, MessageSquare, CheckSquare, CreditCard, ShoppingCart, BarChart, Code, Brain, 
+  HardDrive, Database, Share2, Briefcase, HeadphonesIcon, Cloud, GitBranch, Mail, Send, Zap, 
+  UserPlus, FileText, Grid, Layout, Calendar, CheckCircle: CheckCircle2, Phone, MessageCircle, 
+  Tent, DollarSign, BookOpen, Receipt, Waves, Square, Globe, ShoppingBag, Package, Gift, 
+  BarChart2, PieChart, Activity, Sparkles, Layers, Github, GitMerge, Triangle, Train, Plane, 
+  Box, AlertTriangle: AlertTriangleIcon, Cpu, Bot, Wand2, Volume2, Mic, FileAudio, Hexagon, 
+  Archive, Flame, Twitter, Linkedin, Facebook, Instagram, Youtube, Music, Image, Sprout, 
+  LifeBuoy, Inbox
+};
+
+interface IntegrationConfig {
   id: string;
   name: string;
-  description: string;
-  icon: React.ElementType;
-  category: 'ai' | 'productivity' | 'communication' | 'payment' | 'storage' | 'crm';
-  serviceName: string;
-  placeholder: string;
-  helpUrl?: string;
+  category: ConnectorCategory;
+  icon: string;
   color: string;
-  features: string[];
+  verified: boolean;
+  placeholder?: string;
+  helpUrl?: string;
 }
 
-const integrations: Integration[] = [
-  // AI
-  {
-    id: 'openai',
-    name: 'OpenAI',
-    description: 'GPT-4, GPT-3.5, Whisper, DALL-E',
-    icon: Bot,
-    category: 'ai',
-    serviceName: 'openai',
-    placeholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://platform.openai.com/api-keys',
-    color: 'from-emerald-500 to-teal-500',
-    features: ['GPT-4', 'Whisper', 'DALL-E']
-  },
-  {
-    id: 'anthropic',
-    name: 'Anthropic',
-    description: 'Claude 3.5, Claude 3 Opus/Sonnet',
-    icon: Brain,
-    category: 'ai',
-    serviceName: 'anthropic',
-    placeholder: 'sk-ant-xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://console.anthropic.com/settings/keys',
-    color: 'from-orange-500 to-amber-500',
-    features: ['Claude 3.5', 'Vision', 'Documents']
-  },
-  {
-    id: 'google-ai',
-    name: 'Google AI',
-    description: 'Gemini Pro, Gemini Flash',
-    icon: Brain,
-    category: 'ai',
-    serviceName: 'google_ai',
-    placeholder: 'AIzaSyxxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://aistudio.google.com/apikey',
-    color: 'from-blue-500 to-cyan-500',
-    features: ['Gemini Pro', 'Gemini Flash', 'Vision']
-  },
-  {
-    id: 'mistral',
-    name: 'Mistral AI',
-    description: 'Mistral Large, Mixtral, Codestral',
-    icon: Brain,
-    category: 'ai',
-    serviceName: 'mistral',
-    placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://console.mistral.ai/api-keys/',
-    color: 'from-indigo-500 to-violet-500',
-    features: ['Mistral Large', 'Mixtral', 'Code']
-  },
-  {
-    id: 'groq',
-    name: 'Groq',
-    description: 'LPU ultra-rapide pour LLaMA, Mixtral',
-    icon: Zap,
-    category: 'ai',
-    serviceName: 'groq',
-    placeholder: 'gsk_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://console.groq.com/keys',
-    color: 'from-pink-500 to-rose-500',
-    features: ['LLaMA 3', 'Ultra-rapide', 'Mixtral']
-  },
-  {
-    id: 'perplexity',
-    name: 'Perplexity',
-    description: 'Recherche web augmentée par IA',
-    icon: Globe,
-    category: 'ai',
-    serviceName: 'perplexity',
-    placeholder: 'pplx-xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://www.perplexity.ai/settings/api',
-    color: 'from-teal-500 to-emerald-500',
-    features: ['Sonar', 'Recherche web', 'Citations']
-  },
-  {
-    id: 'replicate',
-    name: 'Replicate',
-    description: 'Modèles open-source (Stable Diffusion, etc.)',
-    icon: Image,
-    category: 'ai',
-    serviceName: 'replicate',
-    placeholder: 'r8_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://replicate.com/account/api-tokens',
-    color: 'from-purple-500 to-fuchsia-500',
-    features: ['Images', 'Vidéo', 'Audio']
-  },
-  {
-    id: 'elevenlabs',
-    name: 'ElevenLabs',
-    description: 'Synthèse vocale ultra-réaliste',
-    icon: Video,
-    category: 'ai',
-    serviceName: 'elevenlabs',
-    placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://elevenlabs.io/app/settings/api-keys',
-    color: 'from-cyan-500 to-blue-500',
-    features: ['TTS', 'Voix clonées', 'Multilingue']
-  },
-  // Communication
-  {
-    id: 'resend',
-    name: 'Resend',
-    description: 'Emails transactionnels modernes',
-    icon: Mail,
-    category: 'communication',
-    serviceName: 'resend',
-    placeholder: 're_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://resend.com/api-keys',
-    color: 'from-blue-500 to-indigo-500',
-    features: ['Transactionnel', 'Templates', 'React Email']
-  },
-  {
-    id: 'sendgrid',
-    name: 'SendGrid',
-    description: 'Envoi d\'emails à grande échelle',
-    icon: Send,
-    category: 'communication',
-    serviceName: 'sendgrid',
-    placeholder: 'SG.xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://app.sendgrid.com/settings/api_keys',
-    color: 'from-sky-500 to-blue-500',
-    features: ['Marketing', 'Transactionnel', 'Analytics']
-  },
-  {
-    id: 'telegram',
-    name: 'Telegram Bot',
-    description: 'Notifications et bots Telegram',
-    icon: MessageSquare,
-    category: 'communication',
-    serviceName: 'telegram',
-    placeholder: '1234567890:ABCdefGHIjklMNOpqrsTUVwxyz',
-    helpUrl: 'https://core.telegram.org/bots#creating-a-new-bot',
-    color: 'from-sky-500 to-blue-500',
-    features: ['Messages', 'Bots', 'Groupes']
-  },
-  {
-    id: 'slack',
-    name: 'Slack',
-    description: 'Messages et notifications Slack',
-    icon: MessageSquare,
-    category: 'communication',
-    serviceName: 'slack',
-    placeholder: 'xoxb-xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://api.slack.com/tutorials/tracks/getting-a-token',
-    color: 'from-purple-500 to-pink-500',
-    features: ['Messages', 'Channels', 'Apps']
-  },
-  {
-    id: 'discord',
-    name: 'Discord',
-    description: 'Webhooks et bots Discord',
-    icon: MessageSquare,
-    category: 'communication',
-    serviceName: 'discord',
-    placeholder: 'Bot token ou Webhook URL',
-    helpUrl: 'https://discord.com/developers/applications',
-    color: 'from-indigo-500 to-purple-500',
-    features: ['Webhooks', 'Bots', 'Embeds']
-  },
-  {
-    id: 'twilio',
-    name: 'Twilio',
-    description: 'SMS, appels et WhatsApp',
-    icon: Phone,
-    category: 'communication',
-    serviceName: 'twilio',
-    placeholder: 'ACxxxxxxxx:AuthToken',
-    helpUrl: 'https://console.twilio.com/',
-    color: 'from-red-500 to-rose-500',
-    features: ['SMS', 'Appels', 'WhatsApp']
-  },
-  // Productivity
-  {
-    id: 'notion',
-    name: 'Notion',
-    description: 'Bases de données et pages Notion',
-    icon: FileText,
-    category: 'productivity',
-    serviceName: 'notion',
-    placeholder: 'secret_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://www.notion.so/my-integrations',
-    color: 'from-stone-600 to-stone-800',
-    features: ['Databases', 'Pages', 'Sync']
-  },
-  {
-    id: 'airtable',
-    name: 'Airtable',
-    description: 'Bases de données collaboratives',
-    icon: Database,
-    category: 'productivity',
-    serviceName: 'airtable',
-    placeholder: 'patxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://airtable.com/create/tokens',
-    color: 'from-yellow-500 to-orange-500',
-    features: ['Bases', 'Automations', 'Views']
-  },
-  {
-    id: 'google-sheets',
-    name: 'Google Sheets',
-    description: 'Lecture/écriture de feuilles Google',
-    icon: FileText,
-    category: 'productivity',
-    serviceName: 'google_sheets',
-    placeholder: 'Service Account JSON (base64)',
-    helpUrl: 'https://console.cloud.google.com/apis/credentials',
-    color: 'from-green-500 to-emerald-500',
-    features: ['Lecture', 'Écriture', 'Formules']
-  },
-  {
-    id: 'github',
-    name: 'GitHub',
-    description: 'Repos, issues et actions',
-    icon: Github,
-    category: 'productivity',
-    serviceName: 'github',
-    placeholder: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://github.com/settings/tokens',
-    color: 'from-gray-600 to-gray-800',
-    features: ['Repos', 'Issues', 'PRs']
-  },
-  {
-    id: 'linear',
-    name: 'Linear',
-    description: 'Gestion de projets et issues',
-    icon: Zap,
-    category: 'productivity',
-    serviceName: 'linear',
-    placeholder: 'lin_api_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://linear.app/settings/api',
-    color: 'from-indigo-500 to-violet-500',
-    features: ['Issues', 'Projets', 'Cycles']
-  },
-  {
-    id: 'calendly',
-    name: 'Calendly',
-    description: 'Gestion de rendez-vous',
-    icon: Calendar,
-    category: 'productivity',
-    serviceName: 'calendly',
-    placeholder: 'eyJhbGcixxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://calendly.com/integrations/api_webhooks',
-    color: 'from-blue-500 to-cyan-500',
-    features: ['Events', 'Webhooks', 'Invités']
-  },
+// Extended connector info with API key placeholders
+const CONNECTOR_DETAILS: Record<string, { placeholder: string; helpUrl?: string }> = {
   // CRM
-  {
-    id: 'hubspot',
-    name: 'HubSpot',
-    description: 'CRM, contacts et deals',
-    icon: Users,
-    category: 'crm',
-    serviceName: 'hubspot',
-    placeholder: 'pat-xxx-xxxxxxxx-xxxx-xxxx',
-    helpUrl: 'https://developers.hubspot.com/docs/api/private-apps',
-    color: 'from-orange-500 to-red-500',
-    features: ['Contacts', 'Deals', 'Pipelines']
-  },
-  {
-    id: 'pipedrive',
-    name: 'Pipedrive',
-    description: 'CRM et pipeline de ventes',
-    icon: BarChart3,
-    category: 'crm',
-    serviceName: 'pipedrive',
-    placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://pipedrive.readme.io/docs/core-api-concepts-authentication',
-    color: 'from-green-500 to-teal-500',
-    features: ['Deals', 'Contacts', 'Activities']
-  },
-  // Payment
-  {
-    id: 'stripe',
-    name: 'Stripe',
-    description: 'Paiements et abonnements',
-    icon: CreditCard,
-    category: 'payment',
-    serviceName: 'stripe',
-    placeholder: 'sk_live_xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://dashboard.stripe.com/apikeys',
-    color: 'from-violet-500 to-purple-500',
-    features: ['Paiements', 'Subscriptions', 'Invoices']
-  },
-  {
-    id: 'paypal',
-    name: 'PayPal',
-    description: 'Paiements PayPal',
-    icon: CreditCard,
-    category: 'payment',
-    serviceName: 'paypal',
-    placeholder: 'Client ID:Secret',
-    helpUrl: 'https://developer.paypal.com/dashboard/applications',
-    color: 'from-blue-500 to-indigo-500',
-    features: ['Paiements', 'Checkout', 'Webhooks']
-  },
+  hubspot: { placeholder: 'pat-xxx-xxxxxxxx-xxxx-xxxx', helpUrl: 'https://developers.hubspot.com/docs/api/private-apps' },
+  salesforce: { placeholder: 'OAuth access token', helpUrl: 'https://developer.salesforce.com/' },
+  pipedrive: { placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://pipedrive.readme.io/docs/core-api-concepts-authentication' },
+  zoho_crm: { placeholder: 'OAuth token', helpUrl: 'https://www.zoho.com/crm/developer/' },
+  freshsales: { placeholder: 'API Key', helpUrl: 'https://www.freshworks.com/freshsales/' },
+  copper: { placeholder: 'API Key', helpUrl: 'https://developer.copper.com/' },
+  
+  // Marketing
+  mailchimp: { placeholder: 'xxxxxxxx-us1', helpUrl: 'https://mailchimp.com/developer/' },
+  sendgrid: { placeholder: 'SG.xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://app.sendgrid.com/settings/api_keys' },
+  klaviyo: { placeholder: 'pk_xxxxxxxxxxxxxxxx', helpUrl: 'https://www.klaviyo.com/account' },
+  activecampaign: { placeholder: 'API Key', helpUrl: 'https://developers.activecampaign.com/' },
+  convertkit: { placeholder: 'API Secret', helpUrl: 'https://app.convertkit.com/account_settings/advanced_settings' },
+  brevo: { placeholder: 'xkeysib-xxx', helpUrl: 'https://app.brevo.com/settings/keys/api' },
+  mailerlite: { placeholder: 'API Key', helpUrl: 'https://dashboard.mailerlite.com/integrations/api' },
+  constant_contact: { placeholder: 'API Key', helpUrl: 'https://developer.constantcontact.com/' },
+  
+  // Communication
+  slack: { placeholder: 'xoxb-xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://api.slack.com/tutorials/tracks/getting-a-token' },
+  discord: { placeholder: 'Bot token or Webhook URL', helpUrl: 'https://discord.com/developers/applications' },
+  telegram: { placeholder: '1234567890:ABCdefGHIjklMNOpqrsTUVwxyz', helpUrl: 'https://core.telegram.org/bots' },
+  twilio: { placeholder: 'AccountSID:AuthToken', helpUrl: 'https://console.twilio.com/' },
+  whatsapp: { placeholder: 'WhatsApp Business API Token', helpUrl: 'https://business.whatsapp.com/' },
+  intercom: { placeholder: 'Access Token', helpUrl: 'https://developers.intercom.com/' },
+  crisp: { placeholder: 'API Key', helpUrl: 'https://developers.crisp.chat/' },
+  zendesk_chat: { placeholder: 'API Token', helpUrl: 'https://developer.zendesk.com/' },
+  
+  // Productivity
+  notion: { placeholder: 'secret_xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://www.notion.so/my-integrations' },
+  airtable: { placeholder: 'patxxxxxxxxxxxxxxxx', helpUrl: 'https://airtable.com/create/tokens' },
+  asana: { placeholder: 'Bearer Token', helpUrl: 'https://developers.asana.com/' },
+  trello: { placeholder: 'API Key', helpUrl: 'https://trello.com/app-key' },
+  monday: { placeholder: 'API Token', helpUrl: 'https://monday.com/developers/' },
+  clickup: { placeholder: 'pk_xxxxxxxx', helpUrl: 'https://clickup.com/api' },
+  todoist: { placeholder: 'API Token', helpUrl: 'https://todoist.com/app/settings/integrations' },
+  linear: { placeholder: 'lin_api_xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://linear.app/settings/api' },
+  basecamp: { placeholder: 'OAuth Token', helpUrl: 'https://github.com/basecamp/api' },
+  jira: { placeholder: 'API Token', helpUrl: 'https://id.atlassian.com/manage-profile/security/api-tokens' },
+  
+  // Finance
+  stripe: { placeholder: 'sk_live_xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://dashboard.stripe.com/apikeys' },
+  paypal: { placeholder: 'Client ID:Secret', helpUrl: 'https://developer.paypal.com/dashboard/applications' },
+  quickbooks: { placeholder: 'OAuth Token', helpUrl: 'https://developer.intuit.com/' },
+  xero: { placeholder: 'OAuth Token', helpUrl: 'https://developer.xero.com/' },
+  freshbooks: { placeholder: 'API Token', helpUrl: 'https://www.freshbooks.com/api' },
+  wave: { placeholder: 'API Token', helpUrl: 'https://developer.waveapps.com/' },
+  square: { placeholder: 'Access Token', helpUrl: 'https://developer.squareup.com/' },
+  wise: { placeholder: 'API Token', helpUrl: 'https://api-docs.wise.com/' },
+  
+  // E-commerce
+  shopify: { placeholder: 'shpat_xxxxxxxxxxxxxxxx', helpUrl: 'https://shopify.dev/' },
+  woocommerce: { placeholder: 'Consumer Key:Consumer Secret', helpUrl: 'https://woocommerce.github.io/woocommerce-rest-api-docs/' },
+  magento: { placeholder: 'Access Token', helpUrl: 'https://devdocs.magento.com/' },
+  bigcommerce: { placeholder: 'API Token', helpUrl: 'https://developer.bigcommerce.com/' },
+  prestashop: { placeholder: 'Webservice Key', helpUrl: 'https://devdocs.prestashop-project.org/' },
+  amazon_seller: { placeholder: 'AWS Access Key', helpUrl: 'https://developer-docs.amazon.com/sp-api/' },
+  etsy: { placeholder: 'API Key', helpUrl: 'https://www.etsy.com/developers/' },
+  
+  // Analytics
+  google_analytics: { placeholder: 'Service Account JSON', helpUrl: 'https://developers.google.com/analytics' },
+  mixpanel: { placeholder: 'Project Token', helpUrl: 'https://developer.mixpanel.com/' },
+  amplitude: { placeholder: 'API Key', helpUrl: 'https://amplitude.com/docs/apis/' },
+  segment: { placeholder: 'Write Key', helpUrl: 'https://segment.com/docs/' },
+  posthog: { placeholder: 'API Key', helpUrl: 'https://posthog.com/docs/api' },
+  heap: { placeholder: 'API Key', helpUrl: 'https://developers.heap.io/' },
+  hotjar: { placeholder: 'Site ID', helpUrl: 'https://www.hotjar.com/' },
+  
+  // Developer
+  github: { placeholder: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://github.com/settings/tokens' },
+  gitlab: { placeholder: 'glpat-xxxxxxxx', helpUrl: 'https://gitlab.com/-/profile/personal_access_tokens' },
+  bitbucket: { placeholder: 'App Password', helpUrl: 'https://bitbucket.org/account/settings/app-passwords/' },
+  vercel: { placeholder: 'Bearer Token', helpUrl: 'https://vercel.com/account/tokens' },
+  netlify: { placeholder: 'Personal Access Token', helpUrl: 'https://app.netlify.com/user/applications' },
+  railway: { placeholder: 'API Token', helpUrl: 'https://railway.app/account/tokens' },
+  render: { placeholder: 'API Key', helpUrl: 'https://render.com/docs/api' },
+  fly_io: { placeholder: 'API Token', helpUrl: 'https://fly.io/docs/reference/api/' },
+  docker_hub: { placeholder: 'Access Token', helpUrl: 'https://hub.docker.com/settings/security' },
+  npm: { placeholder: 'Access Token', helpUrl: 'https://www.npmjs.com/settings/~/tokens' },
+  sentry: { placeholder: 'Auth Token', helpUrl: 'https://sentry.io/settings/account/api/auth-tokens/' },
+  datadog: { placeholder: 'API Key', helpUrl: 'https://app.datadoghq.com/organization-settings/api-keys' },
+  
+  // AI & ML
+  openai: { placeholder: 'sk-xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://platform.openai.com/api-keys' },
+  anthropic: { placeholder: 'sk-ant-xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://console.anthropic.com/settings/keys' },
+  cohere: { placeholder: 'API Key', helpUrl: 'https://dashboard.cohere.com/api-keys' },
+  replicate: { placeholder: 'r8_xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://replicate.com/account/api-tokens' },
+  huggingface: { placeholder: 'hf_xxxxxxxxxxxxxxxx', helpUrl: 'https://huggingface.co/settings/tokens' },
+  stability: { placeholder: 'sk-xxxxxxxx', helpUrl: 'https://platform.stability.ai/' },
+  elevenlabs: { placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxx', helpUrl: 'https://elevenlabs.io/app/settings/api-keys' },
+  deepgram: { placeholder: 'API Key', helpUrl: 'https://console.deepgram.com/' },
+  assembly: { placeholder: 'API Key', helpUrl: 'https://www.assemblyai.com/app/account' },
+  pinecone: { placeholder: 'API Key', helpUrl: 'https://app.pinecone.io/' },
+  weaviate: { placeholder: 'API Key', helpUrl: 'https://weaviate.io/developers/wcs/quickstart' },
+  
   // Storage
-  {
-    id: 'aws-s3',
-    name: 'AWS S3',
-    description: 'Stockage de fichiers cloud',
-    icon: Cloud,
-    category: 'storage',
-    serviceName: 'aws_s3',
-    placeholder: 'AccessKeyId:SecretAccessKey',
-    helpUrl: 'https://console.aws.amazon.com/iam/',
-    color: 'from-orange-500 to-amber-500',
-    features: ['Upload', 'Download', 'Presigned URLs']
-  },
-  {
-    id: 'cloudinary',
-    name: 'Cloudinary',
-    description: 'Gestion d\'images et vidéos',
-    icon: Image,
-    category: 'storage',
-    serviceName: 'cloudinary',
-    placeholder: 'cloud_name:api_key:api_secret',
-    helpUrl: 'https://console.cloudinary.com/console',
-    color: 'from-blue-500 to-cyan-500',
-    features: ['Images', 'Vidéos', 'Transformations']
-  },
-  {
-    id: 'supabase',
-    name: 'Supabase externe',
-    description: 'Base de données externe Supabase',
-    icon: Database,
-    category: 'storage',
-    serviceName: 'supabase_external',
-    placeholder: 'URL:ServiceRoleKey',
-    helpUrl: 'https://supabase.com/dashboard/project/_/settings/api',
-    color: 'from-emerald-500 to-green-500',
-    features: ['Database', 'Auth', 'Storage']
-  },
-  // Webhooks / HTTP
-  {
-    id: 'webhook-generic',
-    name: 'Webhook générique',
-    description: 'Appeler n\'importe quelle API HTTP',
-    icon: Webhook,
-    category: 'productivity',
-    serviceName: 'webhook',
-    placeholder: 'Bearer token ou API key',
-    color: 'from-gray-500 to-slate-600',
-    features: ['GET', 'POST', 'Headers auth']
-  },
-  {
-    id: 'firecrawl',
-    name: 'Firecrawl',
-    description: 'Web scraping et extraction de données',
-    icon: Globe,
-    category: 'productivity',
-    serviceName: 'firecrawl',
-    placeholder: 'fc-xxxxxxxxxxxxxxxxxxxxxxxx',
-    helpUrl: 'https://www.firecrawl.dev/app/api-keys',
-    color: 'from-orange-500 to-red-500',
-    features: ['Scraping', 'Crawling', 'Extraction']
-  },
-];
+  aws_s3: { placeholder: 'AccessKeyId:SecretAccessKey', helpUrl: 'https://console.aws.amazon.com/iam/' },
+  google_cloud_storage: { placeholder: 'Service Account JSON', helpUrl: 'https://console.cloud.google.com/' },
+  azure_blob: { placeholder: 'Connection String', helpUrl: 'https://portal.azure.com/' },
+  dropbox: { placeholder: 'Access Token', helpUrl: 'https://www.dropbox.com/developers/apps' },
+  google_drive: { placeholder: 'Service Account JSON', helpUrl: 'https://console.cloud.google.com/' },
+  onedrive: { placeholder: 'OAuth Token', helpUrl: 'https://developer.microsoft.com/' },
+  box: { placeholder: 'Access Token', helpUrl: 'https://developer.box.com/' },
+  cloudflare_r2: { placeholder: 'Access Key', helpUrl: 'https://dash.cloudflare.com/' },
+  
+  // Database
+  mongodb: { placeholder: 'Connection String', helpUrl: 'https://www.mongodb.com/docs/atlas/' },
+  firebase: { placeholder: 'Service Account JSON', helpUrl: 'https://console.firebase.google.com/' },
+  supabase: { placeholder: 'Service Role Key', helpUrl: 'https://supabase.com/dashboard/' },
+  planetscale: { placeholder: 'Service Token', helpUrl: 'https://planetscale.com/docs/' },
+  redis: { placeholder: 'Connection URL', helpUrl: 'https://redis.io/docs/' },
+  elasticsearch: { placeholder: 'API Key', helpUrl: 'https://www.elastic.co/guide/' },
+  algolia: { placeholder: 'Admin API Key', helpUrl: 'https://dashboard.algolia.com/' },
+  
+  // Social
+  twitter: { placeholder: 'Bearer Token', helpUrl: 'https://developer.twitter.com/' },
+  linkedin: { placeholder: 'Access Token', helpUrl: 'https://www.linkedin.com/developers/' },
+  facebook: { placeholder: 'Access Token', helpUrl: 'https://developers.facebook.com/' },
+  instagram: { placeholder: 'Access Token', helpUrl: 'https://developers.facebook.com/products/instagram/' },
+  youtube: { placeholder: 'API Key', helpUrl: 'https://console.cloud.google.com/' },
+  tiktok: { placeholder: 'Access Token', helpUrl: 'https://developers.tiktok.com/' },
+  pinterest: { placeholder: 'Access Token', helpUrl: 'https://developers.pinterest.com/' },
+  
+  // HR
+  bamboohr: { placeholder: 'API Key', helpUrl: 'https://documentation.bamboohr.com/docs' },
+  workday: { placeholder: 'API Credentials', helpUrl: 'https://community.workday.com/' },
+  gusto: { placeholder: 'API Token', helpUrl: 'https://docs.gusto.com/' },
+  lever: { placeholder: 'API Key', helpUrl: 'https://hire.lever.co/developer/' },
+  greenhouse: { placeholder: 'API Token', helpUrl: 'https://developers.greenhouse.io/' },
+  deel: { placeholder: 'API Token', helpUrl: 'https://developer.deel.com/' },
+  rippling: { placeholder: 'API Key', helpUrl: 'https://developer.rippling.com/' },
+  
+  // Support
+  zendesk: { placeholder: 'API Token', helpUrl: 'https://developer.zendesk.com/' },
+  freshdesk: { placeholder: 'API Key', helpUrl: 'https://developers.freshdesk.com/' },
+  helpscout: { placeholder: 'API Key', helpUrl: 'https://developer.helpscout.com/' },
+  front: { placeholder: 'API Token', helpUrl: 'https://dev.frontapp.com/' },
+  gorgias: { placeholder: 'API Key', helpUrl: 'https://developers.gorgias.com/' },
+  kustomer: { placeholder: 'API Key', helpUrl: 'https://developer.kustomer.com/' },
+};
+
+// Build full integrations list from BUILT_IN_CONNECTORS
+const integrations: IntegrationConfig[] = BUILT_IN_CONNECTORS.map(connector => ({
+  id: connector.id!,
+  name: connector.name!,
+  category: connector.category!,
+  icon: connector.icon!,
+  color: connector.color!,
+  verified: connector.verified || false,
+  placeholder: CONNECTOR_DETAILS[connector.id!]?.placeholder,
+  helpUrl: CONNECTOR_DETAILS[connector.id!]?.helpUrl,
+}));
 
 export default function Integrations() {
   const { 
@@ -420,11 +275,10 @@ export default function Integrations() {
     loading, 
     saveKey, 
     deleteKey, 
-    hasKey,
-    fetchKeys 
+    hasKey 
   } = useUserApiKeys();
   
-  const [activeTab, setActiveTab] = useState<'all' | 'ai' | 'productivity' | 'communication' | 'payment' | 'storage' | 'crm'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | ConnectorCategory>('all');
   const [editingKeys, setEditingKeys] = useState<Record<string, string>>({});
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [savingServices, setSavingServices] = useState<Set<string>>(new Set());
@@ -434,9 +288,9 @@ export default function Integrations() {
   useEffect(() => {
     const initial: Record<string, string> = {};
     integrations.forEach(integration => {
-      const savedKey = keysByService[integration.serviceName];
+      const savedKey = keysByService[integration.id];
       if (savedKey) {
-        initial[integration.serviceName] = savedKey;
+        initial[integration.id] = savedKey;
       }
     });
     setEditingKeys(initial);
@@ -455,28 +309,27 @@ export default function Integrations() {
       const query = searchQuery.toLowerCase();
       result = result.filter(i => 
         i.name.toLowerCase().includes(query) ||
-        i.description.toLowerCase().includes(query) ||
-        i.features.some(f => f.toLowerCase().includes(query))
+        i.category.toLowerCase().includes(query)
       );
     }
     
     return result;
   }, [activeTab, searchQuery]);
 
-  const connectedCount = integrations.filter(i => hasKey(i.serviceName)).length;
+  const connectedCount = integrations.filter(i => hasKey(i.id)).length;
 
-  const handleSave = async (serviceName: string) => {
-    const value = editingKeys[serviceName];
+  const handleSave = async (serviceId: string) => {
+    const value = editingKeys[serviceId];
     if (!value?.trim()) {
       toast.error('Veuillez entrer une clé API');
       return;
     }
 
-    setSavingServices(prev => new Set(prev).add(serviceName));
-    const success = await saveKey(serviceName, value);
+    setSavingServices(prev => new Set(prev).add(serviceId));
+    const success = await saveKey(serviceId, value);
     setSavingServices(prev => {
       const next = new Set(prev);
-      next.delete(serviceName);
+      next.delete(serviceId);
       return next;
     });
 
@@ -487,12 +340,12 @@ export default function Integrations() {
     }
   };
 
-  const handleDelete = async (serviceName: string) => {
-    const success = await deleteKey(serviceName);
+  const handleDelete = async (serviceId: string) => {
+    const success = await deleteKey(serviceId);
     if (success) {
       setEditingKeys(prev => {
         const next = { ...prev };
-        delete next[serviceName];
+        delete next[serviceId];
         return next;
       });
       toast.success('Clé API supprimée');
@@ -501,243 +354,176 @@ export default function Integrations() {
     }
   };
 
-  const toggleShowKey = (serviceName: string) => {
-    setShowKeys(prev => ({ ...prev, [serviceName]: !prev[serviceName] }));
+  const getIcon = (iconName: string): React.ElementType => {
+    return iconMap[iconName] || Key;
   };
 
-  const StatusBadge = ({ serviceName }: { serviceName: string }) => {
-    const isConnected = hasKey(serviceName);
-    if (isConnected) {
-      return (
-        <Badge className="bg-emerald-500/20 text-emerald-600 border-0 gap-1">
-          <CheckCircle className="w-3 h-3" />
-          Connecté
-        </Badge>
-      );
-    }
-    return (
-      <Badge variant="outline" className="text-muted-foreground gap-1">
-        <XCircle className="w-3 h-3" />
-        Non configuré
-      </Badge>
-    );
-  };
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const categories = Object.entries(CONNECTOR_CATEGORIES) as [ConnectorCategory, { label: string; icon: string; color: string }][];
 
   return (
     <DashboardLayout>
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="space-y-6">
         {/* Security notice */}
-        <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-          <div className="flex items-start gap-3">
-            <Key className="w-5 h-5 text-amber-600 mt-0.5" />
-            <div>
-              <h3 className="font-medium text-amber-700 dark:text-amber-400">Clés API personnelles</h3>
-              <p className="text-sm text-amber-600 dark:text-amber-500 mt-1">
-                Ces clés sont stockées de manière sécurisée et liées uniquement à votre compte. 
-                Elles ne sont pas partagées avec votre entreprise ou équipe. Les connexions OAuth 
-                dans les workflows sont également personnelles.
-              </p>
-            </div>
+        <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+          <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-amber-500">Sécurité des clés API</p>
+            <p className="text-muted-foreground mt-1">
+              Vos clés sont chiffrées et stockées de manière sécurisée. Ne partagez jamais vos clés API.
+              {connectedCount > 0 && (
+                <span className="ml-2 text-primary font-medium">
+                  {connectedCount} service{connectedCount > 1 ? 's' : ''} connecté{connectedCount > 1 ? 's' : ''}
+                </span>
+              )}
+            </p>
           </div>
         </div>
 
         {/* Search bar */}
-        <div className="relative mb-6">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            type="text"
-            placeholder="Rechercher une API (ex: OpenAI, Slack, Stripe...)"
+            placeholder="Rechercher une intégration (Slack, OpenAI, Stripe...)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 h-11"
           />
         </div>
 
-        {/* Category Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
-          <TabsList className="w-full sm:w-auto overflow-x-auto flex-wrap h-auto gap-1 p-1">
-            <TabsTrigger value="all" className="gap-1.5 text-xs sm:text-sm">
-              <Plug className="w-3.5 h-3.5" />
-              Toutes
+        {/* Category tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+          <TabsList className="flex flex-wrap gap-1 h-auto p-1 bg-muted/50">
+            <TabsTrigger value="all" className="text-xs">
+              Tous ({integrations.length})
             </TabsTrigger>
-            <TabsTrigger value="ai" className="gap-1.5 text-xs sm:text-sm">
-              <Brain className="w-3.5 h-3.5" />
-              IA
-            </TabsTrigger>
-            <TabsTrigger value="communication" className="gap-1.5 text-xs sm:text-sm">
-              <MessageSquare className="w-3.5 h-3.5" />
-              Communication
-            </TabsTrigger>
-            <TabsTrigger value="productivity" className="gap-1.5 text-xs sm:text-sm">
-              <Zap className="w-3.5 h-3.5" />
-              Productivité
-            </TabsTrigger>
-            <TabsTrigger value="crm" className="gap-1.5 text-xs sm:text-sm">
-              <Users className="w-3.5 h-3.5" />
-              CRM
-            </TabsTrigger>
-            <TabsTrigger value="storage" className="gap-1.5 text-xs sm:text-sm">
-              <HardDrive className="w-3.5 h-3.5" />
-              Stockage
-            </TabsTrigger>
-            <TabsTrigger value="payment" className="gap-1.5 text-xs sm:text-sm">
-              <CreditCard className="w-3.5 h-3.5" />
-              Paiement
-            </TabsTrigger>
+            {categories.map(([key, { label }]) => {
+              const count = integrations.filter(i => i.category === key).length;
+              return (
+                <TabsTrigger key={key} value={key} className="text-xs">
+                  {label} ({count})
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
 
-          <TabsContent value={activeTab} className="mt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {filteredIntegrations.map((integration) => {
-                const isConnected = hasKey(integration.serviceName);
-                const isSaving = savingServices.has(integration.serviceName);
-                const currentValue = editingKeys[integration.serviceName] || '';
-                const savedValue = keysByService[integration.serviceName] || '';
-                const hasChanges = currentValue !== savedValue;
+          <TabsContent value={activeTab} className="mt-4">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : filteredIntegrations.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                Aucune intégration trouvée pour "{searchQuery}"
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredIntegrations.map((integration) => {
+                  const Icon = getIcon(integration.icon);
+                  const isConnected = hasKey(integration.id);
+                  const isSaving = savingServices.has(integration.id);
+                  const currentValue = editingKeys[integration.id] || '';
+                  const isVisible = showKeys[integration.id];
 
-                return (
-                  <Card key={integration.id} className="overflow-hidden">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${integration.color} flex items-center justify-center shrink-0`}>
-                          <integration.icon className="w-5 h-5 text-white" />
-                        </div>
-                        <StatusBadge serviceName={integration.serviceName} />
-                      </div>
-                      <CardTitle className="text-base sm:text-lg mt-3">{integration.name}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">
-                        {integration.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-4">
-                      {/* Features */}
-                      <div className="flex flex-wrap gap-1">
-                        {integration.features.slice(0, 3).map((feature) => (
-                          <Badge key={feature} variant="secondary" className="text-[10px] sm:text-xs">
-                            {feature}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* API Key Input */}
-                      <div className="space-y-2">
-                        <Label className="text-xs">Clé API</Label>
-                        <div className="relative">
-                          <Input
-                            type={showKeys[integration.serviceName] ? 'text' : 'password'}
-                            value={currentValue}
-                            onChange={(e) => setEditingKeys(prev => ({ 
-                              ...prev, 
-                              [integration.serviceName]: e.target.value 
-                            }))}
-                            placeholder={integration.placeholder}
-                            className="pr-10 h-9 text-sm font-mono"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3"
-                            onClick={() => toggleShowKey(integration.serviceName)}
+                  return (
+                    <Card 
+                      key={integration.id}
+                      className={`transition-all hover:shadow-md ${isConnected ? 'border-green-500/50 bg-green-500/5' : ''}`}
+                    >
+                      <CardContent className="p-4 space-y-3">
+                        {/* Header */}
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: `${integration.color}20` }}
                           >
-                            {showKeys[integration.serviceName] ? (
-                              <EyeOff className="w-4 h-4" />
-                            ) : (
-                              <Eye className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <Button
-                          onClick={() => handleSave(integration.serviceName)}
-                          disabled={isSaving || !currentValue?.trim() || (!hasChanges && isConnected)}
-                          size="sm"
-                          className="flex-1"
-                        >
-                          {isSaving ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <Icon className="w-5 h-5" style={{ color: integration.color }} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-sm truncate">{integration.name}</h3>
+                              {integration.verified && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+                                  Vérifié
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground capitalize">
+                              {CONNECTOR_CATEGORIES[integration.category]?.label}
+                            </p>
+                          </div>
+                          {isConnected ? (
+                            <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
                           ) : (
-                            <Save className="w-4 h-4 mr-2" />
+                            <XCircle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                           )}
-                          {isConnected && !hasChanges ? 'Sauvegardé' : 'Sauvegarder'}
-                        </Button>
-                        
-                        {isConnected && (
-                          <Button
-                            variant="destructive"
-                            onClick={() => handleDelete(integration.serviceName)}
-                            size="sm"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                        
-                        {integration.helpUrl && (
-                          <Button variant="ghost" size="sm" asChild>
-                            <a href={integration.helpUrl} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                        </div>
+
+                        {/* API Key input */}
+                        <div className="space-y-2">
+                          <div className="relative">
+                            <Input
+                              type={isVisible ? 'text' : 'password'}
+                              placeholder={integration.placeholder || 'Entrez votre clé API'}
+                              value={currentValue}
+                              onChange={(e) => setEditingKeys(prev => ({ ...prev, [integration.id]: e.target.value }))}
+                              className="pr-10 h-9 text-xs font-mono"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-9 w-9 p-0"
+                              onClick={() => setShowKeys(prev => ({ ...prev, [integration.id]: !isVisible }))}
+                            >
+                              {isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </Button>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="flex-1 h-8 text-xs"
+                              onClick={() => handleSave(integration.id)}
+                              disabled={isSaving || !currentValue.trim()}
+                            >
+                              {isSaving ? (
+                                <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                              ) : (
+                                <Save className="w-3 h-3 mr-1" />
+                              )}
+                              Sauvegarder
+                            </Button>
+                            {isConnected && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleDelete(integration.id)}
+                              >
+                                <Trash2 className="w-3 h-3 text-destructive" />
+                              </Button>
+                            )}
+                            {integration.helpUrl && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0"
+                                asChild
+                              >
+                                <a href={integration.helpUrl} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
-
-        {/* Info Section */}
-        <div className="mt-8 sm:mt-12">
-          <div className="flex items-center gap-2 mb-4">
-            <Link2 className="w-5 h-5 text-primary" />
-            <h2 className="text-lg sm:text-xl font-semibold">Synchronisation automatique</h2>
-          </div>
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                    <Zap className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm">Workflows</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Les clés configurées ici sont automatiquement disponibles dans vos workflows Aether Flow
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                    <Key className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm">Sauvegarde depuis Flow</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Les clés entrées dans un workflow peuvent être sauvegardées ici pour une réutilisation facile
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        </div>
       </div>
     </DashboardLayout>
   );
