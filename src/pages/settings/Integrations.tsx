@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Search, 
   CheckCircle, 
-  XCircle, 
   ExternalLink,
   Key,
   Eye,
@@ -224,7 +224,6 @@ const CONNECTOR_DETAILS: Record<string, { placeholder: string; helpUrl?: string 
   // Database
   mongodb: { placeholder: 'Connection String', helpUrl: 'https://www.mongodb.com/docs/atlas/' },
   firebase: { placeholder: 'Service Account JSON', helpUrl: 'https://console.firebase.google.com/' },
-  supabase: { placeholder: 'Service Role Key', helpUrl: 'https://supabase.com/dashboard/' },
   planetscale: { placeholder: 'Service Token', helpUrl: 'https://planetscale.com/docs/' },
   redis: { placeholder: 'Connection URL', helpUrl: 'https://redis.io/docs/' },
   elasticsearch: { placeholder: 'API Key', helpUrl: 'https://www.elastic.co/guide/' },
@@ -258,16 +257,32 @@ const CONNECTOR_DETAILS: Record<string, { placeholder: string; helpUrl?: string 
 };
 
 // Build full integrations list from BUILT_IN_CONNECTORS
-const integrations: IntegrationConfig[] = BUILT_IN_CONNECTORS.map(connector => ({
-  id: connector.id!,
-  name: connector.name!,
-  category: connector.category!,
-  icon: connector.icon!,
-  color: connector.color!,
-  verified: connector.verified || false,
-  placeholder: CONNECTOR_DETAILS[connector.id!]?.placeholder,
-  helpUrl: CONNECTOR_DETAILS[connector.id!]?.helpUrl,
-}));
+const integrations: IntegrationConfig[] = BUILT_IN_CONNECTORS.map((connector) => {
+  const id = connector.id!;
+
+  const base: IntegrationConfig = {
+    id,
+    name: connector.name!,
+    category: connector.category!,
+    icon: connector.icon!,
+    color: connector.color!,
+    verified: connector.verified || false,
+    placeholder: CONNECTOR_DETAILS[id]?.placeholder,
+    helpUrl: CONNECTOR_DETAILS[id]?.helpUrl,
+  };
+
+  // UI branding: do not display “supabase” wording in Aether APIs.
+  if (id === 'supabase') {
+    return {
+      ...base,
+      name: 'Backend Cloud',
+      placeholder: 'Jeton backend',
+      helpUrl: undefined,
+    };
+  }
+
+  return base;
+});
 
 export default function Integrations() {
   const { 
@@ -362,168 +377,170 @@ export default function Integrations() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Security notice */}
-        <div className="flex items-start gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium text-amber-500">Sécurité des clés API</p>
-            <p className="text-muted-foreground mt-1">
-              Vos clés sont chiffrées et stockées de manière sécurisée. Ne partagez jamais vos clés API.
-              {connectedCount > 0 && (
-                <span className="ml-2 text-primary font-medium">
-                  {connectedCount} service{connectedCount > 1 ? 's' : ''} connecté{connectedCount > 1 ? 's' : ''}
-                </span>
-              )}
-            </p>
-          </div>
-        </div>
+      <div className="h-full min-h-0 flex flex-col">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-4 sm:p-6 space-y-6">
+            {/* Security notice */}
+            <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning/5 p-4">
+              <AlertTriangle className="w-5 h-5 text-warning mt-0.5 shrink-0" />
+              <div className="text-sm">
+                <p className="font-medium text-foreground">Sécurité des clés API</p>
+                <p className="text-muted-foreground mt-1">
+                  Vos clés sont chiffrées et stockées de manière sécurisée. Ne partagez jamais vos clés API.
+                  {connectedCount > 0 && (
+                    <span className="ml-2 text-primary font-medium">
+                      {connectedCount} service{connectedCount > 1 ? 's' : ''} connecté{connectedCount > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
 
-        {/* Search bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher une intégration (Slack, OpenAI, Stripe...)"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-11"
-          />
-        </div>
+            {/* Search bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher une intégration (Slack, OpenAI, Stripe...)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-11"
+              />
+            </div>
 
-        {/* Category tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-          <TabsList className="flex flex-wrap gap-1 h-auto p-1 bg-muted/50">
-            <TabsTrigger value="all" className="text-xs">
-              Tous ({integrations.length})
-            </TabsTrigger>
-            {categories.map(([key, { label }]) => {
-              const count = integrations.filter(i => i.category === key).length;
-              return (
-                <TabsTrigger key={key} value={key} className="text-xs">
-                  {label} ({count})
+            {/* Category tabs */}
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+              <TabsList className="flex flex-wrap gap-1 h-auto p-1 bg-muted/50">
+                <TabsTrigger value="all" className="text-xs">
+                  Tous ({integrations.length})
                 </TabsTrigger>
-              );
-            })}
-          </TabsList>
-
-          <TabsContent value={activeTab} className="mt-4">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
-            ) : filteredIntegrations.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                Aucune intégration trouvée pour "{searchQuery}"
-              </div>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredIntegrations.map((integration) => {
-                  const Icon = getIcon(integration.icon);
-                  const isConnected = hasKey(integration.id);
-                  const isSaving = savingServices.has(integration.id);
-                  const currentValue = editingKeys[integration.id] || '';
-                  const isVisible = showKeys[integration.id];
-
+                {categories.map(([key, { label }]) => {
+                  const count = integrations.filter(i => i.category === key).length;
                   return (
-                    <Card 
-                      key={integration.id}
-                      className={`transition-all hover:shadow-md ${isConnected ? 'border-green-500/50 bg-green-500/5' : ''}`}
-                    >
-                      <CardContent className="p-4 space-y-3">
-                        {/* Header */}
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: `${integration.color}20` }}
-                          >
-                            <Icon className="w-5 h-5" style={{ color: integration.color }} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-sm truncate">{integration.name}</h3>
-                              {integration.verified && (
-                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
-                                  Vérifié
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground capitalize">
-                              {CONNECTOR_CATEGORIES[integration.category]?.label}
-                            </p>
-                          </div>
-                          {isConnected ? (
-                            <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
-                          ) : (
-                            <XCircle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                          )}
-                        </div>
-
-                        {/* API Key input */}
-                        <div className="space-y-2">
-                          <div className="relative">
-                            <Input
-                              type={isVisible ? 'text' : 'password'}
-                              placeholder={integration.placeholder || 'Entrez votre clé API'}
-                              value={currentValue}
-                              onChange={(e) => setEditingKeys(prev => ({ ...prev, [integration.id]: e.target.value }))}
-                              className="pr-10 h-9 text-xs font-mono"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="absolute right-0 top-0 h-9 w-9 p-0"
-                              onClick={() => setShowKeys(prev => ({ ...prev, [integration.id]: !isVisible }))}
-                            >
-                              {isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                            </Button>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              className="flex-1 h-8 text-xs"
-                              onClick={() => handleSave(integration.id)}
-                              disabled={isSaving || !currentValue.trim()}
-                            >
-                              {isSaving ? (
-                                <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                              ) : (
-                                <Save className="w-3 h-3 mr-1" />
-                              )}
-                              Sauvegarder
-                            </Button>
-                            {isConnected && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 w-8 p-0"
-                                onClick={() => handleDelete(integration.id)}
-                              >
-                                <Trash2 className="w-3 h-3 text-destructive" />
-                              </Button>
-                            )}
-                            {integration.helpUrl && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 w-8 p-0"
-                                asChild
-                              >
-                                <a href={integration.helpUrl} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="w-3 h-3" />
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <TabsTrigger key={key} value={key} className="text-xs">
+                      {label} ({count})
+                    </TabsTrigger>
                   );
                 })}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+              </TabsList>
+
+              <TabsContent value={activeTab} className="mt-4">
+                {loading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                ) : filteredIntegrations.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    Aucune intégration trouvée pour "{searchQuery}"
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {filteredIntegrations.map((integration) => {
+                      const Icon = getIcon(integration.icon);
+                      const isConnected = hasKey(integration.id);
+                      const isSaving = savingServices.has(integration.id);
+                      const currentValue = editingKeys[integration.id] || '';
+                      const isVisible = showKeys[integration.id];
+
+                      return (
+                        <Card
+                          key={integration.id}
+                          className={`transition-all hover:shadow-md ${isConnected ? 'border-success/30 bg-success/5' : ''}`}
+                        >
+                          <CardContent className="p-4 space-y-3">
+                            {/* Header */}
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: `${integration.color}20` }}
+                              >
+                                <Icon className="w-5 h-5" style={{ color: integration.color }} />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium text-sm truncate">{integration.name}</h3>
+                                  {integration.verified && (
+                                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+                                      Vérifié
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground capitalize">
+                                  {CONNECTOR_CATEGORIES[integration.category]?.label}
+                                </p>
+                              </div>
+                              {isConnected ? (
+                                <CheckCircle className="w-4 h-4 text-success shrink-0" />
+                              ) : null}
+                            </div>
+
+                            {/* API Key input */}
+                            <div className="space-y-2">
+                              <div className="relative">
+                                <Input
+                                  type={isVisible ? 'text' : 'password'}
+                                  placeholder={integration.placeholder || 'Entrez votre clé API'}
+                                  value={currentValue}
+                                  onChange={(e) => setEditingKeys(prev => ({ ...prev, [integration.id]: e.target.value }))}
+                                  className="pr-10 h-9 text-xs font-mono"
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="absolute right-0 top-0 h-9 w-9 p-0"
+                                  onClick={() => setShowKeys(prev => ({ ...prev, [integration.id]: !isVisible }))}
+                                >
+                                  {isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                </Button>
+                              </div>
+
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  className="flex-1 h-8 text-xs"
+                                  onClick={() => handleSave(integration.id)}
+                                  disabled={isSaving || !currentValue.trim()}
+                                >
+                                  {isSaving ? (
+                                    <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                  ) : (
+                                    <Save className="w-3 h-3 mr-1" />
+                                  )}
+                                  Sauvegarder
+                                </Button>
+                                {isConnected && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => handleDelete(integration.id)}
+                                  >
+                                    <Trash2 className="w-3 h-3 text-destructive" />
+                                  </Button>
+                                )}
+                                {integration.helpUrl && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0"
+                                    asChild
+                                  >
+                                    <a href={integration.helpUrl} target="_blank" rel="noopener noreferrer">
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+        </ScrollArea>
       </div>
     </DashboardLayout>
   );
