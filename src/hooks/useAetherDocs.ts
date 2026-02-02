@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserCompanyId } from '@/hooks/useUserCompanyId';
 import { toast } from 'sonner';
 
 export interface DocFolder {
@@ -59,6 +60,7 @@ export type QuickFilter = 'all' | 'recent' | 'starred' | 'archived' | string;
 
 export function useAetherDocs() {
   const { user } = useAuth();
+  const { companyId } = useUserCompanyId();
   const [documents, setDocuments] = useState<AetherDocument[]>([]);
   const [folders, setFolders] = useState<DocFolder[]>([]);
   const [templates, setTemplates] = useState<DocTemplate[]>([]);
@@ -83,10 +85,11 @@ export function useAetherDocs() {
 
   const fetchDocuments = useCallback(async () => {
     if (!user) return;
+    // RLS handles access control - we fetch all documents the user can see
+    // This includes: personal docs + team/enterprise shared docs from same company
     let query = supabase
       .from('aether_documents')
       .select('*')
-      .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
 
     // Handle quick filters
@@ -205,7 +208,8 @@ export function useAetherDocs() {
     file: File,
     title: string,
     folderId: string | null = null,
-    tags: string[] = []
+    tags: string[] = [],
+    accessLevel: 'personal' | 'team' | 'enterprise' = 'personal'
   ) => {
     if (!user) return null;
 
@@ -226,17 +230,19 @@ export function useAetherDocs() {
       .from('documents')
       .getPublicUrl(fileName);
 
-    // Create document record
+    // Create document record with company_id for shared access
     const { data, error } = await supabase
       .from('aether_documents')
       .insert({
         user_id: user.id,
+        company_id: accessLevel !== 'personal' ? companyId : null,
         title,
         folder_id: folderId,
         file_url: publicUrl,
         file_type: file.type,
         file_size: file.size,
         tags,
+        access_level: accessLevel,
         embedding_status: 'pending'
       })
       .select()
@@ -261,7 +267,8 @@ export function useAetherDocs() {
     content: string,
     folderId: string | null = null,
     templateId: string | null = null,
-    tags: string[] = []
+    tags: string[] = [],
+    accessLevel: 'personal' | 'team' | 'enterprise' = 'personal'
   ) => {
     if (!user) return null;
 
@@ -269,11 +276,13 @@ export function useAetherDocs() {
       .from('aether_documents')
       .insert({
         user_id: user.id,
+        company_id: accessLevel !== 'personal' ? companyId : null,
         title,
         content,
         folder_id: folderId,
         template_id: templateId,
         tags,
+        access_level: accessLevel,
         file_type: 'text/plain',
         embedding_status: 'pending'
       })
@@ -535,6 +544,7 @@ export function useAetherDocs() {
     loading,
     currentFolder,
     searchQuery,
+    companyId,
     setCurrentFolder,
     setSearchQuery,
     createFolder,

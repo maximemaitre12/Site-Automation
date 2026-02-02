@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCompany } from '@/hooks/useCompany';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, ArrowRight, Sparkles, Users, Zap, Shield } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Building2, ArrowRight, Sparkles, Users, Zap, Shield, Plus, UserPlus } from 'lucide-react';
 import { z } from 'zod';
 
 const companySchema = z.object({
@@ -14,16 +17,59 @@ const companySchema = z.object({
   slug: z.string().min(2, 'Slug must be at least 2 characters').max(50).regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens'),
 });
 
+interface AvailableCompany {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function Onboarding() {
   const navigate = useNavigate();
-  const { createCompany, loading: companyLoading } = useCompany();
+  const { createCompany, joinCompany, company, loading: companyLoading } = useCompany();
   const { user } = useAuth();
   
-  const [step, setStep] = useState(1);
+  const [activeTab, setActiveTab] = useState<'join' | 'create'>('join');
   const [companyName, setCompanyName] = useState('');
   const [companySlug, setCompanySlug] = useState('');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [availableCompanies, setAvailableCompanies] = useState<AvailableCompany[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [creating, setCreating] = useState(false);
+  const [joining, setJoining] = useState(false);
+
+  // Redirect if user already has a company
+  useEffect(() => {
+    if (!companyLoading && company) {
+      navigate('/dashboard');
+    }
+  }, [company, companyLoading, navigate]);
+
+  // Fetch available companies
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('companies')
+          .select('id, name, slug')
+          .order('name');
+
+        if (error) throw error;
+        setAvailableCompanies(data || []);
+        
+        // If no companies exist, default to create tab
+        if (!data || data.length === 0) {
+          setActiveTab('create');
+        }
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+      } finally {
+        setLoadingCompanies(false);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
 
   const generateSlug = (name: string) => {
     return name
@@ -37,6 +83,23 @@ export default function Onboarding() {
     setCompanyName(value);
     if (!companySlug || companySlug === generateSlug(companyName)) {
       setCompanySlug(generateSlug(value));
+    }
+  };
+
+  const handleJoinCompany = async () => {
+    if (!selectedCompanyId) {
+      setErrors({ company: 'Please select a company' });
+      return;
+    }
+
+    setJoining(true);
+    setErrors({});
+
+    const success = await joinCompany(selectedCompanyId);
+    setJoining(false);
+
+    if (success) {
+      navigate('/dashboard');
     }
   };
 
@@ -56,10 +119,10 @@ export default function Onboarding() {
     }
 
     setCreating(true);
-    const company = await createCompany(companyName, companySlug);
+    const newCompany = await createCompany(companyName, companySlug);
     setCreating(false);
 
-    if (company) {
+    if (newCompany) {
       navigate('/dashboard');
     }
   };
@@ -69,6 +132,14 @@ export default function Onboarding() {
     { icon: Users, title: 'Team Collaboration', description: 'Work together with role-based access' },
     { icon: Shield, title: 'Enterprise Security', description: 'Bank-grade security and compliance' },
   ];
+
+  if (companyLoading || loadingCompanies) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -86,7 +157,7 @@ export default function Onboarding() {
               Welcome to AETHER AI Suite
             </h1>
             <p className="text-lg text-muted-foreground">
-              Set up your workspace and start automating everything.
+              Join your team or create a new workspace to get started.
             </p>
           </div>
 
@@ -116,62 +187,124 @@ export default function Onboarding() {
               <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-8 h-8 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Create Your Workspace</CardTitle>
+              <CardTitle className="text-2xl">Set Up Your Workspace</CardTitle>
               <CardDescription>
-                Set up your company to get started with AETHER
+                Join an existing company or create a new one
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="companyName">Company Name</Label>
-                  <Input
-                    id="companyName"
-                    placeholder="Acme Inc."
-                    value={companyName}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    className={`bg-secondary border-border ${errors.name ? 'border-destructive' : ''}`}
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-destructive">{errors.name}</p>
-                  )}
-                </div>
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'join' | 'create')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="join" className="gap-2" disabled={availableCompanies.length === 0}>
+                    <UserPlus className="w-4 h-4" />
+                    Join Company
+                  </TabsTrigger>
+                  <TabsTrigger value="create" className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Create New
+                  </TabsTrigger>
+                </TabsList>
 
-                <div className="space-y-2">
-                  <Label htmlFor="companySlug">Workspace URL</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">aether.app/</span>
+                <TabsContent value="join" className="space-y-4 mt-4">
+                  {availableCompanies.length > 0 ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label>Select Your Company</Label>
+                        <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
+                          <SelectTrigger className="bg-secondary border-border">
+                            <SelectValue placeholder="Choose a company..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableCompanies.map((company) => (
+                              <SelectItem key={company.id} value={company.id}>
+                                <div className="flex items-center gap-2">
+                                  <Building2 className="w-4 h-4 text-muted-foreground" />
+                                  <span>{company.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.company && (
+                          <p className="text-sm text-destructive">{errors.company}</p>
+                        )}
+                      </div>
+
+                      <Button
+                        onClick={handleJoinCompany}
+                        disabled={joining || !selectedCompanyId}
+                        className="w-full"
+                      >
+                        {joining ? (
+                          'Joining...'
+                        ) : (
+                          <>
+                            Join Company
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Building2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No companies available yet.</p>
+                      <p className="text-sm">Create a new one to get started!</p>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="create" className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="companyName">Company Name</Label>
                     <Input
-                      id="companySlug"
-                      placeholder="acme"
-                      value={companySlug}
-                      onChange={(e) => setCompanySlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                      className={`bg-secondary border-border ${errors.slug ? 'border-destructive' : ''}`}
+                      id="companyName"
+                      placeholder="Acme Inc."
+                      value={companyName}
+                      onChange={(e) => handleNameChange(e.target.value)}
+                      className={`bg-secondary border-border ${errors.name ? 'border-destructive' : ''}`}
                     />
+                    {errors.name && (
+                      <p className="text-sm text-destructive">{errors.name}</p>
+                    )}
                   </div>
-                  {errors.slug && (
-                    <p className="text-sm text-destructive">{errors.slug}</p>
-                  )}
-                </div>
-              </div>
 
-              <Button
-                onClick={handleCreateCompany}
-                disabled={creating || !companyName || !companySlug}
-                className="w-full"
-              >
-                {creating ? (
-                  'Creating...'
-                ) : (
-                  <>
-                    Create Workspace
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="companySlug">Workspace URL</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">aether.app/</span>
+                      <Input
+                        id="companySlug"
+                        placeholder="acme"
+                        value={companySlug}
+                        onChange={(e) => setCompanySlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                        className={`bg-secondary border-border ${errors.slug ? 'border-destructive' : ''}`}
+                      />
+                    </div>
+                    {errors.slug && (
+                      <p className="text-sm text-destructive">{errors.slug}</p>
+                    )}
+                  </div>
+
+                  <Button
+                    onClick={handleCreateCompany}
+                    disabled={creating || !companyName || !companySlug}
+                    className="w-full"
+                  >
+                    {creating ? (
+                      'Creating...'
+                    ) : (
+                      <>
+                        Create Workspace
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </TabsContent>
+              </Tabs>
 
               <p className="text-xs text-center text-muted-foreground">
-                By creating a workspace, you agree to our Terms of Service and Privacy Policy
+                By joining or creating a workspace, you agree to our Terms of Service and Privacy Policy
               </p>
             </CardContent>
           </Card>
