@@ -3,114 +3,47 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Leaf, Factory, Truck, Zap, TrendingDown, TrendingUp,
+  Leaf, Factory, TrendingDown, TrendingUp,
   Target, AlertTriangle, CheckCircle2, BarChart3, 
-  Building2, Fuel, Recycle, FileText, Download, ArrowDown
+  Building2, Download, Plus, Trash2, ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface EmissionData {
-  category: string;
-  icon: React.ElementType;
-  scope1: number;
-  scope2: number;
-  scope3: number;
-  trend: 'up' | 'down' | 'stable';
-  trendValue: number;
-}
-
-const emissionsData: EmissionData[] = [
-  { 
-    category: 'Vehicle Fleet', 
-    icon: Truck, 
-    scope1: 12450, 
-    scope2: 0, 
-    scope3: 3200,
-    trend: 'down',
-    trendValue: 8.5
-  },
-  { 
-    category: 'Facilities', 
-    icon: Building2, 
-    scope1: 4200, 
-    scope2: 8900, 
-    scope3: 1500,
-    trend: 'down',
-    trendValue: 12.3
-  },
-  { 
-    category: 'Energy', 
-    icon: Zap, 
-    scope1: 0, 
-    scope2: 15600, 
-    scope3: 0,
-    trend: 'down',
-    trendValue: 15.7
-  },
-  { 
-    category: 'Fuel Consumption', 
-    icon: Fuel, 
-    scope1: 8900, 
-    scope2: 0, 
-    scope3: 2100,
-    trend: 'up',
-    trendValue: 2.1
-  },
-];
-
-const kpiData = [
-  { 
-    label: 'Carbon Intensity', 
-    value: 0.42, 
-    unit: 'tCO₂e/M€', 
-    target: 0.35, 
-    status: 'warning' as const,
-    description: 'Emissions per million revenue'
-  },
-  { 
-    label: 'Renewable Energy', 
-    value: 67, 
-    unit: '%', 
-    target: 80, 
-    status: 'warning' as const,
-    description: 'Share of renewable electricity'
-  },
-  { 
-    label: 'Fleet Electrification', 
-    value: 23, 
-    unit: '%', 
-    target: 50, 
-    status: 'alert' as const,
-    description: 'Electric vehicles in fleet'
-  },
-  { 
-    label: 'Waste Recycling Rate', 
-    value: 89, 
-    unit: '%', 
-    target: 85, 
-    status: 'success' as const,
-    description: 'Materials recycled vs landfill'
-  },
-];
-
-const siteEmissions = [
-  { name: 'Siège Social', location: 'Paris', emissions: 8450, percentage: 24 },
-  { name: 'Centre Technique Nord', location: 'Lille', emissions: 5230, percentage: 15 },
-  { name: 'Plateforme Logistique', location: 'Nantes', emissions: 6780, percentage: 19 },
-  { name: 'Centre Distribution', location: 'Barcelone', emissions: 4560, percentage: 13 },
-  { name: 'Centre Services', location: 'Bruxelles', emissions: 3890, percentage: 11 },
-  { name: 'Autres Sites', location: '12 implantations', emissions: 6340, percentage: 18 },
-];
+import { useESGData } from '@/hooks/useESGData';
+import { ESGEmptyState } from './ESGEmptyState';
+import { ESGAddSiteDialog } from './ESGAddSiteDialog';
+import { ESGAddKPIDialog } from './ESGAddKPIDialog';
+import { ESGAddTargetDialog } from './ESGAddTargetDialog';
 
 export function ESGDashboard() {
-  const [selectedScope, setSelectedScope] = useState<'all' | '1' | '2' | '3'>('all');
+  const [showAddSite, setShowAddSite] = useState(false);
+  const [showAddKPI, setShowAddKPI] = useState(false);
+  const [showAddTarget, setShowAddTarget] = useState(false);
 
-  const totalScope1 = emissionsData.reduce((sum, e) => sum + e.scope1, 0);
-  const totalScope2 = emissionsData.reduce((sum, e) => sum + e.scope2, 0);
-  const totalScope3 = emissionsData.reduce((sum, e) => sum + e.scope3, 0);
-  const totalEmissions = totalScope1 + totalScope2 + totalScope3;
+  const {
+    siteEmissions,
+    kpis,
+    targets,
+    totalScope1,
+    totalScope2,
+    totalScope3,
+    totalEmissions,
+    isLoading,
+    hasData,
+    addSiteEmission,
+    addKPI,
+    addTarget,
+    deleteSiteEmission,
+    deleteKPI,
+  } = useESGData();
+
+  const getKPIStatus = (value: number, target: number | null): 'success' | 'warning' | 'alert' => {
+    if (!target) return 'warning';
+    const ratio = value / target;
+    if (ratio >= 1) return 'success';
+    if (ratio >= 0.7) return 'warning';
+    return 'alert';
+  };
 
   const getStatusColor = (status: 'success' | 'warning' | 'alert') => {
     switch (status) {
@@ -128,6 +61,45 @@ export function ESGDashboard() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+      </div>
+    );
+  }
+
+  // Show empty state if no data
+  if (!hasData) {
+    return (
+      <>
+        <ESGEmptyState 
+          onAddSite={() => setShowAddSite(true)}
+          onAddKPI={() => setShowAddKPI(true)}
+          onAddTarget={() => setShowAddTarget(true)}
+        />
+        <ESGAddSiteDialog
+          open={showAddSite}
+          onOpenChange={setShowAddSite}
+          onSubmit={(data) => addSiteEmission.mutate(data)}
+          isLoading={addSiteEmission.isPending}
+        />
+        <ESGAddKPIDialog
+          open={showAddKPI}
+          onOpenChange={setShowAddKPI}
+          onSubmit={(data) => addKPI.mutate(data)}
+          isLoading={addKPI.isPending}
+        />
+        <ESGAddTargetDialog
+          open={showAddTarget}
+          onOpenChange={setShowAddTarget}
+          onSubmit={(data) => addTarget.mutate(data)}
+          isLoading={addTarget.isPending}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -138,13 +110,36 @@ export function ESGDashboard() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-foreground">ESG & Sustainability Dashboard</h2>
-            <p className="text-sm text-muted-foreground">Decarbonization tracking & environmental KPIs</p>
+            <p className="text-sm text-muted-foreground">Données vérifiées uniquement • Aucune estimation</p>
           </div>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Download className="w-4 h-4" />
-          Export Report
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowAddSite(true)}>
+            <Plus className="w-4 h-4 mr-1" />
+            Site
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setShowAddKPI(true)}>
+            <Plus className="w-4 h-4 mr-1" />
+            KPI
+          </Button>
+          <Button variant="outline" className="gap-2">
+            <Download className="w-4 h-4" />
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {/* Verified Data Badge */}
+      <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <ShieldCheck className="w-5 h-5 text-emerald-600" />
+        <p className="text-sm text-emerald-700 dark:text-emerald-300">
+          <strong>Politique Zéro Données Fictives:</strong> Ce dashboard affiche uniquement les données que vous avez saisies. 
+          {siteEmissions.filter(s => s.is_verified).length > 0 && (
+            <span className="ml-1">
+              {siteEmissions.filter(s => s.is_verified).length} site(s) vérifié(s) par audit tiers.
+            </span>
+          )}
+        </p>
       </div>
 
       {/* Total Emissions Overview */}
@@ -153,14 +148,12 @@ export function ESGDashboard() {
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
               <Factory className="w-5 h-5 text-emerald-600" />
-              <span className="text-sm font-medium text-emerald-700">Total Emissions</span>
+              <span className="text-sm font-medium text-emerald-700">Total Émissions</span>
             </div>
-            <p className="text-3xl font-bold text-foreground">{(totalEmissions / 1000).toFixed(1)}k</p>
-            <p className="text-sm text-muted-foreground">tCO₂e / year</p>
-            <div className="flex items-center gap-1 mt-2 text-success">
-              <TrendingDown className="w-4 h-4" />
-              <span className="text-sm font-medium">-9.2% vs last year</span>
-            </div>
+            <p className="text-3xl font-bold text-foreground">
+              {totalEmissions > 0 ? (totalEmissions / 1000).toFixed(1) + 'k' : '0'}
+            </p>
+            <p className="text-sm text-muted-foreground">tCO₂e / année</p>
           </CardContent>
         </Card>
 
@@ -170,10 +163,18 @@ export function ESGDashboard() {
               <div className="w-3 h-3 rounded-full bg-blue-500" />
               <span className="text-sm font-medium">Scope 1</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{(totalScope1 / 1000).toFixed(1)}k</p>
-            <p className="text-xs text-muted-foreground">Direct emissions</p>
-            <Progress value={(totalScope1 / totalEmissions) * 100} className="h-1.5 mt-3" />
-            <p className="text-xs text-muted-foreground mt-1">{((totalScope1 / totalEmissions) * 100).toFixed(0)}% of total</p>
+            <p className="text-2xl font-bold text-foreground">
+              {totalScope1 > 0 ? (totalScope1 / 1000).toFixed(1) + 'k' : '0'}
+            </p>
+            <p className="text-xs text-muted-foreground">Émissions directes</p>
+            {totalEmissions > 0 && (
+              <>
+                <Progress value={(totalScope1 / totalEmissions) * 100} className="h-1.5 mt-3" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {((totalScope1 / totalEmissions) * 100).toFixed(0)}% du total
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -183,10 +184,18 @@ export function ESGDashboard() {
               <div className="w-3 h-3 rounded-full bg-purple-500" />
               <span className="text-sm font-medium">Scope 2</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{(totalScope2 / 1000).toFixed(1)}k</p>
-            <p className="text-xs text-muted-foreground">Indirect (energy)</p>
-            <Progress value={(totalScope2 / totalEmissions) * 100} className="h-1.5 mt-3" />
-            <p className="text-xs text-muted-foreground mt-1">{((totalScope2 / totalEmissions) * 100).toFixed(0)}% of total</p>
+            <p className="text-2xl font-bold text-foreground">
+              {totalScope2 > 0 ? (totalScope2 / 1000).toFixed(1) + 'k' : '0'}
+            </p>
+            <p className="text-xs text-muted-foreground">Indirect (énergie)</p>
+            {totalEmissions > 0 && (
+              <>
+                <Progress value={(totalScope2 / totalEmissions) * 100} className="h-1.5 mt-3" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {((totalScope2 / totalEmissions) * 100).toFixed(0)}% du total
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -196,110 +205,149 @@ export function ESGDashboard() {
               <div className="w-3 h-3 rounded-full bg-amber-500" />
               <span className="text-sm font-medium">Scope 3</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{(totalScope3 / 1000).toFixed(1)}k</p>
-            <p className="text-xs text-muted-foreground">Value chain</p>
-            <Progress value={(totalScope3 / totalEmissions) * 100} className="h-1.5 mt-3" />
-            <p className="text-xs text-muted-foreground mt-1">{((totalScope3 / totalEmissions) * 100).toFixed(0)}% of total</p>
+            <p className="text-2xl font-bold text-foreground">
+              {totalScope3 > 0 ? (totalScope3 / 1000).toFixed(1) + 'k' : '0'}
+            </p>
+            <p className="text-xs text-muted-foreground">Chaîne de valeur</p>
+            {totalEmissions > 0 && (
+              <>
+                <Progress value={(totalScope3 / totalEmissions) * 100} className="h-1.5 mt-3" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {((totalScope3 / totalEmissions) * 100).toFixed(0)}% du total
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {kpiData.map((kpi) => {
-          const StatusIcon = getStatusIcon(kpi.status);
-          const progress = (kpi.value / kpi.target) * 100;
-          
-          return (
-            <Card key={kpi.label} className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">{kpi.label}</p>
-                    <div className="flex items-baseline gap-1 mt-1">
-                      <span className="text-2xl font-bold">{kpi.value}</span>
-                      <span className="text-sm text-muted-foreground">{kpi.unit}</span>
+      {kpis.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {kpis.map((kpi) => {
+            const status = getKPIStatus(kpi.kpi_value, kpi.target_value);
+            const StatusIcon = getStatusIcon(status);
+            const progress = kpi.target_value ? (kpi.kpi_value / kpi.target_value) * 100 : 0;
+            
+            return (
+              <Card key={kpi.id} className="overflow-hidden group">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">{kpi.kpi_name}</p>
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="text-2xl font-bold">{kpi.kpi_value}</span>
+                        <span className="text-sm text-muted-foreground">{kpi.kpi_unit}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {kpi.is_verified && (
+                        <Badge variant="outline" className="text-xs text-success border-success/20">
+                          <ShieldCheck className="w-3 h-3 mr-1" />
+                          Vérifié
+                        </Badge>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                        onClick={() => deleteKPI.mutate(kpi.id)}
+                      >
+                        <Trash2 className="w-3 h-3 text-muted-foreground" />
+                      </Button>
                     </div>
                   </div>
-                  <Badge variant="outline" className={cn("text-xs", getStatusColor(kpi.status))}>
-                    <StatusIcon className="w-3 h-3 mr-1" />
-                    {kpi.status === 'success' ? 'On Track' : kpi.status === 'warning' ? 'At Risk' : 'Behind'}
-                  </Badge>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Progress to target</span>
-                    <span className="font-medium">{kpi.target} {kpi.unit}</span>
-                  </div>
-                  <Progress 
-                    value={Math.min(progress, 100)} 
-                    className={cn(
-                      "h-2",
-                      kpi.status === 'success' && "[&>div]:bg-success",
-                      kpi.status === 'warning' && "[&>div]:bg-warning",
-                      kpi.status === 'alert' && "[&>div]:bg-destructive"
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                  {kpi.target_value && (
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-muted-foreground">Objectif</span>
+                        <span className="font-medium">{kpi.target_value} {kpi.kpi_unit}</span>
+                      </div>
+                      <Progress 
+                        value={Math.min(progress, 100)} 
+                        className={cn(
+                          "h-2",
+                          status === 'success' && "[&>div]:bg-success",
+                          status === 'warning' && "[&>div]:bg-warning",
+                          status === 'alert' && "[&>div]:bg-destructive"
+                        )}
+                      />
+                    </div>
+                  )}
+                  {kpi.data_source && (
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      Source: {kpi.data_source}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Emissions by Category & Site */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* By Category */}
+      {/* Sites Emissions */}
+      {siteEmissions.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-agent-compliance" />
-              Emissions by Category
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-agent-compliance" />
+                Émissions par site
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setShowAddSite(true)}>
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {emissionsData.map((emission) => {
-              const Icon = emission.icon;
-              const total = emission.scope1 + emission.scope2 + emission.scope3;
-              const percentage = (total / totalEmissions) * 100;
+          <CardContent className="space-y-3">
+            {siteEmissions.map((site, index) => {
+              const siteTotal = Number(site.scope1_emissions) + Number(site.scope2_emissions) + Number(site.scope3_emissions);
+              const percentage = totalEmissions > 0 ? (siteTotal / totalEmissions) * 100 : 0;
               
               return (
-                <div key={emission.category} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                        <Icon className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <span className="font-medium text-sm">{emission.category}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold">{(total / 1000).toFixed(1)}k tCO₂e</span>
-                      <div className={cn(
-                        "flex items-center gap-1 text-xs font-medium",
-                        emission.trend === 'down' ? "text-success" : "text-destructive"
-                      )}>
-                        {emission.trend === 'down' ? (
-                          <ArrowDown className="w-3 h-3" />
-                        ) : (
-                          <TrendingUp className="w-3 h-3" />
+                <div key={site.id} className="flex items-center gap-3 group">
+                  <div className="w-8 text-center">
+                    <span className="text-xs font-medium text-muted-foreground">#{index + 1}</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{site.site_name}</span>
+                        <span className="text-xs text-muted-foreground">{site.location}</span>
+                        {site.is_verified && (
+                          <ShieldCheck className="w-3 h-3 text-success" />
                         )}
-                        {emission.trendValue}%
                       </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold">{(siteTotal / 1000).toFixed(1)}k</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                          onClick={() => deleteSiteEmission.mutate(site.id)}
+                        >
+                          <Trash2 className="w-3 h-3 text-muted-foreground" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex h-2 rounded-full overflow-hidden bg-muted">
+                      <div 
+                        className="bg-blue-500 transition-all" 
+                        style={{ width: `${siteTotal > 0 ? (Number(site.scope1_emissions) / siteTotal) * 100 : 0}%` }} 
+                      />
+                      <div 
+                        className="bg-purple-500 transition-all" 
+                        style={{ width: `${siteTotal > 0 ? (Number(site.scope2_emissions) / siteTotal) * 100 : 0}%` }} 
+                      />
+                      <div 
+                        className="bg-amber-500 transition-all" 
+                        style={{ width: `${siteTotal > 0 ? (Number(site.scope3_emissions) / siteTotal) * 100 : 0}%` }} 
+                      />
                     </div>
                   </div>
-                  <div className="flex h-2 rounded-full overflow-hidden bg-muted">
-                    <div 
-                      className="bg-blue-500 transition-all" 
-                      style={{ width: `${(emission.scope1 / total) * 100}%` }} 
-                    />
-                    <div 
-                      className="bg-purple-500 transition-all" 
-                      style={{ width: `${(emission.scope2 / total) * 100}%` }} 
-                    />
-                    <div 
-                      className="bg-amber-500 transition-all" 
-                      style={{ width: `${(emission.scope3 / total) * 100}%` }} 
-                    />
+                  <div className="w-12 text-right">
+                    <span className="text-xs text-muted-foreground">{percentage.toFixed(0)}%</span>
                   </div>
                 </div>
               );
@@ -320,73 +368,60 @@ export function ESGDashboard() {
             </div>
           </CardContent>
         </Card>
-
-        {/* By Site */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-agent-compliance" />
-              Emissions by Location
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {siteEmissions.map((site, index) => (
-              <div key={site.name} className="flex items-center gap-3">
-                <div className="w-8 text-center">
-                  <span className="text-xs font-medium text-muted-foreground">#{index + 1}</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <div>
-                      <span className="text-sm font-medium">{site.name}</span>
-                      <span className="text-xs text-muted-foreground ml-2">{site.location}</span>
-                    </div>
-                    <span className="text-sm font-semibold">{(site.emissions / 1000).toFixed(1)}k</span>
-                  </div>
-                  <Progress value={site.percentage} className="h-1.5" />
-                </div>
-                <div className="w-12 text-right">
-                  <span className="text-xs text-muted-foreground">{site.percentage}%</span>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
       {/* Decarbonization Targets */}
-      <Card className="bg-gradient-to-r from-emerald-500/5 to-green-600/5 border-emerald-500/20">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Target className="w-6 h-6 text-emerald-600" />
-            <h3 className="font-semibold text-lg">Decarbonization Roadmap</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="p-4 rounded-xl bg-background/50 border border-border/50">
-              <p className="text-xs text-muted-foreground mb-1">2024 Target</p>
-              <p className="text-xl font-bold">-10%</p>
-              <p className="text-xs text-success flex items-center gap-1 mt-1">
-                <CheckCircle2 className="w-3 h-3" /> On track (-9.2%)
-              </p>
+      {targets.length > 0 && (
+        <Card className="bg-gradient-to-r from-emerald-500/5 to-green-600/5 border-emerald-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Target className="w-6 h-6 text-emerald-600" />
+                <h3 className="font-semibold text-lg">Trajectoire Décarbonation</h3>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setShowAddTarget(true)}>
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
-            <div className="p-4 rounded-xl bg-background/50 border border-border/50">
-              <p className="text-xs text-muted-foreground mb-1">2025 Target</p>
-              <p className="text-xl font-bold">-25%</p>
-              <p className="text-xs text-muted-foreground mt-1">vs 2023 baseline</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {targets.map((target) => (
+                <div key={target.id} className="p-4 rounded-xl bg-background/50 border border-border/50">
+                  <p className="text-xs text-muted-foreground mb-1">Objectif {target.target_year}</p>
+                  <p className="text-xl font-bold">-{target.target_reduction_percent}%</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    vs {target.baseline_year} ({target.target_type === 'sbti' ? 'SBTi' : target.target_type})
+                  </p>
+                  {target.is_achieved && (
+                    <p className="text-xs text-success flex items-center gap-1 mt-2">
+                      <CheckCircle2 className="w-3 h-3" /> Atteint
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
-            <div className="p-4 rounded-xl bg-background/50 border border-border/50">
-              <p className="text-xs text-muted-foreground mb-1">2030 Target</p>
-              <p className="text-xl font-bold">-50%</p>
-              <p className="text-xs text-muted-foreground mt-1">Science-based target</p>
-            </div>
-            <div className="p-4 rounded-xl bg-background/50 border border-border/50">
-              <p className="text-xs text-muted-foreground mb-1">2050 Target</p>
-              <p className="text-xl font-bold">Net Zero</p>
-              <p className="text-xs text-muted-foreground mt-1">Carbon neutrality</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Dialogs */}
+      <ESGAddSiteDialog
+        open={showAddSite}
+        onOpenChange={setShowAddSite}
+        onSubmit={(data) => addSiteEmission.mutate(data)}
+        isLoading={addSiteEmission.isPending}
+      />
+      <ESGAddKPIDialog
+        open={showAddKPI}
+        onOpenChange={setShowAddKPI}
+        onSubmit={(data) => addKPI.mutate(data)}
+        isLoading={addKPI.isPending}
+      />
+      <ESGAddTargetDialog
+        open={showAddTarget}
+        onOpenChange={setShowAddTarget}
+        onSubmit={(data) => addTarget.mutate(data)}
+        isLoading={addTarget.isPending}
+      />
     </div>
   );
 }
