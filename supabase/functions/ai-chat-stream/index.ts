@@ -160,7 +160,8 @@ async function fetchPlatformContext(
       { data: crmContacts },
       { data: enrichedCompanies },
       { data: esgKpis },
-      { data: companyInfo }
+      { data: companyInfo },
+      { data: teamMembers }
     ] = await Promise.all([
       // Sales deals - company-wide
       supabase
@@ -178,13 +179,13 @@ async function fetchPlatformContext(
         .order('created_at', { ascending: false })
         .limit(30),
 
-      // HR Employees - company-wide
+      // HR Employees - company-wide (using correct column names)
       supabase
         .from('employees')
-        .select('id, first_name, last_name, department, position, status, performance_score, salary')
+        .select('id, name, email, job_title, department, is_active, salary_current')
         .eq('company_id', companyId)
-        .eq('status', 'active')
-        .order('performance_score', { ascending: false })
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
         .limit(50),
 
       // Support tickets - company-wide
@@ -256,8 +257,16 @@ async function fetchPlatformContext(
         .from('companies')
         .select('id, name')
         .eq('id', companyId)
-        .single()
+        .single(),
+
+      // Team members - user_roles + profiles for the company
+      supabase
+        .from('user_roles')
+        .select('user_id, role, profiles(full_name)')
+        .eq('company_id', companyId)
     ]);
+
+    console.log(`Platform data fetched: employees=${employees?.length || 0}, team=${teamMembers?.length || 0}, docs=${documents?.length || 0}, deals=${salesDeals?.length || 0}`);
 
     // Build context string
     let contextParts: string[] = [];
@@ -278,9 +287,21 @@ async function fetchPlatformContext(
       contextParts.push(salesContext);
     }
 
-    // === EMPLOYEES ===
+    // === TEAM MEMBERS (from user_roles) ===
+    if (teamMembers && teamMembers.length > 0) {
+      let teamContext = `\n👥 ÉQUIPE AETHER (${companyName}):\n`;
+      teamContext += `• ${teamMembers.length} membres dans l'équipe\n`;
+      teamContext += `Membres:\n`;
+      teamMembers.forEach((m: any) => {
+        const name = m.profiles?.full_name || 'Utilisateur';
+        teamContext += `  - ${name} (${m.role})\n`;
+      });
+      contextParts.push(teamContext);
+    }
+
+    // === EMPLOYEES (HR) ===
     if (employees && employees.length > 0) {
-      let hrContext = `\n👥 ÉQUIPE (${companyName}):\n`;
+      let hrContext = `\n🏢 EMPLOYÉS RH (${companyName}):\n`;
       hrContext += `• ${employees.length} collaborateurs actifs\n`;
       
       // Group by department
@@ -296,14 +317,11 @@ async function fetchPlatformContext(
         hrContext += `  - ${dept}: ${emps.length} personnes\n`;
       });
       
-      // Top performers
-      const topPerformers = employees.filter((e: any) => e.performance_score >= 4).slice(0, 5);
-      if (topPerformers.length > 0) {
-        hrContext += `Top performers:\n`;
-        topPerformers.forEach((e: any) => {
-          hrContext += `  - ${e.first_name} ${e.last_name} (${e.position}): ${e.performance_score}/5\n`;
-        });
-      }
+      // List employees
+      hrContext += `Liste des employés:\n`;
+      employees.slice(0, 10).forEach((e: any) => {
+        hrContext += `  - ${e.name} (${e.job_title || 'N/A'}, ${e.department || 'N/A'})\n`;
+      });
       contextParts.push(hrContext);
     }
 
