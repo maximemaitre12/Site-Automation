@@ -24,15 +24,8 @@ const Data = () => {
     <DashboardLayout>
       <div className="h-full flex flex-col overflow-hidden bg-gradient-to-b from-background to-background/95">
         {/* Header */}
-        <header className="px-4 md:px-8 py-4 md:py-6 shrink-0">
+        <header className="px-4 md:px-8 py-4 shrink-0">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-6">
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-                <span className="text-foreground">Aether</span>
-                <span className="text-agent-data ml-1">Data</span>
-              </h1>
-            </div>
-            {/* Tabs */}
             <AgentTabs 
               tabs={tabs} 
               activeTab={activeTab} 
