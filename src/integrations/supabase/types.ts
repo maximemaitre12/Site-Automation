@@ -2576,6 +2576,192 @@ export type Database = {
           },
         ]
       }
+      esg_emission_categories: {
+        Row: {
+          category_name: string
+          category_type: string
+          created_at: string
+          data_source: string | null
+          id: string
+          is_verified: boolean | null
+          reporting_year: number
+          scope1_emissions: number | null
+          scope2_emissions: number | null
+          scope3_emissions: number | null
+          trend_percentage: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_name: string
+          category_type?: string
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          is_verified?: boolean | null
+          reporting_year?: number
+          scope1_emissions?: number | null
+          scope2_emissions?: number | null
+          scope3_emissions?: number | null
+          trend_percentage?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_name?: string
+          category_type?: string
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          is_verified?: boolean | null
+          reporting_year?: number
+          scope1_emissions?: number | null
+          scope2_emissions?: number | null
+          scope3_emissions?: number | null
+          trend_percentage?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      esg_kpis: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          description: string | null
+          id: string
+          is_verified: boolean | null
+          kpi_name: string
+          kpi_unit: string
+          kpi_value: number
+          reporting_year: number
+          target_value: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          description?: string | null
+          id?: string
+          is_verified?: boolean | null
+          kpi_name: string
+          kpi_unit: string
+          kpi_value: number
+          reporting_year?: number
+          target_value?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          description?: string | null
+          id?: string
+          is_verified?: boolean | null
+          kpi_name?: string
+          kpi_unit?: string
+          kpi_value?: number
+          reporting_year?: number
+          target_value?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      esg_site_emissions: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          id: string
+          is_verified: boolean | null
+          location: string
+          notes: string | null
+          reporting_period: string | null
+          reporting_year: number
+          scope1_emissions: number | null
+          scope2_emissions: number | null
+          scope3_emissions: number | null
+          site_name: string
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          is_verified?: boolean | null
+          location: string
+          notes?: string | null
+          reporting_period?: string | null
+          reporting_year?: number
+          scope1_emissions?: number | null
+          scope2_emissions?: number | null
+          scope3_emissions?: number | null
+          site_name: string
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          id?: string
+          is_verified?: boolean | null
+          location?: string
+          notes?: string | null
+          reporting_period?: string | null
+          reporting_year?: number
+          scope1_emissions?: number | null
+          scope2_emissions?: number | null
+          scope3_emissions?: number | null
+          site_name?: string
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
+      esg_targets: {
+        Row: {
+          baseline_year: number
+          created_at: string
+          description: string | null
+          id: string
+          is_achieved: boolean | null
+          target_reduction_percent: number
+          target_type: string | null
+          target_year: number
+          user_id: string
+        }
+        Insert: {
+          baseline_year: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_achieved?: boolean | null
+          target_reduction_percent: number
+          target_type?: string | null
+          target_year: number
+          user_id: string
+        }
+        Update: {
+          baseline_year?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_achieved?: boolean | null
+          target_reduction_percent?: number
+          target_type?: string | null
+          target_year?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       hr_disputes: {
         Row: {
           created_at: string | null
