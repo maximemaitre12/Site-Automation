@@ -40,33 +40,38 @@ const REALTIME_KEYWORDS = [
   'direct', 'live', 'streaming'
 ];
 
-// Keywords that indicate a need for platform data
+// Keywords that indicate a need for platform data (accent-insensitive patterns)
 const PLATFORM_DATA_KEYWORDS = [
   // Sales
-  'deal', 'deals', 'vente', 'ventes', 'pipeline', 'opportunité', 'opportunités',
-  'prospect', 'prospects', 'client', 'clients', 'chiffre d\'affaires',
-  // HR
-  'employé', 'employés', 'collaborateur', 'collaborateurs', 'équipe', 'équipes',
-  'candidat', 'candidats', 'recrutement', 'embauche', 'rh', 'ressources humaines',
-  'performance', 'salaire', 'département', 'manager',
+  'deal', 'deals', 'vente', 'ventes', 'pipeline', 'opportunit', 'prospect',
+  'client', 'chiffre', 'affaires', 'ca ', 'c.a.', 'revenu',
+  // HR / Team - with accent variations
+  'employ', 'collaborat', 'equipe', 'équipe', 'membre', 'personnel',
+  'candidat', 'recrutement', 'embauche', 'rh', 'ressources humaines',
+  'performance', 'salaire', 'departement', 'département', 'manager', 'effectif',
   // Support
-  'ticket', 'tickets', 'support', 'incident', 'incidents', 'problème', 'problèmes',
-  'réclamation', 'réclamations', 'sav',
+  'ticket', 'support', 'incident', 'probleme', 'problème', 'reclamation', 'réclamation', 'sav',
   // Documents
-  'document', 'documents', 'fichier', 'fichiers', 'dossier', 'dossiers',
+  'document', 'fichier', 'dossier', 'doc ', 'docs',
   // Workflows
-  'workflow', 'workflows', 'automatisation', 'automation', 'processus',
+  'workflow', 'automatisation', 'automation', 'processus',
   // Compliance
-  'compliance', 'conformité', 'audit', 'alerte', 'alertes', 'risque', 'risques',
+  'compliance', 'conformit', 'audit', 'alerte', 'risque',
   // CRM
-  'crm', 'contact', 'contacts', 'entreprise', 'entreprises', 'société', 'sociétés',
+  'crm', 'contact', 'entreprise', 'societe', 'société',
   // ESG
-  'esg', 'environnement', 'social', 'gouvernance', 'kpi', 'indicateur', 'indicateurs',
+  'esg', 'environnement', 'social', 'gouvernance', 'kpi', 'indicateur',
   // Data
-  'données', 'data', 'enrichissement', 'siren', 'siret',
-  // General questions
-  'combien', 'quels sont', 'quelles sont', 'liste', 'récapitulatif', 'résumé',
-  'en cours', 'actif', 'actifs', 'ouvert', 'ouverts', 'rentable', 'rentabilité'
+  'donnee', 'données', 'data', 'enrichissement', 'siren', 'siret',
+  // General questions about internal data
+  'combien', 'quels sont', 'quelles sont', 'liste', 'recapitulatif', 'récapitulatif', 
+  'resume', 'résumé', 'en cours', 'actif', 'ouvert', 'rentable', 'rentabilit',
+  // Possessive questions about the company
+  'mon ', 'ma ', 'mes ', 'notre', 'nos ', 'mon équipe', 'mon equipe',
+  'dans aether', 'sur aether', 'chez nous', 'dans l\'entreprise',
+  // Common questions about company info
+  'qui fait partie', 'qui travaille', 'qui est dans', 'nombre de', 'statistique',
+  'tableau de bord', 'dashboard', 'stat', 'info', 'situation'
 ];
 
 function needsRealtimeSearch(message: string): boolean {
@@ -75,8 +80,15 @@ function needsRealtimeSearch(message: string): boolean {
 }
 
 function needsPlatformData(message: string): boolean {
+  // Normalize message: remove accents for better matching
   const lowerMessage = message.toLowerCase();
-  return PLATFORM_DATA_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
+  const normalizedMessage = lowerMessage
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Remove accents
+  
+  return PLATFORM_DATA_KEYWORDS.some(keyword => {
+    const normalizedKeyword = keyword.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return lowerMessage.includes(keyword) || normalizedMessage.includes(normalizedKeyword);
+  });
 }
 
 async function searchPerplexity(query: string): Promise<{ content: string; citations: string[] } | null> {
