@@ -116,54 +116,10 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* Center - Logo or Tool Name */}
+            {/* Center - Logo */}
             <Link to="/dashboard" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-              {location.pathname === '/tools/flow' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">AETHER</span>
-                  <span className="text-agent-flow ml-1">Flow</span>
-                </span>
-              ) : location.pathname === '/tools/support' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-agent-support ml-1">Support</span>
-                </span>
-              ) : location.pathname === '/tools/brain' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-agent-brain ml-1">Brain</span>
-                </span>
-              ) : location.pathname === '/tools/hr' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-agent-hr ml-1">HR</span>
-                </span>
-              ) : location.pathname === '/tools/sales' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-agent-sales ml-1">Sales</span>
-                </span>
-              ) : location.pathname === '/tools/doc' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-primary ml-1">Doc</span>
-                </span>
-              ) : location.pathname === '/tools/data' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-agent-data ml-1">Data</span>
-                </span>
-              ) : location.pathname === '/tools/compliance' ? (
-                <span className="text-lg sm:text-xl font-bold tracking-tight">
-                  <span className="text-foreground">Aether</span>
-                  <span className="text-agent-compliance ml-1">Compliance</span>
-                </span>
-              ) : (
-                <>
-                  <AetherLogo size="md" className="sm:hidden" />
-                  <AetherLogo size="lg" className="hidden sm:block" />
-                </>
-              )}
+              <AetherLogo size="md" className="sm:hidden" />
+              <AetherLogo size="lg" className="hidden sm:block" />
             </Link>
 
             {/* Header Actions - Right side */}
