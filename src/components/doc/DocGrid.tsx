@@ -140,7 +140,7 @@ export function DocGrid({
 
   if (viewMode === 'list') {
     return (
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto scrollbar-hide">
         <div className="divide-y divide-border">
           {/* Folders first */}
           {folders.map((folder) => (
@@ -264,7 +264,7 @@ export function DocGrid({
 
   // Grid View - Modern Cards
   return (
-    <div className="flex-1 overflow-auto p-6">
+    <div className="flex-1 overflow-auto scrollbar-hide p-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5">
         {/* Folders first */}
         {folders.map((folder) => (
