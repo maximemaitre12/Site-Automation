@@ -493,7 +493,7 @@ export default function BrainPage() {
                   </p>
                 </div>
               ) : (
-                <ScrollArea className="flex-1 min-h-0 px-4 md:px-6">
+                <ScrollArea className="flex-1 min-h-0 px-4 md:px-6 [&>[data-radix-scroll-area-viewport]]:!overflow-y-scroll [&_[data-radix-scroll-area-scrollbar]]:hidden">
                   <div className="space-y-4 max-w-3xl mx-auto py-4">
                     {(currentConversation.messages as Array<{ role: string; content: string }>)?.map((msg, idx) => (
                       <ChatMessage key={idx} role={msg.role as 'user' | 'assistant'} content={msg.content} />
