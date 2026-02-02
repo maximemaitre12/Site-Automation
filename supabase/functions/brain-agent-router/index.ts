@@ -56,6 +56,9 @@ TABLES DISPONIBLES:
 - conversations (id, title, updated_at) - Historique conversations
 - sales_proposals (id, title, status, total_amount) - Propositions commerciales
 - call_analyses (id, title, sentiment, summary) - Analyses d'appels
+- user_api_keys (id, provider, key_name, is_active, created_at) - Clés API configurées
+- job_descriptions (id, title, department, status, location) - Offres d'emploi
+- subscriptions (id, status, plan_name, price_monthly) - Abonnements
 
 QUESTION: "${query}"
 
