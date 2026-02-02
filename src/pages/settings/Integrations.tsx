@@ -278,27 +278,6 @@ export default function Integrations() {
     <DashboardLayout>
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <Plug className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">APIs</h1>
-                <p className="text-sm text-muted-foreground">
-                  Vos clés API personnelles (non partagées avec votre équipe)
-                </p>
-              </div>
-            </div>
-            <Badge variant="outline" className="gap-1.5">
-              <CheckCircle className="w-3 h-3 text-emerald-500" />
-              {connectedCount} configurées
-            </Badge>
-          </div>
-        </div>
-
         {/* Security notice */}
         <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
           <div className="flex items-start gap-3">
