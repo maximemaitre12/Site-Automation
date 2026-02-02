@@ -27,7 +27,7 @@ import Sales from "./pages/tools/Sales";
 import HR from "./pages/tools/HR";
 import Support from "./pages/tools/Support";
 import BrainPage from "./pages/tools/Brain";
-import Compliance from "./pages/tools/Compliance";
+import Compliance from "./pages/tools/ComplianceAuto";
 import Data from "./pages/tools/Data";
 
 // Company pages
