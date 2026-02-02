@@ -397,20 +397,51 @@ export default function Integrations() {
             </div>
 
             {/* Search bar */}
-            <div className="relative">
+            <form
+              className="relative"
+              autoComplete="off"
+              onSubmit={(e) => e.preventDefault()}
+            >
+              {/*
+                Autofill “decoys”:
+                Some browsers ignore autoComplete="off" and try to inject the last used email into the
+                first text input they find, which can cause a flickering loop with controlled inputs.
+              */}
+              <input
+                tabIndex={-1}
+                aria-hidden="true"
+                className="absolute left-[-10000px] top-auto h-px w-px opacity-0 pointer-events-none"
+                autoComplete="username"
+                name="username"
+              />
+              <input
+                tabIndex={-1}
+                aria-hidden="true"
+                className="absolute left-[-10000px] top-auto h-px w-px opacity-0 pointer-events-none"
+                type="password"
+                autoComplete="new-password"
+                name="password"
+              />
+
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
+                id="integration-search"
+                type="search"
+                inputMode="search"
                 placeholder="Rechercher une intégration (Slack, OpenAI, Stripe...)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-11"
-                autoComplete="off"
+                autoComplete="new-password"
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
                 name="integration-search"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
               />
-            </div>
+            </form>
 
             {/* Category tabs */}
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
