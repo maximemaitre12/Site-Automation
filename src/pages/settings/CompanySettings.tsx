@@ -10,12 +10,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AuditLogsDialog } from '@/components/settings/AuditLogsDialog';
 import { 
   Building2, 
   Users, 
   Shield, 
-  CreditCard, 
-  Settings,
   Crown,
   UserCheck,
   Edit3,
@@ -59,6 +58,7 @@ export default function CompanySettings() {
   const [companySlug, setCompanySlug] = useState(company?.slug || '');
   const [primaryColor, setPrimaryColor] = useState(company?.primary_color || '#3C4DFE');
   const [saving, setSaving] = useState(false);
+  const [auditLogsOpen, setAuditLogsOpen] = useState(false);
 
   const handleSaveCompany = async () => {
     setSaving(true);
@@ -337,10 +337,16 @@ export default function CompanySettings() {
                   <p className="text-sm text-muted-foreground mb-4">
                     Track all actions and changes in your company
                   </p>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => setAuditLogsOpen(true)}>
                     View Audit Logs
                   </Button>
                 </div>
+
+                <AuditLogsDialog 
+                  open={auditLogsOpen} 
+                  onOpenChange={setAuditLogsOpen} 
+                  companyId={company.id} 
+                />
               </CardContent>
             </Card>
           </TabsContent>
