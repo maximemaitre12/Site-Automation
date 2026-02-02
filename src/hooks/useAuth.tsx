@@ -161,8 +161,8 @@ export function RequireSubscription({ children }: { children: ReactNode }) {
       return (data?.status as string | null) ?? null;
     },
     retry: 2,
-    // Pour un contrôle d’accès, on force une donnée toujours fraîche pour éviter
-    // de rediriger sur un cache "null" après un changement (ex: switch d’agent).
+    // Pour un contrôle d'accès, on force une donnée toujours fraîche pour éviter
+    // de rediriger sur un cache "null" après un changement (ex: switch d'agent).
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
@@ -199,7 +199,7 @@ export function RequireSubscription({ children }: { children: ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
         <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 text-card-foreground">
-          <h2 className="text-lg font-semibold">Vérification d’abonnement impossible</h2>
+          <h2 className="text-lg font-semibold">Vérification d'abonnement impossible</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Un problème temporaire empêche de vérifier votre abonnement. Réessayez.
           </p>
@@ -213,6 +213,119 @@ export function RequireSubscription({ children }: { children: ReactNode }) {
   }
 
   if (!hasSubscription && location.pathname !== '/select-plan') return null;
+
+  return <>{children}</>;
+}
+
+// Protected route that requires subscription AND company membership
+export function RequireCompany({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check subscription first
+  const {
+    data: subscriptionStatusRaw,
+    isLoading: subscriptionLoading,
+    isError: subscriptionError,
+    refetch: refetchSubscription,
+  } = useQuery({
+    queryKey: ['subscription-status', user?.id ?? null],
+    enabled: !!user?.id && !loading,
+    queryFn: async ({ queryKey }) => {
+      const userId = queryKey[1] as string;
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data?.status as string | null) ?? null;
+    },
+    retry: 2,
+    staleTime: 0,
+    refetchOnMount: true,
+  });
+
+  const hasSubscription =
+    subscriptionStatusRaw === 'active' || subscriptionStatusRaw === 'trial';
+
+  // Check company membership
+  const {
+    data: userRole,
+    isLoading: companyLoading,
+  } = useQuery({
+    queryKey: ['user-company', user?.id ?? null],
+    enabled: !!user?.id && !loading && hasSubscription,
+    queryFn: async ({ queryKey }) => {
+      const userId = queryKey[1] as string;
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('id, company_id')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    retry: 2,
+    staleTime: 0,
+    refetchOnMount: true,
+  });
+
+  const hasCompany = !!userRole?.company_id;
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (!loading && user && !subscriptionLoading && !subscriptionError && !hasSubscription) {
+      if (location.pathname !== '/select-plan') {
+        navigate('/select-plan');
+      }
+    }
+  }, [loading, user, subscriptionLoading, subscriptionError, hasSubscription, navigate, location.pathname]);
+
+  useEffect(() => {
+    if (!loading && user && hasSubscription && !companyLoading && !hasCompany) {
+      if (location.pathname !== '/onboarding') {
+        navigate('/onboarding');
+      }
+    }
+  }, [loading, user, hasSubscription, companyLoading, hasCompany, navigate, location.pathname]);
+
+  if (loading || subscriptionLoading || (hasSubscription && companyLoading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  if (subscriptionError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 text-card-foreground">
+          <h2 className="text-lg font-semibold">Vérification impossible</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Un problème temporaire empêche de vérifier votre accès. Réessayez.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Button onClick={() => refetchSubscription()} variant="default">Réessayer</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasSubscription && location.pathname !== '/select-plan') return null;
+  if (!hasCompany && location.pathname !== '/onboarding') return null;
 
   return <>{children}</>;
 }

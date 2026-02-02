@@ -67,6 +67,7 @@ export type Database = {
           ai_entities: Json | null
           ai_keywords: Json | null
           ai_summary: string | null
+          company_id: string | null
           content: string | null
           created_at: string
           description: string | null
@@ -93,6 +94,7 @@ export type Database = {
           ai_entities?: Json | null
           ai_keywords?: Json | null
           ai_summary?: string | null
+          company_id?: string | null
           content?: string | null
           created_at?: string
           description?: string | null
@@ -119,6 +121,7 @@ export type Database = {
           ai_entities?: Json | null
           ai_keywords?: Json | null
           ai_summary?: string | null
+          company_id?: string | null
           content?: string | null
           created_at?: string
           description?: string | null
@@ -141,6 +144,13 @@ export type Database = {
           version?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "aether_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "aether_documents_folder_id_fkey"
             columns: ["folder_id"]
@@ -747,6 +757,7 @@ export type Database = {
       candidates: {
         Row: {
           ai_analysis: Json | null
+          company_id: string | null
           created_at: string
           cv_file_url: string | null
           cv_text: string | null
@@ -765,6 +776,7 @@ export type Database = {
         }
         Insert: {
           ai_analysis?: Json | null
+          company_id?: string | null
           created_at?: string
           cv_file_url?: string | null
           cv_text?: string | null
@@ -783,6 +795,7 @@ export type Database = {
         }
         Update: {
           ai_analysis?: Json | null
+          company_id?: string | null
           created_at?: string
           cv_file_url?: string | null
           cv_text?: string | null
@@ -800,6 +813,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "candidates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "candidates_job_id_fkey"
             columns: ["job_id"]
@@ -2321,6 +2341,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           candidate_id: string | null
+          company_id: string | null
           contract_type: string | null
           created_at: string | null
           department: string | null
@@ -2342,6 +2363,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           candidate_id?: string | null
+          company_id?: string | null
           contract_type?: string | null
           created_at?: string | null
           department?: string | null
@@ -2363,6 +2385,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           candidate_id?: string | null
+          company_id?: string | null
           contract_type?: string | null
           created_at?: string | null
           department?: string | null
@@ -2387,6 +2410,13 @@ export type Database = {
             columns: ["candidate_id"]
             isOneToOne: false
             referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -3930,6 +3960,70 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       templates: {
         Row: {
           content: Json | null
@@ -4687,6 +4781,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_same_company: {
+        Args: { _company_id: string; _user_id: string }
         Returns: boolean
       }
     }

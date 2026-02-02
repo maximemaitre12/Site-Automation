@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, RequireAuth, RequireSubscription } from "@/hooks/useAuth";
+import { AuthProvider, RequireAuth, RequireSubscription, RequireCompany } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BlockLibraryProvider } from "@/contexts/BlockLibraryContext";
 
@@ -117,21 +117,21 @@ const App = () => {
               <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
               <Route path="/security" element={<Navigate to="/legal/security" replace />} />
               <Route path="/docs" element={<Navigate to="/resources/documentation" replace />} />
-              {/* Protected routes - require subscription */}
-              <Route path="/dashboard" element={<RequireSubscription><Dashboard /></RequireSubscription>} />
-              <Route path="/tools/flow" element={<RequireSubscription><Flow /></RequireSubscription>} />
-              <Route path="/tools/doc" element={<RequireSubscription><DocPage /></RequireSubscription>} />
-              <Route path="/tools/sales" element={<RequireSubscription><Sales /></RequireSubscription>} />
-              <Route path="/tools/hr" element={<RequireSubscription><HR /></RequireSubscription>} />
-              <Route path="/tools/support" element={<RequireSubscription><Support /></RequireSubscription>} />
-              <Route path="/tools/brain" element={<RequireSubscription><BrainPage /></RequireSubscription>} />
-              <Route path="/tools/compliance" element={<RequireSubscription><Compliance /></RequireSubscription>} />
-              <Route path="/tools/data" element={<RequireSubscription><Data /></RequireSubscription>} />
+              {/* Protected routes - require subscription AND company */}
+              <Route path="/dashboard" element={<RequireCompany><Dashboard /></RequireCompany>} />
+              <Route path="/tools/flow" element={<RequireCompany><Flow /></RequireCompany>} />
+              <Route path="/tools/doc" element={<RequireCompany><DocPage /></RequireCompany>} />
+              <Route path="/tools/sales" element={<RequireCompany><Sales /></RequireCompany>} />
+              <Route path="/tools/hr" element={<RequireCompany><HR /></RequireCompany>} />
+              <Route path="/tools/support" element={<RequireCompany><Support /></RequireCompany>} />
+              <Route path="/tools/brain" element={<RequireCompany><BrainPage /></RequireCompany>} />
+              <Route path="/tools/compliance" element={<RequireCompany><Compliance /></RequireCompany>} />
+              <Route path="/tools/data" element={<RequireCompany><Data /></RequireCompany>} />
               <Route path="/onboarding" element={<RequireSubscription><Onboarding /></RequireSubscription>} />
               <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
-              <Route path="/settings/company" element={<RequireSubscription><CompanySettings /></RequireSubscription>} />
-              <Route path="/settings/api-keys" element={<RequireSubscription><ApiKeys /></RequireSubscription>} />
-              <Route path="/settings/integrations" element={<RequireSubscription><Integrations /></RequireSubscription>} />
+              <Route path="/settings/company" element={<RequireCompany><CompanySettings /></RequireCompany>} />
+              <Route path="/settings/api-keys" element={<RequireCompany><ApiKeys /></RequireCompany>} />
+              <Route path="/settings/integrations" element={<RequireCompany><Integrations /></RequireCompany>} />
               
               {/* Admin routes */}
               <Route path="/admin/demo-requests" element={<RequireAuth><DemoRequests /></RequireAuth>} />

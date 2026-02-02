@@ -201,6 +201,56 @@ export function useCompany() {
     }
   };
 
+  const joinCompany = async (companyId: string): Promise<boolean> => {
+    if (!user) return false;
+
+    try {
+      // Check if user already has a role in this company
+      const { data: existingRole } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('company_id', companyId)
+        .maybeSingle();
+
+      if (existingRole) {
+        toast({ title: 'Info', description: 'You are already a member of this company' });
+        await fetchCompanyData();
+        return true;
+      }
+
+      // Insert new role as 'viewer' by default (admins can upgrade later)
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: user.id,
+          company_id: companyId,
+          role: 'viewer',
+        });
+
+      if (roleError) {
+        toast({ title: 'Error', description: roleError.message, variant: 'destructive' });
+        return false;
+      }
+
+      // Update profile with company_id
+      await supabase
+        .from('profiles')
+        .update({ company_id: companyId })
+        .eq('user_id', user.id);
+
+      toast({ title: 'Success', description: 'Successfully joined the company!' });
+      
+      await fetchCompanyData();
+      
+      return true;
+    } catch (error) {
+      console.error('Error joining company:', error);
+      toast({ title: 'Error', description: 'Failed to join company', variant: 'destructive' });
+      return false;
+    }
+  };
+
   const updateCompany = async (updates: Partial<Pick<Company, 'name' | 'slug' | 'logo_url' | 'primary_color'>>): Promise<boolean> => {
     if (!company || !hasMinRole('admin')) {
       toast({ title: 'Error', description: 'Insufficient permissions', variant: 'destructive' });
@@ -296,6 +346,7 @@ export function useCompany() {
     loading,
     hasMinRole,
     createCompany,
+    joinCompany,
     updateCompany,
     inviteTeamMember,
     updateMemberRole,
