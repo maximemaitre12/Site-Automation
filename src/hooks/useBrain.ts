@@ -6,6 +6,7 @@ import { callAI } from '@/lib/ai';
 import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext } from '@/lib/aether-knowledge-base';
+import { needsPlatformContext } from '@/lib/intent-detector';
 
 export interface Message {
   id: string;
@@ -268,6 +269,67 @@ STYLE DE RÉPONSE:
       // Get relevant knowledge from AETHER Support knowledge base
       const supportKnowledge = getKnowledgeContext(content);
       
+      // Fetch company ID for platform context
+      const companyId = await fetchCompanyId();
+      
+      // Check if user is asking about platform data and fetch real-time context
+      let platformContextStr = '';
+      if (needsPlatformContext(content) && companyId) {
+        try {
+          console.log('Fetching platform context for question:', content);
+          const response = await supabase.functions.invoke('brain-platform-context', {
+            body: { 
+              userId: user.id, 
+              companyId,
+              query: content 
+            }
+          });
+          
+          if (response.data?.context) {
+            const ctx = response.data.context;
+            const sections: string[] = [];
+            
+            if (ctx.workflows) {
+              sections.push(`WORKFLOWS: ${ctx.workflows.total} total, ${ctx.workflows.active} actifs. Liste: ${ctx.workflows.list?.map((w: any) => `"${w.name}" (${w.active ? 'actif' : 'inactif'})`).join(', ') || 'aucun'}`);
+            }
+            if (ctx.sales?.summary) {
+              sections.push(`VENTES: ${ctx.sales.summary.total_deals} deals, pipeline total ${ctx.sales.summary.total_pipeline_value}€, probabilité moyenne ${ctx.sales.summary.average_win_probability}%`);
+            }
+            if (ctx.hr?.candidates) {
+              sections.push(`CANDIDATS: ${ctx.hr.candidates.total} candidats, score moyen ${ctx.hr.candidates.avg_match_score}%`);
+            }
+            if (ctx.hr?.employees) {
+              sections.push(`EMPLOYÉS: ${ctx.hr.employees.total} total, ${ctx.hr.employees.active} actifs`);
+            }
+            if (ctx.support?.summary) {
+              sections.push(`SUPPORT: ${ctx.support.summary.total_tickets} tickets, ${ctx.support.summary.open_tickets} ouverts`);
+            }
+            if (ctx.documents?.summary) {
+              sections.push(`DOCUMENTS: ${ctx.documents.summary.total} documents`);
+            }
+            if (ctx.compliance?.summary) {
+              sections.push(`COMPLIANCE: ${ctx.compliance.summary.total_alerts} alertes, ${ctx.compliance.summary.unresolved} non résolues`);
+            }
+            if (ctx.crm?.opportunities) {
+              sections.push(`CRM OPPORTUNITÉS: ${ctx.crm.opportunities.total}, valeur totale ${ctx.crm.opportunities.total_value}€`);
+            }
+            if (ctx.crm?.contacts) {
+              sections.push(`CRM CONTACTS: ${ctx.crm.contacts.total} contacts`);
+            }
+            if (ctx.esg) {
+              sections.push(`ESG: ${ctx.esg.total_kpis} KPIs suivis`);
+            }
+            
+            if (sections.length > 0) {
+              platformContextStr = `\n\nDONNÉES PLATEFORME EN TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${sections.join('\n')}`;
+              console.log('Platform context loaded:', sections.length, 'sections');
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching platform context:', err);
+        }
+      }
+      
       const systemPrompt = `Tu es AETHER Brain, un assistant expert et dynamique.
 
 STYLE DE RÉPONSE:
@@ -296,13 +358,11 @@ INFORMATIONS CONFIDENTIELLES (NE JAMAIS DIVULGUER):
 - Données d'utilisation globales de la plateforme
 - Si on te demande ces informations, réponds que tu n'as pas accès à ces données internes.
 
-${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
+${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}
+${platformContextStr}`;
 
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
-
-      // Fetch company ID for platform context
-      const companyId = await fetchCompanyId();
 
       await new Promise<void>((resolve, reject) => {
         const cleanedMessages = updatedMessages.slice(-10).map(m => {
