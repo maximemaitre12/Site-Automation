@@ -134,10 +134,6 @@ export default function CompanySettings() {
               <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline">Security</span>
             </TabsTrigger>
-            <TabsTrigger value="billing" className="gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 shrink-0">
-              <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Billing</span>
-            </TabsTrigger>
           </TabsList>
 
           {/* General Settings */}
@@ -349,61 +345,6 @@ export default function CompanySettings() {
                   <Button variant="outline" size="sm">
                     View Audit Logs
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Billing */}
-          <TabsContent value="billing" className="space-y-6">
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-primary" />
-                  Subscription & Billing
-                </CardTitle>
-                <CardDescription>
-                  Manage your subscription and billing information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h4 className="text-lg font-semibold text-foreground capitalize">
-                        {company.subscription_tier} Plan
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {company.max_users} users • {company.max_storage_mb}MB storage
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="border-primary text-primary">
-                      Active
-                    </Badge>
-                  </div>
-                  <Button className="w-full" variant="outline">
-                    Upgrade Plan
-                  </Button>
-                </div>
-
-                <div className="space-y-3 sm:space-y-4">
-                  <h4 className="font-medium text-foreground text-sm sm:text-base">Usage This Month</h4>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 border border-border">
-                      <p className="text-lg sm:text-2xl font-bold text-foreground">
-                        {teamMembers.length}/{company.max_users}
-                      </p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">Team</p>
-                    </div>
-                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 border border-border">
-                      <p className="text-lg sm:text-2xl font-bold text-foreground">0</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">MB</p>
-                    </div>
-                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-secondary/50 border border-border">
-                      <p className="text-lg sm:text-2xl font-bold text-foreground">0</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">AI</p>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
