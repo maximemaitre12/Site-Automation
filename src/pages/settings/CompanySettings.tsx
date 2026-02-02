@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Building2, 
@@ -111,7 +112,9 @@ export default function CompanySettings() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-full overflow-hidden">
+      <div className="h-full min-h-0 flex flex-col">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-full">
         {/* Header */}
         <div className="mb-4 sm:mb-6 lg:mb-8">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1 sm:mb-2">Company Settings</h1>
@@ -350,6 +353,8 @@ export default function CompanySettings() {
             </Card>
           </TabsContent>
         </Tabs>
+          </div>
+        </ScrollArea>
       </div>
     </DashboardLayout>
   );
