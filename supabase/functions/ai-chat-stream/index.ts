@@ -195,13 +195,13 @@ async function fetchPlatformContext(
         .order('created_at', { ascending: false })
         .limit(30),
 
-      // Documents - company-wide
+      // Documents - by company OR by user (since many docs don't have company_id)
       supabase
         .from('aether_documents')
         .select('id, title, ai_summary, file_type, access_level, tags')
-        .eq('company_id', companyId)
+        .or(`company_id.eq.${companyId},user_id.eq.${userId}`)
         .order('created_at', { ascending: false })
-        .limit(20),
+        .limit(30),
 
       // Workflows - user-specific
       supabase
