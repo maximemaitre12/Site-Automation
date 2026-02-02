@@ -358,28 +358,100 @@ async function fetchDataContext(supabase: any, userId: string): Promise<CompactC
 }
 
 async function fetchGeneralContext(supabase: any, userId: string, companyId: string): Promise<CompactContext> {
-  // Fetch light counts from all domains
-  const [workflows, deals, candidates, employees, tickets, docs, alerts] = await Promise.all([
-    supabase.from('workflows').select('id', { count: 'exact', head: true }).eq('user_id', userId),
-    supabase.from('sales_deals').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('candidates').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('employees').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('support_tickets').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('aether_documents').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('compliance_alerts').select('id', { count: 'exact', head: true }).eq('company_id', companyId),
+  // Fetch light counts from ALL domains for complete overview
+  const [
+    workflows, 
+    deals, 
+    candidates, 
+    employees, 
+    tickets, 
+    docs, 
+    alerts,
+    conversations,
+    crmCompanies,
+    crmContacts,
+    enrichedCompanies,
+    esgKpis,
+    proposals,
+    callAnalyses
+  ] = await Promise.all([
+    supabase.from('workflows').select('id, is_active', { count: 'exact' }).eq('user_id', userId).limit(100),
+    supabase.from('sales_deals').select('id, status, value', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('candidates').select('id, status', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('employees').select('id, status', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('support_tickets').select('id, status', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('aether_documents').select('id', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('compliance_alerts').select('id, is_resolved', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('conversations').select('id', { count: 'exact' }).eq('user_id', userId).limit(100),
+    supabase.from('crm_companies').select('id', { count: 'exact' }).eq('user_id', userId).limit(100),
+    supabase.from('crm_contacts').select('id', { count: 'exact' }).eq('user_id', userId).limit(100),
+    supabase.from('enriched_companies').select('id', { count: 'exact' }).eq('user_id', userId).limit(100),
+    supabase.from('esg_kpis').select('id', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('sales_proposals').select('id', { count: 'exact' }).eq('company_id', companyId).limit(100),
+    supabase.from('call_analyses').select('id', { count: 'exact' }).eq('user_id', userId).limit(100),
   ]);
 
+  // Calculate derived metrics
+  const workflowsList = workflows.data || [];
+  const activeWorkflows = workflowsList.filter((w: any) => w.is_active).length;
+  
+  const dealsList = deals.data || [];
+  const activeDeals = dealsList.filter((d: any) => 
+    !['won', 'lost', 'gagné', 'perdu', 'closed'].includes((d.status || '').toLowerCase())
+  ).length;
+  const totalPipeline = dealsList.reduce((sum: number, d: any) => sum + (d.value || 0), 0);
+  
+  const alertsList = alerts.data || [];
+  const unresolvedAlerts = alertsList.filter((a: any) => !a.is_resolved).length;
+
+  const ticketsList = tickets.data || [];
+  const openTickets = ticketsList.filter((t: any) => 
+    !['resolved', 'closed', 'résolu', 'fermé'].includes((t.status || '').toLowerCase())
+  ).length;
+
+  const employeesList = employees.data || [];
+  const activeEmployees = employeesList.filter((e: any) => e.status === 'active').length;
+
+  // Build comprehensive summary
+  const parts = [];
+  
+  if (workflows.count) parts.push(`Flow: ${workflows.count} workflows (${activeWorkflows} actifs)`);
+  if (deals.count) parts.push(`Sales: ${deals.count} deals (${activeDeals} en cours, pipeline ${formatCurrency(totalPipeline)})`);
+  if (candidates.count || employees.count) parts.push(`HR: ${candidates.count || 0} candidats, ${employees.count || 0} employés (${activeEmployees} actifs)`);
+  if (tickets.count) parts.push(`Support: ${tickets.count} tickets (${openTickets} ouverts)`);
+  if (docs.count) parts.push(`Doc: ${docs.count} documents`);
+  if (alerts.count || esgKpis.count) parts.push(`Compliance: ${alerts.count || 0} alertes (${unresolvedAlerts} non résolues), ${esgKpis.count || 0} KPIs ESG`);
+  if (crmCompanies.count || crmContacts.count || enrichedCompanies.count) {
+    parts.push(`Data/CRM: ${enrichedCompanies.count || 0} entreprises enrichies, ${crmCompanies.count || 0} sociétés CRM, ${crmContacts.count || 0} contacts`);
+  }
+  if (conversations.count) parts.push(`Brain: ${conversations.count} conversations`);
+  if (proposals.count) parts.push(`Propositions: ${proposals.count}`);
+  if (callAnalyses.count) parts.push(`Analyses d'appels: ${callAnalyses.count}`);
+
   return {
-    domain: 'VUE D\'ENSEMBLE',
-    summary: `Workflows: ${workflows.count || 0}, Deals: ${deals.count || 0}, Candidats: ${candidates.count || 0}, Employés: ${employees.count || 0}, Tickets: ${tickets.count || 0}, Documents: ${docs.count || 0}, Alertes conformité: ${alerts.count || 0}`,
+    domain: 'VUE GLOBALE PLATEFORME',
+    summary: parts.length > 0 ? parts.join(' | ') : 'Aucune donnée trouvée. Commencez par créer des workflows, ajouter des candidats, ou importer des données.',
     metrics: {
       workflows: workflows.count || 0,
+      workflowsActifs: activeWorkflows,
       deals: deals.count || 0,
+      dealsActifs: activeDeals,
+      pipeline: totalPipeline,
       candidats: candidates.count || 0,
       employes: employees.count || 0,
+      employesActifs: activeEmployees,
       tickets: tickets.count || 0,
+      ticketsOuverts: openTickets,
       documents: docs.count || 0,
-      alertes: alerts.count || 0
+      alertes: alerts.count || 0,
+      alertesNonResolues: unresolvedAlerts,
+      conversations: conversations.count || 0,
+      entreprisesCRM: crmCompanies.count || 0,
+      contacts: crmContacts.count || 0,
+      entreprisesEnrichies: enrichedCompanies.count || 0,
+      kpisESG: esgKpis.count || 0,
+      propositions: proposals.count || 0,
+      analysesAppels: callAnalyses.count || 0
     }
   };
 }

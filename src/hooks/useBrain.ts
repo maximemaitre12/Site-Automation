@@ -275,42 +275,30 @@ STYLE DE RÉPONSE:
       let platformContextStr = '';
       const detectedDomains = detectDomains(content);
       
-      if (detectedDomains.length > 0 && companyId) {
+      // Always try to get context for platform questions
+      const shouldFetchContext = detectedDomains.length > 0 || isPlatformQuestion(content);
+      
+      if (shouldFetchContext && companyId) {
         try {
-          console.log('Smart context - detected domains:', detectedDomains);
+          // If no specific domain but it's a platform question, use 'general' for full overview
+          const domainsToFetch = detectedDomains.length > 0 ? detectedDomains : ['general'];
+          
+          console.log('Smart context - fetching domains:', domainsToFetch);
           const response = await supabase.functions.invoke('brain-smart-context', {
             body: { 
               userId: user.id, 
               companyId,
-              domains: detectedDomains,
+              domains: domainsToFetch,
               query: content 
             }
           });
           
           if (response.data?.contextText) {
             platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${response.data.contextText}`;
-            console.log('Smart context loaded:', response.data.domainsProcessed?.length, 'domains');
+            console.log('Smart context loaded:', response.data.domainsProcessed?.length, 'domains, chars:', response.data.contextText.length);
           }
         } catch (err) {
           console.error('Error fetching smart context:', err);
-        }
-      } else if (isPlatformQuestion(content) && companyId) {
-        // Fallback: If it looks like a platform question but no specific domain detected
-        try {
-          const response = await supabase.functions.invoke('brain-smart-context', {
-            body: { 
-              userId: user.id, 
-              companyId,
-              domains: ['general'],
-              query: content 
-            }
-          });
-          
-          if (response.data?.contextText) {
-            platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${response.data.contextText}`;
-          }
-        } catch (err) {
-          console.error('Error fetching general context:', err);
         }
       }
       

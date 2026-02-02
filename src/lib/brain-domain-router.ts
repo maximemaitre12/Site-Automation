@@ -151,6 +151,11 @@ const DOMAIN_PATTERNS: DomainPattern[] = [
       /plateforme/i,
       /mes\s*donn[eé]es/i,
       /tout(es)?\s*(mes|les)?\s*(donn[eé]es|infos?)/i,
+      /combien\s*(j'?ai|de|d')/i,  // "combien j'ai de X"
+      /qu'?est[- ]ce\s*que\s*j'?ai/i,
+      /montre[- ]moi\s*(tout|mes)/i,
+      /liste[- ]moi\s*(tout|mes)/i,
+      /\bmes\s+(outils|agents|fonctionnalit)/i,
     ]
   }
 ];
