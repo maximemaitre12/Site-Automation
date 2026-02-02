@@ -163,6 +163,11 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
                   <span className="text-foreground">Aether</span>
                   <span className="text-agent-compliance ml-1">Compliance</span>
                 </span>
+              ) : location.pathname === '/settings/integrations' ? (
+                <span className="text-lg sm:text-xl font-bold tracking-tight">
+                  <span className="text-foreground">Aether</span>
+                  <span className="text-primary ml-1">APIs</span>
+                </span>
               ) : (
                 <>
                   <AetherLogo size="md" className="sm:hidden" />
