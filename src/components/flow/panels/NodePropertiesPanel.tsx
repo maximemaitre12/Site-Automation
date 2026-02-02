@@ -1,4 +1,4 @@
-import { memo, useState, useMemo, useEffect } from 'react';
+import { memo, useState, useMemo, useEffect, useCallback } from 'react';
 import { WorkflowBlock, ExecutionStatus } from '@/types/workflow';
 import { getBlockByType, BlockDefinition, BlockParam, BLOCK_LIBRARY } from '@/types/block-library';
 import { Input } from '@/components/ui/input';
@@ -16,11 +16,12 @@ import {
   FileJson, Zap, AlertCircle, CheckCircle2,
   Eye, EyeOff, ExternalLink, Key, Shield, Copy,
   Mail, FolderOpen, Tag, Loader2, LogOut, Brain, Code, Box,
-  ShieldAlert, Lock
+  ShieldAlert, Lock, Link2, Unlink
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGoogleOAuth } from '@/hooks/useGoogleOAuth';
 import { isSensitiveField, maskSensitiveValue } from '@/lib/workflow-security';
+import { useUserApiKeys } from '@/hooks/useUserApiKeys';
 
 interface NodePropertiesPanelProps {
   block: WorkflowBlock | null;
@@ -50,9 +51,46 @@ function NodePropertiesPanelComponent({
     new Set(['main', 'settings', 'connection', 'security'])
   );
   const [showPasswords, setShowPasswords] = useState<Set<string>>(new Set());
+  const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set());
   
   // Google OAuth hook
   const { status: googleOAuthStatus, loading: googleOAuthLoading, connect: connectGoogle, disconnect: disconnectGoogle } = useGoogleOAuth();
+  
+  // User API Keys hook for auto-completion and saving
+  const { 
+    keysByService, 
+    getKeyForConfigKey, 
+    getServiceFromConfigKey,
+    saveKeyFromConfig,
+    loading: keysLoading 
+  } = useUserApiKeys();
+
+  // Auto-fill sensitive fields from saved keys on mount
+  useEffect(() => {
+    if (!block || keysLoading) return;
+    
+    const definition = getBlockByType(block.type);
+    if (!definition?.params) return;
+    
+    const updates: Record<string, string> = {};
+    let hasUpdates = false;
+    
+    definition.params.forEach((param) => {
+      if (isSensitiveField(param.key) && !block.config?.[param.key]) {
+        const savedKey = getKeyForConfigKey(param.key);
+        if (savedKey) {
+          updates[param.key] = savedKey;
+          hasUpdates = true;
+        }
+      }
+    });
+    
+    if (hasUpdates) {
+      onUpdate(block.id, {
+        config: { ...block.config, ...updates },
+      });
+    }
+  }, [block?.id, block?.type, keysLoading]);
 
   if (!block) return null;
 
@@ -92,6 +130,25 @@ function NodePropertiesPanelComponent({
     onUpdate(block.id, {
       config: { ...block.config, [key]: value },
     });
+  };
+  
+  // Save sensitive key to user_api_keys table
+  const handleSaveApiKey = async (paramKey: string, value: string) => {
+    if (!value?.trim()) return;
+    
+    setSavingKeys(prev => new Set(prev).add(paramKey));
+    const success = await saveKeyFromConfig(paramKey, value);
+    setSavingKeys(prev => {
+      const next = new Set(prev);
+      next.delete(paramKey);
+      return next;
+    });
+    
+    if (success) {
+      toast.success('Clé API sauvegardée dans vos intégrations');
+    } else {
+      toast.error('Impossible de sauvegarder la clé');
+    }
   };
 
   const handleRetryChange = (updates: Partial<NonNullable<WorkflowBlock['retryConfig']>>) => {
@@ -143,17 +200,43 @@ function NodePropertiesPanelComponent({
     const defaultVal = param.defaultValue;
     const isSensitive = isSensitiveField(param.key);
     const showSensitiveValue = showPasswords.has(param.key);
+    const serviceName = getServiceFromConfigKey(param.key);
+    const savedKey = serviceName ? keysByService[serviceName] : null;
+    const isLinked = !!savedKey && savedKey === value;
+    const isSaving = savingKeys.has(param.key);
 
-    // Special rendering for sensitive fields
+    // Special rendering for sensitive fields with integration linking
     if (isSensitive) {
       return (
-        <div className="space-y-1">
+        <div className="space-y-2">
+          {/* Status indicator */}
+          {savedKey && (
+            <div className={cn(
+              "flex items-center gap-2 p-2 rounded-lg text-xs",
+              isLinked 
+                ? "bg-green-500/10 border border-green-500/20 text-green-600" 
+                : "bg-amber-500/10 border border-amber-500/20 text-amber-600"
+            )}>
+              {isLinked ? (
+                <>
+                  <Link2 className="h-3 w-3" />
+                  <span>Lié à vos intégrations ({serviceName})</span>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="h-3 w-3" />
+                  <span>Clé différente de vos intégrations</span>
+                </>
+              )}
+            </div>
+          )}
+          
           <div className="relative">
             <Input
               type={showSensitiveValue ? 'text' : 'password'}
               value={value || ''}
               onChange={(e) => handleConfigChange(param.key, e.target.value)}
-              placeholder={param.placeholder || '••••••••'}
+              placeholder={savedKey ? '••• (clé sauvegardée disponible)' : (param.placeholder || '••••••••')}
               className="h-8 text-sm pr-20 font-mono"
             />
             <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1">
@@ -180,9 +263,44 @@ function NodePropertiesPanelComponent({
               )}
             </div>
           </div>
+          
+          {/* Action buttons */}
+          <div className="flex gap-2">
+            {/* Use saved key button */}
+            {savedKey && !isLinked && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs h-7 flex-1"
+                onClick={() => handleConfigChange(param.key, savedKey)}
+              >
+                <Link2 className="h-3 w-3 mr-1" />
+                Utiliser la clé sauvegardée
+              </Button>
+            )}
+            
+            {/* Save to integrations button */}
+            {value && !isLinked && serviceName && (
+              <Button
+                variant="default"
+                size="sm"
+                className="text-xs h-7 flex-1"
+                onClick={() => handleSaveApiKey(param.key, value)}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                ) : (
+                  <Key className="h-3 w-3 mr-1" />
+                )}
+                Sauvegarder dans Intégrations
+              </Button>
+            )}
+          </div>
+          
           <div className="flex items-center gap-1 text-[9px] text-amber-600">
             <Lock className="h-2.5 w-2.5" />
-            <span>Donnée sensible - non visible par l'IA</span>
+            <span>Donnée personnelle - non partagée avec l'équipe</span>
           </div>
         </div>
       );

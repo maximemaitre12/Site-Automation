@@ -16,7 +16,6 @@ import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import SelectPlan from "./pages/SelectPlan";
 import CompanySettings from "./pages/settings/CompanySettings";
-import ApiKeys from "./pages/settings/ApiKeys";
 import Integrations from "./pages/settings/Integrations";
 import DemoRequests from "./pages/admin/DemoRequests";
 
@@ -130,7 +129,7 @@ const App = () => {
               <Route path="/onboarding" element={<RequireSubscription><Onboarding /></RequireSubscription>} />
               <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
               <Route path="/settings/company" element={<RequireCompany><CompanySettings /></RequireCompany>} />
-              <Route path="/settings/api-keys" element={<RequireCompany><ApiKeys /></RequireCompany>} />
+              <Route path="/settings/api-keys" element={<Navigate to="/settings/integrations" replace />} />
               <Route path="/settings/integrations" element={<RequireCompany><Integrations /></RequireCompany>} />
               
               {/* Admin routes */}
