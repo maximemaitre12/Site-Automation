@@ -122,6 +122,16 @@ serve(async (req) => {
         ownerField: 'company_id',
         defaultFields: ['id', 'title', 'department', 'status', 'location'],
         formatFn: (j) => `• "${j.title}" (${j.department || 'n/a'}, ${j.status})`
+      },
+      user_api_keys: {
+        ownerField: 'user_id',
+        defaultFields: ['id', 'provider', 'key_name', 'is_active', 'created_at'],
+        formatFn: (k) => `• ${k.provider}: "${k.key_name || 'clé'}" (${k.is_active ? 'active' : 'inactive'})`
+      },
+      subscriptions: {
+        ownerField: 'user_id',
+        defaultFields: ['id', 'status', 'plan_name', 'price_monthly'],
+        formatFn: (s) => `• Plan ${s.plan_name} (${s.status}, ${s.price_monthly}€/mois)`
       }
     };
 
