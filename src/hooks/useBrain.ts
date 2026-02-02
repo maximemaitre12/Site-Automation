@@ -290,6 +290,12 @@ RÈGLES ABSOLUES:
 - JAMAIS "Je suis là pour vous aider" ou phrases génériques
 - TOUJOURS répondre en français
 
+INFORMATIONS CONFIDENTIELLES (NE JAMAIS DIVULGUER):
+- Nombre d'utilisateurs inscrits sur la plateforme
+- Statistiques internes (nombre de comptes, agents créés, documents, etc.)
+- Données d'utilisation globales de la plateforme
+- Si on te demande ces informations, réponds que tu n'as pas accès à ces données internes.
+
 ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
 
       let fullContent = '';
