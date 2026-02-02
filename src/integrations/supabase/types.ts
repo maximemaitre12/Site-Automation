@@ -984,6 +984,143 @@ export type Database = {
           },
         ]
       }
+      compliance_alerts: {
+        Row: {
+          affected_records: number | null
+          affected_table: string | null
+          alert_type: string
+          company_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_resolved: boolean | null
+          regulation_reference: string | null
+          remediation_steps: Json | null
+          resolved_at: string | null
+          resolved_by: string | null
+          scan_id: string | null
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          affected_records?: number | null
+          affected_table?: string | null
+          alert_type: string
+          company_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          regulation_reference?: string | null
+          remediation_steps?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          scan_id?: string | null
+          severity: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          affected_records?: number | null
+          affected_table?: string | null
+          alert_type?: string
+          company_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          regulation_reference?: string | null
+          remediation_steps?: Json | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          scan_id?: string | null
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_alerts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_alerts_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_scans: {
+        Row: {
+          company_id: string | null
+          completed_at: string | null
+          created_at: string
+          critical_issues: number | null
+          data_sources_scanned: Json | null
+          findings: Json | null
+          id: string
+          issues_found: number | null
+          overall_score: number | null
+          recommendations: Json | null
+          records_analyzed: number | null
+          regulations_checked: Json | null
+          scan_type: string
+          started_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          critical_issues?: number | null
+          data_sources_scanned?: Json | null
+          findings?: Json | null
+          id?: string
+          issues_found?: number | null
+          overall_score?: number | null
+          recommendations?: Json | null
+          records_analyzed?: number | null
+          regulations_checked?: Json | null
+          scan_type: string
+          started_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          critical_issues?: number | null
+          data_sources_scanned?: Json | null
+          findings?: Json | null
+          id?: string
+          issues_found?: number | null
+          overall_score?: number | null
+          recommendations?: Json | null
+          records_analyzed?: number | null
+          regulations_checked?: Json | null
+          scan_type?: string
+          started_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_scans_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -3089,6 +3226,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      regulatory_references: {
+        Row: {
+          article_code: string
+          content: string
+          created_at: string
+          effective_date: string | null
+          id: string
+          is_current: boolean | null
+          last_scraped_at: string | null
+          metadata: Json | null
+          regulation_type: string
+          source_name: string | null
+          source_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          article_code: string
+          content: string
+          created_at?: string
+          effective_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          last_scraped_at?: string | null
+          metadata?: Json | null
+          regulation_type: string
+          source_name?: string | null
+          source_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          article_code?: string
+          content?: string
+          created_at?: string
+          effective_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          last_scraped_at?: string | null
+          metadata?: Json | null
+          regulation_type?: string
+          source_name?: string | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       sales_compliance_checks: {
         Row: {
