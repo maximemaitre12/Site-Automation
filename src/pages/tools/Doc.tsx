@@ -1,15 +1,13 @@
 import { useState, useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAetherDocs, AetherDocument, DocFolder } from "@/hooks/useAetherDocs";
-import { DocSidebar } from "@/components/doc/DocSidebar";
+import { DocSidebar, AccessLevel } from "@/components/doc/DocSidebar";
 import { DocGrid } from "@/components/doc/DocGrid";
 import { DocHeader } from "@/components/doc/DocHeader";
-import { DocStats } from "@/components/doc/DocStats";
-import { DocCategoryTabs, DocCategory } from "@/components/doc/DocCategoryTabs";
 import { DocUploadDialog } from "@/components/doc/DocUploadDialog";
 import { DocGenerateDialog } from "@/components/doc/DocGenerateDialog";
 import { DocViewerDialog } from "@/components/doc/DocViewerDialog";
-import { Loader2, FileText, Files, Wand2 } from "lucide-react";
+import { Loader2, FileText, Files, Wand2, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,19 +18,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-
-// Map template categories to document categories
-const templateCategoryMap: Record<string, DocCategory> = {
-  'hr': 'hr',
-  'sales': 'sales',
-  'compliance': 'compliance',
-  'report': 'report',
-  'project': 'project',
-  'proposal': 'sales',
-  'contract': 'hr',
-  'procedure': 'compliance',
-  'general': 'all'
-};
 
 export default function DocPage() {
   const {
@@ -65,89 +50,86 @@ export default function DocPage() {
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<DocCategory>('all');
+  const [currentAccessLevel, setCurrentAccessLevel] = useState<AccessLevel>('personal');
   const [renameDocId, setRenameDocId] = useState<string | null>(null);
   const [renameTitle, setRenameTitle] = useState('');
   const [isRenaming, setIsRenaming] = useState(false);
 
-  // Filter documents by category
+  // Filter documents by access level and folder/filter
   const filteredDocuments = useMemo(() => {
-    if (activeCategory === 'all') return documents;
-    if (activeCategory === 'ai') return documents.filter(d => d.ai_summary);
-    
-    // Filter by template category
-    return documents.filter(doc => {
-      if (!doc.template_id) return false;
-      const template = templates.find(t => t.id === doc.template_id);
-      if (!template) return false;
-      const mappedCategory = templateCategoryMap[template.category] || 'all';
-      return mappedCategory === activeCategory;
+    let filtered = documents;
+
+    // Filter by access level
+    filtered = filtered.filter(doc => {
+      const docAccess = doc.access_level || 'private';
+      if (currentAccessLevel === 'personal') return docAccess === 'private';
+      if (currentAccessLevel === 'team') return docAccess === 'team';
+      if (currentAccessLevel === 'company') return docAccess === 'company';
+      return true;
     });
-  }, [documents, activeCategory, templates]);
 
-  // Count documents per category
-  const categoryCounts = useMemo(() => {
-    const counts: Record<DocCategory, number> = {
-      all: documents.length,
-      hr: 0,
-      sales: 0,
-      compliance: 0,
-      report: 0,
-      project: 0,
-      ai: documents.filter(d => d.ai_summary).length
-    };
-
-    documents.forEach(doc => {
-      if (doc.template_id) {
-        const template = templates.find(t => t.id === doc.template_id);
-        if (template) {
-          const mappedCategory = templateCategoryMap[template.category];
-          if (mappedCategory && mappedCategory !== 'all') {
-            counts[mappedCategory]++;
-          }
-        }
+    // Apply quick filters
+    if (currentFolder?.startsWith('filter:')) {
+      const filterType = currentFolder.replace('filter:', '');
+      if (filterType === 'recent') {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        filtered = filtered.filter(d => new Date(d.updated_at) > weekAgo);
+      } else if (filterType === 'starred') {
+        filtered = filtered.filter(d => d.is_favorite);
+      } else if (filterType === 'archived') {
+        filtered = filtered.filter(d => d.is_archived);
       }
-    });
+    } else {
+      // Exclude archived by default
+      filtered = filtered.filter(d => !d.is_archived);
+    }
 
-    return counts;
-  }, [documents, templates]);
+    // Apply search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(d => 
+        d.title.toLowerCase().includes(query) ||
+        d.description?.toLowerCase().includes(query) ||
+        d.ai_summary?.toLowerCase().includes(query)
+      );
+    }
 
-  // Filter templates by active category for generation dialog
-  const filteredTemplates = useMemo(() => {
-    if (activeCategory === 'all' || activeCategory === 'ai') return templates;
-    return templates.filter(t => {
-      const mappedCategory = templateCategoryMap[t.category];
-      return mappedCategory === activeCategory;
-    });
-  }, [templates, activeCategory]);
+    return filtered;
+  }, [documents, currentAccessLevel, currentFolder, searchQuery]);
 
   // Check if we're in a special filter view (not a real folder)
-  const specialFilters = ['all', 'recent', 'starred', 'archived'];
-  const isSpecialFilter = !currentFolder || specialFilters.includes(currentFolder) || currentFolder.startsWith('type:');
+  const isSpecialFilter = !currentFolder || currentFolder.startsWith('filter:');
 
   const currentFolderData = currentFolder && !isSpecialFilter
     ? folders.find(f => f.id === currentFolder) 
     : null;
 
-  const breadcrumbs = (() => {
-    const crumbs: { id: string | null; name: string }[] = [{ id: null, name: 'Tous les documents' }];
+  // Generate breadcrumbs
+  const breadcrumbs = useMemo(() => {
+    const accessLabels = {
+      personal: 'Mes documents',
+      team: 'Équipe',
+      company: 'Entreprise'
+    };
+    const crumbs: { id: string | null; name: string }[] = [
+      { id: null, name: accessLabels[currentAccessLevel] }
+    ];
     
-    if (currentFolder === 'starred') {
-      crumbs[0] = { id: 'starred', name: 'Favoris' };
-    } else if (currentFolder === 'archived') {
-      crumbs[0] = { id: 'archived', name: 'Archivés' };
-    } else if (currentFolder === 'recent') {
-      crumbs[0] = { id: 'recent', name: 'Récents' };
-    } else if (currentFolder?.startsWith('type:')) {
-      const typeLabel = currentFolder.replace('type:', '');
-      const labels: Record<string, string> = { pdf: 'PDF', images: 'Images', spreadsheets: 'Tableurs' };
-      crumbs[0] = { id: currentFolder, name: labels[typeLabel] || typeLabel };
+    if (currentFolder?.startsWith('filter:')) {
+      const filterType = currentFolder.replace('filter:', '');
+      const filterLabels: Record<string, string> = { 
+        recent: 'Récents', 
+        starred: 'Favoris', 
+        archived: 'Archivés' 
+      };
+      crumbs.push({ id: currentFolder, name: filterLabels[filterType] || filterType });
     } else if (currentFolderData) {
       crumbs.push({ id: currentFolderData.id, name: currentFolderData.name });
     }
     
     return crumbs;
-  })();
+  }, [currentAccessLevel, currentFolder, currentFolderData]);
 
   const handleDocumentClick = (doc: AetherDocument) => {
     setSelectedDocument(doc);
@@ -177,7 +159,6 @@ export default function DocPage() {
   const handleRenameSubmit = async () => {
     if (renameDocId && renameTitle.trim() && !isRenaming) {
       setIsRenaming(true);
-      // Fermer immédiatement pour une UX réactive
       const docId = renameDocId;
       const newTitle = renameTitle.trim();
       setRenameDocId(null);
@@ -190,6 +171,14 @@ export default function DocPage() {
 
   const headerActions = (
     <>
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => setShowMobileSidebar(true)}
+        className="md:hidden"
+      >
+        <Menu className="w-5 h-5" />
+      </Button>
       <Button 
         variant="outline" 
         size="sm"
@@ -211,13 +200,7 @@ export default function DocPage() {
 
   if (loading) {
     return (
-      <DashboardLayout
-        toolName="Document Hub"
-        toolDescription="Génération et gestion intelligente de documents"
-        toolIcon={<FileText className="w-5 h-5 text-primary" />}
-        showAIBadge
-        headerActions={headerActions}
-      >
+      <DashboardLayout headerActions={headerActions}>
         <div className="flex items-center justify-center h-full">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -226,70 +209,71 @@ export default function DocPage() {
   }
 
   return (
-    <DashboardLayout
-      toolName="Document Hub"
-      toolDescription="Génération et gestion intelligente de documents"
-      toolIcon={<FileText className="w-5 h-5 text-primary" />}
-      showAIBadge
-      headerActions={headerActions}
-    >
-      <div className="flex flex-col h-full overflow-y-auto bg-gradient-to-b from-background to-background/95">
-        {/* Main content area */}
-        <div className="flex flex-1 relative px-4 md:px-8 pb-24 pt-4">
-          <div className="max-w-7xl mx-auto w-full flex">
-            {/* Sidebar - Folders */}
-            <div className={cn(
-              "fixed md:relative inset-0 z-40 md:z-auto transition-transform md:w-64 shrink-0",
-              showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-            )}>
-              <DocSidebar
-                folders={folders}
-                currentFolder={currentFolder}
-                onFolderSelect={(id) => { setCurrentFolder(id); setShowMobileSidebar(false); }}
-                onCreateFolder={(name) => createFolder(name, currentFolder)}
-                onDeleteFolder={deleteFolder}
-              />
-            </div>
+    <DashboardLayout headerActions={headerActions}>
+      <div className="flex h-full overflow-hidden bg-gradient-to-br from-background via-background to-muted/20">
+        {/* Sidebar - Enterprise Navigation */}
+        <div className={cn(
+          "fixed md:relative inset-y-0 left-0 z-40 md:z-auto transition-transform duration-300 ease-out",
+          showMobileSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}>
+          <DocSidebar
+            folders={folders}
+            currentFolder={currentFolder}
+            currentAccessLevel={currentAccessLevel}
+            onFolderSelect={(id) => { setCurrentFolder(id); setShowMobileSidebar(false); }}
+            onAccessLevelChange={(level) => { setCurrentAccessLevel(level); setCurrentFolder(null); }}
+            onCreateFolder={(name) => createFolder(name, currentFolder)}
+            onDeleteFolder={deleteFolder}
+          />
+        </div>
 
-            {/* Mobile overlay */}
-            {showMobileSidebar && (
-              <div 
-                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 md:hidden"
-                onClick={() => setShowMobileSidebar(false)}
-              />
-            )}
+        {/* Mobile overlay */}
+        {showMobileSidebar && (
+          <div 
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
+            onClick={() => setShowMobileSidebar(false)}
+          />
+        )}
 
-            {/* Main content */}
-            <div className="flex-1 flex flex-col min-w-0 md:pl-6 min-h-0">
-              <DocHeader
-                breadcrumbs={breadcrumbs}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-                onBreadcrumbClick={(id) => setCurrentFolder(id)}
-              />
+        {/* Main content */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Search and view controls */}
+          <DocHeader
+            breadcrumbs={breadcrumbs}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onBreadcrumbClick={(id) => setCurrentFolder(id)}
+          />
 
-              <div className="flex-1 min-h-0 flex flex-col">
-                <DocGrid
-                  documents={filteredDocuments}
-                  folders={isSpecialFilter ? [] : folders.filter(f => f.parent_id === currentFolder)}
-                  viewMode={viewMode}
-                  onDocumentClick={handleDocumentClick}
-                  onFolderClick={(folder) => setCurrentFolder(folder.id)}
-                  onDeleteDocument={deleteDocument}
-                  onMoveDocument={moveDocument}
-                  onRenameDocument={handleRenameDocument}
-                  onToggleFavorite={toggleFavorite}
-                  onToggleArchive={toggleArchive}
-                />
-              </div>
-            </div>
+          {/* Document grid */}
+          <div className="flex-1 overflow-hidden">
+            <DocGrid
+              documents={filteredDocuments}
+              folders={isSpecialFilter ? [] : folders.filter(f => f.parent_id === currentFolder)}
+              viewMode={viewMode}
+              currentAccessLevel={currentAccessLevel}
+              onDocumentClick={handleDocumentClick}
+              onFolderClick={(folder) => setCurrentFolder(folder.id)}
+              onDeleteDocument={deleteDocument}
+              onMoveDocument={moveDocument}
+              onRenameDocument={handleRenameDocument}
+              onToggleFavorite={toggleFavorite}
+              onToggleArchive={toggleArchive}
+            />
           </div>
         </div>
 
         {/* Mobile FAB */}
         <div className="md:hidden fixed bottom-20 right-4 z-50 flex flex-col gap-2">
+          <Button
+            onClick={() => setUploadDialogOpen(true)}
+            variant="outline"
+            className="w-12 h-12 rounded-full shadow-lg bg-background"
+          >
+            <Files className="w-5 h-5" />
+          </Button>
           <Button
             onClick={() => setGenerateDialogOpen(true)}
             className="w-12 h-12 rounded-full shadow-lg bg-gradient-to-r from-primary to-primary/80"
@@ -308,7 +292,7 @@ export default function DocPage() {
         <DocGenerateDialog
           open={generateDialogOpen}
           onOpenChange={setGenerateDialogOpen}
-          templates={filteredTemplates}
+          templates={templates}
           onGenerate={handleGenerate}
         />
 
