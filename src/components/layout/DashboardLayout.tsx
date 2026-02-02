@@ -83,7 +83,7 @@ const settingsItems = [
     icon: Settings,
   },
   {
-    label: "Intégrations",
+    label: "APIs",
     path: "/settings/integrations",
     icon: Plug,
   },

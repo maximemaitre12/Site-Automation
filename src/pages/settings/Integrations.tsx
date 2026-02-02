@@ -276,7 +276,8 @@ export default function Integrations() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -285,7 +286,7 @@ export default function Integrations() {
                 <Plug className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Intégrations</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">APIs</h1>
                 <p className="text-sm text-muted-foreground">
                   Vos clés API personnelles (non partagées avec votre équipe)
                 </p>
@@ -477,6 +478,7 @@ export default function Integrations() {
               </div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </DashboardLayout>
