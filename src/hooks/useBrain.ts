@@ -6,7 +6,6 @@ import { callAI } from '@/lib/ai';
 import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-stream';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext } from '@/lib/aether-knowledge-base';
-import { useUserCompanyId } from './useUserCompanyId';
 
 export interface Message {
   id: string;
@@ -41,12 +40,30 @@ export function useBrain() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { companyId } = useUserCompanyId();
   
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Fetch company ID inline to avoid hook initialization issues
+  const fetchCompanyId = useCallback(async (): Promise<string | null> => {
+    if (!user?.id) return null;
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('company_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (error) {
+        console.error('Error fetching company ID:', error);
+        return null;
+      }
+      return data?.company_id || null;
+    } catch {
+      return null;
+    }
+  }, [user?.id]);
 
   const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
     queryKey: ['conversations', user?.id],
@@ -277,6 +294,9 @@ ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}`;
 
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
+
+      // Fetch company ID for platform context
+      const companyId = await fetchCompanyId();
 
       await new Promise<void>((resolve, reject) => {
         const cleanedMessages = updatedMessages.slice(-10).map(m => {
