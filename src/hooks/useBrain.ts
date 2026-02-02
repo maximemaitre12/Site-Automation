@@ -271,34 +271,55 @@ STYLE DE RÉPONSE:
       // Fetch company ID for platform context
       const companyId = await fetchCompanyId();
       
-      // Smart Context: Detect which domains are relevant and fetch only those
+      // AGENT ROUTER: Use AI to intelligently determine which data is needed
       let platformContextStr = '';
-      const detectedDomains = detectDomains(content);
       
-      // Always try to get context for platform questions
-      const shouldFetchContext = detectedDomains.length > 0 || isPlatformQuestion(content);
-      
-      if (shouldFetchContext && companyId) {
+      if (companyId) {
         try {
-          // If no specific domain but it's a platform question, use 'general' for full overview
-          const domainsToFetch = detectedDomains.length > 0 ? detectedDomains : ['general'];
-          
-          console.log('Smart context - fetching domains:', domainsToFetch);
-          const response = await supabase.functions.invoke('brain-smart-context', {
-            body: { 
-              userId: user.id, 
-              companyId,
-              domains: domainsToFetch,
-              query: content 
-            }
+          // Step 1: Ask the router agent what data is needed for this query
+          console.log('Agent Router - analyzing query...');
+          const routerResponse = await supabase.functions.invoke('brain-agent-router', {
+            body: { query: content }
           });
           
-          if (response.data?.contextText) {
-            platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${response.data.contextText}`;
-            console.log('Smart context loaded:', response.data.domainsProcessed?.length, 'domains, chars:', response.data.contextText.length);
+          const requirements = routerResponse.data;
+          console.log('Agent Router - requirements:', requirements);
+          
+          // Step 2: If data is needed, fetch only the targeted data
+          if (requirements?.needs_data !== false && requirements?.tables?.length > 0) {
+            const fetchResponse = await supabase.functions.invoke('brain-fetch-targeted', {
+              body: {
+                userId: user.id,
+                companyId,
+                tables: requirements.tables,
+                filters: requirements.filters || {},
+                limit: requirements.limit || 5,
+                fields: requirements.fields || []
+              }
+            });
+            
+            if (fetchResponse.data?.contextText) {
+              platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${fetchResponse.data.contextText}`;
+              console.log('Targeted data loaded:', fetchResponse.data.contextText.length, 'chars');
+            }
+          } else {
+            console.log('Agent Router - no data needed for this query');
           }
         } catch (err) {
-          console.error('Error fetching smart context:', err);
+          console.error('Error in agent router flow:', err);
+          // Fallback to simple domain detection if agent fails
+          const detectedDomains = detectDomains(content);
+          if (detectedDomains.length > 0 || isPlatformQuestion(content)) {
+            try {
+              const domainsToFetch = detectedDomains.length > 0 ? detectedDomains : ['general'];
+              const response = await supabase.functions.invoke('brain-smart-context', {
+                body: { userId: user.id, companyId, domains: domainsToFetch, query: content }
+              });
+              if (response.data?.contextText) {
+                platformContextStr = `\n\nDONNÉES TEMPS RÉEL:\n${response.data.contextText}`;
+              }
+            } catch { /* ignore fallback errors */ }
+          }
         }
       }
       
