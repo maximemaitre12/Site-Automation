@@ -5,32 +5,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
-const featuredPost = {
-  id: "founders-story",
-  title: "From Vision to Reality: The AETHER Story",
-  excerpt: "How a bold vision for enterprise AI became a platform transforming how businesses operate.",
-  image: "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=400&fit=crop",
-  author: "AETHER Team",
-  date: "December 20, 2025",
-  readTime: "8 min read",
-  category: "Company",
-  featured: true,
-  fullContent: `It started in spring 2025, with a simple observation.
-
-The founding team noticed something during their previous experiences: knowledge workers were spending hours on repetitive tasks that could be automated. The question was simple: "What if we could get AI to handle all that?"
-
-That one question stuck. Over the next few weeks, ideas took shape through countless brainstorming sessions and prototypes.
-
-"There's this energy when you're building something meaningful," the founders explain. "You walk around and everyone seems to be innovating. We figured, why not us?"
-
-While others focused on incremental improvements, the team spent weekends in co-working spaces, digging into machine learning, enterprise software, and automation. The first prototype came together rapidly, fueled by conviction and a clear vision.
-
-No big funding story. Just belief in the mission.
-
-"We don't have investors lining up," the team admits. "But we've seen how much time companies waste on stuff AI could do in seconds. That's the gap we're going after."
-
-The AETHER journey is still early. There's a lot planned for 2025: new capabilities, new features. But the mission stays simple: make enterprise AI something any business can actually use, not just the giants with massive budgets.`
-};
 
 const posts = [
   {
@@ -320,77 +294,6 @@ export default function Blog() {
           </div>
         </section>
 
-        {/* Featured Post */}
-        {(selectedCategory === "All" || selectedCategory === "Company") && (
-          <section className="py-16 px-4">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex items-center gap-2 mb-6">
-                <Sparkles className="w-5 h-5 text-primary" />
-                <span className="text-primary font-semibold">Featured Story</span>
-              </div>
-              <div className="rounded-2xl overflow-hidden border border-border bg-card">
-                <div className="grid md:grid-cols-2">
-                  <div className="relative aspect-[4/3] md:aspect-auto">
-                    <img 
-                      src={featuredPost.image}
-                      alt={featuredPost.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent md:bg-gradient-to-r" />
-                    <div className="absolute bottom-4 left-4 md:hidden">
-                      <span className="px-3 py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-medium">
-                        {featuredPost.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-8 md:p-12 flex flex-col justify-center">
-                    <div className="hidden md:block mb-4">
-                      <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                        {featuredPost.category}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                      {featuredPost.title}
-                    </h2>
-                    <p className="text-muted-foreground mb-6">{featuredPost.excerpt}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4" />
-                        <span>{featuredPost.author}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{featuredPost.date}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{featuredPost.readTime}</span>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => setExpandedPost(expandedPost === featuredPost.id ? null : featuredPost.id)}
-                      className="flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all"
-                    >
-                      {expandedPost === featuredPost.id ? "Read less" : "Read full story"} 
-                      {expandedPost === featuredPost.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Expanded Content */}
-                {expandedPost === featuredPost.id && (
-                  <div className="px-8 md:px-12 pb-12 border-t border-border mt-4 pt-8">
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
-                      {featuredPost.fullContent.split('\n\n').map((paragraph, i) => (
-                        <p key={i} className="text-muted-foreground mb-4">{paragraph}</p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Blog Grid */}
         <section className="py-16 px-4 bg-muted/30">
