@@ -268,58 +268,55 @@ STYLE DE RÉPONSE:
       // Get relevant knowledge from AETHER Support knowledge base
       const supportKnowledge = getKnowledgeContext(content);
       
-      // Fetch company ID for platform context
+      // Fetch company ID for platform context (optional; the fetcher can derive it too)
       const companyId = await fetchCompanyId();
       
-      // AGENT ROUTER: Use AI to intelligently determine which data is needed
+      // AGENT ROUTER: Determine what minimal real-time data is needed
       let platformContextStr = '';
       
-      if (companyId) {
-        try {
-          // Step 1: Ask the router agent what data is needed for this query
-          console.log('Agent Router - analyzing query...');
-          const routerResponse = await supabase.functions.invoke('brain-agent-router', {
-            body: { query: content }
+      try {
+        // Step 1: Ask the router agent what data is needed for this query
+        console.log('Agent Router - analyzing query...');
+        const routerResponse = await supabase.functions.invoke('brain-agent-router', {
+          body: { query: content }
+        });
+        
+        const requirements = routerResponse.data;
+        console.log('Agent Router - requirements:', requirements);
+        
+        // Step 2: Fetch only essential targeted data (counts + small sample)
+        if (requirements?.needs_data !== false && requirements?.tables?.length > 0) {
+          const fetchResponse = await supabase.functions.invoke('brain-fetch-targeted', {
+            body: {
+              tables: requirements.tables,
+              filters: requirements.filters || {},
+              limit: requirements.limit || 5,
+              fields: requirements.fields || [],
+              query: content,
+            }
           });
           
-          const requirements = routerResponse.data;
-          console.log('Agent Router - requirements:', requirements);
-          
-          // Step 2: If data is needed, fetch only the targeted data
-          if (requirements?.needs_data !== false && requirements?.tables?.length > 0) {
-            const fetchResponse = await supabase.functions.invoke('brain-fetch-targeted', {
-              body: {
-                userId: user.id,
-                companyId,
-                tables: requirements.tables,
-                filters: requirements.filters || {},
-                limit: requirements.limit || 5,
-                fields: requirements.fields || []
-              }
+          if (fetchResponse.data?.contextText) {
+            platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${fetchResponse.data.contextText}`;
+            console.log('Targeted data loaded:', fetchResponse.data.contextText.length, 'chars');
+          }
+        } else {
+          console.log('Agent Router - no data needed for this query');
+        }
+      } catch (err) {
+        console.error('Error in agent router flow:', err);
+        // Fallback to simple domain detection if agent fails (needs companyId)
+        const detectedDomains = detectDomains(content);
+        if (companyId && (detectedDomains.length > 0 || isPlatformQuestion(content))) {
+          try {
+            const domainsToFetch = detectedDomains.length > 0 ? detectedDomains : ['general'];
+            const response = await supabase.functions.invoke('brain-smart-context', {
+              body: { userId: user.id, companyId, domains: domainsToFetch, query: content }
             });
-            
-            if (fetchResponse.data?.contextText) {
-              platformContextStr = `\n\nDONNÉES TEMPS RÉEL (${new Date().toLocaleString('fr-FR')}):\n${fetchResponse.data.contextText}`;
-              console.log('Targeted data loaded:', fetchResponse.data.contextText.length, 'chars');
+            if (response.data?.contextText) {
+              platformContextStr = `\n\nDONNÉES TEMPS RÉEL:\n${response.data.contextText}`;
             }
-          } else {
-            console.log('Agent Router - no data needed for this query');
-          }
-        } catch (err) {
-          console.error('Error in agent router flow:', err);
-          // Fallback to simple domain detection if agent fails
-          const detectedDomains = detectDomains(content);
-          if (detectedDomains.length > 0 || isPlatformQuestion(content)) {
-            try {
-              const domainsToFetch = detectedDomains.length > 0 ? detectedDomains : ['general'];
-              const response = await supabase.functions.invoke('brain-smart-context', {
-                body: { userId: user.id, companyId, domains: domainsToFetch, query: content }
-              });
-              if (response.data?.contextText) {
-                platformContextStr = `\n\nDONNÉES TEMPS RÉEL:\n${response.data.contextText}`;
-              }
-            } catch { /* ignore fallback errors */ }
-          }
+          } catch { /* ignore fallback errors */ }
         }
       }
       
@@ -349,6 +346,11 @@ INFORMATIONS CONFIDENTIELLES (NE JAMAIS DIVULGUER À L'EXTÉRIEUR):
 - Statistiques globales de la plateforme (nombre total d'utilisateurs, etc.)
 - Ces restrictions ne s'appliquent PAS aux données personnelles de l'utilisateur actuel
 - Tu DOIS répondre aux questions sur les données de l'utilisateur (ses clés API, workflows, candidats, etc.)
+
+UTILISATION DES DONNÉES TEMPS RÉEL:
+1) Quand une section "DONNÉES TEMPS RÉEL" est fournie, c'est la source de vérité.
+2) Si un compteur "Total: X" est présent, tu réponds avec ce chiffre (même si X = 0).
+3) Si une section indique "Aucun élément" ou une "Erreur", tu le dis clairement et tu proposes l'action suivante.
 
 ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}
 ${platformContextStr}`;
