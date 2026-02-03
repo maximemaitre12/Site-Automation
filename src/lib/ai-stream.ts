@@ -41,12 +41,21 @@ export async function streamAIChat({
   abortSignal,
 }: StreamAIChatOptions) {
   try {
-    // Get the user's session token for proper authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    const accessToken = session?.access_token;
+    // First try to refresh the session to ensure we have a valid token
+    let accessToken: string | undefined;
+    
+    // Try to refresh the session first
+    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+    if (refreshData?.session?.access_token) {
+      accessToken = refreshData.session.access_token;
+    } else {
+      // Fallback to getSession if refresh fails
+      const { data: { session } } = await supabase.auth.getSession();
+      accessToken = session?.access_token;
+    }
     
     if (!accessToken) {
-      throw new Error('Not authenticated');
+      throw new Error('Session expirée. Veuillez vous reconnecter.');
     }
 
     // Use confidential endpoint when mode is enabled

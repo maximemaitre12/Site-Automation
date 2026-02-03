@@ -238,6 +238,13 @@ STYLE DE RÉPONSE:
     setStreamingContent('');
     
     try {
+      // Refresh session to ensure we have a valid token for all subsequent calls
+      const { error: refreshError } = await supabase.auth.refreshSession();
+      if (refreshError) {
+        console.warn('Session refresh warning:', refreshError.message);
+        // Don't fail here - getSession might still work
+      }
+      
       let conv = currentConversation;
       
       if (!conv || (conversationId && conv.id !== conversationId)) {
