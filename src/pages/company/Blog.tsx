@@ -7,31 +7,27 @@ import { toast } from "@/hooks/use-toast";
 
 const featuredPost = {
   id: "founders-story",
-  title: "From Shanghai Coffee to Enterprise AI: The AETHER Story",
-  excerpt: "Two emlyon students turned a casual chat in Shanghai into a global AI platform. Here's how Youriy and Maxime started building AETHER.",
+  title: "From Vision to Reality: The AETHER Story",
+  excerpt: "How a bold vision for enterprise AI became a platform transforming how businesses operate.",
   image: "https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?w=800&h=400&fit=crop",
   author: "AETHER Team",
   date: "December 20, 2025",
   readTime: "8 min read",
   category: "Company",
   featured: true,
-  fullContent: `It started in spring 2025, somewhere in the busy streets of Shanghai.
+  fullContent: `It started in spring 2025, with a simple observation.
 
-Youriy and Maxime had never crossed paths before landing in China. Both were second-year students at emlyon, there for an exchange program that would end up changing everything.
+The founding team noticed something during their previous experiences: knowledge workers were spending hours on repetitive tasks that could be automated. The question was simple: "What if we could get AI to handle all that?"
 
-"We met at a welcome dinner," Youriy remembers. "I was venting about my last internship, hours wasted on repetitive data entry. Maxime just looked at me and said, 'What if we could get AI to handle all that?'"
+That one question stuck. Over the next few weeks, ideas took shape through countless brainstorming sessions and prototypes.
 
-That one question stuck. Over the next few weeks, they kept meeting at coffee shops around Putuo, scribbling ideas on napkins and laptops.
+"There's this energy when you're building something meaningful," the founders explain. "You walk around and everyone seems to be innovating. We figured, why not us?"
 
-Shanghai felt like the right place for this.
+While others focused on incremental improvements, the team spent weekends in co-working spaces, digging into machine learning, enterprise software, and automation. The first prototype came together rapidly, fueled by conviction and a clear vision.
 
-"There's this energy here," Maxime explains. "You walk around and everyone seems to be building something. We figured, why not us?"
+No big funding story. Just belief in the mission.
 
-While their classmates hit the tourist spots, they spent weekends in co-working spaces, digging into machine learning, enterprise software, and automation. The first prototype came together in a small Putuo apartment, fueled by baozi, endless tea, and the Shanghai skyline outside their window.
-
-No big funding story. Just conviction.
-
-"We don't have investors lining up," Youriy admits. "But we've seen how much time companies waste on stuff AI could do in seconds. That's the gap we're going after."
+"We don't have investors lining up," the team admits. "But we've seen how much time companies waste on stuff AI could do in seconds. That's the gap we're going after."
 
 The AETHER journey is still early. There's a lot planned for 2025: new capabilities, new features. But the mission stays simple: make enterprise AI something any business can actually use, not just the giants with massive budgets.`
 };
@@ -42,7 +38,7 @@ const posts = [
     title: "The 30% Problem: Where Your Team's Time Actually Goes",
     excerpt: "We looked at the research. The amount of time knowledge workers spend on automatable tasks is honestly surprising.",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=300&fit=crop",
-    author: "Maxime Maître",
+    author: "AETHER Team",
     date: "December 18, 2025",
     readTime: "5 min read",
     category: "Industry",
@@ -78,7 +74,7 @@ AI has gotten good enough to handle tasks that need judgment, not just simple if
     title: "What Actually Happens When You Talk to an AI",
     excerpt: "The milliseconds between your question and the response involve some fascinating tech. Here's a plain-language breakdown.",
     image: "https://images.unsplash.com/photo-1590650153855-d9e808231d41?w=600&h=300&fit=crop",
-    author: "Youriy Strashnyi",
+    author: "AETHER Team",
     date: "December 15, 2025",
     readTime: "6 min read",
     category: "Innovation",
@@ -115,7 +111,7 @@ This isn't just chatbot stuff. Think automated phone systems that actually get w
     title: "5 Enterprise AI Trends Worth Paying Attention To",
     excerpt: "From AI agents going live to governance spending exploding, here's what the data shows about where things are heading.",
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=crop",
-    author: "Maxime Maître",
+    author: "AETHER Team",
     date: "December 10, 2025",
     readTime: "7 min read",
     category: "Industry",
@@ -158,7 +154,7 @@ The pattern that works: AI handles volume and speed, humans bring judgment and c
     title: "From Basic OCR to AI That Actually Understands Documents",
     excerpt: "Document processing has come a long way. Here's the evolution from simple text extraction to genuine comprehension.",
     image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=600&h=300&fit=crop",
-    author: "Youriy Strashnyi",
+    author: "AETHER Team",
     date: "December 8, 2025",
     readTime: "5 min read",
     category: "Innovation",

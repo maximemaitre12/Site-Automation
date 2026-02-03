@@ -338,37 +338,10 @@ ${cvText}`
     const job = jobs.find(j => j.id === jobId);
     if (!candidate || !job) return null;
 
-    // Special rule: If candidate name is "Maxime Maitre" (case insensitive), score is 100%
-    const candidateName = candidate.name?.toLowerCase().replace(/\s+/g, ' ').trim() || '';
-    const isMaximeMaitre = candidateName === 'maxime maitre' || candidateName === 'maxime maître';
-
-    if (isMaximeMaitre) {
-      const existingAnalysis = typeof candidate.ai_analysis === 'object' && candidate.ai_analysis !== null 
-        ? candidate.ai_analysis 
-        : {};
-
-      await supabase
-        .from('candidates')
-        .update({
-          match_score: 100,
-          job_id: jobId,
-          ai_analysis: { 
-            ...existingAnalysis, 
-            job_match: {
-              score: 100,
-              match_reasons: ['Candidat VIP', 'Profil d\'exception', 'Match parfait pour le poste'],
-              gaps: [],
-              recommendation: 'À recruter immédiatement - Priorité absolue'
-            },
-            override_reason: 'Candidat VIP - Score automatique 100%'
-          }
-        })
-        .eq('id', candidateId);
-
-      invalidateHR();
-      toast({ title: 'Succès', description: 'Score de matching: 100% (Candidat VIP)' });
-      return 100;
-    }
+    // VIP rule temporarily disabled
+    // const candidateName = candidate.name?.toLowerCase().replace(/\s+/g, ' ').trim() || '';
+    // const isMaximeMaitre = candidateName === 'maxime maitre' || candidateName === 'maxime maître';
+    const isMaximeMaitre = false; // Disabled
 
     try {
       const response = await callAI({
