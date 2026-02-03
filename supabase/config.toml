@@ -92,3 +92,12 @@ verify_jwt = true
 
 [functions.google-oauth-disconnect]
 verify_jwt = true
+
+[functions.brain-execute-action]
+verify_jwt = false
+
+[functions.brain-agent-router]
+verify_jwt = false
+
+[functions.brain-fetch-targeted]
+verify_jwt = false

@@ -7,12 +7,15 @@ import { streamAIChat, Attachment, generateConversationTitle } from '@/lib/ai-st
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getKnowledgeContext } from '@/lib/aether-knowledge-base';
 import { detectDomains, isPlatformQuestion, type BrainDomain } from '@/lib/brain-domain-router';
+import { detectAction, useBrainActions, type ActionResult } from './useBrainActions';
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
   attachments?: Attachment[];
+  actionResult?: ActionResult;
 }
 
 export interface Conversation {
@@ -40,10 +43,12 @@ export function useBrain() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { executeAction } = useBrainActions();
   
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
+  const [lastActionResult, setLastActionResult] = useState<ActionResult | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Fetch company ID inline to avoid hook initialization issues
@@ -265,6 +270,53 @@ STYLE DE RÉPONSE:
       const updatedMessages = [...conv.messages, userMessage];
       setCurrentConversation({ ...conv, messages: updatedMessages });
 
+      // ACTION DETECTION: Check if user wants to perform an action (e.g., add CV to HR)
+      const detectedActionInfo = detectAction(content, options?.attachments);
+      let actionResult: ActionResult | null = null;
+      let actionContext = '';
+      
+      if (detectedActionInfo && detectedActionInfo.confidence >= 0.7) {
+        console.log('Action detected:', detectedActionInfo);
+        
+        // Extract file data if needed
+        let fileBase64: string | undefined;
+        let fileName: string | undefined;
+        let mimeType: string | undefined;
+        
+        if (detectedActionInfo.requiresFile && options?.attachments?.length) {
+          const fileAttachment = options.attachments.find(a => 
+            a.type === 'document' || 
+            a.mimeType?.includes('pdf') || 
+            a.mimeType?.includes('word')
+          );
+          if (fileAttachment) {
+            fileBase64 = fileAttachment.content;
+            fileName = fileAttachment.name;
+            mimeType = fileAttachment.mimeType;
+          }
+        }
+        
+        // Execute the action
+        actionResult = await executeAction(
+          detectedActionInfo.action,
+          detectedActionInfo.data,
+          fileBase64,
+          fileName,
+          mimeType
+        );
+        
+        setLastActionResult(actionResult);
+        
+        if (actionResult.success) {
+          actionContext = `\n\nACTION RÉALISÉE:\n✅ ${actionResult.message}`;
+          if (actionResult.data) {
+            actionContext += `\nDétails: ${JSON.stringify(actionResult.data, null, 2)}`;
+          }
+        } else {
+          actionContext = `\n\nACTION ÉCHOUÉE:\n❌ ${actionResult.message}`;
+        }
+      }
+
       // Get relevant knowledge from AETHER Support knowledge base
       const supportKnowledge = getKnowledgeContext(content);
       
@@ -320,7 +372,7 @@ STYLE DE RÉPONSE:
         }
       }
       
-      const systemPrompt = `Tu es AETHER Brain, un assistant expert et dynamique.
+      const systemPrompt = `Tu es AETHER Brain, un assistant expert et dynamique qui peut AGIR sur les données.
 
 STYLE DE RÉPONSE:
 - Sois CONCIS et DIRECT. Maximum 3-4 paragraphes courts.
@@ -335,6 +387,17 @@ PERSONNALITÉ:
 - Expert confiant qui va droit au but
 - Amical mais professionnel
 - Réponds comme un collègue brillant, pas comme une encyclopédie
+
+CAPACITÉS D'ACTION:
+Tu peux modifier les données de la plateforme quand l'utilisateur le demande:
+- Ajouter des candidats (avec CV)
+- Créer des deals/opportunités
+- Créer des documents
+- Créer des tickets support
+- Créer des contacts CRM
+- Mettre à jour ou supprimer des éléments
+
+Quand une action est réalisée, confirme-la clairement et propose les prochaines étapes.
 
 RÈGLES ABSOLUES:
 - JAMAIS de markdown (*, #, -, etc.)
@@ -353,7 +416,8 @@ UTILISATION DES DONNÉES TEMPS RÉEL:
 3) Si une section indique "Aucun élément" ou une "Erreur", tu le dis clairement et tu proposes l'action suivante.
 
 ${supportKnowledge ? `DOCUMENTATION AETHER:\n${supportKnowledge}` : ''}
-${platformContextStr}`;
+${platformContextStr}
+${actionContext}`;
 
       let fullContent = '';
       const assistantMessageId = crypto.randomUUID();
@@ -391,7 +455,8 @@ ${platformContextStr}`;
         id: assistantMessageId,
         role: 'assistant',
         content: fullContent,
-        timestamp: new Date()
+        timestamp: new Date(),
+        actionResult: actionResult || undefined
       };
 
       const finalMessages = [...updatedMessages, assistantMessage];
@@ -661,6 +726,7 @@ ${platformContextStr}`;
     loading,
     sendingMessage,
     streamingContent,
+    lastActionResult,
     createConversation,
     sendMessage,
     cancelGeneration,
@@ -673,6 +739,7 @@ ${platformContextStr}`;
     generateProcedure,
     improveText,
     summarizeDocument,
-    addMessageWithoutAI
+    addMessageWithoutAI,
+    executeAction
   };
 }
