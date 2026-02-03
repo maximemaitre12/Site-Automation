@@ -1,20 +1,15 @@
 import { useState } from 'react';
 import { useDataPlatform } from '@/hooks/useDataPlatform';
-import { useWebSearch } from '@/hooks/useWebSearch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Sparkles, FileText, Table, Database, Clock, ArrowRight, Loader2, Globe, ExternalLink } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Sparkles, FileText, Table, Database, Clock, ArrowRight, Loader2 } from 'lucide-react';
 
 const DataSearch = () => {
   const { catalog, sources, loading } = useDataPlatform();
-  const { searchWeb, isSearching: isWebSearching } = useWebSearch();
   const [query, setQuery] = useState('');
-  const [searchType, setSearchType] = useState<'internal' | 'web'>('internal');
   const [isSearching, setIsSearching] = useState(false);
-  const [webResults, setWebResults] = useState<{ content: string; citations: string[] } | null>(null);
   const [results, setResults] = useState<Array<{
     type: 'dataset' | 'source';
     id: string;
@@ -23,20 +18,8 @@ const DataSearch = () => {
     score: number;
     tags?: string[];
   }>>([]);
-
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
-    if (searchType === 'web') {
-      const result = await searchWeb(query);
-      if (result) {
-        setWebResults({
-          content: result.content,
-          citations: result.citations || []
-        });
-      }
-      return;
-    }
     
     setIsSearching(true);
     
@@ -58,7 +41,7 @@ const DataSearch = () => {
         id: entry.id,
         name: entry.name,
         description: entry.description || undefined,
-        score: Math.random() * 0.3 + 0.7, // Simulated relevance score
+        score: Math.random() * 0.3 + 0.7,
         tags: entry.tags
       }));
     
@@ -82,7 +65,6 @@ const DataSearch = () => {
       .sort((a, b) => b.score - a.score);
     
     setResults(allResults);
-    setWebResults(null);
     setIsSearching(false);
   };
 
@@ -100,42 +82,26 @@ const DataSearch = () => {
                 Recherche sémantique IA
               </div>
               <h2 className="text-2xl font-bold">Trouvez vos données</h2>
-              <p className="text-muted-foreground">Recherche intelligente dans tous vos datasets et sur le web</p>
+              <p className="text-muted-foreground">Recherche intelligente dans tous vos datasets</p>
             </div>
-            
-            <Tabs value={searchType} onValueChange={(v) => setSearchType(v as 'internal' | 'web')} className="mb-4">
-              <TabsList className="w-full">
-                <TabsTrigger value="internal" className="flex-1 gap-2">
-                  <Database className="h-4 w-4" />
-                  Données internes
-                </TabsTrigger>
-                <TabsTrigger value="web" className="flex-1 gap-2">
-                  <Globe className="h-4 w-4" />
-                  Recherche Web IA
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
             
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
-                  placeholder={searchType === 'web' 
-                    ? "Rechercher sur le web avec l'IA Perplexity..." 
-                    : "Rechercher des datasets, colonnes, tags, descriptions..."
-                  }
+                  placeholder="Rechercher des datasets, colonnes, tags, descriptions..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   className="pl-10 h-12 text-lg"
                 />
               </div>
-              <Button size="lg" onClick={handleSearch} disabled={isSearching || isWebSearching || !query.trim()}>
-                {isSearching || isWebSearching ? (
+              <Button size="lg" onClick={handleSearch} disabled={isSearching || !query.trim()}>
+                {isSearching ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    {searchType === 'web' ? <Globe className="h-5 w-5 mr-2" /> : <Search className="h-5 w-5 mr-2" />}
+                    <Search className="h-5 w-5 mr-2" />
                     Rechercher
                   </>
                 )}
@@ -162,42 +128,6 @@ const DataSearch = () => {
         </CardContent>
       </Card>
 
-      {/* Web Search Results */}
-      {webResults && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-cyan-500" />
-              Résultats Web IA
-            </CardTitle>
-            <CardDescription>Propulsé par Perplexity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <div className="whitespace-pre-wrap">{webResults.content}</div>
-            </div>
-            {webResults.citations.length > 0 && (
-              <div className="mt-4 pt-4 border-t">
-                <h4 className="text-sm font-medium mb-2">Sources</h4>
-                <div className="flex flex-wrap gap-2">
-                  {webResults.citations.map((url, i) => (
-                    <a 
-                      key={i}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      {new URL(url).hostname}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Search Results */}
       {results.length > 0 && (
