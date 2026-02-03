@@ -23,7 +23,7 @@ const TABLE_KEYWORDS: Record<string, string[]> = {
   workflows: ['workflow', 'automatisation', 'automation', 'flux', 'flow', 'processus'],
   sales_deals: ['deal', 'opportunité', 'vente', 'sales', 'pipeline', 'prospect', 'client potentiel'],
   candidates: ['candidat', 'recrutement', 'cv', 'profil', 'talent', 'embauche'],
-  employees: ['employé', 'salarié', 'collaborateur', 'équipe', 'team', 'staff', 'rh', 'ressources humaines'],
+  employees: ['employé', 'salarié', 'collaborateur', 'équipe', 'team', 'staff', 'rh', 'ressources humaines', 'membre', 'membres', 'effectif', 'personnel'],
   support_tickets: ['ticket', 'support', 'problème', 'incident', 'demande', 'réclamation'],
   aether_documents: ['document', 'fichier', 'doc', 'pdf', 'rapport', 'contrat'],
   compliance_alerts: ['conformité', 'compliance', 'alerte', 'risque', 'audit', 'rgpd', 'gdpr'],
@@ -34,7 +34,7 @@ const TABLE_KEYWORDS: Record<string, string[]> = {
   conversations: ['conversation', 'historique', 'discussion', 'échange'],
   sales_proposals: ['proposition', 'devis', 'offre commerciale', 'proposal'],
   call_analyses: ['appel', 'call', 'analyse appel', 'transcription'],
-  user_api_keys: ['clé api', 'api key', 'clés api', 'api keys', 'token', 'secret', 'intégration'],
+  user_api_keys: ['clé api', 'api key', 'clés api', 'api keys', 'cle api', 'cles api', 'token', 'secret', 'intégration', 'integration'],
   subscriptions: ['abonnement', 'subscription', 'plan', 'forfait', 'facturation'],
   job_descriptions: ['offre emploi', 'poste', 'job', 'annonce', 'recrutement']
 };
