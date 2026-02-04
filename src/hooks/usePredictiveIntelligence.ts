@@ -71,12 +71,16 @@ export function usePredictiveIntelligence() {
     setError(null);
 
     try {
-      // Refresh session before calling edge function
-      const { data: session } = await supabase.auth.refreshSession();
-      const accessToken = session?.session?.access_token;
+      // Use getSession instead of refreshSession to avoid rate limiting
+      // The Supabase client auto-refreshes tokens when needed
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!accessToken) {
-        throw new Error('Session expirée');
+      if (!session?.access_token) {
+        // Session not available - user needs to re-authenticate
+        console.warn('No active session found');
+        setError('Session non disponible');
+        setLoading(false);
+        return;
       }
 
       const response = await supabase.functions.invoke('predictive-intelligence', {
@@ -127,11 +131,14 @@ export function usePredictiveIntelligence() {
     setError(null);
 
     try {
-      const { data: session } = await supabase.auth.refreshSession();
-      const accessToken = session?.session?.access_token;
+      // Use getSession instead of refreshSession to avoid rate limiting
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!accessToken) {
-        throw new Error('Session expirée');
+      if (!session?.access_token) {
+        console.warn('No active session found');
+        setError('Session non disponible');
+        setLoading(false);
+        return null;
       }
 
       const response = await supabase.functions.invoke('predictive-intelligence', {
