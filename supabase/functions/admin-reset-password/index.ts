@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, newPassword } = await req.json();
+    const { email, newPassword, createUser } = await req.json();
 
     if (!email) {
       return new Response(
@@ -29,6 +29,56 @@ Deno.serve(async (req) => {
         persistSession: false,
       },
     });
+
+    // If createUser flag is set, create a new user
+    if (createUser && newPassword) {
+      // Check if user already exists
+      const { data: users } = await supabase.auth.admin.listUsers();
+      const existingUser = users?.users.find(u => u.email === email);
+      
+      if (existingUser) {
+        // User exists, update password instead
+        const { error: updateError } = await supabase.auth.admin.updateUserById(existingUser.id, {
+          password: newPassword,
+          email_confirm: true,
+        });
+
+        if (updateError) {
+          console.error('Error updating existing user:', updateError);
+          return new Response(
+            JSON.stringify({ error: updateError.message }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('Existing user password updated:', email);
+        return new Response(
+          JSON.stringify({ success: true, message: 'User already exists, password updated', userId: existingUser.id }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Create new user
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email,
+        password: newPassword,
+        email_confirm: true,
+      });
+
+      if (createError) {
+        console.error('Error creating user:', createError);
+        return new Response(
+          JSON.stringify({ error: createError.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('User created successfully:', email, newUser.user?.id);
+      return new Response(
+        JSON.stringify({ success: true, message: 'User created successfully', userId: newUser.user?.id }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // If newPassword is provided, update it directly
     if (newPassword) {
