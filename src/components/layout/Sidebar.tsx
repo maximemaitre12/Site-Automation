@@ -17,6 +17,7 @@ import {
   Settings,
   Menu,
   X,
+  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +27,7 @@ import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Executive", path: "/tools/executive", icon: Crown, description: "Assistant de Direction", colorClass: "text-primary" },
   { name: "AETHER Data", path: "/tools/data", icon: Database, description: "Data Platform" },
   { name: "AETHER Flow", path: "/tools/flow", icon: Workflow, description: "Workflow Orchestrator", colorClass: "text-agent-flow" },
   { name: "AETHER Doc", path: "/tools/doc", icon: FileText, description: "Document Management" },

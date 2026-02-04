@@ -28,6 +28,7 @@ import Support from "./pages/tools/Support";
 import BrainPage from "./pages/tools/Brain";
 import Compliance from "./pages/tools/ComplianceAuto";
 import Data from "./pages/tools/Data";
+import Executive from "./pages/tools/Executive";
 
 // Company pages
 import Blog from "./pages/company/Blog";
@@ -126,6 +127,7 @@ const App = () => {
               <Route path="/tools/brain" element={<RequireCompany><BrainPage /></RequireCompany>} />
               <Route path="/tools/compliance" element={<RequireCompany><Compliance /></RequireCompany>} />
               <Route path="/tools/data" element={<RequireCompany><Data /></RequireCompany>} />
+              <Route path="/tools/executive" element={<RequireCompany><Executive /></RequireCompany>} />
               <Route path="/onboarding" element={<RequireSubscription><Onboarding /></RequireSubscription>} />
               <Route path="/select-plan" element={<RequireAuth><SelectPlan /></RequireAuth>} />
               <Route path="/settings/company" element={<RequireCompany><CompanySettings /></RequireCompany>} />
