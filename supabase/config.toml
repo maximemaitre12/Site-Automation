@@ -108,6 +108,9 @@ verify_jwt = false
 [functions.strategic-intelligence]
 verify_jwt = true
 
+[functions.predictive-intelligence]
+verify_jwt = true
+
 [functions.firecrawl-search]
 verify_jwt = true
 

@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   RefreshCw, Crown, LayoutDashboard, Brain, Bell, 
-  Plug, Beaker, Radar, AlertTriangle
+  Plug, Beaker, Radar, AlertTriangle, TrendingUp
 } from 'lucide-react';
 import { useExecutiveInsights } from '@/hooks/useExecutiveInsights';
 import { HealthGauge } from '@/components/executive/HealthGauge';
@@ -14,12 +14,13 @@ import { ExecutiveDashboard } from '@/components/executive/ExecutiveDashboard';
 import { StrategicAdvisor } from '@/components/executive/StrategicAdvisor';
 import { ExecutiveAlertsPanel } from '@/components/executive/ExecutiveAlertsPanel';
 import { IntegrationHub } from '@/components/executive/IntegrationHub';
-import { ScenarioSimulator } from '@/components/executive/ScenarioSimulator';
+import { StrategicSimulator } from '@/components/executive/StrategicSimulator';
 import { StrategicIntelligencePanel } from '@/components/executive/StrategicIntelligencePanel';
+import { PredictiveIntelligencePanel } from '@/components/executive/PredictiveIntelligencePanel';
 
 export default function Executive() {
   const { connections, metrics, insights, overallHealth, loading, error, refresh } = useExecutiveInsights();
-  const [activeTab, setActiveTab] = useState('intelligence');
+  const [activeTab, setActiveTab] = useState('predictive');
 
   const criticalCount = insights.filter(i => i.priority === 'critical').length;
   const highCount = insights.filter(i => i.priority === 'high').length;
@@ -105,11 +106,18 @@ export default function Executive() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-7xl mx-auto">
             <TabsList className="h-12 bg-transparent p-0 gap-1">
               <TabsTrigger 
+                value="predictive" 
+                className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:shadow-none"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Prédictif
+              </TabsTrigger>
+              <TabsTrigger 
                 value="intelligence" 
                 className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:shadow-none"
               >
                 <Radar className="w-4 h-4" />
-                Veille Stratégique
+                Veille
               </TabsTrigger>
               <TabsTrigger 
                 value="dashboard" 
@@ -165,6 +173,13 @@ export default function Executive() {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsContent value="predictive" className="mt-0">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-280px)]">
+                  <PredictiveIntelligencePanel />
+                  <StrategicSimulator />
+                </div>
+              </TabsContent>
+
               <TabsContent value="intelligence" className="mt-0">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-280px)]">
                   <StrategicIntelligencePanel 
@@ -194,7 +209,7 @@ export default function Executive() {
               <TabsContent value="advisor" className="mt-0">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-280px)]">
                   <StrategicAdvisor />
-                  <ScenarioSimulator />
+                  <StrategicSimulator />
                 </div>
               </TabsContent>
 
@@ -216,8 +231,8 @@ export default function Executive() {
 
               <TabsContent value="simulator" className="mt-0">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-280px)]">
-                  <ScenarioSimulator />
-                  <StrategicAdvisor />
+                  <StrategicSimulator />
+                  <PredictiveIntelligencePanel />
                 </div>
               </TabsContent>
             </Tabs>
