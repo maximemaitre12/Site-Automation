@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { DocTemplate } from "@/hooks/useAetherDocs";
 import {
   FileText,
@@ -21,14 +22,26 @@ import {
   FolderKanban,
   Wand2,
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  CheckCircle2,
+  AlertTriangle,
+  ShieldCheck,
+  Sparkles
 } from "lucide-react";
+
+interface GenerationResult {
+  qualityScore?: number;
+  qualityGrade?: string;
+  reliabilityScore?: number;
+  category?: string;
+  complexity?: string;
+}
 
 interface DocGenerateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   templates: DocTemplate[];
-  onGenerate: (templateId: string, variables: Record<string, string>, title: string) => Promise<void>;
+  onGenerate: (templateId: string, variables: Record<string, string>, title: string) => Promise<GenerationResult | null>;
 }
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -65,21 +78,34 @@ export function DocGenerateDialog({
   const [title, setTitle] = useState("");
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
 
   const handleGenerate = async () => {
     if (!selectedTemplate || !title) return;
     
     setLoading(true);
-    await onGenerate(selectedTemplate.id, { prompt, title }, title);
+    setGenerationResult(null);
+    const result = await onGenerate(selectedTemplate.id, { prompt, title }, title);
     setLoading(false);
-    reset();
-    onOpenChange(false);
+    
+    if (result) {
+      setGenerationResult(result);
+      // Auto-close after showing result
+      setTimeout(() => {
+        reset();
+        onOpenChange(false);
+      }, 2500);
+    } else {
+      reset();
+      onOpenChange(false);
+    }
   };
 
   const reset = () => {
     setSelectedTemplate(null);
     setTitle("");
     setPrompt("");
+    setGenerationResult(null);
   };
 
   const groupedTemplates = templates.reduce((acc, template) => {
@@ -211,7 +237,7 @@ export function DocGenerateDialog({
           </div>
         )}
 
-        {selectedTemplate && (
+        {selectedTemplate && !generationResult && (
           <div className="flex-shrink-0 border-t px-6 py-4 bg-background">
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -221,16 +247,83 @@ export function DocGenerateDialog({
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Génération...
+                    Génération Senior UX v3.0...
                   </>
                 ) : (
                   <>
-                    <Wand2 className="w-4 h-4 mr-2" />
-                    Générer le Word
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Générer (Consulting-Grade)
                   </>
                 )}
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Generation Result Card */}
+        {generationResult && (
+          <div className="flex-shrink-0 border-t px-6 py-4 bg-background">
+            <Card className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-3 mb-3">
+                <CheckCircle2 className="w-6 h-6 text-green-600" />
+                <div>
+                  <p className="font-semibold text-green-800 dark:text-green-200">Document généré avec succès</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    Catégorie: {generationResult.category?.replace(/_/g, ' ')} | Complexité: {generationResult.complexity}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mt-3">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      Qualité
+                    </span>
+                    <Badge variant={
+                      generationResult.qualityGrade === 'A+' || generationResult.qualityGrade === 'A' ? 'default' :
+                      generationResult.qualityGrade === 'B' ? 'secondary' : 'destructive'
+                    }>
+                      {generationResult.qualityGrade} ({generationResult.qualityScore}/100)
+                    </Badge>
+                  </div>
+                  <Progress 
+                    value={generationResult.qualityScore || 0} 
+                    className="h-2"
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" />
+                      Fiabilité
+                    </span>
+                    <Badge variant={
+                      (generationResult.reliabilityScore || 0) >= 80 ? 'default' :
+                      (generationResult.reliabilityScore || 0) >= 60 ? 'secondary' : 'destructive'
+                    }>
+                      {(generationResult.reliabilityScore || 0) >= 80 ? 'Haute' : 
+                       (generationResult.reliabilityScore || 0) >= 60 ? 'Moyenne' : 'À vérifier'} ({generationResult.reliabilityScore}%)
+                    </Badge>
+                  </div>
+                  <Progress 
+                    value={generationResult.reliabilityScore || 0} 
+                    className="h-2"
+                  />
+                </div>
+              </div>
+              
+              {(generationResult.reliabilityScore || 0) < 80 && (
+                <div className="flex items-start gap-2 mt-3 p-2 bg-amber-100 dark:bg-amber-900/30 rounded text-sm">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-amber-800 dark:text-amber-200">
+                    Nous vous recommandons de vérifier les données générées avant utilisation.
+                  </span>
+                </div>
+              )}
+            </Card>
           </div>
         )}
       </DialogContent>
