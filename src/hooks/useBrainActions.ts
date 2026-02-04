@@ -9,6 +9,7 @@ export type ActionType =
   | 'create_document' 
   | 'create_ticket'
   | 'create_contact'
+  | 'create_workflow'
   | 'update_candidate'
   | 'update_deal'
   | 'update_ticket'
@@ -68,6 +69,13 @@ const ACTION_PATTERNS: Record<ActionType, { keywords: string[]; extractors: RegE
     keywords: ['créer contact', 'nouveau contact', 'ajouter contact'],
     extractors: [
       /contact\s+(?:nommé|appelé)?\s*"?([^"]+)"?/i,
+    ]
+  },
+  create_workflow: {
+    keywords: ['créer workflow', 'crée workflow', 'cree workflow', 'nouveau workflow', 'créer un workflow', 'crée un workflow', 'créer automatisation', 'nouvelle automatisation', 'ajouter workflow'],
+    extractors: [
+      /workflow\s+(?:qui|pour|nommé)?\s*"?([^"]+)"?/i,
+      /automatisation\s+(?:qui|pour)?\s*"?([^"]+)"?/i,
     ]
   },
   update_candidate: {
@@ -212,6 +220,9 @@ export function useBrainActions() {
             break;
           case 'create_contact':
             queryClient.invalidateQueries({ queryKey: ['crm-contacts'] });
+            break;
+          case 'create_workflow':
+            queryClient.invalidateQueries({ queryKey: ['workflows'] });
             break;
         }
         
