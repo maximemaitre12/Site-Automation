@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, convertInchesToTwip, Table, TableRow, TableCell, WidthType, HeightRule, VerticalAlign } from "https://esm.sh/docx@8.5.0";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, convertInchesToTwip, Table, TableRow, TableCell, WidthType, HeightRule, VerticalAlign, Header, Footer, PageNumber, NumberFormat } from "https://esm.sh/docx@8.5.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,233 +13,370 @@ interface GenerateRequest {
   title: string;
 }
 
+// ============================================================================
+// TYPES & CLASSIFICATION (Senior Document Intelligence)
+// ============================================================================
+
 type DocumentCategory = 
   | 'purchase_order' | 'invoice' | 'quote' | 'contract' 
   | 'memo' | 'meeting_notes' | 'letter' | 'report' 
-  | 'proposal' | 'email' | 'generic';
+  | 'proposal' | 'email' | 'procedure' | 'specification'
+  | 'audit_report' | 'policy' | 'generic';
 
-// Détection automatique du type de document
-function detectDocumentCategory(title: string, content?: string): DocumentCategory {
-  const titleLower = title.toLowerCase();
-  const contentLower = (content || '').toLowerCase();
-  const combined = `${titleLower} ${contentLower}`;
-
-  if (combined.includes('bon de commande') || combined.includes('purchase order') || /bc[-\s]?\d+/i.test(combined)) {
-    return 'purchase_order';
-  }
-  if (combined.includes('facture') || combined.includes('invoice') || /fact[-\s]?\d+/i.test(combined)) {
-    return 'invoice';
-  }
-  if (combined.includes('devis') || combined.includes('quotation') || combined.includes('offre commerciale')) {
-    return 'quote';
-  }
-  if (combined.includes('contrat') || combined.includes('accord') || combined.includes('convention')) {
-    return 'contract';
-  }
-  if (combined.includes('note de service') || combined.includes('mémo') || combined.includes('memo')) {
-    return 'memo';
-  }
-  if (combined.includes('compte-rendu') || combined.includes('compte rendu') || combined.includes('procès-verbal')) {
-    return 'meeting_notes';
-  }
-  if (combined.includes('rapport') || combined.includes('report') || combined.includes('analyse')) {
-    return 'report';
-  }
-  if (combined.includes('proposition') || combined.includes('proposal')) {
-    return 'proposal';
-  }
-  if (combined.includes('lettre') || combined.includes('courrier')) {
-    return 'letter';
-  }
-  if (combined.includes('email') || combined.includes('mail') || combined.includes('courriel')) {
-    return 'email';
-  }
-  return 'generic';
+interface ClassificationResult {
+  category: DocumentCategory;
+  confidence: number;
+  detectedKeywords: string[];
 }
 
-// Prompts spécialisés par type de document
-const SENIOR_PROMPTS: Record<DocumentCategory, { system: string; structure: string[] }> = {
+const CLASSIFICATION_PATTERNS: Record<DocumentCategory, {
+  keywords: string[];
+  weight: number;
+  regex?: RegExp[];
+}> = {
   purchase_order: {
-    system: `Tu es un Directeur Achats avec 25 ans d'expérience dans des groupes du CAC40. Tu rédiges des bons de commande impeccables.
-
-STRUCTURE OBLIGATOIRE:
-1. EN-TÊTE: Référence BC (format BC-2024-XXXX), date émission
-2. ÉMETTEUR: Société, adresse, SIRET
-3. FOURNISSEUR: Raison sociale, adresse complète
-4. LIVRAISON: Adresse de livraison, date attendue
-5. TABLEAU DES ARTICLES:
-   | N° | Référence | Désignation | Qté | Unité | PU HT | Total HT |
-6. RÉCAPITULATIF: Sous-total HT, TVA 20%, Total TTC
-7. CONDITIONS: Délai paiement (30j fin de mois), Incoterm
-8. SIGNATURE: "Bon pour accord", Nom, Fonction, Date
-
-STYLE:
-- Numéros de ligne pour chaque article
-- Montants avec séparateurs milliers et 2 décimales
-- Références produit réalistes
-- Formulation professionnelle française`,
-    structure: ['header', 'parties', 'items_table', 'totals', 'conditions', 'signature']
+    keywords: ['bon de commande', 'purchase order', 'commande fournisseur', 'ordre d\'achat', 'bc'],
+    weight: 10,
+    regex: [/bc[-\s]?\d+/i, /po[-\s]?\d+/i, /commande\s+n[°o]?\s*\d+/i]
   },
   invoice: {
-    system: `Tu es un DAF expérimenté. Tu produis des factures conformes aux obligations légales françaises.
-
-MENTIONS LÉGALES OBLIGATOIRES:
-- Numéro facture séquentiel (FA-2024-XXXXX)
-- Date émission et échéance
-- Identité émetteur: SIRET, TVA intra (FR XX XXX XXX XXX)
-- Détail par ligne: désignation, qté, PU HT, taux TVA, montant HT
-- Total HT, TVA par taux, Total TTC
-- Conditions règlement, pénalités retard (3x taux BCE)
-- Indemnité forfaitaire recouvrement (40€)`,
-    structure: ['header', 'parties', 'items_table', 'totals', 'legal_mentions']
+    keywords: ['facture', 'invoice', 'facturation', 'règlement', 'échéance'],
+    weight: 10,
+    regex: [/fa[-\s]?\d+/i, /inv[-\s]?\d+/i, /facture\s+n[°o]?\s*\d+/i]
   },
   quote: {
-    system: `Tu es un Directeur Commercial senior. Tu rédiges des devis qui convertissent.
-
-STRUCTURE:
-1. Référence devis (DEV-2024-XXXX), date, validité 30 jours
-2. Destinataire avec coordonnées complètes
-3. Objet clair et synthétique
-4. Détail de l'offre avec justification valeur
-5. Tableau: prestations, quantités, tarifs unitaires, totaux
-6. Récapitulatif: HT, TVA, TTC
-7. Conditions: paiement, délais, exclusions
-8. Zone "Bon pour accord" avec signature client`,
-    structure: ['header', 'recipient', 'offer_detail', 'items_table', 'totals', 'conditions', 'signature']
+    keywords: ['devis', 'quotation', 'offre commerciale', 'proposition tarifaire', 'estimation', 'chiffrage'],
+    weight: 9,
+    regex: [/dev[-\s]?\d+/i, /qt[-\s]?\d+/i, /devis\s+n[°o]?\s*\d+/i]
   },
   contract: {
-    system: `Tu es un juriste d'affaires senior. Tu rédiges des contrats équilibrés.
-
-FORMAT:
-- Identification parties (dénomination, forme, siège, RCS, représentant)
-- PRÉAMBULE avec contexte
-- Articles numérotés: Objet, Durée, Obligations, Prix, Confidentialité, Résiliation, Litige
-- Clause attribution juridiction (Paris)
-- Signatures des deux parties`,
-    structure: ['parties', 'preamble', 'articles', 'signatures']
+    keywords: ['contrat', 'accord', 'convention', 'contract', 'agreement', 'engagement', 'avenant'],
+    weight: 9,
+    regex: [/contrat\s+n[°o]?\s*\d+/i, /avenant\s+n[°o]?\s*\d+/i]
   },
   memo: {
-    system: `Tu es un cadre dirigeant. Tu communiques efficacement.
-
-FORMAT:
-NOTE DE SERVICE n° XX/2024
-De: [Fonction]
-À: [Destinataires]
-Date: [Date]
-Objet: [Sujet]
-
-[Corps direct et actionnable]
-[Actions identifiées avec délais]
-
-[Signature]`,
-    structure: ['header', 'body', 'signature']
+    keywords: ['note de service', 'mémo', 'memo', 'circulaire', 'communication interne', 'note interne'],
+    weight: 8,
+    regex: [/ns[-\s]?\d+/i, /note\s+n[°o]?\s*\d+/i]
   },
   meeting_notes: {
-    system: `Tu rédiges des comptes-rendus exploitables.
-
-STRUCTURE:
-1. Date, heure, lieu, durée
-2. Participants présents (avec fonction), excusés
-3. Ordre du jour
-4. Par point: synthèse, décisions, actions (QUI-QUOI-QUAND)
-5. Prochaine réunion`,
-    structure: ['header', 'participants', 'agenda', 'discussions', 'actions', 'next_meeting']
+    keywords: ['compte-rendu', 'compte rendu', 'procès-verbal', 'pv', 'réunion', 'meeting notes', 'minutes'],
+    weight: 8,
+    regex: [/pv[-\s]?\d+/i, /cr[-\s]?\d+/i]
   },
   report: {
-    system: `Tu es consultant senior (McKinsey/BCG). Tu produis des rapports "board-ready".
-
-STRUCTURE:
-1. Résumé exécutif (1 page max)
-2. Contexte et enjeux
-3. Méthodologie
-4. Constats clés (data-driven)
-5. Analyses et insights
-6. Recommandations hiérarchisées
-7. Prochaines étapes`,
-    structure: ['executive_summary', 'context', 'methodology', 'findings', 'recommendations', 'next_steps']
+    keywords: ['rapport', 'report', 'analyse', 'étude', 'bilan', 'synthèse', 'état des lieux'],
+    weight: 7,
+    regex: [/rapport\s+(d[''])?/i]
   },
   proposal: {
-    system: `Tu es Partner dans un cabinet de conseil. Tu rédiges des propositions gagnantes.
-
-APPROCHE CHALLENGER:
-1. Executive summary percutant
-2. Compréhension enjeux client (reformulée)
-3. Notre conviction et approche
-4. Phases, livrables, planning
-5. Équipe avec profils seniors
-6. Investissement transparent
-7. Références similaires
-8. Call to action`,
-    structure: ['executive_summary', 'understanding', 'approach', 'deliverables', 'team', 'investment', 'references', 'cta']
+    keywords: ['proposition', 'proposal', 'offre de service', 'offre technique', 'réponse appel'],
+    weight: 8,
+    regex: [/prop[-\s]?\d+/i]
   },
   letter: {
-    system: `Tu maîtrises les codes de la correspondance professionnelle française.
-
-FORMAT:
-[Émetteur]
-[Lieu], le [date en lettres]
-[Destinataire + Adresse]
-
-Objet: [Concis]
-
-[Appel: "Madame la Directrice,"]
-
-[Corps 2-4 paragraphes]
-
-[Formule de politesse adaptée]
-
-[Signature]`,
-    structure: ['sender', 'date', 'recipient', 'subject', 'body', 'closing', 'signature']
+    keywords: ['lettre', 'courrier', 'letter', 'correspondance', 'missive'],
+    weight: 6,
+    regex: [/lettre\s+(de|à)/i]
   },
   email: {
-    system: `Tu communiques efficacement par email.
-
-RÈGLES:
-- Objet explicite avec action attendue
-- Structure pyramidale: conclusion d'abord
-- Maximum 5-7 lignes
-- Action claire avec délai
-- Signature professionnelle`,
-    structure: ['subject', 'greeting', 'body', 'action', 'signature']
+    keywords: ['email', 'mail', 'courriel', 'message électronique', 'e-mail'],
+    weight: 5
+  },
+  procedure: {
+    keywords: ['procédure', 'processus', 'mode opératoire', 'instruction', 'protocole'],
+    weight: 7,
+    regex: [/proc[-\s]?\d+/i]
+  },
+  specification: {
+    keywords: ['cahier des charges', 'spécification', 'cdc', 'spec', 'requirements', 'exigences'],
+    weight: 8,
+    regex: [/cdc[-\s]?\d+/i]
+  },
+  audit_report: {
+    keywords: ['audit', 'contrôle', 'inspection', 'vérification', 'conformité'],
+    weight: 8,
+    regex: [/audit[-\s]?\d+/i]
+  },
+  policy: {
+    keywords: ['politique', 'charte', 'règlement', 'directive', 'policy'],
+    weight: 7
   },
   generic: {
-    system: `Tu es un cadre dirigeant expérimenté. Tu rédiges des documents impeccables.
-
-RÈGLES:
-- Aucun artefact markdown
-- Style naturel et fluide
-- Structure claire et logique`,
-    structure: ['title', 'content']
+    keywords: [],
+    weight: 0
   }
 };
 
-// Clean AI artifacts from content
-function cleanAIArtifacts(content: string): string {
-  return content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/^#{1,6}\s+/gm, '')
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/\*([^*]+)\*/g, '$1')
-    .replace(/__([^_]+)__/g, '$1')
-    .replace(/_([^_]+)_/g, '$1')
-    .replace(/^---+$/gm, '')
-    .replace(/^___+$/gm, '')
-    .replace(/^\*\*\*+$/gm, '')
-    .replace(/\[[^\]]*\]/g, '')
-    .replace(/^Voici le contenu du document[^\n]*\n?/gim, '')
-    .replace(/^Voici le document[^\n]*\n?/gim, '')
-    .replace(/^Résumé du Mail\s*:?/gim, '')
-    .replace(/^Ce document présente[^\n]*\n?/gim, '')
-    .replace(/^Veuillez trouver ci-dessous[^\n]*\n?/gim, '')
-    .replace(/N'hésitez pas à me contacter pour[^\n]*$/gim, '')
-    .replace(/Je reste à votre disposition[^\n]*$/gim, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+function classifyDocument(title: string, content?: string): ClassificationResult {
+  const combined = `${title} ${content || ''}`.toLowerCase();
+  const scores: Record<string, number> = {};
+  const detectedKeywords: string[] = [];
+  
+  for (const [category, config] of Object.entries(CLASSIFICATION_PATTERNS)) {
+    let score = 0;
+    
+    for (const keyword of config.keywords) {
+      if (combined.includes(keyword.toLowerCase())) {
+        score += config.weight;
+        detectedKeywords.push(keyword);
+      }
+    }
+    
+    if (config.regex) {
+      for (const regex of config.regex) {
+        if (regex.test(combined)) {
+          score += config.weight * 1.5;
+        }
+      }
+    }
+    
+    scores[category] = score;
+  }
+  
+  const entries = Object.entries(scores);
+  entries.sort((a, b) => b[1] - a[1]);
+  
+  const [bestCategory, bestScore] = entries[0];
+  const totalPossible = Math.max(...Object.values(CLASSIFICATION_PATTERNS).map(c => c.weight * c.keywords.length * 2));
+  const confidence = Math.min(bestScore / totalPossible, 1);
+  
+  return {
+    category: bestScore > 0 ? bestCategory as DocumentCategory : 'generic',
+    confidence: bestScore > 0 ? confidence : 0,
+    detectedKeywords: [...new Set(detectedKeywords)]
+  };
 }
 
-// Parse content into structured sections
-function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'paragraph' | 'list' | 'table'; level?: number; text: string; items?: string[]; rows?: string[][] }> {
-  const sections: Array<{ type: 'heading' | 'paragraph' | 'list' | 'table'; level?: number; text: string; items?: string[]; rows?: string[][] }> = [];
+// ============================================================================
+// SENIOR PROMPTS ENGINE
+// ============================================================================
+
+const SECTION_TEMPLATES: Record<DocumentCategory, string[]> = {
+  purchase_order: [
+    'EN-TÊTE (Logo, Référence BC, Date)',
+    'SOCIÉTÉ ÉMETTRICE (Raison sociale, SIRET, Adresse)',
+    'FOURNISSEUR (Raison sociale, SIRET, Adresse)',
+    'ADRESSE DE LIVRAISON',
+    'TABLEAU DES ARTICLES (N°, Réf, Désignation, Qté, Unité, PU HT, Total HT)',
+    'RÉCAPITULATIF FINANCIER (Sous-total HT, TVA 20%, Total TTC)',
+    'CONDITIONS DE PAIEMENT',
+    'CONDITIONS DE LIVRAISON (Date, Incoterm)',
+    'ZONE DE SIGNATURE (Bon pour accord, Nom, Fonction, Date)'
+  ],
+  invoice: [
+    'EN-TÊTE FACTURE (N° Facture séquentiel, Date émission)',
+    'ÉMETTEUR (Société, SIRET, N° TVA Intracommunautaire, RCS)',
+    'FACTURER À (Client, Adresse facturation)',
+    'RÉFÉRENCES (N° Commande, Date commande)',
+    'DÉTAIL DES PRESTATIONS (Réf, Désignation, Qté, PU HT, Taux TVA, Total HT)',
+    'RÉCAPITULATIF TVA (Base HT par taux, Montant TVA)',
+    'TOTAL (Total HT, Total TVA, Total TTC)',
+    'CONDITIONS DE RÈGLEMENT',
+    'COORDONNÉES BANCAIRES (IBAN, BIC)',
+    'MENTIONS LÉGALES (Pénalités de retard, Indemnité forfaitaire 40€)'
+  ],
+  quote: [
+    'EN-TÊTE DEVIS (Référence, Date, Validité)',
+    'NOTRE SOCIÉTÉ',
+    'CLIENT DESTINATAIRE',
+    'OBJET DU DEVIS',
+    'NOTRE PROPOSITION',
+    'DÉTAIL DE L\'OFFRE (Désignation, Qté, Tarif, Total)',
+    'RÉCAPITULATIF (HT, TVA, TTC)',
+    'CONDITIONS (Validité, Paiement, Délais)',
+    'ACCEPTATION (Bon pour accord, Signature client)'
+  ],
+  contract: [
+    'INTITULÉ DU CONTRAT',
+    'ENTRE LES SOUSSIGNÉS',
+    'PRÉAMBULE',
+    'ARTICLE 1 - OBJET',
+    'ARTICLE 2 - DURÉE',
+    'ARTICLE 3 - OBLIGATIONS DES PARTIES',
+    'ARTICLE 4 - CONDITIONS FINANCIÈRES',
+    'ARTICLE 5 - CONFIDENTIALITÉ',
+    'ARTICLE 6 - RÉSILIATION',
+    'ARTICLE 7 - LOI APPLICABLE',
+    'SIGNATURES DES PARTIES'
+  ],
+  memo: ['EN-TÊTE NOTE DE SERVICE', 'DE / À / DATE / OBJET', 'MESSAGE PRINCIPAL', 'ACTIONS ATTENDUES', 'SIGNATURE'],
+  meeting_notes: ['EN-TÊTE', 'PARTICIPANTS', 'ORDRE DU JOUR', 'POINTS TRAITÉS', 'DÉCISIONS', 'ACTIONS', 'PROCHAINE RÉUNION'],
+  report: ['RÉSUMÉ EXÉCUTIF', 'CONTEXTE', 'MÉTHODOLOGIE', 'CONSTATS', 'RECOMMANDATIONS', 'PLAN D\'ACTION', 'CONCLUSION'],
+  proposal: ['EXECUTIVE SUMMARY', 'COMPRÉHENSION DES ENJEUX', 'NOTRE APPROCHE', 'LIVRABLES ET PLANNING', 'ÉQUIPE', 'INVESTISSEMENT', 'RÉFÉRENCES'],
+  letter: ['ÉMETTEUR', 'DATE', 'DESTINATAIRE', 'OBJET', 'CORPS DE LA LETTRE', 'FORMULE DE POLITESSE', 'SIGNATURE'],
+  email: ['OBJET', 'SALUTATION', 'CORPS', 'CALL TO ACTION', 'SIGNATURE'],
+  procedure: ['OBJET', 'PÉRIMÈTRE', 'RESPONSABILITÉS', 'DESCRIPTION DES ÉTAPES', 'VALIDATION'],
+  specification: ['CONTEXTE', 'OBJECTIFS', 'EXIGENCES FONCTIONNELLES', 'EXIGENCES TECHNIQUES', 'LIVRABLES', 'PLANNING'],
+  audit_report: ['RÉSUMÉ', 'MÉTHODOLOGIE', 'CONSTATS', 'NON-CONFORMITÉS', 'RECOMMANDATIONS', 'PLAN D\'ACTION'],
+  policy: ['OBJET', 'CHAMP D\'APPLICATION', 'PRINCIPES', 'RÈGLES', 'CONTRÔLE', 'ENTRÉE EN VIGUEUR'],
+  generic: ['TITRE', 'CONTENU']
+};
+
+const VOCABULARY_BANKS: Record<DocumentCategory, string[]> = {
+  purchase_order: ['franco de port', 'délai ferme', 'bon pour accord', 'net à 30 jours', 'date limite de livraison'],
+  invoice: ['échéance de paiement', 'taux de TVA applicable', 'escompte', 'pénalités de retard', 'indemnité forfaitaire'],
+  quote: ['validité de l\'offre', 'engagement ferme', 'exclusions', 'options complémentaires', 'réserve de propriété'],
+  contract: ['parties contractantes', 'obligations réciproques', 'tacite reconduction', 'clause résolutoire', 'force majeure'],
+  memo: ['mesure effective', 'application immédiate', 'personnel concerné', 'entrée en vigueur'],
+  meeting_notes: ['décision validée', 'action à mener', 'responsable désigné', 'échéance fixée'],
+  report: ['constat majeur', 'tendance identifiée', 'facteur de risque', 'levier d\'amélioration', 'recommandation prioritaire'],
+  proposal: ['valeur ajoutée', 'retour sur investissement', 'expertise reconnue', 'méthodologie éprouvée'],
+  letter: ['suite à notre entretien', 'comme convenu', 'je me permets de', 'veuillez agréer'],
+  email: ['pour information', 'action requise', 'pour suite à donner', 'urgent'],
+  procedure: ['étape obligatoire', 'point de contrôle', 'validation requise', 'enregistrement obligatoire'],
+  specification: ['exigence fonctionnelle', 'contrainte technique', 'critère d\'acceptation', 'livrable attendu'],
+  audit_report: ['non-conformité majeure', 'non-conformité mineure', 'observation', 'action corrective'],
+  policy: ['disposition applicable', 'mesure obligatoire', 'sanction prévue', 'contrôle de conformité'],
+  generic: []
+};
+
+function generateSeniorSystemPrompt(category: DocumentCategory): string {
+  const sections = SECTION_TEMPLATES[category];
+  const vocabulary = VOCABULARY_BANKS[category];
+  
+  return `Tu es un DIRECTEUR SENIOR avec plus de 30 ans d'expérience dans la rédaction de documents professionnels pour des entreprises du CAC40 et des cabinets de conseil internationaux. Tu produis des documents de qualité IRRÉPROCHABLE.
+
+═══════════════════════════════════════════════════════════════
+RÈGLES ABSOLUES - VIOLATION = ÉCHEC CRITIQUE
+═══════════════════════════════════════════════════════════════
+
+1. JAMAIS de crochets [] ni de placeholders [À compléter] ou [Insérer]
+2. JAMAIS de syntaxe markdown: #, ##, **, *, \`\`\`, ---, ___
+3. JAMAIS de phrases d'introduction IA ("Voici le document", "Ce document présente")
+4. JAMAIS de formules de conclusion artificielles ("N'hésitez pas à me contacter")
+5. JAMAIS de structure visible de template ou de squelette
+6. JAMAIS de données manifestement fausses (ex: SIRET 123 456 789)
+
+═══════════════════════════════════════════════════════════════
+QUALITÉ "BOARD-READY" EXIGÉE
+═══════════════════════════════════════════════════════════════
+
+• Document INDISCERNABLE d'un travail humain expert
+• Chaque phrase apporte une VALEUR AJOUTÉE réelle
+• Vocabulaire RICHE et PRÉCIS adapté au contexte métier français
+• Si une information n'est pas fournie: INVENTER une donnée crédible OU l'omettre
+• Mise en forme PROPRE avec sections CLAIREMENT délimitées
+• Ton PROFESSIONNEL, ni trop formel ni trop familier
+
+═══════════════════════════════════════════════════════════════
+FORMAT TABLEAUX (documents transactionnels)
+═══════════════════════════════════════════════════════════════
+
+Pour les bons de commande, factures, devis, utilise OBLIGATOIREMENT:
+| Colonne 1 | Colonne 2 | Colonne 3 |
+| Donnée 1  | Donnée 2  | Donnée 3  |
+
+Données RÉALISTES et COHÉRENTES.
+
+═══════════════════════════════════════════════════════════════
+STRUCTURE OBLIGATOIRE
+═══════════════════════════════════════════════════════════════
+
+${sections.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+═══════════════════════════════════════════════════════════════
+VOCABULAIRE MÉTIER
+═══════════════════════════════════════════════════════════════
+
+${vocabulary.length > 0 ? vocabulary.join(' • ') : 'Vocabulaire professionnel standard.'}
+
+═══════════════════════════════════════════════════════════════
+DONNÉES À GÉNÉRER (si non fournies)
+═══════════════════════════════════════════════════════════════
+
+• Référence: Format professionnel avec année (ex: BC-2024-0847)
+• Date: Date du jour en format français complet
+• SIRET: 14 chiffres cohérents (format: XXX XXX XXX XXXXX)
+• TVA Intracommunautaire: FR + 2 chiffres + SIREN
+• Montants: Réalistes avec séparateurs milliers et 2 décimales`;
+}
+
+// ============================================================================
+// CONTENT CLEANING & VALIDATION
+// ============================================================================
+
+const FORBIDDEN_PATTERNS = [
+  'Voici le document', 'Voici le contenu', 'Ce document présente', 'Ce document décrit',
+  'Ci-dessous vous trouverez', 'N\'hésitez pas à', 'Je reste à votre disposition',
+  '[À compléter]', '[Insérer ici]', '[PLACEHOLDER]', 'Résumé du Mail'
+];
+
+function cleanAndValidateContent(content: string): { cleaned: string; score: number; issues: string[] } {
+  const issues: string[] = [];
+  let cleaned = content;
+  let score = 100;
+  
+  // Remove forbidden patterns
+  for (const pattern of FORBIDDEN_PATTERNS) {
+    const regex = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    if (regex.test(cleaned)) {
+      issues.push(`Pattern supprimé: "${pattern}"`);
+      score -= 5;
+      cleaned = cleaned.replace(regex, '');
+    }
+  }
+  
+  // Remove markdown
+  const markdownCleaners: Array<{ pattern: RegExp; replacement: string; name: string }> = [
+    { pattern: /```[\s\S]*?```/g, replacement: '', name: 'code blocks' },
+    { pattern: /^#{1,6}\s+/gm, replacement: '', name: 'headers' },
+    { pattern: /\*\*([^*]+)\*\*/g, replacement: '$1', name: 'bold' },
+    { pattern: /\*([^*]+)\*/g, replacement: '$1', name: 'italic' },
+    { pattern: /__([^_]+)__/g, replacement: '$1', name: 'bold underscore' },
+    { pattern: /_([^_]+)_/g, replacement: '$1', name: 'italic underscore' },
+    { pattern: /^---+$/gm, replacement: '', name: 'hr' },
+    { pattern: /^___+$/gm, replacement: '', name: 'hr' },
+    { pattern: /^\*\*\*+$/gm, replacement: '', name: 'hr' },
+  ];
+  
+  for (const { pattern, replacement, name } of markdownCleaners) {
+    if (pattern.test(cleaned)) {
+      issues.push(`Markdown nettoyé: ${name}`);
+      score -= 3;
+      cleaned = cleaned.replace(pattern, replacement);
+    }
+  }
+  
+  // Remove invalid brackets (but keep table format)
+  const bracketMatches = cleaned.match(/\[[^\]|]*\]/g);
+  if (bracketMatches) {
+    const invalidBrackets = bracketMatches.filter(m => 
+      !m.includes('|') && 
+      m.length < 100 && 
+      (m.includes('compléter') || m.includes('insérer') || m.includes('À') || m.includes('...'))
+    );
+    for (const bracket of invalidBrackets) {
+      cleaned = cleaned.replace(bracket, '');
+      issues.push(`Placeholder supprimé: ${bracket.slice(0, 30)}...`);
+      score -= 10;
+    }
+  }
+  
+  // Final cleanup
+  cleaned = cleaned
+    .replace(/\n{4,}/g, '\n\n\n')
+    .replace(/[ \t]+$/gm, '')
+    .replace(/^\s*\n/gm, '\n')
+    .trim();
+  
+  return { cleaned, score: Math.max(0, score), issues };
+}
+
+// ============================================================================
+// CONTENT PARSING
+// ============================================================================
+
+interface ContentSection {
+  type: 'heading' | 'paragraph' | 'list' | 'table';
+  level?: number;
+  text: string;
+  items?: string[];
+  rows?: string[][];
+}
+
+function parseContentIntoSections(content: string): ContentSection[] {
+  const sections: ContentSection[] = [];
   const lines = content.split('\n');
   
   let currentParagraph = '';
@@ -251,7 +388,7 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
   for (const line of lines) {
     const trimmedLine = line.trim();
     
-    // Detect table rows (|...|...|)
+    // Table detection
     if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
@@ -263,7 +400,7 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
         inList = false;
       }
       
-      // Skip separator rows (|---|---|)
+      // Skip separator rows
       if (/^\|[-:\s|]+\|$/.test(trimmedLine)) continue;
       
       inTable = true;
@@ -294,8 +431,8 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
       continue;
     }
     
-    // Uppercase headings
-    if (/^[A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ][A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ\s\-\d]{3,}$/.test(trimmedLine)) {
+    // Uppercase headings (TITRE, SECTION, etc.)
+    if (/^[A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ][A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ\s\-\d'']{2,}$/.test(trimmedLine) && trimmedLine.length <= 80) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
@@ -304,15 +441,25 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
       continue;
     }
     
-    // Numbered headings
-    const numberedMatch = trimmedLine.match(/^(\d+(?:\.\d+)*)\.\s+(.+)$/);
-    if (numberedMatch) {
+    // Numbered headings (1., 1.1., ARTICLE 1, etc.)
+    const numberedMatch = trimmedLine.match(/^(ARTICLE\s+)?(\d+(?:\.\d+)*)[.\-\s]+(.+)$/i);
+    if (numberedMatch && trimmedLine.length <= 100) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
       }
-      const depth = numberedMatch[1].split('.').length;
+      const depth = numberedMatch[2].split('.').length;
       sections.push({ type: 'heading', level: Math.min(depth + 1, 3), text: trimmedLine });
+      continue;
+    }
+    
+    // Section headers with colon (Objet:, De:, etc.)
+    if (/^[A-ZÉÈÀÙÂÊÎÔÛ][a-zéèàùâêîôûäëïöü\s]{0,20}:/.test(trimmedLine) && trimmedLine.length <= 80) {
+      if (currentParagraph) {
+        sections.push({ type: 'paragraph', text: currentParagraph.trim() });
+        currentParagraph = '';
+      }
+      sections.push({ type: 'heading', level: 2, text: trimmedLine });
       continue;
     }
     
@@ -327,7 +474,18 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
       continue;
     }
     
-    if (inList && listItems.length > 0) {
+    // Numbered list items
+    if (/^\d+[.)]\s+/.test(trimmedLine) && !numberedMatch) {
+      if (currentParagraph) {
+        sections.push({ type: 'paragraph', text: currentParagraph.trim() });
+        currentParagraph = '';
+      }
+      inList = true;
+      listItems.push(trimmedLine);
+      continue;
+    }
+    
+    if (inList && listItems.length > 0 && !/^[•\-\*\d]/.test(trimmedLine)) {
       sections.push({ type: 'list', text: '', items: [...listItems] });
       listItems = [];
       inList = false;
@@ -336,7 +494,7 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
     currentParagraph += (currentParagraph ? ' ' : '') + trimmedLine;
   }
   
-  // Remaining content
+  // Handle remaining content
   if (currentParagraph) {
     sections.push({ type: 'paragraph', text: currentParagraph.trim() });
   }
@@ -350,133 +508,121 @@ function parseContentIntoSections(content: string): Array<{ type: 'heading' | 'p
   return sections;
 }
 
-// Generate Word document with senior UX
-async function generateWordDocument(title: string, content: string, category: DocumentCategory): Promise<Uint8Array> {
-  const cleanedContent = cleanAIArtifacts(content);
-  const sections = parseContentIntoSections(cleanedContent);
+// ============================================================================
+// DOCUMENT GENERATION (Senior Word Styling)
+// ============================================================================
+
+const COLOR_SCHEMES: Record<DocumentCategory, { primary: string; accent: string; light: string }> = {
+  purchase_order: { primary: '1E3A5F', accent: '2E7D32', light: 'E8F5E9' },
+  invoice: { primary: '1F2937', accent: '1976D2', light: 'E3F2FD' },
+  quote: { primary: '0D47A1', accent: 'FF6F00', light: 'FFF3E0' },
+  contract: { primary: '263238', accent: '37474F', light: 'ECEFF1' },
+  memo: { primary: '1565C0', accent: '0277BD', light: 'E1F5FE' },
+  meeting_notes: { primary: '2E7D32', accent: '388E3C', light: 'E8F5E9' },
+  report: { primary: '1A237E', accent: '283593', light: 'E8EAF6' },
+  proposal: { primary: '4527A0', accent: '7B1FA2', light: 'F3E5F5' },
+  letter: { primary: '37474F', accent: '455A64', light: 'ECEFF1' },
+  email: { primary: '424242', accent: '616161', light: 'F5F5F5' },
+  procedure: { primary: '00695C', accent: '00897B', light: 'E0F2F1' },
+  specification: { primary: '1565C0', accent: '1976D2', light: 'E3F2FD' },
+  audit_report: { primary: 'B71C1C', accent: 'C62828', light: 'FFEBEE' },
+  policy: { primary: '4A148C', accent: '6A1B9A', light: 'F3E5F5' },
+  generic: { primary: '1F2937', accent: '3C4DFE', light: 'E8EAF6' }
+};
+
+function generateEnrichedReference(category: DocumentCategory): { reference: string; date: string } {
+  const now = new Date();
+  const year = now.getFullYear();
+  const randomNum = Math.floor(Math.random() * 9999) + 1;
+  
+  const prefixes: Record<DocumentCategory, string> = {
+    purchase_order: 'BC', invoice: 'FA', quote: 'DEV', contract: 'CTR',
+    memo: 'NS', meeting_notes: 'CR', report: 'RAP', proposal: 'PROP',
+    letter: 'COU', email: 'MSG', procedure: 'PROC', specification: 'CDC',
+    audit_report: 'AUD', policy: 'POL', generic: 'DOC'
+  };
+  
+  return {
+    reference: `${prefixes[category]}-${year}-${String(randomNum).padStart(4, '0')}`,
+    date: now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+  };
+}
+
+async function generateSeniorWordDocument(
+  title: string, 
+  content: string, 
+  category: DocumentCategory
+): Promise<Uint8Array> {
+  const { cleaned } = cleanAndValidateContent(content);
+  const sections = parseContentIntoSections(cleaned);
+  const colors = COLOR_SCHEMES[category];
+  const { reference, date } = generateEnrichedReference(category);
   
   const children: any[] = [];
   
-  // Professional color scheme based on document type
-  const colors: Record<DocumentCategory, { primary: string; accent: string }> = {
-    purchase_order: { primary: '1E3A5F', accent: '2E7D32' },
-    invoice: { primary: '1F2937', accent: '1976D2' },
-    quote: { primary: '0D47A1', accent: 'FF6F00' },
-    contract: { primary: '263238', accent: '37474F' },
-    memo: { primary: '1565C0', accent: '0277BD' },
-    meeting_notes: { primary: '2E7D32', accent: '388E3C' },
-    report: { primary: '1A237E', accent: '283593' },
-    proposal: { primary: '4527A0', accent: '7B1FA2' },
-    letter: { primary: '37474F', accent: '455A64' },
-    email: { primary: '424242', accent: '616161' },
-    generic: { primary: '1F2937', accent: '3C4DFE' }
-  };
-  
-  const colorScheme = colors[category];
-  
-  // Title
+  // Document title with professional styling
   children.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: title,
+          text: title.toUpperCase(),
           bold: true,
-          size: 48,
-          font: "Calibri",
-          color: colorScheme.primary,
+          size: 44,
+          font: "Calibri Light",
+          color: colors.primary,
         }),
       ],
       alignment: AlignmentType.CENTER,
-      spacing: { after: 200 },
+      spacing: { after: 120 },
     })
   );
   
-  // Date and reference for transactional documents
-  if (['purchase_order', 'invoice', 'quote'].includes(category)) {
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('fr-FR', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    const refPrefix = category === 'purchase_order' ? 'BC' : category === 'invoice' ? 'FA' : 'DEV';
-    const refNum = `${refPrefix}-${today.getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')}`;
-    
-    children.push(
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: `Référence: ${refNum}`,
-            size: 22,
-            font: "Calibri",
-            color: colorScheme.accent,
-            bold: true,
-          }),
-          new TextRun({
-            text: `  •  Date: ${dateStr}`,
-            size: 22,
-            font: "Calibri",
-            color: "666666",
-          }),
-        ],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
-      })
-    );
-  } else {
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('fr-FR', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    
-    children.push(
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: dateStr,
-            size: 22,
-            font: "Calibri",
-            color: "6B7280",
-          }),
-        ],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
-      })
-    );
-  }
+  // Reference and date line
+  children.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: `Réf. ${reference}`,
+          size: 22,
+          font: "Calibri",
+          color: colors.accent,
+          bold: true,
+        }),
+        new TextRun({
+          text: `  │  ${date}`,
+          size: 22,
+          font: "Calibri",
+          color: '6B7280',
+        }),
+      ],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 300 },
+    })
+  );
   
-  // Horizontal line
+  // Decorative line
   children.push(
     new Paragraph({
       border: {
         bottom: {
-          color: colorScheme.accent,
+          color: colors.accent,
           space: 1,
           style: BorderStyle.SINGLE,
-          size: 12,
+          size: 18,
         },
       },
       spacing: { after: 400 },
     })
   );
   
-  // Content sections
+  // Process content sections
   for (const section of sections) {
     if (section.type === 'heading') {
-      let fontSize = 28;
-      let spaceAfter = 200;
-      let color = colorScheme.primary;
-      
-      if (section.level === 2) {
-        fontSize = 26;
-        spaceAfter = 160;
-      } else if (section.level === 3) {
-        fontSize = 24;
-        spaceAfter = 120;
-        color = colorScheme.accent;
-      }
+      const level = section.level || 1;
+      const fontSize = level === 1 ? 32 : level === 2 ? 28 : 24;
+      const color = level === 1 ? colors.primary : level === 2 ? colors.accent : '4B5563';
+      const spaceBefore = level === 1 ? 400 : level === 2 ? 300 : 200;
+      const spaceAfter = level === 1 ? 200 : 150;
       
       children.push(
         new Paragraph({
@@ -485,11 +631,19 @@ async function generateWordDocument(title: string, content: string, category: Do
               text: section.text,
               bold: true,
               size: fontSize,
-              font: "Calibri",
+              font: level === 1 ? "Calibri Light" : "Calibri",
               color: color,
             }),
           ],
-          spacing: { before: 300, after: spaceAfter },
+          spacing: { before: spaceBefore, after: spaceAfter },
+          border: level === 1 ? {
+            bottom: {
+              color: colors.light.replace('#', ''),
+              space: 4,
+              style: BorderStyle.SINGLE,
+              size: 8,
+            },
+          } : undefined,
         })
       );
     } else if (section.type === 'paragraph') {
@@ -513,10 +667,10 @@ async function generateWordDocument(title: string, content: string, category: Do
           new Paragraph({
             children: [
               new TextRun({
-                text: "• ",
+                text: "▸ ",
                 size: 24,
                 font: "Calibri",
-                color: colorScheme.accent,
+                color: colors.accent,
                 bold: true,
               }),
               new TextRun({
@@ -526,16 +680,17 @@ async function generateWordDocument(title: string, content: string, category: Do
                 color: "374151",
               }),
             ],
-            spacing: { after: 100, line: 360 },
-            indent: { left: convertInchesToTwip(0.5) },
+            spacing: { after: 100, line: 340 },
+            indent: { left: convertInchesToTwip(0.4) },
           })
         );
       }
+      // Add spacing after list
+      children.push(new Paragraph({ spacing: { after: 150 } }));
     } else if (section.type === 'table' && section.rows && section.rows.length > 0) {
-      // Create professional table
       const tableRows = section.rows.map((row, rowIndex) => {
         return new TableRow({
-          height: { value: 400, rule: HeightRule.ATLEAST },
+          height: { value: 450, rule: HeightRule.ATLEAST },
           children: row.map((cell) => {
             return new TableCell({
               children: [
@@ -550,14 +705,21 @@ async function generateWordDocument(title: string, content: string, category: Do
                     }),
                   ],
                   alignment: AlignmentType.CENTER,
+                  spacing: { before: 60, after: 60 },
                 }),
               ],
               verticalAlign: VerticalAlign.CENTER,
               shading: rowIndex === 0 
-                ? { fill: colorScheme.primary }
+                ? { fill: colors.primary }
                 : rowIndex % 2 === 0 
-                  ? { fill: "F3F4F6" } 
+                  ? { fill: colors.light } 
                   : { fill: "FFFFFF" },
+              margins: {
+                top: 60,
+                bottom: 60,
+                left: 120,
+                right: 120,
+              },
             });
           }),
         });
@@ -570,15 +732,11 @@ async function generateWordDocument(title: string, content: string, category: Do
         })
       );
       
-      // Add spacing after table
-      children.push(
-        new Paragraph({
-          spacing: { after: 300 },
-        })
-      );
+      children.push(new Paragraph({ spacing: { after: 300 } }));
     }
   }
   
+  // Create document with professional footer
   const doc = new Document({
     creator: "AETHER AI Suite",
     title: title,
@@ -605,6 +763,68 @@ async function generateWordDocument(title: string, content: string, category: Do
             },
           },
         },
+        headers: {
+          default: new Header({
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `${reference}`,
+                    size: 18,
+                    font: "Calibri",
+                    color: "9CA3AF",
+                  }),
+                ],
+                alignment: AlignmentType.RIGHT,
+              }),
+            ],
+          }),
+        },
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Document généré par AETHER  │  ",
+                    size: 18,
+                    font: "Calibri",
+                    color: "9CA3AF",
+                  }),
+                  new TextRun({
+                    children: [PageNumber.CURRENT],
+                    size: 18,
+                    font: "Calibri",
+                    color: colors.primary,
+                    bold: true,
+                  }),
+                  new TextRun({
+                    text: " / ",
+                    size: 18,
+                    font: "Calibri",
+                    color: "9CA3AF",
+                  }),
+                  new TextRun({
+                    children: [PageNumber.TOTAL_PAGES],
+                    size: 18,
+                    font: "Calibri",
+                    color: colors.primary,
+                    bold: true,
+                  }),
+                ],
+                alignment: AlignmentType.CENTER,
+                border: {
+                  top: {
+                    color: "E5E7EB",
+                    space: 8,
+                    style: BorderStyle.SINGLE,
+                    size: 6,
+                  },
+                },
+              }),
+            ],
+          }),
+        },
         children,
       },
     ],
@@ -612,6 +832,10 @@ async function generateWordDocument(title: string, content: string, category: Do
   
   return await Packer.toBuffer(doc);
 }
+
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -651,45 +875,30 @@ serve(async (req) => {
       .single();
 
     const templateName = template?.name || 'Document';
-    const templateCategory = template?.category || 'general';
     
-    // Detect document category for senior UX
+    // Senior Intelligence: Classify document
     const userPrompt = variables.prompt || '';
-    const category = detectDocumentCategory(title, userPrompt);
-    const seniorPrompt = SENIOR_PROMPTS[category];
+    const classification = classifyDocument(title, userPrompt);
+    const category = classification.category;
 
-    console.log(`Generating Word document (category: ${category}) for user ${user.id}`);
+    console.log(`[Senior UX] Document: "${title}" → Category: ${category} (confidence: ${(classification.confidence * 100).toFixed(0)}%)`);
+    console.log(`[Senior UX] Keywords detected: ${classification.detectedKeywords.join(', ') || 'none'}`);
     
-    // System prompt for professional human-like document generation
-    const systemPrompt = `Tu es un expert senior avec plus de 25 ans d'expérience en rédaction de documents professionnels d'entreprise. Tu produis des documents de qualité "board-ready".
-
-RÈGLES ABSOLUES (violation = échec):
-1. JAMAIS de crochets [] ou placeholders
-2. JAMAIS de markdown: #, ##, **, *, -, ---, \`\`\`
-3. JAMAIS de phrases meta ("Voici le document", "Ce document présente")
-4. JAMAIS de structure robotique ou artificielle
-5. JAMAIS de formulations typiques d'IA ou de templates visibles
-
-QUALITÉ SENIOR EXIGÉE:
-- Le document doit être indiscernable d'un travail humain expert
-- Vocabulaire riche, précis, adapté au contexte métier français
-- Si une information manque, l'inventer de façon crédible OU l'omettre
-- Mise en forme propre avec sections claires
-
-FORMAT TABLEAUX (pour bons de commande, factures, devis):
-- Utilise le format: | Colonne1 | Colonne2 | Colonne3 |
-- Une ligne par rangée
-- Données réalistes et cohérentes
-
-${seniorPrompt.system}`;
-
-    const generatePrompt = `Rédige un document professionnel de type "${templateName}" (catégorie détectée: ${category}).
+    // Generate senior prompts
+    const systemPrompt = generateSeniorSystemPrompt(category);
+    
+    const generatePrompt = `DOCUMENT À RÉDIGER: ${category.toUpperCase().replace('_', ' ')}
 
 TITRE: ${title}
 
-${userPrompt ? `INSTRUCTIONS SPÉCIFIQUES:\n${userPrompt}` : 'Génère un document professionnel complet et détaillé.'}
+${userPrompt ? `INSTRUCTIONS SPÉCIFIQUES:\n${userPrompt}` : 'Génère un document professionnel complet avec des données réalistes.'}
 
-Génère le document complet, prêt à l'emploi en entreprise. Qualité senior irréprochable exigée.`;
+${Object.keys(variables).length > 0 ? 
+  `VARIABLES FOURNIES:\n${Object.entries(variables).filter(([k]) => k !== 'prompt').map(([k, v]) => `• ${k}: ${v}`).join('\n')}` : ''}
+
+══════════════════════════════════════
+GÉNÈRE LE DOCUMENT COMPLET, QUALITÉ SENIOR IRRÉPROCHABLE.
+══════════════════════════════════════`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -703,6 +912,7 @@ Génère le document complet, prêt à l'emploi en entreprise. Qualité senior i
           { role: 'system', content: systemPrompt },
           { role: 'user', content: generatePrompt },
         ],
+        temperature: 0.7,
       }),
     });
 
@@ -719,8 +929,15 @@ Génère le document complet, prêt à l'emploi en entreprise. Qualité senior i
       throw new Error('No content generated');
     }
 
-    // Generate Word document with category-aware styling
-    const docBuffer = await generateWordDocument(title, content, category);
+    // Validate and clean content
+    const validation = cleanAndValidateContent(content);
+    console.log(`[Senior UX] Content quality score: ${validation.score}/100`);
+    if (validation.issues.length > 0) {
+      console.log(`[Senior UX] Issues fixed: ${validation.issues.join(', ')}`);
+    }
+
+    // Generate Word document with senior styling
+    const docBuffer = await generateSeniorWordDocument(title, content, category);
     
     // Upload to storage
     const fileName = `docs/${user.id}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâäéèêëïîôùûüç\s-]/gi, '_')}.docx`;
@@ -742,22 +959,24 @@ Génère le document complet, prêt à l'emploi en entreprise. Qualité senior i
       .from('documents')
       .createSignedUrl(fileName, 60 * 60 * 24 * 7);
 
-    // Clean content for database storage
-    const cleanedContent = cleanAIArtifacts(content);
-
     // Create the document in the database
     const { data: document, error: insertError } = await supabase
       .from('aether_documents')
       .insert({
         user_id: user.id,
         title,
-        content: cleanedContent,
+        content: validation.cleaned,
         template_id: templateId,
         file_type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         file_url: signedUrlData?.signedUrl || null,
         status: 'completed',
         embedding_status: 'pending',
-        metadata: JSON.stringify({ category, generated_with: 'senior_ux' })
+        metadata: JSON.stringify({ 
+          category, 
+          generated_with: 'senior_intelligence',
+          quality_score: validation.score,
+          detected_keywords: classification.detectedKeywords
+        })
       })
       .select()
       .single();
@@ -767,11 +986,14 @@ Génère le document complet, prêt à l'emploi en entreprise. Qualité senior i
       throw new Error('Failed to save document');
     }
 
+    console.log(`[Senior UX] Document generated successfully: ${document.id}`);
+
     return new Response(
       JSON.stringify({ 
         document,
         downloadUrl: signedUrlData?.signedUrl,
-        category 
+        category,
+        qualityScore: validation.score
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
