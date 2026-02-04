@@ -13,6 +13,7 @@ type ActionType =
   | 'create_document' 
   | 'create_ticket'
   | 'create_contact'
+  | 'create_workflow'
   | 'update_candidate'
   | 'update_deal'
   | 'update_ticket'
@@ -363,6 +364,91 @@ serve(async (req) => {
             message: `Contact "${contact.first_name} ${contact.last_name}" créé`,
             createdId: contact.id,
             data: contact
+          };
+        }
+        break;
+      }
+
+      // ============ CREATE WORKFLOW ============
+      case 'create_workflow': {
+        // Generate workflow structure from description using AI
+        const workflowDescription = data.description || data.name || 'Nouveau workflow';
+        
+        // Default trigger based on description analysis
+        let triggerType = 'trigger_manual';
+        const descLower = workflowDescription.toLowerCase();
+        if (descLower.includes('formulaire') || descLower.includes('form')) {
+          triggerType = 'trigger_form';
+        } else if (descLower.includes('email') || descLower.includes('gmail')) {
+          triggerType = 'trigger_gmail';
+        } else if (descLower.includes('webhook')) {
+          triggerType = 'trigger_webhook';
+        } else if (descLower.includes('schedule') || descLower.includes('planifié') || descLower.includes('cron')) {
+          triggerType = 'trigger_schedule';
+        }
+
+        // Build basic workflow nodes
+        const nodes: any[] = [
+          {
+            id: 'trigger-1',
+            type: triggerType,
+            position: { x: 100, y: 200 },
+            data: {
+              label: 'Déclencheur',
+              blockType: triggerType,
+              config: {}
+            }
+          }
+        ];
+
+        // Add action nodes based on description
+        if (descLower.includes('email') || descLower.includes('envo')) {
+          nodes.push({
+            id: 'action-1',
+            type: 'send_email',
+            position: { x: 400, y: 200 },
+            data: {
+              label: 'Envoyer Email',
+              blockType: 'send_email',
+              config: {
+                to: '{{ trigger.email }}',
+                subject: 'Notification automatique',
+                body: '{{ trigger.message }}'
+              }
+            }
+          });
+        }
+
+        // Build edges
+        const edges = nodes.length > 1 ? [
+          { id: 'e1', source: 'trigger-1', target: 'action-1', type: 'smoothstep' }
+        ] : [];
+
+        const workflowData = {
+          user_id: userId,
+          name: data.name || `Workflow: ${workflowDescription.slice(0, 50)}`,
+          description: workflowDescription,
+          nodes: nodes,
+          edges: edges,
+          is_active: false,
+          trigger_type: triggerType,
+        };
+
+        const { data: workflow, error } = await supabase
+          .from('workflows')
+          .insert(workflowData)
+          .select()
+          .single();
+
+        if (error) {
+          result = { success: false, action, message: `Erreur: ${error.message}` };
+        } else {
+          result = { 
+            success: true, 
+            action, 
+            message: `Workflow "${workflow.name}" créé ! Accédez à Flow pour le configurer et l'activer.`,
+            createdId: workflow.id,
+            data: workflow
           };
         }
         break;

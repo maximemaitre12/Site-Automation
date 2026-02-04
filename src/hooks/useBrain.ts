@@ -402,7 +402,11 @@ Tu peux modifier les données de la plateforme quand l'utilisateur le demande:
 - Créer des documents
 - Créer des tickets support
 - Créer des contacts CRM
+- CRÉER DES WORKFLOWS (l'utilisateur décrit ce qu'il veut, tu le crées directement)
 - Mettre à jour ou supprimer des éléments
+
+IMPORTANT: Quand l'utilisateur demande de "créer un workflow", TU LE CRÉES DIRECTEMENT via l'action appropriée.
+Ne donne PAS d'instructions pour aller dans Flow. EXÉCUTE L'ACTION.
 
 Quand une action est réalisée, confirme-la clairement et propose les prochaines étapes.
 
