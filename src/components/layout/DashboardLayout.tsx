@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Menu, X, Database, Workflow, FileText, BarChart3, Users, MessageSquare, ShieldCheck, Settings, LogOut, LayoutDashboard, Plug, Sparkles } from "lucide-react";
+import { Menu, X, Database, Workflow, FileText, BarChart3, Users, MessageSquare, ShieldCheck, Settings, LogOut, LayoutDashboard, Plug, Crown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { AetherLogo } from "@/components/ui/aether-logo";
@@ -19,6 +19,13 @@ const menuItems = [
     label: "Dashboard",
     path: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Executive",
+    description: "Assistant de Direction",
+    path: "/tools/executive",
+    icon: Crown,
+    colorClass: "text-primary",
   },
   {
     label: "AETHER Data",
@@ -157,6 +164,11 @@ export function DashboardLayout({ children, headerActions, toolName, toolDescrip
                 <span className="text-lg sm:text-xl font-bold tracking-tight">
                   <span className="text-foreground">Aether</span>
                   <span className="text-agent-data ml-1">Data</span>
+                </span>
+              ) : location.pathname === '/tools/executive' ? (
+                <span className="text-lg sm:text-xl font-bold tracking-tight">
+                  <span className="text-foreground">Aether</span>
+                  <span className="text-primary ml-1">Executive</span>
                 </span>
               ) : location.pathname === '/tools/compliance' ? (
                 <span className="text-lg sm:text-xl font-bold tracking-tight">
