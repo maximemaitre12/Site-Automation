@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, convertInchesToTwip, Table, TableRow, TableCell, WidthType, HeightRule, VerticalAlign, Header, Footer, PageNumber, ShadingType, TableBorders, convertMillimetersToTwip } from "https://esm.sh/docx@8.5.0";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, convertInchesToTwip, Table, TableRow, TableCell, WidthType, HeightRule, VerticalAlign, Header, Footer, PageNumber, NumberFormat } from "https://esm.sh/docx@8.5.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,280 +13,343 @@ interface GenerateRequest {
   title: string;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// SENIOR DOCUMENT INTELLIGENCE v3.0 - CONSULTING-GRADE QUALITY
-// ══════════════════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// TYPES & CLASSIFICATION (Senior Document Intelligence)
+// ============================================================================
 
 type DocumentCategory = 
   | 'purchase_order' | 'invoice' | 'quote' | 'contract' 
   | 'memo' | 'meeting_notes' | 'letter' | 'report' 
   | 'proposal' | 'email' | 'procedure' | 'specification'
-  | 'audit_report' | 'policy' | 'executive_brief' | 'board_memo'
-  | 'investment_memo' | 'due_diligence' | 'strategic_plan' | 'generic';
-
-type IndustryContext = 
-  | 'finance' | 'consulting' | 'technology' | 'healthcare' 
-  | 'manufacturing' | 'retail' | 'legal' | 'energy' | 'generic';
-
-type AudienceLevel = 'board' | 'c_suite' | 'director' | 'manager' | 'operational';
-type DocumentTone = 'executive' | 'formal' | 'professional' | 'technical' | 'persuasive';
-type ComplexityLevel = 'simple' | 'standard' | 'complex' | 'executive';
+  | 'audit_report' | 'policy' | 'generic';
 
 interface ClassificationResult {
   category: DocumentCategory;
   confidence: number;
   detectedKeywords: string[];
-  industry: IndustryContext;
-  tone: DocumentTone;
-  audience: AudienceLevel;
-  complexity: ComplexityLevel;
 }
-
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// CLASSIFICATION ENGINE v3.0
-// ══════════════════════════════════════════════════════════════════════════════════════════
 
 const CLASSIFICATION_PATTERNS: Record<DocumentCategory, {
   keywords: string[];
   weight: number;
-  audienceDefault: AudienceLevel;
-  toneDefault: DocumentTone;
+  regex?: RegExp[];
 }> = {
-  purchase_order: { keywords: ['bon de commande', 'purchase order', 'commande', 'bc', 'po', 'achats'], weight: 10, audienceDefault: 'operational', toneDefault: 'professional' },
-  invoice: { keywords: ['facture', 'invoice', 'facturation', 'règlement', 'avoir'], weight: 10, audienceDefault: 'operational', toneDefault: 'formal' },
-  quote: { keywords: ['devis', 'quotation', 'offre commerciale', 'proposition tarifaire', 'estimation'], weight: 9, audienceDefault: 'manager', toneDefault: 'persuasive' },
-  contract: { keywords: ['contrat', 'accord', 'convention', 'agreement', 'avenant'], weight: 9, audienceDefault: 'director', toneDefault: 'formal' },
-  memo: { keywords: ['note de service', 'mémo', 'memo', 'circulaire', 'note interne'], weight: 8, audienceDefault: 'manager', toneDefault: 'professional' },
-  meeting_notes: { keywords: ['compte-rendu', 'procès-verbal', 'pv', 'réunion', 'cr'], weight: 8, audienceDefault: 'manager', toneDefault: 'professional' },
-  report: { keywords: ['rapport', 'report', 'analyse', 'étude', 'bilan', 'synthèse'], weight: 7, audienceDefault: 'director', toneDefault: 'professional' },
-  proposal: { keywords: ['proposition', 'proposal', 'offre de service', 'réponse appel'], weight: 8, audienceDefault: 'director', toneDefault: 'persuasive' },
-  letter: { keywords: ['lettre', 'courrier', 'correspondance'], weight: 6, audienceDefault: 'manager', toneDefault: 'formal' },
-  email: { keywords: ['email', 'mail', 'courriel'], weight: 5, audienceDefault: 'operational', toneDefault: 'professional' },
-  procedure: { keywords: ['procédure', 'processus', 'mode opératoire', 'instruction'], weight: 7, audienceDefault: 'operational', toneDefault: 'technical' },
-  specification: { keywords: ['cahier des charges', 'spécification', 'cdc', 'requirements'], weight: 8, audienceDefault: 'manager', toneDefault: 'technical' },
-  audit_report: { keywords: ['audit', 'contrôle', 'conformité', 'inspection'], weight: 8, audienceDefault: 'director', toneDefault: 'formal' },
-  policy: { keywords: ['politique', 'charte', 'règlement', 'directive'], weight: 7, audienceDefault: 'director', toneDefault: 'formal' },
-  executive_brief: { keywords: ['brief exécutif', 'executive brief', 'synthèse exécutive'], weight: 9, audienceDefault: 'c_suite', toneDefault: 'executive' },
-  board_memo: { keywords: ['mémo ca', 'conseil d\'administration', 'comex', 'board'], weight: 10, audienceDefault: 'board', toneDefault: 'executive' },
-  investment_memo: { keywords: ['investment memo', 'mémo investissement', 'deal memo'], weight: 10, audienceDefault: 'c_suite', toneDefault: 'executive' },
-  due_diligence: { keywords: ['due diligence', 'dd', 'audit d\'acquisition'], weight: 10, audienceDefault: 'c_suite', toneDefault: 'executive' },
-  strategic_plan: { keywords: ['plan stratégique', 'strategic plan', 'roadmap', 'vision'], weight: 9, audienceDefault: 'board', toneDefault: 'executive' },
-  generic: { keywords: [], weight: 0, audienceDefault: 'manager', toneDefault: 'professional' }
-};
-
-const INDUSTRY_KEYWORDS: Record<IndustryContext, string[]> = {
-  finance: ['banque', 'investissement', 'fonds', 'crédit', 'assurance', 'private equity', 'trading', 'compliance', 'ebitda', 'irr'],
-  consulting: ['cabinet', 'conseil', 'stratégie', 'transformation', 'mckinsey', 'bcg', 'bain', 'mission', 'deliverable'],
-  technology: ['software', 'saas', 'cloud', 'développement', 'agile', 'api', 'data', 'ia', 'startup', 'tech'],
-  healthcare: ['santé', 'médical', 'hôpital', 'pharma', 'patient', 'clinique'],
-  manufacturing: ['industrie', 'production', 'usine', 'supply chain', 'lean', 'qualité', 'iso'],
-  retail: ['distribution', 'magasin', 'e-commerce', 'merchandising', 'logistique'],
-  legal: ['juridique', 'avocat', 'contentieux', 'droit', 'contrat', 'litige'],
-  energy: ['énergie', 'électricité', 'pétrole', 'gaz', 'renouvelable', 'carbone', 'esg'],
-  generic: []
-};
-
-function detectIndustry(text: string): IndustryContext {
-  const lowered = text.toLowerCase();
-  let bestIndustry: IndustryContext = 'generic';
-  let bestScore = 0;
-  
-  for (const [industry, keywords] of Object.entries(INDUSTRY_KEYWORDS)) {
-    let score = 0;
-    for (const keyword of keywords) {
-      if (lowered.includes(keyword)) score += 2;
-    }
-    if (score > bestScore) {
-      bestScore = score;
-      bestIndustry = industry as IndustryContext;
-    }
+  purchase_order: {
+    keywords: ['bon de commande', 'purchase order', 'commande fournisseur', 'ordre d\'achat', 'bc'],
+    weight: 10,
+    regex: [/bc[-\s]?\d+/i, /po[-\s]?\d+/i, /commande\s+n[°o]?\s*\d+/i]
+  },
+  invoice: {
+    keywords: ['facture', 'invoice', 'facturation', 'règlement', 'échéance'],
+    weight: 10,
+    regex: [/fa[-\s]?\d+/i, /inv[-\s]?\d+/i, /facture\s+n[°o]?\s*\d+/i]
+  },
+  quote: {
+    keywords: ['devis', 'quotation', 'offre commerciale', 'proposition tarifaire', 'estimation', 'chiffrage'],
+    weight: 9,
+    regex: [/dev[-\s]?\d+/i, /qt[-\s]?\d+/i, /devis\s+n[°o]?\s*\d+/i]
+  },
+  contract: {
+    keywords: ['contrat', 'accord', 'convention', 'contract', 'agreement', 'engagement', 'avenant'],
+    weight: 9,
+    regex: [/contrat\s+n[°o]?\s*\d+/i, /avenant\s+n[°o]?\s*\d+/i]
+  },
+  memo: {
+    keywords: ['note de service', 'mémo', 'memo', 'circulaire', 'communication interne', 'note interne'],
+    weight: 8,
+    regex: [/ns[-\s]?\d+/i, /note\s+n[°o]?\s*\d+/i]
+  },
+  meeting_notes: {
+    keywords: ['compte-rendu', 'compte rendu', 'procès-verbal', 'pv', 'réunion', 'meeting notes', 'minutes'],
+    weight: 8,
+    regex: [/pv[-\s]?\d+/i, /cr[-\s]?\d+/i]
+  },
+  report: {
+    keywords: ['rapport', 'report', 'analyse', 'étude', 'bilan', 'synthèse', 'état des lieux'],
+    weight: 7,
+    regex: [/rapport\s+(d[''])?/i]
+  },
+  proposal: {
+    keywords: ['proposition', 'proposal', 'offre de service', 'offre technique', 'réponse appel'],
+    weight: 8,
+    regex: [/prop[-\s]?\d+/i]
+  },
+  letter: {
+    keywords: ['lettre', 'courrier', 'letter', 'correspondance', 'missive'],
+    weight: 6,
+    regex: [/lettre\s+(de|à)/i]
+  },
+  email: {
+    keywords: ['email', 'mail', 'courriel', 'message électronique', 'e-mail'],
+    weight: 5
+  },
+  procedure: {
+    keywords: ['procédure', 'processus', 'mode opératoire', 'instruction', 'protocole'],
+    weight: 7,
+    regex: [/proc[-\s]?\d+/i]
+  },
+  specification: {
+    keywords: ['cahier des charges', 'spécification', 'cdc', 'spec', 'requirements', 'exigences'],
+    weight: 8,
+    regex: [/cdc[-\s]?\d+/i]
+  },
+  audit_report: {
+    keywords: ['audit', 'contrôle', 'inspection', 'vérification', 'conformité'],
+    weight: 8,
+    regex: [/audit[-\s]?\d+/i]
+  },
+  policy: {
+    keywords: ['politique', 'charte', 'règlement', 'directive', 'policy'],
+    weight: 7
+  },
+  generic: {
+    keywords: [],
+    weight: 0
   }
-  return bestIndustry;
-}
+};
 
 function classifyDocument(title: string, content?: string): ClassificationResult {
   const combined = `${title} ${content || ''}`.toLowerCase();
-  let bestCategory: DocumentCategory = 'generic';
-  let bestScore = 0;
+  const scores: Record<string, number> = {};
   const detectedKeywords: string[] = [];
   
   for (const [category, config] of Object.entries(CLASSIFICATION_PATTERNS)) {
     let score = 0;
+    
     for (const keyword of config.keywords) {
       if (combined.includes(keyword.toLowerCase())) {
         score += config.weight;
         detectedKeywords.push(keyword);
       }
     }
-    if (score > bestScore) {
-      bestScore = score;
-      bestCategory = category as DocumentCategory;
+    
+    if (config.regex) {
+      for (const regex of config.regex) {
+        if (regex.test(combined)) {
+          score += config.weight * 1.5;
+        }
+      }
     }
+    
+    scores[category] = score;
   }
   
-  const config = CLASSIFICATION_PATTERNS[bestCategory];
-  const industry = detectIndustry(combined);
+  const entries = Object.entries(scores);
+  entries.sort((a, b) => b[1] - a[1]);
   
-  // Determine complexity
-  let complexity: ComplexityLevel = 'standard';
-  if (['board_memo', 'investment_memo', 'due_diligence', 'strategic_plan', 'executive_brief'].includes(bestCategory)) {
-    complexity = 'executive';
-  } else if (['contract', 'audit_report', 'specification', 'proposal'].includes(bestCategory)) {
-    complexity = 'complex';
-  } else if (['email', 'memo'].includes(bestCategory)) {
-    complexity = 'simple';
-  }
+  const [bestCategory, bestScore] = entries[0];
+  const totalPossible = Math.max(...Object.values(CLASSIFICATION_PATTERNS).map(c => c.weight * c.keywords.length * 2));
+  const confidence = Math.min(bestScore / totalPossible, 1);
   
   return {
-    category: bestCategory,
-    confidence: Math.min(bestScore / 30, 1),
-    detectedKeywords: [...new Set(detectedKeywords)],
-    industry,
-    tone: config.toneDefault,
-    audience: config.audienceDefault,
-    complexity
+    category: bestScore > 0 ? bestCategory as DocumentCategory : 'generic',
+    confidence: bestScore > 0 ? confidence : 0,
+    detectedKeywords: [...new Set(detectedKeywords)]
   };
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// SENIOR PROMPT ENGINE v3.0 - CONSULTING-GRADE
-// ══════════════════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// SENIOR PROMPTS ENGINE
+// ============================================================================
 
 const SECTION_TEMPLATES: Record<DocumentCategory, string[]> = {
-  purchase_order: ['EN-TÊTE', 'ÉMETTEUR', 'FOURNISSEUR', 'ADRESSE DE LIVRAISON', 'DÉTAIL DES ARTICLES', 'RÉCAPITULATIF', 'CONDITIONS', 'SIGNATURE'],
-  invoice: ['EN-TÊTE FACTURE', 'ÉMETTEUR', 'DESTINATAIRE', 'DÉTAIL DES PRESTATIONS', 'RÉCAPITULATIF TVA', 'MONTANT TOTAL', 'CONDITIONS DE RÈGLEMENT', 'MENTIONS LÉGALES'],
-  quote: ['EN-TÊTE DEVIS', 'NOTRE SOCIÉTÉ', 'CLIENT', 'CONTEXTE', 'OFFRE DÉTAILLÉE', 'RÉCAPITULATIF', 'CONDITIONS', 'ACCEPTATION'],
-  contract: ['INTITULÉ', 'ENTRE LES PARTIES', 'PRÉAMBULE', 'OBJET', 'DURÉE', 'OBLIGATIONS', 'RÉMUNÉRATION', 'CONFIDENTIALITÉ', 'RÉSILIATION', 'SIGNATURES'],
-  memo: ['EN-TÊTE', 'DE / À / DATE / OBJET', 'CONTEXTE', 'MESSAGE PRINCIPAL', 'ACTIONS REQUISES'],
-  meeting_notes: ['EN-TÊTE', 'PARTICIPANTS', 'ORDRE DU JOUR', 'SYNTHÈSE DES ÉCHANGES', 'DÉCISIONS', 'PLAN D\'ACTIONS', 'PROCHAINE RÉUNION'],
-  report: ['RÉSUMÉ EXÉCUTIF', 'CONTEXTE', 'ANALYSE', 'RECOMMANDATIONS', 'PLAN D\'ACTION', 'CONCLUSION'],
-  proposal: ['PAGE DE GARDE', 'EXECUTIVE SUMMARY', 'COMPRÉHENSION DES ENJEUX', 'APPROCHE PROPOSÉE', 'LIVRABLES ET PLANNING', 'ÉQUIPE', 'INVESTISSEMENT'],
-  letter: ['EN-TÊTE', 'DATE ET LIEU', 'DESTINATAIRE', 'OBJET', 'CORPS DE LETTRE', 'FORMULE DE POLITESSE', 'SIGNATURE'],
-  email: ['OBJET', 'ACCROCHE', 'MESSAGE', 'CALL TO ACTION', 'SIGNATURE'],
-  procedure: ['IDENTIFICATION', 'OBJET', 'PÉRIMÈTRE', 'RESPONSABILITÉS', 'ÉTAPES', 'ENREGISTREMENTS'],
-  specification: ['PAGE DE GARDE', 'CONTEXTE', 'PÉRIMÈTRE', 'EXIGENCES FONCTIONNELLES', 'EXIGENCES TECHNIQUES', 'CONTRAINTES', 'PLANNING'],
-  audit_report: ['SYNTHÈSE', 'MÉTHODOLOGIE', 'CONSTATS', 'NON-CONFORMITÉS', 'RECOMMANDATIONS', 'PLAN D\'ACTION'],
-  policy: ['IDENTIFICATION', 'OBJET', 'CHAMP D\'APPLICATION', 'PRINCIPES', 'RÈGLES', 'CONTRÔLE', 'ENTRÉE EN VIGUEUR'],
-  executive_brief: ['POINTS CLÉS', 'CONTEXTE', 'ANALYSE', 'OPTIONS', 'RECOMMANDATION', 'DÉCISION REQUISE'],
-  board_memo: ['SYNTHÈSE POUR LE CONSEIL', 'CONTEXTE STRATÉGIQUE', 'ANALYSE', 'IMPACTS', 'RÉSOLUTION PROPOSÉE'],
-  investment_memo: ['EXECUTIVE SUMMARY', 'THÈSE D\'INVESTISSEMENT', 'ANALYSE MARCHÉ', 'ANALYSE FINANCIÈRE', 'VALORISATION', 'RISQUES', 'RECOMMANDATION'],
-  due_diligence: ['SYNTHÈSE EXÉCUTIVE', 'QUALITY OF EARNINGS', 'ANALYSE BILAN', 'RED FLAGS', 'AJUSTEMENTS', 'RECOMMANDATIONS'],
-  strategic_plan: ['EXECUTIVE SUMMARY', 'DIAGNOSTIC', 'VISION', 'AXES STRATÉGIQUES', 'TRAJECTOIRE FINANCIÈRE', 'FEUILLE DE ROUTE'],
-  generic: ['INTRODUCTION', 'CONTENU', 'CONCLUSION']
+  purchase_order: [
+    'EN-TÊTE (Logo, Référence BC, Date)',
+    'SOCIÉTÉ ÉMETTRICE (Raison sociale, SIRET, Adresse)',
+    'FOURNISSEUR (Raison sociale, SIRET, Adresse)',
+    'ADRESSE DE LIVRAISON',
+    'TABLEAU DES ARTICLES (N°, Réf, Désignation, Qté, Unité, PU HT, Total HT)',
+    'RÉCAPITULATIF FINANCIER (Sous-total HT, TVA 20%, Total TTC)',
+    'CONDITIONS DE PAIEMENT',
+    'CONDITIONS DE LIVRAISON (Date, Incoterm)',
+    'ZONE DE SIGNATURE (Bon pour accord, Nom, Fonction, Date)'
+  ],
+  invoice: [
+    'EN-TÊTE FACTURE (N° Facture séquentiel, Date émission)',
+    'ÉMETTEUR (Société, SIRET, N° TVA Intracommunautaire, RCS)',
+    'FACTURER À (Client, Adresse facturation)',
+    'RÉFÉRENCES (N° Commande, Date commande)',
+    'DÉTAIL DES PRESTATIONS (Réf, Désignation, Qté, PU HT, Taux TVA, Total HT)',
+    'RÉCAPITULATIF TVA (Base HT par taux, Montant TVA)',
+    'TOTAL (Total HT, Total TVA, Total TTC)',
+    'CONDITIONS DE RÈGLEMENT',
+    'COORDONNÉES BANCAIRES (IBAN, BIC)',
+    'MENTIONS LÉGALES (Pénalités de retard, Indemnité forfaitaire 40€)'
+  ],
+  quote: [
+    'EN-TÊTE DEVIS (Référence, Date, Validité)',
+    'NOTRE SOCIÉTÉ',
+    'CLIENT DESTINATAIRE',
+    'OBJET DU DEVIS',
+    'NOTRE PROPOSITION',
+    'DÉTAIL DE L\'OFFRE (Désignation, Qté, Tarif, Total)',
+    'RÉCAPITULATIF (HT, TVA, TTC)',
+    'CONDITIONS (Validité, Paiement, Délais)',
+    'ACCEPTATION (Bon pour accord, Signature client)'
+  ],
+  contract: [
+    'INTITULÉ DU CONTRAT',
+    'ENTRE LES SOUSSIGNÉS',
+    'PRÉAMBULE',
+    'ARTICLE 1 - OBJET',
+    'ARTICLE 2 - DURÉE',
+    'ARTICLE 3 - OBLIGATIONS DES PARTIES',
+    'ARTICLE 4 - CONDITIONS FINANCIÈRES',
+    'ARTICLE 5 - CONFIDENTIALITÉ',
+    'ARTICLE 6 - RÉSILIATION',
+    'ARTICLE 7 - LOI APPLICABLE',
+    'SIGNATURES DES PARTIES'
+  ],
+  memo: ['EN-TÊTE NOTE DE SERVICE', 'DE / À / DATE / OBJET', 'MESSAGE PRINCIPAL', 'ACTIONS ATTENDUES', 'SIGNATURE'],
+  meeting_notes: ['EN-TÊTE', 'PARTICIPANTS', 'ORDRE DU JOUR', 'POINTS TRAITÉS', 'DÉCISIONS', 'ACTIONS', 'PROCHAINE RÉUNION'],
+  report: ['RÉSUMÉ EXÉCUTIF', 'CONTEXTE', 'MÉTHODOLOGIE', 'CONSTATS', 'RECOMMANDATIONS', 'PLAN D\'ACTION', 'CONCLUSION'],
+  proposal: ['EXECUTIVE SUMMARY', 'COMPRÉHENSION DES ENJEUX', 'NOTRE APPROCHE', 'LIVRABLES ET PLANNING', 'ÉQUIPE', 'INVESTISSEMENT', 'RÉFÉRENCES'],
+  letter: ['ÉMETTEUR', 'DATE', 'DESTINATAIRE', 'OBJET', 'CORPS DE LA LETTRE', 'FORMULE DE POLITESSE', 'SIGNATURE'],
+  email: ['OBJET', 'SALUTATION', 'CORPS', 'CALL TO ACTION', 'SIGNATURE'],
+  procedure: ['OBJET', 'PÉRIMÈTRE', 'RESPONSABILITÉS', 'DESCRIPTION DES ÉTAPES', 'VALIDATION'],
+  specification: ['CONTEXTE', 'OBJECTIFS', 'EXIGENCES FONCTIONNELLES', 'EXIGENCES TECHNIQUES', 'LIVRABLES', 'PLANNING'],
+  audit_report: ['RÉSUMÉ', 'MÉTHODOLOGIE', 'CONSTATS', 'NON-CONFORMITÉS', 'RECOMMANDATIONS', 'PLAN D\'ACTION'],
+  policy: ['OBJET', 'CHAMP D\'APPLICATION', 'PRINCIPES', 'RÈGLES', 'CONTRÔLE', 'ENTRÉE EN VIGUEUR'],
+  generic: ['TITRE', 'CONTENU']
 };
 
-function generateSeniorSystemPrompt(classification: ClassificationResult): string {
-  const { category, industry, audience, complexity } = classification;
+const VOCABULARY_BANKS: Record<DocumentCategory, string[]> = {
+  purchase_order: ['franco de port', 'délai ferme', 'bon pour accord', 'net à 30 jours', 'date limite de livraison'],
+  invoice: ['échéance de paiement', 'taux de TVA applicable', 'escompte', 'pénalités de retard', 'indemnité forfaitaire'],
+  quote: ['validité de l\'offre', 'engagement ferme', 'exclusions', 'options complémentaires', 'réserve de propriété'],
+  contract: ['parties contractantes', 'obligations réciproques', 'tacite reconduction', 'clause résolutoire', 'force majeure'],
+  memo: ['mesure effective', 'application immédiate', 'personnel concerné', 'entrée en vigueur'],
+  meeting_notes: ['décision validée', 'action à mener', 'responsable désigné', 'échéance fixée'],
+  report: ['constat majeur', 'tendance identifiée', 'facteur de risque', 'levier d\'amélioration', 'recommandation prioritaire'],
+  proposal: ['valeur ajoutée', 'retour sur investissement', 'expertise reconnue', 'méthodologie éprouvée'],
+  letter: ['suite à notre entretien', 'comme convenu', 'je me permets de', 'veuillez agréer'],
+  email: ['pour information', 'action requise', 'pour suite à donner', 'urgent'],
+  procedure: ['étape obligatoire', 'point de contrôle', 'validation requise', 'enregistrement obligatoire'],
+  specification: ['exigence fonctionnelle', 'contrainte technique', 'critère d\'acceptation', 'livrable attendu'],
+  audit_report: ['non-conformité majeure', 'non-conformité mineure', 'observation', 'action corrective'],
+  policy: ['disposition applicable', 'mesure obligatoire', 'sanction prévue', 'contrôle de conformité'],
+  generic: []
+};
+
+function generateSeniorSystemPrompt(category: DocumentCategory): string {
   const sections = SECTION_TEMPLATES[category];
+  const vocabulary = VOCABULARY_BANKS[category];
   
-  const experienceLevel = complexity === 'executive' ? '35' : complexity === 'complex' ? '25' : '20';
-  const roleTitle = complexity === 'executive' ? 'SENIOR PARTNER (McKinsey/BCG)' : complexity === 'complex' ? 'DIRECTEUR SENIOR' : 'MANAGER EXPÉRIMENTÉ';
+  return `Tu es un DIRECTEUR SENIOR avec plus de 30 ans d'expérience dans la rédaction de documents professionnels pour des entreprises du CAC40 et des cabinets de conseil internationaux. Tu produis des documents de qualité IRRÉPROCHABLE.
 
-  return `Tu es un ${roleTitle} avec ${experienceLevel}+ ans d'expérience en rédaction de documents professionnels pour des entreprises du CAC40, fonds d'investissement internationaux et cabinets de conseil de premier rang.
+═══════════════════════════════════════════════════════════════
+RÈGLES ABSOLUES - VIOLATION = ÉCHEC CRITIQUE
+═══════════════════════════════════════════════════════════════
 
-════════════════════════════════════════════════════════════════════════════════
-RÈGLES CRITIQUES - VIOLATION = ÉCHEC TOTAL
-════════════════════════════════════════════════════════════════════════════════
+1. JAMAIS de crochets [] ni de placeholders [À compléter] ou [Insérer]
+2. JAMAIS de syntaxe markdown: #, ##, **, *, \`\`\`, ---, ___
+3. JAMAIS de phrases d'introduction IA ("Voici le document", "Ce document présente")
+4. JAMAIS de formules de conclusion artificielles ("N'hésitez pas à me contacter")
+5. JAMAIS de structure visible de template ou de squelette
+6. JAMAIS de données manifestement fausses (ex: SIRET 123 456 789)
 
-🚫 INTERDIT - NE FAIS JAMAIS CECI:
-• Placeholders: [À compléter], [Insérer], [TBD], [Date], [Nom]...
-• Markdown: #, ##, **, *, \`\`\`, ---, ___
-• Meta-talk IA: "Voici le document", "Ce document présente", "Comme demandé"
-• Fausses données évidentes: SIRET 123456789, exemple@email.com, 1 rue du Test
-• Phrases creuses et remplissage générique
+═══════════════════════════════════════════════════════════════
+QUALITÉ "BOARD-READY" EXIGÉE
+═══════════════════════════════════════════════════════════════
 
-✅ OBLIGATOIRE:
-• Données RÉALISTES et CRÉDIBLES (invente si nécessaire)
-• Entrée DIRECTE dans le contenu professionnel
-• Chaque phrase apporte de la VALEUR
-• Précision et concision maximales
+• Document INDISCERNABLE d'un travail humain expert
+• Chaque phrase apporte une VALEUR AJOUTÉE réelle
+• Vocabulaire RICHE et PRÉCIS adapté au contexte métier français
+• Si une information n'est pas fournie: INVENTER une donnée crédible OU l'omettre
+• Mise en forme PROPRE avec sections CLAIREMENT délimitées
+• Ton PROFESSIONNEL, ni trop formel ni trop familier
 
-════════════════════════════════════════════════════════════════════════════════
-FORMAT DOCUMENT: ${category.toUpperCase().replace(/_/g, ' ')}
-AUDIENCE: ${audience.toUpperCase()} | INDUSTRIE: ${industry.toUpperCase()}
-════════════════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════
+FORMAT TABLEAUX (documents transactionnels)
+═══════════════════════════════════════════════════════════════
 
-STRUCTURE ATTENDUE:
+Pour les bons de commande, factures, devis, utilise OBLIGATOIREMENT:
+| Colonne 1 | Colonne 2 | Colonne 3 |
+| Donnée 1  | Donnée 2  | Donnée 3  |
+
+Données RÉALISTES et COHÉRENTES.
+
+═══════════════════════════════════════════════════════════════
+STRUCTURE OBLIGATOIRE
+═══════════════════════════════════════════════════════════════
+
 ${sections.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
-TABLEAUX (pour documents transactionnels):
-| Colonne | Colonne | Colonne |
-| Données | Données | Données |
+═══════════════════════════════════════════════════════════════
+VOCABULAIRE MÉTIER
+═══════════════════════════════════════════════════════════════
 
-DONNÉES À INVENTER SI NON FOURNIES:
-• Référence: Format BC-2025-XXXX, FA-2025-XXXX, DEV-2025-XXXX
-• SIRET: 14 chiffres réalistes (ex: 847 952 361 00024)
-• TVA: FR + 2 chiffres + SIREN (ex: FR 56 847952361)
-• Adresses: Adresses françaises plausibles
-• Montants: Réalistes avec 2 décimales, TVA 20%
+${vocabulary.length > 0 ? vocabulary.join(' • ') : 'Vocabulaire professionnel standard.'}
 
-════════════════════════════════════════════════════════════════════════════════
-QUALITÉ FINALE: Document prêt à être présenté à un ${audience === 'board' ? 'Conseil d\'Administration' : audience === 'c_suite' ? 'Comité de Direction' : 'client exigeant'}
-════════════════════════════════════════════════════════════════════════════════`;
+═══════════════════════════════════════════════════════════════
+DONNÉES À GÉNÉRER (si non fournies)
+═══════════════════════════════════════════════════════════════
+
+• Référence: Format professionnel avec année (ex: BC-2024-0847)
+• Date: Date du jour en format français complet
+• SIRET: 14 chiffres cohérents (format: XXX XXX XXX XXXXX)
+• TVA Intracommunautaire: FR + 2 chiffres + SIREN
+• Montants: Réalistes avec séparateurs milliers et 2 décimales`;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// CONTENT VALIDATION v3.0
-// ══════════════════════════════════════════════════════════════════════════════════════════
-
-interface ValidationResult {
-  cleaned: string;
-  score: number;
-  grade: string;
-  issues: string[];
-  reliabilityScore: number;
-}
+// ============================================================================
+// CONTENT CLEANING & VALIDATION
+// ============================================================================
 
 const FORBIDDEN_PATTERNS = [
   'Voici le document', 'Voici le contenu', 'Ce document présente', 'Ce document décrit',
-  'N\'hésitez pas à', 'Je reste à votre disposition', 'Comme demandé',
-  '[À compléter]', '[Insérer]', '[TBD]', '[Votre nom]', '[Date]', '[Montant]',
-  '**', '##', '###', '```', '---', '___',
-  'SIRET 123 456 789', 'exemple@email.com', 'test@test.com',
-  'Lorem ipsum', 'Xxx', 'Yyy'
+  'Ci-dessous vous trouverez', 'N\'hésitez pas à', 'Je reste à votre disposition',
+  '[À compléter]', '[Insérer ici]', '[PLACEHOLDER]', 'Résumé du Mail'
 ];
 
-function cleanAndValidateContent(content: string): ValidationResult {
+function cleanAndValidateContent(content: string): { cleaned: string; score: number; issues: string[] } {
   const issues: string[] = [];
   let cleaned = content;
   let score = 100;
-  let reliabilityScore = 100;
   
   // Remove forbidden patterns
   for (const pattern of FORBIDDEN_PATTERNS) {
     const regex = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
     if (regex.test(cleaned)) {
-      issues.push(`Supprimé: "${pattern.slice(0, 25)}..."`);
-      score -= pattern.includes('[') ? 8 : 4;
-      reliabilityScore -= 5;
+      issues.push(`Pattern supprimé: "${pattern}"`);
+      score -= 5;
       cleaned = cleaned.replace(regex, '');
     }
   }
   
-  // Clean markdown
-  cleaned = cleaned
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/^#{1,6}\s+(.+)$/gm, '$1')
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/\*([^*]+)\*/g, '$1')
-    .replace(/__([^_]+)__/g, '$1')
-    .replace(/_([^_]+)_/g, '$1')
-    .replace(/^---+$/gm, '')
-    .replace(/^>\s+(.+)$/gm, '$1')
-    .replace(/`([^`]+)`/g, '$1');
+  // Remove markdown
+  const markdownCleaners: Array<{ pattern: RegExp; replacement: string; name: string }> = [
+    { pattern: /```[\s\S]*?```/g, replacement: '', name: 'code blocks' },
+    { pattern: /^#{1,6}\s+/gm, replacement: '', name: 'headers' },
+    { pattern: /\*\*([^*]+)\*\*/g, replacement: '$1', name: 'bold' },
+    { pattern: /\*([^*]+)\*/g, replacement: '$1', name: 'italic' },
+    { pattern: /__([^_]+)__/g, replacement: '$1', name: 'bold underscore' },
+    { pattern: /_([^_]+)_/g, replacement: '$1', name: 'italic underscore' },
+    { pattern: /^---+$/gm, replacement: '', name: 'hr' },
+    { pattern: /^___+$/gm, replacement: '', name: 'hr' },
+    { pattern: /^\*\*\*+$/gm, replacement: '', name: 'hr' },
+  ];
   
-  // Remove invalid brackets
+  for (const { pattern, replacement, name } of markdownCleaners) {
+    if (pattern.test(cleaned)) {
+      issues.push(`Markdown nettoyé: ${name}`);
+      score -= 3;
+      cleaned = cleaned.replace(pattern, replacement);
+    }
+  }
+  
+  // Remove invalid brackets (but keep table format)
   const bracketMatches = cleaned.match(/\[[^\]|]*\]/g);
   if (bracketMatches) {
-    for (const bracket of bracketMatches) {
-      if (bracket.toLowerCase().includes('compléter') || 
-          bracket.toLowerCase().includes('insérer') ||
-          bracket.includes('...') || bracket === '[]') {
-        cleaned = cleaned.replace(bracket, '');
-        issues.push(`Placeholder supprimé: ${bracket.slice(0, 25)}...`);
-        score -= 8;
-        reliabilityScore -= 10;
-      }
+    const invalidBrackets = bracketMatches.filter(m => 
+      !m.includes('|') && 
+      m.length < 100 && 
+      (m.includes('compléter') || m.includes('insérer') || m.includes('À') || m.includes('...'))
+    );
+    for (const bracket of invalidBrackets) {
+      cleaned = cleaned.replace(bracket, '');
+      issues.push(`Placeholder supprimé: ${bracket.slice(0, 30)}...`);
+      score -= 10;
     }
   }
   
@@ -297,24 +360,12 @@ function cleanAndValidateContent(content: string): ValidationResult {
     .replace(/^\s*\n/gm, '\n')
     .trim();
   
-  // Reliability checks
-  if (cleaned.length < 200) {
-    reliabilityScore -= 20;
-    issues.push('Contenu trop court');
-  }
-  if (!/\d/.test(cleaned)) {
-    reliabilityScore -= 10;
-    issues.push('Aucun chiffre détecté');
-  }
-  
-  const grade = score >= 95 ? 'A+' : score >= 85 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
-  
-  return { cleaned, score: Math.max(0, score), grade, issues, reliabilityScore: Math.max(0, reliabilityScore) };
+  return { cleaned, score: Math.max(0, score), issues };
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// CONTENT PARSING v3.0
-// ══════════════════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// CONTENT PARSING
+// ============================================================================
 
 interface ContentSection {
   type: 'heading' | 'paragraph' | 'list' | 'table';
@@ -329,8 +380,10 @@ function parseContentIntoSections(content: string): ContentSection[] {
   const lines = content.split('\n');
   
   let currentParagraph = '';
-  let tableRows: string[][] = [];
+  let inList = false;
+  let listItems: string[] = [];
   let inTable = false;
+  let tableRows: string[][] = [];
   
   for (const line of lines) {
     const trimmedLine = line.trim();
@@ -341,13 +394,22 @@ function parseContentIntoSections(content: string): ContentSection[] {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
       }
+      if (inList && listItems.length > 0) {
+        sections.push({ type: 'list', text: '', items: [...listItems] });
+        listItems = [];
+        inList = false;
+      }
+      
+      // Skip separator rows
       if (/^\|[-:\s|]+\|$/.test(trimmedLine)) continue;
+      
       inTable = true;
       const cells = trimmedLine.split('|').filter(c => c.trim()).map(c => c.trim());
       tableRows.push(cells);
       continue;
     }
     
+    // End of table
     if (inTable && !trimmedLine.startsWith('|')) {
       if (tableRows.length > 0) {
         sections.push({ type: 'table', text: '', rows: [...tableRows] });
@@ -361,11 +423,16 @@ function parseContentIntoSections(content: string): ContentSection[] {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
       }
+      if (inList && listItems.length > 0) {
+        sections.push({ type: 'list', text: '', items: [...listItems] });
+        listItems = [];
+        inList = false;
+      }
       continue;
     }
     
-    // Uppercase headings (main sections)
-    if (/^[A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ][A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ\s\-\d'']{2,}$/.test(trimmedLine) && trimmedLine.length <= 60) {
+    // Uppercase headings (TITRE, SECTION, etc.)
+    if (/^[A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ][A-ZÉÈÀÙÂÊÎÔÛÄËÏÖÜ\s\-\d'']{2,}$/.test(trimmedLine) && trimmedLine.length <= 80) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
@@ -374,9 +441,9 @@ function parseContentIntoSections(content: string): ContentSection[] {
       continue;
     }
     
-    // Numbered headings
+    // Numbered headings (1., 1.1., ARTICLE 1, etc.)
     const numberedMatch = trimmedLine.match(/^(ARTICLE\s+)?(\d+(?:\.\d+)*)[.\-\s]+(.+)$/i);
-    if (numberedMatch && trimmedLine.length <= 80) {
+    if (numberedMatch && trimmedLine.length <= 100) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
@@ -386,8 +453,8 @@ function parseContentIntoSections(content: string): ContentSection[] {
       continue;
     }
     
-    // Section with colon
-    if (/^[A-ZÉÈÀÙÂÊÎÔÛ][a-zéèàùâêîôûäëïöü\s]{0,20}:/.test(trimmedLine) && trimmedLine.length <= 60) {
+    // Section headers with colon (Objet:, De:, etc.)
+    if (/^[A-ZÉÈÀÙÂÊÎÔÛ][a-zéèàùâêîôûäëïöü\s]{0,20}:/.test(trimmedLine) && trimmedLine.length <= 80) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
@@ -397,28 +464,42 @@ function parseContentIntoSections(content: string): ContentSection[] {
     }
     
     // Bullet points
-    if (/^[•\-\*✓✗▸►]\s+/.test(trimmedLine)) {
+    if (/^[•\-\*]\s+/.test(trimmedLine)) {
       if (currentParagraph) {
         sections.push({ type: 'paragraph', text: currentParagraph.trim() });
         currentParagraph = '';
       }
-      const item = trimmedLine.replace(/^[•\-\*✓✗▸►]\s+/, '');
-      const lastSection = sections[sections.length - 1];
-      if (lastSection?.type === 'list') {
-        lastSection.items?.push(item);
-      } else {
-        sections.push({ type: 'list', text: '', items: [item] });
-      }
+      inList = true;
+      listItems.push(trimmedLine.replace(/^[•\-\*]\s+/, ''));
       continue;
     }
     
-    // Regular paragraph
+    // Numbered list items
+    if (/^\d+[.)]\s+/.test(trimmedLine) && !numberedMatch) {
+      if (currentParagraph) {
+        sections.push({ type: 'paragraph', text: currentParagraph.trim() });
+        currentParagraph = '';
+      }
+      inList = true;
+      listItems.push(trimmedLine);
+      continue;
+    }
+    
+    if (inList && listItems.length > 0 && !/^[•\-\*\d]/.test(trimmedLine)) {
+      sections.push({ type: 'list', text: '', items: [...listItems] });
+      listItems = [];
+      inList = false;
+    }
+    
     currentParagraph += (currentParagraph ? ' ' : '') + trimmedLine;
   }
   
-  // Flush remaining
+  // Handle remaining content
   if (currentParagraph) {
     sections.push({ type: 'paragraph', text: currentParagraph.trim() });
+  }
+  if (listItems.length > 0) {
+    sections.push({ type: 'list', text: '', items: listItems });
   }
   if (tableRows.length > 0) {
     sections.push({ type: 'table', text: '', rows: tableRows });
@@ -427,31 +508,26 @@ function parseContentIntoSections(content: string): ContentSection[] {
   return sections;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// CONSULTING-GRADE COLOR SCHEMES v3.0
-// ══════════════════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// DOCUMENT GENERATION (Senior Word Styling)
+// ============================================================================
 
-const COLOR_SCHEMES: Record<DocumentCategory, { primary: string; accent: string; light: string; headerBg: string }> = {
-  purchase_order: { primary: '1E3A5F', accent: '2E7D32', light: 'F0F7F0', headerBg: '1E3A5F' },
-  invoice: { primary: '1F2937', accent: '1976D2', light: 'EFF6FF', headerBg: '1F2937' },
-  quote: { primary: '0D47A1', accent: 'FF6F00', light: 'FFF8E1', headerBg: '0D47A1' },
-  contract: { primary: '1B1B1B', accent: '374151', light: 'F3F4F6', headerBg: '1B1B1B' },
-  memo: { primary: '1565C0', accent: '0277BD', light: 'E3F2FD', headerBg: '1565C0' },
-  meeting_notes: { primary: '2E7D32', accent: '388E3C', light: 'E8F5E9', headerBg: '2E7D32' },
-  report: { primary: '1A237E', accent: '283593', light: 'E8EAF6', headerBg: '1A237E' },
-  proposal: { primary: '4527A0', accent: '7B1FA2', light: 'F3E5F5', headerBg: '4527A0' },
-  letter: { primary: '37474F', accent: '455A64', light: 'ECEFF1', headerBg: '37474F' },
-  email: { primary: '424242', accent: '616161', light: 'FAFAFA', headerBg: '424242' },
-  procedure: { primary: '00695C', accent: '00897B', light: 'E0F2F1', headerBg: '00695C' },
-  specification: { primary: '1565C0', accent: '1976D2', light: 'E3F2FD', headerBg: '1565C0' },
-  audit_report: { primary: 'B71C1C', accent: 'C62828', light: 'FFEBEE', headerBg: 'B71C1C' },
-  policy: { primary: '4A148C', accent: '6A1B9A', light: 'F3E5F5', headerBg: '4A148C' },
-  executive_brief: { primary: '0D47A1', accent: '1565C0', light: 'E3F2FD', headerBg: '0D47A1' },
-  board_memo: { primary: '1B5E20', accent: '2E7D32', light: 'E8F5E9', headerBg: '1B5E20' },
-  investment_memo: { primary: '311B92', accent: '4527A0', light: 'EDE7F6', headerBg: '311B92' },
-  due_diligence: { primary: 'BF360C', accent: 'D84315', light: 'FBE9E7', headerBg: 'BF360C' },
-  strategic_plan: { primary: '006064', accent: '00838F', light: 'E0F7FA', headerBg: '006064' },
-  generic: { primary: '1F2937', accent: '3B82F6', light: 'EFF6FF', headerBg: '1F2937' }
+const COLOR_SCHEMES: Record<DocumentCategory, { primary: string; accent: string; light: string }> = {
+  purchase_order: { primary: '1E3A5F', accent: '2E7D32', light: 'E8F5E9' },
+  invoice: { primary: '1F2937', accent: '1976D2', light: 'E3F2FD' },
+  quote: { primary: '0D47A1', accent: 'FF6F00', light: 'FFF3E0' },
+  contract: { primary: '263238', accent: '37474F', light: 'ECEFF1' },
+  memo: { primary: '1565C0', accent: '0277BD', light: 'E1F5FE' },
+  meeting_notes: { primary: '2E7D32', accent: '388E3C', light: 'E8F5E9' },
+  report: { primary: '1A237E', accent: '283593', light: 'E8EAF6' },
+  proposal: { primary: '4527A0', accent: '7B1FA2', light: 'F3E5F5' },
+  letter: { primary: '37474F', accent: '455A64', light: 'ECEFF1' },
+  email: { primary: '424242', accent: '616161', light: 'F5F5F5' },
+  procedure: { primary: '00695C', accent: '00897B', light: 'E0F2F1' },
+  specification: { primary: '1565C0', accent: '1976D2', light: 'E3F2FD' },
+  audit_report: { primary: 'B71C1C', accent: 'C62828', light: 'FFEBEE' },
+  policy: { primary: '4A148C', accent: '6A1B9A', light: 'F3E5F5' },
+  generic: { primary: '1F2937', accent: '3C4DFE', light: 'E8EAF6' }
 };
 
 function generateEnrichedReference(category: DocumentCategory): { reference: string; date: string } {
@@ -463,9 +539,7 @@ function generateEnrichedReference(category: DocumentCategory): { reference: str
     purchase_order: 'BC', invoice: 'FA', quote: 'DEV', contract: 'CTR',
     memo: 'NS', meeting_notes: 'CR', report: 'RAP', proposal: 'PROP',
     letter: 'COU', email: 'MSG', procedure: 'PROC', specification: 'CDC',
-    audit_report: 'AUD', policy: 'POL', executive_brief: 'BRIEF',
-    board_memo: 'BOARD', investment_memo: 'INV', due_diligence: 'DD',
-    strategic_plan: 'STRAT', generic: 'DOC'
+    audit_report: 'AUD', policy: 'POL', generic: 'DOC'
   };
   
   return {
@@ -474,100 +548,36 @@ function generateEnrichedReference(category: DocumentCategory): { reference: str
   };
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// SENIOR WORD DOCUMENT GENERATION v3.0 - McKINSEY/BCG STYLE
-// ══════════════════════════════════════════════════════════════════════════════════════════
-
 async function generateSeniorWordDocument(
   title: string, 
   content: string, 
-  classification: ClassificationResult,
-  validation: ValidationResult
+  category: DocumentCategory
 ): Promise<Uint8Array> {
-  const sections = parseContentIntoSections(validation.cleaned);
-  const { category, complexity, audience } = classification;
+  const { cleaned } = cleanAndValidateContent(content);
+  const sections = parseContentIntoSections(cleaned);
   const colors = COLOR_SCHEMES[category];
   const { reference, date } = generateEnrichedReference(category);
   
   const children: any[] = [];
-  const isExecutive = complexity === 'executive' || audience === 'board' || audience === 'c_suite';
   
-  // ══════════════════════════════════════════════════════════════════════════════════
-  // COVER BLOCK - CONSULTING STYLE
-  // ══════════════════════════════════════════════════════════════════════════════════
-  
-  if (isExecutive) {
-    // Confidentiality banner
-    children.push(
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: "  STRICTEMENT CONFIDENTIEL  ",
-            bold: true,
-            size: 18,
-            font: "Calibri",
-            color: "FFFFFF",
-            allCaps: true,
-          }),
-        ],
-        alignment: AlignmentType.RIGHT,
-        shading: { fill: 'C62828', type: ShadingType.SOLID },
-        spacing: { after: 200 },
-      })
-    );
-  }
-  
-  // Quality indicator badge
-  const qualityEmoji = validation.grade === 'A+' || validation.grade === 'A' ? '✓' : validation.grade === 'B' ? '◐' : '⚠';
-  const qualityColor = validation.grade === 'A+' || validation.grade === 'A' ? '2E7D32' : validation.grade === 'B' ? 'FF8F00' : 'C62828';
-  
+  // Document title with professional styling
   children.push(
     new Paragraph({
-      children: [
-        new TextRun({
-          text: `${qualityEmoji} Qualité: ${validation.grade} (${validation.score}/100)`,
-          size: 16,
-          font: "Calibri",
-          color: qualityColor,
-        }),
-        new TextRun({
-          text: `  │  Fiabilité: ${validation.reliabilityScore}%`,
-          size: 16,
-          font: "Calibri",
-          color: validation.reliabilityScore >= 80 ? '2E7D32' : validation.reliabilityScore >= 60 ? 'FF8F00' : 'C62828',
-        }),
-      ],
-      alignment: AlignmentType.RIGHT,
-      spacing: { after: 300 },
-    })
-  );
-  
-  // Main title with accent bar
-  children.push(
-    new Paragraph({
-      border: {
-        left: {
-          color: colors.accent,
-          space: 15,
-          style: BorderStyle.SINGLE,
-          size: 48,
-        },
-      },
       children: [
         new TextRun({
           text: title.toUpperCase(),
           bold: true,
-          size: isExecutive ? 56 : 48,
+          size: 44,
           font: "Calibri Light",
           color: colors.primary,
         }),
       ],
-      spacing: { before: 200, after: 100 },
-      indent: { left: convertInchesToTwip(0.3) },
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
     })
   );
   
-  // Reference & date line
+  // Reference and date line
   children.push(
     new Paragraph({
       children: [
@@ -579,77 +589,63 @@ async function generateSeniorWordDocument(
           bold: true,
         }),
         new TextRun({
-          text: `   │   ${date}`,
+          text: `  │  ${date}`,
           size: 22,
           font: "Calibri",
           color: '6B7280',
         }),
-        new TextRun({
-          text: `   │   ${category.replace(/_/g, ' ').toUpperCase()}`,
-          size: 18,
-          font: "Calibri",
-          color: '9CA3AF',
-        }),
       ],
-      spacing: { after: 100 },
-      indent: { left: convertInchesToTwip(0.3) },
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 300 },
     })
   );
   
-  // Separator line
+  // Decorative line
   children.push(
     new Paragraph({
       border: {
         bottom: {
-          color: colors.light.replace('#', ''),
+          color: colors.accent,
           space: 1,
           style: BorderStyle.SINGLE,
-          size: 24,
+          size: 18,
         },
       },
       spacing: { after: 400 },
     })
   );
   
-  // ══════════════════════════════════════════════════════════════════════════════════
-  // CONTENT SECTIONS - PROFESSIONAL FORMATTING
-  // ══════════════════════════════════════════════════════════════════════════════════
-  
+  // Process content sections
   for (const section of sections) {
     if (section.type === 'heading') {
       const level = section.level || 1;
-      const fontSize = level === 1 ? 30 : level === 2 ? 26 : 22;
+      const fontSize = level === 1 ? 32 : level === 2 ? 28 : 24;
       const color = level === 1 ? colors.primary : level === 2 ? colors.accent : '4B5563';
       const spaceBefore = level === 1 ? 400 : level === 2 ? 300 : 200;
+      const spaceAfter = level === 1 ? 200 : 150;
       
-      const headingParagraph: any = {
-        children: [
-          new TextRun({
-            text: section.text,
-            bold: true,
-            size: fontSize,
-            font: level === 1 ? "Calibri Light" : "Calibri",
-            color: color,
-          }),
-        ],
-        spacing: { before: spaceBefore, after: level === 1 ? 200 : 150 },
-      };
-      
-      // Add left border for level 1 headings (consulting style)
-      if (level === 1) {
-        headingParagraph.border = {
-          left: {
-            color: colors.accent,
-            space: 10,
-            style: BorderStyle.SINGLE,
-            size: 24,
-          },
-        };
-        headingParagraph.indent = { left: convertInchesToTwip(0.2) };
-      }
-      
-      children.push(new Paragraph(headingParagraph));
-      
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: section.text,
+              bold: true,
+              size: fontSize,
+              font: level === 1 ? "Calibri Light" : "Calibri",
+              color: color,
+            }),
+          ],
+          spacing: { before: spaceBefore, after: spaceAfter },
+          border: level === 1 ? {
+            bottom: {
+              color: colors.light.replace('#', ''),
+              space: 4,
+              style: BorderStyle.SINGLE,
+              size: 8,
+            },
+          } : undefined,
+        })
+      );
     } else if (section.type === 'paragraph') {
       children.push(
         new Paragraph({
@@ -665,15 +661,14 @@ async function generateSeniorWordDocument(
           alignment: AlignmentType.JUSTIFIED,
         })
       );
-      
     } else if (section.type === 'list' && section.items) {
       for (const item of section.items) {
         children.push(
           new Paragraph({
             children: [
               new TextRun({
-                text: "► ",
-                size: 22,
+                text: "▸ ",
+                size: 24,
                 font: "Calibri",
                 color: colors.accent,
                 bold: true,
@@ -690,12 +685,12 @@ async function generateSeniorWordDocument(
           })
         );
       }
+      // Add spacing after list
       children.push(new Paragraph({ spacing: { after: 150 } }));
-      
     } else if (section.type === 'table' && section.rows && section.rows.length > 0) {
       const tableRows = section.rows.map((row, rowIndex) => {
         return new TableRow({
-          height: { value: 500, rule: HeightRule.ATLEAST },
+          height: { value: 450, rule: HeightRule.ATLEAST },
           children: row.map((cell) => {
             return new TableCell({
               children: [
@@ -710,16 +705,21 @@ async function generateSeniorWordDocument(
                     }),
                   ],
                   alignment: AlignmentType.CENTER,
-                  spacing: { before: 80, after: 80 },
+                  spacing: { before: 60, after: 60 },
                 }),
               ],
               verticalAlign: VerticalAlign.CENTER,
               shading: rowIndex === 0 
-                ? { fill: colors.headerBg, type: ShadingType.SOLID }
+                ? { fill: colors.primary }
                 : rowIndex % 2 === 0 
-                  ? { fill: colors.light, type: ShadingType.SOLID } 
-                  : { fill: "FFFFFF", type: ShadingType.SOLID },
-              margins: { top: 80, bottom: 80, left: 150, right: 150 },
+                  ? { fill: colors.light } 
+                  : { fill: "FFFFFF" },
+              margins: {
+                top: 60,
+                bottom: 60,
+                left: 120,
+                right: 120,
+              },
             });
           }),
         });
@@ -736,18 +736,18 @@ async function generateSeniorWordDocument(
     }
   }
   
-  // ══════════════════════════════════════════════════════════════════════════════════
-  // DOCUMENT ASSEMBLY
-  // ══════════════════════════════════════════════════════════════════════════════════
-  
+  // Create document with professional footer
   const doc = new Document({
-    creator: "AETHER AI Suite - Senior Document Intelligence v3.0",
+    creator: "AETHER AI Suite",
     title: title,
-    description: `Document ${category} - Qualité ${validation.grade}`,
+    description: `Document professionnel - ${category}`,
     styles: {
       default: {
         document: {
-          run: { font: "Calibri", size: 24 },
+          run: {
+            font: "Calibri",
+            size: 24,
+          },
         },
       },
     },
@@ -756,10 +756,10 @@ async function generateSeniorWordDocument(
         properties: {
           page: {
             margin: {
-              top: convertInchesToTwip(0.8),
-              right: convertInchesToTwip(0.9),
-              bottom: convertInchesToTwip(0.8),
-              left: convertInchesToTwip(0.9),
+              top: convertInchesToTwip(1),
+              right: convertInchesToTwip(1),
+              bottom: convertInchesToTwip(1),
+              left: convertInchesToTwip(1),
             },
           },
         },
@@ -774,18 +774,6 @@ async function generateSeniorWordDocument(
                     font: "Calibri",
                     color: "9CA3AF",
                   }),
-                  new TextRun({
-                    text: isExecutive ? `  │  ${audience.toUpperCase()}  │  ` : '  │  ',
-                    size: 18,
-                    font: "Calibri",
-                    color: "9CA3AF",
-                  }),
-                  new TextRun({
-                    text: `v3.0`,
-                    size: 16,
-                    font: "Calibri",
-                    color: colors.accent,
-                  }),
                 ],
                 alignment: AlignmentType.RIGHT,
               }),
@@ -796,57 +784,43 @@ async function generateSeniorWordDocument(
           default: new Footer({
             children: [
               new Paragraph({
-                border: {
-                  top: { color: "E5E7EB", space: 8, style: BorderStyle.SINGLE, size: 6 },
-                },
                 children: [
                   new TextRun({
-                    text: "AETHER Document Intelligence",
-                    size: 16,
-                    font: "Calibri",
-                    color: "9CA3AF",
-                  }),
-                  new TextRun({
-                    text: "  │  Qualité: ",
-                    size: 16,
-                    font: "Calibri",
-                    color: "9CA3AF",
-                  }),
-                  new TextRun({
-                    text: validation.grade,
-                    size: 16,
-                    font: "Calibri",
-                    color: qualityColor,
-                    bold: true,
-                  }),
-                  new TextRun({
-                    text: "  │  Page ",
-                    size: 16,
+                    text: "Document généré par AETHER  │  ",
+                    size: 18,
                     font: "Calibri",
                     color: "9CA3AF",
                   }),
                   new TextRun({
                     children: [PageNumber.CURRENT],
-                    size: 16,
+                    size: 18,
                     font: "Calibri",
                     color: colors.primary,
                     bold: true,
                   }),
                   new TextRun({
                     text: " / ",
-                    size: 16,
+                    size: 18,
                     font: "Calibri",
                     color: "9CA3AF",
                   }),
                   new TextRun({
                     children: [PageNumber.TOTAL_PAGES],
-                    size: 16,
+                    size: 18,
                     font: "Calibri",
                     color: colors.primary,
                     bold: true,
                   }),
                 ],
                 alignment: AlignmentType.CENTER,
+                border: {
+                  top: {
+                    color: "E5E7EB",
+                    space: 8,
+                    style: BorderStyle.SINGLE,
+                    size: 6,
+                  },
+                },
               }),
             ],
           }),
@@ -859,9 +833,9 @@ async function generateSeniorWordDocument(
   return await Packer.toBuffer(doc);
 }
 
-// ══════════════════════════════════════════════════════════════════════════════════════════
-// MAIN HANDLER v3.0
-// ══════════════════════════════════════════════════════════════════════════════════════════
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -899,37 +873,32 @@ serve(async (req) => {
       .select('*')
       .eq('id', templateId)
       .single();
+
+    const templateName = template?.name || 'Document';
     
-    // === SENIOR INTELLIGENCE v3.0: CLASSIFY DOCUMENT ===
+    // Senior Intelligence: Classify document
     const userPrompt = variables.prompt || '';
     const classification = classifyDocument(title, userPrompt);
-    const { category, industry, tone, audience, complexity } = classification;
+    const category = classification.category;
 
-    console.log(`[Senior UX v3.0] Document: "${title}"`);
-    console.log(`[Senior UX v3.0] Classification: ${category} | Industry: ${industry} | Audience: ${audience} | Complexity: ${complexity}`);
+    console.log(`[Senior UX] Document: "${title}" → Category: ${category} (confidence: ${(classification.confidence * 100).toFixed(0)}%)`);
+    console.log(`[Senior UX] Keywords detected: ${classification.detectedKeywords.join(', ') || 'none'}`);
     
-    // === GENERATE SENIOR PROMPTS ===
-    const systemPrompt = generateSeniorSystemPrompt(classification);
+    // Generate senior prompts
+    const systemPrompt = generateSeniorSystemPrompt(category);
     
-    const generatePrompt = `DOCUMENT À PRODUIRE: ${category.toUpperCase().replace(/_/g, ' ')}
+    const generatePrompt = `DOCUMENT À RÉDIGER: ${category.toUpperCase().replace('_', ' ')}
 
 TITRE: ${title}
 
-${userPrompt ? `INSTRUCTIONS SPÉCIFIQUES DU CLIENT:\n${userPrompt}` : 'Génère un document professionnel complet avec des données réalistes et crédibles.'}
+${userPrompt ? `INSTRUCTIONS SPÉCIFIQUES:\n${userPrompt}` : 'Génère un document professionnel complet avec des données réalistes.'}
 
-${Object.keys(variables).filter(k => k !== 'prompt' && variables[k]).length > 0 ? 
-  `INFORMATIONS FOURNIES:\n${Object.entries(variables).filter(([k, v]) => k !== 'prompt' && v).map(([k, v]) => `• ${k}: ${v}`).join('\n')}` : ''}
+${Object.keys(variables).length > 0 ? 
+  `VARIABLES FOURNIES:\n${Object.entries(variables).filter(([k]) => k !== 'prompt').map(([k, v]) => `• ${k}: ${v}`).join('\n')}` : ''}
 
-════════════════════════════════════════════════════════════════
-GÉNÈRE MAINTENANT LE DOCUMENT COMPLET
-Niveau attendu: ${complexity.toUpperCase()} - Audience: ${audience.toUpperCase()}
-Le document doit être IMMÉDIATEMENT UTILISABLE sans modification.
-════════════════════════════════════════════════════════════════`;
-
-    // Use PRO model for executive documents, FLASH for others
-    const model = complexity === 'executive' ? 'google/gemini-2.5-pro' : 'google/gemini-2.5-flash';
-    
-    console.log(`[Senior UX v3.0] Using model: ${model}`);
+══════════════════════════════════════
+GÉNÈRE LE DOCUMENT COMPLET, QUALITÉ SENIOR IRRÉPROCHABLE.
+══════════════════════════════════════`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -938,12 +907,12 @@ Le document doit être IMMÉDIATEMENT UTILISABLE sans modification.
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: generatePrompt },
         ],
-        temperature: 0.6,
+        temperature: 0.7,
       }),
     });
 
@@ -960,15 +929,15 @@ Le document doit être IMMÉDIATEMENT UTILISABLE sans modification.
       throw new Error('No content generated');
     }
 
-    // === VALIDATE AND CLEAN CONTENT ===
+    // Validate and clean content
     const validation = cleanAndValidateContent(content);
-    console.log(`[Senior UX v3.0] Quality: ${validation.grade} (${validation.score}/100) | Reliability: ${validation.reliabilityScore}%`);
+    console.log(`[Senior UX] Content quality score: ${validation.score}/100`);
     if (validation.issues.length > 0) {
-      console.log(`[Senior UX v3.0] Issues fixed: ${validation.issues.length}`);
+      console.log(`[Senior UX] Issues fixed: ${validation.issues.join(', ')}`);
     }
 
-    // === GENERATE WORD DOCUMENT WITH CONSULTING-GRADE STYLING ===
-    const docBuffer = await generateSeniorWordDocument(title, content, classification, validation);
+    // Generate Word document with senior styling
+    const docBuffer = await generateSeniorWordDocument(title, content, category);
     
     // Upload to storage
     const fileName = `docs/${user.id}/${Date.now()}-${title.replace(/[^a-zA-Z0-9àâäéèêëïîôùûüç\s-]/gi, '_')}.docx`;
@@ -1003,16 +972,10 @@ Le document doit être IMMÉDIATEMENT UTILISABLE sans modification.
         status: 'completed',
         embedding_status: 'pending',
         metadata: JSON.stringify({ 
-          category,
-          industry,
-          audience,
-          complexity,
-          generated_with: 'senior_intelligence_v3',
+          category, 
+          generated_with: 'senior_intelligence',
           quality_score: validation.score,
-          quality_grade: validation.grade,
-          reliability_score: validation.reliabilityScore,
-          detected_keywords: classification.detectedKeywords,
-          model_used: model
+          detected_keywords: classification.detectedKeywords
         })
       })
       .select()
@@ -1023,21 +986,14 @@ Le document doit être IMMÉDIATEMENT UTILISABLE sans modification.
       throw new Error('Failed to save document');
     }
 
-    console.log(`[Senior UX v3.0] Document generated successfully: ${document.id}`);
+    console.log(`[Senior UX] Document generated successfully: ${document.id}`);
 
     return new Response(
       JSON.stringify({ 
         document,
         downloadUrl: signedUrlData?.signedUrl,
-        documentId: document.id,
         category,
-        industry,
-        audience,
-        complexity,
-        qualityScore: validation.score,
-        qualityGrade: validation.grade,
-        reliabilityScore: validation.reliabilityScore,
-        modelUsed: model
+        qualityScore: validation.score
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

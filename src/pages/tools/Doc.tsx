@@ -147,9 +147,8 @@ export default function DocPage() {
   };
 
   const handleGenerate = async (templateId: string, variables: Record<string, string>, title: string) => {
-    const result = await generateDocument(templateId, variables, title);
+    await generateDocument(templateId, variables, title);
     setGenerateDialogOpen(false);
-    return result;
   };
 
   const handleRenameDocument = (docId: string, currentTitle: string) => {

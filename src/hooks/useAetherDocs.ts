@@ -442,22 +442,11 @@ export function useAetherDocs() {
     templateId: string,
     variables: Record<string, string>,
     title: string
-  ): Promise<{
-    document?: any;
-    downloadUrl?: string;
-    documentId?: string;
-    qualityScore?: number;
-    qualityGrade?: string;
-    reliabilityScore?: number;
-    category?: string;
-    complexity?: string;
-  } | null> => {
+  ) => {
     if (!user) return null;
 
     try {
-      toast.info('Génération du document Word en cours... (Senior UX v3.0)', {
-        description: 'Utilisation du moteur consulting-grade'
-      });
+      toast.info('Génération du document Word en cours...');
       
       const { data, error } = await supabase.functions.invoke('doc-generate-word', {
         body: { templateId, variables, title }
@@ -470,16 +459,7 @@ export function useAetherDocs() {
       }
 
       await fetchDocuments();
-      
-      // Show quality feedback to user
-      const gradeEmoji = data?.qualityGrade === 'A+' || data?.qualityGrade === 'A' ? '✓' : 
-                         data?.qualityGrade === 'B' ? '◐' : '⚠';
-      const reliabilityText = data?.reliabilityScore >= 80 ? 'Haute' : 
-                              data?.reliabilityScore >= 60 ? 'Moyenne' : 'À vérifier';
-      
-      toast.success(`Document généré avec succès`, {
-        description: `${gradeEmoji} Qualité: ${data?.qualityGrade || 'N/A'} (${data?.qualityScore || 0}/100) | Fiabilité: ${reliabilityText} (${data?.reliabilityScore || 0}%)`
-      });
+      toast.success('Document Word généré avec succès');
       
       // Auto-trigger AI analysis in background (silently)
       if (data?.documentId) {
