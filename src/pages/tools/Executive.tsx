@@ -6,23 +6,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
   RefreshCw, Crown, LayoutDashboard, Brain, Bell, 
-  Plug, Beaker, TrendingUp, AlertTriangle
+  Plug, Beaker, Radar, AlertTriangle
 } from 'lucide-react';
 import { useExecutiveInsights } from '@/hooks/useExecutiveInsights';
 import { HealthGauge } from '@/components/executive/HealthGauge';
 import { ExecutiveDashboard } from '@/components/executive/ExecutiveDashboard';
 import { StrategicAdvisor } from '@/components/executive/StrategicAdvisor';
-import { AlertsPanel } from '@/components/executive/AlertsPanel';
+import { ExecutiveAlertsPanel } from '@/components/executive/ExecutiveAlertsPanel';
 import { IntegrationHub } from '@/components/executive/IntegrationHub';
 import { ScenarioSimulator } from '@/components/executive/ScenarioSimulator';
+import { StrategicIntelligencePanel } from '@/components/executive/StrategicIntelligencePanel';
 
 export default function Executive() {
   const { connections, metrics, insights, overallHealth, loading, error, refresh } = useExecutiveInsights();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('intelligence');
 
   const criticalCount = insights.filter(i => i.priority === 'critical').length;
   const highCount = insights.filter(i => i.priority === 'high').length;
   const connectedCount = connections.filter(c => c.status === 'connected').length;
+
+  // Prepare internal metrics for intelligence correlation
+  const internalMetrics = {
+    pipeline: metrics.find(m => m.id === 'pipeline')?.value,
+    activeDeals: metrics.find(m => m.id === 'deals_active')?.value,
+    employees: metrics.find(m => m.id === 'employees')?.value,
+    openTickets: metrics.find(m => m.id === 'tickets_open')?.value,
+    complianceAlerts: metrics.find(m => m.id === 'compliance_alerts')?.value,
+  };
 
   return (
     <DashboardLayout
@@ -58,7 +68,7 @@ export default function Executive() {
               <div>
                 <h1 className="text-2xl font-bold">AETHER Executive</h1>
                 <p className="text-muted-foreground text-sm">
-                  Votre conseiller stratégique IA • Vue consolidée temps réel
+                  Conseiller stratégique IA • Veille temps réel • Niveau CAC 40
                 </p>
               </div>
             </div>
@@ -94,6 +104,13 @@ export default function Executive() {
         <div className="px-6 border-b bg-background">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-7xl mx-auto">
             <TabsList className="h-12 bg-transparent p-0 gap-1">
+              <TabsTrigger 
+                value="intelligence" 
+                className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:shadow-none"
+              >
+                <Radar className="w-4 h-4" />
+                Veille Stratégique
+              </TabsTrigger>
               <TabsTrigger 
                 value="dashboard" 
                 className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:shadow-none"
@@ -148,6 +165,16 @@ export default function Executive() {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsContent value="intelligence" className="mt-0">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-280px)]">
+                  <StrategicIntelligencePanel 
+                    sector="technologie"
+                    internalMetrics={internalMetrics}
+                  />
+                  <ExecutiveAlertsPanel insights={insights} />
+                </div>
+              </TabsContent>
+
               <TabsContent value="dashboard" className="mt-0">
                 {loading ? (
                   <div className="space-y-6">
@@ -173,7 +200,7 @@ export default function Executive() {
 
               <TabsContent value="alerts" className="mt-0">
                 <div className="h-[calc(100vh-280px)]">
-                  <AlertsPanel insights={insights} />
+                  <ExecutiveAlertsPanel insights={insights} />
                 </div>
               </TabsContent>
 
