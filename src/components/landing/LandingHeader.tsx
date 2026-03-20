@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Menu, X, Sparkles, ArrowRight } from "lucide-react";
+import { Menu, X, Mail } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
@@ -10,6 +9,8 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/legal/privacy" },
 ];
+
+const EMAIL = "maxime.maitre@edu.em-lyon.com";
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,7 +37,6 @@ export function LandingHeader() {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
-            {/* Home - only when not on homepage */}
             {!isSupplyPage && (
               <Link 
                 to="/" 
@@ -46,9 +46,6 @@ export function LandingHeader() {
               </Link>
             )}
             
-
-            
-            {/* Main nav links */}
             {navLinks.map((link) => (
               <Link 
                 key={link.href}
@@ -60,7 +57,7 @@ export function LandingHeader() {
             ))}
           </nav>
           
-          {/* Desktop CTA - Hierarchy: Demo (primary) > Login (tertiary) */}
+          {/* Desktop CTA - Email */}
           <div className="hidden md:flex items-center gap-3">
             {isSupplyPage && (
               <Link to="/auth?mode=login">
@@ -69,12 +66,13 @@ export function LandingHeader() {
                 </span>
               </Link>
             )}
-            <Link to="/demo">
-              <button className="relative px-5 py-2 text-sm font-medium text-primary-foreground rounded-full bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_100%] hover:bg-[position:100%_0] transition-all duration-500 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] group flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Request Demo</span>
-              </button>
-            </Link>
+            <a
+              href={`mailto:${EMAIL}?subject=AETHER — Contact`}
+              className="relative px-5 py-2 text-sm font-medium text-primary-foreground rounded-full bg-foreground hover:bg-foreground/90 transition-all duration-300 hover:shadow-lg active:scale-[0.97] flex items-center gap-2"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>Contact Us</span>
+            </a>
           </div>
           
           {/* Mobile Menu Button */}
@@ -90,7 +88,6 @@ export function LandingHeader() {
         {isMenuOpen && (
           <div className="md:hidden absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl py-4 px-4 animate-fade-in">
             <nav className="flex flex-col gap-1">
-              {/* Home link for mobile */}
               {!isSupplyPage && (
                 <Link
                   to="/"
@@ -101,7 +98,6 @@ export function LandingHeader() {
                 </Link>
               )}
               
-              {/* Main nav links */}
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -113,7 +109,6 @@ export function LandingHeader() {
                 </Link>
               ))}
               
-              {/* CTA buttons */}
               <div className="flex flex-col gap-2 pt-4 mt-3 border-t border-border">
                 {isSupplyPage && (
                   <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)}>
@@ -122,12 +117,14 @@ export function LandingHeader() {
                     </button>
                   </Link>
                 )}
-                <Link to="/demo" onClick={() => setIsMenuOpen(false)}>
-                  <button className="w-full py-2.5 px-4 text-sm font-medium text-primary-foreground rounded-xl bg-gradient-to-r from-primary to-violet-500 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                    <Sparkles className="w-4 h-4" />
-                    Request Demo
-                  </button>
-                </Link>
+                <a
+                  href={`mailto:${EMAIL}?subject=AETHER — Contact`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full py-2.5 px-4 text-sm font-medium text-primary-foreground rounded-xl bg-foreground flex items-center justify-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  Contact Us
+                </a>
               </div>
             </nav>
           </div>
