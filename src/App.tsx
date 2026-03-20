@@ -44,6 +44,7 @@ import Security from "./pages/legal/Security";
 
 // Product Tour
 import ProductTour from "./pages/ProductTour";
+import SupplyChain from "./pages/SupplyChain";
 
 // OAuth callbacks
 import GoogleCallback from "./pages/oauth/GoogleCallback";
@@ -92,6 +93,7 @@ const App = () => {
               <Route path="/" element={<Landing />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/product-tour" element={<ProductTour />} />
+              <Route path="/supply" element={<SupplyChain />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
               <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
