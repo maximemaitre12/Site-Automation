@@ -91,7 +91,7 @@ export function LandingHeader() {
           <div className="md:hidden absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl py-4 px-4 animate-fade-in">
             <nav className="flex flex-col gap-1">
               {/* Home link for mobile */}
-              {!isHomePage && (
+              {!isSupplyPage && (
                 <Link
                   to="/"
                   onClick={() => setIsMenuOpen(false)}
