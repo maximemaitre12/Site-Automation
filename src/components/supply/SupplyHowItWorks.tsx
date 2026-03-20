@@ -26,18 +26,18 @@ const steps = [
 ];
 
 export function SupplyHowItWorks() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
+  const { ref, isVisible } = useScrollAnimation();
 
   return (
     <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6 bg-secondary/40">
       <div className="max-w-5xl mx-auto">
-        <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-600 ${
+        <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
           How it works
         </p>
-        <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-600 delay-100 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
+        <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-500 delay-75 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
           From data silos to full visibility in weeks
         </h2>
@@ -48,10 +48,10 @@ export function SupplyHowItWorks() {
             return (
               <div
                 key={step.step}
-                className={`relative bg-card rounded-2xl border border-border p-7 transition-all duration-500 ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                className={`relative bg-card rounded-2xl border border-border p-7 transition-all duration-400 ${
+                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                 }`}
-                style={{ transitionDelay: isVisible ? `${200 + i * 100}ms` : '0ms' }}
+                style={{ transitionDelay: isVisible ? `${100 + i * 60}ms` : '0ms' }}
               >
                 <span className="text-[10px] font-mono text-muted-foreground/50 tracking-wider">{step.step}</span>
                 <div className="w-10 h-10 rounded-xl bg-foreground/[0.04] flex items-center justify-center mt-3 mb-4">

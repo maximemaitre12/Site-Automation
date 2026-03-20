@@ -33,18 +33,18 @@ const painPoints = [
 ];
 
 export function SupplyPainPoints() {
-  const { ref, isVisible } = useStaggerAnimation(painPoints.length, { threshold: 0.15 });
+  const { ref, isVisible } = useStaggerAnimation(painPoints.length);
 
   return (
     <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6 bg-secondary/40">
       <div className="max-w-5xl mx-auto">
-        <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-600 ${
+        <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
           The problems you already know
         </p>
-        <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight transition-all duration-600 delay-100 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
+        <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight transition-all duration-500 delay-75 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
           Every day without visibility costs you money
         </h2>
@@ -55,10 +55,10 @@ export function SupplyPainPoints() {
             return (
               <div
                 key={point.title}
-                className={`group relative bg-card rounded-2xl border border-border p-7 sm:p-8 transition-all duration-500 hover:shadow-lg hover:shadow-foreground/[0.03] hover:border-foreground/10 ${
-                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                className={`group relative bg-card rounded-2xl border border-border p-7 sm:p-8 transition-all duration-400 hover:shadow-lg hover:shadow-foreground/[0.03] hover:border-foreground/10 ${
+                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                 }`}
-                style={{ transitionDelay: isVisible ? `${150 + i * 80}ms` : '0ms' }}
+                style={{ transitionDelay: isVisible ? `${80 + i * 60}ms` : '0ms' }}
               >
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-foreground/[0.04] flex items-center justify-center shrink-0 group-hover:bg-foreground/[0.07] transition-colors duration-300">

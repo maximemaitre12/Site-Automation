@@ -20,25 +20,25 @@ function getNode(id: string) {
 }
 
 export function SupplyDashboard() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
+  const { ref, isVisible } = useScrollAnimation();
 
   return (
     <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
-        <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-600 ${
+        <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
           Your command center
         </p>
-        <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-600 delay-100 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
+        <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-500 delay-75 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
           One screen. Full visibility.
         </h2>
 
         {/* Dashboard shell */}
-        <div className={`relative bg-[hsl(230_25%_9%)] rounded-2xl border border-white/[0.06] overflow-hidden shadow-2xl shadow-black/20 transition-all duration-700 delay-200 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        <div className={`relative bg-[hsl(230_25%_9%)] rounded-2xl border border-white/[0.06] overflow-hidden shadow-2xl shadow-black/20 transition-all duration-500 delay-100 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           {/* Top bar */}
           <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
@@ -78,7 +78,6 @@ export function SupplyDashboard() {
               <div className="lg:col-span-3 bg-white/[0.02] rounded-xl border border-white/[0.04] p-4 relative min-h-[220px]">
                 <p className="text-[10px] font-medium text-white/30 uppercase tracking-wider mb-3">Global Flows</p>
                 <svg viewBox="0 0 100 80" className="w-full h-auto" fill="none">
-                  {/* Edges */}
                   {edges.map(([from, to]) => {
                     const a = getNode(from);
                     const b = getNode(to);
@@ -93,7 +92,6 @@ export function SupplyDashboard() {
                       />
                     );
                   })}
-                  {/* Nodes */}
                   {nodes.map((node) => (
                     <g key={node.id}>
                       <circle
