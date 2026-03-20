@@ -90,36 +90,34 @@ const App = () => {
         <AuthProvider>
           <BlockLibraryProvider>
             <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<SupplyChain />} />
-              <Route path="/demo" element={<Demo />} />
-              <Route path="/product-tour" element={<ProductTour />} />
-              <Route path="/supply" element={<Landing />} />
+              {/* Public routes with shared header/footer */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<SupplyChain />} />
+                <Route path="/demo" element={<Demo />} />
+                <Route path="/product-tour" element={<ProductTour />} />
+                <Route path="/supply" element={<Landing />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/resources/documentation" element={<Documentation />} />
+                <Route path="/legal/privacy" element={<Privacy />} />
+                <Route path="/legal/terms" element={<Terms />} />
+                <Route path="/legal/security" element={<Security />} />
+              </Route>
+
+              {/* Auth (no shared layout) */}
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
               <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
               
-              {/* Company pages */}
+              {/* Redirects */}
               <Route path="/about" element={<Navigate to="/" replace />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/contact" element={<Contact />} />
-              
-              {/* Resources pages */}
-              <Route path="/resources/documentation" element={<Documentation />} />
-              
-              {/* Legal pages */}
-              <Route path="/legal/privacy" element={<Privacy />} />
-              <Route path="/legal/terms" element={<Terms />} />
-              <Route path="/legal/security" element={<Security />} />
-              
-              {/* OAuth callbacks - receive code from Google and exchange via backend */}
-              <Route path="/oauth/google/callback" element={<GoogleCallback />} />
-
-              {/* Legacy short paths (avoid 404s from old links) */}
               <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
               <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
               <Route path="/security" element={<Navigate to="/legal/security" replace />} />
               <Route path="/docs" element={<Navigate to="/resources/documentation" replace />} />
+              
+              {/* OAuth callbacks */}
+              <Route path="/oauth/google/callback" element={<GoogleCallback />} />
               {/* Protected routes - require subscription AND company */}
               <Route path="/dashboard" element={<RequireCompany><Dashboard /></RequireCompany>} />
               <Route path="/tools/flow" element={<RequireCompany><Flow /></RequireCompany>} />
