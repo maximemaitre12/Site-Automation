@@ -1,91 +1,95 @@
 
-# Plan de Correction - Assistant IA Flow
 
-## Problemes identifies
+# Page `/supply` — Version Prospect-Ready
 
-1. **Collisions d'ID de messages** : Plusieurs endroits dans le code utilisent encore `Date.now().toString()` pour generer les IDs des messages, ce qui cause des collisions quand plusieurs messages sont crees dans la meme milliseconde. React ignore alors certains messages (d'ou les messages utilisateur qui n'apparaissent pas).
+## Constat
 
-2. **Mise a jour du canvas qui echoue** : La fonction `handleAIModify` est appelee (le log console le confirme), mais le canvas ne se met pas a jour visuellement. Cela peut etre du a:
-   - Un probleme de reference de closure stale dans le callback
-   - Le composant `ProCanvasV2` qui ne detecte pas le changement d'etat
+La page doit convaincre un Directeur Supply Chain ou un COO en 30 secondes. Pas de jargon IA, pas de features techniques. Uniquement : "je comprends votre probleme, voici la preuve que je le resous."
 
-3. **Sauvegarde automatique qui interfere** : Le debounce de 500ms de la sauvegarde automatique pourrait creer des conflits avec la mise a jour immediate.
+## Architecture de la page
 
-## Corrections a apporter
+Un seul fichier `src/pages/SupplyChain.tsx` + composants dedies dans `src/components/supply/`. Route `/supply` ajoutee dans `App.tsx`. Aucune autre page modifiee. Aucun lien vers cette page.
 
-### Fichier 1: `src/components/flow/FlowAIAssistant.tsx`
+### Section 1 — Hero (credibilite immediate)
 
-Remplacer TOUS les `Date.now().toString()` restants par `crypto.randomUUID()`:
+Fond blanc epure, style Apple/McKinsey. Pas d'animation flashy.
 
-```text
-Lignes a corriger:
-- Ligne 529: (Date.now() + 1).toString() -> crypto.randomUUID()
-- Ligne 624: (Date.now() + 1).toString() -> crypto.randomUUID()
-- Ligne 667: (Date.now() + 2).toString() -> crypto.randomUUID()
-- Ligne 734: (Date.now() + 1).toString() -> crypto.randomUUID()
-- Ligne 745: (Date.now() + 1).toString() -> crypto.randomUUID()
-- Ligne 750: (Date.now() + 1).toString() -> crypto.randomUUID()
-```
+- **Titre** : "Anticipate. Optimize. Deliver." (sobre, pas de "AI" dans le titre)
+- **Sous-titre** : "The intelligent platform that gives supply chain leaders full visibility — from supplier risk to last-mile delivery."
+- **Chiffre unique accrocheur** : "Companies using predictive supply chain AI reduce stockouts by 35% and logistics costs by 23%." (source-style, credible)
+- **CTA** : "Book a Supply Chain Assessment" → lien vers `/demo`
+- **Pas de logo cloud, pas de badges tech** — ca fait startup, pas enterprise
 
-### Fichier 2: `src/pages/tools/Flow.tsx`
+### Section 2 — Les 4 douleurs (identification immediate)
 
-Ameliorer `handleAIModify` pour forcer la mise a jour du state:
+Grille 2x2, cartes sobres avec icones monochromes. Chaque carte :
+- Un titre = le probleme du prospect
+- Un chiffre = le cout de ne rien faire
+- Une ligne = ce que la plateforme change
 
-```typescript
-const handleAIModify = useCallback((blocks: WorkflowBlock[], connections: BlockConnection[]) => {
-  if (!selectedWorkflowId) {
-    toast.error('Aucun workflow selectionne');
-    return;
-  }
-  
-  // Apply auto-layout
-  const layoutedBlocks = blocks.length > 0 
-    ? applyLayoutToBlocks(blocks, autoLayoutBlocks(blocks, connections))
-    : blocks;
-  
-  console.log('AI Modify: applying', layoutedBlocks.length, 'blocks to canvas');
-  
-  // Force new array references to trigger re-render
-  setLocalBlocks([...layoutedBlocks]);
-  setLocalConnections([...connections]);
-  
-  // Trigger fit view after a microtask to ensure state is updated
-  requestAnimationFrame(() => {
-    setFitViewNonce(n => n + 1);
-  });
-  
-  toast.success('Workflow modifie');
-}, [selectedWorkflowId]);
-```
+| Carte | Probleme | Cout | Solution |
+|-------|----------|------|----------|
+| Demand Blindness | "Your forecasts are wrong 40% of the time" | "$2.1M avg excess inventory per site" | Probabilistic multi-scenario forecasting |
+| Supplier Risk | "You discover supplier failures after impact" | "72h average detection delay" | Real-time supplier scoring & early warnings |
+| Logistics Waste | "Routes and loads are planned manually" | "15-25% transport cost overruns" | Automated consolidation & route optimization |
+| Compliance Gaps | "Audits are reactive, traceability is fragmented" | "€500K+ avg regulatory penalty" | Continuous automated compliance monitoring |
 
-### Verification du passage de donnees
+### Section 3 — Dashboard simule (preuve visuelle)
 
-Dans `handleApplyAction` (ligne 774-776), verifier que les donnees sont bien structurees:
+Un composant statique mais visuellement riche montrant un "Control Tower" :
+- Mini carte mondiale avec 5-6 points relies par des lignes (CSS pur, pas de lib)
+- 4 KPIs animes (OTIF 94.2%, Lead Time 12.3j, Stock Coverage 32j, Risk Score 2/10)
+- 1 alerte active : "Supplier Shenzhen Electronics — 72h delay risk — Confidence: 91%"
+- 1 prediction : "Q3 demand spike +18% on SKU category A — 3 scenarios available"
 
-```typescript
-} else if (action.type === 'modify' && data) {
-  console.log('Applying modify action with blocks:', data.blocks?.length, 'connections:', data.connections?.length);
-  if (data.blocks && Array.isArray(data.blocks)) {
-    onModifyWorkflow(data.blocks, data.connections || []);
-    toast.success('Workflow modifie !');
-  } else {
-    console.error('Invalid data structure for modify action:', data);
-    toast.error('Erreur: donnees invalides');
-  }
-}
-```
+Design : fond sombre (contraste), coins arrondis, style terminal/dashboard pro.
 
-## Resume des modifications
+### Section 4 — Comment ca marche (3 etapes)
 
-| Fichier | Modification | Raison |
-|---------|--------------|--------|
-| FlowAIAssistant.tsx | Remplacer 6 occurrences de Date.now() par crypto.randomUUID() | Eviter les collisions d'ID de messages |
-| FlowAIAssistant.tsx | Ajouter validation des donnees dans handleApplyAction | Debug et robustesse |
-| Flow.tsx | Forcer nouvelles references avec spread operator | Garantir la detection de changement par React |
-| Flow.tsx | Utiliser requestAnimationFrame pour fitView | Synchroniser avec le cycle de rendu |
+Horizontal, minimaliste :
+1. **Connect** — "Your ERP, WMS, TMS in 48h" (logos SAP, Oracle, Microsoft Dynamics en gris)
+2. **Analyze** — "AI maps your flows, detects anomalies, builds prediction models"
+3. **Act** — "Alerts, forecasts, and recommendations — before problems become crises"
 
-## Impact attendu
+### Section 5 — Cas client chiffre
 
-1. Les messages utilisateur s'afficheront correctement dans la conversation
-2. Le canvas se mettra a jour immediatement apres avoir clique sur "Appliquer les modifications"
-3. Plus d'erreurs "duplicate key" dans la console
+Card sobre style "case study brief" :
+- **Titre** : "How a global manufacturer cut logistics costs by 23% in 90 days"
+- **Contexte** : 12 sites, 400+ suppliers, 3 continents
+- **3 resultats** : OTIF +15pts, stock -18%, supplier incidents detected 72h earlier
+- **Citation** : "For the first time, we see our entire supply chain in real time." — VP Supply Chain, Industrial Group
+
+### Section 6 — CTA final
+
+Sobre, direct :
+- "Ready to see what your supply chain is missing?"
+- Bouton "Book Your Assessment" → `/demo`
+- Ligne de confiance : "No commitment · 48h deployment · Dedicated support"
+
+### Section 7 — Footer minimal
+
+Reprise du footer existant (import `LandingFooter`).
+
+## Fichiers
+
+| Action | Fichier |
+|--------|---------|
+| Creer | `src/pages/SupplyChain.tsx` — page principale |
+| Creer | `src/components/supply/SupplyHero.tsx` |
+| Creer | `src/components/supply/SupplyPainPoints.tsx` |
+| Creer | `src/components/supply/SupplyDashboard.tsx` |
+| Creer | `src/components/supply/SupplyHowItWorks.tsx` |
+| Creer | `src/components/supply/SupplyCaseStudy.tsx` |
+| Creer | `src/components/supply/SupplyCTA.tsx` |
+| Modifier (1 ligne) | `src/App.tsx` — ajout `<Route path="/supply" element={<SupplyChain />} />` |
+
+Header : reutilisation de `LandingHeader` existant. Footer : reutilisation de `LandingFooter` existant. Zero modification de ces composants.
+
+## Principes de design
+
+- Police Inter (deja en place), pas de police supplementaire
+- Palette : blanc + gris + indigo primaire existant, section dashboard en fond sombre pour contraste
+- Zero animation gratuite — uniquement des fade-in au scroll (`useScrollAnimation` existant)
+- Espace genereux, texte aere, hierarchie claire
+- Mobile-first responsive (grille 1 col mobile, 2 col desktop)
+
