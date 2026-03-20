@@ -62,7 +62,7 @@ export function LandingHeader() {
           
           {/* Desktop CTA - Hierarchy: Demo (primary) > Login (tertiary) */}
           <div className="hidden md:flex items-center gap-3">
-            {!isHomePage && (
+            {isSupplyPage && (
               <Link to="/auth?mode=login">
                 <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                   Log in
