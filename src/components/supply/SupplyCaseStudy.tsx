@@ -8,13 +8,13 @@ const results = [
 ];
 
 export function SupplyCaseStudy() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
+  const { ref, isVisible } = useScrollAnimation();
 
   return (
     <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        <div className={`bg-card rounded-2xl border border-border overflow-hidden transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        <div className={`bg-card rounded-2xl border border-border overflow-hidden transition-all duration-500 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           {/* Header */}
           <div className="px-7 sm:px-10 pt-8 sm:pt-10 pb-6 border-b border-border">
@@ -43,10 +43,10 @@ export function SupplyCaseStudy() {
             {results.map((r, i) => (
               <div
                 key={r.metric}
-                className={`px-7 sm:px-8 py-6 transition-all duration-500 ${
+                className={`px-7 sm:px-8 py-6 transition-all duration-400 ${
                   isVisible ? 'opacity-100' : 'opacity-0'
                 }`}
-                style={{ transitionDelay: isVisible ? `${300 + i * 100}ms` : '0ms' }}
+                style={{ transitionDelay: isVisible ? `${150 + i * 60}ms` : '0ms' }}
               >
                 <p className="text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground/50">{r.metric}</p>
                 <div className="flex items-baseline gap-2 mt-2">
@@ -60,7 +60,7 @@ export function SupplyCaseStudy() {
           </div>
 
           {/* Quote */}
-          <div className={`px-7 sm:px-10 py-7 bg-secondary/30 border-t border-border transition-all duration-700 delay-500 ${
+          <div className={`px-7 sm:px-10 py-7 bg-secondary/30 border-t border-border transition-all duration-500 delay-200 ${
             isVisible ? 'opacity-100' : 'opacity-0'
           }`}>
             <blockquote className="text-sm sm:text-base text-foreground/80 italic leading-relaxed">

@@ -9,11 +9,10 @@ interface UseScrollAnimationOptions {
 export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
   options: UseScrollAnimationOptions = {}
 ) {
-  const { threshold = 0.1, rootMargin = "0px", triggerOnce = false } = options;
+  const { threshold = 0.05, rootMargin = "0px 0px 80px 0px", triggerOnce = true } = options;
   const ref = useRef<T>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Reset function to restart animations
   const reset = useCallback(() => {
     setIsVisible(false);
   }, []);
@@ -51,7 +50,7 @@ export function useStaggerAnimation<T extends HTMLElement = HTMLDivElement>(
   const { ref, isVisible, reset } = useScrollAnimation<T>(options);
   
   const getStaggerDelay = (index: number) => ({
-    transitionDelay: `${index * 100}ms`,
+    transitionDelay: `${index * 60}ms`,
   });
 
   return { ref, isVisible, getStaggerDelay, reset };
