@@ -8,6 +8,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar globally while preserving scroll */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+html::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
 /* AETHER AI SUITE - Apple-style Modern Design System */
 
 @layer base {
