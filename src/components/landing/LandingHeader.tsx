@@ -46,15 +46,7 @@ export function LandingHeader() {
               </Link>
             )}
             
-            {/* Results - only on homepage when not scrolled */}
-            {isHomePage && !scrolled && (
-              <a 
-                href="#results" 
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
-              >
-                Results
-              </a>
-            )}
+
             
             {/* Main nav links */}
             {navLinks.map((link) => (
