@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 const allLinks = [
-  { label: "About", path: "/about" },
   { label: "Blog", path: "/blog" },
   { label: "Contact", path: "/contact" },
   { label: "Docs", path: "/resources/documentation" },
