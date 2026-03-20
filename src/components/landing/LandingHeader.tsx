@@ -37,7 +37,7 @@ export function LandingHeader() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {/* Home - only when not on homepage */}
-            {!isHomePage && (
+            {!isSupplyPage && (
               <Link 
                 to="/" 
                 className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
