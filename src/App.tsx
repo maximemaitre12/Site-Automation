@@ -90,10 +90,10 @@ const App = () => {
           <BlockLibraryProvider>
             <Routes>
               {/* Public routes */}
-              <Route path="/" element={<SupplyChain />} />
+              <Route path="/" element={<Landing />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/product-tour" element={<ProductTour />} />
-              <Route path="/landing" element={<Landing />} />
+              <Route path="/supply" element={<SupplyChain />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
               <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
