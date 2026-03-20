@@ -1,5 +1,3 @@
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
 import { Clock, User, ArrowRight, ChevronUp, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -57,24 +55,20 @@ The journey from your voice to a response:
 Your voice becomes a digital waveform. Modern systems sample at 16kHz or higher to catch all the details.
 
 2. Turning sound into text (50-200ms)
-Speech recognition models, often transformer-based like Whisper, convert those sound waves into words. Accuracy is now above 95% in most situations.
+Speech recognition models convert those sound waves into words. Accuracy is now above 95% in most situations.
 
 3. Understanding what you meant (100-300ms)
-This is where it gets interesting. The system figures out your intent, pulls out relevant details (names, dates, numbers), and considers what you said before.
+The system figures out your intent, pulls out relevant details, and considers what you said before.
 
 4. Generating a response (200-500ms)
 Based on what it understood, the system might query databases, call APIs, or generate text with a language model.
 
 5. Making it sound human (100-200ms)
-Text-to-speech turns the response into natural-sounding audio. The best neural TTS is nearly indistinguishable from a real person.
+Text-to-speech turns the response into natural-sounding audio.
 
 Why timing matters so much
 
-Natural conversation has pauses of 200-500ms. For AI to feel conversational, total latency needs to stay under a second. The big breakthrough recently has been running these steps in parallel rather than one after another.
-
-What this means for businesses
-
-This isn't just chatbot stuff. Think automated phone systems that actually get what you're saying, meeting transcription that pulls out action items, or voice-controlled data queries.`
+Natural conversation has pauses of 200-500ms. For AI to feel conversational, total latency needs to stay under a second.`
   },
   {
     id: "enterprise-ai-trends-2025",
@@ -88,27 +82,19 @@ This isn't just chatbot stuff. Think automated phone systems that actually get w
     fullContent: `Things are moving fast in enterprise AI. Here are five trends that actually have data behind them.
 
 1. AI agents are leaving the lab
-
-Gartner predicts 33% of enterprise software will include agentic AI by 2028. These aren't chatbots, they execute multi-step tasks on their own.
-
-Right now: 8% of companies have agents in production
-By end of 2025: expected to hit 23%
+Gartner predicts 33% of enterprise software will include agentic AI by 2028.
 
 2. Multimodal is now the default
-
-Text, image, voice: the boundaries are blurring. IDC says 67% of new enterprise AI projects last year were multimodal.
+IDC says 67% of new enterprise AI projects last year were multimodal.
 
 3. Governance is suddenly a priority
-
-Spending on AI governance tools jumped 340% in 2024, according to Forrester.
+Spending on AI governance tools jumped 340% in 2024.
 
 4. ROI measurement is getting serious
-
-McKinsey found that companies with mature measurement frameworks see 2.5x better returns.
+Companies with mature measurement frameworks see 2.5x better returns.
 
 5. Humans + AI beats either alone
-
-Accenture's research shows human-AI teams outperform either alone by 30% on complex work.`
+Human-AI teams outperform either alone by 30% on complex work.`
   },
   {
     id: "document-processing-evolution",
@@ -119,21 +105,14 @@ Accenture's research shows human-AI teams outperform either alone by 30% on comp
     date: "December 8, 2025",
     readTime: "5 min read",
     category: "Innovation",
-    fullContent: `Document processing has evolved through distinct generations. Each one changed what was possible.
+    fullContent: `Document processing has evolved through distinct generations.
 
-Generation 1: OCR (1990s-2000s)
-Optical Character Recognition could turn scanned documents into text. Accuracy hovered around 85-90%.
+Generation 1: OCR (1990s-2000s). Accuracy hovered around 85-90%.
+Generation 2: Template-based (2010s). Every new document type needed a new template.
+Generation 3: Machine learning (2018-2022). Accuracy jumped above 95%.
+Generation 4: LLM-powered (2023+). Now document processing can understand relationships, handle unseen types, and spot anomalies.
 
-Generation 2: Template-based (2010s)
-You could define where the invoice number goes, where the total is. Every new document type needed a new template.
-
-Generation 3: Machine learning (2018-2022)
-Systems started learning from examples. Accuracy jumped above 95%.
-
-Generation 4: LLM-powered (2023+)
-Large language models changed the game completely. Now document processing can understand how fields relate, handle unseen document types, answer questions about content, and spot anomalies.
-
-The real-world difference: traditional invoice processing takes 15-30 minutes. AI-powered: 2-5 minutes total. That's 80% less time, and almost no data entry errors.`
+The real-world difference: traditional invoice processing takes 15-30 minutes. AI-powered: 2-5 minutes. That's 80% less time.`
   },
   {
     id: "shanghai-startup-ecosystem",
@@ -146,13 +125,11 @@ The real-world difference: traditional invoice processing takes 15-30 minutes. A
     category: "Company",
     fullContent: `Shanghai didn't just happen to be where AETHER started, it shaped how we think about building products.
 
-The pace is real. Walking through Lujiazui or Zhangjiang, you feel it. Companies ship in weeks what would take months elsewhere.
+The pace is real. Companies ship in weeks what would take months elsewhere. Our first prototype took 6 weeks, built from a small Putuo apartment.
 
 The scene is surprisingly global. Shanghai's tech community is incredibly international. Meetups in Jing'an draw founders and engineers from everywhere.
 
-No money forces creativity. We started with almost nothing. In Shanghai, that's normal. This meant ruthless focus on what actually matters, building MVPs that work, and finding creative solutions instead of buying our way out.
-
-AETHER doesn't feel like typical enterprise software because we didn't build it like that. We built it like a Shanghai startup: ship fast, iterate faster, global from day one, efficient by necessity.`
+AETHER doesn't feel like typical enterprise software because we didn't build it like that. Ship fast, iterate faster, global from day one.`
   }
 ];
 
@@ -181,139 +158,106 @@ export default function Blog() {
   const filteredPosts = selectedCategory === "All" ? posts : posts.filter(p => p.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-background">
-      <LandingHeader />
-      
-      <main className="pt-20">
-        {/* Hero */}
-        <section className="pt-16 pb-10 px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-5">
-              Insights & Updates
-            </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-[1.08]">
-              The AETHER Blog
-            </h1>
-            <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Enterprise AI insights, product updates, and the future of intelligent automation.
-            </p>
-          </div>
-        </section>
+    <div className="pt-20">
+      {/* Hero */}
+      <section className="pt-16 pb-10 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-5">Insights & Updates</p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-[1.08]">The AETHER Blog</h1>
+          <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Enterprise AI insights, product updates, and the future of intelligent automation.
+          </p>
+        </div>
+      </section>
 
-        {/* Category Filter */}
-        <section className="py-4 px-4 sm:px-6 border-b border-border">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex gap-2 justify-center flex-wrap">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-[0.97] ${
-                    selectedCategory === category
-                      ? "bg-foreground text-background"
-                      : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Blog Grid */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {filteredPosts.map((post) => (
-              <article 
-                key={post.id}
-                className="rounded-2xl overflow-hidden border border-border bg-card transition-all duration-300 hover:shadow-lg hover:shadow-foreground/[0.03] hover:border-foreground/10"
+      {/* Category Filter */}
+      <section className="py-4 px-4 sm:px-6 border-b border-border">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex gap-2 justify-center flex-wrap">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-[0.97] ${
+                  selectedCategory === category
+                    ? "bg-foreground text-background"
+                    : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                }`}
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-                  <div className="relative aspect-video md:aspect-auto overflow-hidden">
-                    <img src={post.image} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
-                  </div>
-                  <div className="md:col-span-2 p-5 sm:p-7">
-                    <p className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground mb-2">
-                      {post.category}
-                    </p>
-                    <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 leading-snug">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground/70">
-                        <div className="flex items-center gap-1.5">
-                          <User className="w-3 h-3" />
-                          <span>{post.author}</span>
-                        </div>
-                        <span className="hidden sm:inline">{post.date}</span>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3 h-3" />
-                          <span>{post.readTime}</span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => setExpandedPost(expandedPost === post.id ? null : post.id)}
-                        className="flex items-center gap-1.5 text-foreground font-medium text-sm hover:gap-2.5 transition-all active:scale-[0.97]"
-                      >
-                        {expandedPost === post.id ? "Close" : "Read"}
-                        {expandedPost === post.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                    
-                    {expandedPost === post.id && (
-                      <div className="mt-5 pt-5 border-t border-border">
-                        {post.fullContent.split('\n\n').map((paragraph, i) => (
-                          <p key={i} className="text-sm text-muted-foreground mb-3 leading-relaxed">{paragraph}</p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </article>
+                {category}
+              </button>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Newsletter */}
-        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-secondary/40">
-          <div className="max-w-lg mx-auto text-center">
-            <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-4">
-              Stay Updated
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-3">
-              Get insights delivered
-            </h2>
-            <p className="text-sm text-muted-foreground mb-6">
-              Enterprise AI trends, product updates, and industry analysis. No spam.
-            </p>
-            {isSubscribed ? (
-              <p className="text-sm font-medium text-foreground">Thanks for subscribing! ✓</p>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
-                <input 
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  disabled={isSubscribing}
-                  className="flex-1 px-4 py-2.5 text-sm rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground/10"
-                />
-                <button
-                  onClick={handleSubscribe}
-                  disabled={isSubscribing}
-                  className="px-6 py-2.5 text-sm font-medium text-background bg-foreground rounded-full hover:bg-foreground/90 transition-all active:scale-[0.97] disabled:opacity-50"
-                >
-                  {isSubscribing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Subscribe"}
-                </button>
+      {/* Blog Grid */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {filteredPosts.map((post) => (
+            <article 
+              key={post.id}
+              className="rounded-2xl overflow-hidden border border-border bg-card transition-all duration-300 hover:shadow-lg hover:shadow-foreground/[0.03] hover:border-foreground/10"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+                <div className="relative aspect-video md:aspect-auto overflow-hidden">
+                  <img src={post.image} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
+                </div>
+                <div className="md:col-span-2 p-5 sm:p-7">
+                  <p className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground mb-2">{post.category}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 leading-snug">{post.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground/70">
+                      <div className="flex items-center gap-1.5"><User className="w-3 h-3" /><span>{post.author}</span></div>
+                      <span className="hidden sm:inline">{post.date}</span>
+                      <div className="flex items-center gap-1.5"><Clock className="w-3 h-3" /><span>{post.readTime}</span></div>
+                    </div>
+                    <button 
+                      onClick={() => setExpandedPost(expandedPost === post.id ? null : post.id)}
+                      className="flex items-center gap-1.5 text-foreground font-medium text-sm hover:gap-2.5 transition-all active:scale-[0.97]"
+                    >
+                      {expandedPost === post.id ? "Close" : "Read"}
+                      {expandedPost === post.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                  {expandedPost === post.id && (
+                    <div className="mt-5 pt-5 border-t border-border">
+                      {post.fullContent.split('\n\n').map((paragraph, i) => (
+                        <p key={i} className="text-sm text-muted-foreground mb-3 leading-relaxed">{paragraph}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        </section>
-      </main>
+            </article>
+          ))}
+        </div>
+      </section>
 
-      <LandingFooter />
+      {/* Newsletter */}
+      <section className="py-12 sm:py-16 px-4 sm:px-6 bg-secondary/40">
+        <div className="max-w-lg mx-auto text-center">
+          <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-4">Stay Updated</p>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-3">Get insights delivered</h2>
+          <p className="text-sm text-muted-foreground mb-6">Enterprise AI trends, product updates, and industry analysis. No spam.</p>
+          {isSubscribed ? (
+            <p className="text-sm font-medium text-foreground">Thanks for subscribing! ✓</p>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
+              <input 
+                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com" disabled={isSubscribing}
+                className="flex-1 px-4 py-2.5 text-sm rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground/10"
+              />
+              <button onClick={handleSubscribe} disabled={isSubscribing}
+                className="px-6 py-2.5 text-sm font-medium text-background bg-foreground rounded-full hover:bg-foreground/90 transition-all active:scale-[0.97] disabled:opacity-50">
+                {isSubscribing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Subscribe"}
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

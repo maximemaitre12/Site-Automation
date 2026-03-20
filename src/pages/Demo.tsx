@@ -4,8 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
 import { ArrowRight, CheckCircle2, Calendar, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -99,10 +97,7 @@ export default function Demo() {
   };
   
   return (
-    <div className="min-h-screen bg-background">
-      <LandingHeader />
-      
-      <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left column - Info */}
@@ -261,11 +256,8 @@ export default function Demo() {
                 </p>
               </form>
             </div>
-          </div>
         </div>
-      </main>
-      
-      <LandingFooter />
+      </div>
     </div>
   );
 }

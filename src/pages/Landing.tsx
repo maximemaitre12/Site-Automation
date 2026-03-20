@@ -2,9 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-// Landing page components
-import { LandingHeader } from "@/components/landing/LandingHeader";
-import { LandingFooter } from "@/components/landing/LandingFooter";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { DemoSection } from "@/components/landing/DemoSection";
 import { PainPointsSection } from "@/components/landing/PainPointsSection";
@@ -18,14 +15,12 @@ export default function Landing() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (!loading && user) {
       navigate('/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
 
-  // Show loading while checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -34,27 +29,20 @@ export default function Landing() {
     );
   }
 
-  // Show landing page only for non-authenticated users
   if (user) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden no-scroll-anchoring">
-      <LandingHeader />
-      
-      <main>
-        <HeroSection />
-        <DemoSection />
-        <PainPointsSection />
-        <ApiSection />
-        <BlogSection />
-        <FinalCTASection />
-        <TestimonialSection />
-        <ContactSection />
-      </main>
-      
-      <LandingFooter />
+    <div className="overflow-x-hidden no-scroll-anchoring">
+      <HeroSection />
+      <DemoSection />
+      <PainPointsSection />
+      <ApiSection />
+      <BlogSection />
+      <FinalCTASection />
+      <TestimonialSection />
+      <ContactSection />
     </div>
   );
 }
