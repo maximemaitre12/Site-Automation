@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, RequireAuth, RequireSubscription, RequireCompany } from "@/hooks/useAuth";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { BlockLibraryProvider } from "@/contexts/BlockLibraryContext";
+import PublicLayout from "@/components/layout/PublicLayout";
 
 // Pages
 import Landing from "./pages/Landing";
