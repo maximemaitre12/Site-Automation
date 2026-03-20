@@ -6,7 +6,7 @@ export function SupplyHero() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   return (
-    <section ref={ref} className="relative pt-32 pb-24 sm:pt-40 sm:pb-32 px-4 sm:px-6 overflow-hidden">
+    <section ref={ref} className="relative pt-28 pb-16 sm:pt-32 sm:pb-20 px-4 sm:px-6 overflow-hidden">
       {/* Subtle grid background */}
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,

@@ -36,7 +36,7 @@ export function SupplyPainPoints() {
   const { ref, isVisible } = useStaggerAnimation(painPoints.length, { threshold: 0.15 });
 
   return (
-    <section ref={ref} className="py-24 sm:py-32 px-4 sm:px-6 bg-secondary/40">
+    <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6 bg-secondary/40">
       <div className="max-w-5xl mx-auto">
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-600 ${
           isVisible ? 'opacity-100' : 'opacity-0'

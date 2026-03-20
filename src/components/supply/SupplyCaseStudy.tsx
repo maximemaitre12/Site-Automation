@@ -11,7 +11,7 @@ export function SupplyCaseStudy() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
 
   return (
-    <section ref={ref} className="py-24 sm:py-32 px-4 sm:px-6">
+    <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <div className={`bg-card rounded-2xl border border-border overflow-hidden transition-all duration-700 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
