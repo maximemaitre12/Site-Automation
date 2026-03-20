@@ -15,7 +15,7 @@ export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const isSupplyPage = location.pathname === "/supply";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -37,7 +37,7 @@ export function LandingHeader() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {/* Home - only when not on homepage */}
-            {!isHomePage && (
+            {!isSupplyPage && (
               <Link 
                 to="/" 
                 className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted/50"
@@ -62,7 +62,7 @@ export function LandingHeader() {
           
           {/* Desktop CTA - Hierarchy: Demo (primary) > Login (tertiary) */}
           <div className="hidden md:flex items-center gap-3">
-            {!isHomePage && (
+            {isSupplyPage && (
               <Link to="/auth?mode=login">
                 <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                   Log in
@@ -91,7 +91,7 @@ export function LandingHeader() {
           <div className="md:hidden absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl py-4 px-4 animate-fade-in">
             <nav className="flex flex-col gap-1">
               {/* Home link for mobile */}
-              {!isHomePage && (
+              {!isSupplyPage && (
                 <Link
                   to="/"
                   onClick={() => setIsMenuOpen(false)}
@@ -115,7 +115,7 @@ export function LandingHeader() {
               
               {/* CTA buttons */}
               <div className="flex flex-col gap-2 pt-4 mt-3 border-t border-border">
-                {!isHomePage && (
+                {isSupplyPage && (
                   <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)}>
                     <button className="w-full py-2.5 px-4 text-sm font-medium text-foreground rounded-xl border border-border bg-transparent hover:bg-muted transition-all">
                       Log in
