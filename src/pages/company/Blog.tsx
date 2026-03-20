@@ -1,10 +1,8 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { Calendar, Clock, User, ArrowRight, Tag, TrendingUp, Sparkles, GraduationCap, Globe, Zap, Brain, Workflow, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Clock, User, ArrowRight, ChevronUp, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-
 
 const posts = [
   {
@@ -16,7 +14,6 @@ const posts = [
     date: "December 18, 2025",
     readTime: "5 min read",
     category: "Industry",
-    icon: TrendingUp,
     fullContent: `McKinsey found that knowledge workers spend about 30% of their time on repetitive tasks that could be automated. That's 12 hours a week, per person.
 
 Where does all that time go?
@@ -52,7 +49,6 @@ AI has gotten good enough to handle tasks that need judgment, not just simple if
     date: "December 15, 2025",
     readTime: "6 min read",
     category: "Innovation",
-    icon: Brain,
     fullContent: `Voice AI has gotten remarkably good, but most people have no idea what happens under the hood. Let's break it down.
 
 The journey from your voice to a response:
@@ -89,7 +85,6 @@ This isn't just chatbot stuff. Think automated phone systems that actually get w
     date: "December 10, 2025",
     readTime: "7 min read",
     category: "Industry",
-    icon: Globe,
     fullContent: `Things are moving fast in enterprise AI. Here are five trends that actually have data behind them.
 
 1. AI agents are leaving the lab
@@ -103,25 +98,17 @@ By end of 2025: expected to hit 23%
 
 Text, image, voice: the boundaries are blurring. IDC says 67% of new enterprise AI projects last year were multimodal.
 
-Document processing now combines OCR, layout analysis, image recognition, and language understanding all at once.
-
 3. Governance is suddenly a priority
 
-Spending on AI governance tools jumped 340% in 2024, according to Forrester. Turns out, deploying AI without controls creates real risk.
-
-Companies are now requiring audit trails, explainability, bias detection, and data lineage tracking.
+Spending on AI governance tools jumped 340% in 2024, according to Forrester.
 
 4. ROI measurement is getting serious
-
-Early AI projects focused on cost savings. Now the metrics are broader: time-to-value for new hires, customer satisfaction, employee experience, revenue acceleration.
 
 McKinsey found that companies with mature measurement frameworks see 2.5x better returns.
 
 5. Humans + AI beats either alone
 
-The most successful deployments augment people rather than replace them. Accenture's research shows human-AI teams outperform either alone by 30% on complex work.
-
-The pattern that works: AI handles volume and speed, humans bring judgment and creativity.`
+Accenture's research shows human-AI teams outperform either alone by 30% on complex work.`
   },
   {
     id: "document-processing-evolution",
@@ -132,44 +119,21 @@ The pattern that works: AI handles volume and speed, humans bring judgment and c
     date: "December 8, 2025",
     readTime: "5 min read",
     category: "Innovation",
-    icon: Zap,
     fullContent: `Document processing has evolved through distinct generations. Each one changed what was possible.
 
 Generation 1: OCR (1990s-2000s)
-
-Optical Character Recognition could turn scanned documents into text. That was it. No understanding of structure, context, or meaning.
-
-Accuracy hovered around 85-90%. Sounds okay until you realize that's 1-2 errors per line.
+Optical Character Recognition could turn scanned documents into text. Accuracy hovered around 85-90%.
 
 Generation 2: Template-based (2010s)
-
-You could define where the invoice number goes, where the total is, and the system would extract those fields.
-
-The catch: every new document type needed a new template. Template maintenance became someone's entire job.
+You could define where the invoice number goes, where the total is. Every new document type needed a new template.
 
 Generation 3: Machine learning (2018-2022)
-
-Systems started learning from examples. Show it 100 invoices, and it figures out how to extract from new ones.
-
-Accuracy jumped above 95%, but the systems still didn't understand what they were pulling out.
+Systems started learning from examples. Accuracy jumped above 95%.
 
 Generation 4: LLM-powered (2023+)
+Large language models changed the game completely. Now document processing can understand how fields relate, handle unseen document types, answer questions about content, and spot anomalies.
 
-Large language models changed the game completely. Now document processing can:
-
-→ Understand how fields relate to each other
-→ Handle document types it's never seen before
-→ Answer questions about content
-→ Summarize and find insights, not just data
-→ Spot anomalies and inconsistencies
-
-The real-world difference
-
-Traditional invoice processing: receive, manually enter or template-extract, validate, route for approval, process payment. 15-30 minutes per invoice.
-
-AI-powered: receive, automatic extraction and validation, human review only for exceptions. 2-5 minutes total.
-
-That's 80% less time, and almost no data entry errors.`
+The real-world difference: traditional invoice processing takes 15-30 minutes. AI-powered: 2-5 minutes total. That's 80% less time, and almost no data entry errors.`
   },
   {
     id: "shanghai-startup-ecosystem",
@@ -180,43 +144,17 @@ That's 80% less time, and almost no data entry errors.`
     date: "December 5, 2025",
     readTime: "6 min read",
     category: "Company",
-    icon: Sparkles,
     fullContent: `Shanghai didn't just happen to be where AETHER started, it shaped how we think about building products.
 
-The pace is real
+The pace is real. Walking through Lujiazui or Zhangjiang, you feel it. Companies ship in weeks what would take months elsewhere.
 
-Walking through Lujiazui or Zhangjiang, you feel it. Companies ship in weeks what would take months elsewhere.
+The scene is surprisingly global. Shanghai's tech community is incredibly international. Meetups in Jing'an draw founders and engineers from everywhere.
 
-That rubbed off on us. Our first prototype took 6 weeks, built from a small Putuo apartment. Anything slower felt wrong.
+No money forces creativity. We started with almost nothing. In Shanghai, that's normal. This meant ruthless focus on what actually matters, building MVPs that work, and finding creative solutions instead of buying our way out.
 
-The scene is surprisingly global
-
-One thing we didn't expect: Shanghai's tech community is incredibly international. Meetups in Jing'an draw founders and engineers from everywhere. WeChat groups connect French entrepreneurs, American engineers, Chinese investors.
-
-We found advisors, early users, and ideas in this mix. AETHER's global perspective, building for businesses everywhere, not just one market, came directly from being here.
-
-No money forces creativity
-
-We started with almost nothing. In Shanghai, that's normal. Many successful startups here bootstrapped longer than their Silicon Valley counterparts.
-
-This meant:
-→ Ruthless focus on what actually matters
-→ Building MVPs that work, not just demos
-→ Finding creative solutions instead of buying our way out
-
-A different mindset
-
-AETHER doesn't feel like typical enterprise software because we didn't build it like that. We built it like a Shanghai startup:
-
-→ Ship fast, iterate faster
-→ Global from day one
-→ Efficient by necessity
-→ Always hungry
-
-The Shanghai chapter is just our beginning. But it defined who we are.`
+AETHER doesn't feel like typical enterprise software because we didn't build it like that. We built it like a Shanghai startup: ship fast, iterate faster, global from day one, efficient by necessity.`
   }
 ];
-
 
 const categories = ["All", "Company", "Innovation", "Industry"];
 
@@ -229,31 +167,18 @@ export default function Blog() {
 
   const handleSubscribe = async () => {
     if (!email || !email.includes("@")) {
-      toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
+      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
       return;
     }
-    
     setIsSubscribing(true);
-    
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     setIsSubscribing(false);
     setIsSubscribed(true);
     setEmail("");
-    toast({
-      title: "Subscribed!",
-      description: "You'll receive our latest updates in your inbox.",
-    });
+    toast({ title: "Subscribed!", description: "You'll receive our latest updates in your inbox." });
   };
 
-  const filteredPosts = selectedCategory === "All" 
-    ? posts 
-    : posts.filter(post => post.category === selectedCategory);
+  const filteredPosts = selectedCategory === "All" ? posts : posts.filter(p => p.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-background">
@@ -261,30 +186,32 @@ export default function Blog() {
       
       <main className="pt-20">
         {/* Hero */}
-        <section className="py-10 md:py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-violet-500/5">
+        <section className="pt-16 pb-10 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-3 sm:mb-4">
-              The AETHER{" "}
-              <span className="text-primary">Blog</span>
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-5">
+              Insights & Updates
+            </p>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground tracking-tight leading-[1.08]">
+              The AETHER Blog
             </h1>
-            <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-              Insights on enterprise AI, product updates, and the future of automation.
+            <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Enterprise AI insights, product updates, and the future of intelligent automation.
             </p>
           </div>
         </section>
 
         {/* Category Filter */}
-        <section className="py-4 md:py-8 px-4 border-b border-border overflow-x-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex gap-2 justify-start md:justify-center min-w-max md:min-w-0 pb-2 md:pb-0">
+        <section className="py-4 px-4 sm:px-6 border-b border-border">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex gap-2 justify-center flex-wrap">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-[0.97] ${
                     selectedCategory === category
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      ? "bg-foreground text-background"
+                      : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80"
                   }`}
                 >
                   {category}
@@ -294,120 +221,94 @@ export default function Blog() {
           </div>
         </section>
 
-
         {/* Blog Grid */}
-        <section className="py-16 px-4 bg-muted/30">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Latest Articles</h2>
-            <div className="space-y-8">
-              {filteredPosts.map((post) => (
-                <article 
-                  key={post.id}
-                  className="rounded-xl overflow-hidden border border-border bg-card"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-                    <div className="relative aspect-video md:aspect-auto overflow-hidden">
-                      <img 
-                        src={post.image}
-                        alt={post.title}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 left-3 md:top-4 md:left-4">
-                        <span className="px-2 md:px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
-                          {post.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="md:col-span-2 p-4 md:p-6 lg:p-8">
-                      <div className="flex items-center gap-2 mb-2 md:mb-3">
-                        <post.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                        <span className="text-xs font-medium text-primary uppercase tracking-wide">{post.category}</span>
-                      </div>
-                      <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 md:mb-3">
-                        {post.title}
-                      </h3>
-                      <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4 line-clamp-2 md:line-clamp-none">{post.excerpt}</p>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1.5">
-                            <User className="w-3 h-3" />
-                            <span>{post.author}</span>
-                          </div>
-                          <span className="hidden sm:inline">{post.date}</span>
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="w-3 h-3" />
-                            <span>{post.readTime}</span>
-                          </div>
-                        </div>
-                        <button 
-                          onClick={() => setExpandedPost(expandedPost === post.id ? null : post.id)}
-                          className="flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"
-                        >
-                          {expandedPost === post.id ? "Close" : "Read more"}
-                          {expandedPost === post.id ? <ChevronUp className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-                        </button>
-                      </div>
-                      
-                      {/* Expanded Content */}
-                      {expandedPost === post.id && (
-                        <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-border">
-                          <div className="prose dark:prose-invert max-w-none">
-                            {post.fullContent.split('\n\n').map((paragraph, i) => (
-                              <p key={i} className="text-muted-foreground mb-3 md:mb-4 text-xs md:text-sm leading-relaxed">{paragraph}</p>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+        <section className="py-12 sm:py-16 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {filteredPosts.map((post) => (
+              <article 
+                key={post.id}
+                className="rounded-2xl overflow-hidden border border-border bg-card transition-all duration-300 hover:shadow-lg hover:shadow-foreground/[0.03] hover:border-foreground/10"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+                  <div className="relative aspect-video md:aspect-auto overflow-hidden">
+                    <img src={post.image} alt={post.title} className="absolute inset-0 w-full h-full object-cover" />
                   </div>
-                </article>
-              ))}
-            </div>
+                  <div className="md:col-span-2 p-5 sm:p-7">
+                    <p className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground mb-2">
+                      {post.category}
+                    </p>
+                    <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 leading-snug">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground/70">
+                        <div className="flex items-center gap-1.5">
+                          <User className="w-3 h-3" />
+                          <span>{post.author}</span>
+                        </div>
+                        <span className="hidden sm:inline">{post.date}</span>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3 h-3" />
+                          <span>{post.readTime}</span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setExpandedPost(expandedPost === post.id ? null : post.id)}
+                        className="flex items-center gap-1.5 text-foreground font-medium text-sm hover:gap-2.5 transition-all active:scale-[0.97]"
+                      >
+                        {expandedPost === post.id ? "Close" : "Read"}
+                        {expandedPost === post.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    
+                    {expandedPost === post.id && (
+                      <div className="mt-5 pt-5 border-t border-border">
+                        {post.fullContent.split('\n\n').map((paragraph, i) => (
+                          <p key={i} className="text-sm text-muted-foreground mb-3 leading-relaxed">{paragraph}</p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
         {/* Newsletter */}
-        <section className="py-12 md:py-20 px-4">
-          <div className="max-w-xl mx-auto text-center">
-            <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-primary mx-auto mb-4 md:mb-6" />
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 md:mb-4">Stay in the Loop</h2>
-            <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 px-2">
-              Get the latest insights on enterprise AI, product updates, and industry trends delivered to your inbox.
+        <section className="py-12 sm:py-16 px-4 sm:px-6 bg-secondary/40">
+          <div className="max-w-lg mx-auto text-center">
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-4">
+              Stay Updated
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight mb-3">
+              Get insights delivered
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Enterprise AI trends, product updates, and industry analysis. No spam.
             </p>
             {isSubscribed ? (
-              <div className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-primary/10 text-primary">
-                <Sparkles className="w-5 h-5" />
-                <span className="font-medium">Thanks for subscribing!</span>
-              </div>
+              <p className="text-sm font-medium text-foreground">Thanks for subscribing! ✓</p>
             ) : (
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
                 <input 
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder="your@email.com"
                   disabled={isSubscribing}
-                  className="flex-1 px-4 py-2.5 md:py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm md:text-base disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 text-sm rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-foreground/10"
                 />
-                <button 
+                <button
                   onClick={handleSubscribe}
                   disabled={isSubscribing}
-                  className="px-5 md:px-6 py-2.5 md:py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm md:text-base disabled:opacity-70 flex items-center justify-center gap-2 min-w-[120px]"
+                  className="px-6 py-2.5 text-sm font-medium text-background bg-foreground rounded-full hover:bg-foreground/90 transition-all active:scale-[0.97] disabled:opacity-50"
                 >
-                  {isSubscribing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Subscribing...</span>
-                    </>
-                  ) : (
-                    "Subscribe"
-                  )}
+                  {isSubscribing ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Subscribe"}
                 </button>
               </div>
             )}
-            <p className="text-xs text-muted-foreground mt-4">
-              No spam, unsubscribe anytime. Read our <Link to="/legal/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
-            </p>
           </div>
         </section>
       </main>
