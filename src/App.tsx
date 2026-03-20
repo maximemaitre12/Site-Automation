@@ -44,6 +44,7 @@ import Security from "./pages/legal/Security";
 
 // Product Tour
 import ProductTour from "./pages/ProductTour";
+import SupplyChain from "./pages/SupplyChain";
 
 // OAuth callbacks
 import GoogleCallback from "./pages/oauth/GoogleCallback";
