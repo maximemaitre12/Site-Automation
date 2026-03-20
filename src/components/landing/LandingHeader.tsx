@@ -115,7 +115,7 @@ export function LandingHeader() {
               
               {/* CTA buttons */}
               <div className="flex flex-col gap-2 pt-4 mt-3 border-t border-border">
-                {!isHomePage && (
+                {isSupplyPage && (
                   <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)}>
                     <button className="w-full py-2.5 px-4 text-sm font-medium text-foreground rounded-xl border border-border bg-transparent hover:bg-muted transition-all">
                       Log in
