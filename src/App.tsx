@@ -94,7 +94,6 @@ const App = () => {
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<SupplyChain />} />
                 <Route path="/demo" element={<Demo />} />
-                <Route path="/product-tour" element={<ProductTour />} />
                 <Route path="/supply" element={<Landing />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
@@ -103,6 +102,9 @@ const App = () => {
                 <Route path="/legal/terms" element={<Terms />} />
                 <Route path="/legal/security" element={<Security />} />
               </Route>
+
+              {/* Product Tour (own layout) */}
+              <Route path="/product-tour" element={<ProductTour />} />
 
               {/* Auth (no shared layout) */}
               <Route path="/auth" element={<Auth />} />
