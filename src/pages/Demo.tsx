@@ -97,10 +97,7 @@ export default function Demo() {
   };
   
   return (
-    <div className="min-h-screen bg-background">
-      <LandingHeader />
-      
-      <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left column - Info */}
