@@ -15,7 +15,7 @@ export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const isSupplyPage = location.pathname === "/supply";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
