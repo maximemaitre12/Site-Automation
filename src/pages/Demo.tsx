@@ -258,9 +258,7 @@ export default function Demo() {
             </div>
           </div>
         </div>
-      </main>
-      
-      <LandingFooter />
+      </div>
     </div>
   );
 }
