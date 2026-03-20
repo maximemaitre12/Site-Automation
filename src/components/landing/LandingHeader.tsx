@@ -73,7 +73,6 @@ export function LandingHeader() {
               <button className="relative px-5 py-2 text-sm font-medium text-primary-foreground rounded-full bg-gradient-to-r from-primary via-violet-500 to-primary bg-[length:200%_100%] hover:bg-[position:100%_0] transition-all duration-500 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] group flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Request Demo</span>
-                <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
               </button>
             </Link>
           </div>
