@@ -23,7 +23,7 @@ export function SupplyDashboard() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
 
   return (
-    <section ref={ref} className="py-24 sm:py-32 px-4 sm:px-6">
+    <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-600 ${
           isVisible ? 'opacity-100' : 'opacity-0'
