@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Mail } from "lucide-react";
 
 const allLinks = [
   { label: "Blog", path: "/blog" },
@@ -6,6 +7,8 @@ const allLinks = [
   { label: "Docs", path: "/resources/documentation" },
   { label: "Privacy", path: "/legal/privacy" },
 ];
+
+const EMAIL = "maxime.maitre@edu.em-lyon.com";
 
 export function LandingFooter() {
   return (
@@ -17,8 +20,17 @@ export function LandingFooter() {
             <Link to="/" className="text-xl font-semibold text-foreground">AETHER</Link>
             <p className="text-sm text-muted-foreground mt-1">Intelligent automation for enterprise.</p>
           </div>
+
+          {/* Email */}
+          <a
+            href={`mailto:${EMAIL}`}
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Mail className="w-4 h-4" />
+            {EMAIL}
+          </a>
           
-          {/* Links - horizontal on all screens */}
+          {/* Links */}
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             {allLinks.map((link) => (
               <Link 

@@ -29,7 +29,8 @@ export default function Documentation() {
           <div className="p-6 rounded-2xl border border-border bg-secondary/30 text-center mb-12">
             <h2 className="text-base font-semibold text-foreground mb-1.5">Documentation Coming Soon</h2>
             <p className="text-sm text-muted-foreground">
-              We're working on comprehensive documentation. In the meantime, contact us for any questions.
+              We're working on comprehensive documentation. In the meantime, email us at{" "}
+              <a href="mailto:maxime.maitre@edu.em-lyon.com" className="text-foreground font-medium hover:underline">maxime.maitre@edu.em-lyon.com</a>.
             </p>
           </div>
 

@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
+
+const EMAIL = "maxime.maitre@edu.em-lyon.com";
 
 export function SupplyCTA() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
@@ -17,13 +18,14 @@ export function SupplyCTA() {
         <div className={`mt-8 transition-all duration-700 delay-150 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          <Link
-            to="/demo"
+          <a
+            href={`mailto:${EMAIL}?subject=AETHER — I'd like an assessment`}
             className="inline-flex items-center gap-2.5 px-7 py-3.5 text-sm font-medium text-primary-foreground bg-foreground rounded-full hover:bg-foreground/90 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10 active:scale-[0.97] group"
           >
-            Book Your Assessment
+            <Mail className="w-4 h-4" />
+            Contact Us
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
-          </Link>
+          </a>
         </div>
 
         <p className={`mt-5 text-xs text-muted-foreground/60 transition-all duration-700 delay-300 ${
