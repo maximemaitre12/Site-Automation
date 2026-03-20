@@ -256,7 +256,6 @@ export default function Demo() {
                 </p>
               </form>
             </div>
-          </div>
         </div>
       </div>
     </div>
