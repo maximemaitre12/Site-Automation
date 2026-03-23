@@ -8,7 +8,7 @@ const allLinks = [
   { label: "Privacy", path: "/legal/privacy" },
 ];
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function LandingFooter() {
   return (

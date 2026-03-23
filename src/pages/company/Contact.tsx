@@ -1,6 +1,6 @@
 import { Mail, ArrowRight, Clock, Shield, Zap } from "lucide-react";
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 const faqs = [
   { q: "How quickly can I get started?", a: "Most customers are up and running within a week. Our team handles onboarding and initial setup." },

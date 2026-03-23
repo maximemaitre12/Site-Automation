@@ -1,7 +1,7 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { ArrowRight, Mail } from "lucide-react";
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function SupplyHero() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });

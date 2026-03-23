@@ -10,7 +10,7 @@ const navLinks = [
   { label: "Privacy", href: "/legal/privacy" },
 ];
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

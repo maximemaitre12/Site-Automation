@@ -1,6 +1,6 @@
 import { ArrowRight, Mail } from "lucide-react";
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function CTASection() {
   return (
