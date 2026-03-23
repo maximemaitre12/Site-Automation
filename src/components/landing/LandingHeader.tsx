@@ -118,7 +118,7 @@ export function LandingHeader() {
                   </Link>
                 )}
                 <a
-                  href={`mailto:${EMAIL}?subject=AETHER — Contact`}
+                  href={`mailto:${EMAILS.join(',')}?subject=AETHER — Contact`}
                   onClick={() => setIsMenuOpen(false)}
                   className="w-full py-2.5 px-4 text-sm font-medium text-primary-foreground rounded-xl bg-foreground flex items-center justify-center gap-2"
                 >

@@ -19,7 +19,7 @@ export function SupplyCTA() {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           <a
-            href={`mailto:${EMAIL}?subject=AETHER — I'd like an assessment`}
+            href={`mailto:${EMAILS.join(',')}?subject=AETHER — I'd like an assessment`}
             className="inline-flex items-center gap-2.5 px-7 py-3.5 text-sm font-medium text-primary-foreground bg-foreground rounded-full hover:bg-foreground/90 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10 active:scale-[0.97] group"
           >
             <Mail className="w-4 h-4" />
