@@ -1,6 +1,6 @@
 import { ArrowRight, Mail } from "lucide-react";
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function CTASection() {
   return (
@@ -18,15 +18,18 @@ export function CTASection() {
           Contactez-nous directement pour une démo personnalisée et un déploiement en 48h.
         </p>
         
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href={`mailto:${EMAIL}?subject=AETHER — Demande de démo`}
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 text-sm font-medium text-primary-foreground bg-foreground rounded-full hover:bg-foreground/90 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10 active:scale-[0.97] group min-w-[280px] justify-center"
-          >
-            <Mail className="w-4 h-4" />
-            {EMAIL}
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
-          </a>
+        <div className="flex flex-col items-center justify-center gap-3">
+          {EMAILS.map((email) => (
+            <a
+              key={email}
+              href={`mailto:${email}?subject=AETHER — Demande de démo`}
+              className="inline-flex items-center gap-2.5 px-7 py-3.5 text-sm font-medium text-primary-foreground bg-foreground rounded-full hover:bg-foreground/90 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10 active:scale-[0.97] group min-w-[280px] justify-center"
+            >
+              <Mail className="w-4 h-4" />
+              {email}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+            </a>
+          ))}
         </div>
         
         <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-sm text-muted-foreground">

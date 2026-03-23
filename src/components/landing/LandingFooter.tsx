@@ -8,7 +8,7 @@ const allLinks = [
   { label: "Privacy", path: "/legal/privacy" },
 ];
 
-const EMAIL = "maxime.maitre@edu.em-lyon.com";
+const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function LandingFooter() {
   return (
@@ -22,13 +22,18 @@ export function LandingFooter() {
           </div>
 
           {/* Email */}
-          <a
-            href={`mailto:${EMAIL}`}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Mail className="w-4 h-4" />
-            {EMAIL}
-          </a>
+          <div className="flex flex-col items-center gap-1.5">
+            {EMAILS.map((email) => (
+              <a
+                key={email}
+                href={`mailto:${email}`}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                {email}
+              </a>
+            ))}
+          </div>
           
           {/* Links */}
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
