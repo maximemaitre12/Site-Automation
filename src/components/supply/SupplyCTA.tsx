@@ -12,18 +12,18 @@ export function SupplyCTA() {
         <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground tracking-tight transition-all duration-700 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          Échangez avec un expert pour identifier vos leviers d'optimisation
+          Talk to an expert to identify your optimization levers
         </h2>
 
         <div className={`mt-8 transition-all duration-700 delay-150 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           <a
-            href={`mailto:${EMAILS.join(',')}?subject=AETHER — Planifier un appel`}
+            href={`mailto:${EMAILS.join(',')}?subject=AETHER — Schedule a call`}
             className="inline-flex items-center gap-2.5 px-7 py-3.5 text-sm font-medium text-primary-foreground bg-foreground rounded-full hover:bg-foreground/90 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10 active:scale-[0.97] group"
           >
             <Mail className="w-4 h-4" />
-            Planifier un appel
+            Schedule a call
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
           </a>
         </div>
@@ -31,7 +31,7 @@ export function SupplyCTA() {
         <p className={`mt-5 text-xs text-muted-foreground/60 transition-all duration-700 delay-300 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
-          Sans engagement · Réponse sous 24h
+          No commitment · Response within 24h
         </p>
       </div>
     </section>

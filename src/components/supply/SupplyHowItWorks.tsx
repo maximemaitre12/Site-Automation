@@ -5,20 +5,20 @@ const steps = [
   {
     icon: Search,
     step: "01",
-    title: "Analyse",
-    description: "Nous étudions vos opérations, vos données et vos processus pour comprendre votre contexte et vos enjeux spécifiques.",
+    title: "Analysis",
+    description: "We study your operations, data and processes to understand your specific context and challenges.",
   },
   {
     icon: Lightbulb,
     step: "02",
     title: "Identification",
-    description: "Nous identifions et priorisons les opportunités d'amélioration à fort impact sur votre performance opérationnelle.",
+    description: "We identify and prioritize high-impact improvement opportunities for your operational performance.",
   },
   {
     icon: Rocket,
     step: "03",
-    title: "Déploiement",
-    description: "Nous accompagnons la mise en œuvre de solutions adaptées à votre organisation, avec des résultats mesurables rapidement.",
+    title: "Deployment",
+    description: "We support the implementation of solutions tailored to your organization, with rapid measurable results.",
   },
 ];
 
@@ -31,12 +31,12 @@ export function SupplyHowItWorks() {
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
-          Notre approche
+          Our approach
         </p>
         <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-500 delay-75 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
-          Une méthodologie éprouvée
+          A proven methodology
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

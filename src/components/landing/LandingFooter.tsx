@@ -10,7 +10,7 @@ export function LandingFooter() {
         <div className="flex flex-col items-center text-center gap-6">
           <div>
             <Link to="/" className="text-xl font-semibold text-foreground">AETHER</Link>
-            <p className="text-sm text-muted-foreground mt-1">Conseil en performance supply chain.</p>
+            <p className="text-sm text-muted-foreground mt-1">Supply chain performance consulting.</p>
           </div>
 
           <div className="flex flex-col items-center gap-1.5">
@@ -28,12 +28,12 @@ export function LandingFooter() {
           
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
-            <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Confidentialité</Link>
-            <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Mentions légales</Link>
+            <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
+            <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
           </nav>
           
           <p className="text-xs text-muted-foreground pt-4 border-t border-border w-full">
-            © {new Date().getFullYear()} AETHER. Tous droits réservés.
+            © {new Date().getFullYear()} AETHER. All rights reserved.
           </p>
         </div>
       </div>

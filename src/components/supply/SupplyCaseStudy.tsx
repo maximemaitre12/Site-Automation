@@ -4,18 +4,18 @@ import { Award, BarChart3, Compass } from "lucide-react";
 const blocks = [
   {
     icon: Award,
-    title: "Double expertise",
-    content: "Nous combinons une compréhension approfondie des métiers de la supply chain avec une maîtrise des technologies d'intelligence artificielle. Cette double compétence nous permet de concevoir des solutions réellement adaptées à vos enjeux opérationnels.",
+    title: "Dual expertise",
+    content: "We combine a deep understanding of supply chain operations with mastery of artificial intelligence technologies. This dual competence allows us to design solutions truly adapted to your operational challenges.",
   },
   {
     icon: BarChart3,
-    title: "Résultats démontrés",
-    content: "Nos interventions ont permis l'identification de plusieurs centaines de milliers d'euros d'optimisation chez nos clients. Amélioration significative de la performance opérationnelle, réduction des coûts et fiabilisation des processus sont au cœur de chaque mission.",
+    title: "Demonstrated results",
+    content: "Our interventions have identified hundreds of thousands of euros in optimization for our clients. Significant improvement in operational performance, cost reduction and process reliability are at the heart of every engagement.",
   },
   {
     icon: Compass,
-    title: "Partenaire stratégique",
-    content: "Nous intervenons en amont des projets pour identifier les leviers de performance, puis accompagnons leur mise en œuvre. Notre rôle est celui d'un partenaire qui s'inscrit dans la durée, pas d'un prestataire technique ponctuel.",
+    title: "Strategic partner",
+    content: "We step in early to identify performance levers, then support their implementation. Our role is that of a long-term partner, not a one-off technical provider.",
   },
 ];
 
@@ -28,12 +28,12 @@ export function SupplyCaseStudy() {
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
-          Pourquoi nous
+          Why us
         </p>
         <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-500 delay-75 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
-          L'expertise au service de vos résultats
+          Expertise at the service of your results
         </h2>
 
         <div className="space-y-6">

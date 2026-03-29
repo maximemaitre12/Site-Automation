@@ -4,27 +4,27 @@ import { TrendingDown, Target, Clock, Package } from "lucide-react";
 const results = [
   {
     icon: TrendingDown,
-    metric: "-15 à 25%",
-    label: "Coûts logistiques",
-    description: "Réduction des coûts de transport et d'entreposage grâce à une meilleure planification.",
+    metric: "-15 to 25%",
+    label: "Logistics costs",
+    description: "Reduction in transportation and warehousing costs through better planning.",
   },
   {
     icon: Target,
     metric: "+30%",
-    label: "Précision des prévisions",
-    description: "Amélioration significative de la fiabilité des prévisions de demande.",
+    label: "Forecast accuracy",
+    description: "Significant improvement in demand forecast reliability.",
   },
   {
     icon: Clock,
     metric: "÷3",
-    label: "Temps d'analyse",
-    description: "Accélération des processus décisionnels par l'automatisation de l'analyse de données.",
+    label: "Analysis time",
+    description: "Faster decision-making through automated data analysis.",
   },
   {
     icon: Package,
     metric: "-20%",
-    label: "Besoin en stock",
-    description: "Optimisation des niveaux de stock sans impact sur le taux de service.",
+    label: "Inventory requirements",
+    description: "Optimized stock levels without impacting service rates.",
   },
 ];
 
@@ -37,12 +37,12 @@ export function SupplyDashboard() {
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
-          Résultats concrets
+          Proven results
         </p>
         <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight mb-16 transition-all duration-500 delay-75 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
-          Un impact mesurable sur vos opérations
+          Measurable impact on your operations
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
