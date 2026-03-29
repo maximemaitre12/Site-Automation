@@ -1,4 +1,4 @@
-import { Menu, X, LogIn } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
@@ -26,10 +26,9 @@ export function LandingHeader() {
           <div className="hidden md:flex items-center">
             <Link
               to="/auth?mode=login&redirect=/farmasoft"
-              className="relative px-5 py-2 text-sm font-medium text-primary-foreground rounded-full bg-foreground hover:bg-foreground/90 transition-all duration-300 hover:shadow-lg active:scale-[0.97] flex items-center gap-2"
+              className="px-5 py-2 text-sm font-medium text-white rounded-full bg-blue-600 hover:bg-blue-700 transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/20 active:scale-[0.97]"
             >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Log in</span>
+              Log in
             </Link>
           </div>
           
@@ -48,9 +47,8 @@ export function LandingHeader() {
                 <Link
                   to="/auth?mode=login&redirect=/farmasoft"
                   onClick={() => setIsMenuOpen(false)}
-                  className="w-full py-2.5 px-4 text-sm font-medium text-primary-foreground rounded-xl bg-foreground flex items-center justify-center gap-2"
+                  className="w-full py-2.5 px-4 text-sm font-medium text-white rounded-xl bg-blue-600 flex items-center justify-center"
                 >
-                  <LogIn className="w-4 h-4" />
                   Log in
                 </Link>
               </div>
