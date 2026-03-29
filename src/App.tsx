@@ -109,6 +109,9 @@ const App = () => {
               {/* Product Tour (own layout) */}
               <Route path="/product-tour" element={<ProductTour />} />
 
+              {/* Farmasoft (own layout) */}
+              <Route path="/farmasoft" element={<FarmasoftApp />} />
+
               {/* Auth (no shared layout) */}
               <Route path="/auth" element={<Auth />} />
               <Route path="/login" element={<Navigate to="/auth?mode=login" replace />} />
