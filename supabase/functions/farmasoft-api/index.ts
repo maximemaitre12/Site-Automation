@@ -414,7 +414,7 @@ serve(async (req) => {
     if (candQualifyMatch && method === "POST") {
       const id = parseInt(candQualifyMatch[1]);
       const { data: candidate } = await supabase.from("farmasoft_candidates").select("*").eq("id", id).eq("user_id", userId).single();
-      if (!candidate) return json({ error: "Candidat introuvable" });
+      if (!candidate) return json({ error: "Candidate not found" });
 
       let job = null;
       if (candidate.job_id) {
@@ -454,7 +454,7 @@ Respond ONLY in valid JSON without markdown. Write the notes in English:
       const aiResult = await callAI(prompt);
       const cleaned = aiResult.replace(/```json|```/g, "").trim();
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return json({ error: "Réponse IA invalide. Réessayez." });
+      if (!jsonMatch) return json({ error: "Invalid AI response. Please retry." });
       const parsed = JSON.parse(jsonMatch[0]) as { score: number; notes: string };
 
       const { data: updated, error } = await supabase.from("farmasoft_candidates").update({ qualification_score: parsed.score, qualification_notes: parsed.notes, stage: "prequalification" }).eq("id", id).eq("user_id", userId).select().single();
