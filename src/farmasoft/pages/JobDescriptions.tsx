@@ -319,7 +319,7 @@ function CandidateModal({ candidate: initial, job, onClose, onUpdate, onDelete }
   const { uiLang } = useAppStore()
   const tm = T[uiLang].jobs.modal
   const [candidate, setCandidate] = useState(initial)
-  const [tab, setTab] = useState<'profile' | 'message'>('profile')
+  const [tab, setTab] = useState<'profile' | 'message' | 'interview'>('profile')
   const [qualifying, setQualifying] = useState(false)
   const [qualError, setQualError] = useState('')
   const [message, setMessage] = useState('')

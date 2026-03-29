@@ -47,6 +47,9 @@ import Security from "./pages/legal/Security";
 import ProductTour from "./pages/ProductTour";
 import SupplyChain from "./pages/SupplyChain";
 
+// Farmasoft
+import FarmasoftApp from "./farmasoft/FarmasoftApp";
+
 // OAuth callbacks
 import GoogleCallback from "./pages/oauth/GoogleCallback";
 
