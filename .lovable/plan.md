@@ -1,95 +1,63 @@
 
 
-# Page `/supply` — Version Prospect-Ready
+# Refonte complète du site — Cabinet de conseil Supply Chain & IA
 
-## Constat
+## Contexte
+Le site actuel (`/`) affiche une page Supply Chain orientée "plateforme tech". L'objectif est de le repositionner comme un **cabinet de conseil premium** qui vend des résultats business, pas de la technologie.
 
-La page doit convaincre un Directeur Supply Chain ou un COO en 30 secondes. Pas de jargon IA, pas de features techniques. Uniquement : "je comprends votre probleme, voici la preuve que je le resous."
+## Approche
+Réécrire les 6 composants `Supply*` existants + adapter le header/footer. Tout le contenu passe en français. Le design reste dans la ligne "Enterprise Minimalism" existante (fond blanc, typographie sobre, espaces généreux).
 
-## Architecture de la page
+## Fichiers modifiés
 
-Un seul fichier `src/pages/SupplyChain.tsx` + composants dedies dans `src/components/supply/`. Route `/supply` ajoutee dans `App.tsx`. Aucune autre page modifiee. Aucun lien vers cette page.
+### 1. `src/components/supply/SupplyHero.tsx` — Section Hero
+- Titre : "Améliorez la performance de votre supply chain grâce à l'IA"
+- Sous-titre : "Nous aidons les entreprises à réduire leurs coûts, fiabiliser leurs opérations et identifier des gains mesurables en quelques semaines."
+- CTA : "Demander un échange" (mailto)
+- Pas de badge technique, pas de statistiques agressives
 
-### Section 1 — Hero (credibilite immediate)
+### 2. `src/components/supply/SupplyPainPoints.tsx` — Section Problèmes
+- 4 situations concrètes : prévisions peu fiables, surstocks/ruptures, processus manuels, données sous-exploitées
+- Format épuré : icône + titre + description courte
+- Pas de chiffres de coût, pas de "solution" — juste l'identification du problème
 
-Fond blanc epure, style Apple/McKinsey. Pas d'animation flashy.
+### 3. `src/components/supply/SupplyDashboard.tsx` — Section Impact / Résultats
+- Remplace le dashboard technique par des KPI business simples
+- 4 résultats : réduction coûts logistiques, précision prévisions, gains de temps, optimisation stocks
+- Chiffres crédibles mais prudents (ex: "-15 à 25%", "+30%", etc.)
 
-- **Titre** : "Anticipate. Optimize. Deliver." (sobre, pas de "AI" dans le titre)
-- **Sous-titre** : "The intelligent platform that gives supply chain leaders full visibility — from supplier risk to last-mile delivery."
-- **Chiffre unique accrocheur** : "Companies using predictive supply chain AI reduce stockouts by 35% and logistics costs by 23%." (source-style, credible)
-- **CTA** : "Book a Supply Chain Assessment" → lien vers `/demo`
-- **Pas de logo cloud, pas de badges tech** — ca fait startup, pas enterprise
+### 4. `src/components/supply/SupplyHowItWorks.tsx` — Section Approche (3 phases)
+- Phase 1 : Analyse des opérations
+- Phase 2 : Identification et priorisation des opportunités
+- Phase 3 : Déploiement de solutions adaptées
+- Pas de tags techniques (SAP, API, etc.) — descriptions high-level uniquement
 
-### Section 2 — Les 4 douleurs (identification immediate)
+### 5. `src/components/supply/SupplyCaseStudy.tsx` — Section Preuves + Expertise + Positionnement
+- Refonte en 3 blocs :
+  - **Expertise** : double compétence supply chain + IA, approche orientée résultats
+  - **Preuves** : résultats anonymisés ("identification de plusieurs centaines de milliers d'euros d'optimisation", "amélioration significative de la performance opérationnelle")
+  - **Positionnement** : "Nous intervenons en amont des projets pour identifier les leviers de performance, puis accompagnons leur mise en œuvre."
 
-Grille 2x2, cartes sobres avec icones monochromes. Chaque carte :
-- Un titre = le probleme du prospect
-- Un chiffre = le cout de ne rien faire
-- Une ligne = ce que la plateforme change
+### 6. `src/components/supply/SupplyCTA.tsx` — CTA Final
+- Titre : "Échangez avec un expert pour identifier vos leviers d'optimisation"
+- Bouton : "Planifier un appel" (mailto)
+- Sous-texte discret : "Sans engagement · Réponse sous 24h"
 
-| Carte | Probleme | Cout | Solution |
-|-------|----------|------|----------|
-| Demand Blindness | "Your forecasts are wrong 40% of the time" | "$2.1M avg excess inventory per site" | Probabilistic multi-scenario forecasting |
-| Supplier Risk | "You discover supplier failures after impact" | "72h average detection delay" | Real-time supplier scoring & early warnings |
-| Logistics Waste | "Routes and loads are planned manually" | "15-25% transport cost overruns" | Automated consolidation & route optimization |
-| Compliance Gaps | "Audits are reactive, traceability is fragmented" | "€500K+ avg regulatory penalty" | Continuous automated compliance monitoring |
+### 7. `src/components/landing/LandingHeader.tsx` — Header
+- Simplifier la navigation : retirer Blog, Docs, Privacy du menu principal
+- Garder uniquement : Accueil, Contact
+- CTA header : "Nous contacter" (mailto)
 
-### Section 3 — Dashboard simule (preuve visuelle)
+### 8. `src/components/landing/LandingFooter.tsx` — Footer
+- Tagline en français : "Conseil en performance supply chain"
+- Garder les liens légaux
+- Emails de contact
 
-Un composant statique mais visuellement riche montrant un "Control Tower" :
-- Mini carte mondiale avec 5-6 points relies par des lignes (CSS pur, pas de lib)
-- 4 KPIs animes (OTIF 94.2%, Lead Time 12.3j, Stock Coverage 32j, Risk Score 2/10)
-- 1 alerte active : "Supplier Shenzhen Electronics — 72h delay risk — Confidence: 91%"
-- 1 prediction : "Q3 demand spike +18% on SKU category A — 3 scenarios available"
-
-Design : fond sombre (contraste), coins arrondis, style terminal/dashboard pro.
-
-### Section 4 — Comment ca marche (3 etapes)
-
-Horizontal, minimaliste :
-1. **Connect** — "Your ERP, WMS, TMS in 48h" (logos SAP, Oracle, Microsoft Dynamics en gris)
-2. **Analyze** — "AI maps your flows, detects anomalies, builds prediction models"
-3. **Act** — "Alerts, forecasts, and recommendations — before problems become crises"
-
-### Section 5 — Cas client chiffre
-
-Card sobre style "case study brief" :
-- **Titre** : "How a global manufacturer cut logistics costs by 23% in 90 days"
-- **Contexte** : 12 sites, 400+ suppliers, 3 continents
-- **3 resultats** : OTIF +15pts, stock -18%, supplier incidents detected 72h earlier
-- **Citation** : "For the first time, we see our entire supply chain in real time." — VP Supply Chain, Industrial Group
-
-### Section 6 — CTA final
-
-Sobre, direct :
-- "Ready to see what your supply chain is missing?"
-- Bouton "Book Your Assessment" → `/demo`
-- Ligne de confiance : "No commitment · 48h deployment · Dedicated support"
-
-### Section 7 — Footer minimal
-
-Reprise du footer existant (import `LandingFooter`).
-
-## Fichiers
-
-| Action | Fichier |
-|--------|---------|
-| Creer | `src/pages/SupplyChain.tsx` — page principale |
-| Creer | `src/components/supply/SupplyHero.tsx` |
-| Creer | `src/components/supply/SupplyPainPoints.tsx` |
-| Creer | `src/components/supply/SupplyDashboard.tsx` |
-| Creer | `src/components/supply/SupplyHowItWorks.tsx` |
-| Creer | `src/components/supply/SupplyCaseStudy.tsx` |
-| Creer | `src/components/supply/SupplyCTA.tsx` |
-| Modifier (1 ligne) | `src/App.tsx` — ajout `<Route path="/supply" element={<SupplyChain />} />` |
-
-Header : reutilisation de `LandingHeader` existant. Footer : reutilisation de `LandingFooter` existant. Zero modification de ces composants.
-
-## Principes de design
-
-- Police Inter (deja en place), pas de police supplementaire
-- Palette : blanc + gris + indigo primaire existant, section dashboard en fond sombre pour contraste
-- Zero animation gratuite — uniquement des fade-in au scroll (`useScrollAnimation` existant)
-- Espace genereux, texte aere, hierarchie claire
-- Mobile-first responsive (grille 1 col mobile, 2 col desktop)
+## Design
+- Fond blanc, pas de `bg-secondary/40` coloré — alternance blanc / gris très léger (`bg-neutral-50`)
+- Typographie : titres `font-semibold tracking-tight`, corps `text-muted-foreground`
+- Icônes monochromes, strokeWidth 1.5
+- Espaces généreux : `py-20 sm:py-28` entre sections
+- Pas de gradients, pas de badges colorés, pas d'animations agressives
+- Animations de scroll légères (fade-in) conservées
 
