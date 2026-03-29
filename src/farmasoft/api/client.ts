@@ -62,10 +62,16 @@ export const api = {
     search: (params: SearchParams) =>
       req<Candidate[]>('/scraper/search', { method: 'POST', ...body(params) }),
   },
+  messages: {
+    list: () => req<Message[]>('/messages'),
+    create: (msg: Partial<Message>) => req<Message>('/messages', { method: 'POST', ...body(msg) }),
+    update: (id: number, msg: Partial<Message>) => req<Message>(`/messages/${id}`, { method: 'PUT', ...body(msg) }),
+    remove: (id: number) => req<{ success: boolean }>(`/messages/${id}`, { method: 'DELETE' }),
+  },
   ai: {
     generateJob: (title: string) =>
       req<Partial<Job>>('/ai/generate-job', { method: 'POST', ...body({ title }) }),
-    generateMessage: (job: Partial<Job>, candidate: Candidate, language: string) =>
+    generateMessage: (job: Partial<Job>, candidate: unknown, language: string) =>
       req<string>('/ai/generate-message', { method: 'POST', ...body({ job, candidate, language }) }),
   },
   analytics: {

@@ -25,6 +25,10 @@ export function Sidebar() {
   const navItems: NavItem[] = [
     { id: 'dashboard', label: t.nav.dashboard, icon: iconDashboard },
     { id: 'jobs',      label: t.nav.jobs,      icon: iconFile },
+    { id: 'prospecting', label: 'Prospection', icon: iconDashboard },
+    { id: 'interviews', label: 'Entretiens', icon: iconFile },
+    { id: 'messages', label: 'Messages', icon: iconFile },
+    { id: 'settings', label: 'Paramètres', icon: iconFile },
   ]
 
   if (!sidebarOpen) {
