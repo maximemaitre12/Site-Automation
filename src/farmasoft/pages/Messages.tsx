@@ -84,7 +84,7 @@ export function Messages() {
     if (!job) { setError('Associez ce message à un poste pour générer avec l\'IA.'); return }
     setGenerating(true)
     setError('')
-    const res = await api.ai.generateMessage(job, genRole || 'candidat', 'plateforme', form.language || 'uk')
+    const res = await api.ai.generateMessage(job, genRole || 'candidat', form.language || 'uk')
     if (res.error) { setError(res.error); setGenerating(false); return }
     if (res.data) {
       setForm((f) => ({ ...f, body: res.data as string, ai_generated: 1 }))
