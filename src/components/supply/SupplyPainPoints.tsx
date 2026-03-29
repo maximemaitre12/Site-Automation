@@ -1,78 +1,62 @@
-import { useScrollAnimation, useStaggerAnimation } from "@/hooks/useScrollAnimation";
-import { TrendingDown, Shield, Truck, FileCheck } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { TrendingDown, PackageX, ClipboardList, Database } from "lucide-react";
 
 const painPoints = [
   {
     icon: TrendingDown,
-    title: "Demand Blindness",
-    problem: "Your forecasts are wrong 40% of the time",
-    cost: "$2.1M avg excess inventory per site",
-    solution: "Probabilistic multi-scenario forecasting that learns from your data",
+    title: "Prévisions peu fiables",
+    description: "Vos prévisions de demande manquent de précision, entraînant des décisions basées sur l'intuition plutôt que sur les données.",
   },
   {
-    icon: Shield,
-    title: "Supplier Risk",
-    problem: "You discover supplier failures after impact",
-    cost: "72h average detection delay",
-    solution: "Real-time supplier scoring & early warnings before disruption",
+    icon: PackageX,
+    title: "Surstocks et ruptures",
+    description: "L'équilibre entre disponibilité produit et coût de stockage reste un défi permanent pour vos équipes.",
   },
   {
-    icon: Truck,
-    title: "Logistics Waste",
-    problem: "Routes and loads are planned manually",
-    cost: "15–25% transport cost overruns",
-    solution: "Automated consolidation & route optimization across all sites",
+    icon: ClipboardList,
+    title: "Processus manuels chronophages",
+    description: "Des tâches répétitives mobilisent vos équipes sur des activités à faible valeur ajoutée au lieu de se concentrer sur l'analyse.",
   },
   {
-    icon: FileCheck,
-    title: "Compliance Gaps",
-    problem: "Audits are reactive, traceability is fragmented",
-    cost: "€500K+ avg regulatory penalty",
-    solution: "Continuous automated compliance monitoring & ESG tracking",
+    icon: Database,
+    title: "Données sous-exploitées",
+    description: "Vous disposez de volumes importants de données, mais leur potentiel reste largement inexploité faute d'outils adaptés.",
   },
 ];
 
 export function SupplyPainPoints() {
-  const { ref, isVisible } = useStaggerAnimation(painPoints.length);
+  const { ref, isVisible } = useScrollAnimation();
 
   return (
-    <section ref={ref} className="py-16 sm:py-20 px-4 sm:px-6 bg-secondary/40">
-      <div className="max-w-5xl mx-auto">
+    <section ref={ref} className="py-20 sm:py-28 px-4 sm:px-6 bg-muted/30">
+      <div className="max-w-4xl mx-auto">
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
-          The problems you already know
+          Vous reconnaissez ces situations ?
         </p>
         <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight transition-all duration-500 delay-75 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
-          Every day without visibility costs you money
+          Des défis que nous comprenons
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-16">
           {painPoints.map((point, i) => {
             const Icon = point.icon;
             return (
               <div
                 key={point.title}
-                className={`group relative bg-card rounded-2xl border border-border p-7 sm:p-8 transition-all duration-400 hover:shadow-lg hover:shadow-foreground/[0.03] hover:border-foreground/10 ${
+                className={`bg-background rounded-2xl border border-border p-8 transition-all duration-400 ${
                   isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                 }`}
-                style={{ transitionDelay: isVisible ? `${80 + i * 60}ms` : '0ms' }}
+                style={{ transitionDelay: isVisible ? `${100 + i * 60}ms` : '0ms' }}
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-foreground/[0.04] flex items-center justify-center shrink-0 group-hover:bg-foreground/[0.07] transition-colors duration-300">
-                    <Icon className="w-5 h-5 text-foreground/60" strokeWidth={1.5} />
-                  </div>
-                  <div className="space-y-3">
-                    <h3 className="text-base font-semibold text-foreground">{point.title}</h3>
-                    <p className="text-sm text-foreground/80 leading-relaxed">{point.problem}</p>
-                    <p className="text-xs font-medium text-destructive/80 tracking-wide">{point.cost}</p>
-                    <div className="pt-2 border-t border-border/60">
-                      <p className="text-sm text-muted-foreground leading-relaxed">{point.solution}</p>
-                    </div>
-                  </div>
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-5">
+                  <Icon className="w-5 h-5 text-foreground/60" strokeWidth={1.5} />
                 </div>
+                <h3 className="text-base font-semibold text-foreground mb-2">{point.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{point.description}</p>
               </div>
             );
           })}
