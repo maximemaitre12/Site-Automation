@@ -298,20 +298,29 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return json({ error: "Unauthorized" }, 401);
+    let userId = "anonymous";
+    let supabase;
+
+    if (authHeader?.startsWith("Bearer ") && authHeader.length > 20) {
+      supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      try {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: claimsData } = await supabase.auth.getUser(token);
+        if (claimsData?.user?.id) userId = claimsData.user.id;
+      } catch { /* use anonymous */ }
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) return json({ error: "Unauthorized" }, 401);
-    const userId = claimsData.claims.sub;
+    if (!supabase || userId === "anonymous") {
+      supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      userId = "anonymous";
+    }
 
     const url = new URL(req.url);
     const path = url.pathname.replace(/^\/farmasoft-api/, "").replace(/\/$/, "") || "/";
