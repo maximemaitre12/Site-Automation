@@ -414,7 +414,7 @@ serve(async (req) => {
     if (candQualifyMatch && method === "POST") {
       const id = parseInt(candQualifyMatch[1]);
       const { data: candidate } = await supabase.from("farmasoft_candidates").select("*").eq("id", id).eq("user_id", userId).single();
-      if (!candidate) return json({ error: "Candidat introuvable" });
+      if (!candidate) return json({ error: "Candidate not found" });
 
       let job = null;
       if (candidate.job_id) {
@@ -423,38 +423,38 @@ serve(async (req) => {
       }
 
       const profile = (() => { try { return candidate.profile_data ? JSON.parse(candidate.profile_data) : null; } catch { return null; } })();
-      const expLine = [candidate.experience_years ? `${candidate.experience_years} ans` : null, candidate.experience_text].filter(Boolean).join(" — ") || "Non précisée";
+      const expLine = [candidate.experience_years ? `${candidate.experience_years} years` : null, candidate.experience_text].filter(Boolean).join(" — ") || "Not specified";
 
       const candidateLines = [
-        `- Titre du profil : ${candidate.role || "Non précisé"}`,
-        `- Expérience : ${expLine}`,
-        `- Localisation : ${candidate.location || "Non précisée"}`,
-        `- Plateforme source : ${candidate.source_platform || "inconnue"}`,
-        profile?.skills?.length ? `- Compétences : ${profile.skills.join(", ")}` : null,
-        profile?.education ? `- Formation : ${profile.education}` : null,
-        profile?.languages?.length ? `- Langues : ${profile.languages.join(", ")}` : null,
-        candidate.cv_text ? `- Extrait CV : ${String(candidate.cv_text).substring(0, 2000)}` : null,
+        `- Profile title: ${candidate.role || "Not specified"}`,
+        `- Experience: ${expLine}`,
+        `- Location: ${candidate.location || "Not specified"}`,
+        `- Source platform: ${candidate.source_platform || "unknown"}`,
+        profile?.skills?.length ? `- Skills: ${profile.skills.join(", ")}` : null,
+        profile?.education ? `- Education: ${profile.education}` : null,
+        profile?.languages?.length ? `- Languages: ${profile.languages.join(", ")}` : null,
+        candidate.cv_text ? `- CV extract: ${String(candidate.cv_text).substring(0, 2000)}` : null,
       ].filter(Boolean).join("\n");
 
-      const prompt = `Tu es un expert RH chez Farmasoft UA. Évalue ce candidat par rapport au poste et donne un score de 0 à 100.
-RÈGLE CRITIQUE : tu DOIS toujours répondre avec le JSON demandé, même si les informations sont limitées.
+      const prompt = `You are an HR expert at Farmasoft UA. Evaluate this candidate against the position and give a score from 0 to 100.
+CRITICAL RULE: you MUST always respond with the requested JSON, even if information is limited.
 
-POSTE RECHERCHÉ : ${job?.title ?? "Non spécifié"}
-Compétences requises : ${job?.skills ?? "Non spécifiées"}
-Expérience requise : ${job?.experience_years ?? 0} ans minimum
-Description : ${job?.description ?? ""}
-Exigences : ${job?.requirements ?? ""}
+POSITION: ${job?.title ?? "Not specified"}
+Required skills: ${job?.skills ?? "Not specified"}
+Required experience: ${job?.experience_years ?? 0} years minimum
+Description: ${job?.description ?? ""}
+Requirements: ${job?.requirements ?? ""}
 
-CANDIDAT :
+CANDIDATE:
 ${candidateLines}
 
-Réponds UNIQUEMENT en JSON valide sans markdown :
-{"score": <entier 0-100>, "notes": "<2-3 points clés concis>"}`;
+Respond ONLY in valid JSON without markdown. Write the notes in English:
+{"score": <integer 0-100>, "notes": "<2-3 concise key points>"}`;
 
       const aiResult = await callAI(prompt);
       const cleaned = aiResult.replace(/```json|```/g, "").trim();
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return json({ error: "Réponse IA invalide. Réessayez." });
+      if (!jsonMatch) return json({ error: "Invalid AI response. Please retry." });
       const parsed = JSON.parse(jsonMatch[0]) as { score: number; notes: string };
 
       const { data: updated, error } = await supabase.from("farmasoft_candidates").update({ qualification_score: parsed.score, qualification_notes: parsed.notes, stage: "prequalification" }).eq("id", id).eq("user_id", userId).select().single();
@@ -804,20 +804,20 @@ async function autoQualifyCandidates(candidateIds: number[], jobId: number, user
         if (!candidate) return;
 
         const profile = (() => { try { return candidate.profile_data ? JSON.parse(candidate.profile_data) : null; } catch { return null; } })();
-        const expLine = [candidate.experience_years ? `${candidate.experience_years} ans` : null, candidate.experience_text].filter(Boolean).join(" — ") || "Non précisée";
+        const expLine = [candidate.experience_years ? `${candidate.experience_years} years` : null, candidate.experience_text].filter(Boolean).join(" — ") || "Not specified";
         const candidateLines = [
-          `- Titre du profil : ${candidate.role || "Non précisé"}`,
-          `- Expérience : ${expLine}`,
-          `- Localisation : ${candidate.location || "Non précisée"}`,
-          profile?.skills?.length ? `- Compétences : ${profile.skills.join(", ")}` : null,
-          profile?.education ? `- Formation : ${profile.education}` : null,
+          `- Profile title: ${candidate.role || "Not specified"}`,
+          `- Experience: ${expLine}`,
+          `- Location: ${candidate.location || "Not specified"}`,
+          profile?.skills?.length ? `- Skills: ${profile.skills.join(", ")}` : null,
+          profile?.education ? `- Education: ${profile.education}` : null,
         ].filter(Boolean).join("\n");
 
-        const prompt = `Tu es un expert RH. Évalue ce candidat par rapport au poste (score 0-100).
-POSTE : ${job.title} | Compétences : ${job.skills} | Exp requise : ${job.experience_years} ans
-CANDIDAT :
+        const prompt = `You are an HR expert. Evaluate this candidate against the position (score 0-100).
+POSITION: ${job.title} | Skills: ${job.skills} | Required exp: ${job.experience_years} years
+CANDIDATE:
 ${candidateLines}
-Réponds UNIQUEMENT en JSON : {"score": <0-100>, "notes": "<2-3 points clés>"}`;
+Respond ONLY in JSON. Write the notes in English: {"score": <0-100>, "notes": "<2-3 key points>"}`;
 
         const text = await callAI(prompt);
         const cleaned = text.replace(/```json|```/g, "").trim();
