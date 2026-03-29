@@ -1,0 +1,6 @@
+ALTER TABLE farmasoft_jobs DROP CONSTRAINT farmasoft_jobs_user_id_fkey;
+ALTER TABLE farmasoft_candidates DROP CONSTRAINT farmasoft_candidates_user_id_fkey;
+ALTER TABLE farmasoft_interviews DROP CONSTRAINT farmasoft_interviews_user_id_fkey;
+ALTER TABLE farmasoft_messages DROP CONSTRAINT farmasoft_messages_user_id_fkey;
+ALTER TABLE farmasoft_events DROP CONSTRAINT farmasoft_events_user_id_fkey;
+ALTER TABLE farmasoft_settings DROP CONSTRAINT farmasoft_settings_user_id_fkey;
