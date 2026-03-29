@@ -32,15 +32,19 @@ export default function Auth() {
   // Track if user just signed up to redirect to plan selection
   const [justSignedUp, setJustSignedUp] = useState(false);
 
+  const redirectTo = searchParams.get('redirect');
+
   useEffect(() => {
     if (user) {
-      if (justSignedUp) {
+      if (redirectTo) {
+        navigate(redirectTo);
+      } else if (justSignedUp) {
         navigate('/select-plan');
       } else {
         navigate('/dashboard');
       }
     }
-  }, [user, navigate, justSignedUp]);
+  }, [user, navigate, justSignedUp, redirectTo]);
 
   const validateForm = () => {
     try {
