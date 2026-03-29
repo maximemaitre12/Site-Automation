@@ -62,20 +62,7 @@ export function TopBar() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 24px',
       }}>
-        <button
-          onClick={() => navigate('/')}
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: 'var(--text-2)', padding: '6px 12px', borderRadius: 8,
-            display: 'flex', alignItems: 'center', gap: 6,
-            fontSize: 12, fontWeight: 500,
-            transition: 'background 120ms, color 120ms',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-2)' }}
-        >
-          {iconBack} Retour au site
-        </button>
+        <div />
 
         <div style={{
           display: 'flex', alignItems: 'center',
