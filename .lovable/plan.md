@@ -1,63 +1,79 @@
 
 
-# Refonte complète du site — Cabinet de conseil Supply Chain & IA
+# Intégration Farmasoft sur `/farmasoft` — Plan
 
-## Contexte
-Le site actuel (`/`) affiche une page Supply Chain orientée "plateforme tech". L'objectif est de le repositionner comme un **cabinet de conseil premium** qui vend des résultats business, pas de la technologie.
+## Ce qui est faisable vs ce qui ne l'est pas
 
-## Approche
-Réécrire les 6 composants `Supply*` existants + adapter le header/footer. Tout le contenu passe en français. Le design reste dans la ligne "Enterprise Minimalism" existante (fond blanc, typographie sobre, espaces généreux).
+**Le frontend** du repo V1F26 utilise React + CSS pur (pas de Tailwind) avec un système de navigation interne via Zustand (`useAppStore` avec `currentPage`). Il fait des appels API vers `/api/*` (chemin relatif). Ce frontend peut être porté **presque tel quel** dans votre projet Lovable.
 
-## Fichiers modifiés
+**Le backend** utilise Express + SQLite avec 9 routes API. Il faut le recréer avec les outils Lovable Cloud (tables + edge functions). Cela remplacera le serveur Express sans toucher au frontend.
 
-### 1. `src/components/supply/SupplyHero.tsx` — Section Hero
-- Titre : "Améliorez la performance de votre supply chain grâce à l'IA"
-- Sous-titre : "Nous aidons les entreprises à réduire leurs coûts, fiabiliser leurs opérations et identifier des gains mesurables en quelques semaines."
-- CTA : "Demander un échange" (mailto)
-- Pas de badge technique, pas de statistiques agressives
+**Le scraping** (work.ua, robota.ua, etc.) **ne fonctionnera PAS** — les edge functions ne peuvent pas faire de web scraping avec Cheerio/HTML parsing sur des sites tiers. La fonctionnalité de prospection/recherche sera limitée.
 
-### 2. `src/components/supply/SupplyPainPoints.tsx` — Section Problèmes
-- 4 situations concrètes : prévisions peu fiables, surstocks/ruptures, processus manuels, données sous-exploitées
-- Format épuré : icône + titre + description courte
-- Pas de chiffres de coût, pas de "solution" — juste l'identification du problème
+## Ce qui change dans le frontend
 
-### 3. `src/components/supply/SupplyDashboard.tsx` — Section Impact / Résultats
-- Remplace le dashboard technique par des KPI business simples
-- 4 résultats : réduction coûts logistiques, précision prévisions, gains de temps, optimisation stocks
-- Chiffres crédibles mais prudents (ex: "-15 à 25%", "+30%", etc.)
+Seul **1 fichier** sera modifié : `src/api/client.ts`. Au lieu d'appeler `/api/jobs`, il appellera les edge functions Lovable Cloud. Le design, les composants, les styles CSS — tout reste identique.
 
-### 4. `src/components/supply/SupplyHowItWorks.tsx` — Section Approche (3 phases)
-- Phase 1 : Analyse des opérations
-- Phase 2 : Identification et priorisation des opportunités
-- Phase 3 : Déploiement de solutions adaptées
-- Pas de tags techniques (SAP, API, etc.) — descriptions high-level uniquement
+## Plan d'exécution
 
-### 5. `src/components/supply/SupplyCaseStudy.tsx` — Section Preuves + Expertise + Positionnement
-- Refonte en 3 blocs :
-  - **Expertise** : double compétence supply chain + IA, approche orientée résultats
-  - **Preuves** : résultats anonymisés ("identification de plusieurs centaines de milliers d'euros d'optimisation", "amélioration significative de la performance opérationnelle")
-  - **Positionnement** : "Nous intervenons en amont des projets pour identifier les leviers de performance, puis accompagnons leur mise en œuvre."
+### 1. Base de données (migration SQL)
+Créer les tables Farmasoft dans Lovable Cloud :
+- `farmasoft_jobs` (id, title, location, salary_min, salary_max, salary_currency, experience_years, skills, description, requirements, is_active, created_at, updated_at)
+- `farmasoft_candidates` (id, job_id, initials, role, location, experience_years, experience_text, salary_expectation, source_platform, profile_url, tags, profile_data, status, source_type, stage, qualification_score, qualification_notes, cv_filename, cv_text, rejection_reason, decision, viewed_at, contacted_at, created_at)
+- `farmasoft_interviews` (id, candidate_id, job_id, scheduled_at, type, interviewer, notes, decision, created_at, updated_at)
+- `farmasoft_messages` (id, job_id, name, subject, body, language, ai_generated, created_at, updated_at)
+- `farmasoft_settings` (key, value)
+- `farmasoft_events` (id, type, job_id, candidate_id, metadata, created_at)
+- `farmasoft_searches` (id, job_id, location, radius_km, salary_min, platforms, candidates_found, created_at)
 
-### 6. `src/components/supply/SupplyCTA.tsx` — CTA Final
-- Titre : "Échangez avec un expert pour identifier vos leviers d'optimisation"
-- Bouton : "Planifier un appel" (mailto)
-- Sous-texte discret : "Sans engagement · Réponse sous 24h"
+### 2. Edge function : `farmasoft-api`
+Une seule edge function qui dispatche selon le chemin et la méthode HTTP. Reproduit exactement la même API que le serveur Express :
+- CRUD jobs, candidates, interviews, messages, settings
+- Analytics (kpis, weekly, recent, log)
+- AI (generate-job, generate-message, qualify-candidate) via Lovable AI
+- CV parsing via Lovable AI
+- **Scraper : retournera une erreur "non disponible en mode cloud"**
 
-### 7. `src/components/landing/LandingHeader.tsx` — Header
-- Simplifier la navigation : retirer Blog, Docs, Privacy du menu principal
-- Garder uniquement : Accueil, Contact
-- CTA header : "Nous contacter" (mailto)
+### 3. Frontend — Fichiers copiés tels quels depuis le repo
+Tous les fichiers frontend sont copiés **sans modification de design** :
+- `src/farmasoft/App.tsx`
+- `src/farmasoft/pages/Dashboard.tsx`
+- `src/farmasoft/pages/JobDescriptions.tsx`
+- `src/farmasoft/pages/Prospecting.tsx`
+- `src/farmasoft/pages/Interviews.tsx`
+- `src/farmasoft/pages/Messages.tsx`
+- `src/farmasoft/pages/Settings.tsx`
+- `src/farmasoft/components/layout/Sidebar.tsx`
+- `src/farmasoft/components/layout/TopBar.tsx`
+- `src/farmasoft/components/SetupModal.tsx`
+- `src/farmasoft/store/useAppStore.ts`
+- `src/farmasoft/hooks/useDebounce.ts`
+- `src/farmasoft/i18n.ts`
+- `src/farmasoft/types/*`
+- `src/farmasoft/lib/utils.ts`
 
-### 8. `src/components/landing/LandingFooter.tsx` — Footer
-- Tagline en français : "Conseil en performance supply chain"
-- Garder les liens légaux
-- Emails de contact
+### 4. Seule modification frontend : `src/farmasoft/api/client.ts`
+Le `BASE` passe de `/api` à un appel vers l'edge function `farmasoft-api`. La structure des requêtes et réponses reste identique (`{ data, error }`).
 
-## Design
-- Fond blanc, pas de `bg-secondary/40` coloré — alternance blanc / gris très léger (`bg-neutral-50`)
-- Typographie : titres `font-semibold tracking-tight`, corps `text-muted-foreground`
-- Icônes monochromes, strokeWidth 1.5
-- Espaces généreux : `py-20 sm:py-28` entre sections
-- Pas de gradients, pas de badges colorés, pas d'animations agressives
-- Animations de scroll légères (fade-in) conservées
+### 5. CSS
+Le fichier `index.css` de Farmasoft est copié en `src/farmasoft/farmasoft.css` et importé localement. Toutes les classes CSS sont scopées via le conteneur `.farmasoft-app` pour éviter les conflits avec le CSS du site principal.
+
+### 6. Route `/farmasoft`
+Ajout d'une route dans `App.tsx` qui monte le composant Farmasoft.
+
+## Limitations honnêtes
+
+| Fonctionnalité | Statut |
+|---|---|
+| Dashboard, KPIs, graphiques | Fonctionnel |
+| CRUD Jobs / Candidates / Interviews / Messages | Fonctionnel |
+| AI : génération fiches de poste | Fonctionnel (via Lovable AI) |
+| AI : génération messages | Fonctionnel (via Lovable AI) |
+| AI : qualification candidats | Fonctionnel (via Lovable AI) |
+| CV parsing | Fonctionnel (via Lovable AI) |
+| **Web scraping (work.ua, robota.ua, etc.)** | **NON fonctionnel** |
+| Settings (clé API Gemini) | Non nécessaire (Lovable AI utilisé) |
+| i18n (FR/EN/UK) | Fonctionnel |
+
+**Le design ne sera pas impacté.** Le scraping est la seule fonctionnalité qui ne marchera pas.
 
