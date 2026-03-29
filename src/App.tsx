@@ -47,6 +47,9 @@ import Security from "./pages/legal/Security";
 import ProductTour from "./pages/ProductTour";
 import SupplyChain from "./pages/SupplyChain";
 
+// Farmasoft
+import FarmasoftApp from "./farmasoft/FarmasoftApp";
+
 // OAuth callbacks
 import GoogleCallback from "./pages/oauth/GoogleCallback";
 
@@ -105,6 +108,9 @@ const App = () => {
 
               {/* Product Tour (own layout) */}
               <Route path="/product-tour" element={<ProductTour />} />
+
+              {/* Farmasoft (own layout) */}
+              <Route path="/farmasoft" element={<FarmasoftApp />} />
 
               {/* Auth (no shared layout) */}
               <Route path="/auth" element={<Auth />} />

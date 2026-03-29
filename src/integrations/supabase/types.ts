@@ -2792,6 +2792,301 @@ export type Database = {
         }
         Relationships: []
       }
+      farmasoft_candidates: {
+        Row: {
+          contacted_at: string | null
+          created_at: string | null
+          cv_filename: string | null
+          cv_text: string | null
+          decision: string | null
+          experience_text: string | null
+          experience_years: number | null
+          id: number
+          initials: string | null
+          job_id: number | null
+          location: string | null
+          profile_data: string | null
+          profile_url: string | null
+          qualification_notes: string | null
+          qualification_score: number | null
+          rejection_reason: string | null
+          role: string | null
+          salary_expectation: number | null
+          source_platform: string | null
+          source_type: string | null
+          stage: string | null
+          status: string | null
+          tags: string | null
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          contacted_at?: string | null
+          created_at?: string | null
+          cv_filename?: string | null
+          cv_text?: string | null
+          decision?: string | null
+          experience_text?: string | null
+          experience_years?: number | null
+          id?: never
+          initials?: string | null
+          job_id?: number | null
+          location?: string | null
+          profile_data?: string | null
+          profile_url?: string | null
+          qualification_notes?: string | null
+          qualification_score?: number | null
+          rejection_reason?: string | null
+          role?: string | null
+          salary_expectation?: number | null
+          source_platform?: string | null
+          source_type?: string | null
+          stage?: string | null
+          status?: string | null
+          tags?: string | null
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          contacted_at?: string | null
+          created_at?: string | null
+          cv_filename?: string | null
+          cv_text?: string | null
+          decision?: string | null
+          experience_text?: string | null
+          experience_years?: number | null
+          id?: never
+          initials?: string | null
+          job_id?: number | null
+          location?: string | null
+          profile_data?: string | null
+          profile_url?: string | null
+          qualification_notes?: string | null
+          qualification_score?: number | null
+          rejection_reason?: string | null
+          role?: string | null
+          salary_expectation?: number | null
+          source_platform?: string | null
+          source_type?: string | null
+          stage?: string | null
+          status?: string | null
+          tags?: string | null
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "farmasoft_candidates_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "farmasoft_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      farmasoft_events: {
+        Row: {
+          candidate_id: number | null
+          created_at: string | null
+          id: number
+          job_id: number | null
+          metadata: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          candidate_id?: number | null
+          created_at?: string | null
+          id?: never
+          job_id?: number | null
+          metadata?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          candidate_id?: number | null
+          created_at?: string | null
+          id?: never
+          job_id?: number | null
+          metadata?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      farmasoft_interviews: {
+        Row: {
+          candidate_id: number
+          created_at: string | null
+          decision: string | null
+          id: number
+          interviewer: string | null
+          job_id: number | null
+          notes: string | null
+          scheduled_at: string
+          type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          candidate_id: number
+          created_at?: string | null
+          decision?: string | null
+          id?: never
+          interviewer?: string | null
+          job_id?: number | null
+          notes?: string | null
+          scheduled_at: string
+          type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          candidate_id?: number
+          created_at?: string | null
+          decision?: string | null
+          id?: never
+          interviewer?: string | null
+          job_id?: number | null
+          notes?: string | null
+          scheduled_at?: string
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "farmasoft_interviews_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "farmasoft_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "farmasoft_interviews_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "farmasoft_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      farmasoft_jobs: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          experience_years: number | null
+          id: number
+          is_active: number | null
+          location: string | null
+          requirements: string | null
+          salary_currency: string | null
+          salary_max: number | null
+          salary_min: number | null
+          skills: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          experience_years?: number | null
+          id?: never
+          is_active?: number | null
+          location?: string | null
+          requirements?: string | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          experience_years?: number | null
+          id?: never
+          is_active?: number | null
+          location?: string | null
+          requirements?: string | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      farmasoft_messages: {
+        Row: {
+          ai_generated: number | null
+          body: string | null
+          created_at: string | null
+          id: number
+          job_id: number | null
+          language: string | null
+          name: string | null
+          subject: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_generated?: number | null
+          body?: string | null
+          created_at?: string | null
+          id?: never
+          job_id?: number | null
+          language?: string | null
+          name?: string | null
+          subject?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_generated?: number | null
+          body?: string | null
+          created_at?: string | null
+          id?: never
+          job_id?: number | null
+          language?: string | null
+          name?: string | null
+          subject?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "farmasoft_messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "farmasoft_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      farmasoft_settings: {
+        Row: {
+          key: string
+          user_id: string
+          value: string | null
+        }
+        Insert: {
+          key: string
+          user_id: string
+          value?: string | null
+        }
+        Update: {
+          key?: string
+          user_id?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
       hr_disputes: {
         Row: {
           created_at: string | null
