@@ -104,7 +104,7 @@ function EditModal({ interview, onSave, onClose }: {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
           <div>
             <label className="form-label">Type</label>
-            <select className="form-input" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+            <select className="form-input" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as "phone" | "video" | "on-site" }))}>
               <option value="phone">Téléphone</option>
               <option value="video">Visio</option>
               <option value="on-site">Présentiel</option>
@@ -112,7 +112,7 @@ function EditModal({ interview, onSave, onClose }: {
           </div>
           <div>
             <label className="form-label">Décision</label>
-            <select className="form-input" value={form.decision} onChange={e => setForm(f => ({ ...f, decision: e.target.value }))}>
+            <select className="form-input" value={form.decision} onChange={e => setForm(f => ({ ...f, decision: e.target.value as "pending" | "hire" | "reject" }))}>
               <option value="pending">En attente</option>
               <option value="hire">Retenu</option>
               <option value="reject">Refusé</option>
