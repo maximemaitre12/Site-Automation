@@ -1,0 +1,26 @@
+import { create } from 'zustand'
+import { Lang } from '../i18n'
+
+export type Page = 'dashboard' | 'jobs' | 'interviews' | 'settings'
+
+interface AppStore {
+  currentPage: Page
+  apiKeyConfigured: boolean
+  uiLang: Lang
+  sidebarOpen: boolean
+  setPage: (page: Page) => void
+  setApiKeyConfigured: (v: boolean) => void
+  setUiLang: (lang: Lang) => void
+  toggleSidebar: () => void
+}
+
+export const useAppStore = create<AppStore>((set) => ({
+  currentPage: 'dashboard',
+  apiKeyConfigured: false,
+  uiLang: 'en',
+  sidebarOpen: true,
+  setPage: (currentPage) => set({ currentPage }),
+  setApiKeyConfigured: (apiKeyConfigured) => set({ apiKeyConfigured }),
+  setUiLang: (uiLang) => set({ uiLang }),
+  toggleSidebar: () => set(s => ({ sidebarOpen: !s.sidebarOpen })),
+}))
