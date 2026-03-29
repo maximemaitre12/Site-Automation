@@ -4,23 +4,23 @@ import { TrendingDown, PackageX, ClipboardList, Database } from "lucide-react";
 const painPoints = [
   {
     icon: TrendingDown,
-    title: "Prévisions peu fiables",
-    description: "Vos prévisions de demande manquent de précision, entraînant des décisions basées sur l'intuition plutôt que sur les données.",
+    title: "Unreliable forecasts",
+    description: "Your demand forecasts lack accuracy, leading to decisions based on intuition rather than data.",
   },
   {
     icon: PackageX,
-    title: "Surstocks et ruptures",
-    description: "L'équilibre entre disponibilité produit et coût de stockage reste un défi permanent pour vos équipes.",
+    title: "Overstocks & stockouts",
+    description: "Balancing product availability with storage costs remains a constant challenge for your teams.",
   },
   {
     icon: ClipboardList,
-    title: "Processus manuels chronophages",
-    description: "Des tâches répétitives mobilisent vos équipes sur des activités à faible valeur ajoutée au lieu de se concentrer sur l'analyse.",
+    title: "Time-consuming manual processes",
+    description: "Repetitive tasks keep your teams busy with low-value activities instead of focusing on analysis.",
   },
   {
     icon: Database,
-    title: "Données sous-exploitées",
-    description: "Vous disposez de volumes importants de données, mais leur potentiel reste largement inexploité faute d'outils adaptés.",
+    title: "Underutilized data",
+    description: "You have large volumes of data, but their potential remains largely untapped due to a lack of proper tools.",
   },
 ];
 
@@ -33,12 +33,12 @@ export function SupplyPainPoints() {
         <p className={`text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground text-center mb-4 transition-all duration-500 ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}>
-          Vous reconnaissez ces situations ?
+          Sound familiar?
         </p>
         <h2 className={`text-3xl sm:text-4xl font-semibold text-foreground text-center tracking-tight transition-all duration-500 delay-75 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
         }`}>
-          Des défis que nous comprenons
+          Challenges we understand
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-16">
