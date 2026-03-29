@@ -1,9 +1,8 @@
-import { Menu, X, Mail } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
-
-const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,13 +25,11 @@ export function LandingHeader() {
           </Link>
           
           <div className="hidden md:flex items-center">
-            <a
-              href={`mailto:${EMAILS.join(',')}?subject=AETHER — Contact`}
-              className="relative px-5 py-2 text-sm font-medium text-primary-foreground rounded-full bg-foreground hover:bg-foreground/90 transition-all duration-300 hover:shadow-lg active:scale-[0.97] flex items-center gap-2"
-            >
-              <Mail className="w-3.5 h-3.5" />
-              <span>Contact us</span>
-            </a>
+            <Link to="/auth?mode=login&redirect=/farmasoft">
+              <Button variant="default" size="sm" className="rounded-full px-5">
+                Log in
+              </Button>
+            </Link>
           </div>
           
           <button
@@ -47,14 +44,13 @@ export function LandingHeader() {
           <div className="md:hidden absolute top-14 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border shadow-xl py-4 px-4 animate-fade-in">
             <nav className="flex flex-col gap-1">
               <div className="pt-2">
-                <a
-                  href={`mailto:${EMAILS.join(',')}?subject=AETHER — Contact`}
+                <Link
+                  to="/auth?mode=login&redirect=/farmasoft"
                   onClick={() => setIsMenuOpen(false)}
                   className="w-full py-2.5 px-4 text-sm font-medium text-primary-foreground rounded-xl bg-foreground flex items-center justify-center gap-2"
                 >
-                  <Mail className="w-4 h-4" />
-                  Contact us
-                </a>
+                  Log in
+                </Link>
               </div>
             </nav>
           </div>
