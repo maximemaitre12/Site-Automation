@@ -298,7 +298,8 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    let userId = "anonymous";
+    const ANON_UUID = "00000000-0000-0000-0000-000000000000";
+    let userId = ANON_UUID;
     let supabase;
 
     if (authHeader?.startsWith("Bearer ") && authHeader.length > 20) {
@@ -314,12 +315,12 @@ serve(async (req) => {
       } catch { /* use anonymous */ }
     }
 
-    if (!supabase || userId === "anonymous") {
+    if (!supabase || userId === ANON_UUID) {
       supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       );
-      userId = "anonymous";
+      userId = ANON_UUID;
     }
 
     const url = new URL(req.url);
