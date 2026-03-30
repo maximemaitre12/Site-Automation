@@ -174,9 +174,9 @@ export function MethodSection() {
                 </div>
 
                 {/* Duration */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08]">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-[pulse_2s_ease-in-out_infinite]" />
-                  <span className="text-[10px] font-semibold text-slate-400">{step.duration}</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]" />
+                  <span className="text-[10px] font-semibold text-slate-500">{step.duration}</span>
                 </div>
               </div>
             );

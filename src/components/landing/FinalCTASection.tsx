@@ -18,10 +18,10 @@ export function FinalCTASection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}
       >
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">
           Identifiez vos leviers d'<span className="text-primary">optimisation</span>
         </h2>
-        <p className="text-sm sm:text-base text-slate-400 max-w-lg mx-auto mb-8">
+        <p className="text-sm sm:text-base text-slate-500 max-w-lg mx-auto mb-8">
           Échangez avec nous pour analyser vos opérations et identifier des opportunités concrètes d'amélioration.
         </p>
         <a href="mailto:contact@aether-connect.com">

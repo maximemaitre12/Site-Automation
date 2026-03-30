@@ -184,7 +184,7 @@ export function PositioningSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">UTF-8 · TypeScript</span>
-                <span className="font-mono text-[10px] text-emerald-500">● Pipeline Active</span>
+                <span className="font-mono text-[10px] text-primary">● Pipeline Active</span>
                 <span className="font-mono text-[10px] text-slate-500">Ln {code.lines.length}, Col 1</span>
               </div>
             }

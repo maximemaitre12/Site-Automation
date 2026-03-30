@@ -160,7 +160,7 @@ export function ImpactSection() {
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-400">Threads: 554</span>
                 <span className="font-mono text-[10px] text-slate-400">Processus: 312</span>
-                <span className="font-mono text-[10px] text-emerald-500">System: Optimal</span>
+                <span className="font-mono text-[10px] text-primary">System: Optimal</span>
               </div>
             }
           >

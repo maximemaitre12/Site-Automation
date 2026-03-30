@@ -123,7 +123,7 @@ export function ProblemsSection() {
             scannedCount >= processes.length ? "opacity-100" : "opacity-0"
           )}>
             <span className="text-xs sm:text-sm text-slate-500">
-              <span className="text-red-500 font-semibold">{criticalCount} points de friction</span> identifiés
+              <span className="text-[hsl(260_70%_60%)] font-semibold">{criticalCount} points de friction</span> identifiés
             </span>
             <span className="text-xs sm:text-sm text-slate-500">
               Potentiel d'optimisation : <span className="text-primary font-bold">{potential}/an</span>
