@@ -5,19 +5,36 @@ import { useEffect, useState } from "react";
 const useCases = [
   {
     title: "Recrutement de profils critiques",
-    before: ["Tri manuel", "Flux lent", "Tâches admin"],
-    after: ["Tri accéléré", "Flux optimisé", "Automatisé"],
+    subtitle: "De 45 jours à 12 jours en moyenne",
+    before: [
+      { label: "Tri manuel", status: "slow" },
+      { label: "Flux lent", status: "blocked" },
+      { label: "Admin lourd", status: "slow" },
+    ],
+    after: [
+      { label: "Tri accéléré", status: "ok" },
+      { label: "Flux optimisé", status: "ok" },
+      { label: "Automatisé", status: "ok" },
+    ],
   },
   {
     title: "Optimisation des processus",
-    before: ["Répétitif", "Blocages", "Non structuré"],
-    after: ["Simplifié", "Fluidifié", "Structuré"],
+    subtitle: "Réduction de 40% des délais opérationnels",
+    before: [
+      { label: "Répétitif", status: "slow" },
+      { label: "Blocages", status: "blocked" },
+      { label: "Non structuré", status: "slow" },
+    ],
+    after: [
+      { label: "Simplifié", status: "ok" },
+      { label: "Fluidifié", status: "ok" },
+      { label: "Structuré", status: "ok" },
+    ],
   },
 ];
 
-function BeforeAfterDiagram({ beforeItems, afterItems, isVisible, delay }: {
-  beforeItems: string[];
-  afterItems: string[];
+function BeforeAfterDiagram({ useCase, isVisible, delay }: {
+  useCase: typeof useCases[0];
   isVisible: boolean;
   delay: number;
 }) {
@@ -25,82 +42,90 @@ function BeforeAfterDiagram({ beforeItems, afterItems, isVisible, delay }: {
 
   useEffect(() => {
     if (!isVisible) return;
-    const timer = setTimeout(() => setShowAfter(true), delay + 800);
+    const timer = setTimeout(() => setShowAfter(true), delay + 1000);
     return () => clearTimeout(timer);
   }, [isVisible, delay]);
 
   return (
-    <svg viewBox="0 0 300 100" className="w-full max-w-[280px] mx-auto" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 380 130" className="w-full" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id={`case-glow-${delay}`}>
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Before label */}
+      <text x="65" y="14" textAnchor="middle" className="text-[9px] font-semibold fill-muted-foreground/60 select-none uppercase">Avant</text>
+      
+      {/* After label */}
+      <text x="315" y="14" textAnchor="middle" className="text-[9px] font-semibold fill-primary/60 select-none uppercase">Après</text>
+
+      {/* Arrow */}
+      <path d="M 155 65 L 225 65" fill="none" stroke={showAfter ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.15)"} strokeWidth="2" className="transition-all duration-700" markerEnd={showAfter ? "url(#case-arrow)" : undefined} />
+      <defs>
+        <marker id="case-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 Z" fill="hsl(var(--primary))" />
+        </marker>
+      </defs>
+
+      {/* Particle on arrow */}
+      {showAfter && (
+        <circle r="3" fill="hsl(var(--primary))" opacity="0.6">
+          <animateMotion dur="1.5s" repeatCount="indefinite" path="M 155 65 L 225 65" />
+        </circle>
+      )}
+
       {/* Before nodes */}
-      {beforeItems.map((item, i) => {
-        const y = 15 + i * 30;
+      {useCase.before.map((item, i) => {
+        const y = 30 + i * 32;
         return (
-          <g key={`before-${i}`}>
+          <g key={`b-${i}`}>
             <rect
-              x="10" y={y} width="80" height="22" rx="4"
-              fill={showAfter ? "hsl(var(--muted-foreground) / 0.05)" : "hsl(var(--destructive) / 0.08)"}
-              stroke={showAfter ? "hsl(var(--muted-foreground) / 0.1)" : "hsl(var(--destructive) / 0.3)"}
+              x="10" y={y} width="110" height="26" rx="6"
+              fill={showAfter ? "hsl(var(--muted-foreground) / 0.04)" : "hsl(var(--destructive) / 0.06)"}
+              stroke={showAfter ? "hsl(var(--muted-foreground) / 0.08)" : "hsl(var(--destructive) / 0.25)"}
               strokeWidth="1"
               className="transition-all duration-700"
             />
             {showAfter && (
-              <line x1="12" y1={y + 11} x2="88" y2={y + 11} stroke="hsl(var(--muted-foreground) / 0.3)" strokeWidth="1" />
+              <line x1="15" y1={y + 13} x2="115" y2={y + 13} stroke="hsl(var(--muted-foreground) / 0.2)" strokeWidth="1" />
             )}
-            <text
-              x="50" y={y + 12} textAnchor="middle" dominantBaseline="middle"
-              className={cn(
-                "text-[7px] font-medium transition-all duration-500",
-                showAfter ? "fill-muted-foreground/40" : "fill-destructive"
-              )}
+            <text x="65" y={y + 14} textAnchor="middle" dominantBaseline="middle"
+              className={cn("text-[9px] font-medium transition-all duration-500 select-none", showAfter ? "fill-muted-foreground/40" : "fill-destructive/70")}
             >
-              {item}
+              {item.label}
             </text>
           </g>
         );
       })}
 
-      {/* Arrow */}
-      <g>
-        <line
-          x1="105" y1="50" x2="185" y2="50"
-          stroke={showAfter ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.2)"}
-          strokeWidth="1.5"
-          markerEnd={showAfter ? "url(#uc-arrow)" : undefined}
-          className="transition-all duration-500"
-        />
-        {showAfter && (
-          <circle r="2.5" fill="hsl(var(--primary))" opacity="0.7">
-            <animateMotion dur="1.2s" repeatCount="indefinite" path="M 105 50 L 185 50" />
-          </circle>
-        )}
-      </g>
-
-      <defs>
-        <marker id="uc-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M 0 0 L 6 3 L 0 6 Z" fill="hsl(var(--primary))" />
-        </marker>
-      </defs>
-
       {/* After nodes */}
-      {afterItems.map((item, i) => {
-        const y = 15 + i * 30;
+      {useCase.after.map((item, i) => {
+        const y = 30 + i * 32;
         return (
-          <g key={`after-${i}`}>
+          <g key={`a-${i}`}>
             <rect
-              x="200" y={y} width="80" height="22" rx="4"
-              fill={showAfter ? "hsl(var(--primary) / 0.08)" : "hsl(var(--muted))"}
-              stroke={showAfter ? "hsl(var(--primary) / 0.4)" : "hsl(var(--muted-foreground) / 0.1)"}
-              strokeWidth="1"
+              x="260" y={y} width="110" height="26" rx="6"
+              fill={showAfter ? "hsl(var(--primary) / 0.08)" : "hsl(var(--muted) / 0.3)"}
+              stroke={showAfter ? "hsl(var(--primary) / 0.35)" : "hsl(var(--muted-foreground) / 0.08)"}
+              strokeWidth={showAfter ? 1.5 : 1}
               className="transition-all duration-700"
+              filter={showAfter ? `url(#case-glow-${delay})` : undefined}
             />
-            <text
-              x="240" y={y + 12} textAnchor="middle" dominantBaseline="middle"
-              className={cn(
-                "text-[7px] font-medium transition-all duration-500",
-                showAfter ? "fill-primary" : "fill-muted-foreground/40"
-              )}
+            {/* Check mark */}
+            {showAfter && (
+              <circle cx="275" cy={y + 13} r="5" fill="hsl(var(--primary) / 0.2)">
+                <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" begin={`${i * 0.2}s`} />
+              </circle>
+            )}
+            <text x="320" y={y + 14} textAnchor="middle" dominantBaseline="middle"
+              className={cn("text-[9px] font-medium transition-all duration-500 select-none", showAfter ? "fill-primary" : "fill-muted-foreground/30")}
             >
-              {item}
+              {item.label}
             </text>
           </g>
         );
@@ -113,38 +138,33 @@ export function UseCasesSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   return (
-    <section className="py-16 sm:py-24 bg-background">
+    <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className={cn(
-          "text-center mb-10 sm:mb-14 transition-all duration-500",
+          "text-center mb-12 sm:mb-16 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-3">
-            Exemples d'optimisation
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-3">
+            Cas d'usage <span className="text-primary">concrets</span>
           </h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+            Des transformations mesurables chez nos clients.
+          </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {useCases.map((uc, i) => (
             <div
               key={i}
               className={cn(
-                "rounded-xl border bg-card p-5 sm:p-6 transition-all duration-500",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                "group rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 sm:p-8 transition-all duration-600 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5",
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}
-              style={{ transitionDelay: `${i * 200}ms` }}
+              style={{ transitionDelay: `${i * 200 + 200}ms` }}
             >
-              <h3 className="text-sm font-semibold text-foreground mb-4 text-center">{uc.title}</h3>
-              <BeforeAfterDiagram
-                beforeItems={uc.before}
-                afterItems={uc.after}
-                isVisible={isVisible}
-                delay={i * 300}
-              />
-              <div className="flex justify-between mt-3 px-2">
-                <span className="text-[10px] text-muted-foreground">Avant</span>
-                <span className="text-[10px] text-primary font-medium">Après</span>
-              </div>
+              <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">{uc.title}</h3>
+              <p className="text-xs text-primary font-medium mb-5">{uc.subtitle}</p>
+              <BeforeAfterDiagram useCase={uc} isVisible={isVisible} delay={i * 300} />
             </div>
           ))}
         </div>
