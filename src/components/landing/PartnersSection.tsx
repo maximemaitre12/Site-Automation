@@ -2,7 +2,7 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 import { MacWindow } from "./MacWindow";
 import { useState } from "react";
-import { Shield, Zap, Globe, Server, ChevronRight, Activity } from "lucide-react";
+import { ChevronRight, Activity } from "lucide-react";
 import awsLogo from "@/assets/partners/aws.png";
 import microsoftLogo from "@/assets/partners/microsoft.png";
 import gcpLogo from "@/assets/partners/gcp.png";
@@ -14,7 +14,6 @@ const partners = [
     short: "AWS",
     tag: "CLOUD-01",
     tier: "Premier Partner",
-    icon: Server,
     gradient: "from-primary to-[hsl(260_70%_60%)]",
     glowColor: "hsl(239,84%,67%)",
     desc: "Infrastructure cloud, compute distribué et services IA managés (SageMaker, Bedrock).",
@@ -23,14 +22,14 @@ const partners = [
       { label: "Services", value: "200+" },
       { label: "SLA", value: "99.99%" },
     ],
-    logo: <img src={awsLogo} alt="AWS" className="h-8 w-auto object-contain" />,
+    logo: awsLogo,
+    logoAlt: "AWS",
   },
   {
     name: "Microsoft Azure",
     short: "Microsoft",
     tag: "CLOUD-02",
     tier: "Gold Partner",
-    icon: Shield,
     gradient: "from-[hsl(210,85%,50%)] to-[hsl(200,80%,55%)]",
     glowColor: "hsl(210,85%,50%)",
     desc: "Écosystème Azure, OpenAI Service, intégration native M365 et sécurité enterprise.",
@@ -39,14 +38,14 @@ const partners = [
       { label: "IA Models", value: "GPT-4o" },
       { label: "Compliance", value: "90+" },
     ],
-    logo: <img src={microsoftLogo} alt="Microsoft" className="h-8 w-auto object-contain" />,
+    logo: microsoftLogo,
+    logoAlt: "Microsoft",
   },
   {
     name: "Google Cloud Platform",
     short: "Google Cloud",
     tag: "CLOUD-03",
     tier: "Partner",
-    icon: Globe,
     gradient: "from-[hsl(200,80%,55%)] to-primary",
     glowColor: "hsl(200,80%,55%)",
     desc: "BigQuery, Vertex AI, Gemini API. Analytics avancées et infrastructure data à l'échelle.",
@@ -55,14 +54,14 @@ const partners = [
       { label: "IA", value: "Gemini" },
       { label: "Data", value: "BigQuery" },
     ],
-    logo: <img src={gcpLogo} alt="Google Cloud" className="h-8 w-auto object-contain" />,
+    logo: gcpLogo,
+    logoAlt: "Google Cloud",
   },
   {
     name: "Confluent",
     short: "Confluent",
     tag: "DATA-04",
     tier: "Technology Partner",
-    icon: Zap,
     gradient: "from-[hsl(260,70%,60%)] to-[hsl(280,60%,55%)]",
     glowColor: "hsl(260,70%,60%)",
     desc: "Streaming de données en temps réel avec Apache Kafka managé. Event-driven architecture.",
@@ -71,7 +70,8 @@ const partners = [
       { label: "Latence", value: "< 5ms" },
       { label: "Connectors", value: "120+" },
     ],
-    logo: <img src={confluentLogo} alt="Confluent" className="h-8 w-auto object-contain" />,
+    logo: confluentLogo,
+    logoAlt: "Confluent",
   },
 ];
 
@@ -109,7 +109,7 @@ function ConnectionPulse({ color, isVisible, delay }: { color: string; isVisible
 function MobilePartnerCard({ partner, index, isVisible }: {
   partner: typeof partners[0]; index: number; isVisible: boolean;
 }) {
-  const Icon = partner.icon;
+  
   const delay = index * 120 + 200;
 
   return (
@@ -121,11 +121,8 @@ function MobilePartnerCard({ partner, index, isVisible }: {
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className={cn(
-          "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10",
-          partner.gradient
-        )} style={{ boxShadow: `0 0 12px ${partner.glowColor}20` }}>
-          <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
+        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 ring-1 ring-slate-200 p-1.5">
+          <img src={partner.logo} alt={partner.logoAlt} className="w-full h-full object-contain" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -159,7 +156,7 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
   partner: typeof partners[0]; index: number; isActive: boolean;
   onClick: () => void; isVisible: boolean;
 }) {
-  const Icon = partner.icon;
+  
   const delay = index * 100 + 200;
 
   return (
@@ -173,11 +170,8 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
         )}
         style={{ transitionDelay: `${delay}ms` }}
       >
-        <div className={cn(
-          "w-9 h-9 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10 transition-shadow",
-          partner.gradient
-        )} style={{ boxShadow: isActive ? `0 0 16px ${partner.glowColor}25` : undefined }}>
-          <Icon className="w-4 h-4 text-white" strokeWidth={1.5} />
+        <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0 ring-1 ring-slate-200 p-1.5">
+          <img src={partner.logo} alt={partner.logoAlt} className="w-full h-full object-contain" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -207,16 +201,13 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
 
 /* ── Detail pane ── */
 function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; isVisible: boolean }) {
-  const Icon = partner.icon;
+  
   return (
     <div className={cn("p-5 lg:p-6 transition-all duration-400", isVisible ? "opacity-100" : "opacity-0")}>
       {/* Header */}
       <div className="flex items-start gap-4 mb-5">
-        <div className={cn(
-          "w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-xl ring-1 ring-white/10 shrink-0",
-          partner.gradient
-        )} style={{ boxShadow: `0 0 24px ${partner.glowColor}20` }}>
-          <Icon className="w-7 h-7 text-white" strokeWidth={1.5} />
+        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-xl ring-1 ring-slate-200 shrink-0 p-2">
+          <img src={partner.logo} alt={partner.logoAlt} className="w-full h-full object-contain" />
         </div>
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -230,10 +221,8 @@ function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; is
       </div>
 
       {/* Logo display */}
-      <div className="rounded-xl bg-white/[0.04] border border-white/5 p-4 mb-5 flex items-center justify-center">
-        <div className="text-slate-400 scale-150 origin-center">
-          {partner.logo}
-        </div>
+      <div className="rounded-xl bg-white/[0.04] border border-white/5 p-6 mb-5 flex items-center justify-center">
+        <img src={partner.logo} alt={partner.logoAlt} className="h-12 w-auto object-contain" />
       </div>
 
       {/* Metrics */}
