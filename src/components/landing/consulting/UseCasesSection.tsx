@@ -174,7 +174,7 @@ function MobileKPICard({ kpi, visible, delay }: { kpi: typeof useCases[0]["kpis"
       </div>
       <span className={cn(
         "font-mono text-xs font-bold shrink-0",
-        kpi.delta < 0 ? "text-emerald-400" : "text-emerald-400"
+        "text-primary"
       )}>
         {kpi.delta > 0 ? "+" : ""}{kpi.delta}%
       </span>
