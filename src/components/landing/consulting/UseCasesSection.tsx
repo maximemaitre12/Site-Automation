@@ -79,7 +79,7 @@ function DatasetRow({ uc, active, onClick, visible, idx }: {
       </div>
       <span className={cn(
         "font-mono text-xs font-bold shrink-0",
-        uc.metric.startsWith("+") || uc.metric.startsWith("÷") ? "text-emerald-400" : "text-emerald-400"
+        "text-primary"
       )}>{uc.metric}</span>
     </button>
   );
