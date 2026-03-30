@@ -145,8 +145,6 @@ function MiniChart({ kpis, visible }: { kpis: typeof useCases[0]["kpis"]; visibl
           <stop offset="100%" stopColor="hsl(260,70%,60%)" />
         </linearGradient>
       </defs>
-        </linearGradient>
-      </defs>
     </svg>
   );
 }
