@@ -68,10 +68,13 @@ export function HeroSection() {
               <a href="mailto:contact@aether-connect.com">
                 <Button
                   size="lg"
-                  className="h-13 px-10 text-sm font-semibold bg-gradient-to-r from-primary to-[hsl(260_70%_60%)] hover:from-primary/90 hover:to-[hsl(260_70%_55%)] border-0 shadow-[0_4px_24px_hsl(239_84%_67%/0.25)] hover:shadow-[0_6px_32px_hsl(239_84%_67%/0.35)] transition-all duration-300 hover:-translate-y-0.5"
+                  className="group/btn relative h-13 px-10 text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 border-0 shadow-[0_4px_20px_hsl(220_20%_10%/0.15)] hover:shadow-[0_8px_30px_hsl(220_20%_10%/0.25)] transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
                 >
-                  Demander un échange
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    Réserver un appel découverte
+                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                  </span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-primary to-[hsl(260_70%_60%)] opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                 </Button>
               </a>
               <a href="#methode" className="text-sm font-medium text-slate-500 hover:text-primary transition-colors flex items-center gap-1.5 pt-3 sm:pt-0 sm:self-center">
