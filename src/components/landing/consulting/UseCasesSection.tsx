@@ -323,8 +323,8 @@ export function UseCasesSection() {
                       isVisible ? "opacity-100" : "opacity-0"
                     )} style={{ transitionDelay: `${i * 150 + 400}ms` }}>
                       <div className="px-3 py-2.5 text-[11px] text-slate-300 font-mono">{kpi.label}</div>
-                      <div className="px-3 py-2.5 text-center text-[11px] text-red-400/70 line-through font-mono">{kpi.before}</div>
-                      <div className="px-3 py-2.5 text-center text-[11px] text-emerald-400 font-bold font-mono">{kpi.after}</div>
+                      <div className="px-3 py-2.5 text-center text-[11px] text-[hsl(260,70%,60%)]/70 line-through font-mono">{kpi.before}</div>
+                      <div className="px-3 py-2.5 text-center text-[11px] text-primary font-bold font-mono">{kpi.after}</div>
                       <div className="px-3 py-2.5 flex items-center gap-2">
                         <div className="flex-1">
                           <AnimatedBar percent={Math.abs(kpi.delta)} visible={isVisible} />
