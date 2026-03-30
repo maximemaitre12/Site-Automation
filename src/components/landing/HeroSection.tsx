@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { HeroDiagram } from "./consulting/HeroDiagram";
+
 import { useCountUp } from "@/hooks/useCountUp";
 
 const stats = [
