@@ -161,7 +161,7 @@ function MobilePartnerCard({ partner, index, isVisible }: {
           </div>
           <span className="text-[10px] text-primary/60 font-medium">{partner.tier}</span>
         </div>
-        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono shrink-0">
+        <span className="flex items-center gap-1 text-[9px] text-primary font-mono shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Actif
         </span>
