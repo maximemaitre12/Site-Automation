@@ -267,8 +267,8 @@ export function PartnersSection() {
   const active = partners[activeIndex];
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220,20%,18%/0.4)_1px,transparent_1px)] bg-[length:24px_24px]" />
+    <section className="py-16 sm:py-24 bg-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:24px_24px]" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
