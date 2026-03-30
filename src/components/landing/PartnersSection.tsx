@@ -11,8 +11,8 @@ const partners = [
     tag: "CLOUD-01",
     tier: "Premier Partner",
     icon: Server,
-    gradient: "from-[hsl(30,90%,50%)] to-[hsl(35,85%,45%)]",
-    glowColor: "hsl(32,87%,47%)",
+    gradient: "from-primary to-[hsl(260_70%_60%)]",
+    glowColor: "hsl(239,84%,67%)",
     desc: "Infrastructure cloud, compute distribué et services IA managés (SageMaker, Bedrock).",
     stats: [
       { label: "Régions", value: "33" },
