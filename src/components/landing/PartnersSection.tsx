@@ -31,8 +31,8 @@ const partners = [
     tag: "CLOUD-02",
     tier: "Gold Partner",
     icon: Shield,
-    gradient: "from-[hsl(210,85%,50%)] to-[hsl(195,75%,45%)]",
-    glowColor: "hsl(202,80%,47%)",
+    gradient: "from-[hsl(210,85%,50%)] to-[hsl(200,80%,55%)]",
+    glowColor: "hsl(210,85%,50%)",
     desc: "Écosystème Azure, OpenAI Service, intégration native M365 et sécurité enterprise.",
     stats: [
       { label: "Datacenters", value: "60+" },
