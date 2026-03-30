@@ -1,44 +1,34 @@
 
 
-## Plan: Refonte totale TrainingsSection — AETHER LEARNING STUDIO v3.0
+## Plan: Normalisation globale des couleurs — Violet/Bleu uniquement
 
-Remplacement complet du "App Store" actuel par un **IDE/Learning Management System** dark premium, style VS Code / Notion croise avec un player video educatif.
+### Problème
+La LP utilise trop de couleurs (emerald, amber, orange, red, yellow, teal, cyan) qui créent un patchwork visuel non professionnel.
 
-### Concept creatif
+### Direction
+- **2 couleurs principales** : Violet (`primary` / `hsl(260 70% 60%)`) et Bleu clair (`hsl(200 80% 55%)`)
+- **Fond blanc** partout — supprimer `bg-slate-50`, `bg-slate-900`, `bg-slate-950`
+- **Emerald** gardé UNIQUEMENT pour les petits dots "Live" / "Actif" (1.5px pulsants)
+- Tout le reste (barres, métriques, accents, badges, sparklines) → violet/bleu
 
-Simuler **"AETHER LEARNING STUDIO v3.0"** — un IDE de formation IA :
+### Fichiers modifiés (9 fichiers)
 
-**Desktop** : MacWindow dark avec 2 panneaux
-- **Sidebar gauche** (bg-slate-900) : les 3 formations comme des "projets" avec icone gradient, barre de progression circulaire SVG (competence level), tag de difficulte colore, et mini indicateur de duree
-- **Zone principale** :
-  1. **Header cours** : grande icone gradient (64px) + titre + badges (duree, niveau, format) en pills glass-morphism + CTA "Demander un devis" lumineux avec glow
-  2. **Timeline des modules** : ligne verticale avec 3 nodes connectees — chaque module est une "etape" avec dot anime, titre, description courte, et icone. Style commit-graph / git timeline
-  3. **Competences acquises** : barres horizontales animees au scroll avec labels et pourcentages (ex: "LLM Architecture 90%", "Prompt Design 85%")
-  4. **Footer module** : mini cards horizontales "Key Takeaways" avec icones et texte court
+| Fichier | Changements clés |
+|---------|-----------------|
+| **ProblemsSection.tsx** | `bg-slate-50` → `bg-white`. Barres critical/warning/optimal → gradient violet (intensité selon score). Badges → violet shades. Scores texte → primary/violet |
+| **ImpactSection.tsx** | `barColor` emerald/amber → primary/violet/bleu. Sparkline colors → all primary/bleu. Supprimer orange/amber |
+| **PositioningSection.tsx** | `bg-slate-50` → `bg-white`. Sidebar `bg-slate-900` → `bg-slate-800` (garder dark car c'est un IDE) |
+| **MethodSection.tsx** | `bg-slate-950` → `bg-white`, texte dark. Accent "emerald" step 3 → bleu clair `hsl(200 80% 55%)`. Supprimer emerald bar/glow/numBg. Duration dots → primary au lieu d'emerald |
+| **UseCasesSection.tsx** | Toutes les `text-emerald-400` métriques → `text-primary`. Hero metric glow → primary shadow. Active borders → primary. "LIVE" badges → primary pulse |
+| **DifferentiationSection.tsx** | Status "Opérationnel" emerald → primary. "6/6 active" → primary |
+| **PartnersSection.tsx** | "Actif"/"Live"/"Connecté" emerald → garder emerald UNIQUEMENT sur les petits dots 1.5px. Texte labels → primary |
+| **TrainingsSection.tsx** | Sidebar `bg-slate-900` → garder dark (IDE style). Normaliser gradients formations → violet/bleu |
+| **FinalCTASection.tsx** | `bg-slate-900` → `bg-white`. Texte blanc → `text-slate-900`. `text-slate-400` → `text-slate-500`. Ligne via-slate-700 → via-slate-200. CTA glow inchangé |
 
-**Mobile (390px — viewport actuel de l'utilisateur)** :
-- **Pas de sidebar** — les 3 formations deviennent des **tabs horizontaux** en haut avec icone + nom court, tab active avec underline gradient animee
-- Le header cours se reorganise en colonne (icone centree + infos en dessous)
-- La timeline des modules reste verticale mais plus compacte
-- Les barres de competences s'empilent pleine largeur
-- CTA sticky en bas pour une meilleure conversion mobile
-
-### Details visuels premium
-
-- MacWindow variant="dark" (bg-slate-900, bordures slate-700)
-- Icones de formation : carres 56px rounded-2xl avec gradient unique + ring glow subtle
-- Timeline : ligne verticale gradient (primary→purple) avec dots pulses et connecting lines
-- Barres de competence : gradient from-primary to-purple avec animation width 1.2s ease-out au scroll
-- Badges : glass-morphism (bg-white/5 backdrop-blur border-white/10)
-- CTA : bouton avec shadow-glow pulsant + hover scale
-- Transitions entre formations : fade + slide vertical smooth
-- Toolbar : "Curriculum · Competences · Certification" tabs
-
-### Fichier modifie
-
-| Fichier | Action |
-|---------|--------|
-| `src/components/landing/TrainingsSection.tsx` | Rewrite complet |
-
-Memes donnees (3 formations IA), presentation radicalement plus immersive et adaptee mobile-first.
+### Règle uniformisée
+- `emerald-400/500` pour métriques/barres/badges → `text-primary` / `bg-primary`
+- `amber-400`, `orange-400`, `yellow-400/500` → `hsl(200 80% 55%)` (bleu clair)
+- `red-400/500` barres → `hsl(260 70% 60%)` (violet moyen) à faible opacité
+- `teal-500`, `cyan-*` → supprimés
+- Seule exception : traffic lights macOS (`red-400`, `yellow-400`, `green-400`) restent intacts
 
