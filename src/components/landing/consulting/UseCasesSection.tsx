@@ -127,7 +127,7 @@ function MiniChart({ kpis, visible }: { kpis: typeof useCases[0]["kpis"]; visibl
           <g key={i}>
             {/* Before bar */}
             <rect x={x} y={chartH - beforeH} width={barW} height={beforeH} rx={3}
-              fill="#ef444440" className="transition-all duration-700" />
+              fill="hsl(260,70%,60%,0.25)" className="transition-all duration-700" />
             {/* After bar */}
             <rect x={x + barW + gap} y={visible ? chartH - afterH : chartH} width={barW}
               height={visible ? afterH : 0} rx={3}
