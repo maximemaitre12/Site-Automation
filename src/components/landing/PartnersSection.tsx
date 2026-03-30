@@ -215,7 +215,7 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
           <span className="text-[9px] text-primary/50 font-medium">{partner.tier}</span>
         </div>
 
-        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono shrink-0">
+        <span className="flex items-center gap-1 text-[9px] text-primary font-mono shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Live
         </span>
