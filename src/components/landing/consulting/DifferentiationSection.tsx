@@ -28,8 +28,8 @@ const capabilities = [
     tag: "AUTO-02",
     desc: "Réduisez les tâches manuelles répétitives. Orchestration intelligente multi-étapes avec validation humaine intégrée.",
     pct: 88,
-    gradient: "from-[hsl(160,70%,45%)] to-[hsl(170,60%,40%)]",
-    glowColor: "hsl(165,65%,42%)",
+    gradient: "from-[hsl(200,80%,55%)] to-[hsl(210,85%,50%)]",
+    glowColor: "hsl(200,80%,55%)",
     metrics: [
       { label: "Workflows", value: "340+" },
       { label: "Temps gagné", value: "62%" },
