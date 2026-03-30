@@ -39,17 +39,7 @@ const partners = [
       { label: "IA Models", value: "GPT-4o" },
       { label: "Compliance", value: "90+" },
     ],
-    logo: (
-      <div className="flex items-center gap-1.5">
-        <div className="grid grid-cols-2 gap-[2px] w-4 h-4">
-          <div className="bg-[#f25022] rounded-[1px]" />
-          <div className="bg-[#7fba00] rounded-[1px]" />
-          <div className="bg-[#00a4ef] rounded-[1px]" />
-          <div className="bg-[#ffb900] rounded-[1px]" />
-        </div>
-        <span className="text-sm font-semibold text-current">Microsoft</span>
-      </div>
-    ),
+    logo: <img src={microsoftLogo} alt="Microsoft" className="h-8 w-auto object-contain" />,
   },
   {
     name: "Google Cloud Platform",
