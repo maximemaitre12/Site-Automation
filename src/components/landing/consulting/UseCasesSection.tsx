@@ -164,9 +164,9 @@ function MobileKPICard({ kpi, visible, delay }: { kpi: typeof useCases[0]["kpis"
       <div className="flex-1 min-w-0">
         <span className="text-[10px] uppercase tracking-wider text-slate-500 font-mono">{kpi.label}</span>
         <div className="flex items-center gap-2 mt-1">
-          <span className="text-xs text-red-400/70 line-through font-mono">{kpi.before}</span>
+          <span className="text-xs text-[hsl(260,70%,60%)]/70 line-through font-mono">{kpi.before}</span>
           <ChevronRight className="w-3 h-3 text-slate-600" />
-          <span className="text-sm text-emerald-400 font-bold font-mono">{kpi.after}</span>
+          <span className="text-sm text-primary font-bold font-mono">{kpi.after}</span>
         </div>
       </div>
       <div className="w-20">
