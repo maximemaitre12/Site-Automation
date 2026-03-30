@@ -206,11 +206,8 @@ function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; is
     <div className={cn("p-5 lg:p-6 transition-all duration-400", isVisible ? "opacity-100" : "opacity-0")}>
       {/* Header */}
       <div className="flex items-start gap-4 mb-5">
-        <div className={cn(
-          "w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-xl ring-1 ring-white/10 shrink-0",
-          partner.gradient
-        )} style={{ boxShadow: `0 0 24px ${partner.glowColor}20` }}>
-          <Icon className="w-7 h-7 text-white" strokeWidth={1.5} />
+        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-xl ring-1 ring-slate-200 shrink-0 p-2">
+          <img src={partner.logo} alt={partner.logoAlt} className="w-full h-full object-contain" />
         </div>
         <div>
           <div className="flex items-center gap-2 mb-1">
