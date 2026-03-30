@@ -68,9 +68,9 @@ export function MethodSection() {
   return (
     <section id="methode" className="py-24 sm:py-32 bg-white relative overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_60%_70%/0.06)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-[radial-gradient(ellipse,hsl(239_84%_67%/0.06),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-[radial-gradient(ellipse,hsl(239_84%_67%/0.04),transparent_70%)]" />
 
       <div ref={ref} className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
