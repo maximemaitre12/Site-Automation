@@ -11,8 +11,8 @@ const partners = [
     tag: "CLOUD-01",
     tier: "Premier Partner",
     icon: Server,
-    gradient: "from-[hsl(30,90%,50%)] to-[hsl(35,85%,45%)]",
-    glowColor: "hsl(32,87%,47%)",
+    gradient: "from-primary to-[hsl(260_70%_60%)]",
+    glowColor: "hsl(239,84%,67%)",
     desc: "Infrastructure cloud, compute distribué et services IA managés (SageMaker, Bedrock).",
     stats: [
       { label: "Régions", value: "33" },
@@ -31,8 +31,8 @@ const partners = [
     tag: "CLOUD-02",
     tier: "Gold Partner",
     icon: Shield,
-    gradient: "from-[hsl(210,85%,50%)] to-[hsl(195,75%,45%)]",
-    glowColor: "hsl(202,80%,47%)",
+    gradient: "from-[hsl(210,85%,50%)] to-[hsl(200,80%,55%)]",
+    glowColor: "hsl(210,85%,50%)",
     desc: "Écosystème Azure, OpenAI Service, intégration native M365 et sécurité enterprise.",
     stats: [
       { label: "Datacenters", value: "60+" },
@@ -57,8 +57,8 @@ const partners = [
     tag: "CLOUD-03",
     tier: "Partner",
     icon: Globe,
-    gradient: "from-[hsl(145,60%,42%)] to-[hsl(200,70%,48%)]",
-    glowColor: "hsl(172,65%,45%)",
+    gradient: "from-[hsl(200,80%,55%)] to-primary",
+    glowColor: "hsl(200,80%,55%)",
     desc: "BigQuery, Vertex AI, Gemini API. Analytics avancées et infrastructure data à l'échelle.",
     stats: [
       { label: "Régions", value: "40" },
@@ -83,8 +83,8 @@ const partners = [
     tag: "DATA-04",
     tier: "Technology Partner",
     icon: Zap,
-    gradient: "from-[hsl(260,65%,55%)] to-[hsl(280,60%,50%)]",
-    glowColor: "hsl(270,62%,52%)",
+    gradient: "from-[hsl(260,70%,60%)] to-[hsl(280,60%,55%)]",
+    glowColor: "hsl(260,70%,60%)",
     desc: "Streaming de données en temps réel avec Apache Kafka managé. Event-driven architecture.",
     stats: [
       { label: "Throughput", value: "10M/s" },
@@ -161,7 +161,7 @@ function MobilePartnerCard({ partner, index, isVisible }: {
           </div>
           <span className="text-[10px] text-primary/60 font-medium">{partner.tier}</span>
         </div>
-        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono shrink-0">
+        <span className="flex items-center gap-1 text-[9px] text-primary font-mono shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Actif
         </span>
@@ -215,7 +215,7 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
           <span className="text-[9px] text-primary/50 font-medium">{partner.tier}</span>
         </div>
 
-        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono shrink-0">
+        <span className="flex items-center gap-1 text-[9px] text-primary font-mono shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Live
         </span>
@@ -275,7 +275,7 @@ function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; is
 
       {/* Status */}
       <div className="flex items-center gap-4 text-[10px]">
-        <span className="flex items-center gap-1.5 text-emerald-400">
+        <span className="flex items-center gap-1.5 text-primary">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Connecté
         </span>
@@ -330,7 +330,7 @@ export function PartnersSection() {
                     )}>{t}</span>
                   ))}
                 </div>
-                <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
+                <span className="text-[9px] font-mono text-primary flex items-center gap-1">
                   <Activity className="w-3 h-3" />
                   4/4 connected
                 </span>
@@ -339,7 +339,7 @@ export function PartnersSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">4 partenaires · infrastructure multi-cloud</span>
-                <span className="font-mono text-[10px] text-emerald-400 flex items-center gap-1">
+                <span className="font-mono text-[10px] text-primary flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                   Toutes connexions actives
                 </span>

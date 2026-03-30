@@ -15,7 +15,7 @@ const capabilities = [
     desc: "Anticipez les risques et opportunités avant vos concurrents grâce à nos modèles prédictifs entraînés sur vos données métier.",
     pct: 94,
     gradient: "from-[hsl(220,80%,55%)] to-primary",
-    glowColor: "hsl(230,70%,55%)",
+    glowColor: "hsl(239,84%,67%)",
     metrics: [
       { label: "Précision", value: "94.2%" },
       { label: "Latence", value: "< 80ms" },
@@ -28,8 +28,8 @@ const capabilities = [
     tag: "AUTO-02",
     desc: "Réduisez les tâches manuelles répétitives. Orchestration intelligente multi-étapes avec validation humaine intégrée.",
     pct: 88,
-    gradient: "from-[hsl(160,70%,45%)] to-[hsl(170,60%,40%)]",
-    glowColor: "hsl(165,65%,42%)",
+    gradient: "from-[hsl(200,80%,55%)] to-[hsl(210,85%,50%)]",
+    glowColor: "hsl(200,80%,55%)",
     metrics: [
       { label: "Workflows", value: "340+" },
       { label: "Temps gagné", value: "62%" },
@@ -42,8 +42,8 @@ const capabilities = [
     tag: "NLP-03",
     desc: "Compréhension contextuelle du langage métier. Extraction d'intentions, sentiment analysis et résumé automatique.",
     pct: 91,
-    gradient: "from-[hsl(270,65%,55%)] to-[hsl(290,60%,50%)]",
-    glowColor: "hsl(280,62%,52%)",
+    gradient: "from-[hsl(260,70%,60%)] to-[hsl(280,60%,55%)]",
+    glowColor: "hsl(260,70%,60%)",
     metrics: [
       { label: "Langues", value: "14" },
       { label: "F1 Score", value: "0.96" },
@@ -56,8 +56,8 @@ const capabilities = [
     tag: "VIS-04",
     desc: "Extraction intelligente de données depuis vos documents : factures, contrats, rapports. OCR + compréhension sémantique.",
     pct: 86,
-    gradient: "from-[hsl(30,80%,50%)] to-[hsl(15,75%,50%)]",
-    glowColor: "hsl(22,77%,50%)",
+    gradient: "from-[hsl(210,85%,50%)] to-primary",
+    glowColor: "hsl(210,85%,50%)",
     metrics: [
       { label: "Formats", value: "50+" },
       { label: "Extraction", value: "97%" },
@@ -70,8 +70,8 @@ const capabilities = [
     tag: "OPT-05",
     desc: "Amélioration continue et auto-apprentissage. Feedback loops automatiques et ré-entraînement des modèles en production.",
     pct: 92,
-    gradient: "from-[hsl(340,70%,50%)] to-[hsl(320,65%,50%)]",
-    glowColor: "hsl(330,67%,50%)",
+    gradient: "from-primary to-[hsl(260,70%,60%)]",
+    glowColor: "hsl(239,84%,67%)",
     metrics: [
       { label: "Itérations", value: "∞" },
       { label: "Gain/cycle", value: "+3.2%" },
@@ -84,8 +84,8 @@ const capabilities = [
     tag: "RPT-06",
     desc: "Tableaux de bord auto-générés et personnalisés. Insights narratifs et alertes proactives sur vos KPIs critiques.",
     pct: 85,
-    gradient: "from-[hsl(195,75%,45%)] to-[hsl(210,70%,50%)]",
-    glowColor: "hsl(202,72%,47%)",
+    gradient: "from-[hsl(200,80%,55%)] to-[hsl(260,70%,60%)]",
+    glowColor: "hsl(200,80%,55%)",
     metrics: [
       { label: "Dashboards", value: "∞" },
       { label: "Refresh", value: "Real-time" },
@@ -244,7 +244,7 @@ function DetailPane({ cap, isVisible }: { cap: typeof capabilities[0]; isVisible
 
       {/* System status mini-grid */}
       <div className="flex items-center gap-4 text-[10px]">
-        <span className="flex items-center gap-1.5 text-emerald-400">
+        <span className="flex items-center gap-1.5 text-primary">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Opérationnel
         </span>
@@ -368,7 +368,7 @@ export function DifferentiationSection() {
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
+                  <span className="text-[9px] font-mono text-primary flex items-center gap-1">
                     <Activity className="w-3 h-3" />
                     6/6 active
                   </span>
@@ -378,7 +378,7 @@ export function DifferentiationSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">6 modules · avg {Math.round(capabilities.reduce((a, c) => a + c.pct, 0) / capabilities.length)}% perf</span>
-                <span className="font-mono text-[10px] text-emerald-400 flex items-center gap-1">
+                <span className="font-mono text-[10px] text-primary flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                   Tous systèmes opérationnels
                 </span>

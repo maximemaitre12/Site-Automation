@@ -54,11 +54,11 @@ const accentMap: Record<string, { bar: string; numBg: string; numText: string; i
     glow: "shadow-[0_8px_30px_hsl(260_70%_60%/0.12)]",
   },
   emerald: {
-    bar: "bg-emerald-500",
-    numBg: "bg-emerald-500",
+    bar: "bg-[hsl(200_80%_55%)]",
+    numBg: "bg-[hsl(200_80%_55%)]",
     numText: "text-white",
-    iconBg: "bg-gradient-to-br from-emerald-500 to-teal-500",
-    glow: "shadow-[0_8px_30px_hsl(160_84%_39%/0.12)]",
+    iconBg: "bg-gradient-to-br from-[hsl(200_80%_55%)] to-[hsl(210_85%_50%)]",
+    glow: "shadow-[0_8px_30px_hsl(200_80%_55%/0.12)]",
   },
 };
 
@@ -66,11 +66,11 @@ export function MethodSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
 
   return (
-    <section id="methode" className="py-24 sm:py-32 bg-slate-950 relative overflow-hidden">
+    <section id="methode" className="py-24 sm:py-32 bg-white relative overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_60%_70%/0.06)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-[radial-gradient(ellipse,hsl(239_84%_67%/0.06),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-[radial-gradient(ellipse,hsl(239_84%_67%/0.04),transparent_70%)]" />
 
       <div ref={ref} className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
@@ -79,10 +79,10 @@ export function MethodSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/70 mb-3">Méthodologie</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">
             Un pipeline structuré en 3 phases
           </h2>
-          <p className="text-sm sm:text-base text-slate-400 max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-slate-500 max-w-md mx-auto">
             Chaque phase est conçue pour maximiser l'impact et minimiser les risques.
           </p>
         </div>
@@ -115,10 +115,10 @@ export function MethodSection() {
             const a = accentMap[step.accent];
 
             return (
-              <div
-                key={i}
-                className={cn(
-                  "group relative rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-sm p-6 transition-all duration-700 hover:bg-white/[0.06] hover:border-white/[0.12]",
+                <div
+                  key={i}
+                  className={cn(
+                    "group relative rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-700 hover:border-primary/30 hover:shadow-lg",
                   a.glow.replace(/shadow/, "hover:shadow"),
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                 )}
@@ -130,7 +130,7 @@ export function MethodSection() {
                     "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
                     a.numBg, a.numText
                   )}
-                    style={{ boxShadow: `0 4px 14px ${step.accent === 'primary' ? 'hsl(239 84% 67% / 0.3)' : step.accent === 'violet' ? 'hsl(260 70% 60% / 0.3)' : 'hsl(160 84% 39% / 0.3)'}` }}
+                    style={{ boxShadow: `0 4px 14px ${step.accent === 'primary' ? 'hsl(239 84% 67% / 0.3)' : step.accent === 'violet' ? 'hsl(260 70% 60% / 0.3)' : 'hsl(200 80% 55% / 0.3)'}` }}
                   >
                     {step.num}
                   </div>
@@ -140,8 +140,8 @@ export function MethodSection() {
                 </div>
 
                 {/* Title + desc */}
-                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">{step.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6">{step.desc}</p>
 
                 {/* Mini dashboard */}
                 <div className="space-y-2.5 mb-5">
@@ -152,14 +152,14 @@ export function MethodSection() {
                         <span className={cn(
                           "text-[10px] font-bold tabular-nums transition-all duration-700",
                           isVisible ? "opacity-100" : "opacity-0",
-                          step.accent === "primary" ? "text-primary" : step.accent === "violet" ? "text-[hsl(260_70%_65%)]" : "text-emerald-400"
+                          step.accent === "primary" ? "text-primary" : step.accent === "violet" ? "text-[hsl(260_70%_65%)]" : "text-[hsl(200_80%_55%)]"
                         )}
                           style={{ transitionDelay: `${i * 200 + j * 100 + 800}ms` }}
                         >
                           {isVisible ? stat.pct : 0}%
                         </span>
                       </div>
-                      <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                      <div className="h-1 rounded-full bg-slate-100 overflow-hidden">
                         <div
                           className={cn("h-full rounded-full transition-all duration-1000 ease-out", a.bar)}
                           style={{
@@ -174,9 +174,9 @@ export function MethodSection() {
                 </div>
 
                 {/* Duration */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08]">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-[pulse_2s_ease-in-out_infinite]" />
-                  <span className="text-[10px] font-semibold text-slate-400">{step.duration}</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]" />
+                  <span className="text-[10px] font-semibold text-slate-500">{step.duration}</span>
                 </div>
               </div>
             );

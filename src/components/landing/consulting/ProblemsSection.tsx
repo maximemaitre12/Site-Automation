@@ -27,7 +27,7 @@ export function ProblemsSection() {
   const potential = "340K€";
 
   return (
-    <section className="py-20 sm:py-28 bg-slate-50 relative overflow-hidden">
+    <section className="py-20 sm:py-28 bg-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.2)_1px,transparent_1px)] bg-[length:32px_32px]" />
       
       <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
@@ -66,16 +66,16 @@ export function ProblemsSection() {
             {processes.map((proc, i) => {
               const scanned = i < scannedCount;
               const statusColor = proc.status === "critical"
-                ? "bg-red-500 text-white"
+                ? "bg-[hsl(260_70%_60%)] text-white"
                 : proc.status === "warning"
-                ? "bg-yellow-500 text-white"
-                : "bg-emerald-500 text-white";
+                ? "bg-[hsl(200_80%_55%)] text-white"
+                : "bg-primary text-white";
 
               const barColor = proc.status === "critical"
-                ? "bg-red-400/60"
+                ? "bg-[hsl(260_70%_60%)/0.6]"
                 : proc.status === "warning"
-                ? "bg-yellow-400/60"
-                : "bg-emerald-400/60";
+                ? "bg-[hsl(200_80%_55%)/0.6]"
+                : "bg-primary/60";
 
               return (
                 <div
@@ -99,7 +99,7 @@ export function ProblemsSection() {
                   <span className={cn(
                     "text-xs font-mono tabular-nums w-8 text-right transition-all duration-300",
                     scanned ? "opacity-100" : "opacity-0",
-                    proc.status === "critical" ? "text-red-500" : proc.status === "warning" ? "text-yellow-600" : "text-emerald-500"
+                    proc.status === "critical" ? "text-[hsl(260_70%_60%)]" : proc.status === "warning" ? "text-[hsl(200_80%_55%)]" : "text-primary"
                   )}>
                     {scanned ? `${proc.score}%` : ""}
                   </span>
@@ -123,7 +123,7 @@ export function ProblemsSection() {
             scannedCount >= processes.length ? "opacity-100" : "opacity-0"
           )}>
             <span className="text-xs sm:text-sm text-slate-500">
-              <span className="text-red-500 font-semibold">{criticalCount} points de friction</span> identifiés
+              <span className="text-[hsl(260_70%_60%)] font-semibold">{criticalCount} points de friction</span> identifiés
             </span>
             <span className="text-xs sm:text-sm text-slate-500">
               Potentiel d'optimisation : <span className="text-primary font-bold">{potential}/an</span>

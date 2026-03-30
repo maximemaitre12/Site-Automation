@@ -103,9 +103,9 @@ function CodeLine({ line, number, isHighlighted, isVisible, delay }: {
 
     return text.split(/(\b(?:const|class|async|await|new|return|from|export)\b|'[^']*'|\b(?:true|false)\b|\/\/.*$|\d+\.?\d*%?)/g).map((part, i) => {
       if (/^(const|class|async|await|new|return|from|export)$/.test(part)) return <span key={i} className="text-purple-400">{part}</span>;
-      if (/^'[^']*'$/.test(part)) return <span key={i} className="text-emerald-400">{part}</span>;
-      if (/^(true|false)$/.test(part)) return <span key={i} className="text-amber-400">{part}</span>;
-      if (/^\d+\.?\d*%?$/.test(part)) return <span key={i} className="text-amber-300">{part}</span>;
+      if (/^'[^']*'$/.test(part)) return <span key={i} className="text-[hsl(200,80%,65%)]">{part}</span>;
+      if (/^(true|false)$/.test(part)) return <span key={i} className="text-[hsl(260,70%,70%)]">{part}</span>;
+      if (/^\d+\.?\d*%?$/.test(part)) return <span key={i} className="text-[hsl(200,80%,70%)]">{part}</span>;
       return <span key={i} className="text-slate-300">{part}</span>;
     });
   };
@@ -138,7 +138,7 @@ export function PositioningSection() {
   const code = codeBlocks[activeFile];
 
   return (
-    <section className="py-24 sm:py-32 bg-slate-50 relative overflow-hidden">
+    <section className="py-24 sm:py-32 bg-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(239_84%_67%/0.03),transparent_60%)]" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
@@ -184,7 +184,7 @@ export function PositioningSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">UTF-8 · TypeScript</span>
-                <span className="font-mono text-[10px] text-emerald-500">● Pipeline Active</span>
+                <span className="font-mono text-[10px] text-primary">● Pipeline Active</span>
                 <span className="font-mono text-[10px] text-slate-500">Ln {code.lines.length}, Col 1</span>
               </div>
             }

@@ -7,25 +7,25 @@ import { useState } from "react";
 const metrics = [
   {
     name: "Délais opérationnels", value: 40, suffix: "%", prefix: "+",
-    color: "hsl(142 71% 45%)", barColor: "from-emerald-400 to-emerald-500",
+    color: "hsl(239 84% 67%)", barColor: "from-primary to-[hsl(260_70%_60%)]",
     trend: [20, 35, 28, 45, 38, 60, 55, 78, 72, 90],
     threads: 142, idle: "8.2%",
   },
   {
     name: "Productivité équipes", value: 60, suffix: "%", prefix: "+",
-    color: "hsl(239 84% 67%)", barColor: "from-primary to-[hsl(260_70%_60%)]",
+    color: "hsl(260 70% 60%)", barColor: "from-[hsl(260_70%_60%)] to-primary",
     trend: [15, 25, 30, 40, 42, 55, 60, 68, 75, 85],
     threads: 89, idle: "3.1%",
   },
   {
     name: "Vitesse d'analyse", value: 3, suffix: "×", prefix: "",
-    color: "hsl(38 92% 50%)", barColor: "from-amber-400 to-orange-400",
+    color: "hsl(200 80% 55%)", barColor: "from-[hsl(200_80%_55%)] to-[hsl(210_85%_50%)]",
     trend: [10, 18, 22, 35, 45, 52, 65, 72, 80, 92],
     threads: 256, idle: "12.4%",
   },
   {
     name: "Économies identifiées", value: 25, suffix: "%", prefix: "+",
-    color: "hsl(280 70% 55%)", barColor: "from-purple-400 to-violet-500",
+    color: "hsl(210 85% 50%)", barColor: "from-[hsl(210_85%_50%)] to-primary",
     trend: [12, 20, 18, 30, 35, 42, 50, 58, 65, 80],
     threads: 67, idle: "5.7%",
   },
@@ -93,7 +93,7 @@ function CPUHistoryChart({ isVisible }: { isVisible: boolean }) {
     <div className="px-3 sm:px-4 py-3">
       <div className="flex items-center justify-between mb-2">
         <span className="font-mono text-[10px] text-slate-400 uppercase tracking-wider">CPU History</span>
-        <span className="font-mono text-[10px] text-emerald-500">● Active</span>
+        <span className="font-mono text-[10px] text-primary">● Active</span>
       </div>
       <div className="bg-slate-950 rounded-lg p-2 border border-slate-800">
         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12" preserveAspectRatio="none">
@@ -102,9 +102,9 @@ function CPUHistoryChart({ isVisible }: { isVisible: boolean }) {
             <line key={v} x1="0" y1={h - (v / 100) * h} x2={w} y2={h - (v / 100) * h}
               stroke="hsl(220 14% 20%)" strokeWidth="0.5" />
           ))}
-          <polyline points={toPath(points2)} fill="none" stroke="hsl(239 84% 67% / 0.3)"
+          <polyline points={toPath(points2)} fill="none" stroke="hsl(200 80% 55% / 0.3)"
             strokeWidth="1" className={cn("transition-all duration-[2500ms]", isVisible ? "opacity-100" : "opacity-0")} />
-          <polyline points={toPath(points1)} fill="none" stroke="hsl(142 71% 45%)"
+          <polyline points={toPath(points1)} fill="none" stroke="hsl(239 84% 67%)"
             strokeWidth="1.5" strokeLinecap="round"
             className={cn("transition-all duration-[2500ms]", isVisible ? "opacity-100" : "opacity-0")} />
         </svg>
@@ -160,7 +160,7 @@ export function ImpactSection() {
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-400">Threads: 554</span>
                 <span className="font-mono text-[10px] text-slate-400">Processus: 312</span>
-                <span className="font-mono text-[10px] text-emerald-500">System: Optimal</span>
+                <span className="font-mono text-[10px] text-primary">System: Optimal</span>
               </div>
             }
           >

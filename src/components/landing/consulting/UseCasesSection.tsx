@@ -41,7 +41,7 @@ const useCases = [
 function Sparkline({ points, color }: { points: number[]; color: string }) {
   const max = Math.max(...points);
   const pts = points.map((v, i) => `${i * 12},${24 - (v / max) * 20}`).join(" ");
-  const strokeColor = color === "blue" ? "#60a5fa" : color === "purple" ? "#a78bfa" : "#34d399";
+  const strokeColor = color === "blue" ? "hsl(200,80%,55%)" : color === "purple" ? "hsl(260,70%,60%)" : "hsl(239,84%,67%)";
   return (
     <svg width="48" height="24" viewBox="0 0 48 24" className="shrink-0">
       <polyline fill="none" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={pts} />
@@ -59,7 +59,7 @@ function DatasetRow({ uc, active, onClick, visible, idx }: {
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-2.5 px-3 py-3 text-left transition-all duration-300 border-b border-slate-700/40",
-        active ? "bg-slate-700/50 border-l-2 border-l-emerald-400" : "hover:bg-slate-800/80",
+        active ? "bg-slate-700/50 border-l-2 border-l-primary" : "hover:bg-slate-800/80",
         visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
       )}
       style={{ transitionDelay: `${idx * 120 + 200}ms` }}
@@ -71,15 +71,15 @@ function DatasetRow({ uc, active, onClick, visible, idx }: {
           <span className={cn(
             "text-[8px] font-bold tracking-wider px-1.5 py-0.5 rounded-full",
             uc.status === "LIVE"
-              ? "bg-emerald-500/20 text-emerald-400 animate-pulse"
-              : "bg-blue-500/20 text-blue-400"
+              ? "bg-primary/20 text-primary animate-pulse"
+              : "bg-[hsl(200,80%,55%)]/20 text-[hsl(200,80%,55%)]"
           )}>{uc.status}</span>
         </div>
         <Sparkline points={uc.sparkline} color={uc.color} />
       </div>
       <span className={cn(
         "font-mono text-xs font-bold shrink-0",
-        uc.metric.startsWith("+") || uc.metric.startsWith("÷") ? "text-emerald-400" : "text-emerald-400"
+        "text-primary"
       )}>{uc.metric}</span>
     </button>
   );
@@ -94,7 +94,7 @@ function AnimatedBar({ percent, visible }: { percent: number; visible: boolean }
         className="h-full rounded-full transition-all duration-[1.5s] ease-out"
         style={{
           width: visible ? `${abs}%` : "0%",
-          background: "linear-gradient(90deg, #ef4444 0%, #f59e0b 40%, #10b981 100%)",
+          background: "linear-gradient(90deg, hsl(260,70%,60%) 0%, hsl(200,80%,55%) 40%, hsl(239,84%,67%) 100%)",
         }}
       />
     </div>
@@ -127,7 +127,7 @@ function MiniChart({ kpis, visible }: { kpis: typeof useCases[0]["kpis"]; visibl
           <g key={i}>
             {/* Before bar */}
             <rect x={x} y={chartH - beforeH} width={barW} height={beforeH} rx={3}
-              fill="#ef444440" className="transition-all duration-700" />
+              fill="hsl(260,70%,60%,0.25)" className="transition-all duration-700" />
             {/* After bar */}
             <rect x={x + barW + gap} y={visible ? chartH - afterH : chartH} width={barW}
               height={visible ? afterH : 0} rx={3}
@@ -141,8 +141,8 @@ function MiniChart({ kpis, visible }: { kpis: typeof useCases[0]["kpis"]; visibl
       })}
       <defs>
         <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#34d399" />
-          <stop offset="100%" stopColor="#059669" />
+          <stop offset="0%" stopColor="hsl(239,84%,67%)" />
+          <stop offset="100%" stopColor="hsl(260,70%,60%)" />
         </linearGradient>
       </defs>
     </svg>
@@ -162,9 +162,9 @@ function MobileKPICard({ kpi, visible, delay }: { kpi: typeof useCases[0]["kpis"
       <div className="flex-1 min-w-0">
         <span className="text-[10px] uppercase tracking-wider text-slate-500 font-mono">{kpi.label}</span>
         <div className="flex items-center gap-2 mt-1">
-          <span className="text-xs text-red-400/70 line-through font-mono">{kpi.before}</span>
+          <span className="text-xs text-[hsl(260,70%,60%)]/70 line-through font-mono">{kpi.before}</span>
           <ChevronRight className="w-3 h-3 text-slate-600" />
-          <span className="text-sm text-emerald-400 font-bold font-mono">{kpi.after}</span>
+          <span className="text-sm text-primary font-bold font-mono">{kpi.after}</span>
         </div>
       </div>
       <div className="w-20">
@@ -172,7 +172,7 @@ function MobileKPICard({ kpi, visible, delay }: { kpi: typeof useCases[0]["kpis"
       </div>
       <span className={cn(
         "font-mono text-xs font-bold shrink-0",
-        kpi.delta < 0 ? "text-emerald-400" : "text-emerald-400"
+        "text-primary"
       )}>
         {kpi.delta > 0 ? "+" : ""}{kpi.delta}%
       </span>
@@ -224,8 +224,8 @@ export function UseCasesSection() {
             }
             statusBar={
               <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                 <span className="flex items-center gap-1.5">
+                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Last analysis: 2 min ago
                 </span>
                 <span>3 datasets loaded</span>
@@ -240,7 +240,7 @@ export function UseCasesSection() {
                   <button key={i} onClick={() => setActiveCase(i)} className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap shrink-0 transition-all",
                     activeCase === i
-                      ? "bg-slate-700 text-slate-100 ring-1 ring-emerald-500/40"
+                      ? "bg-slate-700 text-slate-100 ring-1 ring-primary/40"
                       : "bg-slate-800/60 text-slate-400 hover:bg-slate-700/60"
                   )}>
                     <span>{u.icon}</span>
@@ -251,8 +251,8 @@ export function UseCasesSection() {
 
               {/* Hero metric */}
               <div className="text-center py-5">
-                <span className="font-mono text-4xl font-black text-emerald-400" style={{
-                  textShadow: "0 0 24px rgba(16,185,129,0.35)"
+              <span className="font-mono text-4xl font-black text-primary" style={{
+                  textShadow: "0 0 24px hsla(239,84%,67%,0.35)"
                 }}>{uc.metric}</span>
                 <p className="text-[11px] text-slate-500 font-mono mt-1">{uc.metricLabel}</p>
               </div>
@@ -277,10 +277,10 @@ export function UseCasesSection() {
                 <div className="p-3 mt-auto">
                   <div className="text-[9px] uppercase tracking-wider text-slate-600 font-mono mb-1">Active datasets</div>
                   <div className="flex gap-1">
-                    {useCases.map((_, i) => (
+                     {useCases.map((_, i) => (
                       <div key={i} className={cn(
                         "w-2 h-2 rounded-full transition-colors",
-                        activeCase === i ? "bg-emerald-400" : "bg-slate-700"
+                        activeCase === i ? "bg-primary" : "bg-slate-700"
                       )} />
                     ))}
                   </div>
@@ -299,8 +299,8 @@ export function UseCasesSection() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-mono text-3xl lg:text-4xl font-black text-emerald-400 block" style={{
-                      textShadow: "0 0 24px rgba(16,185,129,0.35)"
+                   <span className="font-mono text-3xl lg:text-4xl font-black text-primary block" style={{
+                      textShadow: "0 0 24px hsla(239,84%,67%,0.35)"
                     }}>{uc.metric}</span>
                   </div>
                 </div>
@@ -321,13 +321,13 @@ export function UseCasesSection() {
                       isVisible ? "opacity-100" : "opacity-0"
                     )} style={{ transitionDelay: `${i * 150 + 400}ms` }}>
                       <div className="px-3 py-2.5 text-[11px] text-slate-300 font-mono">{kpi.label}</div>
-                      <div className="px-3 py-2.5 text-center text-[11px] text-red-400/70 line-through font-mono">{kpi.before}</div>
-                      <div className="px-3 py-2.5 text-center text-[11px] text-emerald-400 font-bold font-mono">{kpi.after}</div>
+                      <div className="px-3 py-2.5 text-center text-[11px] text-[hsl(260,70%,60%)]/70 line-through font-mono">{kpi.before}</div>
+                      <div className="px-3 py-2.5 text-center text-[11px] text-primary font-bold font-mono">{kpi.after}</div>
                       <div className="px-3 py-2.5 flex items-center gap-2">
                         <div className="flex-1">
                           <AnimatedBar percent={Math.abs(kpi.delta)} visible={isVisible} />
                         </div>
-                        <span className="text-[10px] font-mono font-bold text-emerald-400 shrink-0 w-10 text-right">
+                        <span className="text-[10px] font-mono font-bold text-primary shrink-0 w-10 text-right">
                           {kpi.delta > 0 ? "+" : ""}{kpi.delta}%
                         </span>
                       </div>
