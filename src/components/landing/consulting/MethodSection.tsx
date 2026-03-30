@@ -54,11 +54,11 @@ const accentMap: Record<string, { bar: string; numBg: string; numText: string; i
     glow: "shadow-[0_8px_30px_hsl(260_70%_60%/0.12)]",
   },
   emerald: {
-    bar: "bg-emerald-500",
-    numBg: "bg-emerald-500",
+    bar: "bg-[hsl(200_80%_55%)]",
+    numBg: "bg-[hsl(200_80%_55%)]",
     numText: "text-white",
-    iconBg: "bg-gradient-to-br from-emerald-500 to-teal-500",
-    glow: "shadow-[0_8px_30px_hsl(160_84%_39%/0.12)]",
+    iconBg: "bg-gradient-to-br from-[hsl(200_80%_55%)] to-[hsl(210_85%_50%)]",
+    glow: "shadow-[0_8px_30px_hsl(200_80%_55%/0.12)]",
   },
 };
 
