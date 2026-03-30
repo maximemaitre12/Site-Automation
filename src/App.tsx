@@ -95,9 +95,9 @@ const App = () => {
             <Routes>
               {/* Public routes with shared header/footer */}
               <Route element={<PublicLayout />}>
-                <Route path="/" element={<SupplyChain />} />
+                <Route path="/" element={<Landing />} />
                 <Route path="/demo" element={<Demo />} />
-                <Route path="/supply" element={<Landing />} />
+                <Route path="/supply" element={<SupplyChain />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/resources/documentation" element={<Documentation />} />
