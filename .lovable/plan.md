@@ -1,88 +1,68 @@
 
 
-# Passage au fond blanc — Adaptation complète de la palette
+## Plan: Chaque section = une app Mac unique et immersive
 
-## Constat
-Actuellement, toutes les sections de la landing page utilisent `bg-[#060918]` ou `bg-[#0a0e1f]` (fond quasi-noir) avec du texte blanc et des effets glass-morphism conçus pour le sombre. Le header utilise déjà `bg-background` (blanc). Il faut inverser la palette tout en conservant le niveau de qualité et l'esthétique premium.
+L'idee est de transformer chaque section du landing en une **fenetre Mac distincte** avec un style d'application different (terminal, dashboard, IDE, Finder, etc.), tout en gardant les contenus actuels.
 
-## Principe
-- Fond blanc (`bg-white` ou `bg-background`) pour toutes les sections
-- Texte sombre (`text-foreground`, `text-slate-900`, `text-slate-600`)
-- Les cartes glass-morphism deviennent des cartes à bordures fines sur fond `bg-slate-50` ou `bg-white` avec `shadow-sm`
-- Accents lumineux (primary/indigo) restent pour les highlights, badges et icônes
-- Alternance de sections `bg-white` / `bg-slate-50` pour créer du rythme visuel (au lieu de sombre/sombre)
-- Les mesh gradients deviennent des gradients très subtils clairs (bleu/violet à 3-5% d'opacité)
-- La grille de points de fond passe de `white/0.02` à `slate-900/0.03`
+### Composant partage
 
-## Changements par fichier
+**Creer `src/components/landing/MacWindow.tsx`**
+- Props: `title`, `variant` (light/dark), `statusDot` (couleur custom), `toolbar` (boutons optionnels), `children`, `className`
+- Les 3 dots (rouge/jaune/vert), barre de titre mono, coins arrondis, ombre
+- Support mode sombre (bg-slate-900) et clair (bg-white)
 
-### 1. `HeroSection.tsx`
-- `bg-[#060918]` → `bg-white`
-- Mesh gradients : inverser en `hsl(239 84% 67% / 0.04)` sur fond clair
-- Dot grid : `hsl(0 0% 0% / 0.03)` au lieu de `white/0.03`
-- Texte : `text-white` → `text-slate-900`, `text-white/50` → `text-slate-500`
-- Badge top : `border-white/10 bg-white/5` → `border-slate-200 bg-slate-50`
-- Stats : `text-white` → `text-slate-900`, `text-white/50` → `text-slate-500`
-- CTA shadow : garder le glow primary mais plus subtil
-- Gradient text "Intelligence Artificielle" : conserver tel quel (fonctionne sur clair)
+### Sections transformees
 
-### 2. `HeroDiagram.tsx`
-- Nœuds : `bg-white/[0.04] border-white/[0.08]` → `bg-white border-slate-200 shadow-sm`
-- Nœud central "IA" : garder `bg-primary/10 border-primary/30`
-- Labels : `text-white/70` → `text-slate-700`
-- Connexions : `from-primary/0 via-primary/30` → `from-primary/0 via-primary/20`
-- Data flow labels : `bg-primary/20 text-primary` → garder, ça marche sur clair
+| Section | App Mac simulee | Titre fenetre | Idee creative |
+|---------|----------------|---------------|---------------|
+| **ProblemsSection** | Terminal/Scanner | `AETHER DIAGNOSTIC ENGINE v2.4` | Deja fait, on conserve tel quel |
+| **ImpactSection** | Activity Monitor | `AETHER PERFORMANCE MONITOR` | Les 4 metriques deviennent des lignes de monitoring avec sparklines en temps reel, barre CPU/Memory style macOS Activity Monitor |
+| **PositioningSection** | IDE/Code Editor | `AETHER PIPELINE EDITOR v1.8` | Le pipeline donnees→IA→decisions presente comme des blocs de code avec syntax highlighting, onglets fichiers, sidebar mini-map |
+| **UseCasesSection** | Finder/Comparator | `AETHER CASE LAB v2.0` | Les avant/apres presentes comme des fichiers dans un Finder avec colonnes, icones dossier, tags couleur |
+| **DifferentiationSection** | System Preferences | `AETHER CAPABILITIES` | Les 6 capacites presentees comme des panneaux System Preferences macOS avec icones rondes, toggles actifs, barres de niveau |
+| **TrainingsSection** | App Store | `AETHER ACADEMY` | Les 3 formations presentees comme des apps a telecharger avec bouton "Obtenir", ratings, previews |
 
-### 3. `ProblemsSection.tsx`
-- `bg-[#060918]` → `bg-slate-50`
-- Dashboard frame : `bg-white/[0.03] border-white/[0.08]` → `bg-white border-slate-200 shadow-lg`
-- Barre titre terminal : `bg-white/[0.05]` → `bg-slate-100`
-- Titre "AETHER" : `text-white/50` → `text-slate-500`
-- Texte : `text-white` → `text-slate-900`, `text-white/40` → `text-slate-500`
-- Barres de progression : adapter les backgrounds
-- Badges status : garder les couleurs (rouge/vert/jaune fonctionnent sur clair)
+### Details techniques
 
-### 4. `ImpactSection.tsx`
-- `bg-[#060918]` → `bg-white`
-- Metric cards : `bg-white/[0.04] border-white/[0.06]` → `bg-slate-50 border-slate-200 shadow-sm`
-- Texte : `text-white` → `text-slate-900`
-- Mini charts SVG : `stroke="hsl(0 0% 100% / 0.06)"` → `stroke="hsl(0 0% 0% / 0.08)"`
-- Gradient fill : garder le primary gradient, fonctionne sur clair
+**ImpactSection** (Activity Monitor):
+- Header avec onglets "CPU / Memory / Network / Disk" (seul CPU actif)
+- Les 4 metriques en lignes de tableau avec barres horizontales animees
+- Un mini graphe en bas style "CPU History" avec courbe animee
+- Couleurs vert/jaune/rouge selon les valeurs
 
-### 5. `PositioningSection.tsx`
-- `bg-[#060918]` → `bg-slate-50`
-- Layer cards : adapter les couleurs de fond/border pour fond clair
-- `text-white` → `text-slate-900`
-- Texte descriptif à droite : `text-white/50` → `text-slate-500`
+**PositioningSection** (IDE):
+- Barre d'onglets fichiers: `data.src`, `engine.ai`, `output.opt`
+- Sidebar sombre avec arborescence de fichiers
+- Contenu: blocs de pseudo-code colore qui montrent la transformation
+- Numeros de lignes, cursor clignotant
 
-### 6. `MethodSection.tsx`
-- `bg-[#0a0e1f]` → `bg-white`
-- Step cards : `bg-white/[0.03] border-white/[0.08]` → `bg-white border-slate-200 shadow-sm`
-- Mini stats internes : `bg-white/[0.06]` → `bg-slate-100`
-- Texte : inverser toutes les refs `text-white`
-- Ligne connecteur : `via-primary/30` reste OK
+**UseCasesSection** (Finder):
+- Barre de navigation avec breadcrumb "Aether > Cases > [secteur]"
+- Vue en colonnes style Finder macOS
+- Chaque cas est un dossier avec preview avant/apres
+- Tags couleur (rouge=avant, vert=apres)
 
-### 7. `UseCasesSection.tsx`
-- `bg-[#060918]` → `bg-slate-50`
-- Split cards : adapter les fonds "AVANT" (gris clair) / "APRÈS" (blanc)
-- `bg-white/[0.03]` → `bg-white border-slate-200 shadow-sm`
-- Texte : `text-white` → `text-slate-900`
+**DifferentiationSection** (System Preferences):
+- Grille d'icones rondes style System Preferences
+- Au clic/hover, le panneau s'ouvre avec details + progress circulaire
+- Search bar en haut (decoratif)
 
-### 8. `DifferentiationSection.tsx`
-- `bg-[#0a0e1f]` → `bg-white`
-- Capability cards : `bg-white/[0.04] border-white/[0.06]` → `bg-slate-50 border-slate-200 shadow-sm`
-- Cercles SVG : `stroke="hsl(0 0% 100% / 0.06)"` → `stroke="hsl(0 0% 0% / 0.08)"`
-- Icônes : `drop-shadow` coloré reste OK sur fond clair
-- Texte : inverser
+**TrainingsSection** (App Store):
+- Cards avec icones arrondies style app
+- Bouton bleu "Obtenir" / "GET"
+- Sous-titre "In-App Purchases" remplace par duree
+- Rating etoiles decoratif
 
-### 9. `FinalCTASection.tsx`
-- `bg-[#060918]` → `bg-slate-900` (garder cette section sombre pour le contraste final, c'est un pattern classique consulting)
-- Ou si tout doit être blanc : `bg-slate-50` avec texte sombre
+### Fichiers modifies
 
-### 10. `LandingHeader.tsx`
-- Déjà en `bg-background` (blanc) — rien à changer
-- Le bouton "Log in" bleu fonctionne toujours
+| Fichier | Action |
+|---------|--------|
+| `src/components/landing/MacWindow.tsx` | Creer |
+| `src/components/landing/consulting/ImpactSection.tsx` | Rewrite |
+| `src/components/landing/consulting/PositioningSection.tsx` | Rewrite |
+| `src/components/landing/consulting/UseCasesSection.tsx` | Rewrite |
+| `src/components/landing/consulting/DifferentiationSection.tsx` | Rewrite |
+| `src/components/landing/TrainingsSection.tsx` | Rewrite |
 
-## Résultat
-Landing page sur fond blanc avec sections alternées `bg-white` / `bg-slate-50`, cartes avec bordures fines et ombres légères, texte sombre, accents indigo conservés. Style Apple/Stripe plutôt que Palantir, mais avec la même densité de contenu et animations.
+Les animations scroll-triggered existantes sont conservees. Chaque fenetre Mac a une animation d'entree unique (slide-up + scale).
 
