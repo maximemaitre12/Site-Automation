@@ -1,79 +1,61 @@
 
 
-# Intégration Farmasoft sur `/farmasoft` — Plan
+# Refonte Homepage AETHER — Ultra-visuelle et structurée
 
-## Ce qui est faisable vs ce qui ne l'est pas
+## Concept
+Chaque section possède un **schéma SVG inline animé au scroll** qui raconte visuellement le concept. Pas de texte seul — tout est accompagné d'un visuel logique. Style "Enterprise Minimalism" conservé : fond blanc, indigo comme accent, Inter, espacement généreux.
 
-**Le frontend** du repo V1F26 utilise React + CSS pur (pas de Tailwind) avec un système de navigation interne via Zustand (`useAppStore` avec `currentPage`). Il fait des appels API vers `/api/*` (chemin relatif). Ce frontend peut être porté **presque tel quel** dans votre projet Lovable.
+## Architecture des fichiers
 
-**Le backend** utilise Express + SQLite avec 9 routes API. Il faut le recréer avec les outils Lovable Cloud (tables + edge functions). Cela remplacera le serveur Express sans toucher au frontend.
+**Créer (7 nouveaux composants)** :
+- `src/components/landing/consulting/HeroDiagram.tsx` — SVG animé : flux d'entreprise avec nœuds "inefficacité" → "optimisé"
+- `src/components/landing/consulting/ProblemsSection.tsx` — 5 pain points + diagramme de process avec goulots rouges animés
+- `src/components/landing/consulting/ImpactSection.tsx` — 5 gains + barres/jauges animées qui montent au scroll
+- `src/components/landing/consulting/PositioningSection.tsx` — cercles concentriques animés (Opérations critiques au centre)
+- `src/components/landing/consulting/MethodSection.tsx` — pipeline 3 étapes avec particules animées gauche→droite
+- `src/components/landing/consulting/UseCasesSection.tsx` — 2 cartes avec mini-diagrammes avant/après
+- `src/components/landing/consulting/DifferentiationSection.tsx` — 4 points forts + radar chart SVG animé
 
-**Le scraping** (work.ua, robota.ua, etc.) **ne fonctionnera PAS** — les edge functions ne peuvent pas faire de web scraping avec Cheerio/HTML parsing sur des sites tiers. La fonctionnalité de prospection/recherche sera limitée.
+**Modifier (3)** :
+- `src/components/landing/HeroSection.tsx` — refonte totale : titre FR consulting + `HeroDiagram` animé à droite
+- `src/components/landing/FinalCTASection.tsx` — contenu FR, CTA "Planifier un appel" → mailto
+- `src/pages/Landing.tsx` — remplacer toutes les anciennes sections par les nouvelles
 
-## Ce qui change dans le frontend
+## Détail des schémas animés par section
 
-Seul **1 fichier** sera modifié : `src/api/client.ts`. Au lieu d'appeler `/api/jobs`, il appellera les edge functions Lovable Cloud. Le design, les composants, les styles CSS — tout reste identique.
+### 1. Hero
+Layout split : texte gauche, SVG droite. Le SVG montre 4 nœuds (Supply Chain, RH, Logistique, Opérations) connectés par des edges. Des particules circulent entre les nœuds. Un "scan beam" horizontal descend et les nœuds passent de gris à indigo (optimisés). Déclenché automatiquement à l'entrée.
 
-## Plan d'exécution
+### 2. Problèmes
+Diagramme vertical de 5 nœuds de processus connectés. Chaque nœud clignote en rouge séquentiellement au scroll (goulot d'étranglement). Une ligne de scan descend et "révèle" chaque problème. Les connexions sont en pointillés (lenteur).
 
-### 1. Base de données (migration SQL)
-Créer les tables Farmasoft dans Lovable Cloud :
-- `farmasoft_jobs` (id, title, location, salary_min, salary_max, salary_currency, experience_years, skills, description, requirements, is_active, created_at, updated_at)
-- `farmasoft_candidates` (id, job_id, initials, role, location, experience_years, experience_text, salary_expectation, source_platform, profile_url, tags, profile_data, status, source_type, stage, qualification_score, qualification_notes, cv_filename, cv_text, rejection_reason, decision, viewed_at, contacted_at, created_at)
-- `farmasoft_interviews` (id, candidate_id, job_id, scheduled_at, type, interviewer, notes, decision, created_at, updated_at)
-- `farmasoft_messages` (id, job_id, name, subject, body, language, ai_generated, created_at, updated_at)
-- `farmasoft_settings` (key, value)
-- `farmasoft_events` (id, type, job_id, candidate_id, metadata, created_at)
-- `farmasoft_searches` (id, job_id, location, radius_km, salary_min, platforms, candidates_found, created_at)
+### 3. Impact
+5 barres horizontales qui se remplissent progressivement avec des pourcentages animés (CountUp). Chaque barre a une icône et un label. Les barres apparaissent en cascade (stagger 100ms). Couleurs : indigo pour les gains positifs.
 
-### 2. Edge function : `farmasoft-api`
-Une seule edge function qui dispatche selon le chemin et la méthode HTTP. Reproduit exactement la même API que le serveur Express :
-- CRUD jobs, candidates, interviews, messages, settings
-- Analytics (kpis, weekly, recent, log)
-- AI (generate-job, generate-message, qualify-candidate) via Lovable AI
-- CV parsing via Lovable AI
-- **Scraper : retournera une erreur "non disponible en mode cloud"**
+### 4. Positionnement
+3 cercles concentriques SVG. Au centre : "Opérations critiques". Les cercles s'illuminent de l'intérieur vers l'extérieur (Simplifier → Structurer → Améliorer) avec un délai séquentiel. Fond neutre, traits fins.
 
-### 3. Frontend — Fichiers copiés tels quels depuis le repo
-Tous les fichiers frontend sont copiés **sans modification de design** :
-- `src/farmasoft/App.tsx`
-- `src/farmasoft/pages/Dashboard.tsx`
-- `src/farmasoft/pages/JobDescriptions.tsx`
-- `src/farmasoft/pages/Prospecting.tsx`
-- `src/farmasoft/pages/Interviews.tsx`
-- `src/farmasoft/pages/Messages.tsx`
-- `src/farmasoft/pages/Settings.tsx`
-- `src/farmasoft/components/layout/Sidebar.tsx`
-- `src/farmasoft/components/layout/TopBar.tsx`
-- `src/farmasoft/components/SetupModal.tsx`
-- `src/farmasoft/store/useAppStore.ts`
-- `src/farmasoft/hooks/useDebounce.ts`
-- `src/farmasoft/i18n.ts`
-- `src/farmasoft/types/*`
-- `src/farmasoft/lib/utils.ts`
+### 5. Méthode (3 étapes)
+Pipeline horizontal SVG : 3 nœuds numérotés (Analyse → Priorisation → Déploiement) connectés par des flèches. Particules animées coulent de gauche à droite. Chaque nœud pulse séquentiellement quand visible. Sur mobile : vertical.
 
-### 4. Seule modification frontend : `src/farmasoft/api/client.ts`
-Le `BASE` passe de `/api` à un appel vers l'edge function `farmasoft-api`. La structure des requêtes et réponses reste identique (`{ data, error }`).
+### 6. Cas d'usage
+2 cartes côte à côte. Chaque carte contient un mini SVG : 3 nœuds "avant" (gris, barrés) → flèche → 3 nœuds "après" (indigo, check). Animation : les nœuds "avant" s'estompent, les nœuds "après" s'allument au scroll.
 
-### 5. CSS
-Le fichier `index.css` de Farmasoft est copié en `src/farmasoft/farmasoft.css` et importé localement. Toutes les classes CSS sont scopées via le conteneur `.farmasoft-app` pour éviter les conflits avec le CSS du site principal.
+### 7. Différenciation
+Radar chart SVG à 4 axes (Résultats, Opérationnel, Impact, Accompagnement). Les axes se remplissent progressivement au scroll avec un trait indigo. Simple et élégant.
 
-### 6. Route `/farmasoft`
-Ajout d'une route dans `App.tsx` qui monte le composant Farmasoft.
+### 8. CTA Final
+Sobre. Titre + sous-titre + bouton "Planifier un appel". Subtle pulse glow sur le bouton. Pas de schéma complexe.
 
-## Limitations honnêtes
+## Animations
+- Toutes déclenchées via `useScrollAnimation` existant (trigger 80px avant viewport, une seule fois)
+- SVG animés avec CSS transitions + `transition-delay` pour les séquences
+- `useCountUp` existant pour les métriques
+- Pas de librairies externes — tout en CSS/SVG natif
 
-| Fonctionnalité | Statut |
-|---|---|
-| Dashboard, KPIs, graphiques | Fonctionnel |
-| CRUD Jobs / Candidates / Interviews / Messages | Fonctionnel |
-| AI : génération fiches de poste | Fonctionnel (via Lovable AI) |
-| AI : génération messages | Fonctionnel (via Lovable AI) |
-| AI : qualification candidats | Fonctionnel (via Lovable AI) |
-| CV parsing | Fonctionnel (via Lovable AI) |
-| **Web scraping (work.ua, robota.ua, etc.)** | **NON fonctionnel** |
-| Settings (clé API Gemini) | Non nécessaire (Lovable AI utilisé) |
-| i18n (FR/EN/UK) | Fonctionnel |
-
-**Le design ne sera pas impacté.** Le scraping est la seule fonctionnalité qui ne marchera pas.
+## Responsive
+- Hero : stack vertical sur mobile (texte au-dessus, SVG en dessous, taille réduite)
+- Pipeline méthode : horizontal → vertical sur mobile
+- Cartes cas d'usage : 2 colonnes → 1 colonne
+- Diagrammes SVG : `viewBox` + `preserveAspectRatio` pour le scaling automatique
 
