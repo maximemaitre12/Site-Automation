@@ -79,10 +79,10 @@ export function MethodSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/70 mb-3">Méthodologie</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">
             Un pipeline structuré en 3 phases
           </h2>
-          <p className="text-sm sm:text-base text-slate-400 max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-slate-500 max-w-md mx-auto">
             Chaque phase est conçue pour maximiser l'impact et minimiser les risques.
           </p>
         </div>
