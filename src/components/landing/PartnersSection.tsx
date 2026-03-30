@@ -339,7 +339,7 @@ export function PartnersSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">4 partenaires · infrastructure multi-cloud</span>
-                <span className="font-mono text-[10px] text-emerald-400 flex items-center gap-1">
+                <span className="font-mono text-[10px] text-primary flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                   Toutes connexions actives
                 </span>

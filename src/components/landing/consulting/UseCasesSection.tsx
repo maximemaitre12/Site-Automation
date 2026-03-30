@@ -226,8 +226,8 @@ export function UseCasesSection() {
             }
             statusBar={
               <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                 <span className="flex items-center gap-1.5">
+                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Last analysis: 2 min ago
                 </span>
                 <span>3 datasets loaded</span>
