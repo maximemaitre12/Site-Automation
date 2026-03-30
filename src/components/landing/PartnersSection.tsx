@@ -23,11 +23,7 @@ const partners = [
       { label: "Services", value: "200+" },
       { label: "SLA", value: "99.99%" },
     ],
-    logo: (
-      <svg viewBox="0 0 100 36" className="h-5 w-auto">
-        <text x="0" y="28" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="26" fill="currentColor" letterSpacing="-1">aws</text>
-      </svg>
-    ),
+    logo: <img src={awsLogo} alt="AWS" className="h-8 w-auto object-contain" />,
   },
   {
     name: "Microsoft Azure",
