@@ -93,7 +93,7 @@ function CPUHistoryChart({ isVisible }: { isVisible: boolean }) {
     <div className="px-3 sm:px-4 py-3">
       <div className="flex items-center justify-between mb-2">
         <span className="font-mono text-[10px] text-slate-400 uppercase tracking-wider">CPU History</span>
-        <span className="font-mono text-[10px] text-emerald-500">● Active</span>
+        <span className="font-mono text-[10px] text-primary">● Active</span>
       </div>
       <div className="bg-slate-950 rounded-lg p-2 border border-slate-800">
         <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12" preserveAspectRatio="none">
