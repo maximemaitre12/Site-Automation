@@ -34,7 +34,7 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 w-full relative z-10">
-        <div className="grid lg:grid-cols-[1fr,1.1fr] gap-12 lg:gap-20 items-center">
+        <div className="max-w-2xl mx-auto text-center">
           {/* Text */}
           <div className="animate-cloud-fade-in">
             {/* Premium badge */}
