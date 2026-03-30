@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 import { HeroSection } from "@/components/landing/HeroSection";
-import { DemoSection } from "@/components/landing/DemoSection";
-import { PainPointsSection } from "@/components/landing/PainPointsSection";
-import { ApiSection } from "@/components/landing/ApiSection";
-import { TestimonialSection } from "@/components/landing/TestimonialSection";
+import { ProblemsSection } from "@/components/landing/consulting/ProblemsSection";
+import { ImpactSection } from "@/components/landing/consulting/ImpactSection";
+import { PositioningSection } from "@/components/landing/consulting/PositioningSection";
+import { MethodSection } from "@/components/landing/consulting/MethodSection";
+import { UseCasesSection } from "@/components/landing/consulting/UseCasesSection";
+import { DifferentiationSection } from "@/components/landing/consulting/DifferentiationSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
-import { BlogSection } from "@/components/landing/BlogSection";
-import { ContactSection } from "@/components/landing/ContactSection";
 
 export default function Landing() {
   const { user, loading } = useAuth();
@@ -36,13 +36,13 @@ export default function Landing() {
   return (
     <div className="overflow-x-hidden no-scroll-anchoring">
       <HeroSection />
-      <DemoSection />
-      <PainPointsSection />
-      <ApiSection />
-      <BlogSection />
+      <ProblemsSection />
+      <ImpactSection />
+      <PositioningSection />
+      <MethodSection />
+      <UseCasesSection />
+      <DifferentiationSection />
       <FinalCTASection />
-      <TestimonialSection />
-      <ContactSection />
     </div>
   );
 }
