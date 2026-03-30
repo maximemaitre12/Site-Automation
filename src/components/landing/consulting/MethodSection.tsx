@@ -1,102 +1,182 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { Search, BarChart3, Rocket } from "lucide-react";
+import { Search, BarChart3, Rocket, ArrowRight } from "lucide-react";
 
 const steps = [
   {
     num: "01", title: "Analyse", duration: "1-2 semaines", icon: Search,
+    accent: "primary",
     desc: "Cartographie complète de vos opérations et identification des points de friction via notre moteur IA.",
-    miniStats: ["Flux analysés", "Données collectées", "Points identifiés", "Score global"],
+    miniStats: [
+      { label: "Flux analysés", pct: 92 },
+      { label: "Données collectées", pct: 78 },
+      { label: "Points identifiés", pct: 85 },
+      { label: "Score global", pct: 96 },
+    ],
   },
   {
     num: "02", title: "Priorisation", duration: "1 semaine", icon: BarChart3,
+    accent: "violet",
     desc: "Évaluation des opportunités à plus fort impact business et construction du plan d'action.",
-    miniStats: ["Impact estimé", "Effort requis", "ROI projeté", "Quick wins"],
+    miniStats: [
+      { label: "Impact estimé", pct: 88 },
+      { label: "Effort requis", pct: 45 },
+      { label: "ROI projeté", pct: 94 },
+      { label: "Quick wins", pct: 72 },
+    ],
   },
   {
     num: "03", title: "Déploiement", duration: "2-4 semaines", icon: Rocket,
+    accent: "emerald",
     desc: "Mise en place des solutions et accompagnement opérationnel pour des résultats durables.",
-    miniStats: ["Actions déployées", "KPIs suivis", "Gains réalisés", "Adoption"],
+    miniStats: [
+      { label: "Actions déployées", pct: 100 },
+      { label: "KPIs suivis", pct: 82 },
+      { label: "Gains réalisés", pct: 91 },
+      { label: "Adoption", pct: 97 },
+    ],
   },
 ];
+
+const accentMap: Record<string, { bar: string; numBg: string; numText: string; iconBg: string; glow: string }> = {
+  primary: {
+    bar: "bg-primary",
+    numBg: "bg-primary",
+    numText: "text-white",
+    iconBg: "bg-gradient-to-br from-primary to-[hsl(260_70%_60%)]",
+    glow: "shadow-[0_8px_30px_hsl(239_84%_67%/0.12)]",
+  },
+  violet: {
+    bar: "bg-[hsl(260_70%_60%)]",
+    numBg: "bg-[hsl(260_70%_60%)]",
+    numText: "text-white",
+    iconBg: "bg-gradient-to-br from-[hsl(260_70%_60%)] to-[hsl(280_60%_55%)]",
+    glow: "shadow-[0_8px_30px_hsl(260_70%_60%/0.12)]",
+  },
+  emerald: {
+    bar: "bg-emerald-500",
+    numBg: "bg-emerald-500",
+    numText: "text-white",
+    iconBg: "bg-gradient-to-br from-emerald-500 to-teal-500",
+    glow: "shadow-[0_8px_30px_hsl(160_84%_39%/0.12)]",
+  },
+};
 
 export function MethodSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
 
   return (
-    <section className="py-20 sm:py-28 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+    <section id="methode" className="py-24 sm:py-32 bg-slate-950 relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_60%_70%/0.06)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-[radial-gradient(ellipse,hsl(239_84%_67%/0.06),transparent_70%)]" />
 
-      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+      <div ref={ref} className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        {/* Header */}
         <div className={cn(
-          "text-center mb-10 sm:mb-14 transition-all duration-500",
+          "text-center mb-14 sm:mb-20 transition-all duration-600",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
-          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Méthodologie</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/70 mb-3">Méthodologie</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
             Un pipeline structuré en 3 phases
           </h2>
+          <p className="text-sm sm:text-base text-slate-400 max-w-md mx-auto">
+            Chaque phase est conçue pour maximiser l'impact et minimiser les risques.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 sm:gap-5 relative">
-          {/* Connector lines (desktop only) */}
-          <div className="hidden md:block absolute top-1/2 left-0 right-0 -translate-y-1/2 h-px">
-            <div className={cn(
-              "h-full bg-gradient-to-r from-primary/20 via-primary/15 to-primary/20 transition-all duration-1000",
-              isVisible ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
-            )} style={{ transitionDelay: "600ms" }} />
+        {/* Steps */}
+        <div className="grid md:grid-cols-3 gap-5 sm:gap-6 relative">
+          {/* Connector (desktop) */}
+          <div className="hidden md:flex absolute top-16 left-[20%] right-[20%] items-center z-0">
+            {[0, 1].map(i => (
+              <div key={i} className={cn("flex-1 flex items-center", i === 0 ? "" : "")}>
+                <div className={cn(
+                  "flex-1 h-px transition-all duration-1000",
+                  isVisible ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+                )}
+                  style={{
+                    background: "linear-gradient(90deg, hsl(239 84% 67% / 0.3), hsl(260 70% 60% / 0.3))",
+                    transitionDelay: `${800 + i * 300}ms`,
+                  }}
+                />
+                <ArrowRight className={cn(
+                  "w-3 h-3 text-primary/40 mx-1 transition-all duration-500",
+                  isVisible ? "opacity-100" : "opacity-0"
+                )} style={{ transitionDelay: `${1000 + i * 300}ms` }} />
+              </div>
+            ))}
           </div>
 
           {steps.map((step, i) => {
             const Icon = step.icon;
+            const a = accentMap[step.accent];
+
             return (
               <div
                 key={i}
                 className={cn(
-                  "relative rounded-xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6 transition-all duration-600",
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                  "group relative rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-sm p-6 transition-all duration-700 hover:bg-white/[0.06] hover:border-white/[0.12]",
+                  a.glow.replace(/shadow/, "hover:shadow"),
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                 )}
-                style={{ transitionDelay: `${i * 180 + 300}ms` }}
+                style={{ transitionDelay: `${i * 200 + 300}ms` }}
               >
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                    <Icon className="w-5 h-5" />
+                {/* Top: Number + Icon */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className={cn(
+                    "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
+                    a.numBg, a.numText
+                  )}
+                    style={{ boxShadow: `0 4px 14px ${step.accent === 'primary' ? 'hsl(239 84% 67% / 0.3)' : step.accent === 'violet' ? 'hsl(260 70% 60% / 0.3)' : 'hsl(160 84% 39% / 0.3)'}` }}
+                  >
+                    {step.num}
                   </div>
-                  <div>
-                    <span className="text-[10px] font-mono text-primary/50">{step.num}</span>
-                    <h3 className="text-sm font-bold text-slate-900">{step.title}</h3>
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", a.iconBg)}>
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-5">{step.desc}</p>
+                {/* Title + desc */}
+                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">{step.desc}</p>
 
-                {/* Mini dashboard preview */}
-                <div className="grid grid-cols-2 gap-2 mb-4">
+                {/* Mini dashboard */}
+                <div className="space-y-2.5 mb-5">
                   {step.miniStats.map((stat, j) => (
-                    <div
-                      key={j}
-                      className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2"
-                    >
-                      <div className={cn(
-                        "w-full h-1.5 rounded-full mb-1.5 transition-all duration-700",
-                        isVisible ? "opacity-100" : "opacity-0",
-                        j % 2 === 0 ? "bg-primary/30" : "bg-emerald-500/30"
-                      )}
-                        style={{
-                          width: isVisible ? `${60 + j * 10}%` : "0%",
-                          transitionDelay: `${i * 180 + j * 80 + 600}ms`,
-                        }}
-                      />
-                      <span className="text-[9px] text-slate-400">{stat}</span>
+                    <div key={j}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] font-medium text-slate-500">{stat.label}</span>
+                        <span className={cn(
+                          "text-[10px] font-bold tabular-nums transition-all duration-700",
+                          isVisible ? "opacity-100" : "opacity-0",
+                          step.accent === "primary" ? "text-primary" : step.accent === "violet" ? "text-[hsl(260_70%_65%)]" : "text-emerald-400"
+                        )}
+                          style={{ transitionDelay: `${i * 200 + j * 100 + 800}ms` }}
+                        >
+                          {isVisible ? stat.pct : 0}%
+                        </span>
+                      </div>
+                      <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                        <div
+                          className={cn("h-full rounded-full transition-all duration-1000 ease-out", a.bar)}
+                          style={{
+                            width: isVisible ? `${stat.pct}%` : "0%",
+                            transitionDelay: `${i * 200 + j * 100 + 600}ms`,
+                            opacity: 0.7,
+                          }}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Duration badge */}
-                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200">
-                  <span className="text-[10px] font-medium text-slate-500">{step.duration}</span>
+                {/* Duration */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.08]">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-[pulse_2s_ease-in-out_infinite]" />
+                  <span className="text-[10px] font-semibold text-slate-400">{step.duration}</span>
                 </div>
               </div>
             );
