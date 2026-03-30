@@ -42,8 +42,8 @@ const capabilities = [
     tag: "NLP-03",
     desc: "Compréhension contextuelle du langage métier. Extraction d'intentions, sentiment analysis et résumé automatique.",
     pct: 91,
-    gradient: "from-[hsl(270,65%,55%)] to-[hsl(290,60%,50%)]",
-    glowColor: "hsl(280,62%,52%)",
+    gradient: "from-[hsl(260,70%,60%)] to-[hsl(280,60%,55%)]",
+    glowColor: "hsl(260,70%,60%)",
     metrics: [
       { label: "Langues", value: "14" },
       { label: "F1 Score", value: "0.96" },
