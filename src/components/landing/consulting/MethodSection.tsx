@@ -152,7 +152,7 @@ export function MethodSection() {
                         <span className={cn(
                           "text-[10px] font-bold tabular-nums transition-all duration-700",
                           isVisible ? "opacity-100" : "opacity-0",
-                          step.accent === "primary" ? "text-primary" : step.accent === "violet" ? "text-[hsl(260_70%_65%)]" : "text-emerald-400"
+                          step.accent === "primary" ? "text-primary" : step.accent === "violet" ? "text-[hsl(260_70%_65%)]" : "text-[hsl(200_80%_55%)]"
                         )}
                           style={{ transitionDelay: `${i * 200 + j * 100 + 800}ms` }}
                         >
