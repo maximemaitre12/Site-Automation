@@ -118,6 +118,7 @@ const App = () => {
               <Route path="/signup" element={<Navigate to="/auth?mode=signup" replace />} />
               
               {/* Redirects */}
+              <Route path="/index" element={<Navigate to="/" replace />} />
               <Route path="/about" element={<Navigate to="/" replace />} />
               <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
               <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
