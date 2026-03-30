@@ -130,7 +130,7 @@ export function MethodSection() {
                     "w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black",
                     a.numBg, a.numText
                   )}
-                    style={{ boxShadow: `0 4px 14px ${step.accent === 'primary' ? 'hsl(239 84% 67% / 0.3)' : step.accent === 'violet' ? 'hsl(260 70% 60% / 0.3)' : 'hsl(160 84% 39% / 0.3)'}` }}
+                    style={{ boxShadow: `0 4px 14px ${step.accent === 'primary' ? 'hsl(239 84% 67% / 0.3)' : step.accent === 'violet' ? 'hsl(260 70% 60% / 0.3)' : 'hsl(200 80% 55% / 0.3)'}` }}
                   >
                     {step.num}
                   </div>
