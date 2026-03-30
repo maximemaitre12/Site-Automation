@@ -1,26 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-import { useCountUp } from "@/hooks/useCountUp";
-
-const stats = [
-  { value: 40, suffix: "+", label: "Missions réalisées" },
-  { value: 15, suffix: "M€", label: "Économies identifiées" },
-  { value: 12, suffix: "", label: "Secteurs couverts" },
-  { value: 98, suffix: "%", label: "Satisfaction client" },
-];
-
-function HeroStat({ value, suffix, label }: { value: number; suffix: string; label: string }) {
-  const { formattedCount } = useCountUp({ end: value, duration: 2000, suffix });
-  return (
-    <div className="text-center group">
-      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tabular-nums transition-colors group-hover:text-primary">
-        {formattedCount}
-      </div>
-      <div className="text-xs sm:text-sm text-slate-400 mt-1 font-medium">{label}</div>
-    </div>
-  );
-}
 
 export function HeroSection() {
   return (
