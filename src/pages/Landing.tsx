@@ -43,7 +43,7 @@ export default function Landing() {
       <ImpactSection />
       <PositioningSection />
       
-      <TrainingsSection />
+      
       <UseCasesSection />
       <DifferentiationSection />
       <FinalCTASection />
