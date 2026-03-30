@@ -1,6 +1,5 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 import { Brain, Workflow, MessageSquareText, Eye, Settings, FileBarChart } from "lucide-react";
 
 const capabilities = [
@@ -18,7 +17,7 @@ function CircularProgress({ pct, isVisible, delay }: { pct: number; isVisible: b
 
   return (
     <svg viewBox="0 0 48 48" className="w-12 h-12">
-      <circle cx="24" cy="24" r={r} fill="none" stroke="hsl(0 0% 100% / 0.06)" strokeWidth="3" />
+      <circle cx="24" cy="24" r={r} fill="none" stroke="hsl(220 20% 90%)" strokeWidth="3" />
       <circle
         cx="24" cy="24" r={r} fill="none"
         stroke="hsl(239 84% 67%)"
@@ -30,7 +29,7 @@ function CircularProgress({ pct, isVisible, delay }: { pct: number; isVisible: b
         style={{ transitionDelay: `${delay}ms` }}
       />
       <text x="24" y="25" textAnchor="middle" dominantBaseline="middle"
-        className="text-[9px] font-bold fill-white/70"
+        className="text-[9px] font-bold fill-slate-700"
       >{isVisible ? pct : 0}%</text>
     </svg>
   );
@@ -40,9 +39,9 @@ export function DifferentiationSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   return (
-    <section className="py-20 sm:py-28 bg-[#0a0e1f] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(0_0%_100%/0.02)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <section className="py-20 sm:py-28 bg-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
@@ -50,7 +49,7 @@ export function DifferentiationSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Capacités</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
             Technologies IA de pointe
           </h2>
         </div>
@@ -62,19 +61,19 @@ export function DifferentiationSection() {
               <div
                 key={i}
                 className={cn(
-                  "rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm p-5 transition-all duration-600 hover:border-primary/20 hover:bg-white/[0.04]",
+                  "rounded-xl border border-slate-200 bg-white shadow-sm p-5 transition-all duration-600 hover:border-primary/30 hover:shadow-md",
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 )}
                 style={{ transitionDelay: `${i * 100 + 200}ms` }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" style={{ filter: "drop-shadow(0 0 6px hsl(239 84% 67% / 0.4))" }} />
+                    <Icon className="w-5 h-5 text-primary" style={{ filter: "drop-shadow(0 0 4px hsl(239 84% 67% / 0.3))" }} />
                   </div>
                   <CircularProgress pct={cap.pct} isVisible={isVisible} delay={i * 100 + 400} />
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">{cap.label}</h3>
-                <p className="text-xs text-white/40 leading-relaxed">{cap.desc}</p>
+                <h3 className="text-sm font-bold text-slate-900 mb-1">{cap.label}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{cap.desc}</p>
               </div>
             );
           })}

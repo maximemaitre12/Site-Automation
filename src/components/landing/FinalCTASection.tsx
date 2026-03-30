@@ -7,9 +7,9 @@ export function FinalCTASection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
 
   return (
-    <section className="py-20 sm:py-28 bg-[#060918] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(239_84%_67%/0.06),transparent_60%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <section className="py-20 sm:py-28 bg-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(239_84%_67%/0.08),transparent_60%)]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
 
       <div
         ref={ref}
@@ -21,7 +21,7 @@ export function FinalCTASection() {
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
           Identifiez vos leviers d'<span className="text-primary">optimisation</span>
         </h2>
-        <p className="text-sm sm:text-base text-white/40 max-w-lg mx-auto mb-8">
+        <p className="text-sm sm:text-base text-slate-400 max-w-lg mx-auto mb-8">
           Échangez avec nous pour analyser vos opérations et identifier des opportunités concrètes d'amélioration.
         </p>
         <a href="mailto:contact@aether-connect.com">

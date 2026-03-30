@@ -30,14 +30,11 @@ export function HeroDiagram() {
   const [activeFlows, setActiveFlows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    // Stagger node appearance
     const nodeTimers = nodes.map((_, i) =>
       setTimeout(() => setVisibleNodes(i + 1), 200 + i * 80)
     );
-    // Light connections after nodes
     const connTimer = setTimeout(() => setConnectionsLit(true), 200 + nodes.length * 80 + 300);
 
-    // Data flow labels
     const flowTimers = dataFlows.map((f, i) => {
       const show = setTimeout(() => setActiveFlows(prev => new Set([...prev, i])), f.delay);
       const hide = setTimeout(() => setActiveFlows(prev => {
@@ -48,7 +45,6 @@ export function HeroDiagram() {
       return [show, hide];
     }).flat();
 
-    // Loop data flows
     const loopInterval = setInterval(() => {
       dataFlows.forEach((f, i) => {
         setTimeout(() => setActiveFlows(prev => new Set([...prev, i])), f.delay - 2000);
@@ -71,7 +67,7 @@ export function HeroDiagram() {
   return (
     <div className="relative p-4">
       {/* Ambient glow behind the center node */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-primary/10 blur-[60px] animate-[pulse_6s_ease-in-out_infinite]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-primary/8 blur-[60px] animate-[pulse_6s_ease-in-out_infinite]" />
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4 relative">
         {nodes.map((node, i) => {
@@ -85,43 +81,41 @@ export function HeroDiagram() {
                 "relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border transition-all duration-500",
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
                 node.center
-                  ? "bg-primary/10 border-primary/30 shadow-[0_0_30px_hsl(239_84%_67%/0.15)]"
-                  : "bg-white/[0.03] border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.05]",
-                "backdrop-blur-sm"
+                  ? "bg-primary/10 border-primary/30 shadow-[0_0_20px_hsl(239_84%_67%/0.1)]"
+                  : "bg-white border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md"
               )}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               <div className={cn(
                 "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500",
                 node.center
-                  ? "bg-primary/20 text-primary shadow-[0_0_15px_hsl(239_84%_67%/0.2)]"
-                  : "bg-white/[0.06] text-white/60"
+                  ? "bg-primary/20 text-primary shadow-[0_0_15px_hsl(239_84%_67%/0.15)]"
+                  : "bg-slate-100 text-slate-500"
               )}>
                 <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <span className={cn(
                 "text-[10px] sm:text-xs font-medium",
-                node.center ? "text-primary" : "text-white/50"
+                node.center ? "text-primary" : "text-slate-500"
               )}>
                 {node.label}
               </span>
 
               {/* Connection indicator dot */}
               {connectionsLit && !node.center && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary/60 shadow-[0_0_6px_hsl(239_84%_67%/0.4)]" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary/60 shadow-[0_0_6px_hsl(239_84%_67%/0.3)]" />
               )}
             </div>
           );
         })}
 
-        {/* Connection lines (CSS pseudo grid lines) */}
+        {/* Connection lines */}
         {connectionsLit && (
           <div className="absolute inset-0 pointer-events-none">
-            {/* Horizontal lines */}
             {[0, 1, 2].map(row => (
               <div
                 key={`h-${row}`}
-                className="absolute h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+                className="absolute h-px bg-gradient-to-r from-transparent via-primary/15 to-transparent"
                 style={{
                   top: `${(row * 33.33) + 16.66}%`,
                   left: '10%',
@@ -129,11 +123,10 @@ export function HeroDiagram() {
                 }}
               />
             ))}
-            {/* Vertical lines */}
             {[0, 1, 2].map(col => (
               <div
                 key={`v-${col}`}
-                className="absolute w-px bg-gradient-to-b from-transparent via-primary/20 to-transparent"
+                className="absolute w-px bg-gradient-to-b from-transparent via-primary/15 to-transparent"
                 style={{
                   left: `${(col * 33.33) + 16.66}%`,
                   top: '10%',
@@ -158,7 +151,7 @@ export function HeroDiagram() {
             <div
               key={i}
               className={cn(
-                "absolute px-2 py-1 rounded-md bg-primary/10 border border-primary/20 text-[10px] font-mono font-bold text-primary/80 backdrop-blur-sm transition-all duration-500",
+                "absolute px-2 py-1 rounded-md bg-primary/10 border border-primary/20 text-[10px] font-mono font-bold text-primary backdrop-blur-sm transition-all duration-500",
                 activeFlows.has(i) ? "opacity-100 scale-100" : "opacity-0 scale-75"
               )}
               style={positions[i]}
@@ -170,12 +163,12 @@ export function HeroDiagram() {
       </div>
 
       {/* Status bar */}
-      <div className="mt-4 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+      <div className="mt-4 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
         <Cpu className="w-3 h-3 text-primary/60" />
-        <span className="text-[10px] sm:text-xs font-medium text-white/40 tracking-wider uppercase">
+        <span className="text-[10px] sm:text-xs font-medium text-slate-400 tracking-wider uppercase">
           Neural Processing Engine — Active
         </span>
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_6px_hsl(142_76%_36%/0.4)]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_hsl(142_76%_36%/0.4)]" />
       </div>
     </div>
   );
