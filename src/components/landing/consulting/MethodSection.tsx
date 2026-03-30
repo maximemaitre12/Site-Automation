@@ -140,8 +140,8 @@ export function MethodSection() {
                 </div>
 
                 {/* Title + desc */}
-                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">{step.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6">{step.desc}</p>
 
                 {/* Mini dashboard */}
                 <div className="space-y-2.5 mb-5">
