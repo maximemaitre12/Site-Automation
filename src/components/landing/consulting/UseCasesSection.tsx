@@ -301,8 +301,8 @@ export function UseCasesSection() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-mono text-3xl lg:text-4xl font-black text-emerald-400 block" style={{
-                      textShadow: "0 0 24px rgba(16,185,129,0.35)"
+                   <span className="font-mono text-3xl lg:text-4xl font-black text-primary block" style={{
+                      textShadow: "0 0 24px hsla(239,84%,67%,0.35)"
                     }}>{uc.metric}</span>
                   </div>
                 </div>
