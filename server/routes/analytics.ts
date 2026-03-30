@@ -121,4 +121,36 @@ router.get('/recent', (_req: Request, res: Response) => {
   }
 })
 
+router.get('/searches', (_req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const rows = db.prepare(`
+      SELECT s.*, j.title as job_title
+      FROM searches s
+      LEFT JOIN jobs j ON s.job_id = j.id
+      ORDER BY s.created_at DESC
+      LIMIT 20
+    `).all()
+    res.json({ data: rows })
+  } catch (err: unknown) {
+    res.json({ error: (err as Error).message })
+  }
+})
+
+router.get('/candidate-messages/:candidateId', (req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const rows = db.prepare(`
+      SELECT id, metadata, created_at
+      FROM events
+      WHERE type = 'message_copied' AND candidate_id = ?
+      ORDER BY created_at DESC
+      LIMIT 10
+    `).all(req.params.candidateId)
+    res.json({ data: rows })
+  } catch (err: unknown) {
+    res.json({ error: (err as Error).message })
+  }
+})
+
 export default router

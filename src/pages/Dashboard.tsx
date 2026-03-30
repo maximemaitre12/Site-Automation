@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, KPIs, Interview } from '../api/client'
+import { api, Candidate, KPIs, Interview } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { T } from '../i18n'
 
@@ -42,6 +42,7 @@ export function Dashboard() {
   const [kpis, setKpis] = useState<KPIs | null>(null)
   const [interviews, setInterviews] = useState<Interview[]>([])
   const [pendingCVs, setPendingCVs] = useState(0)
+  const [allCandidates, setAllCandidates] = useState<Candidate[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export function Dashboard() {
         setInterviews(upcoming)
       }
       if (cands.data) {
+        setAllCandidates(cands.data)
         setPendingCVs(cands.data.filter(c => c.source_type === 'upload' && c.stage === 'new').length)
       }
       setLoading(false)
@@ -65,6 +67,22 @@ export function Dashboard() {
 
   const todayInterviews = interviews.filter(i => isToday(i.scheduled_at))
   const nextInterviews  = interviews.filter(i => !isToday(i.scheduled_at)).slice(0, 5)
+
+  // Action items
+  const hotUncontacted = allCandidates.filter(c =>
+    c.qualification_score != null && c.qualification_score >= 70 &&
+    c.status !== 'contacted' && c.status !== 'rejected'
+  ).length
+  const soon24h = interviews.filter(i => {
+    const ms = new Date(i.scheduled_at).getTime() - Date.now()
+    return ms > 0 && ms <= 24 * 60 * 60 * 1000
+  }).length
+  const jobsEmpty = kpis ? kpis.byJob.filter(j => j.count === 0).length : 0
+  const todoItems = [
+    hotUncontacted > 0 && d.todoHotCandidates(hotUncontacted),
+    soon24h > 0 && d.todoInterviewsSoon(soon24h),
+    jobsEmpty > 0 && d.todoJobsEmpty(jobsEmpty),
+  ].filter(Boolean) as string[]
 
   const activeJobs   = kpis?.activeJobs ?? 0
   const contacted    = kpis?.totalContacted ?? 0
@@ -148,6 +166,47 @@ export function Dashboard() {
           sub={contactRate >= 60 ? k.excellent : contactRate >= 30 ? k.improve : k.low}
           subColor={contactRate >= 60 ? 'var(--ok)' : contactRate >= 30 ? 'var(--warn)' : 'var(--err)'}
         />
+      </div>
+
+      {/* ── Action items ── */}
+      <div style={{
+        background: todoItems.length > 0 ? '#FFF8EE' : 'var(--surface)',
+        border: `1px solid ${todoItems.length > 0 ? '#FDDFA0' : 'var(--border)'}`,
+        borderRadius: 12, padding: '12px 18px', marginBottom: 14, flexShrink: 0,
+        display: 'flex', alignItems: 'flex-start', gap: 12,
+      }}>
+        <div style={{
+          width: 24, height: 24, borderRadius: '50%', flexShrink: 0, marginTop: 1,
+          background: todoItems.length > 0 ? '#FDDFA0' : 'var(--surface-2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {todoItems.length > 0 ? (
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 2v5l3 3"/><circle cx="8" cy="8" r="6"/>
+            </svg>
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--ok)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="2,8 6,12 14,4"/>
+            </svg>
+          )}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: todoItems.length > 0 ? 6 : 0, color: todoItems.length > 0 ? '#92400E' : 'var(--ok)' }}>
+            {d.todo}
+          </div>
+          {todoItems.length === 0 ? (
+            <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{d.todoEmpty}</span>
+          ) : (
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {todoItems.map((item, i) => (
+                <li key={i} style={{ fontSize: 12, color: '#92400E', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#D97706', flexShrink: 0 }} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       {/* ── Middle row ── */}

@@ -34,6 +34,8 @@ export const api = {
       req<Candidate>(`/candidates/${id}/status`, { method: 'PUT', ...body({ status }) }),
     updateStage: (id: number, stage: string) =>
       req<Candidate>(`/candidates/${id}/stage`, { method: 'PUT', ...body({ stage }) }),
+    updateRejectionReason: (id: number, rejection_reason: string) =>
+      req<Candidate>(`/candidates/${id}/rejection-reason`, { method: 'PUT', ...body({ rejection_reason }) }),
     qualify: (id: number) =>
       req<Candidate>(`/candidates/${id}/qualify`, { method: 'POST' }),
     remove: (id: number) => req<{ success: boolean }>(`/candidates/${id}`, { method: 'DELETE' }),
@@ -69,6 +71,8 @@ export const api = {
     kpis: () => req<KPIs>('/analytics/kpis'),
     weekly: () => req<WeeklyData[]>('/analytics/weekly'),
     recent: () => req<RecentEvent[]>('/analytics/recent'),
+    searches: () => req<SearchHistory[]>('/analytics/searches'),
+    candidateMessages: (candidateId: number) => req<CandidateMessageEvent[]>(`/analytics/candidate-messages/${candidateId}`),
     log: (type: string, metadata?: Record<string, unknown>) =>
       req<{ success: boolean }>('/analytics/log', { method: 'POST', ...body({ type, metadata }) }),
   },
@@ -193,4 +197,20 @@ export interface RecentEvent {
   role: string | null
   source_platform: string | null
   job_title: string | null
+}
+
+export interface SearchHistory {
+  id: number
+  job_id: number | null
+  job_title: string | null
+  location: string
+  platforms: string
+  candidates_found: number
+  created_at: string
+}
+
+export interface CandidateMessageEvent {
+  id: number
+  metadata: string
+  created_at: string
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, KPIs, WeeklyData, RecentEvent } from '../api/client'
+import { api, KPIs, SearchHistory, WeeklyData, RecentEvent } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { T } from '../i18n'
 
@@ -9,6 +9,7 @@ export function Analytics() {
   const [kpis, setKpis] = useState<KPIs | null>(null)
   const [weekly, setWeekly] = useState<WeeklyData[]>([])
   const [recent, setRecent] = useState<RecentEvent[]>([])
+  const [searches, setSearches] = useState<SearchHistory[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -16,10 +17,12 @@ export function Analytics() {
       api.analytics.kpis(),
       api.analytics.weekly(),
       api.analytics.recent(),
-    ]).then(([k, w, r]) => {
+      api.analytics.searches(),
+    ]).then(([k, w, r, s]) => {
       if (k.data) setKpis(k.data)
       if (w.data) setWeekly(w.data)
       if (r.data) setRecent(r.data)
+      if (s.data) setSearches(s.data)
       setLoading(false)
     })
   }, [])
@@ -54,7 +57,7 @@ export function Analytics() {
               {[
                 { label: T[uiLang].dashboard.kpi.activeJobs, value: kpis.activeJobs, color: 'var(--accent)' },
                 { label: T[uiLang].dashboard.kpi.contacted, value: kpis.totalContacted, color: 'var(--ok)' },
-                { label: 'Searches this week', value: kpis.weekSearches, color: 'var(--text-2)' },
+                { label: uiLang === 'ua' ? 'Пошуки за тиждень' : 'Searches this week', value: kpis.weekSearches, color: 'var(--text-2)' },
                 { label: T[uiLang].dashboard.kpi.contactRate, value: `${kpis.contactRate}%`, color: kpis.contactRate >= 20 ? 'var(--ok)' : '#d97706' },
               ].map((kpi, i) => (
                 <div key={i} className="card" style={{ textAlign: 'center', padding: '16px 12px' }}>
@@ -108,6 +111,48 @@ export function Analytics() {
               </div>
             </div>
           )}
+
+          {/* Search history */}
+          <div className="card">
+            <div className="t-14 medium mb-16">{ta.searchesTitle}</div>
+            {searches.length === 0 ? (
+              <p className="t-13 c-3">{ta.noSearches}</p>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                      {['Date', uiLang === 'ua' ? 'Посада' : 'Position', uiLang === 'ua' ? 'Місто' : 'City', uiLang === 'ua' ? 'Платформи' : 'Platforms', uiLang === 'ua' ? 'Результати' : 'Results'].map(h => (
+                        <th key={h} style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 600, color: 'var(--text-3)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {searches.map((s, i) => {
+                      const platforms = (() => { try { return JSON.parse(s.platforms) as string[] } catch { return [s.platforms] } })()
+                      return (
+                        <tr key={s.id} style={{ borderBottom: i < searches.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                          <td style={{ padding: '8px 10px', color: 'var(--text-3)' }}>{formatDate(s.created_at)}</td>
+                          <td style={{ padding: '8px 10px', fontWeight: 500, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.job_title || '—'}</td>
+                          <td style={{ padding: '8px 10px', color: 'var(--text-2)' }}>{s.location || '—'}</td>
+                          <td style={{ padding: '8px 10px' }}>
+                            <div className="flex flex-wrap gap-4">
+                              {platforms.map(p => (
+                                <span key={p} style={{ fontSize: 9, padding: '1px 6px', borderRadius: 4, background: 'var(--surface-2)', color: 'var(--text-2)' }}>{p}</span>
+                              ))}
+                            </div>
+                          </td>
+                          <td style={{ padding: '8px 10px', fontWeight: 600, color: s.candidates_found > 0 ? 'var(--ok)' : 'var(--text-3)' }}>
+                            {s.candidates_found}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
           {/* Recent activity */}
           <div className="card">

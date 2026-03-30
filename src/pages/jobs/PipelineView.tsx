@@ -8,6 +8,14 @@ import { CandidateModal } from './CandidateModal'
 import { AddCandidatePanel } from './AddCandidatePanel'
 
 const STAGE_ORDER = ['new', 'prequalification', 'interview', 'decision'] as const
+type Stage = typeof STAGE_ORDER[number]
+
+const STAGE_COLORS: Record<Stage, { bg: string; color: string; border: string }> = {
+  new:              { bg: 'var(--surface-2)',  color: 'var(--text-3)',  border: 'var(--border)' },
+  prequalification: { bg: '#D0E4F8',           color: '#2563EB',        border: '#93C5FD' },
+  interview:        { bg: '#FEE8D0',           color: '#D9780A',        border: '#FCD09A' },
+  decision:         { bg: '#D0F0E4',           color: '#2E9460',        border: '#86EFAC' },
+}
 
 export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) {
   const { uiLang } = useAppStore()
@@ -21,6 +29,9 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
   const [search, setSearch] = useState('')
   const [filterStage, setFilterStage] = useState<string>('all')
   const [filterPlatform, setFilterPlatform] = useState<string>('all')
+  const [viewMode, setViewMode] = useState<'grid' | 'kanban'>('kanban')
+  const [batchQualifying, setBatchQualifying] = useState(false)
+  const [qualifyProgress, setQualifyProgress] = useState<{ done: number; total: number } | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -41,14 +52,26 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
     if (res.data) setCandidates(prev => prev.map(c => c.id === id ? res.data! : c))
   }
 
+  async function batchQualify() {
+    const unscored = candidates.filter(c => c.qualification_score == null)
+    if (unscored.length === 0) return
+    setBatchQualifying(true)
+    setQualifyProgress({ done: 0, total: unscored.length })
+    for (let i = 0; i < unscored.length; i++) {
+      const res = await api.candidates.qualify(unscored[i].id)
+      if (res.data) setCandidates(prev => prev.map(c => c.id === res.data!.id ? res.data! : c))
+      setQualifyProgress({ done: i + 1, total: unscored.length })
+    }
+    setBatchQualifying(false)
+    setQualifyProgress(null)
+  }
+
   function addCandidates(newOnes: Candidate[]) {
     setCandidates(prev => {
       const existing = new Set(prev.map(c => c.profile_url || c.id.toString()))
       const toAdd = newOnes.filter(c => !existing.has(c.profile_url || c.id.toString()))
       return [...toAdd, ...prev]
     })
-
-    // Poll until all new candidates have a qualification score (max 60s)
     if (pollRef.current) clearInterval(pollRef.current)
     let attempts = 0
     pollRef.current = setInterval(async () => {
@@ -85,10 +108,9 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
     URL.revokeObjectURL(url)
   }
 
-  // Derive available platforms
   const platforms = Array.from(new Set(candidates.map(c => c.source_platform))).filter(Boolean)
+  const unscoredCount = candidates.filter(c => c.qualification_score == null).length
 
-  // Apply filters
   const filtered = candidates.filter(c => {
     if (filterStage !== 'all' && c.stage !== filterStage) return false
     if (filterPlatform !== 'all' && c.source_platform !== filterPlatform) return false
@@ -118,6 +140,28 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
             </div>
           </div>
           <div className="flex items-center gap-8">
+            {/* View toggle */}
+            <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 8, padding: 2 }}>
+              {(['kanban', 'grid'] as const).map(m => (
+                <button key={m} onClick={() => setViewMode(m)} style={{
+                  background: viewMode === m ? 'var(--surface)' : 'transparent',
+                  border: 'none', borderRadius: 6, padding: '4px 10px',
+                  cursor: 'pointer', fontSize: 11, fontWeight: 500,
+                  color: viewMode === m ? 'var(--text-1)' : 'var(--text-3)',
+                  boxShadow: viewMode === m ? 'var(--shadow-sm)' : 'none',
+                }}>
+                  {m === 'kanban' ? tp.kanban : tp.grid}
+                </button>
+              ))}
+            </div>
+            {unscoredCount > 0 && (
+              <button className="btn btn-secondary" onClick={batchQualify} disabled={batchQualifying} style={{ fontSize: 11 }}>
+                {batchQualifying && qualifyProgress
+                  ? `${tp.qualifying} ${qualifyProgress.done}/${qualifyProgress.total}`
+                  : tp.qualifyAll(unscoredCount)
+                }
+              </button>
+            )}
             <button className="btn btn-secondary" onClick={exportCSV} style={{ fontSize: 11 }}>
               {tj.exportCSV}
             </button>
@@ -150,11 +194,11 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
           {platforms.length > 1 && (
             <select
               className="input"
-              style={{ width: 130, fontSize: 12 }}
+              style={{ width: 140, fontSize: 12 }}
               value={filterPlatform}
               onChange={e => setFilterPlatform(e.target.value)}
             >
-              <option value="all">All platforms</option>
+              <option value="all">{tp.allPlatforms}</option>
               {platforms.map(p => (
                 <option key={p} value={p}>{p === 'cv_import' ? 'CV' : p}</option>
               ))}
@@ -166,7 +210,7 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
         </div>
       </div>
 
-      {/* Candidates grid */}
+      {/* Content */}
       {loading ? (
         <div className="flex items-center gap-8" style={{ padding: 32 }}>
           <span className="spinner" /><span className="c-2">{tj.loading}</span>
@@ -180,10 +224,58 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
           <p className="t-12 c-3">{tj.noCandidatesHint}</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="empty-state">
-          <p className="t-13 c-2">No candidates match the current filters.</p>
+        <div className="empty-state"><p className="t-13 c-2">{tp.noMatch}</p></div>
+      ) : viewMode === 'kanban' ? (
+        /* ── Kanban view ── */
+        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0, overflowX: 'auto' }}>
+          {STAGE_ORDER.map(stage => {
+            const stageCands = filtered.filter(c => c.stage === stage)
+            const conf = STAGE_COLORS[stage]
+            const avgScore = stageCands.filter(c => c.qualification_score != null).length > 0
+              ? Math.round(stageCands.filter(c => c.qualification_score != null).reduce((a, c) => a + c.qualification_score!, 0) / stageCands.filter(c => c.qualification_score != null).length)
+              : null
+            return (
+              <div key={stage} style={{ flex: '1 1 0', minWidth: 240, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                {/* Column header */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '8px 12px', marginBottom: 8,
+                  background: conf.bg, borderRadius: 10, border: `1px solid ${conf.border}`,
+                  flexShrink: 0,
+                }}>
+                  <div className="flex items-center gap-6">
+                    <span style={{ fontSize: 11, fontWeight: 600, color: conf.color }}>{stages[stage]}</span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 10,
+                      background: conf.color + '20', color: conf.color,
+                    }}>{stageCands.length}</span>
+                  </div>
+                  {avgScore !== null && (
+                    <span style={{ fontSize: 10, color: conf.color, opacity: 0.7 }}>∅ {avgScore}</span>
+                  )}
+                </div>
+                {/* Cards */}
+                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {stageCands.map(c => (
+                    <PipelineCard
+                      key={c.id}
+                      candidate={c}
+                      job={job}
+                      onDelete={deleteCandidate}
+                      onClick={() => setSelectedCandidate(c)}
+                      onStageAdvance={advanceStage}
+                    />
+                  ))}
+                  {stageCands.length === 0 && (
+                    <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 11 }}>—</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       ) : (
+        /* ── Grid view ── */
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12,
           overflowY: 'auto', paddingBottom: 8,
@@ -201,7 +293,6 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
         </div>
       )}
 
-      {/* Modals & panels */}
       {showAdd && (
         <AddCandidatePanel
           job={job}

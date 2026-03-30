@@ -36,6 +36,11 @@ export const T = {
       candidatesPerJob: 'Candidates per position',
       createPositions: 'Create positions and add candidates',
       managePositions: 'Manage positions →',
+      todo: 'Action items',
+      todoEmpty: 'Nothing urgent — all up to date.',
+      todoHotCandidates: (n: number) => `${n} hot candidate${n !== 1 ? 's' : ''} (score ≥ 70) not yet contacted`,
+      todoInterviewsSoon: (n: number) => `${n} interview${n !== 1 ? 's' : ''} in the next 24h`,
+      todoJobsEmpty: (n: number) => `${n} position${n !== 1 ? 's' : ''} with no candidates`,
     },
 
     jobs: {
@@ -116,10 +121,26 @@ export const T = {
 
       pipeline: {
         allStages: 'All',
+        allPlatforms: 'All platforms',
         filterLabel: 'Filter',
         searchPlaceholder: 'Search role or location…',
         advanceStage: 'Advance stage',
         stageChanged: 'Stage updated',
+        noMatch: 'No candidates match the current filters.',
+        qualifyAll: (n: number) => `Qualify unscored (${n})`,
+        qualifying: 'Qualifying…',
+        kanban: 'Kanban',
+        grid: 'Grid',
+      },
+
+      candidate: {
+        hired: 'Retained',
+        rejected: 'Rejected',
+        rejectionReason: 'Reason for rejection',
+        rejectionReasonPlaceholder: 'Skills mismatch, location, experience level…',
+        saving: 'Saving…',
+        save: 'Save',
+        messageHistory: 'Messages sent',
       },
     },
 
@@ -133,6 +154,8 @@ export const T = {
       weeklyTitle: 'Profiles viewed — last 8 weeks',
       recentTitle: 'Recent activity',
       noActivity: 'No activity recorded yet.',
+      searchesTitle: 'Search history',
+      noSearches: 'No searches performed yet.',
       eventTypes: {
         profile_viewed: 'Profile viewed',
         message_copied: 'Message copied',
@@ -190,6 +213,11 @@ export const T = {
       candidatesPerJob: 'Кандидати за посадою',
       createPositions: 'Створіть посади та додайте кандидатів',
       managePositions: 'Керувати посадами →',
+      todo: 'Що зробити',
+      todoEmpty: 'Нічого термінового — все актуально.',
+      todoHotCandidates: (n: number) => `${n} гарячих кандидат${n === 1 ? '' : 'ів'} (оцінка ≥ 70) ще не зв\'язані`,
+      todoInterviewsSoon: (n: number) => `${n} співбесід${n === 1 ? 'а' : 'и'} у найближчі 24 год`,
+      todoJobsEmpty: (n: number) => `${n} посад${n === 1 ? 'а' : 'и'} без кандидатів`,
     },
 
     jobs: {
@@ -270,10 +298,26 @@ export const T = {
 
       pipeline: {
         allStages: 'Всі',
+        allPlatforms: 'Всі платформи',
         filterLabel: 'Фільтр',
         searchPlaceholder: 'Пошук по ролі або місту…',
         advanceStage: 'Просунути етап',
         stageChanged: 'Етап оновлено',
+        noMatch: 'Немає кандидатів, що відповідають фільтрам.',
+        qualifyAll: (n: number) => `Оцінити без скорингу (${n})`,
+        qualifying: 'Оцінка…',
+        kanban: 'Канбан',
+        grid: 'Сітка',
+      },
+
+      candidate: {
+        hired: 'Відібраний',
+        rejected: 'Відхилений',
+        rejectionReason: 'Причина відмови',
+        rejectionReasonPlaceholder: 'Невідповідність навичок, розташування, рівень досвіду…',
+        saving: 'Збереження…',
+        save: 'Зберегти',
+        messageHistory: 'Надіслані повідомлення',
       },
     },
 
@@ -287,6 +331,8 @@ export const T = {
       weeklyTitle: 'Переглянуті профілі — останні 8 тижнів',
       recentTitle: 'Остання активність',
       noActivity: 'Активність ще не зареєстрована.',
+      searchesTitle: 'Історія пошуку',
+      noSearches: 'Пошуки ще не виконувались.',
       eventTypes: {
         profile_viewed: 'Профіль переглянуто',
         message_copied: 'Повідомлення скопійовано',

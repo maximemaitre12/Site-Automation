@@ -83,6 +83,19 @@ router.put('/:id/stage', (req: Request, res: Response) => {
   }
 })
 
+router.put('/:id/rejection-reason', (req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const { id } = req.params
+    const { rejection_reason } = req.body
+    db.prepare('UPDATE candidates SET rejection_reason = ? WHERE id = ?').run(rejection_reason || null, id)
+    const candidate = db.prepare('SELECT * FROM candidates WHERE id = ?').get(id)
+    res.json({ data: candidate })
+  } catch (err: unknown) {
+    res.json({ error: (err as Error).message })
+  }
+})
+
 router.post('/:id/qualify', async (req: Request, res: Response) => {
   try {
     const db = getDb()

@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
-import { api, Candidate, Interview, Job } from '../../api/client'
+import { useEffect, useRef, useState } from 'react'
+import { api, Candidate, CandidateMessageEvent, Interview, Job } from '../../api/client'
 import { useAppStore } from '../../store/useAppStore'
 import { T } from '../../i18n'
-// T is used for locale and stage labels below
 import { INTERVIEW_TYPES, PLATFORM_COLOR } from './constants'
 import { iconCalendar, iconClose, iconSparkle, iconStar, iconTrash } from './icons'
 import { parseProfile, parseTags } from './helpers'
@@ -17,6 +16,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
 }) {
   const { uiLang } = useAppStore()
   const tm = T[uiLang].jobs.modal
+  const tc = T[uiLang].jobs.candidate
   const [candidate, setCandidate] = useState(initial)
   const [tab, setTab] = useState<'profile' | 'message' | 'interview'>('profile')
   const [qualifying, setQualifying] = useState(false)
@@ -28,11 +28,32 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
   const [genError, setGenError] = useState('')
   const [showSchedule, setShowSchedule] = useState(false)
   const [interviews, setInterviews] = useState<Interview[]>([])
+  const [rejectionReason, setRejectionReason] = useState(initial.rejection_reason || '')
+  const [savingReason, setSavingReason] = useState(false)
+  const [messageHistory, setMessageHistory] = useState<CandidateMessageEvent[]>([])
+  const viewedRef = useRef(false)
+
+  // Mark as viewed on first open
+  useEffect(() => {
+    if (viewedRef.current) return
+    viewedRef.current = true
+    if (initial.status === 'new') {
+      api.candidates.updateStatus(initial.id, 'viewed').then(r => {
+        if (r.data) { setCandidate(r.data); onUpdate(r.data) }
+      })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (tab === 'interview') {
       api.interviews.list(job.id).then(r => {
         if (r.data) setInterviews(r.data.filter(i => i.candidate_id === candidate.id))
+      })
+    }
+    if (tab === 'message') {
+      api.analytics.candidateMessages(candidate.id).then(r => {
+        if (r.data) setMessageHistory(r.data)
       })
     }
   }, [tab, candidate.id, job.id])
@@ -51,10 +72,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
     setGenerating(true); setGenError('')
     const res = await api.ai.generateMessage(job, candidate, msgLang)
     if (res.error) { setGenError(res.error); setGenerating(false); return }
-    if (res.data) {
-      setMessage(res.data)
-      api.candidates.updateStatus(candidate.id, 'viewed')
-    }
+    if (res.data) setMessage(res.data)
     setGenerating(false)
   }
 
@@ -63,7 +81,22 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
     setCopied(true); setTimeout(() => setCopied(false), 2000)
     const r = await api.candidates.updateStatus(candidate.id, 'contacted')
     if (r.data) { setCandidate(r.data); onUpdate(r.data) }
-    api.analytics.log('message_copied', { candidateId: candidate.id, jobId: candidate.job_id })
+    api.analytics.log('message_copied', {
+      candidateId: candidate.id,
+      jobId: candidate.job_id,
+      preview: message.substring(0, 100),
+    })
+    // Refresh message history
+    api.analytics.candidateMessages(candidate.id).then(r2 => {
+      if (r2.data) setMessageHistory(r2.data)
+    })
+  }
+
+  async function saveRejectionReason() {
+    setSavingReason(true)
+    const r = await api.candidates.updateRejectionReason(candidate.id, rejectionReason)
+    if (r.data) { setCandidate(r.data); onUpdate(r.data) }
+    setSavingReason(false)
   }
 
   const scoreColor = candidate.qualification_score == null ? 'var(--text-3)'
@@ -140,7 +173,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
 
             {tab === 'profile' && (
               <div>
-                {/* Stats row — only show filled fields */}
+                {/* Stats row */}
                 {(() => {
                   const profileData = candidate.profile_data ? (() => { try { return JSON.parse(candidate.profile_data as string) } catch { return null } })() : null
                   const education = profileData?.education || ''
@@ -166,7 +199,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
                   )
                 })()}
 
-                {/* Timestamps + interview decision */}
+                {/* Timestamps + decision */}
                 {(candidate.viewed_at || candidate.contacted_at || (candidate.decision && candidate.decision !== 'pending')) && (
                   <div className="flex flex-wrap gap-8" style={{ marginBottom: 16 }}>
                     {candidate.viewed_at && (
@@ -185,13 +218,35 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
                         background: candidate.decision === 'hire' ? '#D0F0E4' : '#FDDDD8',
                         color: candidate.decision === 'hire' ? '#2E9460' : '#D94040',
                       }}>
-                        {tm.interviewDecision}: {candidate.decision === 'hire' ? '✓ Retenu' : '✗ Refusé'}
+                        {tm.interviewDecision}: {candidate.decision === 'hire' ? '✓ ' + tc.hired : '✗ ' + tc.rejected}
                       </span>
                     )}
                   </div>
                 )}
 
-                {/* Qualification section */}
+                {/* Rejection reason — only when rejected */}
+                {(candidate.decision === 'reject' || candidate.status === 'rejected') && (
+                  <div style={{ background: '#FFF4F2', borderRadius: 12, padding: '14px 16px', marginBottom: 16, border: '1px solid #FDDDD8' }}>
+                    <div className="t-11 medium" style={{ color: '#D94040', marginBottom: 8 }}>{tc.rejectionReason}</div>
+                    <textarea
+                      className="input"
+                      style={{ width: '100%', minHeight: 64, fontSize: 12, resize: 'vertical', boxSizing: 'border-box' }}
+                      placeholder={tc.rejectionReasonPlaceholder}
+                      value={rejectionReason}
+                      onChange={e => setRejectionReason(e.target.value)}
+                    />
+                    <button
+                      className="btn btn-secondary"
+                      style={{ marginTop: 8, fontSize: 11 }}
+                      onClick={saveRejectionReason}
+                      disabled={savingReason}
+                    >
+                      {savingReason ? tc.saving : tc.save}
+                    </button>
+                  </div>
+                )}
+
+                {/* Qualification */}
                 <div style={{ background: 'var(--surface-2)', borderRadius: 12, padding: '16px 18px', marginBottom: 16 }}>
                   <div className="flex items-center justify-between mb-12">
                     <span className="t-12 medium">{tm.aiScore}</span>
@@ -202,17 +257,15 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
                   </div>
                   {qualError && <p style={{ color: 'var(--err)', fontSize: 11, marginBottom: 8 }}>{qualError}</p>}
                   {candidate.qualification_score != null ? (
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                        <div style={{
-                          width: 48, height: 48, borderRadius: '50%', border: `3px solid ${scoreColor}`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 15, fontWeight: 700, color: scoreColor, flexShrink: 0,
-                        }}>
-                          {candidate.qualification_score}
-                        </div>
-                        <div className="t-12 c-2" style={{ lineHeight: 1.5 }}>{candidate.qualification_notes}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{
+                        width: 48, height: 48, borderRadius: '50%', border: `3px solid ${scoreColor}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 15, fontWeight: 700, color: scoreColor, flexShrink: 0,
+                      }}>
+                        {candidate.qualification_score}
                       </div>
+                      <div className="t-12 c-2" style={{ lineHeight: 1.5 }}>{candidate.qualification_notes}</div>
                     </div>
                   ) : (
                     <p className="t-11 c-3">{tm.noScore}</p>
@@ -323,6 +376,24 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
 
                 {!message && !generating && (
                   <p className="t-12 c-3">{tm.messageHint}</p>
+                )}
+
+                {/* Message history */}
+                {messageHistory.length > 0 && (
+                  <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+                    <div className="t-11 c-3 medium" style={{ marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {tc.messageHistory}
+                    </div>
+                    {messageHistory.map(ev => {
+                      const meta = (() => { try { return JSON.parse(ev.metadata) } catch { return {} } })()
+                      return (
+                        <div key={ev.id} style={{ padding: '8px 12px', background: 'var(--surface-2)', borderRadius: 8, marginBottom: 6 }}>
+                          <div className="t-11 c-3">{new Date(ev.created_at).toLocaleDateString(T[uiLang].locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
+                          {meta.preview && <div className="t-11 c-2 mt-4" style={{ fontStyle: 'italic' }}>"{meta.preview}…"</div>}
+                        </div>
+                      )
+                    })}
+                  </div>
                 )}
               </div>
             )}
