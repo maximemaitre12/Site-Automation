@@ -201,7 +201,7 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
 
 /* ── Detail pane ── */
 function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; isVisible: boolean }) {
-  const Icon = partner.icon;
+  
   return (
     <div className={cn("p-5 lg:p-6 transition-all duration-400", isVisible ? "opacity-100" : "opacity-0")}>
       {/* Header */}
