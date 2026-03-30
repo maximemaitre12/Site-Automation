@@ -17,14 +17,43 @@ const iconFile = (
     <path d="M10 2v3h3" /><line x1="5.5" y1="8" x2="10.5" y2="8" /><line x1="5.5" y1="10.5" x2="8.5" y2="10.5" />
   </svg>
 )
+const iconCalendar = (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="3" width="12" height="11" rx="1.5" />
+    <line x1="5" y1="1.5" x2="5" y2="4.5" />
+    <line x1="11" y1="1.5" x2="11" y2="4.5" />
+    <line x1="2" y1="7" x2="14" y2="7" />
+  </svg>
+)
+const iconMessage = (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3l3 3 3-3h3a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
+  </svg>
+)
+const iconChart = (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="2,12 6,7 9,10 14,4" />
+    <line x1="2" y1="14" x2="14" y2="14" />
+  </svg>
+)
+const iconSettings = (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="8" cy="8" r="2.5" />
+    <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" />
+  </svg>
+)
 
 export function Sidebar() {
   const { currentPage, setPage, uiLang, sidebarOpen } = useAppStore()
   const t = T[uiLang]
 
   const navItems: NavItem[] = [
-    { id: 'dashboard', label: t.nav.dashboard, icon: iconDashboard },
-    { id: 'jobs',      label: t.nav.jobs,      icon: iconFile },
+    { id: 'dashboard',  label: t.nav.dashboard,  icon: iconDashboard },
+    { id: 'jobs',       label: t.nav.jobs,        icon: iconFile },
+    { id: 'interviews', label: t.nav.interviews,  icon: iconCalendar },
+    { id: 'messages',   label: t.nav.messages,    icon: iconMessage },
+    { id: 'analytics',  label: t.nav.analytics,   icon: iconChart },
+    { id: 'settings',   label: t.nav.settings,    icon: iconSettings },
   ]
 
   if (!sidebarOpen) {
@@ -56,7 +85,6 @@ export function Sidebar() {
 
   return (
     <aside className="sidebar">
-      {/* Nav */}
       <nav className="sidebar-nav">
         {navItems.map(item => (
           <div
@@ -70,7 +98,6 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* User */}
       <div style={{ marginTop: 'auto', paddingTop: 16 }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10, padding: '10px 10px',

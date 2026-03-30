@@ -18,14 +18,12 @@ export function JobDescriptions() {
   const [candidateCounts, setCandidateCounts] = useState<Record<number, number>>({})
 
   useEffect(() => {
-    api.jobs.list().then(r => {
+    api.jobs.withCounts().then(r => {
       if (r.data) {
         setJobs(r.data)
-        r.data.forEach(job => {
-          api.candidates.list(job.id).then(cr => {
-            if (cr.data) setCandidateCounts(prev => ({ ...prev, [job.id]: cr.data!.length }))
-          })
-        })
+        const counts: Record<number, number> = {}
+        r.data.forEach(j => { counts[j.id] = (j as typeof j & { candidate_count: number }).candidate_count })
+        setCandidateCounts(counts)
       }
       setLoading(false)
     })

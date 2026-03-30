@@ -3,7 +3,14 @@ export type Lang = 'en' | 'ua'
 export const T = {
   en: {
     locale: 'en-GB',
-    nav: { dashboard: 'Dashboard', jobs: 'Positions' },
+    nav: {
+      dashboard: 'Dashboard',
+      jobs: 'Positions',
+      interviews: 'Interviews',
+      messages: 'Messages',
+      analytics: 'Analytics',
+      settings: 'Settings',
+    },
     user: { name: 'User', role: 'Admin' },
 
     dashboard: {
@@ -50,6 +57,7 @@ export const T = {
       noProfileUrl: 'Profile link unavailable (AI-generated)',
       noCandidates: 'No candidates for this position',
       noCandidatesHint: 'Add candidates via online search or CV import',
+      exportCSV: 'Export CSV',
 
       form: {
         editTitle: 'Edit position', newTitle: 'New position',
@@ -75,6 +83,9 @@ export const T = {
         scheduleInterview: 'Schedule interview',
         noInterviews: 'No interview scheduled for this candidate.',
         years: (n: number) => `${n} yr`,
+        viewedAt: 'Profile viewed',
+        contactedAt: 'Last contacted',
+        interviewDecision: 'Interview decision',
       },
 
       schedule: {
@@ -102,16 +113,58 @@ export const T = {
         parsing: (f: string) => `Analysing ${f}…`,
         disclaimer: 'Data from public recruitment platforms. Max. 6 months retention.',
       },
+
+      pipeline: {
+        allStages: 'All',
+        filterLabel: 'Filter',
+        searchPlaceholder: 'Search role or location…',
+        advanceStage: 'Advance stage',
+        stageChanged: 'Stage updated',
+      },
     },
 
     interviewTypes: { phone: 'Phone', video: 'Video', 'on-site': 'On-site' },
-    stages: { new: 'New', prequalification: 'Pre-qualification', interview: 'Interview', decision: 'Decision' },
+    stages: { new: 'New', prequalification: 'Pre-qual', interview: 'Interview', decision: 'Decision' },
     messageLangs: [['uk', 'UA'], ['en', 'EN']] as [string, string][],
+
+    analytics: {
+      title: 'Analytics',
+      desc: 'Recruitment activity overview',
+      weeklyTitle: 'Profiles viewed — last 8 weeks',
+      recentTitle: 'Recent activity',
+      noActivity: 'No activity recorded yet.',
+      eventTypes: {
+        profile_viewed: 'Profile viewed',
+        message_copied: 'Message copied',
+        search_launched: 'Search launched',
+      },
+    },
+
+    settings: {
+      title: 'Settings',
+      desc: 'Platform configuration',
+      geminiKey: 'Gemini API Key',
+      geminiDesc: 'Required for AI features: job generation, candidate scoring and message drafting.',
+      keyLabel: 'API Key',
+      save: 'Save', saving: 'Saving…', clear: 'Clear key',
+      saved: 'Key saved successfully.',
+      required: 'API key is required.',
+      modelTitle: 'Model in use',
+      privacyTitle: 'Privacy',
+      privacyDesc: 'No full names are stored. Candidates are identified by initials only (e.g. A.B.). All data stays local on this server.',
+    },
   },
 
   ua: {
     locale: 'uk-UA',
-    nav: { dashboard: 'Панель', jobs: 'Посади' },
+    nav: {
+      dashboard: 'Панель',
+      jobs: 'Посади',
+      interviews: 'Співбесіди',
+      messages: 'Повідомлення',
+      analytics: 'Аналітика',
+      settings: 'Налаштування',
+    },
     user: { name: 'Користувач', role: 'Адмін' },
 
     dashboard: {
@@ -158,6 +211,7 @@ export const T = {
       noProfileUrl: 'Посилання недоступне (згенеровано ШІ)',
       noCandidates: 'Немає кандидатів для цієї посади',
       noCandidatesHint: 'Додайте кандидатів через пошук або імпорт CV',
+      exportCSV: 'Експорт CSV',
 
       form: {
         editTitle: 'Редагувати посаду', newTitle: 'Нова посада',
@@ -183,6 +237,9 @@ export const T = {
         scheduleInterview: 'Запланувати співбесіду',
         noInterviews: 'Немає запланованих співбесід для цього кандидата.',
         years: (n: number) => `${n} р.`,
+        viewedAt: 'Профіль переглянуто',
+        contactedAt: 'Останній контакт',
+        interviewDecision: 'Рішення по співбесіді',
       },
 
       schedule: {
@@ -210,11 +267,46 @@ export const T = {
         parsing: (f: string) => `Аналіз ${f}…`,
         disclaimer: 'Дані з публічних платформ. Зберігання макс. 6 місяців.',
       },
+
+      pipeline: {
+        allStages: 'Всі',
+        filterLabel: 'Фільтр',
+        searchPlaceholder: 'Пошук по ролі або місту…',
+        advanceStage: 'Просунути етап',
+        stageChanged: 'Етап оновлено',
+      },
     },
 
     interviewTypes: { phone: 'Телефон', video: 'Відео', 'on-site': 'Очна' },
-    stages: { new: 'Новий', prequalification: 'Прекваліфікація', interview: 'Співбесіда', decision: 'Рішення' },
+    stages: { new: 'Новий', prequalification: 'Прекваліф.', interview: 'Співбесіда', decision: 'Рішення' },
     messageLangs: [['uk', 'UA'], ['en', 'EN']] as [string, string][],
+
+    analytics: {
+      title: 'Аналітика',
+      desc: 'Огляд рекрутингової активності',
+      weeklyTitle: 'Переглянуті профілі — останні 8 тижнів',
+      recentTitle: 'Остання активність',
+      noActivity: 'Активність ще не зареєстрована.',
+      eventTypes: {
+        profile_viewed: 'Профіль переглянуто',
+        message_copied: 'Повідомлення скопійовано',
+        search_launched: 'Пошук запущено',
+      },
+    },
+
+    settings: {
+      title: 'Налаштування',
+      desc: 'Конфігурація платформи',
+      geminiKey: 'Ключ API Gemini',
+      geminiDesc: 'Необхідний для AI-функцій: генерація вакансій, оцінка кандидатів та повідомлень.',
+      keyLabel: 'API ключ',
+      save: 'Зберегти', saving: 'Збереження…', clear: 'Очистити ключ',
+      saved: 'Ключ успішно збережено.',
+      required: 'API ключ обов\'язковий.',
+      modelTitle: 'Поточна модель',
+      privacyTitle: 'Конфіденційність',
+      privacyDesc: 'Повні імена не зберігаються. Кандидати ідентифікуються лише за ініціалами (напр. A.B.). Всі дані залишаються на цьому сервері.',
+    },
   },
 }
 

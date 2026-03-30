@@ -83,6 +83,18 @@ Réponds UNIQUEMENT en JSON valide sans markdown ni backticks :
 
     const candidate = db.prepare('SELECT * FROM candidates WHERE id = ?').get(result.lastInsertRowid)
     res.json({ data: candidate })
+
+    // Trigger async AI qualification (non-blocking — response already sent)
+    if (jobId) {
+      const PORT = process.env.PORT || 3001
+      const API_KEY = process.env.API_SECRET || ''
+      const candidateId = result.lastInsertRowid
+      axios.post(
+        `http://localhost:${PORT}/api/candidates/${candidateId}/qualify`,
+        {},
+        { headers: { 'Content-Type': 'application/json', ...(API_KEY ? { 'x-api-key': API_KEY } : {}) } },
+      ).catch(() => {})
+    }
   } catch (err: unknown) {
     const msg = (err as Error).message
     if (msg.includes('JSON')) return res.json({ error: 'Réponse IA invalide. Réessayez.' })

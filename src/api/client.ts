@@ -23,6 +23,7 @@ const body = (data: any) => ({ body: JSON.stringify(data) })
 export const api = {
   jobs: {
     list: () => req<Job[]>('/jobs'),
+    withCounts: () => req<(Job & { candidate_count: number })[]>('/jobs/with-counts'),
     create: (job: Partial<Job>) => req<Job>('/jobs', { method: 'POST', ...body(job) }),
     update: (id: number, job: Partial<Job>) => req<Job>(`/jobs/${id}`, { method: 'PUT', ...body(job) }),
     remove: (id: number) => req<{ success: boolean }>(`/jobs/${id}`, { method: 'DELETE' }),

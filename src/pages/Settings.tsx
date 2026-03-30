@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
+import { T } from '../i18n'
 
 export function Settings() {
-  const { setApiKeyConfigured } = useAppStore()
+  const { setApiKeyConfigured, uiLang } = useAppStore()
+  const ts = T[uiLang].settings
   const [apiKey, setApiKey] = useState('')
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -12,18 +14,17 @@ export function Settings() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    api.settings.get('anthropicApiKey').then((res) => {
+    api.settings.get('geminiKey').then((res) => {
       if (res.data) setApiKey(res.data)
       setLoading(false)
     })
   }, [])
 
   async function save() {
-    if (!apiKey.trim()) { setError('La clé API est requise.'); return }
-    if (!apiKey.startsWith('sk-ant-')) { setError('Format invalide. La clé doit commencer par sk-ant-'); return }
+    if (!apiKey.trim()) { setError(ts.required); return }
     setSaving(true)
     setError('')
-    const res = await api.settings.set('anthropicApiKey', apiKey.trim())
+    const res = await api.settings.set('geminiKey', apiKey.trim())
     if (res.error) { setError(res.error); setSaving(false); return }
     setSaved(true)
     setApiKeyConfigured(true)
@@ -32,7 +33,7 @@ export function Settings() {
   }
 
   async function clear() {
-    await api.settings.set('anthropicApiKey', '')
+    await api.settings.set('geminiKey', '')
     setApiKey('')
     setApiKeyConfigured(false)
   }
@@ -40,30 +41,28 @@ export function Settings() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Paramètres</h1>
-        <p className="page-desc">Configuration de la plateforme</p>
+        <h1 className="page-title">{ts.title}</h1>
+        <p className="page-desc">{ts.desc}</p>
       </div>
 
       <div style={{ maxWidth: 480 }}>
         <div className="card">
-          <div className="t-15 medium mb-4">Clé API Anthropic</div>
-          <p className="t-13 c-2 mb-24">
-            Nécessaire pour la génération de fiches de poste et de messages de contact via Claude.
-          </p>
+          <div className="t-15 medium mb-4">{ts.geminiKey}</div>
+          <p className="t-13 c-2 mb-24">{ts.geminiDesc}</p>
 
           {loading ? (
             <div className="spinner" />
           ) : (
             <div className="flex-col gap-16">
               <div className="field">
-                <label className="label">Clé API</label>
+                <label className="label">{ts.keyLabel}</label>
                 <div className="flex gap-8">
                   <input
                     className="input flex-1"
                     type={visible ? 'text' : 'password'}
                     value={apiKey}
                     onChange={(e) => { setApiKey(e.target.value); setError('') }}
-                    placeholder="sk-ant-api03-…"
+                    placeholder="AIzaSy…"
                     autoComplete="off"
                   />
                   <button
@@ -89,15 +88,15 @@ export function Settings() {
               </div>
 
               {error && <p className="msg-error">{error}</p>}
-              {saved && <p className="msg-ok">Clé enregistrée avec succès.</p>}
+              {saved && <p className="msg-ok">{ts.saved}</p>}
 
               <div className="flex gap-8">
                 <button className="btn btn-primary" onClick={save} disabled={saving}>
                   {saving ? <span className="spinner" /> : null}
-                  {saving ? 'Enregistrement…' : 'Enregistrer'}
+                  {saving ? ts.saving : ts.save}
                 </button>
                 {apiKey && (
-                  <button className="btn btn-ghost" onClick={clear}>Effacer la clé</button>
+                  <button className="btn btn-ghost" onClick={clear}>{ts.clear}</button>
                 )}
               </div>
             </div>
@@ -105,19 +104,16 @@ export function Settings() {
         </div>
 
         <div className="card mt-16">
-          <div className="t-15 medium mb-4">Modèle utilisé</div>
+          <div className="t-15 medium mb-4">{ts.modelTitle}</div>
           <p className="t-13 c-2">
-            <span className="chip chip-accent" style={{ marginRight: 8 }}>claude-sonnet-4-20250514</span>
-            Génération de fiches de poste et messages de contact
+            <span className="chip chip-accent" style={{ marginRight: 8 }}>gemini-2.5-flash</span>
+            {ts.geminiDesc}
           </p>
         </div>
 
         <div className="card mt-16">
-          <div className="t-15 medium mb-4">Confidentialité</div>
-          <p className="t-13 c-2">
-            Aucun nom complet n'est stocké. Les candidats sont identifiés par leurs initiales uniquement (ex. A.B.).
-            Toutes les données restent locales sur ce serveur.
-          </p>
+          <div className="t-15 medium mb-4">{ts.privacyTitle}</div>
+          <p className="t-13 c-2">{ts.privacyDesc}</p>
         </div>
       </div>
     </div>

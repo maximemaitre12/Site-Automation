@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, Candidate, Interview, Job } from '../../api/client'
 import { useAppStore } from '../../store/useAppStore'
 import { T } from '../../i18n'
+// T is used for locale and stage labels below
 import { INTERVIEW_TYPES, PLATFORM_COLOR } from './constants'
 import { iconCalendar, iconClose, iconSparkle, iconStar, iconTrash } from './icons'
 import { parseProfile, parseTags } from './helpers'
@@ -122,13 +123,13 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
 
             {/* Tabs */}
             <div style={{ display: 'flex', gap: 0, marginBottom: -1 }}>
-              {(['profile', 'message'] as const).map(t => (
+              {(['profile', 'message', 'interview'] as const).map(t => (
                 <button key={t} onClick={() => setTab(t)} style={{
                   background: 'none', border: 'none', cursor: 'pointer', padding: '8px 16px',
                   fontSize: 12, fontWeight: 500, borderBottom: tab === t ? '2px solid var(--accent)' : '2px solid transparent',
                   color: tab === t ? 'var(--accent)' : 'var(--text-2)',
                 }}>
-                  {t === 'profile' ? tm.tabProfile : tm.tabMessage}
+                  {t === 'profile' ? tm.tabProfile : t === 'message' ? tm.tabMessage : tm.tabInterview}
                 </button>
               ))}
             </div>
@@ -164,6 +165,31 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
                     </div>
                   )
                 })()}
+
+                {/* Timestamps + interview decision */}
+                {(candidate.viewed_at || candidate.contacted_at || (candidate.decision && candidate.decision !== 'pending')) && (
+                  <div className="flex flex-wrap gap-8" style={{ marginBottom: 16 }}>
+                    {candidate.viewed_at && (
+                      <span style={{ fontSize: 10, color: 'var(--text-3)', padding: '3px 10px', background: 'var(--surface-2)', borderRadius: 20 }}>
+                        {tm.viewedAt}: {new Date(candidate.viewed_at).toLocaleDateString(T[uiLang].locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                    {candidate.contacted_at && (
+                      <span style={{ fontSize: 10, color: 'var(--text-3)', padding: '3px 10px', background: 'var(--surface-2)', borderRadius: 20 }}>
+                        {tm.contactedAt}: {new Date(candidate.contacted_at).toLocaleDateString(T[uiLang].locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                    {candidate.decision && candidate.decision !== 'pending' && (
+                      <span style={{
+                        fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 20,
+                        background: candidate.decision === 'hire' ? '#D0F0E4' : '#FDDDD8',
+                        color: candidate.decision === 'hire' ? '#2E9460' : '#D94040',
+                      }}>
+                        {tm.interviewDecision}: {candidate.decision === 'hire' ? '✓ Retenu' : '✗ Refusé'}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Qualification section */}
                 <div style={{ background: 'var(--surface-2)', borderRadius: 12, padding: '16px 18px', marginBottom: 16 }}>

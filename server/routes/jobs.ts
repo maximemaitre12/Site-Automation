@@ -13,6 +13,23 @@ router.get('/', (_req: Request, res: Response) => {
   }
 })
 
+router.get('/with-counts', (_req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const jobs = db.prepare(`
+      SELECT j.*, COUNT(c.id) as candidate_count
+      FROM jobs j
+      LEFT JOIN candidates c ON c.job_id = j.id
+      WHERE j.is_active = 1
+      GROUP BY j.id
+      ORDER BY j.created_at DESC
+    `).all()
+    res.json({ data: jobs })
+  } catch (err: unknown) {
+    res.json({ error: (err as Error).message })
+  }
+})
+
 router.post('/', (req: Request, res: Response) => {
   try {
     const db = getDb()
