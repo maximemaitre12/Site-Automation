@@ -99,7 +99,7 @@ export function ProblemsSection() {
                   <span className={cn(
                     "text-xs font-mono tabular-nums w-8 text-right transition-all duration-300",
                     scanned ? "opacity-100" : "opacity-0",
-                    proc.status === "critical" ? "text-red-500" : proc.status === "warning" ? "text-yellow-600" : "text-emerald-500"
+                    proc.status === "critical" ? "text-[hsl(260_70%_60%)]" : proc.status === "warning" ? "text-[hsl(200_80%_55%)]" : "text-primary"
                   )}>
                     {scanned ? `${proc.score}%` : ""}
                   </span>
