@@ -71,8 +71,8 @@ function DatasetRow({ uc, active, onClick, visible, idx }: {
           <span className={cn(
             "text-[8px] font-bold tracking-wider px-1.5 py-0.5 rounded-full",
             uc.status === "LIVE"
-              ? "bg-emerald-500/20 text-emerald-400 animate-pulse"
-              : "bg-blue-500/20 text-blue-400"
+              ? "bg-primary/20 text-primary animate-pulse"
+              : "bg-[hsl(200,80%,55%)]/20 text-[hsl(200,80%,55%)]"
           )}>{uc.status}</span>
         </div>
         <Sparkline points={uc.sparkline} color={uc.color} />
