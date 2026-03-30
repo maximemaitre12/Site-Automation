@@ -121,11 +121,8 @@ function MobilePartnerCard({ partner, index, isVisible }: {
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className={cn(
-          "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10",
-          partner.gradient
-        )} style={{ boxShadow: `0 0 12px ${partner.glowColor}20` }}>
-          <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
+        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 ring-1 ring-slate-200 p-1.5">
+          <img src={partner.logo} alt={partner.logoAlt} className="w-full h-full object-contain" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
