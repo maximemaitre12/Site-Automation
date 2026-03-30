@@ -109,7 +109,7 @@ function ConnectionPulse({ color, isVisible, delay }: { color: string; isVisible
 function MobilePartnerCard({ partner, index, isVisible }: {
   partner: typeof partners[0]; index: number; isVisible: boolean;
 }) {
-  const Icon = partner.icon;
+  
   const delay = index * 120 + 200;
 
   return (
