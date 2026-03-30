@@ -15,7 +15,7 @@ const capabilities = [
     desc: "Anticipez les risques et opportunités avant vos concurrents grâce à nos modèles prédictifs entraînés sur vos données métier.",
     pct: 94,
     gradient: "from-[hsl(220,80%,55%)] to-primary",
-    glowColor: "hsl(230,70%,55%)",
+    glowColor: "hsl(239,84%,67%)",
     metrics: [
       { label: "Précision", value: "94.2%" },
       { label: "Latence", value: "< 80ms" },
