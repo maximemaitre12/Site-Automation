@@ -1,97 +1,378 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
+import { MacWindow } from "./MacWindow";
+import { useState } from "react";
+import { Shield, Zap, Globe, Server, ChevronRight, Activity } from "lucide-react";
 
 const partners = [
   {
-    name: "AWS",
+    name: "Amazon Web Services",
+    short: "AWS",
+    tag: "CLOUD-01",
+    tier: "Premier Partner",
+    icon: Server,
+    gradient: "from-[hsl(30,90%,50%)] to-[hsl(35,85%,45%)]",
+    glowColor: "hsl(32,87%,47%)",
+    desc: "Infrastructure cloud, compute distribué et services IA managés (SageMaker, Bedrock).",
+    stats: [
+      { label: "Régions", value: "33" },
+      { label: "Services", value: "200+" },
+      { label: "SLA", value: "99.99%" },
+    ],
     logo: (
-      <svg viewBox="0 0 120 40" className="h-8 w-auto">
-        <text x="10" y="30" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="28" fill="currentColor" letterSpacing="-1">
-          aws
-        </text>
+      <svg viewBox="0 0 100 36" className="h-5 w-auto">
+        <text x="0" y="28" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="26" fill="currentColor" letterSpacing="-1">aws</text>
       </svg>
     ),
   },
   {
-    name: "Microsoft",
+    name: "Microsoft Azure",
+    short: "Microsoft",
+    tag: "CLOUD-02",
+    tier: "Gold Partner",
+    icon: Shield,
+    gradient: "from-[hsl(210,85%,50%)] to-[hsl(195,75%,45%)]",
+    glowColor: "hsl(202,80%,47%)",
+    desc: "Écosystème Azure, OpenAI Service, intégration native M365 et sécurité enterprise.",
+    stats: [
+      { label: "Datacenters", value: "60+" },
+      { label: "IA Models", value: "GPT-4o" },
+      { label: "Compliance", value: "90+" },
+    ],
     logo: (
-      <div className="flex items-center gap-2">
-        <div className="grid grid-cols-2 gap-0.5 w-5 h-5">
+      <div className="flex items-center gap-1.5">
+        <div className="grid grid-cols-2 gap-[2px] w-4 h-4">
           <div className="bg-[#f25022] rounded-[1px]" />
           <div className="bg-[#7fba00] rounded-[1px]" />
           <div className="bg-[#00a4ef] rounded-[1px]" />
           <div className="bg-[#ffb900] rounded-[1px]" />
         </div>
-        <span className="text-lg font-semibold tracking-tight text-slate-700">Microsoft</span>
+        <span className="text-sm font-semibold text-current">Microsoft</span>
       </div>
     ),
   },
   {
-    name: "Google Cloud",
+    name: "Google Cloud Platform",
+    short: "Google Cloud",
+    tag: "CLOUD-03",
+    tier: "Partner",
+    icon: Globe,
+    gradient: "from-[hsl(145,60%,42%)] to-[hsl(200,70%,48%)]",
+    glowColor: "hsl(172,65%,45%)",
+    desc: "BigQuery, Vertex AI, Gemini API. Analytics avancées et infrastructure data à l'échelle.",
+    stats: [
+      { label: "Régions", value: "40" },
+      { label: "IA", value: "Gemini" },
+      { label: "Data", value: "BigQuery" },
+    ],
     logo: (
-      <div className="flex items-center gap-2">
-        <svg viewBox="0 0 24 24" className="w-6 h-6">
+      <div className="flex items-center gap-1.5">
+        <svg viewBox="0 0 24 24" className="w-4 h-4">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
-        <span className="text-lg font-semibold tracking-tight text-slate-700">Google Cloud</span>
+        <span className="text-sm font-semibold text-current">Google Cloud</span>
       </div>
     ),
   },
   {
     name: "Confluent",
+    short: "Confluent",
+    tag: "DATA-04",
+    tier: "Technology Partner",
+    icon: Zap,
+    gradient: "from-[hsl(260,65%,55%)] to-[hsl(280,60%,50%)]",
+    glowColor: "hsl(270,62%,52%)",
+    desc: "Streaming de données en temps réel avec Apache Kafka managé. Event-driven architecture.",
+    stats: [
+      { label: "Throughput", value: "10M/s" },
+      { label: "Latence", value: "< 5ms" },
+      { label: "Connectors", value: "120+" },
+    ],
     logo: (
-      <div className="flex items-center gap-2">
-        <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none">
+      <div className="flex items-center gap-1.5">
+        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-3.07c-2.02-.25-3.74-1.35-4.84-2.93l2.1-1.54c.7.97 1.72 1.66 2.74 1.84V8.2c-2.13-.46-4-1.97-4-4.2h2.5c0 1.08.93 1.93 1.5 2.24V2h2.5v4.24c.57-.31 1.5-1.16 1.5-2.24H17c0 2.23-1.87 3.74-4 4.2v3.6c1.02-.18 2.04-.87 2.74-1.84l2.1 1.54c-1.1 1.58-2.82 2.68-4.84 2.93v3.07H11z" fill="currentColor"/>
         </svg>
-        <span className="text-lg font-semibold tracking-tight text-slate-700">Confluent</span>
+        <span className="text-sm font-semibold text-current">Confluent</span>
       </div>
     ),
   },
 ];
 
-export function PartnersSection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
+/* ── Connection line SVG ── */
+function ConnectionPulse({ color, isVisible, delay }: { color: string; isVisible: boolean; delay: number }) {
+  return (
+    <div className="h-5 flex items-center justify-center">
+      <div className="relative w-full h-px">
+        <div className="absolute inset-0 bg-slate-800" />
+        <div
+          className="absolute inset-y-0 left-0 bg-gradient-to-r transition-all ease-out"
+          style={{
+            backgroundImage: `linear-gradient(to right, transparent, ${color}, transparent)`,
+            width: isVisible ? '100%' : '0%',
+            transitionDuration: '1.5s',
+            transitionDelay: `${delay}ms`,
+          }}
+        />
+        <div
+          className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full animate-pulse"
+          style={{
+            backgroundColor: color,
+            boxShadow: `0 0 8px ${color}`,
+            right: '0',
+            opacity: isVisible ? 1 : 0,
+            transition: `opacity 0.5s ${delay + 800}ms`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ── Mobile partner card ── */
+function MobilePartnerCard({ partner, index, isVisible }: {
+  partner: typeof partners[0]; index: number; isVisible: boolean;
+}) {
+  const Icon = partner.icon;
+  const delay = index * 120 + 200;
 
   return (
-    <section className="py-16 sm:py-20 bg-white relative overflow-hidden">
-      {/* Subtle top border */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+    <div
+      className={cn(
+        "rounded-xl bg-white/[0.03] border border-white/5 p-3.5 transition-all duration-500 hover:border-primary/15",
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      )}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div className={cn(
+          "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10",
+          partner.gradient
+        )} style={{ boxShadow: `0 0 12px ${partner.glowColor}20` }}>
+          <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-200">{partner.short}</span>
+            <span className="text-[8px] font-mono text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">{partner.tag}</span>
+          </div>
+          <span className="text-[10px] text-primary/60 font-medium">{partner.tier}</span>
+        </div>
+        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Actif
+        </span>
+      </div>
 
-      <div
-        ref={ref}
+      <p className="text-[11px] text-slate-500 leading-relaxed mb-3">{partner.desc}</p>
+
+      <div className="grid grid-cols-3 gap-1.5">
+        {partner.stats.map((s) => (
+          <div key={s.label} className="rounded-lg bg-slate-800/50 p-2 text-center">
+            <div className="text-[11px] font-bold font-mono text-white">{s.value}</div>
+            <div className="text-[8px] text-slate-600 uppercase tracking-wider mt-0.5">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Desktop partner row ── */
+function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
+  partner: typeof partners[0]; index: number; isActive: boolean;
+  onClick: () => void; isVisible: boolean;
+}) {
+  const Icon = partner.icon;
+  const delay = index * 100 + 200;
+
+  return (
+    <>
+      <button
+        onClick={onClick}
         className={cn(
-          "max-w-5xl mx-auto px-4 sm:px-6 transition-all duration-700",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+          "flex items-center gap-3 w-full text-left px-4 py-3.5 border-b border-slate-700/20 transition-all duration-300 group",
+          isActive ? "bg-primary/5" : "hover:bg-white/[0.02]",
+          isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
         )}
+        style={{ transitionDelay: `${delay}ms` }}
       >
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-2">
+        <div className={cn(
+          "w-9 h-9 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10 transition-shadow",
+          partner.gradient
+        )} style={{ boxShadow: isActive ? `0 0 16px ${partner.glowColor}25` : undefined }}>
+          <Icon className="w-4 h-4 text-white" strokeWidth={1.5} />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold text-slate-300 truncate">{partner.short}</span>
+            <span className="text-[8px] font-mono text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">{partner.tag}</span>
+          </div>
+          <span className="text-[9px] text-primary/50 font-medium">{partner.tier}</span>
+        </div>
+
+        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Live
+        </span>
+
+        <ChevronRight className={cn(
+          "w-3.5 h-3.5 shrink-0 transition-colors",
+          isActive ? "text-primary" : "text-slate-700"
+        )} />
+      </button>
+      {index < partners.length - 1 && (
+        <ConnectionPulse color={partner.glowColor} isVisible={isVisible} delay={delay + 400} />
+      )}
+    </>
+  );
+}
+
+/* ── Detail pane ── */
+function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; isVisible: boolean }) {
+  const Icon = partner.icon;
+  return (
+    <div className={cn("p-5 lg:p-6 transition-all duration-400", isVisible ? "opacity-100" : "opacity-0")}>
+      {/* Header */}
+      <div className="flex items-start gap-4 mb-5">
+        <div className={cn(
+          "w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-xl ring-1 ring-white/10 shrink-0",
+          partner.gradient
+        )} style={{ boxShadow: `0 0 24px ${partner.glowColor}20` }}>
+          <Icon className="w-7 h-7 text-white" strokeWidth={1.5} />
+        </div>
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-base lg:text-lg font-bold text-white">{partner.name}</h3>
+          </div>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-primary/70 font-medium backdrop-blur">
+            {partner.tier}
+          </span>
+          <p className="text-[11px] lg:text-xs text-slate-500 mt-2 leading-relaxed max-w-md">{partner.desc}</p>
+        </div>
+      </div>
+
+      {/* Logo display */}
+      <div className="rounded-xl bg-white/[0.04] border border-white/5 p-4 mb-5 flex items-center justify-center">
+        <div className="text-slate-400 scale-150 origin-center">
+          {partner.logo}
+        </div>
+      </div>
+
+      {/* Metrics */}
+      <div className="grid grid-cols-3 gap-2 mb-5">
+        {partner.stats.map((s) => (
+          <div key={s.label} className="rounded-xl bg-white/[0.03] border border-white/5 p-3 text-center hover:border-primary/15 transition-colors">
+            <div className="text-sm lg:text-base font-bold font-mono text-white">{s.value}</div>
+            <div className="text-[9px] text-slate-600 mt-0.5 uppercase tracking-wider">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Status */}
+      <div className="flex items-center gap-4 text-[10px]">
+        <span className="flex items-center gap-1.5 text-emerald-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Connecté
+        </span>
+        <span className="text-slate-700">|</span>
+        <span className="text-slate-500 font-mono">Sync: real-time</span>
+        <span className="text-slate-700">|</span>
+        <span className="text-slate-500 font-mono">Certifié</span>
+      </div>
+    </div>
+  );
+}
+
+export function PartnersSection() {
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = partners[activeIndex];
+
+  return (
+    <section className="py-16 sm:py-24 bg-slate-950 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220,20%,18%/0.4)_1px,transparent_1px)] bg-[length:24px_24px]" />
+
+      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className={cn(
+          "text-center mb-10 sm:mb-14 transition-all duration-700",
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        )}>
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Écosystème</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
             Nos partenaires
           </h2>
-          <p className="text-sm text-slate-500 max-w-md mx-auto">
+          <p className="text-sm text-slate-400 max-w-lg mx-auto">
             Nous collaborons avec les leaders du cloud et de la data pour déployer des solutions fiables à grande échelle.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {partners.map((partner, i) => (
-            <div
-              key={partner.name}
-              className="group flex flex-col items-center gap-4 p-6 sm:p-8 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-lg hover:shadow-slate-100/50 transition-all duration-300"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              <div className="h-10 flex items-center justify-center text-slate-400 group-hover:text-slate-600 transition-colors duration-300">
-                {partner.logo}
+        <div className={cn(
+          "transition-all duration-700 delay-200",
+          isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-[0.97]"
+        )}>
+          <MacWindow
+            variant="dark"
+            title="AETHER NETWORK v3.0 — Partner Hub"
+            toolbar={
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-4">
+                  {["Partenaires", "Intégrations", "Certifications"].map((t, i) => (
+                    <span key={t} className={cn(
+                      "text-[11px] transition-colors cursor-default",
+                      i === 0
+                        ? "font-semibold text-primary border-b-2 border-primary pb-0.5"
+                        : "text-slate-500 hover:text-slate-300"
+                    )}>{t}</span>
+                  ))}
+                </div>
+                <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
+                  <Activity className="w-3 h-3" />
+                  4/4 connected
+                </span>
               </div>
-              <span className="text-xs font-medium text-slate-400 group-hover:text-slate-600 transition-colors">
-                {partner.name}
-              </span>
+            }
+            statusBar={
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] text-slate-500">4 partenaires · infrastructure multi-cloud</span>
+                <span className="font-mono text-[10px] text-emerald-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+                  Toutes connexions actives
+                </span>
+              </div>
+            }
+          >
+            {/* ── MOBILE ── */}
+            <div className="sm:hidden p-3 space-y-2.5">
+              {partners.map((p, i) => (
+                <MobilePartnerCard key={p.tag} partner={p} index={i} isVisible={isVisible} />
+              ))}
             </div>
-          ))}
+
+            {/* ── DESKTOP ── */}
+            <div className="hidden sm:grid sm:grid-cols-[220px_1fr] lg:grid-cols-[250px_1fr]">
+              {/* Left list */}
+              <div className="border-r border-slate-700/30 bg-slate-900/40 py-2">
+                {partners.map((p, i) => (
+                  <PartnerRow
+                    key={p.tag}
+                    partner={p}
+                    index={i}
+                    isActive={i === activeIndex}
+                    onClick={() => setActiveIndex(i)}
+                    isVisible={isVisible}
+                  />
+                ))}
+              </div>
+
+              {/* Right detail */}
+              <PartnerDetail partner={active} isVisible={isVisible} />
+            </div>
+          </MacWindow>
         </div>
       </div>
     </section>
