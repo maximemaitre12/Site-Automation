@@ -57,8 +57,8 @@ const partners = [
     tag: "CLOUD-03",
     tier: "Partner",
     icon: Globe,
-    gradient: "from-[hsl(145,60%,42%)] to-[hsl(200,70%,48%)]",
-    glowColor: "hsl(172,65%,45%)",
+    gradient: "from-[hsl(200,80%,55%)] to-primary",
+    glowColor: "hsl(200,80%,55%)",
     desc: "BigQuery, Vertex AI, Gemini API. Analytics avancées et infrastructure data à l'échelle.",
     stats: [
       { label: "Régions", value: "40" },
