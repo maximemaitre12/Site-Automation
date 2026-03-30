@@ -56,8 +56,8 @@ const capabilities = [
     tag: "VIS-04",
     desc: "Extraction intelligente de données depuis vos documents : factures, contrats, rapports. OCR + compréhension sémantique.",
     pct: 86,
-    gradient: "from-[hsl(30,80%,50%)] to-[hsl(15,75%,50%)]",
-    glowColor: "hsl(22,77%,50%)",
+    gradient: "from-[hsl(210,85%,50%)] to-primary",
+    glowColor: "hsl(210,85%,50%)",
     metrics: [
       { label: "Formats", value: "50+" },
       { label: "Extraction", value: "97%" },
