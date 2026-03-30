@@ -1,41 +1,44 @@
 
 
-## Plan: Refonte totale UseCasesSection — AETHER ANALYTICS LAB v3.0
+## Plan: Refonte totale TrainingsSection — AETHER LEARNING STUDIO v3.0
 
-Réécriture complète en **dashboard d'analyse de données** style Bloomberg Terminal / Tableau, bien plus immersif et responsive que le Finder actuel.
+Remplacement complet du "App Store" actuel par un **IDE/Learning Management System** dark premium, style VS Code / Notion croise avec un player video educatif.
 
-### Concept créatif
+### Concept creatif
 
-Simuler **"AETHER ANALYTICS LAB v3.0"** — un outil d'intelligence data premium :
+Simuler **"AETHER LEARNING STUDIO v3.0"** — un IDE de formation IA :
 
-**Desktop (lg+)** : Layout 2 colonnes dans MacWindow dark
-- **Sidebar gauche** (w-52, bg-slate-900) : les 3 secteurs comme des "datasets" avec mini sparkline SVG inline (5 points animés), badge pulsant "LIVE" vert, variation delta colorée, et hover glow
-- **Zone principale** divisée verticalement :
-  1. **Header dataset** : nom du secteur + icône gradient + gros chiffre delta animé avec glow pulsant (ex: "−40%" en 3xl avec text-shadow emerald)
-  2. **Tableau spreadsheet** : 3 lignes (une par KPI), colonnes "KPI | Avant | Après | Δ" — les cellules "Avant" en rouge barré, "Après" en vert bold, et la colonne Delta contient une **barre de progression horizontale animée** (0→100% au scroll) avec pourcentage
-  3. **Mini bar chart SVG** en bas : barres groupées (before=rouge semi-transparent 40%, after=vert gradient) avec gridlines pointillées horizontales et labels d'axe Y — les barres "after" grandissent avec animation spring
-- **Status bar** : "Last analysis: 2 min ago" + dot vert pulsant "Live" + "3 datasets loaded"
+**Desktop** : MacWindow dark avec 2 panneaux
+- **Sidebar gauche** (bg-slate-900) : les 3 formations comme des "projets" avec icone gradient, barre de progression circulaire SVG (competence level), tag de difficulte colore, et mini indicateur de duree
+- **Zone principale** :
+  1. **Header cours** : grande icone gradient (64px) + titre + badges (duree, niveau, format) en pills glass-morphism + CTA "Demander un devis" lumineux avec glow
+  2. **Timeline des modules** : ligne verticale avec 3 nodes connectees — chaque module est une "etape" avec dot anime, titre, description courte, et icone. Style commit-graph / git timeline
+  3. **Competences acquises** : barres horizontales animees au scroll avec labels et pourcentages (ex: "LLM Architecture 90%", "Prompt Design 85%")
+  4. **Footer module** : mini cards horizontales "Key Takeaways" avec icones et texte court
 
-**Tablet (md)** : Même layout mais sidebar plus étroite (w-40), textes légèrement réduits
+**Mobile (390px — viewport actuel de l'utilisateur)** :
+- **Pas de sidebar** — les 3 formations deviennent des **tabs horizontaux** en haut avec icone + nom court, tab active avec underline gradient animee
+- Le header cours se reorganise en colonne (icone centree + infos en dessous)
+- La timeline des modules reste verticale mais plus compacte
+- Les barres de competences s'empilent pleine largeur
+- CTA sticky en bas pour une meilleure conversion mobile
 
-**Mobile (<md)** : 
-- Pas de sidebar — les 3 secteurs deviennent des **pills horizontaux scrollables** en haut
-- Le tableau devient des **cards empilées** (une par KPI) avec barre de progression
-- Le chart SVG s'adapte en largeur 100%
-- Le gros chiffre delta reste centré et proéminent
+### Details visuels premium
 
-### Détails visuels premium
+- MacWindow variant="dark" (bg-slate-900, bordures slate-700)
+- Icones de formation : carres 56px rounded-2xl avec gradient unique + ring glow subtle
+- Timeline : ligne verticale gradient (primary→purple) avec dots pulses et connecting lines
+- Barres de competence : gradient from-primary to-purple avec animation width 1.2s ease-out au scroll
+- Badges : glass-morphism (bg-white/5 backdrop-blur border-white/10)
+- CTA : bouton avec shadow-glow pulsant + hover scale
+- Transitions entre formations : fade + slide vertical smooth
+- Toolbar : "Curriculum · Competences · Certification" tabs
 
-- **MacWindow variant="dark"** : fond slate-900, bordures slate-700
-- Sparklines sidebar : polyline SVG avec stroke-dasharray animé
-- Barres de progression : dégradé from-red-500 to-emerald-500 avec transition width 1.5s ease-out déclenchée au scroll
-- Chart barres : coins arrondis (rx=3), hover scale(1.05), gradient vertical sur les barres "after"
-- Chiffre hero : font-mono text-3xl avec text-shadow: 0 0 20px emerald-500/40 et animation pulse subtile
-- Toolbar : onglets "Overview · Compare · Trends" avec le actif souligné en primary
-
-### Fichier modifié
+### Fichier modifie
 
 | Fichier | Action |
 |---------|--------|
-| `src/components/landing/consulting/UseCasesSection.tsx` | Rewrite complet |
+| `src/components/landing/TrainingsSection.tsx` | Rewrite complet |
+
+Memes donnees (3 formations IA), presentation radicalement plus immersive et adaptee mobile-first.
 
