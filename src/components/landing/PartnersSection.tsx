@@ -3,6 +3,10 @@ import { cn } from "@/lib/utils";
 import { MacWindow } from "./MacWindow";
 import { useState } from "react";
 import { Shield, Zap, Globe, Server, ChevronRight, Activity } from "lucide-react";
+import awsLogo from "@/assets/partners/aws.png";
+import microsoftLogo from "@/assets/partners/microsoft.png";
+import gcpLogo from "@/assets/partners/gcp.png";
+import confluentLogo from "@/assets/partners/confluent.png";
 
 const partners = [
   {
