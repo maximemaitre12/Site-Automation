@@ -102,9 +102,9 @@ function CPUHistoryChart({ isVisible }: { isVisible: boolean }) {
             <line key={v} x1="0" y1={h - (v / 100) * h} x2={w} y2={h - (v / 100) * h}
               stroke="hsl(220 14% 20%)" strokeWidth="0.5" />
           ))}
-          <polyline points={toPath(points2)} fill="none" stroke="hsl(239 84% 67% / 0.3)"
+          <polyline points={toPath(points2)} fill="none" stroke="hsl(200 80% 55% / 0.3)"
             strokeWidth="1" className={cn("transition-all duration-[2500ms]", isVisible ? "opacity-100" : "opacity-0")} />
-          <polyline points={toPath(points1)} fill="none" stroke="hsl(142 71% 45%)"
+          <polyline points={toPath(points1)} fill="none" stroke="hsl(239 84% 67%)"
             strokeWidth="1.5" strokeLinecap="round"
             className={cn("transition-all duration-[2500ms]", isVisible ? "opacity-100" : "opacity-0")} />
         </svg>
