@@ -66,16 +66,16 @@ export function ProblemsSection() {
             {processes.map((proc, i) => {
               const scanned = i < scannedCount;
               const statusColor = proc.status === "critical"
-                ? "bg-red-500 text-white"
+                ? "bg-[hsl(260_70%_60%)] text-white"
                 : proc.status === "warning"
-                ? "bg-yellow-500 text-white"
-                : "bg-emerald-500 text-white";
+                ? "bg-[hsl(200_80%_55%)] text-white"
+                : "bg-primary text-white";
 
               const barColor = proc.status === "critical"
-                ? "bg-red-400/60"
+                ? "bg-[hsl(260_70%_60%)/0.6]"
                 : proc.status === "warning"
-                ? "bg-yellow-400/60"
-                : "bg-emerald-400/60";
+                ? "bg-[hsl(200_80%_55%)/0.6]"
+                : "bg-primary/60";
 
               return (
                 <div
