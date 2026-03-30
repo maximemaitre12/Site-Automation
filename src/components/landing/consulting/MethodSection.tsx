@@ -1,127 +1,106 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { Search, BarChart3, Rocket } from "lucide-react";
 
 const steps = [
-  { num: "01", title: "Analyse", desc: "Nous identifions les points de friction dans vos opérations et les sources de perte de performance." },
-  { num: "02", title: "Priorisation", desc: "Nous évaluons les opportunités à plus fort impact, en fonction de vos enjeux business." },
-  { num: "03", title: "Déploiement", desc: "Nous accompagnons la mise en place de solutions concrètes pour améliorer durablement vos opérations." },
+  {
+    num: "01", title: "Analyse", duration: "1-2 semaines", icon: Search,
+    desc: "Cartographie complète de vos opérations et identification des points de friction via notre moteur IA.",
+    miniStats: ["Flux analysés", "Données collectées", "Points identifiés", "Score global"],
+  },
+  {
+    num: "02", title: "Priorisation", duration: "1 semaine", icon: BarChart3,
+    desc: "Évaluation des opportunités à plus fort impact business et construction du plan d'action.",
+    miniStats: ["Impact estimé", "Effort requis", "ROI projeté", "Quick wins"],
+  },
+  {
+    num: "03", title: "Déploiement", duration: "2-4 semaines", icon: Rocket,
+    desc: "Mise en place des solutions et accompagnement opérationnel pour des résultats durables.",
+    miniStats: ["Actions déployées", "KPIs suivis", "Gains réalisés", "Adoption"],
+  },
 ];
-
-function PipelineDiagram({ isVisible }: { isVisible: boolean }) {
-  const [activeStep, setActiveStep] = useState(-1);
-
-  useEffect(() => {
-    if (!isVisible) return;
-    const timers = steps.map((_, i) =>
-      setTimeout(() => setActiveStep(i), 400 + i * 600)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [isVisible]);
-
-  const nodes = [
-    { x: 160, y: 50 },
-    { x: 160, y: 130 },
-    { x: 160, y: 210 },
-  ];
-
-  return (
-    <svg viewBox="0 0 320 260" className="w-full max-w-[300px] mx-auto" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <marker id="method-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M 0 0 L 6 3 L 0 6 Z" fill="hsl(var(--primary))" opacity="0.5" />
-        </marker>
-      </defs>
-
-      {/* Connecting lines */}
-      {[0, 1].map(i => {
-        const active = i < activeStep;
-        return (
-          <g key={`line-${i}`}>
-            <line
-              x1="160" y1={nodes[i].y + 28}
-              x2="160" y2={nodes[i + 1].y - 28}
-              stroke={active ? "hsl(var(--primary))" : "hsl(var(--border))"}
-              strokeWidth={active ? 1.5 : 1}
-              opacity={active ? 0.4 : 0.15}
-              className="transition-all duration-500"
-              markerEnd={active ? "url(#method-arrow)" : undefined}
-            />
-            {active && (
-              <circle r="2" fill="hsl(var(--primary))" opacity="0.4">
-                <animateMotion dur="2s" repeatCount="indefinite"
-                  path={`M 160 ${nodes[i].y + 28} L 160 ${nodes[i + 1].y - 28}`}
-                />
-              </circle>
-            )}
-          </g>
-        );
-      })}
-
-      {/* Step nodes */}
-      {nodes.map((pos, i) => {
-        const active = i <= activeStep;
-        return (
-          <g key={`step-${i}`}>
-            <circle
-              cx={pos.x} cy={pos.y} r="26"
-              fill={active ? "hsl(var(--primary) / 0.06)" : "hsl(var(--muted) / 0.4)"}
-              stroke={active ? "hsl(var(--primary) / 0.35)" : "hsl(var(--border))"}
-              strokeWidth={active ? 1.5 : 0.8}
-              className="transition-all duration-500"
-            />
-            <text x={pos.x} y={pos.y - 4} textAnchor="middle" dominantBaseline="middle"
-              className={cn("text-[13px] font-semibold select-none transition-colors duration-500", active ? "fill-primary" : "fill-muted-foreground/25")}
-            >{steps[i].num}</text>
-            <text x={pos.x} y={pos.y + 10} textAnchor="middle" dominantBaseline="middle"
-              className={cn("text-[8px] font-medium select-none transition-colors duration-500", active ? "fill-foreground/60" : "fill-muted-foreground/15")}
-            >{steps[i].title}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 export function MethodSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
 
   return (
-    <section className="py-20 sm:py-28 bg-secondary/30 relative overflow-hidden">
+    <section className="py-20 sm:py-28 bg-[#0a0e1f] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(0_0%_100%/0.02)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
           "text-center mb-10 sm:mb-14 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">Méthodologie</p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground">
-            Une approche structurée
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Méthodologie</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">
+            Un pipeline structuré en 3 phases
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-[1fr,1.3fr] gap-8 md:gap-12 items-center">
-          <div className={cn("transition-all duration-700", isVisible ? "opacity-100" : "opacity-0")}>
-            <PipelineDiagram isVisible={isVisible} />
+        <div className="grid md:grid-cols-3 gap-4 sm:gap-5 relative">
+          {/* Connector lines (desktop only) */}
+          <div className="hidden md:block absolute top-1/2 left-0 right-0 -translate-y-1/2 h-px">
+            <div className={cn(
+              "h-full bg-gradient-to-r from-primary/30 via-primary/20 to-primary/30 transition-all duration-1000",
+              isVisible ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+            )} style={{ transitionDelay: "600ms" }} />
           </div>
 
-          <div className="space-y-4">
-            {steps.map((step, i) => (
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            return (
               <div
                 key={i}
                 className={cn(
-                  "rounded-lg border border-border/40 p-5 transition-all duration-500 hover:border-primary/20",
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                  "relative rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm p-5 sm:p-6 transition-all duration-600",
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 )}
-                style={{ transitionDelay: `${i * 180 + 400}ms` }}
+                style={{ transitionDelay: `${i * 180 + 300}ms` }}
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-xs font-semibold text-primary/50">{step.num}</span>
-                  <h3 className="text-sm font-semibold text-foreground">{step.title}</h3>
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono text-primary/50">{step.num}</span>
+                    <h3 className="text-sm font-bold text-white">{step.title}</h3>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+
+                <p className="text-xs sm:text-sm text-white/40 leading-relaxed mb-5">{step.desc}</p>
+
+                {/* Mini dashboard preview */}
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {step.miniStats.map((stat, j) => (
+                    <div
+                      key={j}
+                      className="rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2"
+                    >
+                      <div className={cn(
+                        "w-full h-1.5 rounded-full mb-1.5 transition-all duration-700",
+                        isVisible ? "opacity-100" : "opacity-0",
+                        j % 2 === 0 ? "bg-primary/30" : "bg-emerald-500/30"
+                      )}
+                        style={{
+                          width: isVisible ? `${60 + j * 10}%` : "0%",
+                          transitionDelay: `${i * 180 + j * 80 + 600}ms`,
+                        }}
+                      />
+                      <span className="text-[9px] text-white/30">{stat}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Duration badge */}
+                <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08]">
+                  <span className="text-[10px] font-medium text-white/40">{step.duration}</span>
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>

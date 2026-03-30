@@ -1,118 +1,98 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { Database, Brain, Target } from "lucide-react";
 
-const rings = [
-  { label: "Opérations critiques", radius: 45 },
-  { label: "Simplifier", radius: 95 },
-  { label: "Structurer", radius: 145 },
-  { label: "Améliorer", radius: 195 },
+const layers = [
+  { label: "Données brutes", desc: "Sources structurées et non structurées", icon: Database, color: "text-white/40 bg-white/[0.04] border-white/[0.08]" },
+  { label: "Moteur IA", desc: "Analyse, corrélation et prédiction", icon: Brain, color: "text-primary bg-primary/10 border-primary/25 shadow-[0_0_20px_hsl(239_84%_67%/0.1)]" },
+  { label: "Décisions optimisées", desc: "Actions concrètes et mesurables", icon: Target, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20 shadow-[0_0_20px_hsl(142_76%_36%/0.1)]" },
 ];
-
-function ConcentricDiagram({ isVisible }: { isVisible: boolean }) {
-  const [activeRing, setActiveRing] = useState(-1);
-
-  useEffect(() => {
-    if (!isVisible) return;
-    const timers = rings.map((_, i) =>
-      setTimeout(() => setActiveRing(i), 300 + i * 450)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [isVisible]);
-
-  const cx = 210, cy = 210;
-
-  return (
-    <svg viewBox="0 0 420 420" className="w-full max-w-[360px] mx-auto" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <radialGradient id="center-fill" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.08" />
-          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      {/* Rings outer to inner */}
-      {rings.slice().reverse().map((ring, ri) => {
-        const i = rings.length - 1 - ri;
-        const active = i <= activeRing;
-
-        return (
-          <g key={i}>
-            <circle
-              cx={cx} cy={cy} r={ring.radius}
-              fill={i === 0 && active ? "url(#center-fill)" : "none"}
-              stroke={active ? "hsl(var(--primary))" : "hsl(var(--border))"}
-              strokeWidth={i === 0 ? 2 : 1}
-              opacity={active ? (i === 0 ? 0.7 : 0.25 - i * 0.04) : 0.06}
-              className="transition-all duration-700"
-            />
-
-            {/* Subtle orbit dot */}
-            {active && i > 0 && (
-              <circle r="3" fill="hsl(var(--primary))" opacity="0.25">
-                <animateMotion
-                  dur={`${8 + i * 4}s`}
-                  repeatCount="indefinite"
-                  path={`M ${cx + ring.radius} ${cy} A ${ring.radius} ${ring.radius} 0 1 1 ${cx + ring.radius - 0.01} ${cy}`}
-                />
-              </circle>
-            )}
-
-            {/* Label */}
-            {i === 0 ? (
-              <>
-                <text x={cx} y={cy - 5} textAnchor="middle" dominantBaseline="middle"
-                  className={cn("text-[10px] font-semibold select-none transition-all duration-500", active ? "fill-foreground" : "fill-muted-foreground/20")}
-                >Opérations</text>
-                <text x={cx} y={cy + 9} textAnchor="middle" dominantBaseline="middle"
-                  className={cn("text-[10px] font-semibold select-none transition-all duration-500", active ? "fill-foreground" : "fill-muted-foreground/20")}
-                >critiques</text>
-              </>
-            ) : (
-              <text x={cx} y={cy - ring.radius + 14} textAnchor="middle" dominantBaseline="middle"
-                className={cn("text-[9px] font-medium select-none transition-all duration-500", active ? "fill-muted-foreground" : "fill-muted-foreground/15")}
-              >{ring.label}</text>
-            )}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 export function PositioningSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   return (
-    <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
-      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="grid md:grid-cols-2 gap-8 md:gap-14 items-center">
-          <div className={cn("transition-all duration-700", isVisible ? "opacity-100" : "opacity-0")}>
-            <ConcentricDiagram isVisible={isVisible} />
+    <section className="py-20 sm:py-28 bg-[#060918] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(239_84%_67%/0.04),transparent_60%)]" />
+
+      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+          {/* Isometric stack */}
+          <div className={cn("transition-all duration-700", isVisible ? "opacity-100" : "opacity-0")} style={{ transitionDelay: "200ms" }}>
+            <div className="relative flex flex-col items-center gap-4 py-8" style={{ perspective: "800px" }}>
+              {layers.slice().reverse().map((layer, ri) => {
+                const i = layers.length - 1 - ri;
+                const Icon = layer.icon;
+                return (
+                  <div
+                    key={i}
+                    className={cn(
+                      "w-full max-w-[320px] px-5 py-4 rounded-xl border backdrop-blur-sm flex items-center gap-4 transition-all duration-600",
+                      layer.color,
+                      isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                    )}
+                    style={{
+                      transitionDelay: `${(layers.length - 1 - ri) * 200 + 400}ms`,
+                      transform: isVisible
+                        ? `rotateX(8deg) translateZ(${ri * 8}px)`
+                        : `rotateX(8deg) translateZ(${ri * 8}px) translateY(24px)`,
+                    }}
+                  >
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white/[0.06]">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{layer.label}</p>
+                      <p className="text-xs text-white/40">{layer.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Vertical arrows between layers */}
+              {[0, 1].map(i => (
+                <div
+                  key={`arrow-${i}`}
+                  className={cn(
+                    "absolute w-px h-4 bg-gradient-to-b from-primary/40 to-primary/10 transition-all duration-500",
+                    isVisible ? "opacity-100" : "opacity-0"
+                  )}
+                  style={{
+                    top: `${28 + i * 37}%`,
+                    left: "50%",
+                    transitionDelay: `${800 + i * 200}ms`,
+                  }}
+                />
+              ))}
+            </div>
           </div>
 
-          <div className={cn("transition-all duration-500", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")} style={{ transitionDelay: "200ms" }}>
-            <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">Positionnement</p>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-4">
-              Une approche orientée résultats
+          {/* Text */}
+          <div className={cn("transition-all duration-500", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")} style={{ transitionDelay: "300ms" }}>
+            <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Architecture</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-5">
+              De la donnée brute à la décision optimisée
             </h2>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Nous intervenons là où les inefficacités ont le plus d'impact : les opérations critiques de votre organisation.
+            <p className="text-sm sm:text-base text-white/40 mb-8 leading-relaxed">
+              Notre approche transforme vos données opérationnelles en leviers d'action concrets grâce à une intelligence artificielle entraînée sur vos processus métier.
             </p>
-            <div className="space-y-3">
-              {rings.slice(1).map((ring, i) => (
+            <div className="space-y-4">
+              {layers.map((layer, i) => (
                 <div
                   key={i}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg border border-border/40 transition-all duration-500",
-                    isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-3"
+                    "flex items-center gap-3 transition-all duration-500",
+                    isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
                   )}
-                  style={{ transitionDelay: `${400 + i * 120}ms` }}
+                  style={{ transitionDelay: `${600 + i * 120}ms` }}
                 >
-                  <div className="w-7 h-7 rounded bg-muted flex items-center justify-center shrink-0">
-                    <span className="text-[10px] font-semibold text-muted-foreground">{i + 1}</span>
+                  <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-xs font-bold text-primary/60">
+                    {String(i + 1).padStart(2, "0")}
                   </div>
-                  <p className="text-sm text-foreground">{ring.label}</p>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{layer.label}</p>
+                    <p className="text-xs text-white/40">{layer.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>

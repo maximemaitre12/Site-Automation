@@ -1,176 +1,182 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  Brain, Database, BarChart3, Zap, Target, TrendingUp,
+  Activity, Cpu, Globe, Shield, LineChart, Layers,
+} from "lucide-react";
 
-const departments = [
-  { id: "supply", label: "Supply Chain", x: 90, y: 55, size: 42 },
-  { id: "rh", label: "RH", x: 310, y: 45, size: 38 },
-  { id: "logistique", label: "Logistique", x: 140, y: 195, size: 40 },
-  { id: "ops", label: "Opérations", x: 380, y: 185, size: 44 },
-  { id: "finance", label: "Finance", x: 240, y: 115, size: 36 },
+const nodes = [
+  { id: "data", label: "Données", icon: Database, row: 0, col: 0 },
+  { id: "process", label: "Processus", icon: Activity, row: 0, col: 1 },
+  { id: "security", label: "Conformité", icon: Shield, row: 0, col: 2 },
+  { id: "supply", label: "Supply Chain", icon: Globe, row: 1, col: 0 },
+  { id: "ai", label: "IA Engine", icon: Brain, row: 1, col: 1, center: true },
+  { id: "analytics", label: "Analytics", icon: LineChart, row: 1, col: 2 },
+  { id: "optim", label: "Optimisation", icon: Zap, row: 2, col: 0 },
+  { id: "predict", label: "Prédiction", icon: TrendingUp, row: 2, col: 1 },
+  { id: "decision", label: "Décision", icon: Target, row: 2, col: 2 },
 ];
 
-const connections = [
-  { from: "supply", to: "finance", path: "M 130 65 Q 185 80 210 105" },
-  { from: "supply", to: "logistique", path: "M 100 97 Q 110 140 135 170" },
-  { from: "finance", to: "rh", path: "M 270 110 Q 290 80 295 55" },
-  { from: "finance", to: "ops", path: "M 272 125 Q 325 155 360 170" },
-  { from: "finance", to: "logistique", path: "M 220 130 Q 185 160 155 175" },
-  { from: "rh", to: "ops", path: "M 335 65 Q 365 120 380 155" },
-  { from: "logistique", to: "ops", path: "M 175 200 Q 275 210 350 195" },
+const dataFlows = [
+  { text: "+12%", delay: 2000 },
+  { text: "−3j", delay: 3500 },
+  { text: "×2", delay: 5000 },
+  { text: "−40%", delay: 6500 },
 ];
 
 export function HeroDiagram() {
-  const [phase, setPhase] = useState(0);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [activeNodes, setActiveNodes] = useState<Set<string>>(new Set());
-  const [connectedEdges, setConnectedEdges] = useState<Set<number>>(new Set());
+  const [visibleNodes, setVisibleNodes] = useState(0);
+  const [connectionsLit, setConnectionsLit] = useState(false);
+  const [activeFlows, setActiveFlows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 400),
-      setTimeout(() => setPhase(2), 2200),
-      setTimeout(() => setPhase(3), 3000),
-    ];
-    return () => timers.forEach(clearTimeout);
+    // Stagger node appearance
+    const nodeTimers = nodes.map((_, i) =>
+      setTimeout(() => setVisibleNodes(i + 1), 200 + i * 80)
+    );
+    // Light connections after nodes
+    const connTimer = setTimeout(() => setConnectionsLit(true), 200 + nodes.length * 80 + 300);
+
+    // Data flow labels
+    const flowTimers = dataFlows.map((f, i) => {
+      const show = setTimeout(() => setActiveFlows(prev => new Set([...prev, i])), f.delay);
+      const hide = setTimeout(() => setActiveFlows(prev => {
+        const n = new Set(prev);
+        n.delete(i);
+        return n;
+      }), f.delay + 1200);
+      return [show, hide];
+    }).flat();
+
+    // Loop data flows
+    const loopInterval = setInterval(() => {
+      dataFlows.forEach((f, i) => {
+        setTimeout(() => setActiveFlows(prev => new Set([...prev, i])), f.delay - 2000);
+        setTimeout(() => setActiveFlows(prev => {
+          const n = new Set(prev);
+          n.delete(i);
+          return n;
+        }), f.delay - 2000 + 1200);
+      });
+    }, 8000);
+
+    return () => {
+      nodeTimers.forEach(clearTimeout);
+      clearTimeout(connTimer);
+      flowTimers.forEach(clearTimeout);
+      clearInterval(loopInterval);
+    };
   }, []);
 
-  useEffect(() => {
-    if (phase < 1) return;
-    const interval = setInterval(() => {
-      setScanProgress(prev => {
-        if (prev >= 100) { clearInterval(interval); return 100; }
-        return prev + 1.2;
-      });
-    }, 16);
-    return () => clearInterval(interval);
-  }, [phase]);
-
-  useEffect(() => {
-    departments.forEach(dept => {
-      const threshold = (dept.y / 250) * 100;
-      if (scanProgress >= threshold) {
-        setActiveNodes(prev => {
-          if (prev.has(dept.id)) return prev;
-          return new Set([...prev, dept.id]);
-        });
-      }
-    });
-  }, [scanProgress]);
-
-  useEffect(() => {
-    if (phase < 3) return;
-    connections.forEach((_, i) => {
-      setTimeout(() => setConnectedEdges(prev => new Set([...prev, i])), i * 180);
-    });
-  }, [phase]);
-
-  const scanY = (scanProgress / 100) * 260;
-
   return (
-    <div className="relative">
-      <svg viewBox="0 0 480 270" className="w-full relative z-10" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <pattern id="grid-dots" width="24" height="24" patternUnits="userSpaceOnUse">
-            <circle cx="12" cy="12" r="0.4" fill="hsl(var(--muted-foreground))" opacity="0.1" />
-          </pattern>
-          <linearGradient id="scan-line" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-            <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-          </linearGradient>
-          <filter id="soft-glow">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
+    <div className="relative p-4">
+      {/* Ambient glow behind the center node */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-primary/10 blur-[60px] animate-[pulse_6s_ease-in-out_infinite]" />
 
-        <rect width="480" height="270" fill="url(#grid-dots)" rx="8" />
+      <div className="grid grid-cols-3 gap-3 sm:gap-4 relative">
+        {nodes.map((node, i) => {
+          const Icon = node.icon;
+          const visible = i < visibleNodes;
 
-        {/* Scan */}
-        {phase >= 1 && scanProgress < 100 && (
-          <rect x="0" y={scanY - 20} width="480" height="40" fill="url(#scan-line)" />
+          return (
+            <div
+              key={node.id}
+              className={cn(
+                "relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border transition-all duration-500",
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
+                node.center
+                  ? "bg-primary/10 border-primary/30 shadow-[0_0_30px_hsl(239_84%_67%/0.15)]"
+                  : "bg-white/[0.03] border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.05]",
+                "backdrop-blur-sm"
+              )}
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              <div className={cn(
+                "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-all duration-500",
+                node.center
+                  ? "bg-primary/20 text-primary shadow-[0_0_15px_hsl(239_84%_67%/0.2)]"
+                  : "bg-white/[0.06] text-white/60"
+              )}>
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <span className={cn(
+                "text-[10px] sm:text-xs font-medium",
+                node.center ? "text-primary" : "text-white/50"
+              )}>
+                {node.label}
+              </span>
+
+              {/* Connection indicator dot */}
+              {connectionsLit && !node.center && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary/60 shadow-[0_0_6px_hsl(239_84%_67%/0.4)]" />
+              )}
+            </div>
+          );
+        })}
+
+        {/* Connection lines (CSS pseudo grid lines) */}
+        {connectionsLit && (
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Horizontal lines */}
+            {[0, 1, 2].map(row => (
+              <div
+                key={`h-${row}`}
+                className="absolute h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+                style={{
+                  top: `${(row * 33.33) + 16.66}%`,
+                  left: '10%',
+                  right: '10%',
+                }}
+              />
+            ))}
+            {/* Vertical lines */}
+            {[0, 1, 2].map(col => (
+              <div
+                key={`v-${col}`}
+                className="absolute w-px bg-gradient-to-b from-transparent via-primary/20 to-transparent"
+                style={{
+                  left: `${(col * 33.33) + 16.66}%`,
+                  top: '10%',
+                  bottom: '10%',
+                }}
+              />
+            ))}
+          </div>
         )}
+      </div>
 
-        {/* Edges */}
-        {connections.map((conn, i) => {
-          const fromActive = activeNodes.has(conn.from);
-          const toActive = activeNodes.has(conn.to);
-          const linked = connectedEdges.has(i);
-
+      {/* Floating data labels */}
+      <div className="absolute inset-0 pointer-events-none">
+        {dataFlows.map((flow, i) => {
+          const positions = [
+            { top: '25%', left: '20%' },
+            { top: '60%', right: '15%' },
+            { bottom: '20%', left: '30%' },
+            { top: '40%', left: '55%' },
+          ];
           return (
-            <g key={`e-${i}`}>
-              <path
-                d={conn.path} fill="none"
-                stroke={linked ? "hsl(var(--primary))" : "hsl(var(--border))"}
-                strokeWidth={linked ? 1.5 : 0.8}
-                opacity={linked ? 0.4 : fromActive && toActive ? 0.15 : 0.06}
-                className="transition-all duration-700"
-              />
-              {linked && (
-                <circle r="2.5" fill="hsl(var(--primary))" opacity="0.6">
-                  <animateMotion dur={`${2.5 + i * 0.2}s`} repeatCount="indefinite" path={conn.path} />
-                </circle>
+            <div
+              key={i}
+              className={cn(
+                "absolute px-2 py-1 rounded-md bg-primary/10 border border-primary/20 text-[10px] font-mono font-bold text-primary/80 backdrop-blur-sm transition-all duration-500",
+                activeFlows.has(i) ? "opacity-100 scale-100" : "opacity-0 scale-75"
               )}
-            </g>
+              style={positions[i]}
+            >
+              {flow.text}
+            </div>
           );
         })}
+      </div>
 
-        {/* Nodes */}
-        {departments.map(dept => {
-          const isActive = activeNodes.has(dept.id);
-          const isConnected = phase >= 3;
-
-          return (
-            <g key={dept.id}>
-              {isActive && isConnected && (
-                <circle cx={dept.x} cy={dept.y} r={dept.size} fill="none" stroke="hsl(var(--primary))" strokeWidth="0.8" opacity="0">
-                  <animate attributeName="r" values={`${dept.size};${dept.size + 12}`} dur="3s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.2;0" dur="3s" repeatCount="indefinite" />
-                </circle>
-              )}
-
-              <circle
-                cx={dept.x} cy={dept.y} r={dept.size}
-                fill={isActive ? "hsl(var(--primary) / 0.06)" : "hsl(var(--muted) / 0.4)"}
-                stroke={isActive ? "hsl(var(--primary) / 0.4)" : "hsl(var(--border))"}
-                strokeWidth={isActive ? 1.5 : 0.8}
-                className="transition-all duration-700"
-                filter={isActive && isConnected ? "url(#soft-glow)" : undefined}
-              />
-
-              {/* Small status circle */}
-              {isActive && (
-                <circle
-                  cx={dept.x + dept.size * 0.55}
-                  cy={dept.y - dept.size * 0.55}
-                  r="4"
-                  fill={isConnected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                  opacity={isConnected ? 0.8 : 0.3}
-                  className="transition-all duration-500"
-                />
-              )}
-
-              <text
-                x={dept.x} y={dept.y + 1}
-                textAnchor="middle" dominantBaseline="middle"
-                className={cn(
-                  "font-medium transition-colors duration-500 select-none",
-                  isActive ? "fill-foreground" : "fill-muted-foreground",
-                  dept.size >= 42 ? "text-[10px]" : "text-[9px]"
-                )}
-              >
-                {dept.label}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Status label */}
-        <rect x="358" y="238" width="112" height="22" rx="11" fill="hsl(var(--muted))" stroke="hsl(var(--border))" strokeWidth="0.8" />
-        <text x="414" y="250" textAnchor="middle" dominantBaseline="middle" className="text-[8px] font-medium fill-muted-foreground select-none">
-          {phase < 1 ? "Initialisation" : phase < 2 ? "Scan en cours" : phase < 3 ? "Analyse" : "Connecté"}
-        </text>
-      </svg>
+      {/* Status bar */}
+      <div className="mt-4 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+        <Cpu className="w-3 h-3 text-primary/60" />
+        <span className="text-[10px] sm:text-xs font-medium text-white/40 tracking-wider uppercase">
+          Neural Processing Engine — Active
+        </span>
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 shadow-[0_0_6px_hsl(142_76%_36%/0.4)]" />
+      </div>
     </div>
   );
 }
