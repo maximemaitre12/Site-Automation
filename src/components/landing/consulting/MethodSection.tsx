@@ -66,7 +66,7 @@ export function MethodSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
 
   return (
-    <section id="methode" className="py-24 sm:py-32 bg-slate-950 relative overflow-hidden">
+    <section id="methode" className="py-24 sm:py-32 bg-white relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_60%_70%/0.06)_1px,transparent_1px)] bg-[length:32px_32px]" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
