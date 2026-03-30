@@ -4,7 +4,7 @@
   "description": "Farmasoft UA — Plateforme RH Intelligence",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 tsx watch --tsconfig server/tsconfig.json server/index.ts\" \"vite\"",
+    "dev": "concurrently \"tsx watch --tsconfig server/tsconfig.json server/index.ts\" \"vite\"",
     "build": "vite build",
     "start": "NODE_ENV=production tsx --tsconfig server/tsconfig.json server/index.ts",
     "typecheck": "tsc --noEmit"
@@ -13,8 +13,8 @@
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
     "express": "^4.21.2",
-    "puppeteer-core": "^24.40.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zustand": "^5.0.3"

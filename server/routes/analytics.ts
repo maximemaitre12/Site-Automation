@@ -39,10 +39,11 @@ router.get('/kpis', (_req: Request, res: Response) => {
 
     const totalSearches = (db.prepare(`SELECT COUNT(*) as count FROM events WHERE type = 'search_launched'`).get() as { count: number }).count
     const weekSearches = (db.prepare(`SELECT COUNT(*) as count FROM events WHERE type = 'search_launched' AND created_at >= ?`).get(weekAgo) as { count: number }).count
-    const totalViewed = (db.prepare(`SELECT COUNT(*) as count FROM events WHERE type = 'profile_viewed'`).get() as { count: number }).count
-    const todayViewed = (db.prepare(`SELECT COUNT(*) as count FROM events WHERE type = 'profile_viewed' AND date(created_at) = ?`).get(today) as { count: number }).count
-    const totalContacted = (db.prepare(`SELECT COUNT(*) as count FROM events WHERE type = 'message_copied'`).get() as { count: number }).count
-    const contactRate = totalViewed > 0 ? Math.round((totalContacted / totalViewed) * 100) : 0
+    const totalViewed = (db.prepare(`SELECT COUNT(*) as count FROM candidates WHERE status != 'new'`).get() as { count: number }).count
+    const todayViewed = (db.prepare(`SELECT COUNT(*) as count FROM candidates WHERE status != 'new' AND date(viewed_at) = ?`).get(today) as { count: number }).count
+    const totalContacted = (db.prepare(`SELECT COUNT(*) as count FROM candidates WHERE status = 'contacted'`).get() as { count: number }).count
+    const totalCandidates = (db.prepare(`SELECT COUNT(*) as count FROM candidates`).get() as { count: number }).count
+    const contactRate = totalCandidates > 0 ? Math.round((totalContacted / totalCandidates) * 100) : 0
     const activeJobs = (db.prepare(`SELECT COUNT(*) as count FROM jobs WHERE is_active = 1`).get() as { count: number }).count
 
     const byJob = db.prepare(`

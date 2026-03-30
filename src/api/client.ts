@@ -1,9 +1,12 @@
 const BASE = '/api'
+const API_KEY = (import.meta as unknown as { env: Record<string, string> }).env.VITE_API_SECRET
 
 async function req<T>(url: string, options?: RequestInit): Promise<{ data?: T; error?: string }> {
   try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (API_KEY) headers['x-api-key'] = API_KEY
     const res = await fetch(`${BASE}${url}`, {
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       ...options,
     })
     const json = await res.json()
@@ -40,6 +43,12 @@ export const api = {
     update: (id: number, interview: Partial<Interview>) =>
       req<Interview>(`/interviews/${id}`, { method: 'PUT', ...body(interview) }),
     remove: (id: number) => req<{ success: boolean }>(`/interviews/${id}`, { method: 'DELETE' }),
+  },
+  messages: {
+    list: (jobId?: number) => req<Message[]>(`/messages${jobId ? `?jobId=${jobId}` : ''}`),
+    create: (msg: Partial<Message>) => req<Message>('/messages', { method: 'POST', ...body(msg) }),
+    update: (id: number, msg: Partial<Message>) => req<Message>(`/messages/${id}`, { method: 'PUT', ...body(msg) }),
+    remove: (id: number) => req<{ success: boolean }>(`/messages/${id}`, { method: 'DELETE' }),
   },
   cv: {
     parse: (filename: string, content: string, mimeType: string, jobId?: number) =>

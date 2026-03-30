@@ -7,17 +7,19 @@ const router = Router()
 const VALID_STATUSES = ['new', 'viewed', 'contacted', 'rejected']
 const VALID_STAGES = ['new', 'prequalification', 'interview', 'decision']
 
-const GEMINI_KEY = 'AIzaSyB3eK0-j1mUjqUu3cqab0rffviAkdEB8a8'
+const GEMINI_KEY = process.env.GEMINI_KEY
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
 
 router.get('/', (req: Request, res: Response) => {
   try {
     const db = getDb()
     const { jobId } = req.query
+    const limit = Math.min(parseInt(req.query.limit as string) || 500, 1000)
+    const offset = (Math.max(parseInt(req.query.page as string) || 1, 1) - 1) * limit
 
     const candidates = jobId
-      ? db.prepare('SELECT * FROM candidates WHERE job_id = ? ORDER BY created_at DESC').all(jobId)
-      : db.prepare('SELECT * FROM candidates ORDER BY created_at DESC').all()
+      ? db.prepare('SELECT * FROM candidates WHERE job_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?').all(jobId, limit, offset)
+      : db.prepare('SELECT * FROM candidates ORDER BY created_at DESC LIMIT ? OFFSET ?').all(limit, offset)
 
     res.json({ data: candidates })
   } catch (err: unknown) {

@@ -36,7 +36,7 @@ function CandidateModal({ candidate, job, onClose, onStatusChange }: CandidateMo
     if (!job) { setGenError('Associez ce candidat à un poste pour générer un message.'); return }
     setGenerating(true)
     setGenError('')
-    const res = await api.ai.generateMessage(job, candidate.role, candidate.source_platform, language)
+    const res = await api.ai.generateMessage(job, candidate, language)
     if (res.error) { setGenError(res.error); setGenerating(false); return }
     if (res.data) setMessage(res.data)
     setGenerating(false)

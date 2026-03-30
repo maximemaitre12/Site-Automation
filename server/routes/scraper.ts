@@ -9,12 +9,12 @@ const router = Router()
 // Disable SSL verification for corporate/Windows certificate issues
 const httpsAgent = new https.Agent({ rejectUnauthorized: false })
 
-const GEMINI_KEY = 'AIzaSyB3eK0-j1mUjqUu3cqab0rffviAkdEB8a8'
+const GEMINI_KEY = process.env.GEMINI_KEY
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
 
 // Google CSE — fallback if work.ua HTTP fails (requires billing active)
-const GOOGLE_API_KEY = 'AIzaSyDspjTotGPjixzYBsHkvhylzOgecDuTDlk'
-const GOOGLE_CSE_ID = '977f1bf44ff6542f5'
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
+const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID
 const GOOGLE_CSE_URL = 'https://www.googleapis.com/customsearch/v1'
 
 const BROWSER_HEADERS = {
@@ -193,7 +193,7 @@ async function translateToUkrainian(query: string): Promise<string> {
     const { data } = await axios.post(
       GEMINI_URL,
       { contents: [{ parts: [{ text: `Translate to Ukrainian (1-4 words, nominative case, no explanation): "${query}". Reply ONLY with Ukrainian. Examples: "driver"→"водій", "truck driver"→"водій вантажного автомобіля", "pharmacist"→"фармацевт"` }] }] },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 8000, httpsAgent },
+      { headers: { 'Content-Type': 'application/json' }, timeout: 8000 },
     )
     return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || query
   } catch {
@@ -298,7 +298,6 @@ async function scrapeWorkUa(queryUk: string, location: string, count: number): P
 async function searchViaGoogle(queryUk: string, location: string, count: number, siteFilter: string, platform: string): Promise<ScrapedCandidate[]> {
   try {
     const { data } = await axios.get(GOOGLE_CSE_URL, {
-      httpsAgent,
       params: {
         key: GOOGLE_API_KEY,
         cx: GOOGLE_CSE_ID,
@@ -393,7 +392,7 @@ Réponds UNIQUEMENT en JSON valide sans markdown : {"score": <entier 0-100>, "no
       const response = await axios.post(
         GEMINI_URL,
         { contents: [{ parts: [{ text: prompt }] }] },
-        { headers: { 'Content-Type': 'application/json' }, timeout: 30000, httpsAgent },
+        { headers: { 'Content-Type': 'application/json' }, timeout: 30000 },
       )
       const text: string = response.data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
       const jsonMatch = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)

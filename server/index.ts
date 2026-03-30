@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import path from 'path'
@@ -11,6 +12,7 @@ import scraperRouter from './routes/scraper'
 import aiRouter from './routes/ai'
 import interviewsRouter from './routes/interviews'
 import cvRouter from './routes/cv'
+import { apiAuth } from './middleware/auth'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -21,6 +23,7 @@ app.use((_req, res, next) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8')
   next()
 })
+app.use('/api', apiAuth)
 
 app.use('/api/jobs', jobsRouter)
 app.use('/api/candidates', candidatesRouter)

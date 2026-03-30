@@ -4,7 +4,7 @@ import { getDb } from '../db'
 
 const router = Router()
 
-const GEMINI_KEY = 'AIzaSyB3eK0-j1mUjqUu3cqab0rffviAkdEB8a8'
+const GEMINI_KEY = process.env.GEMINI_KEY
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
 
 // Parse a CV (PDF or text) and create a candidate record
