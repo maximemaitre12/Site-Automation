@@ -1,68 +1,41 @@
 
 
-## Plan: Chaque section = une app Mac unique et immersive
+## Plan: Refonte totale UseCasesSection — AETHER ANALYTICS LAB v3.0
 
-L'idee est de transformer chaque section du landing en une **fenetre Mac distincte** avec un style d'application different (terminal, dashboard, IDE, Finder, etc.), tout en gardant les contenus actuels.
+Réécriture complète en **dashboard d'analyse de données** style Bloomberg Terminal / Tableau, bien plus immersif et responsive que le Finder actuel.
 
-### Composant partage
+### Concept créatif
 
-**Creer `src/components/landing/MacWindow.tsx`**
-- Props: `title`, `variant` (light/dark), `statusDot` (couleur custom), `toolbar` (boutons optionnels), `children`, `className`
-- Les 3 dots (rouge/jaune/vert), barre de titre mono, coins arrondis, ombre
-- Support mode sombre (bg-slate-900) et clair (bg-white)
+Simuler **"AETHER ANALYTICS LAB v3.0"** — un outil d'intelligence data premium :
 
-### Sections transformees
+**Desktop (lg+)** : Layout 2 colonnes dans MacWindow dark
+- **Sidebar gauche** (w-52, bg-slate-900) : les 3 secteurs comme des "datasets" avec mini sparkline SVG inline (5 points animés), badge pulsant "LIVE" vert, variation delta colorée, et hover glow
+- **Zone principale** divisée verticalement :
+  1. **Header dataset** : nom du secteur + icône gradient + gros chiffre delta animé avec glow pulsant (ex: "−40%" en 3xl avec text-shadow emerald)
+  2. **Tableau spreadsheet** : 3 lignes (une par KPI), colonnes "KPI | Avant | Après | Δ" — les cellules "Avant" en rouge barré, "Après" en vert bold, et la colonne Delta contient une **barre de progression horizontale animée** (0→100% au scroll) avec pourcentage
+  3. **Mini bar chart SVG** en bas : barres groupées (before=rouge semi-transparent 40%, after=vert gradient) avec gridlines pointillées horizontales et labels d'axe Y — les barres "after" grandissent avec animation spring
+- **Status bar** : "Last analysis: 2 min ago" + dot vert pulsant "Live" + "3 datasets loaded"
 
-| Section | App Mac simulee | Titre fenetre | Idee creative |
-|---------|----------------|---------------|---------------|
-| **ProblemsSection** | Terminal/Scanner | `AETHER DIAGNOSTIC ENGINE v2.4` | Deja fait, on conserve tel quel |
-| **ImpactSection** | Activity Monitor | `AETHER PERFORMANCE MONITOR` | Les 4 metriques deviennent des lignes de monitoring avec sparklines en temps reel, barre CPU/Memory style macOS Activity Monitor |
-| **PositioningSection** | IDE/Code Editor | `AETHER PIPELINE EDITOR v1.8` | Le pipeline donnees→IA→decisions presente comme des blocs de code avec syntax highlighting, onglets fichiers, sidebar mini-map |
-| **UseCasesSection** | Finder/Comparator | `AETHER CASE LAB v2.0` | Les avant/apres presentes comme des fichiers dans un Finder avec colonnes, icones dossier, tags couleur |
-| **DifferentiationSection** | System Preferences | `AETHER CAPABILITIES` | Les 6 capacites presentees comme des panneaux System Preferences macOS avec icones rondes, toggles actifs, barres de niveau |
-| **TrainingsSection** | App Store | `AETHER ACADEMY` | Les 3 formations presentees comme des apps a telecharger avec bouton "Obtenir", ratings, previews |
+**Tablet (md)** : Même layout mais sidebar plus étroite (w-40), textes légèrement réduits
 
-### Details techniques
+**Mobile (<md)** : 
+- Pas de sidebar — les 3 secteurs deviennent des **pills horizontaux scrollables** en haut
+- Le tableau devient des **cards empilées** (une par KPI) avec barre de progression
+- Le chart SVG s'adapte en largeur 100%
+- Le gros chiffre delta reste centré et proéminent
 
-**ImpactSection** (Activity Monitor):
-- Header avec onglets "CPU / Memory / Network / Disk" (seul CPU actif)
-- Les 4 metriques en lignes de tableau avec barres horizontales animees
-- Un mini graphe en bas style "CPU History" avec courbe animee
-- Couleurs vert/jaune/rouge selon les valeurs
+### Détails visuels premium
 
-**PositioningSection** (IDE):
-- Barre d'onglets fichiers: `data.src`, `engine.ai`, `output.opt`
-- Sidebar sombre avec arborescence de fichiers
-- Contenu: blocs de pseudo-code colore qui montrent la transformation
-- Numeros de lignes, cursor clignotant
+- **MacWindow variant="dark"** : fond slate-900, bordures slate-700
+- Sparklines sidebar : polyline SVG avec stroke-dasharray animé
+- Barres de progression : dégradé from-red-500 to-emerald-500 avec transition width 1.5s ease-out déclenchée au scroll
+- Chart barres : coins arrondis (rx=3), hover scale(1.05), gradient vertical sur les barres "after"
+- Chiffre hero : font-mono text-3xl avec text-shadow: 0 0 20px emerald-500/40 et animation pulse subtile
+- Toolbar : onglets "Overview · Compare · Trends" avec le actif souligné en primary
 
-**UseCasesSection** (Finder):
-- Barre de navigation avec breadcrumb "Aether > Cases > [secteur]"
-- Vue en colonnes style Finder macOS
-- Chaque cas est un dossier avec preview avant/apres
-- Tags couleur (rouge=avant, vert=apres)
-
-**DifferentiationSection** (System Preferences):
-- Grille d'icones rondes style System Preferences
-- Au clic/hover, le panneau s'ouvre avec details + progress circulaire
-- Search bar en haut (decoratif)
-
-**TrainingsSection** (App Store):
-- Cards avec icones arrondies style app
-- Bouton bleu "Obtenir" / "GET"
-- Sous-titre "In-App Purchases" remplace par duree
-- Rating etoiles decoratif
-
-### Fichiers modifies
+### Fichier modifié
 
 | Fichier | Action |
 |---------|--------|
-| `src/components/landing/MacWindow.tsx` | Creer |
-| `src/components/landing/consulting/ImpactSection.tsx` | Rewrite |
-| `src/components/landing/consulting/PositioningSection.tsx` | Rewrite |
-| `src/components/landing/consulting/UseCasesSection.tsx` | Rewrite |
-| `src/components/landing/consulting/DifferentiationSection.tsx` | Rewrite |
-| `src/components/landing/TrainingsSection.tsx` | Rewrite |
-
-Les animations scroll-triggered existantes sont conservees. Chaque fenetre Mac a une animation d'entree unique (slide-up + scale).
+| `src/components/landing/consulting/UseCasesSection.tsx` | Rewrite complet |
 
