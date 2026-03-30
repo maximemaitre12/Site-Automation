@@ -83,8 +83,8 @@ const partners = [
     tag: "DATA-04",
     tier: "Technology Partner",
     icon: Zap,
-    gradient: "from-[hsl(260,65%,55%)] to-[hsl(280,60%,50%)]",
-    glowColor: "hsl(270,62%,52%)",
+    gradient: "from-[hsl(260,70%,60%)] to-[hsl(280,60%,55%)]",
+    glowColor: "hsl(260,70%,60%)",
     desc: "Streaming de données en temps réel avec Apache Kafka managé. Event-driven architecture.",
     stats: [
       { label: "Throughput", value: "10M/s" },
