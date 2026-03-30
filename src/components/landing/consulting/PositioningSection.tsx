@@ -103,9 +103,9 @@ function CodeLine({ line, number, isHighlighted, isVisible, delay }: {
 
     return text.split(/(\b(?:const|class|async|await|new|return|from|export)\b|'[^']*'|\b(?:true|false)\b|\/\/.*$|\d+\.?\d*%?)/g).map((part, i) => {
       if (/^(const|class|async|await|new|return|from|export)$/.test(part)) return <span key={i} className="text-purple-400">{part}</span>;
-      if (/^'[^']*'$/.test(part)) return <span key={i} className="text-emerald-400">{part}</span>;
-      if (/^(true|false)$/.test(part)) return <span key={i} className="text-amber-400">{part}</span>;
-      if (/^\d+\.?\d*%?$/.test(part)) return <span key={i} className="text-amber-300">{part}</span>;
+      if (/^'[^']*'$/.test(part)) return <span key={i} className="text-[hsl(200,80%,65%)]">{part}</span>;
+      if (/^(true|false)$/.test(part)) return <span key={i} className="text-[hsl(260,70%,70%)]">{part}</span>;
+      if (/^\d+\.?\d*%?$/.test(part)) return <span key={i} className="text-[hsl(200,80%,70%)]">{part}</span>;
       return <span key={i} className="text-slate-300">{part}</span>;
     });
   };
