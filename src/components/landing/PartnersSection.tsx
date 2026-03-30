@@ -170,11 +170,8 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
         )}
         style={{ transitionDelay: `${delay}ms` }}
       >
-        <div className={cn(
-          "w-9 h-9 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10 transition-shadow",
-          partner.gradient
-        )} style={{ boxShadow: isActive ? `0 0 16px ${partner.glowColor}25` : undefined }}>
-          <Icon className="w-4 h-4 text-white" strokeWidth={1.5} />
+        <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0 ring-1 ring-slate-200 p-1.5">
+          <img src={partner.logo} alt={partner.logoAlt} className="w-full h-full object-contain" />
         </div>
 
         <div className="flex-1 min-w-0">
