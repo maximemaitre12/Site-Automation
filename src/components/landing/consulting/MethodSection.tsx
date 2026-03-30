@@ -115,10 +115,10 @@ export function MethodSection() {
             const a = accentMap[step.accent];
 
             return (
-              <div
-                key={i}
-                className={cn(
-                  "group relative rounded-2xl border border-white/[0.06] bg-white/[0.03] backdrop-blur-sm p-6 transition-all duration-700 hover:bg-white/[0.06] hover:border-white/[0.12]",
+                <div
+                  key={i}
+                  className={cn(
+                    "group relative rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-700 hover:border-primary/30 hover:shadow-lg",
                   a.glow.replace(/shadow/, "hover:shadow"),
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                 )}
