@@ -1,179 +1,249 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Brain, Database, BarChart3, Zap, Target, TrendingUp,
-  Activity, Cpu, Globe, Shield, LineChart,
+  Brain, Database, BarChart3, Zap, Shield, TrendingUp,
+  Activity, Globe, Cpu, ArrowUpRight,
 } from "lucide-react";
 
-const nodes = [
-  { id: "data", label: "Données", icon: Database, row: 0, col: 0 },
-  { id: "process", label: "Processus", icon: Activity, row: 0, col: 1 },
-  { id: "security", label: "Conformité", icon: Shield, row: 0, col: 2 },
-  { id: "supply", label: "Supply Chain", icon: Globe, row: 1, col: 0 },
-  { id: "ai", label: "IA Engine", icon: Brain, row: 1, col: 1, center: true },
-  { id: "analytics", label: "Analytics", icon: LineChart, row: 1, col: 2 },
-  { id: "optim", label: "Optimisation", icon: Zap, row: 2, col: 0 },
-  { id: "predict", label: "Prédiction", icon: TrendingUp, row: 2, col: 1 },
-  { id: "decision", label: "Décision", icon: Target, row: 2, col: 2 },
+const orbitNodes = [
+  { icon: Database, label: "Data", angle: 0, ring: 1, color: "from-blue-500 to-cyan-400" },
+  { icon: Activity, label: "Process", angle: 60, ring: 1, color: "from-violet-500 to-purple-400" },
+  { icon: Shield, label: "Compliance", angle: 120, ring: 1, color: "from-emerald-500 to-teal-400" },
+  { icon: Globe, label: "Supply", angle: 180, ring: 1, color: "from-amber-500 to-orange-400" },
+  { icon: BarChart3, label: "Analytics", angle: 240, ring: 1, color: "from-rose-500 to-pink-400" },
+  { icon: Zap, label: "Automation", angle: 300, ring: 1, color: "from-indigo-500 to-blue-400" },
 ];
 
-const dataFlows = [
-  { text: "+12%", delay: 2000 },
-  { text: "−3j", delay: 3500 },
-  { text: "×2", delay: 5000 },
-  { text: "−40%", delay: 6500 },
+const metrics = [
+  { value: "+12%", label: "Efficacité", trend: "up" },
+  { value: "−40%", label: "Coûts", trend: "down" },
+  { value: "×2", label: "Vitesse", trend: "up" },
 ];
 
 export function HeroDiagram() {
-  const [visibleNodes, setVisibleNodes] = useState(0);
-  const [connectionsLit, setConnectionsLit] = useState(false);
-  const [activeFlows, setActiveFlows] = useState<Set<number>>(new Set());
+  const [phase, setPhase] = useState(0);
+  const [pulseIdx, setPulseIdx] = useState(-1);
 
   useEffect(() => {
-    const nodeTimers = nodes.map((_, i) =>
-      setTimeout(() => setVisibleNodes(i + 1), 300 + i * 100)
-    );
-    const connTimer = setTimeout(() => setConnectionsLit(true), 300 + nodes.length * 100 + 400);
+    const t1 = setTimeout(() => setPhase(1), 400);
+    const t2 = setTimeout(() => setPhase(2), 1200);
+    const t3 = setTimeout(() => setPhase(3), 2000);
 
-    const flowTimers = dataFlows.map((f, i) => {
-      const show = setTimeout(() => setActiveFlows(prev => new Set([...prev, i])), f.delay);
-      const hide = setTimeout(() => setActiveFlows(prev => {
-        const n = new Set(prev);
-        n.delete(i);
-        return n;
-      }), f.delay + 1400);
-      return [show, hide];
-    }).flat();
-
-    const loopInterval = setInterval(() => {
-      dataFlows.forEach((f, i) => {
-        setTimeout(() => setActiveFlows(prev => new Set([...prev, i])), f.delay - 2000);
-        setTimeout(() => setActiveFlows(prev => {
-          const n = new Set(prev);
-          n.delete(i);
-          return n;
-        }), f.delay - 2000 + 1400);
-      });
-    }, 8000);
+    const pulseLoop = setInterval(() => {
+      setPulseIdx(p => (p + 1) % orbitNodes.length);
+    }, 1800);
 
     return () => {
-      nodeTimers.forEach(clearTimeout);
-      clearTimeout(connTimer);
-      flowTimers.forEach(clearTimeout);
-      clearInterval(loopInterval);
+      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
+      clearInterval(pulseLoop);
     };
   }, []);
 
+  const size = 280; // viewBox logical size
+  const cx = size / 2;
+  const cy = size / 2;
+  const r1 = 100;
+
   return (
-    <div className="relative p-3 sm:p-4">
-      {/* Center glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 sm:w-40 sm:h-40 rounded-full bg-primary/6 blur-[50px] animate-[pulse_8s_ease-in-out_infinite]" />
+    <div className="relative aspect-square max-w-[380px] mx-auto">
+      {/* Ambient glow layers */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="w-48 h-48 rounded-full bg-primary/[0.06] blur-[60px] animate-[pulse_6s_ease-in-out_infinite]" />
+      </div>
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="w-28 h-28 rounded-full bg-[hsl(260_70%_60%/0.08)] blur-[40px] animate-[pulse_4s_ease-in-out_infinite_1s]" />
+      </div>
 
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 relative">
-        {nodes.map((node, i) => {
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full relative z-10">
+        <defs>
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(239 84% 67%)" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="hsl(239 84% 67%)" stopOpacity="0" />
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="hsl(239 84% 67%)" stopOpacity="0.15" />
+            <stop offset="50%" stopColor="hsl(260 70% 60%)" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="hsl(239 84% 67%)" stopOpacity="0.1" />
+          </linearGradient>
+        </defs>
+
+        {/* Center glow */}
+        <circle cx={cx} cy={cy} r="60" fill="url(#centerGlow)" />
+
+        {/* Orbit ring */}
+        <circle
+          cx={cx} cy={cy} r={r1}
+          fill="none"
+          stroke="url(#ringGrad)"
+          strokeWidth="1"
+          className={cn(
+            "transition-all duration-1000",
+            phase >= 1 ? "opacity-100" : "opacity-0"
+          )}
+          strokeDasharray="4 6"
+        />
+
+        {/* Connection lines from center to nodes */}
+        {orbitNodes.map((node, i) => {
+          const rad = (node.angle * Math.PI) / 180;
+          const nx = cx + r1 * Math.cos(rad);
+          const ny = cy + r1 * Math.sin(rad);
+          return (
+            <line
+              key={`line-${i}`}
+              x1={cx} y1={cy} x2={nx} y2={ny}
+              stroke="hsl(239 84% 67%)"
+              strokeOpacity={pulseIdx === i ? 0.35 : 0.08}
+              strokeWidth={pulseIdx === i ? 1.5 : 0.5}
+              className="transition-all duration-700"
+            />
+          );
+        })}
+
+        {/* Pulse traveling dot */}
+        {pulseIdx >= 0 && phase >= 2 && (() => {
+          const node = orbitNodes[pulseIdx];
+          const rad = (node.angle * Math.PI) / 180;
+          const nx = cx + r1 * Math.cos(rad);
+          const ny = cy + r1 * Math.sin(rad);
+          return (
+            <circle r="2.5" fill="hsl(239 84% 67%)" filter="url(#glow)">
+              <animate
+                attributeName="cx"
+                from={cx} to={nx}
+                dur="0.8s" fill="freeze"
+                key={`px-${pulseIdx}`}
+              />
+              <animate
+                attributeName="cy"
+                from={cy} to={ny}
+                dur="0.8s" fill="freeze"
+                key={`py-${pulseIdx}`}
+              />
+              <animate
+                attributeName="opacity"
+                values="1;1;0" dur="1.2s" fill="freeze"
+                key={`po-${pulseIdx}`}
+              />
+            </circle>
+          );
+        })()}
+
+        {/* Center brain node */}
+        <g className={cn(
+          "transition-all duration-700",
+          phase >= 1 ? "opacity-100" : "opacity-0"
+        )}>
+          <circle cx={cx} cy={cy} r="28" fill="white" stroke="hsl(239 84% 67%)" strokeWidth="1.5" strokeOpacity="0.3" />
+          <circle cx={cx} cy={cy} r="28" fill="hsl(239 84% 67%)" fillOpacity="0.06" />
+          {/* Rotating ring */}
+          <circle
+            cx={cx} cy={cy} r="34"
+            fill="none" stroke="hsl(239 84% 67%)" strokeWidth="0.8" strokeOpacity="0.15"
+            strokeDasharray="8 16"
+          >
+            <animateTransform attributeName="transform" type="rotate" from={`0 ${cx} ${cy}`} to={`360 ${cx} ${cy}`} dur="20s" repeatCount="indefinite" />
+          </circle>
+        </g>
+
+        {/* Orbit nodes */}
+        {orbitNodes.map((node, i) => {
+          const rad = (node.angle * Math.PI) / 180;
+          const nx = cx + r1 * Math.cos(rad);
+          const ny = cy + r1 * Math.sin(rad);
           const Icon = node.icon;
-          const visible = i < visibleNodes;
+          const isActive = pulseIdx === i;
 
           return (
-            <div
-              key={node.id}
+            <g
+              key={node.label}
               className={cn(
-                "relative flex flex-col items-center gap-1.5 sm:gap-2 p-2.5 sm:p-3.5 rounded-xl border transition-all duration-500",
-                visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-95",
-                node.center
-                  ? "bg-gradient-to-br from-primary/12 to-primary/6 border-primary/25 shadow-[0_0_24px_hsl(239_84%_67%/0.1),inset_0_1px_0_hsl(0_0%_100%/0.5)] ring-1 ring-primary/10"
-                  : "bg-white border-slate-200/80 shadow-sm hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-300"
+                "transition-all duration-500",
+                phase >= 2 ? "opacity-100" : "opacity-0"
               )}
-              style={{ transitionDelay: `${i * 100}ms` }}
+              style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <div className={cn(
-                "w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center transition-all duration-500",
-                node.center
-                  ? "bg-primary/20 text-primary"
-                  : "bg-slate-50 text-slate-400 group-hover:text-slate-600"
-              )}>
-                <Icon className={cn("w-3.5 h-3.5 sm:w-4.5 sm:h-4.5", node.center && "drop-shadow-[0_0_4px_hsl(239_84%_67%/0.4)]")} />
-              </div>
-              <span className={cn(
-                "text-[9px] sm:text-[11px] font-semibold tracking-wide",
-                node.center ? "text-primary" : "text-slate-500"
-              )}>
+              {/* Active glow */}
+              {isActive && (
+                <circle cx={nx} cy={ny} r="22" fill="hsl(239 84% 67%)" fillOpacity="0.08" className="animate-[pulse_1.5s_ease-in-out]" />
+              )}
+              <circle
+                cx={nx} cy={ny} r="18"
+                fill="white"
+                stroke={isActive ? "hsl(239 84% 67%)" : "hsl(220 14% 85%)"}
+                strokeWidth={isActive ? 1.5 : 1}
+                className="transition-all duration-300"
+                filter={isActive ? "url(#glow)" : undefined}
+              />
+              {/* Icon placeholder — foreignObject */}
+              <foreignObject x={nx - 10} y={ny - 10} width="20" height="20">
+                <div className="w-full h-full flex items-center justify-center">
+                  <Icon className={cn(
+                    "w-[12px] h-[12px] transition-colors duration-300",
+                    isActive ? "text-primary" : "text-slate-400"
+                  )} />
+                </div>
+              </foreignObject>
+              {/* Label */}
+              <text
+                x={nx} y={ny + 28}
+                textAnchor="middle"
+                className={cn(
+                  "text-[8px] font-semibold transition-all duration-300 fill-current",
+                  isActive ? "fill-primary" : "fill-slate-400"
+                )}
+              >
                 {node.label}
-              </span>
-
-              {connectionsLit && !node.center && (
-                <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary shadow-[0_0_8px_hsl(239_84%_67%/0.5)]" />
-              )}
-            </div>
+              </text>
+            </g>
           );
         })}
 
-        {/* Connection lines — subtle animated grid */}
-        {connectionsLit && (
-          <div className="absolute inset-0 pointer-events-none">
-            {[0, 1, 2].map(row => (
-              <div
-                key={`h-${row}`}
-                className="absolute h-px"
-                style={{
-                  top: `${(row * 33.33) + 16.66}%`,
-                  left: '8%',
-                  right: '8%',
-                  background: 'linear-gradient(90deg, transparent, hsl(239 84% 67% / 0.12), hsl(239 84% 67% / 0.2), hsl(239 84% 67% / 0.12), transparent)',
-                }}
-              />
-            ))}
-            {[0, 1, 2].map(col => (
-              <div
-                key={`v-${col}`}
-                className="absolute w-px"
-                style={{
-                  left: `${(col * 33.33) + 16.66}%`,
-                  top: '8%',
-                  bottom: '8%',
-                  background: 'linear-gradient(180deg, transparent, hsl(239 84% 67% / 0.12), hsl(239 84% 67% / 0.2), hsl(239 84% 67% / 0.12), transparent)',
-                }}
-              />
-            ))}
+        {/* Center brain icon */}
+        <foreignObject x={cx - 14} y={cy - 14} width="28" height="28">
+          <div className="w-full h-full flex items-center justify-center">
+            <Brain className="w-[18px] h-[18px] text-primary drop-shadow-[0_0_6px_hsl(239_84%_67%/0.4)]" />
           </div>
-        )}
+        </foreignObject>
+      </svg>
+
+      {/* Floating metric cards */}
+      <div className={cn(
+        "absolute top-3 right-2 sm:top-4 sm:right-3 flex flex-col gap-1.5 transition-all duration-700",
+        phase >= 3 ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+      )}>
+        {metrics.map((m, i) => (
+          <div
+            key={m.label}
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/90 backdrop-blur-sm border border-slate-100 shadow-sm"
+            style={{ transitionDelay: `${i * 100 + 200}ms` }}
+          >
+            <span className="text-[11px] sm:text-xs font-bold text-slate-900 font-mono">{m.value}</span>
+            <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium">{m.label}</span>
+            <ArrowUpRight className={cn(
+              "w-2.5 h-2.5",
+              m.trend === "up" ? "text-emerald-500" : "text-emerald-500 rotate-180"
+            )} />
+          </div>
+        ))}
       </div>
 
-      {/* Floating data labels */}
-      <div className="absolute inset-0 pointer-events-none">
-        {dataFlows.map((flow, i) => {
-          const positions = [
-            { top: '22%', left: '18%' },
-            { top: '58%', right: '12%' },
-            { bottom: '22%', left: '28%' },
-            { top: '38%', left: '53%' },
-          ];
-          return (
-            <div
-              key={i}
-              className={cn(
-                "absolute px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[9px] sm:text-[10px] font-mono font-bold text-primary transition-all duration-600",
-                activeFlows.has(i) ? "opacity-100 scale-100" : "opacity-0 scale-75"
-              )}
-              style={positions[i]}
-            >
-              {flow.text}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Status bar */}
-      <div className="mt-3 flex items-center justify-center gap-2 px-3 py-1.5 sm:py-2 rounded-lg bg-slate-50 border border-slate-100">
-        <Cpu className="w-3 h-3 text-primary/50" />
-        <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 tracking-[0.15em] uppercase">
-          Neural Processing Engine
+      {/* Bottom status */}
+      <div className={cn(
+        "absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 shadow-sm transition-all duration-700",
+        phase >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
+      )}>
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_hsl(142_76%_36%/0.5)] animate-[pulse_2s_ease-in-out_infinite]" />
+        <span className="text-[9px] sm:text-[10px] font-semibold text-slate-400 tracking-[0.1em] uppercase whitespace-nowrap">
+          AI Engine Active
         </span>
-        <span className="text-[9px] sm:text-[10px] text-slate-300">•</span>
-        <div className="flex items-center gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_hsl(142_76%_36%/0.5)]" />
-          <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-500">Active</span>
-        </div>
       </div>
     </div>
   );
