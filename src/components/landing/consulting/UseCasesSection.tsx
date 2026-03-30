@@ -242,7 +242,7 @@ export function UseCasesSection() {
                   <button key={i} onClick={() => setActiveCase(i)} className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap shrink-0 transition-all",
                     activeCase === i
-                      ? "bg-slate-700 text-slate-100 ring-1 ring-emerald-500/40"
+                      ? "bg-slate-700 text-slate-100 ring-1 ring-primary/40"
                       : "bg-slate-800/60 text-slate-400 hover:bg-slate-700/60"
                   )}>
                     <span>{u.icon}</span>
