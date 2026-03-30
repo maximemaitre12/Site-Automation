@@ -159,7 +159,7 @@ export function MethodSection() {
                           {isVisible ? stat.pct : 0}%
                         </span>
                       </div>
-                      <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                      <div className="h-1 rounded-full bg-slate-100 overflow-hidden">
                         <div
                           className={cn("h-full rounded-full transition-all duration-1000 ease-out", a.bar)}
                           style={{
