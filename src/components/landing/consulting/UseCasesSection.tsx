@@ -41,7 +41,7 @@ const useCases = [
 function Sparkline({ points, color }: { points: number[]; color: string }) {
   const max = Math.max(...points);
   const pts = points.map((v, i) => `${i * 12},${24 - (v / max) * 20}`).join(" ");
-  const strokeColor = color === "blue" ? "#60a5fa" : color === "purple" ? "#a78bfa" : "#34d399";
+  const strokeColor = color === "blue" ? "hsl(200,80%,55%)" : color === "purple" ? "hsl(260,70%,60%)" : "hsl(239,84%,67%)";
   return (
     <svg width="48" height="24" viewBox="0 0 48 24" className="shrink-0">
       <polyline fill="none" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={pts} />
