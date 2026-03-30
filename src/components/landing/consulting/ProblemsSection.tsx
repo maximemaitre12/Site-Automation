@@ -27,7 +27,7 @@ export function ProblemsSection() {
   const potential = "340K€";
 
   return (
-    <section className="py-20 sm:py-28 bg-slate-50 relative overflow-hidden">
+    <section className="py-20 sm:py-28 bg-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.2)_1px,transparent_1px)] bg-[length:32px_32px]" />
       
       <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
