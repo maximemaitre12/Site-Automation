@@ -279,10 +279,10 @@ export function UseCasesSection() {
                 <div className="p-3 mt-auto">
                   <div className="text-[9px] uppercase tracking-wider text-slate-600 font-mono mb-1">Active datasets</div>
                   <div className="flex gap-1">
-                    {useCases.map((_, i) => (
+                     {useCases.map((_, i) => (
                       <div key={i} className={cn(
                         "w-2 h-2 rounded-full transition-colors",
-                        activeCase === i ? "bg-emerald-400" : "bg-slate-700"
+                        activeCase === i ? "bg-primary" : "bg-slate-700"
                       )} />
                     ))}
                   </div>
