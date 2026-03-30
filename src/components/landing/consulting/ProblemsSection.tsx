@@ -3,178 +3,143 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 const problems = [
-  { label: "Processus trop longs ou manuels", shortLabel: "Processus manuels", icon: "⏱" },
-  { label: "Difficulté à recruter sur postes critiques", shortLabel: "Recrutement lent", icon: "👥" },
-  { label: "Tâches répétitives à faible valeur", shortLabel: "Tâches répétitives", icon: "🔄" },
-  { label: "Manque de visibilité sur les flux", shortLabel: "Flux opaques", icon: "👁" },
-  { label: "Opérations peu structurées", shortLabel: "Non structuré", icon: "📋" },
+  { label: "Processus trop longs", severity: 85, color: "destructive" },
+  { label: "Recrutement lent", severity: 70, color: "destructive" },
+  { label: "Tâches répétitives", severity: 90, color: "destructive" },
+  { label: "Flux opaques", severity: 65, color: "destructive" },
+  { label: "Non structuré", severity: 75, color: "destructive" },
 ];
 
-function ProblemsDiagram({ isVisible }: { isVisible: boolean }) {
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [scanY, setScanY] = useState(0);
+function BottleneckDiagram({ isVisible }: { isVisible: boolean }) {
+  const [scanY, setScanY] = useState(-30);
+  const [detectedCount, setDetectedCount] = useState(0);
 
   useEffect(() => {
     if (!isVisible) return;
-    const interval = setInterval(() => {
-      setScanY((prev) => {
-        if (prev >= 400) { clearInterval(interval); return 400; }
+    let frame: number;
+    const animate = () => {
+      setScanY(prev => {
+        if (prev >= 320) return 320;
         return prev + 2;
       });
-    }, 16);
-    return () => clearInterval(interval);
+      frame = requestAnimationFrame(animate);
+    };
+    const timeout = setTimeout(() => { frame = requestAnimationFrame(animate); }, 300);
+    return () => { clearTimeout(timeout); cancelAnimationFrame(frame); };
   }, [isVisible]);
 
   useEffect(() => {
-    if (!isVisible) return;
     problems.forEach((_, i) => {
-      const threshold = 30 + i * 75;
-      if (scanY >= threshold) {
-        setActiveIndex((prev) => Math.max(prev, i));
+      const nodeY = 30 + i * 60;
+      if (scanY >= nodeY && detectedCount <= i) {
+        setDetectedCount(i + 1);
       }
     });
-  }, [scanY, isVisible]);
-
-  const nodeHeight = 44;
-  const gap = 75;
-  const startY = 50;
+  }, [scanY, detectedCount]);
 
   return (
-    <svg viewBox="0 0 360 430" className="w-full max-w-sm mx-auto" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 340 340" className="w-full max-w-[340px] mx-auto" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="scan-problems" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="scan-red" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="hsl(var(--destructive))" stopOpacity="0" />
           <stop offset="50%" stopColor="hsl(var(--destructive))" stopOpacity="0.3" />
           <stop offset="100%" stopColor="hsl(var(--destructive))" stopOpacity="0" />
         </linearGradient>
-        <filter id="red-glow">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
+        <filter id="alert-glow">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
 
-      {/* Vertical connection line */}
-      <line
-        x1="180" y1={startY + nodeHeight / 2}
-        x2="180" y2={startY + (problems.length - 1) * gap + nodeHeight / 2}
-        stroke="hsl(var(--muted-foreground))"
-        strokeWidth="1.5"
-        strokeDasharray="6 6"
-        opacity="0.15"
-      />
+      {/* Flow pipe - main vertical */}
+      <rect x="155" y="10" width="30" height="320" rx="15" fill="hsl(var(--muted) / 0.3)" stroke="hsl(var(--muted-foreground) / 0.08)" strokeWidth="1" />
 
       {/* Scan beam */}
-      {isVisible && scanY < 400 && (
-        <rect x="20" y={scanY - 20} width="320" height="40" fill="url(#scan-problems)" />
+      {isVisible && scanY < 320 && (
+        <rect x="10" y={scanY - 25} width="320" height="50" fill="url(#scan-red)" />
       )}
 
-      {/* Nodes */}
+      {/* Problem nodes */}
       {problems.map((p, i) => {
-        const isActive = i <= activeIndex;
-        const cy = startY + i * gap;
+        const y = 30 + i * 60;
+        const detected = i < detectedCount;
+        const barWidth = (p.severity / 100) * 100;
+
         return (
           <g key={i}>
-            {/* Connection dots */}
-            {i < problems.length - 1 && (
-              <circle
-                cx="180" cy={cy + nodeHeight / 2 + gap / 2}
-                r="3"
-                fill={isActive ? "hsl(var(--destructive) / 0.4)" : "hsl(var(--muted-foreground) / 0.15)"}
-                className="transition-all duration-500"
-              />
-            )}
-
-            {/* Pulse ring */}
-            {isActive && (
-              <rect
-                x="35" y={cy - 4}
-                width="290" height={nodeHeight + 8}
-                rx="14"
-                fill="none"
-                stroke="hsl(var(--destructive))"
-                strokeWidth="1"
-                opacity="0"
-              >
-                <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="3" />
-              </rect>
-            )}
-
-            {/* Node background */}
+            {/* Bottleneck indicator on pipe */}
             <rect
-              x="40" y={cy}
-              width="280" height={nodeHeight}
-              rx="10"
-              fill={isActive ? "hsl(var(--destructive) / 0.06)" : "hsl(var(--muted) / 0.5)"}
-              stroke={isActive ? "hsl(var(--destructive) / 0.35)" : "hsl(var(--muted-foreground) / 0.1)"}
-              strokeWidth={isActive ? 1.5 : 1}
-              className="transition-all duration-600"
+              x="152" y={y - 3}
+              width="36" height="26"
+              rx="4"
+              fill={detected ? "hsl(var(--destructive) / 0.15)" : "transparent"}
+              stroke={detected ? "hsl(var(--destructive) / 0.5)" : "transparent"}
+              strokeWidth="1.5"
+              className="transition-all duration-500"
             />
 
-            {/* Warning indicator */}
-            {isActive && (
-              <circle
-                cx="62" cy={cy + nodeHeight / 2}
-                r="10"
-                fill="hsl(var(--destructive) / 0.12)"
-                stroke="hsl(var(--destructive) / 0.4)"
-                strokeWidth="1"
-                filter="url(#red-glow)"
-              >
-                <animate attributeName="r" values="8;11;8" dur="1.5s" repeatCount="indefinite" />
-              </circle>
-            )}
-            {isActive && (
-              <text
-                x="62" y={cy + nodeHeight / 2 + 1}
-                textAnchor="middle" dominantBaseline="middle"
-                className="text-[8px]"
-              >
-                ⚠
-              </text>
+            {/* X mark for blockage */}
+            {detected && (
+              <g filter="url(#alert-glow)">
+                <text x="170" y={y + 11} textAnchor="middle" dominantBaseline="middle" className="text-[12px] select-none" fill="hsl(var(--destructive))">✕</text>
+              </g>
             )}
 
-            {/* Label */}
-            <text
-              x="90" y={cy + nodeHeight / 2 + 1}
-              dominantBaseline="middle"
-              className={cn(
-                "text-[11px] font-medium transition-colors duration-500 select-none",
-                isActive ? "fill-destructive" : "fill-muted-foreground"
+            {/* Label + severity bar extending right */}
+            <g className={cn("transition-all duration-600", detected ? "opacity-100" : "opacity-0")} style={{ transitionDelay: `${i * 100}ms` }}>
+              {/* Connector line */}
+              <line x1="190" y1={y + 10} x2="210" y2={y + 10} stroke="hsl(var(--destructive) / 0.3)" strokeWidth="1" strokeDasharray="3 2" />
+
+              {/* Label */}
+              <text x="215" y={y + 6} className="text-[10px] font-semibold fill-foreground select-none">{p.label}</text>
+
+              {/* Severity bar */}
+              <rect x="215" y={y + 13} width={detected ? barWidth : 0} height="5" rx="2.5" fill="hsl(var(--destructive) / 0.5)" className="transition-all duration-800" style={{ transitionDelay: `${i * 150 + 300}ms` }} />
+              <rect x="215" y={y + 13} width="100" height="5" rx="2.5" fill="hsl(var(--destructive) / 0.08)" />
+
+              {/* Severity % */}
+              {detected && (
+                <text x={218 + barWidth + 5} y={y + 18} className="text-[8px] font-bold fill-destructive select-none">{p.severity}%</text>
               )}
-            >
-              {p.shortLabel}
-            </text>
+            </g>
 
-            {/* Status bar */}
-            <rect
-              x="250" y={cy + nodeHeight / 2 - 3}
-              width={isActive ? "50" : "0"}
-              height="6"
-              rx="3"
-              fill="hsl(var(--destructive) / 0.3)"
-              className="transition-all duration-700"
-              style={{ transitionDelay: `${i * 100}ms` }}
-            />
+            {/* Alert indicator left side */}
+            {detected && (
+              <g>
+                <circle cx="130" cy={y + 10} r="10" fill="hsl(var(--destructive) / 0.1)" stroke="hsl(var(--destructive) / 0.4)" strokeWidth="1">
+                  <animate attributeName="r" values="9;12;9" dur="2s" repeatCount="indefinite" begin={`${i * 0.2}s`} />
+                  <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" begin={`${i * 0.2}s`} />
+                </circle>
+                <text x="130" y={y + 11} textAnchor="middle" dominantBaseline="middle" className="text-[8px] select-none" fill="hsl(var(--destructive))">⚠</text>
+              </g>
+            )}
           </g>
         );
       })}
+
+      {/* Score badge */}
+      {detectedCount >= problems.length && (
+        <g className="animate-fade-in">
+          <rect x="20" y="300" width="90" height="28" rx="14" fill="hsl(var(--destructive) / 0.1)" stroke="hsl(var(--destructive) / 0.3)" strokeWidth="1" />
+          <text x="65" y="315" textAnchor="middle" dominantBaseline="middle" className="text-[9px] font-bold fill-destructive select-none">
+            {detectedCount} blocages
+          </text>
+        </g>
+      )}
     </svg>
   );
 }
 
 export function ProblemsSection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
 
   return (
     <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(var(--destructive)/0.03),transparent_60%)]" />
-      
-      <div ref={ref} className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+
+      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
-          "text-center mb-12 sm:mb-16 transition-all duration-500",
+          "text-center mb-10 sm:mb-14 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-3">
@@ -182,40 +147,36 @@ export function ProblemsSection() {
             <span className="text-destructive">ralentissent</span> votre activité
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-            Dans de nombreuses organisations, des points de friction freinent la performance sans être toujours identifiés.
+            Notre scan identifie les points de friction cachés dans vos flux opérationnels.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-[1fr,1.1fr] gap-10 md:gap-14 items-center">
-          {/* Diagram — prominent */}
+        <div className="grid md:grid-cols-[1fr,1fr] gap-8 md:gap-12 items-center">
+          {/* Diagram */}
           <div className={cn(
-            "order-2 md:order-1 transition-all duration-700",
+            "transition-all duration-700",
             isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
           )}>
-            <ProblemsDiagram isVisible={isVisible} />
+            <BottleneckDiagram isVisible={isVisible} />
           </div>
 
-          {/* Text list */}
-          <div className="order-1 md:order-2 space-y-5">
+          {/* Text */}
+          <div className="space-y-4">
             {problems.map((p, i) => (
               <div
                 key={i}
                 className={cn(
-                  "flex items-start gap-4 p-3 rounded-lg transition-all duration-500",
-                  isVisible ? "opacity-100 translate-y-0 bg-destructive/3" : "opacity-0 translate-y-4"
+                  "flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-card/40 transition-all duration-500",
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 )}
-                style={{ transitionDelay: `${i * 120}ms` }}
+                style={{ transitionDelay: `${i * 100 + 200}ms` }}
               >
-                <span className="text-lg">{p.icon}</span>
-                <p className="text-sm sm:text-base text-foreground leading-relaxed">{p.label}</p>
+                <div className="w-10 h-10 rounded-lg bg-destructive/8 flex items-center justify-center shrink-0">
+                  <span className="text-destructive font-bold text-sm">{p.severity}%</span>
+                </div>
+                <p className="text-sm text-foreground font-medium">{p.label}</p>
               </div>
             ))}
-            <p className={cn(
-              "text-sm text-muted-foreground italic pt-2 border-l-2 border-destructive/30 pl-4 transition-all duration-500",
-              isVisible ? "opacity-100" : "opacity-0"
-            )} style={{ transitionDelay: "700ms" }}>
-              Ces inefficacités ont un impact direct sur vos coûts, vos délais et votre capacité à exécuter.
-            </p>
           </div>
         </div>
       </div>
