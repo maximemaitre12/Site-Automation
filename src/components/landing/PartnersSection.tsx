@@ -330,7 +330,7 @@ export function PartnersSection() {
                     )}>{t}</span>
                   ))}
                 </div>
-                <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
+                <span className="text-[9px] font-mono text-primary flex items-center gap-1">
                   <Activity className="w-3 h-3" />
                   4/4 connected
                 </span>
