@@ -55,7 +55,7 @@ export function HeroSection() {
             </h1>
 
             <p
-              className="text-base sm:text-lg text-slate-500 max-w-lg leading-relaxed mb-10 animate-cloud-fade-in"
+              className="text-base sm:text-lg text-slate-500 max-w-lg mx-auto leading-relaxed mb-10 animate-cloud-fade-in"
               style={{ animationDelay: "0.15s", opacity: 0 }}
             >
               Nous identifions et corrigeons les inefficacités dans vos processus critiques, avec des résultats concrets et mesurables dès les premières semaines.
