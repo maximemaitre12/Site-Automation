@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { HeroDiagram } from "./consulting/HeroDiagram";
+
 import { useCountUp } from "@/hooks/useCountUp";
 
 const stats = [
@@ -34,7 +34,7 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 w-full relative z-10">
-        <div className="grid lg:grid-cols-[1fr,1.1fr] gap-12 lg:gap-20 items-center">
+        <div className="max-w-2xl mx-auto text-center">
           {/* Text */}
           <div className="animate-cloud-fade-in">
             {/* Premium badge */}
@@ -55,14 +55,14 @@ export function HeroSection() {
             </h1>
 
             <p
-              className="text-base sm:text-lg text-slate-500 max-w-lg leading-relaxed mb-10 animate-cloud-fade-in"
+              className="text-base sm:text-lg text-slate-500 max-w-lg mx-auto leading-relaxed mb-10 animate-cloud-fade-in"
               style={{ animationDelay: "0.15s", opacity: 0 }}
             >
               Nous identifions et corrigeons les inefficacités dans vos processus critiques, avec des résultats concrets et mesurables dès les premières semaines.
             </p>
 
             <div
-              className="flex flex-col sm:flex-row items-start gap-4 animate-cloud-fade-in"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-cloud-fade-in"
               style={{ animationDelay: "0.3s", opacity: 0 }}
             >
               <a href="mailto:contact@aether-connect.com">
@@ -83,19 +83,6 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Diagram */}
-          <div
-            className="animate-cloud-fade-in"
-            style={{ animationDelay: "0.2s", opacity: 0 }}
-          >
-            <div className="relative">
-              {/* Glow ring behind diagram */}
-              <div className="absolute -inset-6 bg-gradient-to-br from-primary/[0.04] via-transparent to-[hsl(260_70%_60%/0.04)] rounded-3xl blur-2xl" />
-              <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-[0_8px_40px_hsl(220_20%_50%/0.08)] p-2">
-                <HeroDiagram />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Stats bar */}
