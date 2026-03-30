@@ -94,7 +94,7 @@ function AnimatedBar({ percent, visible }: { percent: number; visible: boolean }
         className="h-full rounded-full transition-all duration-[1.5s] ease-out"
         style={{
           width: visible ? `${abs}%` : "0%",
-          background: "linear-gradient(90deg, #ef4444 0%, #f59e0b 40%, #10b981 100%)",
+          background: "linear-gradient(90deg, hsl(260,70%,60%) 0%, hsl(200,80%,55%) 40%, hsl(239,84%,67%) 100%)",
         }}
       />
     </div>
