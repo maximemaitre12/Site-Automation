@@ -34,18 +34,16 @@ function MiniChart({ trend, isVisible }: { trend: number[]; isVisible: boolean }
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-10" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="hsl(239 84% 67%)" stopOpacity="0.3" />
+        <linearGradient id="chart-grad-light" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="hsl(239 84% 67%)" stopOpacity="0.15" />
           <stop offset="100%" stopColor="hsl(239 84% 67%)" stopOpacity="0" />
         </linearGradient>
       </defs>
-      {/* Fill area */}
       <path
         d={`${pathD} L ${w} ${h} L 0 ${h} Z`}
-        fill="url(#chart-grad)"
+        fill="url(#chart-grad-light)"
         className={cn("transition-opacity duration-1000", isVisible ? "opacity-100" : "opacity-0")}
       />
-      {/* Line */}
       <path
         d={pathD}
         fill="none"
@@ -70,21 +68,21 @@ function MetricCard({ metric, isVisible, delay }: {
   return (
     <div
       className={cn(
-        "rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm p-5 sm:p-6 transition-all duration-600",
+        "rounded-xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6 transition-all duration-600",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
       )}
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white tabular-nums">
+          <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tabular-nums">
             +{formattedCount}
           </div>
-          <div className="text-xs sm:text-sm text-white/40 mt-1">{metric.label}</div>
+          <div className="text-xs sm:text-sm text-slate-500 mt-1">{metric.label}</div>
         </div>
-        <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20">
-          <TrendingUp className="w-3 h-3 text-emerald-400" />
-          <span className="text-[10px] font-semibold text-emerald-400">↑</span>
+        <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 border border-emerald-200">
+          <TrendingUp className="w-3 h-3 text-emerald-500" />
+          <span className="text-[10px] font-semibold text-emerald-500">↑</span>
         </div>
       </div>
       <MiniChart trend={metric.trend} isVisible={isVisible} />
@@ -96,9 +94,9 @@ export function ImpactSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   return (
-    <section className="py-20 sm:py-28 bg-[#0a0e1f] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(0_0%_100%/0.02)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <section className="py-20 sm:py-28 bg-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
@@ -106,7 +104,7 @@ export function ImpactSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Performance</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-3">
             Des gains mesurables sur vos opérations
           </h2>
         </div>
