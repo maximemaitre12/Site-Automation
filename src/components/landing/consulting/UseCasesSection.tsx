@@ -329,7 +329,7 @@ export function UseCasesSection() {
                         <div className="flex-1">
                           <AnimatedBar percent={Math.abs(kpi.delta)} visible={isVisible} />
                         </div>
-                        <span className="text-[10px] font-mono font-bold text-emerald-400 shrink-0 w-10 text-right">
+                        <span className="text-[10px] font-mono font-bold text-primary shrink-0 w-10 text-right">
                           {kpi.delta > 0 ? "+" : ""}{kpi.delta}%
                         </span>
                       </div>
