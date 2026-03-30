@@ -1,64 +1,59 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useCountUp } from "@/hooks/useCountUp";
 import { cn } from "@/lib/utils";
-import { TrendingUp } from "lucide-react";
+import { MacWindow } from "../MacWindow";
+import { useState } from "react";
 
 const metrics = [
   {
-    value: 40, suffix: "%", label: "Réduction des délais",
+    name: "Délais opérationnels", value: 40, suffix: "%", prefix: "+",
+    color: "hsl(142 71% 45%)", barColor: "from-emerald-400 to-emerald-500",
     trend: [20, 35, 28, 45, 38, 60, 55, 78, 72, 90],
+    threads: 142, idle: "8.2%",
   },
   {
-    value: 60, suffix: "%", label: "Gain de productivité",
+    name: "Productivité équipes", value: 60, suffix: "%", prefix: "+",
+    color: "hsl(239 84% 67%)", barColor: "from-primary to-[hsl(260_70%_60%)]",
     trend: [15, 25, 30, 40, 42, 55, 60, 68, 75, 85],
+    threads: 89, idle: "3.1%",
   },
   {
-    value: 3, suffix: "×", label: "Vitesse d'analyse",
+    name: "Vitesse d'analyse", value: 3, suffix: "×", prefix: "",
+    color: "hsl(38 92% 50%)", barColor: "from-amber-400 to-orange-400",
     trend: [10, 18, 22, 35, 45, 52, 65, 72, 80, 92],
+    threads: 256, idle: "12.4%",
   },
   {
-    value: 25, suffix: "%", label: "Économies identifiées",
+    name: "Économies identifiées", value: 25, suffix: "%", prefix: "+",
+    color: "hsl(280 70% 55%)", barColor: "from-purple-400 to-violet-500",
     trend: [12, 20, 18, 30, 35, 42, 50, 58, 65, 80],
+    threads: 67, idle: "5.7%",
   },
 ];
 
-function MiniChart({ trend, isVisible }: { trend: number[]; isVisible: boolean }) {
-  const w = 120, h = 40;
-  const points = trend.map((v, i) => ({
-    x: (i / (trend.length - 1)) * w,
-    y: h - (v / 100) * h,
-  }));
-  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-  const totalLength = 300;
+const tabs = ["CPU", "Mémoire", "Réseau", "Énergie"];
 
+function Sparkline({ trend, color, isVisible }: { trend: number[]; color: string; isVisible: boolean }) {
+  const w = 80, h = 24;
+  const pts = trend.map((v, i) => `${(i / (trend.length - 1)) * w},${h - (v / 100) * h}`).join(" ");
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-10" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="chart-grad-light" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="hsl(239 84% 67%)" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="hsl(239 84% 67%)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path
-        d={`${pathD} L ${w} ${h} L 0 ${h} Z`}
-        fill="url(#chart-grad-light)"
-        className={cn("transition-opacity duration-1000", isVisible ? "opacity-100" : "opacity-0")}
-      />
-      <path
-        d={pathD}
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-20 h-6" preserveAspectRatio="none">
+      <polyline
+        points={pts}
         fill="none"
-        stroke="hsl(239 84% 67%)"
+        stroke={color}
         strokeWidth="1.5"
         strokeLinecap="round"
-        strokeDasharray={totalLength}
-        strokeDashoffset={isVisible ? 0 : totalLength}
+        strokeLinejoin="round"
+        strokeDasharray={isVisible ? "0" : "300"}
+        strokeDashoffset={isVisible ? "0" : "300"}
         className="transition-all duration-[2000ms] ease-out"
       />
     </svg>
   );
 }
 
-function MetricCard({ metric, isVisible, delay }: {
+function MetricRow({ metric, isVisible, delay }: {
   metric: typeof metrics[0]; isVisible: boolean; delay: number;
 }) {
   const { formattedCount } = useCountUp({
@@ -68,37 +63,65 @@ function MetricCard({ metric, isVisible, delay }: {
   return (
     <div
       className={cn(
-        "rounded-xl border border-slate-200 bg-white shadow-sm p-5 sm:p-6 transition-all duration-600",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        "grid grid-cols-[1fr_80px_60px_60px] sm:grid-cols-[1fr_100px_80px_80px] items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 border-b border-slate-100 transition-all duration-500",
+        isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
       )}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tabular-nums">
-            +{formattedCount}
-          </div>
-          <div className="text-xs sm:text-sm text-slate-500 mt-1">{metric.label}</div>
-        </div>
-        <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 border border-emerald-200">
-          <TrendingUp className="w-3 h-3 text-emerald-500" />
-          <span className="text-[10px] font-semibold text-emerald-500">↑</span>
-        </div>
+      <div className="flex items-center gap-2 min-w-0">
+        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: metric.color }} />
+        <span className="text-xs font-medium text-slate-700 truncate">{metric.name}</span>
       </div>
-      <MiniChart trend={metric.trend} isVisible={isVisible} />
+      <Sparkline trend={metric.trend} color={metric.color} isVisible={isVisible} />
+      <span className="font-mono text-xs font-bold text-slate-900 text-right">
+        {metric.prefix}{formattedCount}
+      </span>
+      <span className="font-mono text-[10px] text-slate-400 text-right">{metric.idle}</span>
+    </div>
+  );
+}
+
+function CPUHistoryChart({ isVisible }: { isVisible: boolean }) {
+  const points1 = [0,12,8,25,18,35,28,42,38,52,48,62,55,70,65,78,72,85,80,90];
+  const points2 = [5,8,15,10,22,18,28,22,32,28,38,35,42,38,48,42,52,48,58,55];
+  const w = 400, h = 60;
+
+  const toPath = (pts: number[]) =>
+    pts.map((v, i) => `${(i / (pts.length - 1)) * w},${h - (v / 100) * h}`).join(" ");
+
+  return (
+    <div className="px-3 sm:px-4 py-3">
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-mono text-[10px] text-slate-400 uppercase tracking-wider">CPU History</span>
+        <span className="font-mono text-[10px] text-emerald-500">● Active</span>
+      </div>
+      <div className="bg-slate-950 rounded-lg p-2 border border-slate-800">
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-12" preserveAspectRatio="none">
+          {/* Grid lines */}
+          {[0, 25, 50, 75, 100].map(v => (
+            <line key={v} x1="0" y1={h - (v / 100) * h} x2={w} y2={h - (v / 100) * h}
+              stroke="hsl(220 14% 20%)" strokeWidth="0.5" />
+          ))}
+          <polyline points={toPath(points2)} fill="none" stroke="hsl(239 84% 67% / 0.3)"
+            strokeWidth="1" className={cn("transition-all duration-[2500ms]", isVisible ? "opacity-100" : "opacity-0")} />
+          <polyline points={toPath(points1)} fill="none" stroke="hsl(142 71% 45%)"
+            strokeWidth="1.5" strokeLinecap="round"
+            className={cn("transition-all duration-[2500ms]", isVisible ? "opacity-100" : "opacity-0")} />
+        </svg>
+      </div>
     </div>
   );
 }
 
 export function ImpactSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
     <section className="py-20 sm:py-28 bg-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
-      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+      <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
           "text-center mb-10 sm:mb-14 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
@@ -109,10 +132,52 @@ export function ImpactSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-          {metrics.map((m, i) => (
-            <MetricCard key={i} metric={m} isVisible={isVisible} delay={i * 120} />
-          ))}
+        <div className={cn(
+          "transition-all duration-700",
+          isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+        )}>
+          <MacWindow
+            title="AETHER PERFORMANCE MONITOR v3.1"
+            toolbar={
+              <div className="flex items-center gap-1">
+                {tabs.map((tab, i) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(i)}
+                    className={cn(
+                      "px-3 py-1 rounded-md text-[10px] sm:text-[11px] font-medium transition-all",
+                      activeTab === i
+                        ? "bg-primary/10 text-primary border border-primary/20"
+                        : "text-slate-400 hover:text-slate-600"
+                    )}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            }
+            statusBar={
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] text-slate-400">Threads: 554</span>
+                <span className="font-mono text-[10px] text-slate-400">Processus: 312</span>
+                <span className="font-mono text-[10px] text-emerald-500">System: Optimal</span>
+              </div>
+            }
+          >
+            {/* Column headers */}
+            <div className="grid grid-cols-[1fr_80px_60px_60px] sm:grid-cols-[1fr_100px_80px_80px] gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-slate-50/80 border-b border-slate-100">
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Processus</span>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Tendance</span>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider text-right">Gain</span>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider text-right">Idle</span>
+            </div>
+
+            {metrics.map((m, i) => (
+              <MetricRow key={i} metric={m} isVisible={isVisible} delay={i * 150 + 300} />
+            ))}
+
+            <CPUHistoryChart isVisible={isVisible} />
+          </MacWindow>
         </div>
       </div>
     </section>
