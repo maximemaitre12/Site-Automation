@@ -276,10 +276,10 @@ export function PartnersSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Écosystème</p>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-2">
             Nos partenaires
           </h2>
-          <p className="text-sm text-slate-400 max-w-lg mx-auto">
+          <p className="text-sm text-slate-500 max-w-lg mx-auto">
             Nous collaborons avec les leaders du cloud et de la data pour déployer des solutions fiables à grande échelle.
           </p>
         </div>
