@@ -253,8 +253,8 @@ export function UseCasesSection() {
 
               {/* Hero metric */}
               <div className="text-center py-5">
-                <span className="font-mono text-4xl font-black text-emerald-400" style={{
-                  textShadow: "0 0 24px rgba(16,185,129,0.35)"
+              <span className="font-mono text-4xl font-black text-primary" style={{
+                  textShadow: "0 0 24px hsla(239,84%,67%,0.35)"
                 }}>{uc.metric}</span>
                 <p className="text-[11px] text-slate-500 font-mono mt-1">{uc.metricLabel}</p>
               </div>
