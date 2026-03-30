@@ -275,7 +275,7 @@ function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; is
 
       {/* Status */}
       <div className="flex items-center gap-4 text-[10px]">
-        <span className="flex items-center gap-1.5 text-emerald-400">
+        <span className="flex items-center gap-1.5 text-primary">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Connecté
         </span>
