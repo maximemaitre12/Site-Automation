@@ -138,7 +138,7 @@ export function PositioningSection() {
   const code = codeBlocks[activeFile];
 
   return (
-    <section className="py-24 sm:py-32 bg-slate-50 relative overflow-hidden">
+    <section className="py-24 sm:py-32 bg-white relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(239_84%_67%/0.03),transparent_60%)]" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
