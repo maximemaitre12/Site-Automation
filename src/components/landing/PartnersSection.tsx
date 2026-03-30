@@ -156,7 +156,7 @@ function PartnerRow({ partner, index, isActive, onClick, isVisible }: {
   partner: typeof partners[0]; index: number; isActive: boolean;
   onClick: () => void; isVisible: boolean;
 }) {
-  const Icon = partner.icon;
+  
   const delay = index * 100 + 200;
 
   return (
