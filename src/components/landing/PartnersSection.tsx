@@ -71,14 +71,7 @@ const partners = [
       { label: "Latence", value: "< 5ms" },
       { label: "Connectors", value: "120+" },
     ],
-    logo: (
-      <div className="flex items-center gap-1.5">
-        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-3.07c-2.02-.25-3.74-1.35-4.84-2.93l2.1-1.54c.7.97 1.72 1.66 2.74 1.84V8.2c-2.13-.46-4-1.97-4-4.2h2.5c0 1.08.93 1.93 1.5 2.24V2h2.5v4.24c.57-.31 1.5-1.16 1.5-2.24H17c0 2.23-1.87 3.74-4 4.2v3.6c1.02-.18 2.04-.87 2.74-1.84l2.1 1.54c-1.1 1.58-2.82 2.68-4.84 2.93v3.07H11z" fill="currentColor"/>
-        </svg>
-        <span className="text-sm font-semibold text-current">Confluent</span>
-      </div>
-    ),
+    logo: <img src={confluentLogo} alt="Confluent" className="h-8 w-auto object-contain" />,
   },
 ];
 
