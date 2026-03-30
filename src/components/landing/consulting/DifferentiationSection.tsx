@@ -244,7 +244,7 @@ function DetailPane({ cap, isVisible }: { cap: typeof capabilities[0]; isVisible
 
       {/* System status mini-grid */}
       <div className="flex items-center gap-4 text-[10px]">
-        <span className="flex items-center gap-1.5 text-emerald-400">
+        <span className="flex items-center gap-1.5 text-primary">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Opérationnel
         </span>
