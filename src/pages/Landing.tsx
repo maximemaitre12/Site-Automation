@@ -42,7 +42,7 @@ export default function Landing() {
       <ProblemsSection />
       <ImpactSection />
       <PositioningSection />
-      <MethodSection />
+      
       <TrainingsSection />
       <UseCasesSection />
       <DifferentiationSection />
