@@ -1,26 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-import { useCountUp } from "@/hooks/useCountUp";
-
-const stats = [
-  { value: 40, suffix: "+", label: "Missions réalisées" },
-  { value: 15, suffix: "M€", label: "Économies identifiées" },
-  { value: 12, suffix: "", label: "Secteurs couverts" },
-  { value: 98, suffix: "%", label: "Satisfaction client" },
-];
-
-function HeroStat({ value, suffix, label }: { value: number; suffix: string; label: string }) {
-  const { formattedCount } = useCountUp({ end: value, duration: 2000, suffix });
-  return (
-    <div className="text-center group">
-      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tabular-nums transition-colors group-hover:text-primary">
-        {formattedCount}
-      </div>
-      <div className="text-xs sm:text-sm text-slate-400 mt-1 font-medium">{label}</div>
-    </div>
-  );
-}
 
 export function HeroSection() {
   return (
@@ -85,21 +65,6 @@ export function HeroSection() {
 
         </div>
 
-        {/* Stats bar */}
-        <div
-          className="mt-20 sm:mt-24 animate-cloud-fade-in"
-          style={{ animationDelay: "0.5s", opacity: 0 }}
-        >
-          <div className="relative rounded-2xl border border-slate-200/80 bg-white/60 backdrop-blur-sm shadow-[0_2px_20px_hsl(220_20%_50%/0.06)] px-6 py-8 sm:px-10 sm:py-10">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-6">
-              {stats.map((s, i) => (
-                <HeroStat key={i} {...s} />
-              ))}
-            </div>
-            {/* Decorative top line */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent -translate-y-px" />
-          </div>
-        </div>
       </div>
     </section>
   );
