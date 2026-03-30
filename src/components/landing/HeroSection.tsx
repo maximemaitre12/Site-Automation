@@ -4,12 +4,11 @@ import { HeroDiagram } from "./consulting/HeroDiagram";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center bg-background pt-16 md:pt-14 overflow-hidden">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.04),transparent_60%)]" />
+    <section className="relative min-h-[80vh] flex items-center bg-background pt-16 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.05),transparent_60%)]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-20 w-full relative z-10">
-        <div className="grid lg:grid-cols-[1fr,1.3fr] gap-10 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[1fr,1.4fr] gap-8 lg:gap-14 items-center">
           {/* Text */}
           <div className="animate-cloud-fade-in">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 mb-5">
@@ -42,9 +41,9 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Diagram — large and prominent */}
+          {/* Diagram — always visible, large */}
           <div
-            className="animate-cloud-fade-in lg:pl-4"
+            className="animate-cloud-fade-in"
             style={{ animationDelay: "0.2s", opacity: 0 }}
           >
             <HeroDiagram />

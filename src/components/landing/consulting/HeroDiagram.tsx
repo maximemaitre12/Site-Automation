@@ -1,110 +1,167 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-const nodes = [
-  { id: "supply", label: "Supply Chain", cx: 120, cy: 80, r: 38 },
-  { id: "rh", label: "RH", cx: 380, cy: 60, r: 34 },
-  { id: "logistique", label: "Logistique", cx: 200, cy: 240, r: 36 },
-  { id: "ops", label: "Opérations", cx: 440, cy: 220, r: 40 },
-  { id: "finance", label: "Finance", cx: 300, cy: 140, r: 32 },
+const departments = [
+  { id: "supply", label: "Supply Chain", x: 90, y: 55, size: 42 },
+  { id: "rh", label: "RH", x: 310, y: 45, size: 38 },
+  { id: "logistique", label: "Logistique", x: 140, y: 195, size: 40 },
+  { id: "ops", label: "Opérations", x: 380, y: 185, size: 44 },
+  { id: "finance", label: "Finance", x: 240, y: 115, size: 36 },
 ];
 
-const edges = [
-  { from: "supply", to: "finance", path: "M 155 90 Q 220 100 270 130" },
-  { from: "supply", to: "logistique", path: "M 130 118 Q 150 170 195 205" },
-  { from: "finance", to: "rh", path: "M 330 135 Q 350 100 355 70" },
-  { from: "finance", to: "ops", path: "M 330 155 Q 380 190 415 210" },
-  { from: "finance", to: "logistique", path: "M 275 155 Q 240 190 210 215" },
-  { from: "rh", to: "ops", path: "M 400 85 Q 430 140 440 185" },
-  { from: "logistique", to: "ops", path: "M 235 245 Q 330 250 405 230" },
+const connections = [
+  { from: "supply", to: "finance", path: "M 130 65 Q 185 80 210 105" },
+  { from: "supply", to: "logistique", path: "M 100 97 Q 110 140 135 170" },
+  { from: "finance", to: "rh", path: "M 270 110 Q 290 80 295 55" },
+  { from: "finance", to: "ops", path: "M 272 125 Q 325 155 360 170" },
+  { from: "finance", to: "logistique", path: "M 220 130 Q 185 160 155 175" },
+  { from: "rh", to: "ops", path: "M 335 65 Q 365 120 380 155" },
+  { from: "logistique", to: "ops", path: "M 175 200 Q 275 210 350 195" },
+];
+
+// Data packets flowing through the network
+const dataFlows = [
+  { path: "M 130 65 Q 185 80 210 105", speed: 2.2, delay: 0 },
+  { path: "M 272 125 Q 325 155 360 170", speed: 1.8, delay: 0.5 },
+  { path: "M 175 200 Q 275 210 350 195", speed: 2.5, delay: 1 },
+  { path: "M 295 55 Q 290 80 270 110", speed: 2, delay: 1.5 },
+  { path: "M 135 170 Q 110 140 100 97", speed: 2.3, delay: 0.8 },
 ];
 
 export function HeroDiagram() {
-  const [scanY, setScanY] = useState(-20);
+  const [phase, setPhase] = useState(0); // 0=idle, 1=scanning, 2=connected, 3=optimized
+  const [scanProgress, setScanProgress] = useState(0);
   const [activeNodes, setActiveNodes] = useState<Set<string>>(new Set());
-  const [started, setStarted] = useState(false);
+  const [optimizedPaths, setOptimizedPaths] = useState<Set<number>>(new Set());
 
+  // Phase progression
   useEffect(() => {
-    const t = setTimeout(() => setStarted(true), 300);
-    return () => clearTimeout(t);
+    const timers = [
+      setTimeout(() => setPhase(1), 400),
+      setTimeout(() => setPhase(2), 2200),
+      setTimeout(() => setPhase(3), 3200),
+    ];
+    return () => timers.forEach(clearTimeout);
   }, []);
 
+  // Scanning animation
   useEffect(() => {
-    if (!started) return;
+    if (phase < 1) return;
     const interval = setInterval(() => {
-      setScanY((prev) => {
-        if (prev >= 300) { clearInterval(interval); return 300; }
-        return prev + 1.5;
+      setScanProgress(prev => {
+        if (prev >= 100) { clearInterval(interval); return 100; }
+        return prev + 1.2;
       });
     }, 16);
     return () => clearInterval(interval);
-  }, [started]);
+  }, [phase]);
 
+  // Activate nodes as scan passes
   useEffect(() => {
-    nodes.forEach((node) => {
-      if (scanY >= node.cy - 20) {
-        setActiveNodes((prev) => {
-          if (prev.has(node.id)) return prev;
-          return new Set([...prev, node.id]);
+    departments.forEach(dept => {
+      const threshold = (dept.y / 250) * 100;
+      if (scanProgress >= threshold) {
+        setActiveNodes(prev => {
+          if (prev.has(dept.id)) return prev;
+          return new Set([...prev, dept.id]);
         });
       }
     });
-  }, [scanY]);
+  }, [scanProgress]);
+
+  // Optimize paths sequentially
+  useEffect(() => {
+    if (phase < 3) return;
+    connections.forEach((_, i) => {
+      setTimeout(() => setOptimizedPaths(prev => new Set([...prev, i])), i * 200);
+    });
+  }, [phase]);
+
+  const scanY = (scanProgress / 100) * 260;
 
   return (
     <div className="relative">
-      {/* Glow backdrop */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3 rounded-2xl" />
-      
-      <svg
-        viewBox="0 0 560 320"
-        className="w-full relative z-10"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* Background grid */}
+      {/* Ambient glow */}
+      <div className={cn(
+        "absolute inset-0 rounded-2xl transition-opacity duration-1000",
+        phase >= 2 ? "opacity-100" : "opacity-0",
+        "bg-gradient-to-br from-primary/8 via-transparent to-primary/4"
+      )} />
+
+      <svg viewBox="0 0 480 270" className="w-full relative z-10" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <pattern id="hero-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.3" opacity="0.15" />
+          {/* Subtle grid */}
+          <pattern id="hero-grid-v2" width="30" height="30" patternUnits="userSpaceOnUse">
+            <circle cx="15" cy="15" r="0.5" fill="hsl(var(--muted-foreground))" opacity="0.12" />
           </pattern>
-          <linearGradient id="scan-grad" x1="0" y1="0" x2="0" y2="1">
+
+          {/* Scan gradient */}
+          <linearGradient id="scan-beam-v2" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0" />
-            <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
+            <stop offset="40%" stopColor="hsl(var(--primary))" stopOpacity="0.25" />
+            <stop offset="60%" stopColor="hsl(var(--primary))" stopOpacity="0.35" />
             <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
           </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="blur" />
+
+          {/* Node glow */}
+          <filter id="node-glow-v2">
+            <feGaussianBlur stdDeviation="5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+
+          {/* Optimized edge gradient */}
+          <linearGradient id="edge-active-v2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+            <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.3" />
+          </linearGradient>
         </defs>
 
-        <rect width="560" height="320" fill="url(#hero-grid)" rx="12" />
+        {/* Background */}
+        <rect width="480" height="270" fill="url(#hero-grid-v2)" rx="12" />
 
-        {/* Edges */}
-        {edges.map((edge, i) => {
-          const fromActive = activeNodes.has(edge.from);
-          const toActive = activeNodes.has(edge.to);
-          const edgeActive = fromActive && toActive;
+        {/* Scan beam */}
+        {phase >= 1 && scanProgress < 100 && (
+          <g>
+            <rect x="0" y={scanY - 25} width="480" height="50" fill="url(#scan-beam-v2)" />
+            {/* Scan line */}
+            <line x1="0" y1={scanY} x2="480" y2={scanY} stroke="hsl(var(--primary))" strokeWidth="1" opacity="0.5">
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="0.5s" repeatCount="indefinite" />
+            </line>
+          </g>
+        )}
+
+        {/* Connections */}
+        {connections.map((conn, i) => {
+          const fromActive = activeNodes.has(conn.from);
+          const toActive = activeNodes.has(conn.to);
+          const bothActive = fromActive && toActive;
+          const isOptimized = optimizedPaths.has(i);
+
           return (
-            <g key={i}>
+            <g key={`edge-${i}`}>
+              {/* Base path */}
               <path
-                d={edge.path}
+                d={conn.path}
                 fill="none"
-                stroke={edgeActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
-                strokeWidth={edgeActive ? "2" : "1"}
-                strokeDasharray={edgeActive ? "none" : "6 4"}
-                opacity={edgeActive ? 0.6 : 0.15}
+                stroke={isOptimized ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                strokeWidth={isOptimized ? 2 : 1}
+                strokeDasharray={bothActive ? "none" : "4 6"}
+                opacity={isOptimized ? 0.5 : bothActive ? 0.2 : 0.08}
                 className="transition-all duration-700"
               />
-              {edgeActive && (
+
+              {/* Data packets */}
+              {isOptimized && (
                 <>
-                  <circle r="3.5" fill="hsl(var(--primary))" filter="url(#glow)">
-                    <animateMotion dur="2.5s" repeatCount="indefinite" path={edge.path} />
+                  <circle r="3.5" fill="hsl(var(--primary))" filter="url(#node-glow-v2)" opacity="0.9">
+                    <animateMotion dur={`${2 + i * 0.3}s`} repeatCount="indefinite" path={conn.path} />
                   </circle>
                   <circle r="2" fill="hsl(var(--primary))" opacity="0.4">
-                    <animateMotion dur="2.5s" repeatCount="indefinite" path={edge.path} begin="0.8s" />
+                    <animateMotion dur={`${2 + i * 0.3}s`} repeatCount="indefinite" path={conn.path} begin={`${0.7 + i * 0.1}s`} />
                   </circle>
                 </>
               )}
@@ -112,82 +169,81 @@ export function HeroDiagram() {
           );
         })}
 
-        {/* Scan beam */}
-        {started && scanY < 300 && (
-          <rect
-            x="0"
-            y={scanY - 15}
-            width="560"
-            height="30"
-            fill="url(#scan-grad)"
-            className="transition-none"
-          />
-        )}
+        {/* Department nodes */}
+        {departments.map(dept => {
+          const isActive = activeNodes.has(dept.id);
+          const isOptimized = phase >= 3;
 
-        {/* Nodes */}
-        {nodes.map((node) => {
-          const isActive = activeNodes.has(node.id);
           return (
-            <g key={node.id}>
-              {/* Outer pulse ring */}
-              {isActive && (
-                <circle
-                  cx={node.cx}
-                  cy={node.cy}
-                  r={node.r}
-                  fill="none"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth="1"
-                  opacity="0"
-                >
-                  <animate attributeName="r" values={`${node.r};${node.r + 16};${node.r + 20}`} dur="2.5s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.5;0.1;0" dur="2.5s" repeatCount="indefinite" />
+            <g key={dept.id}>
+              {/* Outer pulse */}
+              {isActive && isOptimized && (
+                <circle cx={dept.x} cy={dept.y} r={dept.size} fill="none" stroke="hsl(var(--primary))" strokeWidth="1" opacity="0">
+                  <animate attributeName="r" values={`${dept.size};${dept.size + 18};${dept.size + 22}`} dur="3s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.4;0.08;0" dur="3s" repeatCount="indefinite" />
                 </circle>
               )}
 
-              {/* Background circle */}
+              {/* Background fill */}
               <circle
-                cx={node.cx}
-                cy={node.cy}
-                r={node.r}
-                fill={isActive ? "hsl(var(--primary) / 0.12)" : "hsl(var(--muted) / 0.8)"}
-                stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.15)"}
-                strokeWidth={isActive ? 2 : 1}
-                className="transition-all duration-600"
-                filter={isActive ? "url(#glow)" : undefined}
+                cx={dept.x} cy={dept.y} r={dept.size}
+                fill={isActive ? "hsl(var(--primary) / 0.08)" : "hsl(var(--muted) / 0.6)"}
+                stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.12)"}
+                strokeWidth={isActive ? 2 : 0.8}
+                className="transition-all duration-700"
+                filter={isActive && isOptimized ? "url(#node-glow-v2)" : undefined}
               />
 
-              {/* Status indicator */}
+              {/* Status dot */}
               {isActive && (
-                <circle
-                  cx={node.cx + node.r * 0.65}
-                  cy={node.cy - node.r * 0.65}
-                  r="5"
-                  fill="hsl(var(--primary))"
-                  stroke="hsl(var(--background))"
-                  strokeWidth="2"
-                >
-                  <animate attributeName="r" values="4;6;4" dur="1.5s" repeatCount="indefinite" />
-                </circle>
+                <g>
+                  <circle
+                    cx={dept.x + dept.size * 0.6}
+                    cy={dept.y - dept.size * 0.6}
+                    r="6"
+                    fill={isOptimized ? "hsl(var(--primary))" : "hsl(var(--warning))"}
+                    stroke="hsl(var(--background))"
+                    strokeWidth="2"
+                  >
+                    {isOptimized && <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite" />}
+                  </circle>
+                  {/* Checkmark for optimized */}
+                  {isOptimized && (
+                    <text
+                      x={dept.x + dept.size * 0.6}
+                      y={dept.y - dept.size * 0.6 + 1}
+                      textAnchor="middle" dominantBaseline="middle"
+                      className="text-[7px] fill-primary-foreground font-bold select-none"
+                    >
+                      ✓
+                    </text>
+                  )}
+                </g>
               )}
 
               {/* Label */}
               <text
-                x={node.cx}
-                y={node.cy + 1}
-                textAnchor="middle"
-                dominantBaseline="middle"
+                x={dept.x} y={dept.y + 1}
+                textAnchor="middle" dominantBaseline="middle"
                 className={cn(
                   "font-semibold transition-colors duration-500 select-none",
                   isActive ? "fill-primary" : "fill-muted-foreground",
-                  node.r >= 38 ? "text-[11px]" : "text-[10px]"
+                  dept.size >= 42 ? "text-[11px]" : "text-[10px]"
                 )}
               >
-                {node.label}
+                {dept.label}
               </text>
             </g>
           );
         })}
+
+        {/* Phase indicator */}
+        <g className="transition-all duration-500">
+          <rect x="350" y="235" width="120" height="24" rx="12" fill="hsl(var(--primary) / 0.08)" stroke="hsl(var(--primary) / 0.2)" strokeWidth="1" />
+          <text x="410" y="248" textAnchor="middle" dominantBaseline="middle" className="text-[8px] font-semibold fill-primary select-none">
+            {phase < 1 ? "Initialisation…" : phase < 2 ? "Scan en cours…" : phase < 3 ? "Analyse…" : "✓ Optimisé"}
+          </text>
+        </g>
       </svg>
     </div>
   );
