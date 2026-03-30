@@ -84,8 +84,8 @@ const capabilities = [
     tag: "RPT-06",
     desc: "Tableaux de bord auto-générés et personnalisés. Insights narratifs et alertes proactives sur vos KPIs critiques.",
     pct: 85,
-    gradient: "from-[hsl(195,75%,45%)] to-[hsl(210,70%,50%)]",
-    glowColor: "hsl(202,72%,47%)",
+    gradient: "from-[hsl(200,80%,55%)] to-[hsl(260,70%,60%)]",
+    glowColor: "hsl(200,80%,55%)",
     metrics: [
       { label: "Dashboards", value: "∞" },
       { label: "Refresh", value: "Real-time" },
