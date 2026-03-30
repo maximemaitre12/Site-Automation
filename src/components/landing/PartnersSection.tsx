@@ -221,10 +221,8 @@ function PartnerDetail({ partner, isVisible }: { partner: typeof partners[0]; is
       </div>
 
       {/* Logo display */}
-      <div className="rounded-xl bg-white/[0.04] border border-white/5 p-4 mb-5 flex items-center justify-center">
-        <div className="text-slate-400 scale-150 origin-center">
-          {partner.logo}
-        </div>
+      <div className="rounded-xl bg-white/[0.04] border border-white/5 p-6 mb-5 flex items-center justify-center">
+        <img src={partner.logo} alt={partner.logoAlt} className="h-12 w-auto object-contain" />
       </div>
 
       {/* Metrics */}
