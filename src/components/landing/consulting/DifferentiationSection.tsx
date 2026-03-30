@@ -70,8 +70,8 @@ const capabilities = [
     tag: "OPT-05",
     desc: "Amélioration continue et auto-apprentissage. Feedback loops automatiques et ré-entraînement des modèles en production.",
     pct: 92,
-    gradient: "from-[hsl(340,70%,50%)] to-[hsl(320,65%,50%)]",
-    glowColor: "hsl(330,67%,50%)",
+    gradient: "from-primary to-[hsl(260,70%,60%)]",
+    glowColor: "hsl(239,84%,67%)",
     metrics: [
       { label: "Itérations", value: "∞" },
       { label: "Gain/cycle", value: "+3.2%" },
