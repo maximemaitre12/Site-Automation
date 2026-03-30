@@ -2,145 +2,133 @@ import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
-const problems = [
-  { label: "Processus manuels chronophages", severity: 85 },
-  { label: "Recrutement sur postes critiques", severity: 70 },
-  { label: "Tâches répétitives à faible valeur", severity: 90 },
-  { label: "Manque de visibilité sur les flux", severity: 65 },
-  { label: "Organisation non structurée", severity: 75 },
+const processes = [
+  { name: "Gestion des flux logistiques", score: 34, status: "critical" as const },
+  { name: "Processus de recrutement", score: 52, status: "warning" as const },
+  { name: "Reporting financier", score: 28, status: "critical" as const },
+  { name: "Conformité réglementaire", score: 61, status: "warning" as const },
+  { name: "Allocation des ressources", score: 45, status: "critical" as const },
+  { name: "Communication inter-équipes", score: 73, status: "optimal" as const },
 ];
 
-function BottleneckDiagram({ isVisible }: { isVisible: boolean }) {
-  const [revealCount, setRevealCount] = useState(0);
+export function ProblemsSection() {
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
+  const [scannedCount, setScannedCount] = useState(0);
 
   useEffect(() => {
     if (!isVisible) return;
-    const timers = problems.map((_, i) =>
-      setTimeout(() => setRevealCount(i + 1), 400 + i * 350)
+    const timers = processes.map((_, i) =>
+      setTimeout(() => setScannedCount(i + 1), 400 + i * 350)
     );
     return () => timers.forEach(clearTimeout);
   }, [isVisible]);
 
-  return (
-    <svg viewBox="0 0 320 310" className="w-full max-w-[320px] mx-auto" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <filter id="bar-shadow">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
-
-      {/* Vertical axis */}
-      <line x1="110" y1="20" x2="110" y2="290" stroke="hsl(var(--border))" strokeWidth="1" />
-
-      {/* Nodes */}
-      {problems.map((p, i) => {
-        const y = 35 + i * 55;
-        const detected = i < revealCount;
-        const barW = (p.severity / 100) * 180;
-
-        return (
-          <g key={i}>
-            {/* Label left */}
-            <text
-              x="105" y={y + 10}
-              textAnchor="end" dominantBaseline="middle"
-              className={cn(
-                "text-[9px] font-medium transition-all duration-500 select-none",
-                detected ? "fill-foreground" : "fill-muted-foreground/25"
-              )}
-            >
-              {p.label.length > 22 ? p.label.substring(0, 20) + "…" : p.label}
-            </text>
-
-            {/* Bar track */}
-            <rect x="118" y={y + 3} width="180" height="14" rx="3" fill="hsl(var(--muted) / 0.4)" />
-
-            {/* Bar fill */}
-            <rect
-              x="118" y={y + 3}
-              width={detected ? barW : 0}
-              height="14" rx="3"
-              fill="hsl(var(--destructive) / 0.55)"
-              className="transition-all duration-800 ease-out"
-              style={{ transitionDelay: `${i * 100}ms` }}
-            />
-
-            {/* Percentage */}
-            {detected && (
-              <text
-                x={120 + barW + 6} y={y + 11}
-                dominantBaseline="middle"
-                className="text-[8px] font-semibold fill-destructive/70 select-none"
-              >
-                {p.severity}%
-              </text>
-            )}
-
-            {/* Critical indicator dot */}
-            {detected && p.severity >= 80 && (
-              <circle cx="310" cy={y + 10} r="3.5" fill="hsl(var(--destructive) / 0.6)">
-                <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" begin={`${i * 0.15}s`} />
-              </circle>
-            )}
-          </g>
-        );
-      })}
-
-      {/* Legend */}
-      <g>
-        <circle cx="280" cy="300" r="3" fill="hsl(var(--destructive) / 0.6)" />
-        <text x="288" y="301" dominantBaseline="middle" className="text-[7px] fill-muted-foreground select-none">Critique</text>
-      </g>
-    </svg>
-  );
-}
-
-export function ProblemsSection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
+  const criticalCount = processes.filter(p => p.status === "critical").length;
+  const potential = "340K€";
 
   return (
-    <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
-      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+    <section className="py-20 sm:py-28 bg-[#060918] relative overflow-hidden">
+      {/* Grid bg */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(0_0%_100%/0.02)_1px,transparent_1px)] bg-[length:32px_32px]" />
+      
+      <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
           "text-center mb-10 sm:mb-14 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">Diagnostic</p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-3">
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Diagnostic</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">
             Identifier les freins à la performance
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
-            Des points de friction souvent invisibles, mais dont l'impact cumulé est significatif.
+          <p className="text-sm sm:text-base text-white/40 max-w-xl mx-auto">
+            Notre moteur d'analyse détecte les points de friction dans vos opérations.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 md:gap-14 items-center">
-          {/* Diagram */}
-          <div className={cn(
-            "transition-all duration-700",
-            isVisible ? "opacity-100" : "opacity-0"
-          )}>
-            <BottleneckDiagram isVisible={isVisible} />
+        {/* Terminal-style dashboard */}
+        <div className={cn(
+          "rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden transition-all duration-700",
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        )} style={{ transitionDelay: "200ms" }}>
+          {/* Title bar */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+            </div>
+            <span className="text-[10px] sm:text-xs font-mono text-white/30 ml-2 tracking-wider">
+              AETHER DIAGNOSTIC ENGINE v2.4
+            </span>
           </div>
 
-          {/* Description cards */}
-          <div className="space-y-3">
-            {problems.map((p, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "flex items-center gap-4 p-4 rounded-lg border border-border/40 transition-all duration-500",
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-                )}
-                style={{ transitionDelay: `${i * 80 + 200}ms` }}
-              >
-                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                  <span className="text-xs font-semibold text-muted-foreground">{String(i + 1).padStart(2, '0')}</span>
+          {/* Process scan lines */}
+          <div className="p-4 sm:p-6 space-y-3">
+            {processes.map((proc, i) => {
+              const scanned = i < scannedCount;
+              const statusColor = proc.status === "critical"
+                ? "bg-red-500/80 text-red-200"
+                : proc.status === "warning"
+                ? "bg-yellow-500/80 text-yellow-200"
+                : "bg-emerald-500/80 text-emerald-200";
+
+              const barColor = proc.status === "critical"
+                ? "bg-red-500/40"
+                : proc.status === "warning"
+                ? "bg-yellow-500/40"
+                : "bg-emerald-500/40";
+
+              return (
+                <div
+                  key={i}
+                  className={cn(
+                    "flex items-center gap-3 sm:gap-4 transition-all duration-500",
+                    scanned ? "opacity-100" : "opacity-20"
+                  )}
+                >
+                  <span className="text-xs sm:text-sm text-white/60 font-medium w-[45%] sm:w-[40%] truncate">{proc.name}</span>
+                  
+                  {/* Progress bar */}
+                  <div className="flex-1 h-2 bg-white/[0.05] rounded-full overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-700 ease-out", barColor)}
+                      style={{ width: scanned ? `${proc.score}%` : "0%", transitionDelay: `${i * 100}ms` }}
+                    />
+                  </div>
+
+                  {/* Score */}
+                  <span className={cn(
+                    "text-xs font-mono tabular-nums w-8 text-right transition-all duration-300",
+                    scanned ? "opacity-100" : "opacity-0",
+                    proc.status === "critical" ? "text-red-400/80" : proc.status === "warning" ? "text-yellow-400/80" : "text-emerald-400/80"
+                  )}>
+                    {scanned ? `${proc.score}%` : ""}
+                  </span>
+
+                  {/* Status badge */}
+                  <div className={cn(
+                    "px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 whitespace-nowrap",
+                    scanned ? "opacity-100 scale-100" : "opacity-0 scale-75",
+                    statusColor
+                  )}>
+                    {proc.status === "critical" ? "Friction" : proc.status === "warning" ? "À risque" : "Optimal"}
+                  </div>
                 </div>
-                <p className="text-sm text-foreground">{p.label}</p>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+
+          {/* Summary bar */}
+          <div className={cn(
+            "px-4 sm:px-6 py-4 border-t border-white/[0.06] bg-white/[0.02] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 transition-all duration-500",
+            scannedCount >= processes.length ? "opacity-100" : "opacity-0"
+          )}>
+            <span className="text-xs sm:text-sm text-white/50">
+              <span className="text-red-400 font-semibold">{criticalCount} points de friction</span> identifiés
+            </span>
+            <span className="text-xs sm:text-sm text-white/50">
+              Potentiel d'optimisation : <span className="text-primary font-bold">{potential}/an</span>
+            </span>
           </div>
         </div>
       </div>

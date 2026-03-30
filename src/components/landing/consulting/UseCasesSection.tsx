@@ -4,82 +4,98 @@ import { useEffect, useState } from "react";
 
 const useCases = [
   {
-    title: "Recrutement de profils critiques",
-    metric: "45j → 12j",
-    before: ["Tri manuel", "Flux lent", "Admin lourd"],
-    after: ["Tri accéléré", "Flux optimisé", "Automatisé"],
+    sector: "Supply Chain", metric: "−40%", metricLabel: "délais opérationnels",
+    before: { stats: ["72h", "12%", "Manuel"], labels: ["Délai moyen", "Erreur", "Processus"] },
+    after: { stats: ["43h", "3%", "Automatisé"], labels: ["Délai moyen", "Erreur", "Processus"] },
   },
   {
-    title: "Optimisation des processus",
-    metric: "−40% délais",
-    before: ["Répétitif", "Blocages", "Non structuré"],
-    after: ["Simplifié", "Fluidifié", "Structuré"],
+    sector: "Recrutement", metric: "÷3", metricLabel: "temps d'analyse",
+    before: { stats: ["45j", "8/100", "Subjectif"], labels: ["Time-to-hire", "Recall", "Scoring"] },
+    after: { stats: ["15j", "42/100", "IA-assisted"], labels: ["Time-to-hire", "Recall", "Scoring"] },
+  },
+  {
+    sector: "Finance", metric: "+85%", metricLabel: "précision prédictive",
+    before: { stats: ["±22%", "5j", "Tableur"], labels: ["Variance", "Reporting", "Outil"] },
+    after: { stats: ["±4%", "Temps réel", "Dashboard"], labels: ["Variance", "Reporting", "Outil"] },
   },
 ];
 
-function TransformationDiagram({ useCase, isVisible, index }: {
+function SplitCard({ useCase, isVisible, index }: {
   useCase: typeof useCases[0]; isVisible: boolean; index: number;
 }) {
-  const [showAfter, setShowAfter] = useState(false);
+  const [sliderPos, setSliderPos] = useState(0);
 
   useEffect(() => {
     if (!isVisible) return;
-    const timer = setTimeout(() => setShowAfter(true), 700 + index * 400);
+    const timer = setTimeout(() => setSliderPos(100), 600 + index * 300);
     return () => clearTimeout(timer);
   }, [isVisible, index]);
 
   return (
-    <svg viewBox="0 0 300 140" className="w-full" preserveAspectRatio="xMidYMid meet">
-      {/* Before */}
-      <text x="60" y="12" textAnchor="middle" className="text-[8px] font-medium fill-muted-foreground/50 uppercase tracking-wider select-none">Avant</text>
-      {useCase.before.map((label, i) => (
-        <g key={`b-${i}`}>
-          <rect x="10" y={22 + i * 28} width="100" height="22" rx="4"
-            fill={showAfter ? "hsl(var(--muted) / 0.2)" : "hsl(var(--destructive) / 0.04)"}
-            stroke={showAfter ? "hsl(var(--border) / 0.4)" : "hsl(var(--destructive) / 0.15)"}
-            strokeWidth="0.8"
-            className="transition-all duration-700"
-          />
-          <text x="60" y={35 + i * 28} textAnchor="middle" dominantBaseline="middle"
-            className={cn("text-[8px] font-medium select-none transition-all duration-500", showAfter ? "fill-muted-foreground/30" : "fill-muted-foreground/60")}
-          >{label}</text>
-        </g>
-      ))}
+    <div className={cn(
+      "rounded-xl border border-white/[0.08] bg-white/[0.02] backdrop-blur-sm overflow-hidden transition-all duration-600",
+      isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+    )} style={{ transitionDelay: `${index * 180 + 200}ms` }}>
+      {/* Sector label */}
+      <div className="px-5 pt-4 pb-3 flex items-center gap-2">
+        <div className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider text-primary/70 bg-primary/10 border border-primary/15">
+          {useCase.sector}
+        </div>
+      </div>
 
-      {/* Arrow */}
-      <line x1="125" y1="50" x2="165" y2="50"
-        stroke={showAfter ? "hsl(var(--primary))" : "hsl(var(--border))"}
-        strokeWidth="1" opacity={showAfter ? 0.5 : 0.15}
-        className="transition-all duration-500"
-      />
-      {showAfter && (
-        <polygon points="163,46 172,50 163,54" fill="hsl(var(--primary))" opacity="0.5" />
-      )}
+      {/* Split screen */}
+      <div className="relative px-5 pb-4">
+        <div className="grid grid-cols-2 gap-3 relative">
+          {/* Before */}
+          <div className={cn(
+            "rounded-lg p-3 transition-all duration-700",
+            sliderPos > 50 ? "bg-white/[0.02] border border-white/[0.04]" : "bg-red-500/5 border border-red-500/10"
+          )}>
+            <span className="text-[9px] font-mono uppercase tracking-wider text-red-400/60 mb-2 block">Avant</span>
+            {useCase.before.stats.map((stat, j) => (
+              <div key={j} className="flex items-center justify-between py-1">
+                <span className="text-[10px] text-white/30">{useCase.before.labels[j]}</span>
+                <span className={cn(
+                  "text-xs font-mono transition-all duration-500",
+                  sliderPos > 50 ? "text-white/20" : "text-red-400/70"
+                )}>{stat}</span>
+              </div>
+            ))}
+          </div>
 
-      {/* After */}
-      <text x="240" y="12" textAnchor="middle" className="text-[8px] font-medium fill-primary/40 uppercase tracking-wider select-none">Après</text>
-      {useCase.after.map((label, i) => (
-        <g key={`a-${i}`}>
-          <rect x="190" y={22 + i * 28} width="100" height="22" rx="4"
-            fill={showAfter ? "hsl(var(--primary) / 0.05)" : "hsl(var(--muted) / 0.15)"}
-            stroke={showAfter ? "hsl(var(--primary) / 0.2)" : "hsl(var(--border) / 0.3)"}
-            strokeWidth={showAfter ? 1 : 0.8}
-            className="transition-all duration-700"
-          />
-          <text x="240" y={35 + i * 28} textAnchor="middle" dominantBaseline="middle"
-            className={cn("text-[8px] font-medium select-none transition-all duration-500", showAfter ? "fill-foreground/70" : "fill-muted-foreground/20")}
-          >{label}</text>
-        </g>
-      ))}
+          {/* After */}
+          <div className={cn(
+            "rounded-lg p-3 transition-all duration-700",
+            sliderPos > 50 ? "bg-emerald-500/5 border border-emerald-500/10" : "bg-white/[0.02] border border-white/[0.04]"
+          )}>
+            <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-400/60 mb-2 block">Après</span>
+            {useCase.after.stats.map((stat, j) => (
+              <div key={j} className="flex items-center justify-between py-1">
+                <span className="text-[10px] text-white/30">{useCase.after.labels[j]}</span>
+                <span className={cn(
+                  "text-xs font-mono font-semibold transition-all duration-500",
+                  sliderPos > 50 ? "text-emerald-400/80" : "text-white/20"
+                )}>{stat}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {/* Metric badge */}
-      {showAfter && (
-        <g>
-          <rect x="115" y="108" width="70" height="22" rx="11" fill="hsl(var(--primary) / 0.06)" stroke="hsl(var(--primary) / 0.15)" strokeWidth="0.8" />
-          <text x="150" y="120" textAnchor="middle" dominantBaseline="middle" className="text-[8px] font-semibold fill-primary/70 select-none">{useCase.metric}</text>
-        </g>
-      )}
-    </svg>
+        {/* Slider line */}
+        <div className="absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2">
+          <div className={cn(
+            "h-full bg-gradient-to-b from-transparent via-primary/40 to-transparent transition-all duration-700",
+            sliderPos > 50 ? "opacity-100" : "opacity-0"
+          )} />
+        </div>
+      </div>
+
+      {/* Metric */}
+      <div className="px-5 py-4 border-t border-white/[0.06] flex items-baseline gap-2">
+        <span className="text-2xl sm:text-3xl font-bold text-primary tabular-nums">{useCase.metric}</span>
+        <span className="text-xs sm:text-sm text-white/40">{useCase.metricLabel}</span>
+      </div>
+    </div>
   );
 }
 
@@ -87,31 +103,23 @@ export function UseCasesSection() {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
 
   return (
-    <section className="py-20 sm:py-28 bg-background relative overflow-hidden">
-      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6">
+    <section className="py-20 sm:py-28 bg-[#060918] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(239_84%_67%/0.04),transparent_60%)]" />
+
+      <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
           "text-center mb-10 sm:mb-14 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-muted-foreground mb-3">Cas d'usage</p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-foreground mb-3">
-            Transformations concrètes
+          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Transformations</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">
+            Résultats concrets par secteur
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-4 sm:gap-5">
           {useCases.map((uc, i) => (
-            <div
-              key={i}
-              className={cn(
-                "rounded-lg border border-border/40 p-5 sm:p-6 transition-all duration-500 hover:border-primary/20",
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-              )}
-              style={{ transitionDelay: `${i * 180 + 200}ms` }}
-            >
-              <h3 className="text-sm font-semibold text-foreground mb-4">{uc.title}</h3>
-              <TransformationDiagram useCase={uc} isVisible={isVisible} index={i} />
-            </div>
+            <SplitCard key={i} useCase={uc} isVisible={isVisible} index={i} />
           ))}
         </div>
       </div>
