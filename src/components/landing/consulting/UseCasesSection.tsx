@@ -59,7 +59,7 @@ function DatasetRow({ uc, active, onClick, visible, idx }: {
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-2.5 px-3 py-3 text-left transition-all duration-300 border-b border-slate-700/40",
-        active ? "bg-slate-700/50 border-l-2 border-l-emerald-400" : "hover:bg-slate-800/80",
+        active ? "bg-slate-700/50 border-l-2 border-l-primary" : "hover:bg-slate-800/80",
         visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
       )}
       style={{ transitionDelay: `${idx * 120 + 200}ms` }}
