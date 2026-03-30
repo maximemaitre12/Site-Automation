@@ -62,7 +62,7 @@ export function HeroSection() {
             </p>
 
             <div
-              className="flex flex-col sm:flex-row items-start gap-4 animate-cloud-fade-in"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-cloud-fade-in"
               style={{ animationDelay: "0.3s", opacity: 0 }}
             >
               <a href="mailto:contact@aether-connect.com">
