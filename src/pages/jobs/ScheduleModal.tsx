@@ -7,7 +7,7 @@ import { iconCalendar, iconClose } from './icons'
 
 export function ScheduleModal({ candidate, job, onSave, onClose }: {
   candidate: Candidate
-  job: Job
+  job: Job | null
   onSave: (interview: Interview) => void
   onClose: () => void
 }) {
@@ -25,7 +25,7 @@ export function ScheduleModal({ candidate, job, onSave, onClose }: {
     setSaving(true); setError('')
     const res = await api.interviews.create({
       candidate_id: candidate.id,
-      job_id: job.id,
+      job_id: job?.id,
       scheduled_at: form.scheduled_at,
       type: form.type as Interview['type'],
       interviewer: form.interviewer,

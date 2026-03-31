@@ -18,7 +18,7 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
   const [query, setQuery] = useState(job.title)
   const [location, setLocation] = useState(job.location || 'Kyiv')
   const [count, setCount] = useState(5)
-  const [platforms] = useState<string[]>(['work.ua'])
+  const [platforms, setPlatforms] = useState<string[]>(['work.ua'])
   const [salaryMin, setSalaryMin] = useState(job.salary_min || 0)
   const [salaryMax, setSalaryMax] = useState(job.salary_max || 0)
   const [experienceMin, setExperienceMin] = useState(job.experience_years || 0)
@@ -36,6 +36,11 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
   const [parseError, setParseError] = useState('')
   const [parsedFile, setParsedFile] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const ALL_PLATFORMS = ['work.ua', 'robota.ua', 'djinni.co', 'hh.ua']
+  function togglePlatform(p: string) {
+    setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
+  }
 
   async function doSearch() {
     if (!query || platforms.length === 0) return
@@ -131,7 +136,7 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
 
             <div style={{ marginBottom: 12 }}>
               <label className="form-label">{tap.skills}</label>
-              <input className="form-input" value={skills} onChange={e => setSkills(e.target.value)} placeholder="ex: permis C, ADR, logistique" />
+              <input className="form-input" value={skills} onChange={e => setSkills(e.target.value)} placeholder={tap.searchPlaceholder} />
             </div>
 
             <div style={{ marginBottom: 12 }}>
@@ -147,6 +152,25 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
               <div>
                 <label className="form-label">{tap.salaryMax}</label>
                 <input className="form-input" type="number" min={0} step={1000} value={salaryMax} onChange={e => setSalaryMax(+e.target.value)} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label className="form-label">{tap.platforms}</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                {ALL_PLATFORMS.map(p => (
+                  <div
+                    key={p}
+                    onClick={() => togglePlatform(p)}
+                    style={{
+                      padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer',
+                      background: platforms.includes(p) ? 'var(--accent)' : 'var(--surface-2)',
+                      color: platforms.includes(p) ? '#fff' : 'var(--text-2)',
+                      border: `1px solid ${platforms.includes(p) ? 'var(--accent)' : 'var(--border)'}`,
+                      transition: 'all 120ms ease',
+                    }}
+                  >{p}</div>
+                ))}
               </div>
             </div>
 

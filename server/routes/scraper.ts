@@ -472,29 +472,39 @@ router.post('/search', async (req: Request, res: Response) => {
     const finalResults = allResults.slice(0, count)
 
     const insertedIds: number[] = []
+    let toInsert = finalResults
 
     if (jobId && finalResults.length > 0) {
-      const stmt = db.prepare(`
-        INSERT INTO candidates (job_id, initials, role, location, salary_expectation, experience_years, source_platform, profile_url, tags, status, experience_text, profile_data)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?)
-      `)
-      db.exec('BEGIN')
-      try {
-        for (const c of finalResults) {
-          const result = stmt.run(jobId, c.initials, c.role, c.location_text, c.salary_expectation,
-            c.experience_years || 0, c.source_platform, c.profile_url, JSON.stringify(c.tags), c.experience_text || null,
-            c.profile_data ? JSON.stringify(c.profile_data) : null)
-          insertedIds.push(result.lastInsertRowid as number)
-        }
-        db.exec('COMMIT')
-      } catch { db.exec('ROLLBACK') }
+      // Dedup: skip candidates whose profile_url already exists for this job
+      const existingUrls = new Set(
+        (db.prepare('SELECT profile_url FROM candidates WHERE job_id = ? AND profile_url != ""').all(jobId) as { profile_url: string }[])
+          .map(r => r.profile_url),
+      )
+      toInsert = finalResults.filter(c => !c.profile_url || !existingUrls.has(c.profile_url))
+
+      if (toInsert.length > 0) {
+        const stmt = db.prepare(`
+          INSERT INTO candidates (job_id, initials, role, location, salary_expectation, experience_years, source_platform, profile_url, tags, status, experience_text, profile_data)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?)
+        `)
+        db.exec('BEGIN')
+        try {
+          for (const c of toInsert) {
+            const result = stmt.run(jobId, c.initials, c.role, c.location_text, c.salary_expectation,
+              c.experience_years || 0, c.source_platform, c.profile_url, JSON.stringify(c.tags), c.experience_text || null,
+              c.profile_data ? JSON.stringify(c.profile_data) : null)
+            insertedIds.push(result.lastInsertRowid as number)
+          }
+          db.exec('COMMIT')
+        } catch { db.exec('ROLLBACK') }
+      }
     }
 
     db.prepare(`INSERT INTO events (type, job_id, metadata) VALUES ('search_launched', ?, ?)`)
-      .run(jobId || null, JSON.stringify({ jobId, platforms, count: finalResults.length, searchTerm }))
+      .run(jobId || null, JSON.stringify({ jobId, platforms, count: finalResults.length, searchTerm, location }))
 
     res.json({
-      data: finalResults.map((c, i) => ({
+      data: toInsert.map((c, i) => ({
         ...c,
         location: c.location_text,
         experience_years: c.experience_years || 0,

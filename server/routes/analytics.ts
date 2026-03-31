@@ -124,14 +124,30 @@ router.get('/recent', (_req: Request, res: Response) => {
 router.get('/searches', (_req: Request, res: Response) => {
   try {
     const db = getDb()
+    // Scraper writes to events table (type='search_launched'), not searches table
     const rows = db.prepare(`
-      SELECT s.*, j.title as job_title
-      FROM searches s
-      LEFT JOIN jobs j ON s.job_id = j.id
-      ORDER BY s.created_at DESC
+      SELECT e.id, e.job_id, e.metadata, e.created_at, j.title as job_title
+      FROM events e
+      LEFT JOIN jobs j ON j.id = e.job_id
+      WHERE e.type = 'search_launched'
+      ORDER BY e.created_at DESC
       LIMIT 20
-    `).all()
-    res.json({ data: rows })
+    `).all() as { id: number; job_id: number|null; metadata: string; created_at: string; job_title: string|null }[]
+
+    const mapped = rows.map(r => {
+      let meta: Record<string, unknown> = {}
+      try { meta = JSON.parse(r.metadata) } catch { /* ignore */ }
+      return {
+        id: r.id,
+        job_id: r.job_id,
+        job_title: r.job_title,
+        location: (meta.location as string) || '',
+        platforms: Array.isArray(meta.platforms) ? meta.platforms : [meta.platforms].filter(Boolean),
+        candidates_found: (meta.count as number) || 0,
+        created_at: r.created_at,
+      }
+    })
+    res.json({ data: mapped })
   } catch (err: unknown) {
     res.json({ error: (err as Error).message })
   }

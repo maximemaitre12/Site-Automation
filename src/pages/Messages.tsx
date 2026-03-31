@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, Message, Job } from '../api/client'
+import { useAppStore } from '../store/useAppStore'
+import { T } from '../i18n'
 
 const EMPTY_MSG: Partial<Message> = {
   name: '',
@@ -11,6 +13,9 @@ const EMPTY_MSG: Partial<Message> = {
 }
 
 export function Messages() {
+  const { uiLang } = useAppStore()
+  const tm = T[uiLang].messages
+
   const [messages, setMessages] = useState<Message[]>([])
   const [jobs, setJobs] = useState<Job[]>([])
   const [selected, setSelected] = useState<Message | null>(null)
@@ -49,7 +54,7 @@ export function Messages() {
   }
 
   async function save() {
-    if (!form.name?.trim()) { setError('Le nom est requis.'); return }
+    if (!form.name?.trim()) { setError(tm.nameRequired); return }
     setSaving(true)
     setError('')
     const res = isNew
@@ -81,10 +86,10 @@ export function Messages() {
 
   async function generateWithAI() {
     const job = jobs.find((j) => j.id === form.job_id)
-    if (!job) { setError('Associez ce message à un poste pour générer avec l\'IA.'); return }
+    if (!job) { setError(tm.noJobForAI); return }
     setGenerating(true)
     setError('')
-    const fakeCandidate = { role: genRole || 'candidat', source_platform: 'work.ua', experience_years: 0, location: job.location } as import('../api/client').Candidate
+    const fakeCandidate = { role: genRole || 'candidate', source_platform: 'work.ua', experience_years: 0, location: job.location } as import('../api/client').Candidate
     const res = await api.ai.generateMessage(job, fakeCandidate, form.language || 'uk')
     if (res.error) { setError(res.error); setGenerating(false); return }
     if (res.data) {
@@ -102,14 +107,17 @@ export function Messages() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const LANG_LABELS: Record<string, string> = { uk: 'Ukrainien', fr: 'Français', en: 'Anglais' }
+  const langLabel = (code: string) => {
+    const found = tm.langs.find(([k]) => k === code)
+    return found ? found[1] : code
+  }
 
   return (
     <div className="panel-layout">
       <div className="panel-list">
         <div className="panel-list-header">
-          <span className="medium t-13">Messages</span>
-          <button className="btn btn-primary btn-sm" onClick={startNew}>+ Nouveau</button>
+          <span className="medium t-13">{tm.title}</span>
+          <button className="btn btn-primary btn-sm" onClick={startNew}>{tm.new}</button>
         </div>
 
         <div className="panel-list-body">
@@ -118,7 +126,7 @@ export function Messages() {
               <div className="spinner" />
             </div>
           ) : messages.length === 0 ? (
-            <div className="empty-state"><p>Aucun message</p></div>
+            <div className="empty-state"><p>{tm.noMessages}</p></div>
           ) : (
             messages.map((msg) => (
               <div
@@ -127,7 +135,7 @@ export function Messages() {
                 onClick={() => selectMessage(msg)}
               >
                 <div className="list-item-title truncate">{msg.name}</div>
-                <div className="list-item-sub">{LANG_LABELS[msg.language] || msg.language}{msg.ai_generated ? ' · IA' : ''}</div>
+                <div className="list-item-sub">{langLabel(msg.language)}{msg.ai_generated ? tm.aiLabel : ''}</div>
               </div>
             ))
           )}
@@ -137,44 +145,44 @@ export function Messages() {
       <div className="panel-detail">
         {!selected && !isNew ? (
           <div className="empty-state">
-            <p>Sélectionnez un message ou créez-en un nouveau</p>
-            <button className="btn btn-secondary mt-16" onClick={startNew}>Créer un message</button>
+            <p>{tm.selectOrCreate}</p>
+            <button className="btn btn-secondary mt-16" onClick={startNew}>{tm.create}</button>
           </div>
         ) : (
           <div style={{ maxWidth: 640 }}>
             <div className="flex items-center justify-between mb-32">
-              <h2 className="t-22 medium">{isNew ? 'Nouveau message' : form.name}</h2>
+              <h2 className="t-22 medium">{isNew ? tm.newTitle : form.name}</h2>
               <div className="flex gap-8">
                 {!isNew && (
-                  <button className="btn btn-danger btn-sm" onClick={remove}>Supprimer</button>
+                  <button className="btn btn-danger btn-sm" onClick={remove}>{tm.delete}</button>
                 )}
                 <button className="btn btn-ghost btn-sm" onClick={copyBody} disabled={!form.body}>
-                  {copied ? 'Copié !' : 'Copier'}
+                  {copied ? tm.copied : tm.copy}
                 </button>
                 <button className="btn btn-secondary btn-sm" onClick={() => setShowGen((v) => !v)}>
-                  Générer avec l'IA
+                  {tm.generateAI}
                 </button>
                 <button className="btn btn-primary btn-sm" onClick={save} disabled={saving}>
                   {saving ? <span className="spinner" /> : null}
-                  {saving ? 'Enregistrement…' : 'Enregistrer'}
+                  {saving ? tm.saving : tm.save}
                 </button>
               </div>
             </div>
 
             {showGen && (
               <div className="card-sm mb-24">
-                <div className="t-11 c-2 mb-12">Générer un message personnalisé</div>
+                <div className="t-11 c-2 mb-12">{tm.generateTitle}</div>
                 <div className="flex gap-8 items-center">
                   <input
                     className="input flex-1"
-                    placeholder="Profil du candidat (ex. Développeur Python 3 ans d'expérience)"
+                    placeholder={tm.candidateProfilePlaceholder}
                     value={genRole}
                     onChange={(e) => setGenRole(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && generateWithAI()}
                   />
                   <button className="btn btn-primary" onClick={generateWithAI} disabled={generating}>
                     {generating ? <span className="spinner" /> : null}
-                    {generating ? 'Génération…' : 'Générer'}
+                    {generating ? tm.generating : tm.generate}
                   </button>
                 </div>
               </div>
@@ -185,40 +193,40 @@ export function Messages() {
             <div className="flex-col gap-20">
               <div className="form-grid">
                 <div className="field">
-                  <label className="label">Nom du message</label>
-                  <input className="input" value={form.name || ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="ex. Message Work.ua — Dev Backend" />
+                  <label className="label">{tm.labelName}</label>
+                  <input className="input" value={form.name || ''} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder={tm.namePlaceholder} />
                 </div>
                 <div className="field">
-                  <label className="label">Langue</label>
+                  <label className="label">{tm.labelLang}</label>
                   <select className="select" value={form.language || 'uk'} onChange={(e) => setForm((f) => ({ ...f, language: e.target.value }))}>
-                    <option value="uk">Ukrainien</option>
-                    <option value="fr">Français</option>
-                    <option value="en">Anglais</option>
+                    {tm.langs.map(([code, label]) => (
+                      <option key={code} value={code}>{label}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div className="field">
-                <label className="label">Fiche de poste associée</label>
+                <label className="label">{tm.labelJob}</label>
                 <select className="select" value={form.job_id || ''} onChange={(e) => setForm((f) => ({ ...f, job_id: e.target.value ? +e.target.value : undefined }))}>
-                  <option value="">— Aucune —</option>
+                  <option value="">{tm.noJob}</option>
                   {jobs.map((j) => <option key={j.id} value={j.id}>{j.title}</option>)}
                 </select>
               </div>
 
               <div className="field">
-                <label className="label">Sujet (optionnel)</label>
-                <input className="input" value={form.subject || ''} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} placeholder="Objet de l'email ou titre du message" />
+                <label className="label">{tm.labelSubject}</label>
+                <input className="input" value={form.subject || ''} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} placeholder={tm.subjectPlaceholder} />
               </div>
 
               <div className="field">
-                <label className="label">Corps du message</label>
+                <label className="label">{tm.labelBody}</label>
                 <textarea
                   className="textarea"
                   rows={14}
                   value={form.body || ''}
                   onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))}
-                  placeholder="Rédigez votre message ici, ou utilisez la génération IA…"
+                  placeholder={tm.bodyPlaceholder}
                 />
               </div>
             </div>

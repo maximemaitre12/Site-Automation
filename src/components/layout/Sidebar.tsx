@@ -42,18 +42,25 @@ const iconSettings = (
     <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" />
   </svg>
 )
+const iconSearch = (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="6.5" cy="6.5" r="4.5" />
+    <line x1="10.5" y1="10.5" x2="14" y2="14" />
+  </svg>
+)
 
 export function Sidebar() {
   const { currentPage, setPage, uiLang, sidebarOpen } = useAppStore()
   const t = T[uiLang]
 
   const navItems: NavItem[] = [
-    { id: 'dashboard',  label: t.nav.dashboard,  icon: iconDashboard },
-    { id: 'jobs',       label: t.nav.jobs,        icon: iconFile },
-    { id: 'interviews', label: t.nav.interviews,  icon: iconCalendar },
-    { id: 'messages',   label: t.nav.messages,    icon: iconMessage },
-    { id: 'analytics',  label: t.nav.analytics,   icon: iconChart },
-    { id: 'settings',   label: t.nav.settings,    icon: iconSettings },
+    { id: 'dashboard',    label: t.nav.dashboard,    icon: iconDashboard },
+    { id: 'jobs',         label: t.nav.jobs,          icon: iconFile },
+    { id: 'prospecting',  label: t.nav.prospecting,   icon: iconSearch },
+    { id: 'interviews',   label: t.nav.interviews,    icon: iconCalendar },
+    { id: 'messages',     label: t.nav.messages,      icon: iconMessage },
+    { id: 'analytics',    label: t.nav.analytics,     icon: iconChart },
+    { id: 'settings',     label: t.nav.settings,      icon: iconSettings },
   ]
 
   if (!sidebarOpen) {

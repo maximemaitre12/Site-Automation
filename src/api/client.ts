@@ -24,12 +24,14 @@ export const api = {
   jobs: {
     list: () => req<Job[]>('/jobs'),
     withCounts: () => req<(Job & { candidate_count: number })[]>('/jobs/with-counts'),
+    get: (id: number) => req<Job>(`/jobs/${id}`),
     create: (job: Partial<Job>) => req<Job>('/jobs', { method: 'POST', ...body(job) }),
     update: (id: number, job: Partial<Job>) => req<Job>(`/jobs/${id}`, { method: 'PUT', ...body(job) }),
     remove: (id: number) => req<{ success: boolean }>(`/jobs/${id}`, { method: 'DELETE' }),
   },
   candidates: {
     list: (jobId?: number) => req<Candidate[]>(`/candidates${jobId ? `?jobId=${jobId}` : ''}`),
+    get: (id: number) => req<Candidate>(`/candidates/${id}`),
     updateStatus: (id: number, status: string) =>
       req<Candidate>(`/candidates/${id}/status`, { method: 'PUT', ...body({ status }) }),
     updateStage: (id: number, stage: string) =>

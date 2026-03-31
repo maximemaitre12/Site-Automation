@@ -27,6 +27,17 @@ router.get('/', (req: Request, res: Response) => {
   }
 })
 
+router.get('/:id', (req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const candidate = db.prepare('SELECT * FROM candidates WHERE id = ?').get(req.params.id)
+    if (!candidate) return res.json({ error: 'Candidat introuvable' })
+    res.json({ data: candidate })
+  } catch (err: unknown) {
+    res.json({ error: (err as Error).message })
+  }
+})
+
 router.put('/:id/status', (req: Request, res: Response) => {
   try {
     const db = getDb()

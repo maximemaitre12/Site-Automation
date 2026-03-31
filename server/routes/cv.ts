@@ -66,8 +66,8 @@ Réponds UNIQUEMENT en JSON valide sans markdown ni backticks :
       INSERT INTO candidates (
         job_id, initials, role, location, experience_years, experience_text,
         salary_expectation, source_platform, profile_url, tags, profile_data,
-        status, source_type, cv_filename, stage
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'cv_import', '', ?, ?, 'new', 'upload', ?, 'new')
+        status, source_type, cv_filename, cv_text, stage
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'cv_import', '', ?, ?, 'new', 'upload', ?, ?, 'new')
     `).run(
       jobId || null,
       (parsed.initials as string) || 'CV',
@@ -79,6 +79,7 @@ Réponds UNIQUEMENT en JSON valide sans markdown ni backticks :
       JSON.stringify(parsed.tags || []),
       JSON.stringify(profileData || {}),
       filename || 'cv.pdf',
+      mimeType === 'text/plain' ? content : null,
     )
 
     const candidate = db.prepare('SELECT * FROM candidates WHERE id = ?').get(result.lastInsertRowid)

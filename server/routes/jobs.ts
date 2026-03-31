@@ -30,6 +30,17 @@ router.get('/with-counts', (_req: Request, res: Response) => {
   }
 })
 
+router.get('/:id', (req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(req.params.id)
+    if (!job) return res.json({ error: 'Poste introuvable' })
+    res.json({ data: job })
+  } catch (err: unknown) {
+    res.json({ error: (err as Error).message })
+  }
+})
+
 router.post('/', (req: Request, res: Response) => {
   try {
     const db = getDb()

@@ -9,7 +9,7 @@ import { ScheduleModal } from './ScheduleModal'
 
 export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onDelete }: {
   candidate: Candidate
-  job: Job
+  job: Job | null
   onClose: () => void
   onUpdate: (c: Candidate) => void
   onDelete: (id: number) => void
@@ -47,7 +47,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
 
   useEffect(() => {
     if (tab === 'interview') {
-      api.interviews.list(job.id).then(r => {
+      api.interviews.list(job?.id).then(r => {
         if (r.data) setInterviews(r.data.filter(i => i.candidate_id === candidate.id))
       })
     }
@@ -56,7 +56,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
         if (r.data) setMessageHistory(r.data)
       })
     }
-  }, [tab, candidate.id, job.id])
+  }, [tab, candidate.id, job?.id])
 
   const profile = parseProfile(candidate.profile_data)
 
@@ -69,6 +69,7 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
   }
 
   async function generateMessage() {
+    if (!job) { setGenError('No position linked to this candidate.'); return }
     setGenerating(true); setGenError('')
     const res = await api.ai.generateMessage(job, candidate, msgLang)
     if (res.error) { setGenError(res.error); setGenerating(false); return }

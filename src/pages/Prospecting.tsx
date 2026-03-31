@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react'
 import { api, Job, Candidate } from '../api/client'
+import { useAppStore } from '../store/useAppStore'
+import { T } from '../i18n'
 
 const PLATFORMS = ['work.ua', 'robota.ua', 'djinni.co', 'hh.ua']
 const CITIES = ['Kyiv', 'Kharkiv', 'Lviv', 'Odesa', 'Dnipro', 'Zaporizhzhia', 'Vinnytsia', 'Poltava', 'Remote']
-
-const STATUS_LABELS: Record<string, string> = {
-  new: 'nouveau',
-  viewed: 'consulté',
-  contacted: 'contacté',
-  rejected: 'refusé',
-}
 
 const STATUS_CHIP: Record<string, string> = {
   new: '',
@@ -26,14 +21,18 @@ interface CandidateModalProps {
 }
 
 function CandidateModal({ candidate, job, onClose, onStatusChange }: CandidateModalProps) {
+  const { uiLang } = useAppStore()
+  const tp = T[uiLang].prospecting
+
   const [message, setMessage] = useState('')
   const [generating, setGenerating] = useState(false)
   const [genError, setGenError] = useState('')
   const [language, setLanguage] = useState('uk')
   const [copied, setCopied] = useState(false)
+  const langs = T[uiLang].messageLangs
 
   async function generateMessage() {
-    if (!job) { setGenError('Associez ce candidat à un poste pour générer un message.'); return }
+    if (!job) { setGenError(tp.noJobError); return }
     setGenerating(true)
     setGenError('')
     const res = await api.ai.generateMessage(job, candidate, language)
@@ -66,9 +65,9 @@ function CandidateModal({ candidate, job, onClose, onStatusChange }: CandidateMo
           </div>
           <div className="flex gap-8 items-center">
             <span className={`chip ${STATUS_CHIP[candidate.status] || ''}`}>
-              {STATUS_LABELS[candidate.status] || candidate.status}
+              {tp.statusLabels[candidate.status as keyof typeof tp.statusLabels] || candidate.status}
             </span>
-            <button className="btn btn-ghost btn-sm" onClick={onClose}>Fermer</button>
+            <button className="btn btn-ghost btn-sm" onClick={onClose}>{tp.close}</button>
           </div>
         </div>
 
@@ -79,27 +78,27 @@ function CandidateModal({ candidate, job, onClose, onStatusChange }: CandidateMo
           </div>
           <div className="card-sm flex-1 text-center">
             <div className="t-22 medium">{candidate.experience_years || '—'}</div>
-            <div className="t-11 c-2 mt-4">ans d'expérience</div>
+            <div className="t-11 c-2 mt-4">{tp.expYears(candidate.experience_years || 0)}</div>
           </div>
           <div className="card-sm flex-1 text-center">
             <div className="t-13 medium" style={{ paddingTop: 6 }}>{candidate.source_platform}</div>
-            <div className="t-11 c-2 mt-4">plateforme</div>
+            <div className="t-11 c-2 mt-4">{tp.platform}</div>
           </div>
         </div>
 
         <hr className="divider mb-20" />
 
         <div className="flex items-center justify-between mb-12">
-          <span className="t-13 medium">Message de contact</span>
+          <span className="t-13 medium">Message</span>
           <div className="flex gap-8 items-center">
             <select className="select" style={{ width: 'auto', height: 28, fontSize: 11, padding: '0 8px' }} value={language} onChange={(e) => setLanguage(e.target.value)}>
-              <option value="uk">Ukrainien</option>
-              <option value="fr">Français</option>
-              <option value="en">English</option>
+              {langs.map(([code, label]) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
             </select>
             <button className="btn btn-secondary btn-sm" onClick={generateMessage} disabled={generating}>
               {generating ? <span className="spinner" /> : null}
-              {generating ? 'Génération…' : 'Générer avec l\'IA'}
+              {generating ? tp.generating : tp.generateMessage}
             </button>
           </div>
         </div>
@@ -111,17 +110,17 @@ function CandidateModal({ candidate, job, onClose, onStatusChange }: CandidateMo
           rows={8}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Le message généré par l'IA apparaîtra ici. Vous pouvez le modifier avant de le copier."
+          placeholder="…"
         />
 
         <div className="modal-footer">
-          <button className="btn btn-ghost btn-sm" onClick={openProfile}>Voir le profil</button>
+          <button className="btn btn-ghost btn-sm" onClick={openProfile}>{tp.viewProfile}</button>
           <button
             className="btn btn-primary btn-sm"
             onClick={copyMessage}
             disabled={!message}
           >
-            {copied ? 'Copié !' : 'Copier le message'}
+            {copied ? tp.copied : tp.copyMessage}
           </button>
         </div>
       </div>
@@ -130,6 +129,9 @@ function CandidateModal({ candidate, job, onClose, onStatusChange }: CandidateMo
 }
 
 export function Prospecting() {
+  const { uiLang } = useAppStore()
+  const tp = T[uiLang].prospecting
+
   const [jobs, setJobs] = useState<Job[]>([])
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [selectedJob, setSelectedJob] = useState<number | undefined>()
@@ -157,8 +159,8 @@ export function Prospecting() {
   }
 
   async function search() {
-    if (!query.trim()) { setError('Entrez un terme de recherche.'); return }
-    if (platforms.length === 0) { setError('Sélectionnez au moins une plateforme.'); return }
+    if (!query.trim()) { setError(tp.errorQuery); return }
+    if (platforms.length === 0) { setError(tp.errorPlatform); return }
     setSearching(true)
     setError('')
     const res = await api.scraper.search({ query, location, count, platforms, jobId: selectedJob })
@@ -181,13 +183,13 @@ export function Prospecting() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1 className="page-title">Prospection</h1>
-        <p className="page-desc">Recherche de candidats sur Work.ua, Robota.ua, Djinni et HH.ua</p>
+        <h1 className="page-title">{tp.title}</h1>
+        <p className="page-desc">{tp.desc}</p>
       </div>
 
       <div className="search-config">
         <div className="search-config-header" onClick={() => setConfigOpen((v) => !v)}>
-          <span className="t-13 medium">Configuration de recherche</span>
+          <span className="t-13 medium">{tp.configTitle}</span>
           <svg
             width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
             style={{ transform: configOpen ? 'rotate(180deg)' : 'none', transition: 'transform 150ms ease', opacity: 0.5 }}
@@ -200,30 +202,30 @@ export function Prospecting() {
           <div className="search-config-body">
             <div className="form-grid mb-20">
               <div className="field">
-                <label className="label">Terme de recherche</label>
+                <label className="label">{tp.labelQuery}</label>
                 <input
                   className="input"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && search()}
-                  placeholder="ex. Développeur React, Pharmacien, Logisticien"
+                  placeholder={tp.queryPlaceholder}
                 />
               </div>
               <div className="field">
-                <label className="label">Fiche de poste associée (optionnel)</label>
+                <label className="label">{tp.labelJob}</label>
                 <select className="select" value={selectedJob || ''} onChange={(e) => setSelectedJob(e.target.value ? +e.target.value : undefined)}>
-                  <option value="">— Aucune —</option>
+                  <option value="">{tp.noJob}</option>
                   {jobs.map((j) => <option key={j.id} value={j.id}>{j.title}</option>)}
                 </select>
               </div>
               <div className="field">
-                <label className="label">Ville</label>
+                <label className="label">{tp.labelCity}</label>
                 <select className="select" value={location} onChange={(e) => setLocation(e.target.value)}>
                   {CITIES.map((c) => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div className="field">
-                <label className="label">Nombre de résultats</label>
+                <label className="label">{tp.labelCount}</label>
                 <select className="select" value={count} onChange={(e) => setCount(+e.target.value)}>
                   <option value={10}>10</option>
                   <option value={20}>20</option>
@@ -233,7 +235,7 @@ export function Prospecting() {
             </div>
 
             <div className="mb-20">
-              <div className="label mb-8">Plateformes</div>
+              <div className="label mb-8">{tp.labelPlatforms}</div>
               <div className="platform-grid">
                 {PLATFORMS.map((p) => (
                   <div
@@ -251,7 +253,7 @@ export function Prospecting() {
 
             <button className="btn btn-primary mt-20" onClick={search} disabled={searching}>
               {searching ? <span className="spinner" /> : null}
-              {searching ? 'Recherche en cours…' : 'Lancer la recherche'}
+              {searching ? tp.searching : tp.startSearch}
             </button>
           </div>
         )}
@@ -259,19 +261,21 @@ export function Prospecting() {
 
       {candidates.length === 0 ? (
         <div className="empty-state">
-          <p>Aucun candidat trouvé. Lancez une recherche.</p>
+          <p>{tp.noCandidates}</p>
         </div>
       ) : (
         <>
           <div className="flex items-center justify-between mb-16">
-            <span className="t-13 c-2">{candidates.length} profil{candidates.length > 1 ? 's' : ''}</span>
+            <span className="t-13 c-2">{tp.profiles(candidates.length)}</span>
           </div>
           <div className="candidate-grid">
             {candidates.map((c) => (
               <div key={c.id} className="candidate-card" onClick={() => setSelectedCandidate(c)}>
                 <div className="flex items-center justify-between mb-8">
                   <div className="t-15 medium">{c.initials}</div>
-                  <span className={`chip ${STATUS_CHIP[c.status] || ''}`}>{STATUS_LABELS[c.status] || c.status}</span>
+                  <span className={`chip ${STATUS_CHIP[c.status] || ''}`}>
+                    {tp.statusLabels[c.status as keyof typeof tp.statusLabels] || c.status}
+                  </span>
                 </div>
                 <div className="t-13 mb-4 truncate">{c.role}</div>
                 <div className="t-11 c-2">{c.location}</div>

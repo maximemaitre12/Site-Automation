@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Candidate, Job } from '../../api/client'
 import { PLATFORM_COLOR } from './constants'
 import { iconStar, iconTrash } from './icons'
@@ -22,6 +23,7 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
   const { uiLang } = useAppStore()
   const stages = T[uiLang].stages
   const profile = parseProfile(candidate.profile_data)
+  const [showNotes, setShowNotes] = useState(false)
   const platformColor = PLATFORM_COLOR[candidate.source_platform] || 'var(--text-3)'
 
   const scoreColor = candidate.qualification_score == null ? 'var(--text-3)'
@@ -63,15 +65,32 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
           </div>
         </div>
 
-        {/* Score badge — prominent */}
+        {/* Score badge with notes tooltip */}
         {candidate.qualification_score != null ? (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 3,
-            background: scoreColor + '18', color: scoreColor,
-            fontSize: 12, fontWeight: 700, flexShrink: 0,
-            padding: '3px 8px', borderRadius: 8,
-          }}>
-            {iconStar} {candidate.qualification_score}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', gap: 3,
+                background: scoreColor + '18', color: scoreColor,
+                fontSize: 12, fontWeight: 700,
+                padding: '3px 8px', borderRadius: 8, cursor: candidate.qualification_notes ? 'help' : 'default',
+              }}
+              onMouseEnter={() => candidate.qualification_notes && setShowNotes(true)}
+              onMouseLeave={() => setShowNotes(false)}
+            >
+              {iconStar} {candidate.qualification_score}
+            </div>
+            {showNotes && candidate.qualification_notes && (
+              <div style={{
+                position: 'absolute', right: 0, top: '100%', marginTop: 4, zIndex: 20,
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: 10, padding: '8px 12px', boxShadow: 'var(--shadow)',
+                fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5,
+                width: 220, whiteSpace: 'pre-wrap', pointerEvents: 'none',
+              }}>
+                {candidate.qualification_notes}
+              </div>
+            )}
           </div>
         ) : (
           <div style={{
