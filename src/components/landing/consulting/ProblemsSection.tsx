@@ -1,134 +1,54 @@
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { TrendingDown, Package, ClipboardList, Database } from "lucide-react";
 
-const processes = [
-  { name: "Gestion des flux logistiques", score: 34, status: "critical" as const },
-  { name: "Processus de recrutement", score: 52, status: "warning" as const },
-  { name: "Reporting financier", score: 28, status: "critical" as const },
-  { name: "Conformité réglementaire", score: 61, status: "warning" as const },
-  { name: "Allocation des ressources", score: 45, status: "critical" as const },
-  { name: "Communication inter-équipes", score: 73, status: "optimal" as const },
+const challenges = [
+  {
+    icon: TrendingDown,
+    title: "Unreliable forecasts",
+    description: "Your demand forecasts lack accuracy, leading to decisions based on intuition rather than data.",
+  },
+  {
+    icon: Package,
+    title: "Overstocks & stockouts",
+    description: "Balancing product availability with storage costs remains a constant challenge for your teams.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Time-consuming manual processes",
+    description: "Repetitive tasks keep your teams busy with low-value activities instead of focusing on analysis.",
+  },
+  {
+    icon: Database,
+    title: "Underutilized data",
+    description: "You have large volumes of data, but their potential remains largely untapped due to a lack of proper tools.",
+  },
 ];
 
 export function ProblemsSection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.08 });
-  const [scannedCount, setScannedCount] = useState(0);
-
-  useEffect(() => {
-    if (!isVisible) return;
-    const timers = processes.map((_, i) =>
-      setTimeout(() => setScannedCount(i + 1), 400 + i * 350)
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [isVisible]);
-
-  const criticalCount = processes.filter(p => p.status === "critical").length;
-  const potential = "340K€";
-
   return (
-    <section className="py-20 sm:py-28 bg-slate-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_18%/0.4)_1px,transparent_1px)] bg-[length:32px_32px]" />
-      
-      <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-        <div className={cn(
-          "text-center mb-10 sm:mb-14 transition-all duration-500",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-        )}>
-          <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Diagnostic</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-3">
-            Identifier les freins à la performance
-          </h2>
-          <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto">
-            Notre moteur d'analyse détecte les points de friction dans vos opérations.
+    <section className="py-20 sm:py-28 bg-muted/30">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-14">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground mb-4">
+            Sound familiar?
           </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+            Challenges we understand
+          </h2>
         </div>
 
-        {/* Terminal-style dashboard */}
-        <div className={cn(
-          "rounded-xl border border-slate-800 bg-slate-900 shadow-lg overflow-hidden transition-all duration-700",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        )} style={{ transitionDelay: "200ms" }}>
-          {/* Title bar */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-800 bg-slate-900/80">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-              <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+        <div className="grid sm:grid-cols-2 gap-5">
+          {challenges.map((item) => (
+            <div
+              key={item.title}
+              className="bg-card rounded-2xl border border-border/50 p-8 hover:shadow-sm transition-shadow"
+            >
+              <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-6">
+                <item.icon className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
+              <p className="text-muted-foreground leading-relaxed">{item.description}</p>
             </div>
-            <span className="text-[10px] sm:text-xs font-mono text-slate-500 ml-2 tracking-wider">
-              AETHER DIAGNOSTIC ENGINE v2.4
-            </span>
-          </div>
-
-          {/* Process scan lines */}
-          <div className="p-4 sm:p-6 space-y-3">
-            {processes.map((proc, i) => {
-              const scanned = i < scannedCount;
-              const statusColor = proc.status === "critical"
-                ? "bg-red-500 text-white"
-                : proc.status === "warning"
-                ? "bg-amber-500 text-white"
-                : "bg-emerald-500 text-white";
-
-              const barColor = proc.status === "critical"
-                ? "bg-red-500/60"
-                : proc.status === "warning"
-                ? "bg-amber-500/60"
-                : "bg-emerald-500/60";
-
-              return (
-                <div
-                  key={i}
-                  className={cn(
-                    "flex items-center gap-3 sm:gap-4 transition-all duration-500",
-                    scanned ? "opacity-100" : "opacity-20"
-                  )}
-                >
-                  <span className="text-xs sm:text-sm text-slate-300 font-medium w-[45%] sm:w-[40%] truncate">{proc.name}</span>
-                  
-                  {/* Progress bar */}
-                  <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className={cn("h-full rounded-full transition-all duration-700 ease-out", barColor)}
-                      style={{ width: scanned ? `${proc.score}%` : "0%", transitionDelay: `${i * 100}ms` }}
-                    />
-                  </div>
-
-                  {/* Score */}
-                  <span className={cn(
-                    "text-xs font-mono tabular-nums w-8 text-right transition-all duration-300",
-                    scanned ? "opacity-100" : "opacity-0",
-                    proc.status === "critical" ? "text-red-400" : proc.status === "warning" ? "text-amber-400" : "text-emerald-400"
-                  )}>
-                    {scanned ? `${proc.score}%` : ""}
-                  </span>
-
-                  {/* Status badge */}
-                  <div className={cn(
-                    "px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider transition-all duration-300 whitespace-nowrap",
-                    scanned ? "opacity-100 scale-100" : "opacity-0 scale-75",
-                    statusColor
-                  )}>
-                    {proc.status === "critical" ? "Friction" : proc.status === "warning" ? "À risque" : "Optimal"}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Summary bar */}
-          <div className={cn(
-            "px-4 sm:px-6 py-4 border-t border-slate-800 bg-slate-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 transition-all duration-500",
-            scannedCount >= processes.length ? "opacity-100" : "opacity-0"
-          )}>
-            <span className="text-xs sm:text-sm text-slate-400">
-              <span className="text-red-400 font-semibold">{criticalCount} points de friction</span> identifiés
-            </span>
-            <span className="text-xs sm:text-sm text-slate-400">
-              Potentiel d'optimisation : <span className="text-emerald-400 font-bold">{potential}/an</span>
-            </span>
-          </div>
+          ))}
         </div>
       </div>
     </section>

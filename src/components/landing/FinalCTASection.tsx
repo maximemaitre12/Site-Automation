@@ -1,38 +1,24 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { cn } from "@/lib/utils";
+import { ArrowRight, Mail } from "lucide-react";
 
 export function FinalCTASection() {
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.3 });
-
   return (
-    <section className="py-20 sm:py-28 bg-slate-950 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(239_84%_67%/0.08),transparent_60%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
-
-      <div
-        ref={ref}
-        className={cn(
-          "max-w-2xl mx-auto px-4 sm:px-6 text-center relative z-10 transition-all duration-700",
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        )}
-      >
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
-          Identifiez vos leviers d'<span className="text-primary">optimisation</span>
+    <section className="py-20 sm:py-28 bg-muted/30">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-8">
+          Talk to an expert to identify your optimization levers
         </h2>
-        <p className="text-sm sm:text-base text-slate-400 max-w-lg mx-auto mb-8">
-          Échangez avec nous pour analyser vos opérations et identifier des opportunités concrètes d'amélioration.
-        </p>
-        <a href="mailto:contact@aether-connect.com">
-          <Button
-            size="lg"
-            className="h-12 px-10 text-sm font-medium bg-primary hover:bg-primary/90 border border-primary/50 shadow-[0_0_30px_hsl(239_84%_67%/0.3)] hover:shadow-[0_0_40px_hsl(239_84%_67%/0.4)] transition-all"
-          >
-            Planifier un appel
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+
+        <a href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com">
+          <button className="inline-flex items-center gap-3 h-14 px-8 text-base font-medium text-white bg-foreground rounded-full hover:opacity-90 transition-opacity">
+            <Mail className="w-5 h-5" />
+            Schedule a call
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </a>
+
+        <p className="text-sm text-muted-foreground mt-5">
+          No commitment · Response within 24h
+        </p>
       </div>
     </section>
   );
