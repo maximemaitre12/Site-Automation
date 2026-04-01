@@ -46,9 +46,17 @@ export default function Auth() {
     }
   }, [user, navigate, justSignedUp, redirectTo]);
 
+  // Resolve identifier: if no "@", treat as username and append default domain
+  const resolveEmail = (identifier: string) => {
+    const trimmed = identifier.trim();
+    if (trimmed.includes('@')) return trimmed;
+    return `${trimmed}@aether-suite.com`;
+  };
+
   const validateForm = () => {
     try {
-      emailSchema.parse(email);
+      const resolved = resolveEmail(email);
+      emailSchema.parse(resolved);
       if (mode !== 'reset') {
         passwordSchema.parse(password);
       }
@@ -69,8 +77,10 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      const resolvedEmail = resolveEmail(email);
+
       if (mode === 'login') {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(resolvedEmail, password);
         setLoading(false);
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
@@ -83,7 +93,7 @@ export default function Auth() {
           // Navigation is handled by useEffect when user state updates
         }
       } else if (mode === 'signup') {
-        const { error } = await signUp(email, password, name);
+        const { error } = await signUp(resolvedEmail, password, name);
         setLoading(false);
         if (error) {
           if (error.message.includes('already registered')) {
@@ -96,7 +106,7 @@ export default function Auth() {
           toast.success('Account created successfully!');
         }
       } else if (mode === 'reset') {
-        const { error } = await resetPassword(email);
+        const { error } = await resetPassword(resolvedEmail);
         setLoading(false);
         if (error) {
           toast.error(error.message);
@@ -218,11 +228,13 @@ export default function Auth() {
             )}
 
             <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="email" className="text-sm">Email</Label>
+              <Label htmlFor="email" className="text-sm">
+                {mode === 'login' ? 'Email or username' : 'Email'}
+              </Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="you@company.com"
+                type={mode === 'login' ? 'text' : 'email'}
+                placeholder={mode === 'login' ? 'you@company.com or username' : 'you@company.com'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-10 sm:h-11 md:h-12 bg-secondary border-border text-sm"
