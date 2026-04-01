@@ -106,7 +106,7 @@ export default function Auth() {
           toast.success('Account created successfully!');
         }
       } else if (mode === 'reset') {
-        const { error } = await resetPassword(email);
+        const { error } = await resetPassword(resolvedEmail);
         setLoading(false);
         if (error) {
           toast.error(error.message);
