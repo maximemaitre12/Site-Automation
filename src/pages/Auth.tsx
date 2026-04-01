@@ -279,18 +279,6 @@ export default function Auth() {
               </div>
             )}
 
-            {mode === 'login' && (
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked === true)}
-                />
-                <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">
-                  Remember me
-                </Label>
-              </div>
-            )}
 
             <Button type="submit" variant="hero" className="w-full h-10 sm:h-11 md:h-12 text-sm sm:text-base" disabled={loading}>
               {loading ? (
