@@ -228,11 +228,13 @@ export default function Auth() {
             )}
 
             <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="email" className="text-sm">Email</Label>
+              <Label htmlFor="email" className="text-sm">
+                {mode === 'login' ? 'Email or username' : 'Email'}
+              </Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="you@company.com"
+                type={mode === 'login' ? 'text' : 'email'}
+                placeholder={mode === 'login' ? 'you@company.com or username' : 'you@company.com'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-10 sm:h-11 md:h-12 bg-secondary border-border text-sm"
