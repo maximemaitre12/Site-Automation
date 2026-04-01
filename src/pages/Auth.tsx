@@ -93,7 +93,7 @@ export default function Auth() {
           // Navigation is handled by useEffect when user state updates
         }
       } else if (mode === 'signup') {
-        const { error } = await signUp(email, password, name);
+        const { error } = await signUp(resolvedEmail, password, name);
         setLoading(false);
         if (error) {
           if (error.message.includes('already registered')) {
