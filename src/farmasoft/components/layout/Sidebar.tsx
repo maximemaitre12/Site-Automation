@@ -1,5 +1,8 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAppStore, Page } from '../../store/useAppStore'
 import { T } from '../../i18n'
+import { useAuth } from '@/hooks/useAuth'
 
 interface NavItem { id: Page; label: string; icon: JSX.Element }
 
