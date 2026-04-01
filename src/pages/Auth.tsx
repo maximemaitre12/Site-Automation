@@ -46,9 +46,17 @@ export default function Auth() {
     }
   }, [user, navigate, justSignedUp, redirectTo]);
 
+  // Resolve identifier: if no "@", treat as username and append default domain
+  const resolveEmail = (identifier: string) => {
+    const trimmed = identifier.trim();
+    if (trimmed.includes('@')) return trimmed;
+    return `${trimmed}@aether-suite.com`;
+  };
+
   const validateForm = () => {
     try {
-      emailSchema.parse(email);
+      const resolved = resolveEmail(email);
+      emailSchema.parse(resolved);
       if (mode !== 'reset') {
         passwordSchema.parse(password);
       }
