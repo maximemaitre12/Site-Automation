@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemsSection } from "@/components/landing/consulting/ProblemsSection";
@@ -10,26 +7,6 @@ import { DifferentiationSection } from "@/components/landing/consulting/Differen
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 
 export default function Landing() {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && user) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, loading, navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return null;
-  }
 
   return (
     <div className="overflow-x-hidden">
