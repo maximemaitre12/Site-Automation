@@ -817,7 +817,7 @@ async function autoQualifyCandidates(candidateIds: number[], jobId: number, user
 POSITION: ${job.title} | Skills: ${job.skills} | Required exp: ${job.experience_years} years
 CANDIDATE:
 ${candidateLines}
-Respond ONLY in JSON. Write the notes in English: {"score": <0-100>, "notes": "<2-3 key points>"}`;
+Respond ONLY in JSON. Write the notes in Ukrainian (українською мовою): {"score": <0-100>, "notes": "<2-3 key points in Ukrainian>"}`;
 
         const text = await callAI(prompt);
         const cleaned = text.replace(/```json|```/g, "").trim();
