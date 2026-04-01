@@ -448,8 +448,8 @@ Requirements: ${job?.requirements ?? ""}
 CANDIDATE:
 ${candidateLines}
 
-Respond ONLY in valid JSON without markdown. Write the notes in English:
-{"score": <integer 0-100>, "notes": "<2-3 concise key points>"}`;
+Respond ONLY in valid JSON without markdown. Write the notes in Ukrainian (українською мовою):
+{"score": <integer 0-100>, "notes": "<2-3 concise key points in Ukrainian>"}`;
 
       const aiResult = await callAI(prompt);
       const cleaned = aiResult.replace(/```json|```/g, "").trim();
