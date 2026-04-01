@@ -26,7 +26,7 @@ export function DifferentiationSection() {
           <p className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground mb-4">
             Why us
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
             Expertise at the service of your results
           </h2>
         </div>

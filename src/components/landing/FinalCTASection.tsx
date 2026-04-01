@@ -4,7 +4,7 @@ export function FinalCTASection() {
   return (
     <section className="py-20 sm:py-28 bg-muted/30">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-8">
           Talk to an expert to identify your optimization levers
         </h2>
 

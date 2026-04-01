@@ -4,7 +4,7 @@ export function HeroSection() {
   return (
     <section className="min-h-[85vh] flex flex-col justify-center bg-background pt-14">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-32 text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
           Improve your supply chain performance
         </h1>
 
