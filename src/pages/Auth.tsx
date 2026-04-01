@@ -235,7 +235,7 @@ export default function Auth() {
               </Label>
               <Input
                 id="email"
-                type={mode === 'login' ? 'text' : 'email'}
+                type="text"
                 placeholder={mode === 'login' ? 'you@company.com or username' : 'you@company.com'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
