@@ -31,7 +31,7 @@ export function ProblemsSection() {
           <p className="text-xs font-semibold tracking-[0.2em] uppercase text-muted-foreground mb-4">
             Sound familiar?
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
             Challenges we understand
           </h2>
         </div>
