@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 
 import { HeroSection } from "@/components/landing/HeroSection";
 import { ProblemsSection } from "@/components/landing/consulting/ProblemsSection";
