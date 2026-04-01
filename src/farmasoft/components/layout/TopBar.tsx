@@ -1,6 +1,7 @@
 import { useAppStore } from '../../store/useAppStore'
 import { Lang } from '../../i18n'
 import { useNavigate } from 'react-router-dom'
+import farmasoftLogo from '@/assets/farmasoft-logo.svg'
 
 const SIDEBAR_WIDTH = 224
 const SIDEBAR_COLLAPSED_WIDTH = 56
@@ -53,7 +54,7 @@ export function TopBar() {
           {iconMenu}
         </button>
         {sidebarOpen && (
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>Farmasoft</span>
+          <img src={farmasoftLogo} alt="Farmasoft" style={{ height: 28 }} />
         )}
       </div>
 
