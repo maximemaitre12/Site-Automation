@@ -103,9 +103,9 @@ function CodeLine({ line, number, isHighlighted, isVisible, delay }: {
 
     return text.split(/(\b(?:const|class|async|await|new|return|from|export)\b|'[^']*'|\b(?:true|false)\b|\/\/.*$|\d+\.?\d*%?)/g).map((part, i) => {
       if (/^(const|class|async|await|new|return|from|export)$/.test(part)) return <span key={i} className="text-purple-400">{part}</span>;
-      if (/^'[^']*'$/.test(part)) return <span key={i} className="text-[hsl(200,80%,65%)]">{part}</span>;
-      if (/^(true|false)$/.test(part)) return <span key={i} className="text-[hsl(260,70%,70%)]">{part}</span>;
-      if (/^\d+\.?\d*%?$/.test(part)) return <span key={i} className="text-[hsl(200,80%,70%)]">{part}</span>;
+      if (/^'[^']*'$/.test(part)) return <span key={i} className="text-cyan-400">{part}</span>;
+      if (/^(true|false)$/.test(part)) return <span key={i} className="text-orange-400">{part}</span>;
+      if (/^\d+\.?\d*%?$/.test(part)) return <span key={i} className="text-amber-300">{part}</span>;
       return <span key={i} className="text-slate-300">{part}</span>;
     });
   };
@@ -138,8 +138,8 @@ export function PositioningSection() {
   const code = codeBlocks[activeFile];
 
   return (
-    <section className="py-24 sm:py-32 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(239_84%_67%/0.03),transparent_60%)]" />
+    <section className="py-24 sm:py-32 bg-slate-950 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(239_84%_67%/0.06),transparent_60%)]" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
@@ -147,10 +147,10 @@ export function PositioningSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Architecture</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4">
             De la donnée brute à la décision optimisée
           </h2>
-          <p className="text-sm sm:text-base text-slate-500 max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
             Notre IA transforme vos données opérationnelles en leviers d'action concrets, couche par couche.
           </p>
         </div>
@@ -184,13 +184,13 @@ export function PositioningSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">UTF-8 · TypeScript</span>
-                <span className="font-mono text-[10px] text-primary">● Pipeline Active</span>
+                <span className="font-mono text-[10px] text-emerald-400">● Pipeline Active</span>
                 <span className="font-mono text-[10px] text-slate-500">Ln {code.lines.length}, Col 1</span>
               </div>
             }
           >
             <div className="flex min-h-[300px] sm:min-h-[380px]">
-              {/* Sidebar file tree — hidden on small screens */}
+              {/* Sidebar file tree */}
               <div className="hidden sm:block w-44 border-r border-slate-700/40 bg-slate-900/60 py-2 overflow-hidden">
                 <div className="px-3 mb-2">
                   <span className="font-mono text-[9px] uppercase tracking-wider text-slate-500">Explorer</span>

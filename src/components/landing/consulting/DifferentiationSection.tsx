@@ -14,8 +14,8 @@ const capabilities = [
     tag: "PRED-01",
     desc: "Anticipez les risques et opportunités avant vos concurrents grâce à nos modèles prédictifs entraînés sur vos données métier.",
     pct: 94,
-    gradient: "from-[hsl(220,80%,55%)] to-primary",
-    glowColor: "hsl(239,84%,67%)",
+    gradient: "from-purple-500 to-primary",
+    glowColor: "hsl(260,70%,60%)",
     metrics: [
       { label: "Précision", value: "94.2%" },
       { label: "Latence", value: "< 80ms" },
@@ -28,8 +28,8 @@ const capabilities = [
     tag: "AUTO-02",
     desc: "Réduisez les tâches manuelles répétitives. Orchestration intelligente multi-étapes avec validation humaine intégrée.",
     pct: 88,
-    gradient: "from-[hsl(200,80%,55%)] to-[hsl(210,85%,50%)]",
-    glowColor: "hsl(200,80%,55%)",
+    gradient: "from-cyan-500 to-blue-500",
+    glowColor: "hsl(190,80%,50%)",
     metrics: [
       { label: "Workflows", value: "340+" },
       { label: "Temps gagné", value: "62%" },
@@ -42,8 +42,8 @@ const capabilities = [
     tag: "NLP-03",
     desc: "Compréhension contextuelle du langage métier. Extraction d'intentions, sentiment analysis et résumé automatique.",
     pct: 91,
-    gradient: "from-[hsl(260,70%,60%)] to-[hsl(280,60%,55%)]",
-    glowColor: "hsl(260,70%,60%)",
+    gradient: "from-emerald-500 to-teal-500",
+    glowColor: "hsl(160,84%,39%)",
     metrics: [
       { label: "Langues", value: "14" },
       { label: "F1 Score", value: "0.96" },
@@ -56,8 +56,8 @@ const capabilities = [
     tag: "VIS-04",
     desc: "Extraction intelligente de données depuis vos documents : factures, contrats, rapports. OCR + compréhension sémantique.",
     pct: 86,
-    gradient: "from-[hsl(210,85%,50%)] to-primary",
-    glowColor: "hsl(210,85%,50%)",
+    gradient: "from-amber-500 to-orange-500",
+    glowColor: "hsl(38,92%,50%)",
     metrics: [
       { label: "Formats", value: "50+" },
       { label: "Extraction", value: "97%" },
@@ -70,8 +70,8 @@ const capabilities = [
     tag: "OPT-05",
     desc: "Amélioration continue et auto-apprentissage. Feedback loops automatiques et ré-entraînement des modèles en production.",
     pct: 92,
-    gradient: "from-primary to-[hsl(260,70%,60%)]",
-    glowColor: "hsl(239,84%,67%)",
+    gradient: "from-rose-500 to-pink-500",
+    glowColor: "hsl(350,80%,55%)",
     metrics: [
       { label: "Itérations", value: "∞" },
       { label: "Gain/cycle", value: "+3.2%" },
@@ -84,8 +84,8 @@ const capabilities = [
     tag: "RPT-06",
     desc: "Tableaux de bord auto-générés et personnalisés. Insights narratifs et alertes proactives sur vos KPIs critiques.",
     pct: 85,
-    gradient: "from-[hsl(200,80%,55%)] to-[hsl(260,70%,60%)]",
-    glowColor: "hsl(200,80%,55%)",
+    gradient: "from-blue-500 to-indigo-500",
+    glowColor: "hsl(230,80%,55%)",
     metrics: [
       { label: "Dashboards", value: "∞" },
       { label: "Refresh", value: "Real-time" },
@@ -164,7 +164,6 @@ function CapabilityRow({ cap, index, isActive, onClick, isVisible }: {
       )}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      {/* Icon */}
       <div className={cn(
         "w-8 h-8 rounded-lg bg-gradient-to-br flex items-center justify-center shrink-0 ring-1 ring-white/10 transition-shadow",
         cap.gradient
@@ -174,7 +173,6 @@ function CapabilityRow({ cap, index, isActive, onClick, isVisible }: {
         <Icon className="w-4 h-4 text-white" strokeWidth={1.5} />
       </div>
 
-      {/* Label + tag */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-semibold text-slate-300 truncate">{cap.label}</span>
@@ -182,10 +180,7 @@ function CapabilityRow({ cap, index, isActive, onClick, isVisible }: {
         </div>
       </div>
 
-      {/* Sparkline */}
       <Sparkline color={cap.glowColor} delay={delay + 300} isVisible={isVisible} />
-
-      {/* Gauge */}
       <GaugeRing value={cap.pct} color={cap.glowColor} isVisible={isVisible} delay={delay + 200} />
 
       <ChevronRight className={cn(
@@ -201,7 +196,6 @@ function DetailPane({ cap, isVisible }: { cap: typeof capabilities[0]; isVisible
   const Icon = cap.icon;
   return (
     <div className={cn("p-5 lg:p-6 transition-all duration-400", isVisible ? "opacity-100" : "opacity-0")}>
-      {/* Header */}
       <div className="flex items-start gap-4 mb-5">
         <div className={cn(
           "w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center shadow-xl ring-1 ring-white/10 shrink-0",
@@ -218,7 +212,6 @@ function DetailPane({ cap, isVisible }: { cap: typeof capabilities[0]; isVisible
         </div>
       </div>
 
-      {/* Metrics grid */}
       <div className="grid grid-cols-3 gap-2 mb-5">
         {cap.metrics.map((m) => (
           <div key={m.label} className="rounded-xl bg-white/[0.03] border border-white/5 p-3 text-center hover:border-primary/15 transition-colors">
@@ -228,7 +221,6 @@ function DetailPane({ cap, isVisible }: { cap: typeof capabilities[0]; isVisible
         ))}
       </div>
 
-      {/* Performance bar */}
       <div className="mb-5">
         <div className="flex justify-between items-center mb-1.5">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Performance globale</span>
@@ -242,9 +234,8 @@ function DetailPane({ cap, isVisible }: { cap: typeof capabilities[0]; isVisible
         </div>
       </div>
 
-      {/* System status mini-grid */}
       <div className="flex items-center gap-4 text-[10px]">
-        <span className="flex items-center gap-1.5 text-primary">
+        <span className="flex items-center gap-1.5 text-emerald-400">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Opérationnel
         </span>
@@ -304,7 +295,6 @@ function MobileCard({ cap, index, isVisible }: {
         )} />
       </button>
 
-      {/* Expanded content */}
       <div className={cn(
         "transition-all duration-300 overflow-hidden",
         expanded ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
@@ -331,8 +321,8 @@ export function DifferentiationSection() {
   const active = capabilities[activeIndex];
 
   return (
-    <section className="py-16 sm:py-24 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.15)_1px,transparent_1px)] bg-[length:24px_24px]" />
+    <section className="py-16 sm:py-24 bg-slate-950 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_18%/0.4)_1px,transparent_1px)] bg-[length:24px_24px]" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={cn(
@@ -340,10 +330,10 @@ export function DifferentiationSection() {
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
           <p className="text-xs font-medium tracking-[0.25em] uppercase text-primary/60 mb-3">Capacités</p>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
             Technologies IA de pointe
           </h2>
-          <p className="text-sm text-slate-500 max-w-lg mx-auto">
+          <p className="text-sm text-slate-400 max-w-lg mx-auto">
             Six modules d'intelligence artificielle, entraînés et optimisés pour vos opérations.
           </p>
         </div>
@@ -368,7 +358,7 @@ export function DifferentiationSection() {
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-mono text-primary flex items-center gap-1">
+                  <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1">
                     <Activity className="w-3 h-3" />
                     6/6 active
                   </span>
@@ -378,7 +368,7 @@ export function DifferentiationSection() {
             statusBar={
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] text-slate-500">6 modules · avg {Math.round(capabilities.reduce((a, c) => a + c.pct, 0) / capabilities.length)}% perf</span>
-                <span className="font-mono text-[10px] text-primary flex items-center gap-1">
+                <span className="font-mono text-[10px] text-emerald-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
                   Tous systèmes opérationnels
                 </span>
@@ -394,7 +384,6 @@ export function DifferentiationSection() {
 
             {/* ── DESKTOP ── */}
             <div className="hidden sm:grid sm:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr]">
-              {/* Left list */}
               <div className="border-r border-slate-700/30 bg-slate-900/40">
                 <div className="px-4 py-2.5 border-b border-slate-700/20">
                   <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-800/60">
@@ -414,7 +403,6 @@ export function DifferentiationSection() {
                 ))}
               </div>
 
-              {/* Right detail */}
               <DetailPane cap={active} isVisible={isVisible} />
             </div>
           </MacWindow>
