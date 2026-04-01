@@ -5,7 +5,7 @@ export function HeroSection() {
     <section className="min-h-[85vh] flex flex-col justify-center bg-background pt-14">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 md:py-32 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1] mb-6">
-          Improve your supply chain performance with AI
+          Improve your supply chain performance
         </h1>
 
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
