@@ -9,7 +9,7 @@ export function FinalCTASection() {
         </h2>
 
         <a href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com">
-          <button className="inline-flex items-center gap-3 h-14 px-8 text-base font-medium text-white bg-foreground rounded-full hover:opacity-90 transition-opacity">
+          <button className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white bg-foreground rounded-full hover:opacity-90 transition-opacity">
             <Mail className="w-5 h-5" />
             Schedule a call
             <ArrowRight className="w-4 h-4" />
