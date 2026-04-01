@@ -1,8 +1,8 @@
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 import { MacWindow } from "../MacWindow";
-import { useState, useEffect, useRef } from "react";
-import { ChevronRight, TrendingDown, TrendingUp, Activity } from "lucide-react";
+import { useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 const useCases = [
   {
@@ -41,7 +41,7 @@ const useCases = [
 function Sparkline({ points, color }: { points: number[]; color: string }) {
   const max = Math.max(...points);
   const pts = points.map((v, i) => `${i * 12},${24 - (v / max) * 20}`).join(" ");
-  const strokeColor = color === "blue" ? "hsl(200,80%,55%)" : color === "purple" ? "hsl(260,70%,60%)" : "hsl(239,84%,67%)";
+  const strokeColor = color === "blue" ? "hsl(210,80%,55%)" : color === "purple" ? "hsl(260,70%,60%)" : "hsl(160,84%,39%)";
   return (
     <svg width="48" height="24" viewBox="0 0 48 24" className="shrink-0">
       <polyline fill="none" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={pts} />
@@ -71,16 +71,13 @@ function DatasetRow({ uc, active, onClick, visible, idx }: {
           <span className={cn(
             "text-[8px] font-bold tracking-wider px-1.5 py-0.5 rounded-full",
             uc.status === "LIVE"
-              ? "bg-primary/20 text-primary animate-pulse"
-              : "bg-[hsl(200,80%,55%)]/20 text-[hsl(200,80%,55%)]"
+              ? "bg-emerald-500/20 text-emerald-400 animate-pulse"
+              : "bg-cyan-500/20 text-cyan-400"
           )}>{uc.status}</span>
         </div>
         <Sparkline points={uc.sparkline} color={uc.color} />
       </div>
-      <span className={cn(
-        "font-mono text-xs font-bold shrink-0",
-        "text-primary"
-      )}>{uc.metric}</span>
+      <span className="font-mono text-xs font-bold shrink-0 text-emerald-400">{uc.metric}</span>
     </button>
   );
 }
@@ -94,7 +91,7 @@ function AnimatedBar({ percent, visible }: { percent: number; visible: boolean }
         className="h-full rounded-full transition-all duration-[1.5s] ease-out"
         style={{
           width: visible ? `${abs}%` : "0%",
-          background: "linear-gradient(90deg, hsl(260,70%,60%) 0%, hsl(200,80%,55%) 40%, hsl(239,84%,67%) 100%)",
+          background: "linear-gradient(90deg, hsl(160,84%,39%) 0%, hsl(38,92%,50%) 40%, hsl(210,80%,55%) 100%)",
         }}
       />
     </div>
@@ -111,7 +108,6 @@ function MiniChart({ kpis, visible }: { kpis: typeof useCases[0]["kpis"]; visibl
 
   return (
     <svg width="100%" height={chartH + 24} viewBox={`0 0 ${totalW + 20} ${chartH + 24}`} className="mx-auto">
-      {/* Gridlines */}
       {[0, 25, 50, 75, 100].map(v => (
         <g key={v}>
           <line x1="0" x2={totalW + 20} y1={chartH - (v / 100) * chartH} y2={chartH - (v / 100) * chartH}
@@ -125,24 +121,21 @@ function MiniChart({ kpis, visible }: { kpis: typeof useCases[0]["kpis"]; visibl
         const afterH = Math.min(Math.abs(kpi.delta) + 20, 78);
         return (
           <g key={i}>
-            {/* Before bar */}
             <rect x={x} y={chartH - beforeH} width={barW} height={beforeH} rx={3}
-              fill="hsl(260,70%,60%,0.25)" className="transition-all duration-700" />
-            {/* After bar */}
+              fill="hsl(0,0%,40%,0.25)" className="transition-all duration-700" />
             <rect x={x + barW + gap} y={visible ? chartH - afterH : chartH} width={barW}
               height={visible ? afterH : 0} rx={3}
               className="transition-all duration-[1.2s] ease-out"
               style={{ transitionDelay: `${i * 200 + 400}ms` }}
               fill="url(#greenGrad)" />
-            {/* Label */}
             <text x={x + groupW / 2} y={chartH + 14} fontSize="8" fill="#94a3b8" textAnchor="middle">{kpi.label}</text>
           </g>
         );
       })}
       <defs>
         <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="hsl(239,84%,67%)" />
-          <stop offset="100%" stopColor="hsl(260,70%,60%)" />
+          <stop offset="0%" stopColor="hsl(160,84%,39%)" />
+          <stop offset="100%" stopColor="hsl(210,80%,55%)" />
         </linearGradient>
       </defs>
     </svg>
@@ -162,18 +155,15 @@ function MobileKPICard({ kpi, visible, delay }: { kpi: typeof useCases[0]["kpis"
       <div className="flex-1 min-w-0">
         <span className="text-[10px] uppercase tracking-wider text-slate-500 font-mono">{kpi.label}</span>
         <div className="flex items-center gap-2 mt-1">
-          <span className="text-xs text-[hsl(260,70%,60%)]/70 line-through font-mono">{kpi.before}</span>
+          <span className="text-xs text-red-400/70 line-through font-mono">{kpi.before}</span>
           <ChevronRight className="w-3 h-3 text-slate-600" />
-          <span className="text-sm text-primary font-bold font-mono">{kpi.after}</span>
+          <span className="text-sm text-emerald-400 font-bold font-mono">{kpi.after}</span>
         </div>
       </div>
       <div className="w-20">
         <AnimatedBar percent={Math.abs(kpi.delta)} visible={visible} />
       </div>
-      <span className={cn(
-        "font-mono text-xs font-bold shrink-0",
-        "text-primary"
-      )}>
+      <span className="font-mono text-xs font-bold shrink-0 text-emerald-400">
         {kpi.delta > 0 ? "+" : ""}{kpi.delta}%
       </span>
     </div>
@@ -193,7 +183,6 @@ export function UseCasesSection() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_1px_at_center,hsl(220_20%_80%/0.12)_1px,transparent_1px)] bg-[length:32px_32px]" />
 
       <div ref={ref} className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
-        {/* Section header */}
         <div className={cn(
           "text-center mb-10 sm:mb-14 transition-all duration-500",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
@@ -204,7 +193,6 @@ export function UseCasesSection() {
           </h2>
         </div>
 
-        {/* MacWindow dark */}
         <div className={cn(
           "transition-all duration-700",
           isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
@@ -234,7 +222,6 @@ export function UseCasesSection() {
           >
             {/* ── Mobile: pills + cards ── */}
             <div className="md:hidden">
-              {/* Pills */}
               <div className="flex gap-2 p-3 overflow-x-auto border-b border-slate-700/40 no-scrollbar">
                 {useCases.map((u, i) => (
                   <button key={i} onClick={() => setActiveCase(i)} className={cn(
@@ -249,15 +236,13 @@ export function UseCasesSection() {
                 ))}
               </div>
 
-              {/* Hero metric */}
               <div className="text-center py-5">
-              <span className="font-mono text-4xl font-black text-primary" style={{
-                  textShadow: "0 0 24px hsla(239,84%,67%,0.35)"
+              <span className="font-mono text-4xl font-black text-emerald-400" style={{
+                  textShadow: "0 0 24px hsla(160,84%,39%,0.35)"
                 }}>{uc.metric}</span>
                 <p className="text-[11px] text-slate-500 font-mono mt-1">{uc.metricLabel}</p>
               </div>
 
-              {/* KPI cards */}
               <div className="flex flex-col gap-2 px-3 pb-4">
                 {uc.kpis.map((kpi, i) => (
                   <MobileKPICard key={`${activeCase}-${i}`} kpi={kpi} visible={isVisible} delay={i * 150 + 300} />
@@ -267,29 +252,25 @@ export function UseCasesSection() {
 
             {/* ── Desktop: sidebar + analytics ── */}
             <div className="hidden md:flex min-h-[360px]">
-              {/* Sidebar */}
               <div className="w-40 lg:w-52 border-r border-slate-700/40 bg-slate-900/80 shrink-0">
                 {useCases.map((u, i) => (
                   <DatasetRow key={i} uc={u} active={activeCase === i} onClick={() => setActiveCase(i)}
                     visible={isVisible} idx={i} />
                 ))}
-                {/* Sidebar footer */}
                 <div className="p-3 mt-auto">
                   <div className="text-[9px] uppercase tracking-wider text-slate-600 font-mono mb-1">Active datasets</div>
                   <div className="flex gap-1">
                      {useCases.map((_, i) => (
                       <div key={i} className={cn(
                         "w-2 h-2 rounded-full transition-colors",
-                        activeCase === i ? "bg-primary" : "bg-slate-700"
+                        activeCase === i ? "bg-emerald-400" : "bg-slate-700"
                       )} />
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Main analytics pane */}
               <div className="flex-1 flex flex-col p-4 lg:p-5 bg-slate-900/40">
-                {/* Dataset header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{uc.icon}</span>
@@ -299,35 +280,32 @@ export function UseCasesSection() {
                     </div>
                   </div>
                   <div className="text-right">
-                   <span className="font-mono text-3xl lg:text-4xl font-black text-primary block" style={{
-                      textShadow: "0 0 24px hsla(239,84%,67%,0.35)"
+                   <span className="font-mono text-3xl lg:text-4xl font-black text-emerald-400 block" style={{
+                      textShadow: "0 0 24px hsla(160,84%,39%,0.35)"
                     }}>{uc.metric}</span>
                   </div>
                 </div>
 
-                {/* Data table */}
                 <div className="rounded-lg border border-slate-700/50 overflow-hidden mb-4">
-                  {/* Header */}
                   <div className="grid grid-cols-[1fr_80px_80px_1fr] gap-0 bg-slate-800/80 text-[9px] uppercase tracking-wider text-slate-500 font-mono">
                     <div className="px-3 py-2">KPI</div>
                     <div className="px-3 py-2 text-center">Avant</div>
                     <div className="px-3 py-2 text-center">Après</div>
                     <div className="px-3 py-2">Delta</div>
                   </div>
-                  {/* Rows */}
                   {uc.kpis.map((kpi, i) => (
                     <div key={`${activeCase}-${i}`} className={cn(
                       "grid grid-cols-[1fr_80px_80px_1fr] gap-0 border-t border-slate-700/30 items-center transition-all duration-500",
                       isVisible ? "opacity-100" : "opacity-0"
                     )} style={{ transitionDelay: `${i * 150 + 400}ms` }}>
                       <div className="px-3 py-2.5 text-[11px] text-slate-300 font-mono">{kpi.label}</div>
-                      <div className="px-3 py-2.5 text-center text-[11px] text-[hsl(260,70%,60%)]/70 line-through font-mono">{kpi.before}</div>
-                      <div className="px-3 py-2.5 text-center text-[11px] text-primary font-bold font-mono">{kpi.after}</div>
+                      <div className="px-3 py-2.5 text-center text-[11px] text-red-400/70 line-through font-mono">{kpi.before}</div>
+                      <div className="px-3 py-2.5 text-center text-[11px] text-emerald-400 font-bold font-mono">{kpi.after}</div>
                       <div className="px-3 py-2.5 flex items-center gap-2">
                         <div className="flex-1">
                           <AnimatedBar percent={Math.abs(kpi.delta)} visible={isVisible} />
                         </div>
-                        <span className="text-[10px] font-mono font-bold text-primary shrink-0 w-10 text-right">
+                        <span className="text-[10px] font-mono font-bold text-emerald-400 shrink-0 w-10 text-right">
                           {kpi.delta > 0 ? "+" : ""}{kpi.delta}%
                         </span>
                       </div>
@@ -335,7 +313,6 @@ export function UseCasesSection() {
                   ))}
                 </div>
 
-                {/* Mini chart */}
                 <div className="flex-1 flex items-end">
                   <MiniChart kpis={uc.kpis} visible={isVisible} />
                 </div>
