@@ -77,8 +77,10 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      const resolvedEmail = resolveEmail(email);
+
       if (mode === 'login') {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(resolvedEmail, password);
         setLoading(false);
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
