@@ -2,43 +2,43 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const faqs = [
   {
-    q: "Ça prend combien de temps vraiment ?",
-    a: "4-6 semaines du diagnostic au déploiement.\n\n• Semaine 1 : Audit complet\n• Semaines 2-3 : Design & specifications\n• Semaines 4-6 : Development + testing + deployment\n\nComparaison : Nous : 6 semaines vs. Grands consultants : 16-24 semaines vs. Intégration interne : 12-20 semaines.\n\nRaison : On a fait ça 50+ fois. Pour vous, c'est la première.",
+    q: "On doit vraiment faire une transformation complète ?",
+    a: "Non nécessairement.\n\nOn propose 3 options :\n1. Diagnostic seul (€8-15k) : You get clarity\n2. Targeted implementation (€50k+) : Fix your biggest gap\n3. Full transformation (€100-200k+) : Complete reset\n\nÇa dépend de votre compliance maturity level, growth trajectory, et budget. On peut vous aider à décider après le diagnostic.",
   },
   {
-    q: "C'est sûr au niveau réglementation ?",
-    a: "Oui. Chaque solution est 21 CFR Part 11 ready.\n\nCe que ça veut dire :\n✓ Audit trails complètes et immuables\n✓ Signatures numériques légalement valides\n✓ Traçabilité 100% (qui a fait quoi, quand)\n✓ Validation de chaque étape processus\n\nOn vous livre un dossier de conformité, des test reports complets et une documentation audit-ready. Vous pouvez auditer immédiatement.",
+    q: "Ça va interrompre notre production ?",
+    a: "Non. C'est une garantie.\n\nPourquoi :\n→ We plan everything as \"no disruption\"\n→ We work off-hours when possible\n→ We have contingencies for everything\n→ Our team includes ops veterans\n→ We've done this 50+ times\n\nSi ça commence à affecter production, on ajuste le plan immédiatement.",
   },
   {
-    q: "Combien ça coûte ?",
-    a: "Dépend du périmètre.\n\n1. Audit gratuit (valeur: €5k) — Diagnostic complet + ROI estimate\n2. Pilote (€35k - €80k) — 1-3 automations + 12 mois support\n3. Scaling (€50k - €200k+) — 5-10+ automations + full infrastructure\n\nROI Pattern : Year 1: 300-500% ROI (payback: 2-4 mois)\n\nExemple réel (Farmasoft UA) : Cost: €42k → Year 1 savings: €251k → ROI: 500%",
+    q: "Combien de temps ça prend vraiment ?",
+    a: "Dépend du scope :\n\n• Diagnostic : 2-3 weeks\n• Transformation : 12-16 weeks\n• Scaling : 16-24 weeks\n• Ongoing : 12-36 months\n\nTimeline réaliste :\n• Weeks 1-2 : Assessment\n• Weeks 3-5 : Strategy & design\n• Weeks 6-12 : Implementation & training\n• Months 4-12 : Sustainment\n\nNo shortcuts. No magic. Just proven process.",
   },
   {
-    q: "On doit remplacer nos systèmes existants ?",
-    a: "Non, absolument pas.\n\nNotre approche :\n✓ Nous intégrons à vos ERP/systèmes existants\n✓ Zéro disruption opérationnelle\n✓ On ajoute, on n'enlève rien\n\nSystèmes supportés : SAP, Oracle, Salesforce, NetSuite, Microsoft Dynamics, systèmes legacy custom.\n\nVous gardez votre stack. On ajoute l'IA là où ça manque.",
+    q: "Vous travaillez avec nos systèmes actuels ?",
+    a: "Oui, toujours.\n\nNotre approche :\n✓ We integrate with what you have\n✓ We don't force new systems\n✓ We optimize existing infrastructure\n✓ We add tech only when needed\n\nSystèmes intégrés : SAP, Oracle, Salesforce, NetSuite, Microsoft Dynamics, systèmes legacy custom.\n\nVous gardez votre stack. On optimise ce qui existe.",
   },
   {
-    q: "Qu'est-ce qui se passe après les 6 semaines ?",
-    a: "Support + optimisation continue.\n\nInclus (12 mois) :\n✓ 24/7 monitoring & alerting\n✓ Bug fixes (4h SLA pour critical)\n✓ Weekly optimization calls\n✓ Performance reports mensuels\n✓ Retraining équipe (on-demand)\n\nAprès 12 mois : Maintenance SLA, Scaling, ou Knowledge transfer. C'est à vous de décider.",
+    q: "Vous avez des références ?",
+    a: "Oui. Sous NDA stricte.\n\nOn peut vous mettre en contact avec :\n• Clients similar size/sector\n• Companies in your region\n• Organizations with similar challenges\n\nDemandez lors de votre first call.",
   },
   {
-    q: "Vous avez déjà fait ça pour un concurrent ?",
-    a: "Oui, mais confidentialité respectée.\n\nClients sous NDA (3 cas anonymisés). Case studies partagées (1-2 identifiés). Pas de data sharing cross-clients.\n\nJe peux vous mettre en contact avec 2-3 références vérifiables (avec permission).",
+    q: "Qu'est-ce que je vais apprendre ?",
+    a: "L'objectif est que vous DEVENIEZ experts.\n\nAprès notre engagement :\n✓ Votre team comprend GMP en profondeur\n✓ Vos processes sont documentées\n✓ Vous pouvez maintenir & évoluer\n✓ Vous pouvez passer audit FDA\n✓ Vous avez institutional knowledge\n\nOn ne crée pas de dépendance. On augmente votre capacité.",
   },
 ];
 
 export function PharmaFAQ() {
   return (
-    <section className="py-24 bg-white">
+    <section id="faq" className="py-24 bg-white">
       <div className="max-w-3xl mx-auto px-6">
-        <h2 className="font-heading text-3xl md:text-4xl font-bold mb-12 text-center" style={{ color: "#0033CC" }}>
-          Questions Fréquentes
+        <h2 className="font-heading text-3xl md:text-4xl font-bold mb-12 text-center" style={{ color: "#1A3A6B" }}>
+          Questions fréquentes
         </h2>
 
         <Accordion type="single" collapsible className="space-y-2">
           {faqs.map((faq, i) => (
             <AccordionItem key={i} value={`faq-${i}`} className="border rounded-lg px-6" style={{ borderColor: "#E8EFF8" }}>
-              <AccordionTrigger className="font-heading text-base font-bold hover:no-underline" style={{ color: "#0033CC" }}>
+              <AccordionTrigger className="font-heading text-base font-bold hover:no-underline" style={{ color: "#1A3A6B" }}>
                 {faq.q}
               </AccordionTrigger>
               <AccordionContent>

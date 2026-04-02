@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import aetherLogo from "@/assets/aether-new-logo.jpeg";
 
 const navItems = [
-  { label: "Expertise", href: "#problems" },
-  { label: "Services", href: "#methodology" },
+  { label: "Expertise", href: "#expertise" },
   { label: "Cas d'Étude", href: "#case-study" },
-  { label: "Technologie", href: "#tech" },
-  { label: "À propos", href: "#trust" },
+  { label: "Ressources", href: "#resources" },
+  { label: "À propos", href: "#team" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function LandingHeader() {
@@ -23,9 +23,7 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "shadow-sm" : ""
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "shadow-sm" : ""}`}
       style={{ background: scrolled ? "rgba(250,251,252,0.97)" : "#FAFBFC", height: 70, borderBottom: scrolled ? "1px solid #E8EFF8" : "none" }}
     >
       <div className="max-w-[1400px] mx-auto px-6 h-full flex items-center justify-between">
@@ -35,14 +33,15 @@ export function LandingHeader() {
 
         <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="text-sm font-medium transition-colors hover:opacity-70"
-              style={{ color: "#2C3E50" }}
-            >
-              {item.label}
-            </a>
+            item.href.startsWith("/") ? (
+              <Link key={item.label} to={item.href} className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: "#2C3E50" }}>
+                {item.label}
+              </Link>
+            ) : (
+              <a key={item.label} href={item.href} className="text-sm font-medium transition-colors hover:opacity-70" style={{ color: "#2C3E50" }}>
+                {item.label}
+              </a>
+            )
           ))}
         </nav>
 
@@ -50,16 +49,16 @@ export function LandingHeader() {
           <Link
             to="/auth?mode=login&redirect=/farmasoft"
             className="text-sm font-medium px-4 py-2 rounded-md transition-colors"
-            style={{ color: "#0033CC" }}
+            style={{ color: "#1A3A6B" }}
           >
             Log in
           </Link>
           <Link
             to="/contact"
-            className="text-sm font-bold px-5 py-2.5 rounded-md text-white transition-all hover:shadow-lg active:scale-[0.97]"
-            style={{ background: "#FF6B35" }}
+            className="text-sm font-bold px-5 py-2.5 rounded text-white transition-all hover:shadow-lg active:scale-[0.97]"
+            style={{ background: "#0D8B5E" }}
           >
-            Audit Gratuit
+            Discuter de votre défi
           </Link>
         </div>
 
@@ -76,23 +75,23 @@ export function LandingHeader() {
         <div className="md:hidden absolute top-[70px] left-0 right-0 border-b shadow-xl py-4 px-6 animate-fade-in" style={{ background: "#FAFBFC", borderColor: "#E8EFF8" }}>
           <nav className="flex flex-col gap-3">
             {navItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium py-2"
-                style={{ color: "#2C3E50" }}
-              >
-                {item.label}
-              </a>
+              item.href.startsWith("/") ? (
+                <Link key={item.label} to={item.href} onClick={() => setIsMenuOpen(false)} className="text-sm font-medium py-2" style={{ color: "#2C3E50" }}>
+                  {item.label}
+                </Link>
+              ) : (
+                <a key={item.label} href={item.href} onClick={() => setIsMenuOpen(false)} className="text-sm font-medium py-2" style={{ color: "#2C3E50" }}>
+                  {item.label}
+                </a>
+              )
             ))}
             <Link
               to="/contact"
               onClick={() => setIsMenuOpen(false)}
-              className="w-full py-2.5 px-4 text-sm font-bold text-white rounded-md text-center mt-2"
-              style={{ background: "#FF6B35" }}
+              className="w-full py-2.5 px-4 text-sm font-bold text-white rounded text-center mt-2"
+              style={{ background: "#0D8B5E" }}
             >
-              Audit Gratuit
+              Nous contacter
             </Link>
           </nav>
         </div>
