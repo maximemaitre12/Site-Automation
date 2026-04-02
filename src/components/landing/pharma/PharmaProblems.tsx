@@ -1,104 +1,102 @@
-import { Users, Package, ShieldCheck, Check } from "lucide-react";
+import { Users, Link2, Scale, Check } from "lucide-react";
 
 const columns = [
   {
     icon: Users,
-    iconColor: "#17A2B8",
-    title: "RH & Recrutement",
-    problem: "Recruter des talents pharma prend 8-12 semaines. Et c'est chaque fois un cauchemar administratif.",
+    iconColor: "#0D8B5E",
+    title: "Talent Pharma",
+    problem: "Recruter en regulatory affairs, quality assurance, manufacturing. C'est complexe.",
     pains: [
-      "Tri manuel de 200-500 CVs par poste → 60-80 heures de travail pur",
-      "Matching candidat/compétences exige expertise pharma → Souvent des mauvaises décisions",
-      "Scheduling entretiens = 15 emails ping-pong → 20+ heures perdues en coordination",
-      "Onboarding des nouvelles recrues = 40 tâches manuelles → Checklist dispersée en 5 outils",
+      "Talent pool limité — Salaires très élevés (€60-80k)",
+      "Temps de recruitment: 24-32 semaines en moyenne",
+      "Erreurs regulatory = FDA warning letters (€500k+)",
+      "Turnover en quality = production delays & compliance gaps",
     ],
-    costLabel: "Coût mensuel de ce goulot:",
-    costValue: "€35,000 - €50,000",
-    costSub: "(salaires + temps perdu)",
-    costBg: "#FFF4E6",
-    costBorder: "#FF6B35",
-    solutions: ["Screening automatisé par IA", "Scoring de fit en 5 minutes", "Scheduling auto avec calendrier", "Onboarding checklist intelligente"],
+    costLabel: "Coût d'une mauvaise hire pharma:",
+    costValue: "€180,000+",
+    costSub: "(quality incidents + remplacement)",
+    costBg: "#FFF9F0",
+    costBorder: "#FF8A45",
+    solutions: ["Cartographie des vrais besoins pharma", "Screening basé sur regulatory knowledge", "Validation compétences FDA/EMA", "Time-to-hire: 24 sem → 6 sem"],
   },
   {
-    icon: Package,
-    iconColor: "#17A2B8",
-    title: "Supply Chain & Logistique",
-    problem: "Traiter manuellement les commandes fournisseurs ? C'est lent, ça crée des erreurs, ça coûte cher.",
+    icon: Link2,
+    iconColor: "#0D8B5E",
+    title: "GMP & Traçabilité",
+    problem: "GMP, traçabilité, batch records. Maîtriser sans ralentir la prod.",
     pains: [
-      "Bons de commande saisis manuellement dans 3 systèmes → Risque erreurs, doublons",
-      "Suivi fournisseurs = feuilles Excel → Pas de visibilité temps-réel",
-      "Ruptures de stock imprévisibles → Arrêts production, délais clients",
-      "Réconciliation inventaire = 2 jours/mois → Nombreuses discordances non résolues",
+      "Batch records = 200-400 pages par batch, documentation manuelle",
+      "Validation systèmes = 6-12 mois, €200k+ d'investissement",
+      "Change control = processus très lourd, ralentit l'innovation",
+      "Validation manquée = FDA can stop production",
     ],
-    costLabel: "Coût moyen rupture de stock:",
-    costValue: "€150,000 - €300,000",
-    costSub: "(perte prod + livraisons urgentes)",
-    costBg: "#E8F9F7",
-    costBorder: "#17A2B8",
-    solutions: ["Traitement automatisé commandes", "Synchronisation temps-réel (ERP/fournisseurs)", "Prévention proactive ruptures", "Reporting inventaire quotidien"],
+    costLabel: "Risque product recall:",
+    costValue: "€1M+",
+    costSub: "(mauvaise traçabilité)",
+    costBg: "#F0FFF4",
+    costBorder: "#0D8B5E",
+    solutions: ["GMP implémenté chez de nombreux clients", "Batch records automatisés mais auditables", "Audit trail immuable (21 CFR Part 11)", "Compliance 100% + 0% ralentissement prod"],
   },
   {
-    icon: ShieldCheck,
-    iconColor: "#2CAA56",
-    title: "Conformité & Regulatory",
-    problem: "La pharma = réglementation stricte. Mais votre compliance est dispersée partout.",
+    icon: Scale,
+    iconColor: "#1A3A6B",
+    title: "Compliance & Scaling",
+    problem: "Scaler vos opérations. Sans perdre la conformité.",
     pains: [
-      "Audit trails = documentation manuelle → Incomplètes, non traçables",
-      "Reports réglementaires = construction manuelle → Temps énorme, risque erreurs",
-      "21 CFR Part 11, GMP, GDPR = 4 systèmes disjoints → Pas de vue globale",
-      "Chaque audit externe = 2-3 semaines de collecte info → Stressant, tardif",
+      "Chaque expansion = projet 18+ mois de complexité réglementaire",
+      "Coûts regulatory: €500k-2M par expansion marché",
+      "Compliance team ne peut pas scaler à la vitesse du business",
+      "Concurrents expansent plus vite → perte de market share",
     ],
-    costLabel: "Temps annuel compliance:",
-    costValue: "500-800 heures/an",
-    costSub: "Risque: Non-conformité = €50-500k",
-    costBg: "#F0F9F4",
-    costBorder: "#2CAA56",
-    solutions: ["Audit trails automatisés & immuables", "Génération rapports en 1 clic", "Traçabilité complète 21 CFR Part 11", "Documentation compliance ready-for-audit"],
+    costLabel: "Temps expansion avec compliance:",
+    costValue: "18+ mois",
+    costSub: "Risque: Mauvaise compliance = perte marché",
+    costBg: "#F3F4FF",
+    costBorder: "#1A3A6B",
+    solutions: ["Framework de compliance scalable", "Processes documentés, reproductibles", "Audit-ready dès le départ", "Expansion 18 mois → 8 mois, coûts -40%"],
   },
 ];
 
 export function PharmaProblems() {
   return (
-    <section className="py-24 bg-white">
+    <section id="challenges" className="py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-[48px] font-bold mb-5" style={{ color: "#0033CC" }}>
-            Vos processus pharma deviennent coûteux.
+          <h2 className="font-heading text-3xl md:text-4xl lg:text-[48px] font-bold mb-5" style={{ color: "#1A3A6B" }}>
+            Les défis opérationnels que seul
             <br className="hidden md:block" />
-            Voici pourquoi — et comment on les réduit.
+            un expert pharma comprend.
           </h2>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4A4A4A" }}>
-            Nous avons analysé +50 entreprises pharmaceutiques. Voici les 3 goulots d'étranglement qu'on voit partout.
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4A5568" }}>
+            Nous ne vous vendons pas de solutions génériques. Nous comprenons votre réalité pharma.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-10">
           {columns.map((col) => (
-            <div key={col.title} className="rounded-xl p-8" style={{ background: "#F9FBFF" }}>
+            <div key={col.title} className="rounded-lg p-8" style={{ background: "#F9FBFC" }}>
               <col.icon className="w-14 h-14 mb-4" style={{ color: col.iconColor }} />
-              <h3 className="font-heading text-xl font-bold mb-3" style={{ color: "#0033CC" }}>{col.title}</h3>
+              <h3 className="font-heading text-xl font-bold mb-3" style={{ color: "#1A3A6B" }}>{col.title}</h3>
               <p className="text-base mb-4" style={{ color: "#2C3E50" }}>{col.problem}</p>
 
               <ul className="space-y-2 mb-5">
                 {col.pains.map((p) => (
-                  <li key={p} className="text-sm leading-relaxed" style={{ color: "#4A4A4A" }}>
-                    <span style={{ color: "#FF6B35" }}>•</span> {p}
+                  <li key={p} className="text-sm leading-relaxed" style={{ color: "#4A5568" }}>
+                    <span style={{ color: "#FF8A45" }}>•</span> {p}
                   </li>
                 ))}
               </ul>
 
-              {/* Cost box */}
               <div className="rounded-lg p-4 mb-5" style={{ background: col.costBg, borderLeft: `4px solid ${col.costBorder}` }}>
                 <div className="text-sm" style={{ color: "#2C3E50" }}>{col.costLabel}</div>
                 <div className="text-2xl font-bold" style={{ color: col.costBorder }}>{col.costValue}</div>
                 <div className="text-sm" style={{ color: "#6B7C8C" }}>{col.costSub}</div>
               </div>
 
-              {/* Solutions */}
               <ul className="space-y-1.5">
                 {col.solutions.map((s) => (
                   <li key={s} className="flex items-center gap-2 text-sm" style={{ color: "#2C3E50" }}>
-                    <Check className="w-4 h-4 shrink-0" style={{ color: "#17A2B8" }} />
+                    <Check className="w-4 h-4 shrink-0" style={{ color: "#0D8B5E" }} />
                     {s}
                   </li>
                 ))}
