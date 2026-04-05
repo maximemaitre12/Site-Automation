@@ -36,7 +36,7 @@ export function LandingHeader() {
           <img
             src={aetherLogo}
             alt="Aether Connect"
-            className="h-40 w-auto transition-all duration-500"
+            className="h-10 w-auto transition-all duration-500"
             style={{
               filter: (!isContactPage && !scrolled)
                 ? "brightness(0) invert(1)"
