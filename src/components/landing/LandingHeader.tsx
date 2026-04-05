@@ -5,8 +5,8 @@ import aetherLogo from "@/assets/aether-logo.png";
 
 const navItems = [
   { label: "Expertise", href: "#expertise" },
-  { label: "Cas d'Étude", href: "#case-study" },
-  { label: "À propos", href: "#team" },
+  { label: "Case Study", href: "#case-study" },
+  { label: "About", href: "#team" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -65,14 +65,14 @@ export function LandingHeader() {
             to="/auth?mode=login&redirect=/farmasoft"
             className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-[#0891B2]" : "text-white/70 hover:text-white"}`}
           >
-            Connexion
+            Log in
           </Link>
           <Link
             to="/contact"
             className="text-sm font-semibold px-6 py-2.5 text-white transition-all hover:opacity-90"
             style={{ background: "#0891B2" }}
           >
-            Présentation
+            Book a Demo
           </Link>
         </div>
 
@@ -108,7 +108,7 @@ export function LandingHeader() {
               className="w-full py-3 px-4 text-sm font-bold text-white text-center mt-2"
               style={{ background: "#0891B2" }}
             >
-              Présentation
+              Book a Demo
             </Link>
           </nav>
         </div>

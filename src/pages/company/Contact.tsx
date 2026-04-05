@@ -3,32 +3,32 @@ import { Mail, ArrowRight, Clock, Shield, Zap } from "lucide-react";
 const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 const faqs = [
-  { q: "Comment démarrer rapidement ?", a: "La plupart de nos clients sont opérationnels en moins d'une semaine. Notre équipe gère l'onboarding et la configuration initiale." },
-  { q: "Proposez-vous un essai gratuit ?", a: "Oui. 14 jours d'essai gratuit avec accès complet à toutes les fonctionnalités. Sans carte bancaire." },
-  { q: "Quelles intégrations supportez-vous ?", a: "Nous nous intégrons aux principaux outils entreprise : Salesforce, HubSpot, Slack, Microsoft 365, et plus de 100 autres." },
-  { q: "Mes données sont-elles sécurisées ?", a: "Toutes les données sont chiffrées au repos et en transit. Nous sommes conformes RGPD et certifiés SOC 2 Type II." },
+  { q: "How quickly can we get started?", a: "Most clients are operational within a week. Our team handles onboarding and initial configuration." },
+  { q: "Do you offer a free trial?", a: "Yes. 14-day free trial with full access to all features. No credit card required." },
+  { q: "What integrations do you support?", a: "We integrate with major enterprise tools: Salesforce, HubSpot, Slack, Microsoft 365, and 100+ others." },
+  { q: "Is my data secure?", a: "All data is encrypted at rest and in transit. We are GDPR-compliant and SOC 2 Type II certified." },
 ];
 
 const reasons = [
-  { icon: Clock, title: "Réponse rapide", desc: "Nous répondons sous 24 heures les jours ouvrés." },
-  { icon: Zap, title: "Démo personnalisée", desc: "Présentation sur mesure adaptée à votre cas d'usage." },
-  { icon: Shield, title: "Sans engagement", desc: "Évaluation gratuite, sans obligation." },
+  { icon: Clock, title: "Fast response", desc: "We respond within 24 hours on business days." },
+  { icon: Zap, title: "Custom demo", desc: "Tailored presentation adapted to your use case." },
+  { icon: Shield, title: "No commitment", desc: "Free evaluation, no strings attached." },
 ];
 
 export default function Contact() {
   return (
     <div className="pt-20">
-      {/* Hero */}
-      <section className="pt-24 pb-16 px-6 lg:px-12" style={{ background: "#0C4A6E" }}>
+      {/* Hero — light background so the white logo remains visible */}
+      <section className="pt-24 pb-16 px-6 lg:px-12" style={{ background: "#E8F4F8" }}>
         <div className="max-w-[900px] mx-auto">
-          <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-6" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-6" style={{ color: "#0369A1" }}>
             Contact
           </p>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1]" style={{ color: "#FFFFFF" }}>
-            Parlons de votre projet
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1]" style={{ color: "#0F172A" }}>
+            Let's talk about your project
           </h1>
-          <p className="mt-6 text-base sm:text-lg leading-relaxed max-w-xl" style={{ color: "rgba(255,255,255,0.7)" }}>
-            Intéressé par AETHER ? Contactez-nous directement par email et nous vous répondons sous 24 heures.
+          <p className="mt-6 text-base sm:text-lg leading-relaxed max-w-xl" style={{ color: "#64748B" }}>
+            Interested in AETHER? Reach out directly by email and we'll get back to you within 24 hours.
           </p>
         </div>
       </section>
@@ -40,16 +40,16 @@ export default function Contact() {
             <Mail className="w-8 h-8" style={{ color: "#0369A1" }} />
           </div>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3" style={{ color: "#0F172A" }}>
-            Envoyez-nous un email
+            Send us an email
           </h2>
           <p className="text-sm leading-relaxed mb-10" style={{ color: "#64748B" }}>
-            Décrivez-nous vos besoins et nous vous répondrons avec une proposition personnalisée.
+            Describe your needs and we'll respond with a personalized proposal.
           </p>
           <div className="flex flex-col gap-4">
             {EMAILS.map((email) => (
               <a
                 key={email}
-                href={`mailto:${email}?subject=AETHER — J'aimerais en savoir plus`}
+                href={`mailto:${email}?subject=AETHER — I'd like to learn more`}
                 className="inline-flex items-center gap-3 px-8 py-4 text-sm font-semibold text-white transition-all duration-300 hover:opacity-90 group justify-center"
                 style={{ background: "#0891B2" }}
               >
@@ -61,14 +61,14 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Why reach out */}
+      {/* What to expect */}
       <section className="py-20 sm:py-28 px-6 lg:px-12" style={{ background: "#E8F4F8" }}>
         <div className="max-w-[900px] mx-auto">
           <p className="text-xs font-semibold tracking-[0.25em] uppercase text-center mb-4" style={{ color: "#0369A1" }}>
-            À quoi s'attendre
+            What to expect
           </p>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center mb-14" style={{ color: "#0F172A" }}>
-            Ce que nous vous offrons
+            What we offer
           </h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {reasons.map((r) => (
@@ -88,10 +88,10 @@ export default function Contact() {
       <section className="py-20 sm:py-28 px-6 lg:px-12" style={{ background: "#FFFFFF" }}>
         <div className="max-w-[900px] mx-auto">
           <p className="text-xs font-semibold tracking-[0.25em] uppercase text-center mb-4" style={{ color: "#94A3B8" }}>
-            Questions fréquentes
+            Common questions
           </p>
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center mb-14" style={{ color: "#0F172A" }}>
-            Vous avez des questions ?
+            Frequently asked questions
           </h2>
           <div className="grid sm:grid-cols-2 gap-6">
             {faqs.map((faq) => (
