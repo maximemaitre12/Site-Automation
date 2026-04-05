@@ -1,83 +1,73 @@
-import { Check } from "lucide-react";
-
 const founders = [
   {
-    title: "Chief Operations Officer & Co-Founder",
-    bg: "#F9FBFC",
-    experience: [
-      "15 ans dans la pharmacie",
-      "VP Operations, Sanofi (5 ans) — 3 usines, 2000+ employees",
-      "Operations Director, Novartis (4 ans) — Supply chain €300M+",
-      "Quality Assurance Manager, Pharmadev (3 ans)",
-    ],
-    expertise: ["GMP & Manufacturing", "Supply Chain Pharma", "Regulatory Strategy", "Quality Management Systems", "FDA/EMA Interactions"],
-    quote: "18 years in pharma taught me one thing: Operations are not about tech. They're about people, processes, and compliance.",
+    initials: "CO",
+    title: "Chief Operations Officer",
+    subtitle: "Co-Founder",
+    experience: "15 ans · VP Operations Sanofi · Operations Director Novartis",
+    expertise: ["GMP & Manufacturing", "Supply Chain Pharma", "FDA/EMA Interactions"],
+    quote: "Operations are not about tech. They're about people, processes, and compliance.",
   },
   {
-    title: "Chief Compliance Officer & Co-Founder",
-    bg: "#F9FBFC",
-    experience: [
-      "12 ans dans regulatory pharma",
-      "Head of Regulatory Affairs, Boehringer Ingelheim (4 ans)",
-      "Regulatory Manager, GSK (5 ans) — Global regulatory strategy",
-      "Quality Auditor, TÜV SÜD (2 ans)",
-    ],
-    expertise: ["FDA & EMA Regulations", "Dossier Technique & CTD", "GMP Compliance", "Audit Preparation & Management", "21 CFR Part 11 Compliance"],
+    initials: "CC",
+    title: "Chief Compliance Officer",
+    subtitle: "Co-Founder",
+    experience: "12 ans · Head Regulatory Boehringer Ingelheim · Regulatory Manager GSK",
+    expertise: ["FDA & EMA Regulations", "GMP Compliance", "21 CFR Part 11"],
     quote: "Compliance is not a constraint. It's the foundation on which everything else is built.",
   },
   {
-    title: "Chief Technology Officer & Co-Founder",
-    bg: "#F9FBFC",
-    experience: [
-      "10 ans tech, 5 ans pharma-specific",
-      "Head of Digital Transformation, Pharma Startup (3 ans)",
-      "Solutions Architect, Accenture Digital (3 ans)",
-      "Software Engineer, startups tech (4 ans)",
-    ],
-    expertise: ["System Architecture", "Pharma Compliance Tech", "Data Security & Encryption", "API Integration & Legacy Systems", "GxP-aware Development"],
+    initials: "CT",
+    title: "Chief Technology Officer",
+    subtitle: "Co-Founder",
+    experience: "10 ans tech, 5 ans pharma · Head Digital Transformation · Solutions Architect Accenture",
+    expertise: ["Pharma Compliance Tech", "System Architecture", "GxP-aware Development"],
     quote: "Technology should serve pharma operations, not complicate them.",
   },
 ];
 
 export function PharmaTeam() {
   return (
-    <section id="team" className="py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-[44px] font-bold mb-5" style={{ color: "#1A3A6B" }}>
-            Nous sommes des vétérans pharma.
-            <br className="hidden md:block" />
-            Pas des consultants IA.
+    <section id="team" className="py-24" style={{ background: "#FAFCFE" }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-20">
+          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#0F172A" }}>
+            Des vétérans pharma.
+            <br />
+            <span style={{ color: "#0891B2" }}>Pas des consultants IA.</span>
           </h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {founders.map((f) => (
-            <div key={f.title} className="rounded-lg p-8 border transition-all hover:border-[#0D8B5E]" style={{ background: f.bg, borderColor: "#E8EFF8" }}>
-              <div className="w-16 h-16 rounded-full mb-4 flex items-center justify-center" style={{ background: "#1A3A6B" }}>
-                <span className="text-white text-xl font-bold">{f.title.charAt(6)}</span>
+            <div
+              key={f.initials}
+              className="rounded-2xl p-8 bg-white transition-all hover:shadow-xl hover:-translate-y-1"
+              style={{ border: "1px solid #E2E8F0" }}
+            >
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mb-6 text-white text-xl font-bold"
+                style={{ background: "linear-gradient(135deg, #0891B2, #0EA5E9)" }}
+              >
+                {f.initials}
               </div>
-              <h3 className="font-heading text-base font-bold mb-4" style={{ color: "#1A3A6B" }}>{f.title}</h3>
 
-              <div className="space-y-1.5 mb-5">
-                {f.experience.map((e) => (
-                  <p key={e} className="text-sm" style={{ color: "#4A5568" }}>{e}</p>
+              <h3 className="font-heading text-lg font-bold mb-0.5" style={{ color: "#0F172A" }}>{f.title}</h3>
+              <p className="text-sm mb-4" style={{ color: "#0891B2" }}>{f.subtitle}</p>
+              <p className="text-sm mb-6 leading-relaxed" style={{ color: "#64748B" }}>{f.experience}</p>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {f.expertise.map((e) => (
+                  <span
+                    key={e}
+                    className="text-xs font-medium px-3 py-1.5 rounded-full"
+                    style={{ background: "#E0F2FE", color: "#0369A1" }}
+                  >
+                    {e}
+                  </span>
                 ))}
               </div>
 
-              <div className="mb-5">
-                <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "#0D8B5E" }}>Expertise</div>
-                <ul className="space-y-1">
-                  {f.expertise.map((e) => (
-                    <li key={e} className="flex items-center gap-2 text-sm" style={{ color: "#2C3E50" }}>
-                      <Check className="w-3.5 h-3.5 shrink-0" style={{ color: "#0D8B5E" }} />
-                      {e}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <p className="text-sm italic pl-3" style={{ color: "#1A3A6B", borderLeft: "3px solid #1A3A6B" }}>
+              <p className="text-sm italic leading-relaxed" style={{ color: "#475569", borderLeft: "3px solid #0891B2", paddingLeft: 12 }}>
                 "{f.quote}"
               </p>
             </div>
