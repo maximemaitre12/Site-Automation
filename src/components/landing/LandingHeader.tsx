@@ -37,7 +37,7 @@ export function LandingHeader() {
             src={aetherLogo}
             alt="Aether Connect"
             className="h-40 w-auto transition-all duration-500"
-            style={useDarkMode ? { filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" } : {}}
+            style={{ filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" }}
           />
         </Link>
 
