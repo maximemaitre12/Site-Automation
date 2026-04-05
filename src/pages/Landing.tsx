@@ -5,11 +5,8 @@ import { PharmaTeam } from "@/components/landing/pharma/PharmaTeam";
 import { PharmaExpertise } from "@/components/landing/pharma/PharmaExpertise";
 import { PharmaMethodology } from "@/components/landing/pharma/PharmaMethodology";
 import { PharmaCaseStudy } from "@/components/landing/pharma/PharmaCaseStudy";
-import { PharmaPortfolio } from "@/components/landing/pharma/PharmaPortfolio";
 import { PharmaTrust } from "@/components/landing/pharma/PharmaTrust";
-import { PharmaServices } from "@/components/landing/pharma/PharmaServices";
 import { PharmaFAQ } from "@/components/landing/pharma/PharmaFAQ";
-import { PharmaResources } from "@/components/landing/pharma/PharmaResources";
 import { PharmaFinalCTA } from "@/components/landing/pharma/PharmaFinalCTA";
 
 export default function Landing() {
@@ -17,16 +14,13 @@ export default function Landing() {
     <div className="overflow-x-hidden">
       <PharmaHero />
       <PharmaStats />
-      <div id="challenges"><PharmaProblems /></div>
+      <PharmaProblems />
       <PharmaTeam />
       <PharmaExpertise />
-      <div id="methodology"><PharmaMethodology /></div>
+      <PharmaMethodology />
       <PharmaCaseStudy />
-      <PharmaPortfolio />
       <PharmaTrust />
-      <PharmaServices />
-      <div id="faq"><PharmaFAQ /></div>
-      <PharmaResources />
+      <PharmaFAQ />
       <PharmaFinalCTA />
     </div>
   );

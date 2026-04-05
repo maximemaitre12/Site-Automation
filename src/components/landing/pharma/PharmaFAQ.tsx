@@ -3,61 +3,67 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const faqs = [
   {
     q: "On doit vraiment faire une transformation complète ?",
-    a: "Non nécessairement. On propose 3 options : Diagnostic seul (€8-15k), Targeted implementation (€50k+), ou Full transformation (€100-200k+). On peut vous aider à décider après le diagnostic.",
+    a: "Non. Diagnostic seul (€8-15k), implémentation ciblée (€50k+), ou transformation complète (€100-200k+). Le diagnostic vous aide à décider.",
   },
   {
     q: "Ça va interrompre notre production ?",
-    a: "Non, c'est une garantie. Nous planifions tout en mode \"no disruption\", travaillons en off-hours quand possible, et avons des contingencies pour tout. Notre équipe inclut des vétérans ops qui comprennent vos contraintes.",
+    a: "Non, c'est une garantie. Planification « no disruption » dès le jour 1. Notre équipe inclut des vétérans ops qui comprennent vos contraintes.",
   },
   {
-    q: "Combien de temps ça prend vraiment ?",
-    a: "Diagnostic : 2-3 semaines. Transformation : 12-16 semaines. Scaling : 16-24 semaines. Ongoing : 12-36 mois. No shortcuts. No magic. Just proven process.",
+    q: "Combien de temps ça prend ?",
+    a: "Diagnostic : 2-3 semaines. Transformation : 12-16 semaines. Scaling : 16-24 semaines. Pas de raccourcis.",
   },
   {
     q: "Vous travaillez avec nos systèmes actuels ?",
-    a: "Oui, toujours. Nous intégrons avec ce que vous avez (SAP, Oracle, Salesforce, NetSuite, systèmes legacy). Nous n'imposons pas de nouveaux systèmes. Nous optimisons l'existant.",
+    a: "Toujours. SAP, Oracle, Salesforce, systèmes legacy. Nous optimisons l'existant, jamais d'imposition de nouveaux outils.",
   },
   {
     q: "Vous avez des références ?",
-    a: "Oui, sous NDA stricte. Nous pouvons vous mettre en contact avec des clients de taille et secteur similaires. Demandez lors de votre premier appel.",
-  },
-  {
-    q: "Qu'est-ce que mon équipe va apprendre ?",
-    a: "L'objectif est que vous deveniez experts. Après notre engagement, votre équipe comprend le GMP en profondeur, vos processus sont documentés, et vous pouvez passer un audit FDA en autonomie.",
+    a: "Oui, sous NDA. Nous pouvons vous connecter avec des clients de taille et secteur similaires.",
   },
 ];
 
 export function PharmaFAQ() {
   return (
-    <section className="py-28 bg-white">
-      <div className="max-w-[700px] mx-auto px-6">
-        <div className="mb-16">
-          <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#0891B2" }}>
-            FAQ
-          </p>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold" style={{ color: "#0F172A" }}>
-            Questions fréquentes.
-          </h2>
-        </div>
-
-        <Accordion type="single" collapsible className="space-y-0 divide-y" style={{ borderColor: "#E2E8F0" }}>
-          {faqs.map((faq, i) => (
-            <AccordionItem
-              key={i}
-              value={`faq-${i}`}
-              className="border-none py-0"
+    <section className="py-36 md:py-44 bg-white">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="grid lg:grid-cols-2 gap-20 lg:gap-32">
+          <div>
+            <h2
+              className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1]"
+              style={{ color: "#0F172A" }}
             >
-              <AccordionTrigger className="font-heading text-base font-bold hover:no-underline py-6" style={{ color: "#0F172A" }}>
-                {faq.q}
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm leading-relaxed pb-4" style={{ color: "#64748B" }}>
-                  {faq.a}
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+              Questions
+              <br />
+              fréquentes.
+            </h2>
+          </div>
+
+          <div>
+            <Accordion type="single" collapsible>
+              {faqs.map((faq, i) => (
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="border-b py-0"
+                  style={{ borderColor: "#E2E8F0" }}
+                >
+                  <AccordionTrigger
+                    className="font-heading text-base font-bold hover:no-underline py-6"
+                    style={{ color: "#0F172A" }}
+                  >
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-sm leading-relaxed pb-4" style={{ color: "#64748B" }}>
+                      {faq.a}
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
       </div>
     </section>
   );
