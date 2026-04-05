@@ -1,12 +1,12 @@
 import pharmaProduction from "@/assets/pharma-production.jpg";
 
 const quality = [
-  { value: "40%", desc: "Réduction du time-to-market sur les phases précliniques" },
-  { value: "–85%", desc: "Temps de revue des ICSRs par pharmacovigilance automatisée" },
-  { value: "4–6", desc: "Semaines pour un premier MVP validé en environnement GxP" },
-  { value: "99.7%", desc: "Précision de classification MedDRA sur adverse events" },
-  { value: "24/7", desc: "Monitoring continu des signaux de sécurité post-market" },
-  { value: "100%", desc: "Traçabilité ALCOA+ sur chaque action automatisée" },
+  { value: "40%", desc: "Reduction in preclinical time-to-market" },
+  { value: "–85%", desc: "ICSR review time through automated pharmacovigilance" },
+  { value: "4–6", desc: "Weeks to a validated MVP in GxP environments" },
+  { value: "99.7%", desc: "MedDRA classification accuracy on adverse events" },
+  { value: "24/7", desc: "Continuous post-market safety signal monitoring" },
+  { value: "100%", desc: "ALCOA+ traceability on every automated action" },
 ];
 
 export function PharmaMethodology() {
@@ -16,7 +16,7 @@ export function PharmaMethodology() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Résultats cliniques & opérationnels
+            Clinical & operational results
           </span>
         </div>
 
@@ -26,22 +26,23 @@ export function PharmaMethodology() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
               style={{ color: "#0F172A" }}
             >
-              Des KPIs validés
+              Validated KPIs
               <br />
-              en environnement
+              in regulated
               <br />
-              réglementé.
+              environments.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
-              Chaque déploiement fait l'objet d'une <strong style={{ color: "#0F172A" }}>qualification IQ/OQ/PQ</strong> complète.
-              Les performances sont mesurées sur des <strong style={{ color: "#0F172A" }}>endpoints validés statistiquement</strong> et
-              documentées dans des <strong style={{ color: "#0F172A" }}>rapports de validation CSV</strong>.
+              Every deployment undergoes full <strong style={{ color: "#0F172A" }}>IQ/OQ/PQ qualification</strong>.
+              Performance is measured against <strong style={{ color: "#0F172A" }}>statistically validated endpoints</strong> and
+              documented in <strong style={{ color: "#0F172A" }}>CSV validation reports</strong> — giving your QA team
+              complete audit-ready documentation from day one.
             </p>
           </div>
           <div className="relative overflow-hidden">
             <img
               src={pharmaProduction}
-              alt="IA en production pharmaceutique GMP"
+              alt="AI in GMP pharmaceutical production"
               className="w-full h-[260px] lg:h-[300px] object-cover"
               loading="lazy"
               width={1280}

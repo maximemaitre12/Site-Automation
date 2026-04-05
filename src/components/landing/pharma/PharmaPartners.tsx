@@ -21,7 +21,7 @@ export function PharmaPartners() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Partenaires technologiques
+            Technology partners
           </span>
         </div>
 

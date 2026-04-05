@@ -1,10 +1,10 @@
 const areas = [
-  { title: "PHARMACOVIGILANCE & SIGNAL DETECTION", desc: "Détection automatisée des signaux de sécurité dans les bases ICSR. Classification MedDRA, scoring disproportionnalité (PRR, ROR, EBGM) et génération de rapports PSUR/PBRER conformes ICH E2E." },
-  { title: "OPTIMISATION ESSAIS CLINIQUES", desc: "Matching patients-protocoles par NLP sur critères d'inclusion/exclusion. Prédiction d'attrition, optimisation de cohortes et monitoring adaptatif des endpoints primaires et secondaires." },
-  { title: "COMPUTER VISION GMP", desc: "Inspection automatisée des lignes de conditionnement : détection de particules, vérification d'intégrité des sertissages, lecture OCR des numéros de lot. Conformité Annexe 11 et 21 CFR Part 211." },
-  { title: "RÉDACTION RÉGLEMENTAIRE IA", desc: "Génération assistée des modules eCTD (Module 2.5, 2.7, 3.2.S/P). Cross-référencement automatique des guidances ICH Q8-Q12, FDA et EMA. Pré-validation des soumissions avant gateway." },
-  { title: "DRUG DISCOVERY & REPURPOSING", desc: "Modèles de docking moléculaire, prédiction ADMET, screening virtuel par graph neural networks. Identification de nouvelles indications thérapeutiques par analyse de réseaux biologiques." },
-  { title: "DATA INTEGRITY & AUDIT TRAIL", desc: "Architecture ALCOA+ native. Audit trails immutables, electronic signatures conformes 21 CFR Part 11, contrôle d'accès RBAC et encryption AES-256 at rest/in transit." },
+  { title: "PHARMACOVIGILANCE & SIGNAL DETECTION", desc: "Automated safety signal detection across ICSR databases. MedDRA classification, disproportionality scoring (PRR, ROR, EBGM) and generation of ICH E2E-compliant PSUR/PBRER reports — fully integrated with your existing safety data lake." },
+  { title: "CLINICAL TRIAL OPTIMIZATION", desc: "Patient-protocol matching through NLP on inclusion/exclusion criteria. Attrition prediction, cohort optimization and adaptive monitoring of primary and secondary endpoints. Cloud-based dashboards for real-time trial oversight." },
+  { title: "GMP COMPUTER VISION", desc: "Automated inspection of packaging lines: particle detection in injectable solutions, crimp integrity verification, batch number OCR. Annex 11 and 21 CFR Part 211 compliant. Deployed on edge or cloud depending on throughput requirements." },
+  { title: "AI-POWERED REGULATORY WRITING", desc: "AI-assisted generation of eCTD modules (Module 2.5, 2.7, 3.2.S/P). Automatic cross-referencing against ICH Q8-Q12, FDA and EMA guidelines. Pre-validation of submissions before gateway upload — cutting months off your filing timeline." },
+  { title: "DRUG DISCOVERY & REPURPOSING", desc: "Molecular docking models, ADMET prediction, virtual screening via graph neural networks. Identification of new therapeutic indications through biological network analysis. Direct integration with your HTS platforms and cloud data warehouses." },
+  { title: "DATA INTEGRITY & AUDIT TRAIL", desc: "Native ALCOA+ architecture. Immutable audit trails, electronic signatures compliant with 21 CFR Part 11, RBAC access control and AES-256 encryption at rest/in transit. Full traceability from raw data to automated decision — cloud or on-premise." },
 ];
 
 export function PharmaExpertise() {
@@ -14,7 +14,7 @@ export function PharmaExpertise() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Capacités IA spécialisées Pharma
+            Pharma-specialized AI capabilities
           </span>
         </div>
 
@@ -22,9 +22,9 @@ export function PharmaExpertise() {
           className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
           style={{ color: "#0F172A" }}
         >
-          IA de grade
+          Pharmaceutical-grade
           <br />
-          pharmaceutique.
+          AI automation.
         </h2>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-0">

@@ -8,14 +8,14 @@ export function PharmaCaseStudy() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px] bg-white/30" />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-white/40">
-            Cas d'usage · Pharma Top 20
+            Use case · Top 20 Pharma
           </span>
         </div>
 
         <div className="relative mb-20 overflow-hidden">
           <img
             src={pharmaLab}
-            alt="Laboratoire de recherche pharmaceutique"
+            alt="Pharmaceutical research laboratory"
             className="w-full h-[220px] md:h-[300px] object-cover opacity-30"
             loading="lazy"
             width={1280}
@@ -23,9 +23,9 @@ export function PharmaCaseStudy() {
           />
           <div className="absolute inset-0 flex items-center">
             <h2 className="font-heading text-[40px] md:text-[56px] lg:text-[68px] font-bold leading-[1.05] text-white px-8 md:px-12">
-              Pipeline R&D
+              R&D pipeline
               <br />
-              accéléré par l'IA.
+              accelerated by AI.
             </h2>
           </div>
           <div className="absolute bottom-0 left-0 w-24 h-1 bg-white/40" />
@@ -35,30 +35,31 @@ export function PharmaCaseStudy() {
           <div>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "rgba(255,255,255,0.6)" }}>
               <p>
-                Un <strong className="text-white font-medium">laboratoire pharmaceutique européen</strong> faisait
-                face à des <strong className="text-white font-medium">délais de soumission réglementaire critiques</strong> :
-                rédaction CTD manuelle, revues de pharmacovigilance fragmentées, données de stabilité non consolidées.
+                A <strong className="text-white font-medium">European pharmaceutical laboratory</strong> was
+                facing <strong className="text-white font-medium">critical regulatory submission delays</strong>:
+                manual CTD writing, fragmented pharmacovigilance reviews, unconsolidated stability data
+                scattered across disconnected on-premise systems.
               </p>
               <p>
-                Notre plateforme a <strong className="text-white font-medium">automatisé la compilation eCTD</strong>,
-                déployé un <strong className="text-white font-medium">système de signal detection en temps réel</strong> et
-                implémenté une <strong className="text-white font-medium">analyse prédictive des profils ADMET</strong> —
-                réduisant le <strong className="text-white font-medium">cycle de soumission de 18 à 7 mois</strong>.
+                Our platform <strong className="text-white font-medium">automated eCTD compilation</strong>,
+                deployed a <strong className="text-white font-medium">real-time signal detection system</strong> and
+                implemented <strong className="text-white font-medium">predictive ADMET profile analysis</strong> on
+                cloud infrastructure — reducing the <strong className="text-white font-medium">submission cycle from 18 to 7 months</strong>.
               </p>
             </div>
 
             <div className="mt-14 pt-10" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
               <div className="font-heading text-[52px] md:text-[68px] font-bold leading-none mb-3 text-white">–61%</div>
-              <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Réduction du cycle de soumission réglementaire</p>
+              <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Reduction in regulatory submission cycle</p>
             </div>
           </div>
 
           <div>
             <div className="space-y-0 mb-14">
               {[
-                { val: "–85%", label: "Temps de revue ICSR grâce au NLP médical" },
-                { val: "99.7%", label: "Précision de classification MedDRA automatisée" },
-                { val: "0", label: "Non-conformité Annexe 11 depuis le déploiement" },
+                { val: "–85%", label: "ICSR review time through medical NLP automation" },
+                { val: "99.7%", label: "Automated MedDRA classification accuracy" },
+                { val: "0", label: "Annex 11 non-compliance events since deployment" },
               ].map((m) => (
                 <div key={m.val + m.label} className="py-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <div className="font-heading text-[36px] md:text-[44px] font-bold mb-2 text-white">{m.val}</div>
@@ -69,10 +70,10 @@ export function PharmaCaseStudy() {
 
             <div className="relative pl-6" style={{ borderLeft: "2px solid rgba(255,255,255,0.2)" }}>
               <p className="text-base md:text-lg italic leading-relaxed mb-5 text-white/80">
-                "Leur expertise réglementaire combinée à la puissance de leur IA nous a fait gagner
-                deux cycles de soumission. Le ROI était visible dès le premier trimestre."
+                "Their regulatory expertise combined with the power of their AI platform saved us
+                two submission cycles. The ROI was visible within the first quarter."
               </p>
-              <p className="text-sm font-semibold text-white/90">VP Regulatory Affairs — Pharma EU</p>
+              <p className="text-sm font-semibold text-white/90">VP Regulatory Affairs — EU Pharma</p>
               <div className="flex items-center gap-0.5 mt-3">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star key={i} className="w-3.5 h-3.5 fill-current" style={{ color: "#FBBF24" }} />
