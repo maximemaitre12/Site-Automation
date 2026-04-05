@@ -41,39 +41,7 @@ export function PharmaTeam() {
             </p>
           </div>
 
-          <div className="space-y-0">
-            {[
-              {
-                role: "Fondateur",
-                name: "Nicolas Parisi",
-                bio: <>
-                  Architecte de <strong style={{ color: "#0F172A" }}>systèmes IA</strong> et spécialiste
-                  de l'<strong style={{ color: "#0F172A" }}>automatisation opérationnelle</strong>.
-                  Construit des solutions qui <strong style={{ color: "#0F172A" }}>tournent en production</strong>,
-                  pas des prototypes.
-                </>,
-              },
-              {
-                role: "Co-fondateur",
-                name: "Vladyslav Mazurkevych",
-                bio: <>
-                  Expert en <strong style={{ color: "#0F172A" }}>infrastructure IA</strong> et{" "}
-                  <strong style={{ color: "#0F172A" }}>scaling opérationnel</strong>.
-                  Spécialiste des <strong style={{ color: "#0F172A" }}>agents autonomes</strong> et
-                  de l'intégration dans les systèmes existants.
-                </>,
-              },
-            ].map((f) => (
-              <div key={f.name} className="py-8" style={{ borderBottom: "1px solid rgba(3,105,161,0.15)" }}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-2 h-2 rounded-full" style={{ background: "#0369A1" }} />
-                  <span className="text-[11px] tracking-[0.25em] uppercase" style={{ color: "#0369A1" }}>{f.role}</span>
-                </div>
-                <h3 className="font-heading text-xl md:text-2xl font-bold mb-3" style={{ color: "#0F172A" }}>{f.name}</h3>
-                <p className="text-[15px] leading-[1.85]" style={{ color: "#334155" }}>{f.bio}</p>
-              </div>
-            ))}
-          </div>
+          <div />
         </div>
       </div>
     </section>
