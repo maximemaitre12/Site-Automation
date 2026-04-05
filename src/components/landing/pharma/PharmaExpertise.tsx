@@ -1,62 +1,55 @@
-const pillars = [
+const areas = [
   {
-    num: "01",
-    title: "Talent Acquisition & Retention",
-    desc: "Recruter des professionnels regulatory affairs, quality assurance et manufacturing dans le contexte pharma.",
-    result: "Time-to-hire: 24 → 6 semaines",
+    title: "TALENT ACQUISITION & RETENTION",
+    desc: "Recruter les meilleurs professionnels en regulatory, quality et manufacturing.",
   },
   {
-    num: "02",
-    title: "GMP & Manufacturing",
-    desc: "Implémenter les systèmes GMP sans ralentir la production. Batch records modernisés.",
-    result: "Compliance incidents: -90%",
+    title: "GMP & MANUFACTURING",
+    desc: "Implémenter les systèmes GMP sans ralentir la production.",
   },
   {
-    num: "03",
-    title: "Regulatory Strategy & Expansion",
-    desc: "Planifier votre expansion avec la compliance intégrée dès le départ.",
-    result: "Market entry timeline: -40%",
+    title: "REGULATORY STRATEGY",
+    desc: "Planifier votre expansion avec la compliance intégrée.",
   },
   {
-    num: "04",
-    title: "Quality Management Systems",
+    title: "QUALITY MANAGEMENT",
     desc: "Construire des QMS robustes, auditables et scalables.",
-    result: "Audit findings: -85%",
   },
   {
-    num: "05",
-    title: "Compliance Technology",
-    desc: "Implémenter la tech compliance-first. Sans casser l'existant.",
-    result: "System downtime: Zero",
+    title: "COMPLIANCE TECHNOLOGY",
+    desc: "Implémenter la tech compliance-first, sans casser l'existant.",
+  },
+  {
+    title: "OPERATIONAL SCALING",
+    desc: "Scaler vos opérations tout en maintenant la conformité.",
   },
 ];
 
 export function PharmaExpertise() {
   return (
-    <section id="expertise" className="py-28 bg-white">
-      <div className="max-w-[1100px] mx-auto px-6">
-        <div className="mb-20">
-          <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#0891B2" }}>
-            Expertise
-          </p>
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-[44px] font-bold leading-tight" style={{ color: "#0F172A" }}>
-            Notre expertise spécialisée
-            <br />en pharma.
-          </h2>
-        </div>
+    <section id="expertise" className="py-36 md:py-44 bg-white">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <h2
+          className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] mb-20"
+          style={{ color: "#0F172A" }}
+        >
+          Domaines
+          <br />
+          d'expertise.
+        </h2>
 
-        <div className="space-y-0 divide-y" style={{ borderColor: "#E2E8F0" }}>
-          {pillars.map((p) => (
-            <div
-              key={p.num}
-              className="grid md:grid-cols-[80px_1fr_1.2fr_auto] gap-6 items-start py-8 first:pt-0 group"
-            >
-              <span className="text-xs font-mono tracking-wider pt-1" style={{ color: "#94A3B8" }}>
-                {p.num}
-              </span>
-              <h3 className="font-heading text-base font-bold" style={{ color: "#0F172A" }}>{p.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "#64748B" }}>{p.desc}</p>
-              <span className="text-sm font-semibold whitespace-nowrap" style={{ color: "#0891B2" }}>{p.result}</span>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
+          {areas.map((a) => (
+            <div key={a.title} className="group cursor-default">
+              <h3
+                className="font-heading text-sm font-bold tracking-[0.15em] mb-4 transition-colors group-hover:opacity-60"
+                style={{ color: "#0F172A" }}
+              >
+                {a.title}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: "#64748B" }}>
+                {a.desc}
+              </p>
             </div>
           ))}
         </div>
