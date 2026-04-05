@@ -13,6 +13,9 @@ const navItems = [
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isContactPage = location.pathname === "/contact";
+  const useDarkMode = scrolled || isContactPage;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
