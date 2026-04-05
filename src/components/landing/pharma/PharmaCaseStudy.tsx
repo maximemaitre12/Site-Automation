@@ -3,7 +3,7 @@ import farmasoftLogo from "@/assets/farmasoft-client-logo.png";
 
 export function PharmaCaseStudy() {
   return (
-    <section id="case-study" className="py-28 md:py-36 bg-white">
+    <section id="case-study" className="py-16 md:py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px] bg-[#0369A1]" />
