@@ -2,7 +2,6 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const stats = [
   { value: "85%", label: "Reduction", sub: "in manual document processing" },
-  { value: "2", label: "AI Agents", sub: "purpose-built for pharma ops" },
   { value: "0", label: "Unvalidated", sub: "actions — human-in-the-loop enforced" },
   { value: "4–6w", label: "Deployment", sub: "from audit to production MVP" },
 ];
