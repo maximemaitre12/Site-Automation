@@ -8,11 +8,13 @@ import { PharmaCaseStudy } from "@/components/landing/pharma/PharmaCaseStudy";
 import { PharmaTrust } from "@/components/landing/pharma/PharmaTrust";
 import { PharmaFAQ } from "@/components/landing/pharma/PharmaFAQ";
 import { PharmaFinalCTA } from "@/components/landing/pharma/PharmaFinalCTA";
+import { PharmaPartners } from "@/components/landing/pharma/PharmaPartners";
 
 export default function Landing() {
   return (
     <div className="overflow-x-hidden">
       <PharmaHero />
+      <PharmaPartners />
       <PharmaStats />
       <PharmaProblems />
       <PharmaTeam />
