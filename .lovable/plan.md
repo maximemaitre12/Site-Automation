@@ -1,60 +1,48 @@
 
 
-# Plan: Translate entire landing page to English + refocus on real pharma automation & cloud needs
+## Chatbot Premium Redesign
 
-## What changes
+Upgrade the floating chatbot to an ultra-premium, enterprise-grade aesthetic aligned with Aether Connect's brand identity.
 
-Translate all 12 pharma landing components from French to English, and shift the messaging to focus more on **real enterprise pain points**: cloud migration, operational automation, data pipeline modernization, and AI-driven compliance — not just regulatory jargon.
+### Changes (single file: `FloatingChatbot.tsx`)
 
-## Files to edit (11 components)
+**1. Floating trigger button**
+- Replace simple circle with a refined pill-shaped button: icon + "Ask Aether" label
+- Subtle glassmorphism effect with `backdrop-blur`, refined shadow
+- Smooth scale + glow animation on hover
 
-### 1. PharmaHero.tsx
-- Headline: "AI systems that accelerate your R&D pipeline."
-- Subtitle refocused on: cloud-native automation, regulatory compliance at scale, operational efficiency
-- CTAs: "Request a free AI audit" / "See our clinical results"
+**2. Header redesign**
+- Use the Aether logo icon (stylized "A" via SVG inline or Sparkles icon) instead of MessageCircle
+- Title: "Aether Intelligence" (more premium than "Aether Connect")
+- Subtitle: "Enterprise AI Assistant" with a refined green dot
+- Add a subtle animated gradient mesh background pattern
+- Minimalist close button with hover state
 
-### 2. PharmaPartners.tsx
-- Label: "Technology partners"
+**3. Empty state (welcome screen)**
+- Replace the generic icon with a sophisticated radial gradient orb with animated shimmer
+- Headline: "What can we solve for you?"
+- Subtitle: "Powered by our proprietary RAG knowledge base"
+- Quick prompts styled as glass cards with subtle left border accent in brand blue, hover lift effect
 
-### 3. PharmaStats.tsx
-- Intro paragraph + stats all in English
-- Stats reframed around real business value: time-to-market reduction, compliance coverage, classification accuracy, integrated frameworks
+**4. Message bubbles**
+- User messages: clean solid blue with subtle inner shadow, no gradient
+- Assistant messages: white with a very thin left blue accent bar (3px), cleaner shadow
+- Assistant avatar: smaller, circular, with a pulsing ring when streaming
+- Typography: Inter-like spacing, 13.5px size
 
-### 4. PharmaProblems.tsx
-- Headline: "Your CTD filings take 18 months. We do 4."
-- Rewrite pain points in English focusing on: manual regulatory writing bottlenecks, siloed batch data, fragmented pharmacovigilance — and how AI automation + cloud infrastructure solve them
-- Domain list in English
-- CTA: "Free regulatory audit"
+**5. Input area**
+- Refined input with inner shadow instead of border
+- Send button: circular with smooth icon rotation on hover
+- Footer: "Aether Intelligence" with a small sparkle icon, more subtle
 
-### 5. PharmaTeam.tsx
-- "Industrial-grade AI engineering" section fully in English
-- Pillar descriptions (MLOps, Autonomous Agents & RAG, Infrastructure & Compliance) rewritten to emphasize cloud automation and enterprise needs: scalable data pipelines, real-time monitoring, multi-cloud deployment
+**6. Animations**
+- Panel entrance: spring animation with slight blur-in
+- Messages: fade-in + slide-up micro-animation
+- Typing indicator: smoother wave animation instead of bounce
 
-### 6. PharmaExpertise.tsx
-- All 6 expertise areas translated, with more emphasis on automation value and cloud infrastructure alongside pharma terminology
-
-### 7. PharmaAIPlatform.tsx
-- "Aether Pharma AI. Built for science." — all capabilities and stats in English
-- Add emphasis on cloud-native architecture and enterprise data integration needs
-
-### 8. PharmaMethodology.tsx
-- KPI section in English, refocused on operational ROI metrics pharma companies actually care about
-
-### 9. PharmaCaseStudy.tsx
-- Case study narrative + testimonial in English
-- More focus on automation impact and cloud migration benefits
-
-### 10. PharmaTrust.tsx
-- Compliance guarantees in English with stronger cloud/automation angle
-
-### 11. PharmaFAQ.tsx
-- All Q&A in English, adding questions about cloud infrastructure, data migration, and automation ROI
-
-### 12. PharmaFinalCTA.tsx
-- CTAs in English: "Free regulatory audit" / "Contact the R&D team"
-
-## Tone shift
-- Everything in English
-- Keep ultra-technical pharma terminology (GxP, eCTD, MedDRA, ICH) but balance it with **real enterprise automation language**: cloud migration, data pipeline orchestration, legacy system modernization, operational cost reduction, scalable infrastructure
-- Position Aether Connect as solving the gap between pharma's regulatory complexity and modern cloud/AI capabilities
+### Technical details
+- Single file edit: `src/components/landing/FloatingChatbot.tsx`
+- Replace `MessageCircle` with `Sparkles` from lucide-react for brand differentiation
+- Add CSS keyframes for shimmer, message fade-in, and wave animations
+- All inline styles/Tailwind, no external dependencies needed
 
