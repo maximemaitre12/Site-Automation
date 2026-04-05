@@ -3,7 +3,7 @@ import farmasoftLogo from "@/assets/farmasoft-client-logo.png";
 
 export function PharmaCaseStudy() {
   return (
-    <section id="case-study" className="py-28 md:py-36 bg-white">
+    <section id="case-study" className="py-16 md:py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px] bg-[#0369A1]" />
@@ -18,14 +18,14 @@ export function PharmaCaseStudy() {
             <img
               src={farmasoftLogo}
               alt="Farmasoft — Reliable Logistics"
-              className="h-20 md:h-24 object-contain"
+              className="h-28 md:h-36 object-contain"
               loading="lazy"
             />
           </div>
           <h2 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-8 text-[#111]">
-            Two AI agents.
+            Farmasoft × Aether Connect
             <br />
-            <span className="text-[#0369A1]">One operational backbone.</span>
+            <span className="text-[#0369A1]">Two AI agents. One operational backbone.</span>
           </h2>
           <p className="text-[15px] md:text-base leading-[1.85] mb-6 text-[#6B6560] max-w-3xl">
             <strong className="text-[#111] font-medium">Farmasoft</strong> is a major European pharmaceutical
