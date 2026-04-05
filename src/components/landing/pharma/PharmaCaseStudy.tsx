@@ -27,14 +27,10 @@ export function PharmaCaseStudy() {
             <span className="text-[#0369A1]">Two AI agents deployed by Aether Connect</span>
           </h2>
           <p className="text-[15px] md:text-base leading-[1.85] mb-6 text-[#6B6560] max-w-3xl">
-            <strong className="text-[#111] font-medium">Farmasoft</strong> is a major European pharmaceutical
-            logistics operator managing <strong className="text-[#111] font-medium">high-volume inbound and
-            outbound flows</strong> across regulated supply chains.
+            <strong className="text-[#111] font-medium">Farmasoft</strong> is a recognized European leader in pharmaceutical logistics, trusted to orchestrate <strong className="text-[#111] font-medium">high-volume, temperature-sensitive supply chains</strong> across multiple regulated markets with exceptional operational precision and reliability.
           </p>
           <p className="text-[15px] md:text-base leading-[1.85] text-[#6B6560] max-w-3xl">
-            We deployed <strong className="text-[#111] font-medium">two purpose-built AI agents</strong>,
-            designed to integrate directly into their existing systems and operate under{" "}
-            <strong className="text-[#111] font-medium">strict human validation at every step</strong>.
+            We engineered <strong className="text-[#111] font-medium">two purpose-built AI agents</strong> designed to integrate seamlessly into their mission-critical infrastructure, operating under <strong className="text-[#111] font-medium">strict human-in-the-loop validation</strong> at every decision point.
           </p>
         </div>
 
