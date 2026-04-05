@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import pharmaQuality from "@/assets/pharma-quality.jpg";
 
 const domains = [
-  { name: "AUTOMATED PHARMACOVIGILANCE", tag: "Signal Detection" },
-  { name: "CLINICAL TRIAL OPTIMIZATION", tag: "Phase I–IV" },
-  { name: "eCTD REGULATORY SUBMISSION", tag: "FDA · EMA" },
-  { name: "QUALITY CONTROL BY COMPUTER VISION", tag: "GMP Compliance" },
-  { name: "DRUG REPURPOSING & TARGET ID", tag: "R&D Pipeline" },
+  { name: "LOGISTICS AUTOMATION", tag: "Inbound · Outbound" },
+  { name: "DOCUMENT INTELLIGENCE", tag: "PDF · Email · EDI" },
+  { name: "TALENT ACQUISITION AI", tag: "Sourcing · Scoring" },
+  { name: "ERP INTEGRATION", tag: "Draft Orders · Validation" },
+  { name: "CLOUD MIGRATION", tag: "Legacy · Modernization" },
 ];
 
 export function PharmaProblems() {
@@ -16,7 +16,7 @@ export function PharmaProblems() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Regulatory & operational challenges
+            Operational challenges we solve
           </span>
         </div>
 
@@ -26,30 +26,30 @@ export function PharmaProblems() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Your CTD filings
+              Your teams process
               <br />
-              take 18 months.
+              documents manually.
               <br />
-              We do 4.
+              Our agents don't.
             </h2>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
               <p>
-                <strong style={{ color: "#0F172A" }}>Regulatory writing</strong> ties up your best people
-                for months. <strong style={{ color: "#0F172A" }}>Pharmacovigilance reviews</strong> are still
-                manual. Your <strong style={{ color: "#0F172A" }}>batch record data</strong> sits locked
-                in siloed legacy systems with no cloud connectivity.
+                <strong style={{ color: "#0F172A" }}>Order preparation</strong> requires hours of manual data entry.
+                <strong style={{ color: "#0F172A" }}> Inbound reception</strong> means parsing PDFs, scans and emails
+                by hand. Your <strong style={{ color: "#0F172A" }}>recruitment pipeline</strong> can't keep pace
+                with operational growth.
               </p>
               <p>
-                Our <strong style={{ color: "#0F172A" }}>pharma-specialized NLP agents</strong> extract, classify
-                and structure your <strong style={{ color: "#0F172A" }}>ICSRs</strong>, generate{" "}
-                <strong style={{ color: "#0F172A" }}>PSURs/PBRERs</strong> and compile your{" "}
-                <strong style={{ color: "#0F172A" }}>eCTD modules</strong> automatically — deployed on scalable cloud infrastructure.
+                Our <strong style={{ color: "#0F172A" }}>purpose-built AI agents</strong> extract, classify
+                and structure data from <strong style={{ color: "#0F172A" }}>any document format</strong> —
+                generating <strong style={{ color: "#0F172A" }}>draft orders</strong> directly in your ERP,
+                and <strong style={{ color: "#0F172A" }}>qualified candidate shortlists</strong> for your HR team.
               </p>
               <p>
-                From <strong style={{ color: "#0F172A" }}>signal detection</strong> to{" "}
-                <strong style={{ color: "#0F172A" }}>benefit-risk assessment</strong>, our AI operates
-                within a native <strong style={{ color: "#0F172A" }}>ICH E2B(R3)</strong> framework,
-                fully integrated with your existing data pipelines.
+                Every automated output is a <strong style={{ color: "#0F172A" }}>draft</strong> —
+                validated by <strong style={{ color: "#0F172A" }}>your team before execution</strong>.
+                No black box. Full traceability. Deployed on <strong style={{ color: "#0F172A" }}>cloud infrastructure</strong> that
+                scales with your operations.
               </p>
             </div>
 
@@ -59,7 +59,7 @@ export function PharmaProblems() {
                 className="inline-flex items-center justify-center h-12 px-8 text-[13px] font-bold tracking-[0.1em] uppercase text-white transition-all hover:opacity-90"
                 style={{ background: "#0369A1" }}
               >
-                Free regulatory audit
+                Free automation audit
               </Link>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function PharmaProblems() {
             <div className="relative mb-14 overflow-hidden">
               <img
                 src={pharmaQuality}
-                alt="Automated pharmaceutical quality control"
+                alt="Automated pharmaceutical logistics"
                 className="w-full h-[300px] lg:h-[360px] object-cover"
                 loading="lazy"
                 width={800}

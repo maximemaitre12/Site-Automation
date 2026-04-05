@@ -7,7 +7,7 @@ export function PharmaTeam() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Operational architecture
+            How we build
           </span>
         </div>
 
@@ -29,51 +29,49 @@ export function PharmaTeam() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Industrial-grade
+              Production-grade
               <br />
               AI engineering.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
-              Our <strong style={{ color: "#0F172A" }}>machine learning pipelines</strong> are
-              built for <strong style={{ color: "#0F172A" }}>GxP-compliant</strong> environments and
-              <strong style={{ color: "#0F172A" }}> FDA 21 CFR Part 11</strong> workflows. Every model
-              is versioned, auditable and deployed through <strong style={{ color: "#0F172A" }}>validated CI/CD</strong> on
-              <strong style={{ color: "#0F172A" }}> SOC 2 Type II</strong> cloud infrastructure — eliminating manual handoffs
-              and accelerating your path from data to production.
+              Our <strong style={{ color: "#0F172A" }}>agents</strong> are not prototypes — they are
+              <strong style={{ color: "#0F172A" }}> production systems</strong> integrated into your
+              operational stack. Every model is versioned, every action is auditable, and every
+              deployment follows <strong style={{ color: "#0F172A" }}>validated CI/CD pipelines</strong> on
+              <strong style={{ color: "#0F172A" }}> cloud infrastructure</strong> compliant with
+              pharmaceutical industry standards.
             </p>
           </div>
 
           <div className="space-y-0">
             {[
               {
-                title: "MLOps ORCHESTRATION",
+                title: "AGENT ARCHITECTURE",
                 desc: <>
-                  Centralized <strong style={{ color: "#0F172A" }}>feature stores</strong>,{" "}
-                  <strong style={{ color: "#0F172A" }}>model registry</strong> with semantic versioning,{" "}
-                  containerized <strong style={{ color: "#0F172A" }}>inference pipelines</strong> on
-                  Kubernetes. Real-time drift monitoring via <strong style={{ color: "#0F172A" }}>Prometheus/Grafana</strong>.
-                  Scalable from single-tenant to enterprise multi-cloud.
-                </>,
-              },
-              {
-                title: "AUTONOMOUS AGENTS & RAG",
-                desc: <>
-                  <strong style={{ color: "#0F172A" }}>Multi-agent architectures</strong> with{" "}
+                  <strong style={{ color: "#0F172A" }}>Multi-agent orchestration</strong> with{" "}
                   <strong style={{ color: "#0F172A" }}>retrieval-augmented generation</strong>,{" "}
-                  <strong style={{ color: "#0F172A" }}>vector databases</strong> (Pinecone, pgvector),
-                  reasoning chains via <strong style={{ color: "#0F172A" }}>LangChain/LlamaIndex</strong> and
-                  <strong style={{ color: "#0F172A" }}> event-driven</strong> orchestration — automating regulatory document processing at scale.
+                  <strong style={{ color: "#0F172A" }}>vector databases</strong> and
+                  <strong style={{ color: "#0F172A" }}> event-driven</strong> processing — each agent handles
+                  a specific operational domain while sharing a unified intelligence layer.
                 </>,
               },
               {
-                title: "CLOUD INFRASTRUCTURE & COMPLIANCE",
+                title: "CLOUD INFRASTRUCTURE",
                 desc: <>
                   <strong style={{ color: "#0F172A" }}>Multi-cloud deployment</strong> (AWS, Azure, GCP)
                   with <strong style={{ color: "#0F172A" }}>IaC Terraform</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>encryption at rest/in transit</strong>,{" "}
                   immutable <strong style={{ color: "#0F172A" }}>audit trails</strong> and{" "}
-                  granular <strong style={{ color: "#0F172A" }}>RBAC</strong>. GDPR, HIPAA, ISO 27001 compliant.
-                  Seamless migration from legacy on-premise systems.
+                  granular <strong style={{ color: "#0F172A" }}>RBAC</strong>. Seamless migration from legacy on-premise systems.
+                </>,
+              },
+              {
+                title: "HUMAN-IN-THE-LOOP GOVERNANCE",
+                desc: <>
+                  Every agent output is a <strong style={{ color: "#0F172A" }}>draft</strong> — no automated
+                  action executes without <strong style={{ color: "#0F172A" }}>explicit human validation</strong>.
+                  Full traceability, audit logs, and <strong style={{ color: "#0F172A" }}>role-based access control</strong> at
+                  every step of the pipeline.
                 </>,
               },
             ].map((item) => (

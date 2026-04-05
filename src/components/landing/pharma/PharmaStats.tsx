@@ -1,8 +1,8 @@
 const stats = [
-  { value: "40%", label: "Reduction", sub: "in preclinical time-to-market" },
-  { value: "21", label: "CFR Part 11", sub: "native FDA compliance" },
-  { value: "99.7%", label: "Accuracy", sub: "adverse event classification" },
-  { value: "ICH", label: "Q8–Q12", sub: "frameworks integrated by default" },
+  { value: "85%", label: "Reduction", sub: "in manual document processing" },
+  { value: "2", label: "AI Agents", sub: "purpose-built for pharma ops" },
+  { value: "0", label: "Unvalidated", sub: "actions — human-in-the-loop enforced" },
+  { value: "4–6w", label: "Deployment", sub: "from audit to production MVP" },
 ];
 
 export function PharmaStats() {
@@ -12,11 +12,10 @@ export function PharmaStats() {
         <div className="flex items-start gap-8 mb-24">
           <div className="w-16 h-px mt-3 shrink-0" style={{ background: "#0369A1" }} />
           <p className="text-base md:text-[17px] leading-[1.85] max-w-[620px]" style={{ color: "#4a5568" }}>
-            Our <strong style={{ color: "#0F172A" }}>machine learning pipelines</strong> are architected for
-            <strong style={{ color: "#0F172A" }}> GMP/GLP/GCP-compliant</strong> environments — from{" "}
-            <strong style={{ color: "#0F172A" }}>therapeutic target discovery</strong> to{" "}
-            <strong style={{ color: "#0F172A" }}>eCTD submission</strong>. Every model is versioned, auditable and
-            deployed through <strong style={{ color: "#0F172A" }}>IQ/OQ/PQ-validated CI/CD</strong> on cloud-native infrastructure.
+            Our <strong style={{ color: "#0F172A" }}>AI agents</strong> are designed to integrate directly into your
+            <strong style={{ color: "#0F172A" }}> existing systems</strong> — ERP, HRIS, email workflows. Every output is a
+            <strong style={{ color: "#0F172A" }}> draft requiring human validation</strong>, deployed on{" "}
+            <strong style={{ color: "#0F172A" }}>scalable cloud infrastructure</strong> compliant with pharmaceutical regulations.
           </p>
         </div>
 
