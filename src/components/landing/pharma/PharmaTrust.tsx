@@ -1,8 +1,8 @@
 const blocks = [
-  { title: "IA DE POINTE", desc: "On utilise les modèles les plus avancés du marché. Pas des outils no-code — de vrais systèmes architecturés pour performer." },
-  { title: "SUR MESURE", desc: "Pas de solutions génériques. Chaque système est conçu pour votre réalité opérationnelle, vos données, vos contraintes." },
-  { title: "ZÉRO DISRUPTION", desc: "Nos déploiements s'intègrent dans vos systèmes existants. Vos opérations ne ralentissent jamais." },
-  { title: "RÉSULTATS MESURABLES", desc: "KPIs définis dès le jour 1. Chaque projet est évalué sur son impact réel, pas sur des démos impressionnantes." },
+  { title: "GxP-NATIVE PAR DESIGN", desc: "Chaque composant de notre stack est conçu pour des environnements GMP, GLP et GCP. Pas d'adaptation a posteriori — la conformité est architecturale, pas cosmétique." },
+  { title: "VALIDATION CSV INTÉGRÉE", desc: "Protocoles IQ/OQ/PQ automatisés, rapports de validation générés à chaque release. Traçabilité complète du code source aux résultats d'inférence, conforme Annexe 11 et 21 CFR Part 11." },
+  { title: "MODÈLES ENTRAÎNÉS SUR DONNÉES PHARMA", desc: "Nos modèles NLP sont fine-tunés sur des corpus réglementaires (ICH, FDA Guidance, EMA Scientific Guidelines) et des datasets de pharmacovigilance anonymisés." },
+  { title: "DÉPLOIEMENT SANS DISRUPTION", desc: "Intégration native avec vos LIMS, MES, ERP (SAP), EDMS et systèmes de pharmacovigilance (Argus, ArisGlobal). Architecture microservices containerisée, zero-downtime deployment." },
 ];
 
 export function PharmaTrust() {
@@ -12,7 +12,7 @@ export function PharmaTrust() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Pourquoi nous
+            Garanties réglementaires
           </span>
         </div>
 
@@ -20,9 +20,11 @@ export function PharmaTrust() {
           className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
           style={{ color: "#0F172A" }}
         >
-          Ce qui nous
+          La conformité n'est pas
           <br />
-          différencie.
+          une feature. C'est
+          <br />
+          l'architecture.
         </h2>
 
         <div className="grid sm:grid-cols-2 gap-0">

@@ -3,6 +3,7 @@ import { PharmaStats } from "@/components/landing/pharma/PharmaStats";
 import { PharmaProblems } from "@/components/landing/pharma/PharmaProblems";
 import { PharmaTeam } from "@/components/landing/pharma/PharmaTeam";
 import { PharmaExpertise } from "@/components/landing/pharma/PharmaExpertise";
+import { PharmaAIPlatform } from "@/components/landing/pharma/PharmaAIPlatform";
 import { PharmaMethodology } from "@/components/landing/pharma/PharmaMethodology";
 import { PharmaCaseStudy } from "@/components/landing/pharma/PharmaCaseStudy";
 import { PharmaTrust } from "@/components/landing/pharma/PharmaTrust";
@@ -19,6 +20,7 @@ export default function Landing() {
       <PharmaProblems />
       <PharmaTeam />
       <PharmaExpertise />
+      <PharmaAIPlatform />
       <PharmaMethodology />
       <PharmaCaseStudy />
       <PharmaTrust />

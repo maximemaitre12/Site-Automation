@@ -1,11 +1,11 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const faqs = [
-  { q: "L'IA, c'est pour les grandes entreprises non ?", a: "Non. Nos solutions s'adaptent à toutes les tailles. PME, ETI, grands groupes — le ROI est le même. On commence petit, on scale vite." },
-  { q: "Ça va interrompre nos opérations ?", a: "Jamais. Nos déploiements s'intègrent dans vos systèmes existants (SAP, ERP, CRM, legacy). Zéro disruption, c'est notre garantie." },
-  { q: "Combien de temps pour voir des résultats ?", a: "Premier prototype fonctionnel en 4 à 6 semaines. Déploiement complet en 12 à 16 semaines. Pas de projets qui traînent." },
-  { q: "Vous travaillez dans quel secteur ?", a: "Industrie, finance, logistique, retail, santé, manufacturing... Notre force c'est de comprendre votre métier en profondeur avant de construire quoi que ce soit." },
-  { q: "Quelle différence avec un cabinet de conseil classique ?", a: "On ne livre pas de slides. On livre des systèmes IA en production, avec des KPIs mesurables et un ROI concret." },
+  { q: "Votre IA est-elle conforme 21 CFR Part 11 et Annexe 11 ?", a: "Oui. Chaque système est déployé avec des electronic signatures, audit trails immutables et contrôle d'accès RBAC. Nos protocoles de validation IQ/OQ/PQ sont fournis avec chaque release et documentés dans un Validation Master Plan." },
+  { q: "Comment intégrez-vous les systèmes existants (LIMS, MES, SAP) ?", a: "Via une architecture microservices et des API RESTful/GraphQL. Nous supportons les connecteurs natifs SAP, Veeva Vault, Documentum, Argus Safety et les principaux LIMS du marché. L'intégration se fait sans interruption de vos opérations." },
+  { q: "Vos modèles sont-ils entraînés sur des données pharma ?", a: "Nos modèles NLP sont fine-tunés sur des corpus réglementaires ICH, FDA Guidance Documents, EMA Scientific Guidelines et des datasets de pharmacovigilance anonymisés. Les modèles de vision sont entraînés sur des données GMP de contrôle qualité." },
+  { q: "Quel est le délai de déploiement typique ?", a: "Premier MVP validé en 4 à 6 semaines en environnement de qualification. Déploiement production avec validation CSV complète en 12 à 16 semaines. Nous suivons un cycle V-Model adapté aux systèmes informatisés pharmaceutiques." },
+  { q: "Comment gérez-vous la protection des données patients ?", a: "Architecture privacy-by-design conforme RGPD et HIPAA. Les données sont pseudonymisées ou anonymisées à l'ingestion. Encryption AES-256 at rest, TLS 1.3 in transit. Hébergement sur infrastructure certifiée ISO 27001 et SOC 2 Type II." },
 ];
 
 export function PharmaFAQ() {
@@ -15,7 +15,7 @@ export function PharmaFAQ() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            FAQ
+            Questions réglementaires & techniques
           </span>
         </div>
 
@@ -30,7 +30,8 @@ export function PharmaFAQ() {
               fréquentes.
             </h2>
             <p className="text-[15px] leading-[1.85]" style={{ color: "#4a5568" }}>
-              Tout ce que vous devez savoir avant de <strong style={{ color: "#0F172A" }}>lancer un projet IA</strong> avec nous.
+              Tout ce que les <strong style={{ color: "#0F172A" }}>équipes Regulatory Affairs et Quality Assurance</strong> doivent
+              savoir avant de déployer notre plateforme.
             </p>
           </div>
 

@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import pharmaQuality from "@/assets/pharma-quality.jpg";
 
 const domains = [
-  { name: "AGENTS IA AUTONOMES", tag: "Automatisation" },
-  { name: "ANALYSE PRÉDICTIVE", tag: "Data" },
-  { name: "VISION PAR ORDINATEUR", tag: "Qualité" },
-  { name: "NLP & TRAITEMENT DOCUMENTAIRE", tag: "Process" },
-  { name: "INTÉGRATION SYSTÈMES", tag: "Infrastructure" },
+  { name: "PHARMACOVIGILANCE AUTOMATISÉE", tag: "Signal Detection" },
+  { name: "OPTIMISATION ESSAIS CLINIQUES", tag: "Phase I–IV" },
+  { name: "SOUMISSION RÉGLEMENTAIRE eCTD", tag: "FDA · EMA" },
+  { name: "CONTRÔLE QUALITÉ PAR VISION", tag: "GMP Compliance" },
+  { name: "DRUG REPURPOSING & TARGET ID", tag: "R&D Pipeline" },
 ];
 
 export function PharmaProblems() {
@@ -16,7 +16,7 @@ export function PharmaProblems() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Ce qu'on résout
+            Défis réglementaires & opérationnels
           </span>
         </div>
 
@@ -26,25 +26,29 @@ export function PharmaProblems() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Vos processus
+              Vos dossiers CTD
               <br />
-              manuels vous
+              prennent 18 mois.
               <br />
-              coûtent cher.
+              On fait 4.
             </h2>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
               <p>
-                Chaque <strong style={{ color: "#0F172A" }}>tâche répétitive</strong> est une opportunité d'automatisation.
-                Chaque <strong style={{ color: "#0F172A" }}>donnée inexploitée</strong> est un manque à gagner.
+                La <strong style={{ color: "#0F172A" }}>rédaction réglementaire</strong> mobilise vos meilleurs
+                profils pendant des mois. Les <strong style={{ color: "#0F172A" }}>revues de pharmacovigilance</strong> sont
+                encore manuelles. Vos <strong style={{ color: "#0F172A" }}>données de batch records</strong> dorment
+                dans des systèmes cloisonnés.
               </p>
               <p>
-                On conçoit des <strong style={{ color: "#0F172A" }}>systèmes IA sur mesure</strong> qui
-                s'intègrent dans vos outils existants — <strong style={{ color: "#0F172A" }}>sans disruption</strong>,
-                avec des <strong style={{ color: "#0F172A" }}>résultats mesurables en semaines</strong>.
+                Nos <strong style={{ color: "#0F172A" }}>agents NLP spécialisés pharma</strong> extraient, classifient
+                et structurent vos <strong style={{ color: "#0F172A" }}>ICSRs</strong>, génèrent des{" "}
+                <strong style={{ color: "#0F172A" }}>PSURs/PBRERs</strong> et compilent vos{" "}
+                <strong style={{ color: "#0F172A" }}>modules eCTD</strong> automatiquement.
               </p>
               <p>
-                Traçabilité, prédiction, contrôle qualité, traitement documentaire — notre IA
-                s'adapte à <strong style={{ color: "#0F172A" }}>votre réalité opérationnelle</strong>.
+                Du <strong style={{ color: "#0F172A" }}>signal detection</strong> à la{" "}
+                <strong style={{ color: "#0F172A" }}>benefit-risk assessment</strong>, notre IA opère
+                dans un cadre <strong style={{ color: "#0F172A" }}>ICH E2B(R3)</strong> natif.
               </p>
             </div>
 
@@ -54,7 +58,7 @@ export function PharmaProblems() {
                 className="inline-flex items-center justify-center h-12 px-8 text-[13px] font-bold tracking-[0.1em] uppercase text-white transition-all hover:opacity-90"
                 style={{ background: "#0369A1" }}
               >
-                Demander un diagnostic IA
+                Audit réglementaire gratuit
               </Link>
             </div>
           </div>
@@ -63,7 +67,7 @@ export function PharmaProblems() {
             <div className="relative mb-14 overflow-hidden">
               <img
                 src={pharmaQuality}
-                alt="Intelligence artificielle en action"
+                alt="Contrôle qualité pharmaceutique automatisé"
                 className="w-full h-[300px] lg:h-[360px] object-cover"
                 loading="lazy"
                 width={800}
@@ -73,7 +77,7 @@ export function PharmaProblems() {
             </div>
 
             <p className="text-[11px] font-semibold tracking-[0.3em] uppercase mb-8" style={{ color: "#94a3b8" }}>
-              Technologies déployées
+              Domaines d'intervention
             </p>
             <div className="space-y-0">
               {domains.map((d) => (
