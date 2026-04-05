@@ -7,7 +7,7 @@ const blocks = [
 
 export function PharmaTrust() {
   return (
-    <section className="py-32 md:py-40" style={{ background: "#F7F8FA" }}>
+    <section className="py-32 md:py-40" style={{ background: "#D6EEF5" }}>
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <h2
           className="font-heading text-[36px] md:text-5xl lg:text-[56px] font-bold leading-[1.08] mb-20"
@@ -17,19 +17,11 @@ export function PharmaTrust() {
           <br />
           de confiance.
         </h2>
-
         <div className="grid sm:grid-cols-2 gap-x-14 gap-y-14">
           {blocks.map((b) => (
             <div key={b.title}>
-              <h3
-                className="font-heading text-[12px] font-bold tracking-[0.18em] mb-4"
-                style={{ color: "#0F172A" }}
-              >
-                {b.title}
-              </h3>
-              <p className="text-[15px] leading-[1.8]" style={{ color: "#5a6577" }}>
-                {b.desc}
-              </p>
+              <h3 className="font-heading text-[12px] font-bold tracking-[0.18em] mb-4" style={{ color: "#0F172A" }}>{b.title}</h3>
+              <p className="text-[15px] leading-[1.8]" style={{ color: "#3d5060" }}>{b.desc}</p>
             </div>
           ))}
         </div>
