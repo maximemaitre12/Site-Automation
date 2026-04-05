@@ -2,11 +2,14 @@ import { Link } from "react-router-dom";
 import pharmaQuality from "@/assets/pharma-quality.jpg";
 
 const domains = [
-  { name: "LOGISTICS AUTOMATION", tag: "Inbound · Outbound" },
-  { name: "DOCUMENT INTELLIGENCE", tag: "PDF · Email · EDI" },
-  { name: "TALENT ACQUISITION AI", tag: "Sourcing · Scoring" },
-  { name: "ERP INTEGRATION", tag: "Draft Orders · Validation" },
-  { name: "CLOUD MIGRATION", tag: "Legacy · Modernization" },
+  { name: "LOGISTICS & SUPPLY CHAIN", tag: "Inbound · Outbound · WMS" },
+  { name: "DOCUMENT INTELLIGENCE", tag: "PDF · Email · EDI · Scans" },
+  { name: "TALENT & RECRUITMENT", tag: "Sourcing · Scoring · HRIS" },
+  { name: "REGULATORY & COMPLIANCE", tag: "GxP · eCTD · Pharmacovigilance" },
+  { name: "ERP & SYSTEM INTEGRATION", tag: "SAP · Oracle · Dynamics" },
+  { name: "CLOUD & INFRASTRUCTURE", tag: "Migration · DevOps · Security" },
+  { name: "R&D & DATA SCIENCE", tag: "NLP · Computer Vision · ML" },
+  { name: "QUALITY & AUDIT", tag: "CAPA · Deviations · Audit Trail" },
 ];
 
 export function PharmaProblems() {
@@ -16,7 +19,7 @@ export function PharmaProblems() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Operational challenges we solve
+            What we automate
           </span>
         </div>
 
@@ -26,30 +29,36 @@ export function PharmaProblems() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Your teams process
+              Any process.
               <br />
-              documents manually.
+              Any system.
               <br />
-              Our agents don't.
+              Any scale.
             </h2>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
               <p>
-                <strong style={{ color: "#0F172A" }}>Order preparation</strong> requires hours of manual data entry.
-                <strong style={{ color: "#0F172A" }}> Inbound reception</strong> means parsing PDFs, scans and emails
-                by hand. Your <strong style={{ color: "#0F172A" }}>recruitment pipeline</strong> can't keep pace
-                with operational growth.
+                From <strong style={{ color: "#0F172A" }}>logistics operations</strong> and{" "}
+                <strong style={{ color: "#0F172A" }}>regulatory submissions</strong> to{" "}
+                <strong style={{ color: "#0F172A" }}>talent acquisition</strong> and{" "}
+                <strong style={{ color: "#0F172A" }}>quality management</strong> — we build
+                AI agents that plug into your existing stack and automate the workflows
+                that slow your teams down.
               </p>
               <p>
-                Our <strong style={{ color: "#0F172A" }}>purpose-built AI agents</strong> extract, classify
-                and structure data from <strong style={{ color: "#0F172A" }}>any document format</strong> —
-                generating <strong style={{ color: "#0F172A" }}>draft orders</strong> directly in your ERP,
-                and <strong style={{ color: "#0F172A" }}>qualified candidate shortlists</strong> for your HR team.
+                Our agents handle <strong style={{ color: "#0F172A" }}>document processing</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>data extraction</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>ERP integration</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>compliance monitoring</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>pharmacovigilance</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>cloud migration</strong> and{" "}
+                <strong style={{ color: "#0F172A" }}>infrastructure modernization</strong>.
+                Whatever your operational bottleneck — we've built an agent for it.
               </p>
               <p>
-                Every automated output is a <strong style={{ color: "#0F172A" }}>draft</strong> —
-                validated by <strong style={{ color: "#0F172A" }}>your team before execution</strong>.
-                No black box. Full traceability. Deployed on <strong style={{ color: "#0F172A" }}>cloud infrastructure</strong> that
-                scales with your operations.
+                Every deployment starts with a <strong style={{ color: "#0F172A" }}>free audit</strong> of your
+                current workflows. We identify the <strong style={{ color: "#0F172A" }}>highest-impact automation
+                opportunities</strong>, prototype in <strong style={{ color: "#0F172A" }}>4–6 weeks</strong>, and
+                scale from there — always with <strong style={{ color: "#0F172A" }}>human validation</strong> at every step.
               </p>
             </div>
 
@@ -68,7 +77,7 @@ export function PharmaProblems() {
             <div className="relative mb-14 overflow-hidden">
               <img
                 src={pharmaQuality}
-                alt="Automated pharmaceutical logistics"
+                alt="Enterprise automation at scale"
                 className="w-full h-[300px] lg:h-[360px] object-cover"
                 loading="lazy"
                 width={800}
