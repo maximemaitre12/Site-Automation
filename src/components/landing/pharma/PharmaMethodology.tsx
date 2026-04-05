@@ -1,12 +1,12 @@
 import pharmaProduction from "@/assets/pharma-production.jpg";
 
 const quality = [
-  { value: "40%", desc: "Reduction in preclinical time-to-market" },
-  { value: "–85%", desc: "ICSR review time through automated pharmacovigilance" },
-  { value: "4–6", desc: "Weeks to a validated MVP in GxP environments" },
-  { value: "99.7%", desc: "MedDRA classification accuracy on adverse events" },
-  { value: "24/7", desc: "Continuous post-market safety signal monitoring" },
-  { value: "100%", desc: "ALCOA+ traceability on every automated action" },
+  { value: "–72%", desc: "Document processing time through Operations Intelligence Agent" },
+  { value: "–65%", desc: "Time-to-hire via automated candidate sourcing and qualification" },
+  { value: "3x", desc: "Faster inbound-to-dispatch cycle with AI-drafted preparation orders" },
+  { value: "€1.5M+", desc: "Estimated annual value created across operations and recruitment" },
+  { value: "100%", desc: "Human-validated outputs — zero autonomous execution" },
+  { value: "< 6 wks", desc: "Full agent deployment cycle including system integration" },
 ];
 
 export function PharmaMethodology() {
@@ -16,7 +16,7 @@ export function PharmaMethodology() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Clinical & operational results
+            Measured outcomes
           </span>
         </div>
 
@@ -26,23 +26,21 @@ export function PharmaMethodology() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
               style={{ color: "#0F172A" }}
             >
-              Validated KPIs
+              Real results.
               <br />
-              in regulated
-              <br />
-              environments.
+              Not prototypes.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
-              Every deployment undergoes full <strong style={{ color: "#0F172A" }}>IQ/OQ/PQ qualification</strong>.
-              Performance is measured against <strong style={{ color: "#0F172A" }}>statistically validated endpoints</strong> and
-              documented in <strong style={{ color: "#0F172A" }}>CSV validation reports</strong> — giving your QA team
-              complete audit-ready documentation from day one.
+              Every metric below comes from <strong style={{ color: "#0F172A" }}>production deployment</strong> at
+              Farmasoft — a pharmaceutical logistics enterprise processing thousands of operations daily.
+              Our agents are measured on <strong style={{ color: "#0F172A" }}>operational impact</strong>, not
+              demo scenarios.
             </p>
           </div>
           <div className="relative overflow-hidden">
             <img
               src={pharmaProduction}
-              alt="AI in GMP pharmaceutical production"
+              alt="AI-powered pharmaceutical logistics operations"
               className="w-full h-[260px] lg:h-[300px] object-cover"
               loading="lazy"
               width={1280}
