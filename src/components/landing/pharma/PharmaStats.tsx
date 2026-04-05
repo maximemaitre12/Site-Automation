@@ -2,7 +2,6 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const stats = [
   { value: "85%", label: "Reduction", sub: "in manual document processing" },
-  { value: "2", label: "AI Agents", sub: "purpose-built for pharma ops" },
   { value: "0", label: "Unvalidated", sub: "actions — human-in-the-loop enforced" },
   { value: "4–6w", label: "Deployment", sub: "from audit to production MVP" },
 ];
@@ -23,7 +22,7 @@ export function PharmaStats() {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-14 gap-x-8">
           {stats.map((s, i) => (
             <ScrollReveal key={s.label} delay={i * 200}>
               <div className="relative pl-6">
