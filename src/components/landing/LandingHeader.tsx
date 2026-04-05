@@ -65,7 +65,7 @@ export function LandingHeader() {
             to="/auth?mode=login&redirect=/farmasoft"
             className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-[#0891B2]" : "text-white/70 hover:text-white"}`}
           >
-            Log in
+            Connexion
           </Link>
           <Link
             to="/contact"
