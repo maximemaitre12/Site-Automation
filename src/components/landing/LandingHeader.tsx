@@ -25,9 +25,9 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "shadow-sm backdrop-blur-md" : ""}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${(scrolled || isContactPage) ? "shadow-sm backdrop-blur-md" : ""}`}
       style={{
-        background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
+        background: (scrolled || isContactPage) ? "rgba(255,255,255,0.95)" : "transparent",
         height: 80,
       }}
     >
@@ -37,7 +37,7 @@ export function LandingHeader() {
             src={aetherLogo}
             alt="Aether Connect"
             className="h-40 w-auto transition-all duration-500"
-            style={scrolled ? { filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" } : {}}
+            style={useDarkMode ? { filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" } : {}}
           />
         </Link>
 
