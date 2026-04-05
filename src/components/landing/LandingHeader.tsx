@@ -1,5 +1,5 @@
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import aetherLogo from "@/assets/aether-logo.png";
 
@@ -13,6 +13,9 @@ const navItems = [
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isContactPage = location.pathname === "/contact";
+  const useDarkMode = scrolled || isContactPage;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -22,9 +25,9 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "shadow-sm backdrop-blur-md" : ""}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${(scrolled || isContactPage) ? "shadow-sm backdrop-blur-md" : ""}`}
       style={{
-        background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
+        background: (scrolled || isContactPage) ? "rgba(255,255,255,0.95)" : "transparent",
         height: 80,
       }}
     >
@@ -34,7 +37,7 @@ export function LandingHeader() {
             src={aetherLogo}
             alt="Aether Connect"
             className="h-40 w-auto transition-all duration-500"
-            style={scrolled ? { filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" } : {}}
+            style={useDarkMode ? { filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" } : {}}
           />
         </Link>
 
@@ -44,7 +47,7 @@ export function LandingHeader() {
               <Link
                 key={item.label}
                 to={item.href}
-                className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
+                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
               </Link>
@@ -52,7 +55,7 @@ export function LandingHeader() {
               <a
                 key={item.label}
                 href={item.href}
-                className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
+                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
               </a>
@@ -63,7 +66,7 @@ export function LandingHeader() {
         <div className="hidden md:flex items-center gap-4">
           <Link
             to="/auth?mode=login&redirect=/farmasoft"
-            className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-[#0891B2]" : "text-white/70 hover:text-white"}`}
+            className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-600 hover:text-[#0891B2]" : "text-white/70 hover:text-white"}`}
           >
             Log in
           </Link>
@@ -81,9 +84,9 @@ export function LandingHeader() {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? (
-            <X className={`w-6 h-6 ${scrolled ? "text-gray-700" : "text-white"}`} />
+            <X className={`w-6 h-6 ${useDarkMode ? "text-gray-700" : "text-white"}`} />
           ) : (
-            <Menu className={`w-6 h-6 ${scrolled ? "text-gray-700" : "text-white"}`} />
+            <Menu className={`w-6 h-6 ${useDarkMode ? "text-gray-700" : "text-white"}`} />
           )}
         </button>
       </div>
