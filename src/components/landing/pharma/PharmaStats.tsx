@@ -1,8 +1,8 @@
 const stats = [
-  { value: "10x", label: "Plus rapide", sub: "que le traitement manuel" },
-  { value: "4-6", label: "Semaines", sub: "pour un prototype en production" },
-  { value: "85%", label: "Réduction", sub: "du temps de traitement" },
-  { value: "0", label: "Disruption", sub: "intégration dans vos outils" },
+  { value: "40%", label: "Réduction", sub: "du time-to-market préclinique" },
+  { value: "21", label: "CFR Part 11", sub: "conformité native FDA" },
+  { value: "99.7%", label: "Précision", sub: "classification adverse events" },
+  { value: "ICH", label: "Q8-Q12", sub: "frameworks intégrés par défaut" },
 ];
 
 export function PharmaStats() {
@@ -12,10 +12,11 @@ export function PharmaStats() {
         <div className="flex items-start gap-8 mb-24">
           <div className="w-16 h-px mt-3 shrink-0" style={{ background: "#0369A1" }} />
           <p className="text-base md:text-[17px] leading-[1.85] max-w-[620px]" style={{ color: "#4a5568" }}>
-            On ne vend pas du conseil. On <strong style={{ color: "#0F172A" }}>construit des systèmes IA</strong> qui
-            tournent en production — <strong style={{ color: "#0F172A" }}>agents autonomes</strong>,{" "}
-            <strong style={{ color: "#0F172A" }}>analyse prédictive</strong>,{" "}
-            <strong style={{ color: "#0F172A" }}>automatisation intelligente</strong>. Du concret, pas des slides.
+            Nos <strong style={{ color: "#0F172A" }}>pipelines de machine learning</strong> sont architecturés pour des
+            environnements <strong style={{ color: "#0F172A" }}>GMP/GLP/GCP-compatibles</strong> — de la{" "}
+            <strong style={{ color: "#0F172A" }}>découverte de cibles thérapeutiques</strong> à la{" "}
+            <strong style={{ color: "#0F172A" }}>soumission eCTD</strong>, chaque modèle est versionné, auditable et
+            déployé via des <strong style={{ color: "#0F172A" }}>CI/CD validés IQ/OQ/PQ</strong>.
           </p>
         </div>
 

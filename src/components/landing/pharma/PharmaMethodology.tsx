@@ -1,12 +1,12 @@
 import pharmaProduction from "@/assets/pharma-production.jpg";
 
 const quality = [
-  { value: "10x", desc: "Accélération moyenne des processus automatisés" },
-  { value: "–85%", desc: "Réduction du temps de traitement documentaire" },
-  { value: "4–6", desc: "Semaines pour un premier prototype fonctionnel" },
-  { value: "0", desc: "Disruption de vos opérations pendant le déploiement" },
-  { value: "24/7", desc: "Vos agents IA travaillent sans interruption" },
-  { value: "100%", desc: "Intégration dans vos systèmes existants" },
+  { value: "40%", desc: "Réduction du time-to-market sur les phases précliniques" },
+  { value: "–85%", desc: "Temps de revue des ICSRs par pharmacovigilance automatisée" },
+  { value: "4–6", desc: "Semaines pour un premier MVP validé en environnement GxP" },
+  { value: "99.7%", desc: "Précision de classification MedDRA sur adverse events" },
+  { value: "24/7", desc: "Monitoring continu des signaux de sécurité post-market" },
+  { value: "100%", desc: "Traçabilité ALCOA+ sur chaque action automatisée" },
 ];
 
 export function PharmaMethodology() {
@@ -16,7 +16,7 @@ export function PharmaMethodology() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Résultats
+            Résultats cliniques & opérationnels
           </span>
         </div>
 
@@ -26,20 +26,22 @@ export function PharmaMethodology() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
               style={{ color: "#0F172A" }}
             >
-              L'IA qui
+              Des KPIs validés
               <br />
-              livre des résultats.
+              en environnement
+              <br />
+              réglementé.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
-              Pas de buzzwords, pas de POCs sans suite. Chaque projet est conçu pour un{" "}
-              <strong style={{ color: "#0F172A" }}>impact mesurable</strong> et un{" "}
-              <strong style={{ color: "#0F172A" }}>déploiement rapide</strong>.
+              Chaque déploiement fait l'objet d'une <strong style={{ color: "#0F172A" }}>qualification IQ/OQ/PQ</strong> complète.
+              Les performances sont mesurées sur des <strong style={{ color: "#0F172A" }}>endpoints validés statistiquement</strong> et
+              documentées dans des <strong style={{ color: "#0F172A" }}>rapports de validation CSV</strong>.
             </p>
           </div>
           <div className="relative overflow-hidden">
             <img
               src={pharmaProduction}
-              alt="Intelligence artificielle en production"
+              alt="IA en production pharmaceutique GMP"
               className="w-full h-[260px] lg:h-[300px] object-cover"
               loading="lazy"
               width={1280}
