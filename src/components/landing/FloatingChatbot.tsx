@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, ArrowRight } from "lucide-react";
+import { X, Send, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -136,19 +136,20 @@ export function FloatingChatbot() {
 
   return (
     <>
-      {/* Floating trigger */}
+      {/* Floating trigger — pill button */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-5 right-5 z-50 group"
           aria-label="Open chat"
         >
-          <div className="relative">
-            {/* Pulse ring */}
-            <span className="absolute inset-0 rounded-full bg-[#0369A1] animate-ping opacity-20" />
-            <div className="relative w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] flex items-center justify-center shadow-[0_8px_32px_rgba(3,105,161,0.4)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_12px_40px_rgba(3,105,161,0.5)]">
-              <MessageCircle className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-2.5 px-5 py-3 rounded-full bg-white/80 backdrop-blur-xl border border-[#0369A1]/15 shadow-[0_8px_40px_rgba(3,105,161,0.15)] transition-all duration-300 group-hover:shadow-[0_12px_48px_rgba(3,105,161,0.25)] group-hover:scale-[1.03] group-hover:border-[#0369A1]/30">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] flex items-center justify-center shadow-[0_2px_8px_rgba(3,105,161,0.3)]">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
+            <span className="text-[13px] font-semibold text-[#0c4a6e] tracking-tight pr-0.5">
+              Ask Aether
+            </span>
           </div>
         </button>
       )}
@@ -158,29 +159,34 @@ export function FloatingChatbot() {
         <div
           className="fixed z-50 flex flex-col overflow-hidden
             bottom-0 right-0 w-full h-[100dvh]
-            sm:bottom-5 sm:right-5 sm:w-[400px] sm:h-[560px] sm:rounded-2xl
-            bg-white shadow-[0_24px_80px_rgba(0,0,0,0.15)] sm:border sm:border-[#e2e8f0]"
-          style={{ animation: "chatSlideUp 0.3s cubic-bezier(0.16,1,0.3,1)" }}
+            sm:bottom-5 sm:right-5 sm:w-[400px] sm:h-[580px] sm:rounded-2xl
+            bg-white shadow-[0_32px_80px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)]"
+          style={{ animation: "chatPanelIn 0.4s cubic-bezier(0.16,1,0.3,1)" }}
         >
           {/* Header */}
-          <div className="relative shrink-0 px-5 py-4 bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] overflow-hidden">
-            {/* Decorative circles */}
-            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/5" />
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/5" />
+          <div className="relative shrink-0 px-5 py-4 bg-gradient-to-br from-[#0369A1] via-[#075985] to-[#0c4a6e] overflow-hidden">
+            {/* Mesh decorations */}
+            <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white/[0.04] blur-2xl" />
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/[0.03] blur-xl" />
+            <div className="absolute top-1/2 right-1/4 w-1 h-1 rounded-full bg-white/20 animate-pulse" />
+            <div className="absolute top-1/3 right-1/3 w-0.5 h-0.5 rounded-full bg-white/30 animate-pulse [animation-delay:1s]" />
             
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/10">
-                  <MessageCircle className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-[15px] font-semibold text-white tracking-tight">
-                    Aether Connect
+                  <p className="text-[15px] font-semibold text-white tracking-[-0.01em]">
+                    Aether Intelligence
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <p className="text-[11px] text-white/70 font-medium">
-                      AI Assistant — Online
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-50" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                    </span>
+                    <p className="text-[11px] text-white/60 font-medium tracking-wide uppercase">
+                      Enterprise AI Assistant
                     </p>
                   </div>
                 </div>
@@ -189,35 +195,42 @@ export function FloatingChatbot() {
                 onClick={() => setOpen(false)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition-colors"
               >
-                <X className="w-4 h-4 text-white/80" />
+                <X className="w-4 h-4 text-white/70" />
               </button>
             </div>
           </div>
 
           {/* Messages area */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-5 space-y-3 bg-[#fafbfc]">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-5 space-y-4 bg-[#f8fafb]">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center pt-4 pb-2">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0369A1]/10 to-[#0369A1]/5 flex items-center justify-center mb-4 border border-[#0369A1]/10">
-                  <MessageCircle className="w-7 h-7 text-[#0369A1]" />
+              <div className="flex flex-col items-center pt-6 pb-2">
+                {/* Animated orb */}
+                <div className="relative w-16 h-16 mb-5">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#0369A1]/20 to-[#0369A1]/5 animate-pulse" />
+                  <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[#0369A1]/10 to-transparent" style={{ animation: "shimmerOrb 3s ease-in-out infinite" }} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-7 h-7 text-[#0369A1]" />
+                  </div>
                 </div>
-                <p className="text-[15px] font-semibold text-[#0f172a] mb-1">
-                  How can we help?
+                <p className="text-[16px] font-semibold text-[#0f172a] mb-1 tracking-[-0.01em]">
+                  What can we solve for you?
                 </p>
-                <p className="text-[13px] text-[#64748b] text-center max-w-[260px] leading-relaxed">
-                  Ask about our AI agents, services, or methodology
+                <p className="text-[12px] text-[#64748b] text-center max-w-[240px] leading-relaxed">
+                  Powered by our proprietary RAG knowledge base
                 </p>
                 
                 {/* Quick prompts */}
-                <div className="w-full mt-5 space-y-2">
+                <div className="w-full mt-6 space-y-2">
                   {QUICK_PROMPTS.map((prompt) => (
                     <button
                       key={prompt}
                       onClick={() => send(prompt)}
-                      className="w-full text-left px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-[13px] text-[#334155] hover:border-[#0369A1]/30 hover:bg-[#f0f9ff] transition-all duration-200 flex items-center justify-between group"
+                      className="w-full text-left px-4 py-3 rounded-xl bg-white border border-[#e8ecf0] text-[13px] text-[#334155] transition-all duration-200 flex items-center justify-between group
+                        border-l-[3px] border-l-[#0369A1]/30 hover:border-l-[#0369A1]
+                        hover:bg-[#f0f7fc] hover:shadow-[0_2px_12px_rgba(3,105,161,0.08)] hover:-translate-y-px"
                     >
-                      <span>{prompt}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#94a3b8] group-hover:text-[#0369A1] transition-colors shrink-0 ml-2" />
+                      <span className="font-medium">{prompt}</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#94a3b8] group-hover:text-[#0369A1] group-hover:translate-x-0.5 transition-all duration-200 shrink-0 ml-2" />
                     </button>
                   ))}
                 </div>
@@ -227,22 +240,27 @@ export function FloatingChatbot() {
             {messages.map((msg, i) => (
               <div
                 key={i}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                className="chatMsg flex"
+                style={{
+                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                  animation: "msgFadeIn 0.3s ease-out both",
+                  animationDelay: `${i * 0.05}s`,
+                }}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] flex items-center justify-center shrink-0 mr-2 mt-0.5 shadow-sm">
-                    <MessageCircle className="w-3.5 h-3.5 text-white" />
+                  <div className={`relative w-6 h-6 rounded-full bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] flex items-center justify-center shrink-0 mr-2.5 mt-0.5 ${isLoading && i === messages.length - 1 ? 'ring-2 ring-[#0369A1]/20 ring-offset-1' : ''}`}>
+                    <Sparkles className="w-3 h-3 text-white" />
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] px-4 py-3 text-[13px] leading-relaxed ${
+                  className={`max-w-[80%] px-4 py-3 text-[13.5px] leading-[1.6] ${
                     msg.role === "user"
-                      ? "rounded-2xl rounded-br-md bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] text-white shadow-sm"
-                      : "rounded-2xl rounded-bl-md bg-white text-[#1e293b] shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-[#f1f5f9]"
+                      ? "rounded-2xl rounded-br-md bg-[#0369A1] text-white shadow-[0_2px_8px_rgba(3,105,161,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                      : "rounded-2xl rounded-bl-md bg-white text-[#1e293b] shadow-[0_1px_4px_rgba(0,0,0,0.04)] border border-[#f0f2f5] border-l-[3px] border-l-[#0369A1]/20"
                   }`}
                 >
                   {msg.role === "assistant" ? (
-                    <div className="prose prose-sm max-w-none [&>p]:m-0 [&>p+p]:mt-2 [&>ul]:mt-1 [&>ul]:mb-0 [&>ol]:mt-1 [&>ol]:mb-0 [&>ul>li]:text-[13px] [&>ol>li]:text-[13px]">
+                    <div className="prose prose-sm max-w-none [&>p]:m-0 [&>p+p]:mt-2 [&>ul]:mt-1 [&>ul]:mb-0 [&>ol]:mt-1 [&>ol]:mb-0 [&>ul>li]:text-[13.5px] [&>ol>li]:text-[13.5px]">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   ) : (
@@ -253,15 +271,15 @@ export function FloatingChatbot() {
             ))}
 
             {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <div className="flex justify-start">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] flex items-center justify-center shrink-0 mr-2 mt-0.5 shadow-sm">
-                  <MessageCircle className="w-3.5 h-3.5 text-white" />
+              <div className="flex justify-start" style={{ animation: "msgFadeIn 0.3s ease-out" }}>
+                <div className="relative w-6 h-6 rounded-full bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] flex items-center justify-center shrink-0 mr-2.5 mt-0.5 ring-2 ring-[#0369A1]/20 ring-offset-1">
+                  <Sparkles className="w-3 h-3 text-white" />
                 </div>
-                <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-[#f1f5f9]">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1] animate-bounce [animation-delay:0ms]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1] animate-bounce [animation-delay:150ms]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1] animate-bounce [animation-delay:300ms]" />
+                <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-white shadow-[0_1px_4px_rgba(0,0,0,0.04)] border border-[#f0f2f5] border-l-[3px] border-l-[#0369A1]/20">
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1]/60" style={{ animation: "wave 1.4s ease-in-out infinite" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1]/60" style={{ animation: "wave 1.4s ease-in-out 0.2s infinite" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#0369A1]/60" style={{ animation: "wave 1.4s ease-in-out 0.4s infinite" }} />
                   </div>
                 </div>
               </div>
@@ -269,7 +287,7 @@ export function FloatingChatbot() {
           </div>
 
           {/* Input area */}
-          <div className="shrink-0 px-4 py-3 border-t border-[#e2e8f0] bg-white">
+          <div className="shrink-0 px-4 py-3 border-t border-[#eef0f3] bg-white">
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -278,33 +296,48 @@ export function FloatingChatbot() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
                 placeholder="Ask us anything..."
-                className="flex-1 text-[13px] px-4 py-2.5 rounded-xl bg-[#f8fafc] border border-[#e2e8f0] outline-none focus:border-[#0369A1]/40 focus:ring-2 focus:ring-[#0369A1]/10 transition-all placeholder:text-[#94a3b8]"
+                className="flex-1 text-[13px] px-4 py-2.5 rounded-xl bg-[#f4f6f8] shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] outline-none focus:shadow-[inset_0_1px_3px_rgba(0,0,0,0.04),0_0_0_2px_rgba(3,105,161,0.12)] transition-all placeholder:text-[#94a3b8]"
                 style={{ color: "#0f172a" }}
                 disabled={isLoading}
               />
               <button
                 onClick={() => send()}
                 disabled={isLoading || !input.trim()}
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 disabled:opacity-30 bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] hover:shadow-md active:scale-95"
+                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 disabled:opacity-25 bg-gradient-to-br from-[#0369A1] to-[#0c4a6e] hover:shadow-[0_4px_16px_rgba(3,105,161,0.3)] active:scale-95 group"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 text-white animate-spin" />
                 ) : (
-                  <Send className="w-4 h-4 text-white" />
+                  <Send className="w-4 h-4 text-white transition-transform duration-200 group-hover:translate-x-px group-hover:-translate-y-px" />
                 )}
               </button>
             </div>
-            <p className="text-[10px] text-[#94a3b8] text-center mt-2 font-medium">
-              Powered by Aether AI
-            </p>
+            <div className="flex items-center justify-center gap-1 mt-2">
+              <Sparkles className="w-2.5 h-2.5 text-[#c0c8d4]" />
+              <p className="text-[10px] text-[#b0b8c4] font-medium tracking-wide">
+                Aether Intelligence
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       <style>{`
-        @keyframes chatSlideUp {
-          from { opacity: 0; transform: translateY(16px) scale(0.97); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes chatPanelIn {
+          from { opacity: 0; transform: translateY(12px) scale(0.98); filter: blur(4px); }
+          to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes shimmerOrb {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        @keyframes msgFadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes wave {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-4px); opacity: 1; }
         }
       `}</style>
     </>
