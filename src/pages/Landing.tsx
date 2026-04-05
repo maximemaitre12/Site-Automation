@@ -16,9 +16,9 @@ export default function Landing() {
     <div className="overflow-x-hidden">
       <PharmaHero />
       <PharmaPartners />
-      <PharmaCaseStudy />
       <PharmaStats />
       <PharmaProblems />
+      <PharmaCaseStudy />
       <PharmaTeam />
       <PharmaExpertise />
       <PharmaAIPlatform />
