@@ -4,66 +4,57 @@ import { Link } from "react-router-dom";
 const services = [
   {
     title: "Diagnostic Audit",
-    price: "€8k - €15k",
+    price: "€8k – €15k",
     duration: "2-3 semaines",
     desc: "Audit complet de votre réalité pharma avec rapport détaillé et roadmap priorisé.",
-    color: "#059669",
   },
   {
     title: "Transformation Project",
-    price: "€50k - €200k+",
+    price: "€50k – €200k+",
     duration: "12-24 semaines",
     desc: "Transformation complète: assessment, implémentation, training, 12 mois support inclus.",
     featured: true,
-    color: "#0891B2",
   },
   {
     title: "Ongoing Advisory",
-    price: "€5k - €15k/mois",
+    price: "€5k – €15k/mois",
     duration: "12-36 mois",
     desc: "Soutien continu stratégique et opérationnel. Monthly meetings, issue resolution 24h SLA.",
-    color: "#1E40AF",
   },
 ];
 
 export function PharmaServices() {
   return (
-    <section id="services" className="py-24" style={{ background: "#FAFCFE" }}>
-      <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-20">
-          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#0F172A" }}>
-            Nos <span style={{ color: "#0891B2" }}>services</span>
+    <section id="services" className="py-28" style={{ background: "#FAFCFE" }}>
+      <div className="max-w-[1100px] mx-auto px-6">
+        <div className="mb-20">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#0891B2" }}>
+            Services
+          </p>
+          <h2 className="font-heading text-3xl md:text-4xl lg:text-[44px] font-bold leading-tight" style={{ color: "#0F172A" }}>
+            Nos services.
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-0 divide-x" style={{ borderColor: "#E2E8F0" }}>
           {services.map((s) => (
             <div
               key={s.title}
-              className={`rounded-2xl p-8 transition-all hover:shadow-xl hover:-translate-y-1 ${s.featured ? "ring-2 ring-[#0891B2]" : ""}`}
-              style={{
-                background: s.featured ? "linear-gradient(135deg, #F0F9FF, #E0F2FE)" : "white",
-                border: "1px solid #E2E8F0",
-              }}
+              className="px-8 first:pl-0 last:pr-0"
             >
-              <div className="text-sm font-medium mb-4 px-3 py-1 rounded-full inline-block" style={{ background: `${s.color}12`, color: s.color }}>
+              <span className="text-xs font-medium" style={{ color: "#94A3B8" }}>
                 {s.duration}
-              </div>
-              <h3 className="font-heading text-xl font-bold mb-2" style={{ color: "#0F172A" }}>{s.title}</h3>
-              <div className="text-2xl font-bold mb-4" style={{ color: s.color }}>{s.price}</div>
+              </span>
+              <h3 className="font-heading text-xl font-bold mt-2 mb-1" style={{ color: "#0F172A" }}>{s.title}</h3>
+              <div className="text-2xl font-bold mb-4" style={{ color: "#0891B2" }}>{s.price}</div>
               <p className="text-sm leading-relaxed mb-8" style={{ color: "#64748B" }}>{s.desc}</p>
 
-              <Link to="/contact">
-                <button
-                  className="w-full inline-flex items-center justify-center gap-2 h-12 text-sm font-bold rounded-full transition-all hover:shadow-lg hover:scale-105"
-                  style={{
-                    background: s.featured ? "#0891B2" : "transparent",
-                    color: s.featured ? "white" : s.color,
-                    border: s.featured ? "none" : `2px solid ${s.color}`,
-                  }}
-                >
-                  En savoir plus <ArrowRight className="w-4 h-4" />
-                </button>
+              <Link
+                to="/contact"
+                className="text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all"
+                style={{ color: "#0F172A" }}
+              >
+                En savoir plus <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           ))}
