@@ -29,7 +29,7 @@ export function LandingHeader() {
       }}
     >
       <div className="h-full flex items-center justify-between px-0">
-        <Link to="/" className="flex items-center shrink-0">
+        <Link to="/" className="flex items-center shrink-0 -ml-8">
           <img src={aetherLogo} alt="Aether Connect" className="h-40 w-auto" />
         </Link>
 
