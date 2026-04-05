@@ -40,11 +40,10 @@ export function PharmaServices() {
           {services.map((s) => (
             <div
               key={s.title}
-              className={`rounded-2xl p-8 transition-all hover:shadow-xl hover:-translate-y-1 ${s.featured ? "ring-2" : ""}`}
+              className={`rounded-2xl p-8 transition-all hover:shadow-xl hover:-translate-y-1 ${s.featured ? "ring-2 ring-[#0891B2]" : ""}`}
               style={{
                 background: s.featured ? "linear-gradient(135deg, #F0F9FF, #E0F2FE)" : "white",
                 border: "1px solid #E2E8F0",
-                ringColor: s.featured ? "#0891B2" : undefined,
               }}
             >
               <div className="text-sm font-medium mb-4 px-3 py-1 rounded-full inline-block" style={{ background: `${s.color}12`, color: s.color }}>
