@@ -48,6 +48,16 @@ export function PharmaCaseStudy() {
           </p>
         </div>
 
+        {/* Warehouse photo */}
+        <div className="mb-20 rounded-xl overflow-hidden">
+          <img
+            src={farmasoftWarehouse}
+            alt="Farmasoft pharmaceutical logistics warehouse"
+            className="w-full h-[280px] md:h-[400px] object-cover"
+            loading="lazy"
+          />
+        </div>
+
         {/* Two agents */}
         <div className="grid lg:grid-cols-2 gap-0 mb-20">
           {/* Agent 1 — Operations */}
