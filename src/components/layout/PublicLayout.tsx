@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
+import { FloatingChatbot } from "@/components/landing/FloatingChatbot";
 
 export default function PublicLayout() {
   return (
@@ -10,6 +11,8 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <LandingFooter />
+      <FloatingChatbot />
     </div>
   );
+}
 }
