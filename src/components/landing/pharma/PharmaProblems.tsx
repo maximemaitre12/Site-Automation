@@ -58,7 +58,7 @@ export function PharmaProblems() {
                   We work with pharma operations teams to identify the processes that{" "}
                   <strong style={{ color: "#0F172A" }}>consume the most hours</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>generate the most errors</strong>, and{" "}
-                  <strong style={{ color: "#0F172A" }}>create the highest compliance risk</strong> — then
+                  <strong style={{ color: "#0F172A" }}>create the highest compliance risk</strong>, then
                   we deploy AI agents that handle them end-to-end.
                 </p>
               </div>
