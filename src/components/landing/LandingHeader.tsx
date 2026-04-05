@@ -66,7 +66,7 @@ export function LandingHeader() {
         <div className="hidden md:flex items-center gap-4">
           <Link
             to="/auth?mode=login&redirect=/farmasoft"
-            className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-[#0891B2]" : "text-white/70 hover:text-white"}`}
+            className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-600 hover:text-[#0891B2]" : "text-white/70 hover:text-white"}`}
           >
             Log in
           </Link>
