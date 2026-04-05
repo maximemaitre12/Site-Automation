@@ -18,7 +18,7 @@ export function PharmaCaseStudy() {
             <img
               src={farmasoftLogo}
               alt="Farmasoft — Reliable Logistics"
-              className="h-20 md:h-24 object-contain"
+              className="h-28 md:h-36 object-contain"
               loading="lazy"
             />
           </div>
