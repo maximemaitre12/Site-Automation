@@ -1,16 +1,54 @@
 
 
-## Update Farmasoft Description Text
+## Aether Intelligence -- Refonte Ultra-Pro + Mode Plein Ecran
 
-### What changes
-In `src/components/landing/pharma/PharmaCaseStudy.tsx` (lines 28-38), replace the two description paragraphs with a more flattering version and remove the dash/tiret styling.
+### Direction
+Passer d'un chatbot "dark startup" a un assistant enterprise minimaliste et propre, avec un bouton pour basculer en plein ecran.
 
-### New text
-- Paragraph 1: "Farmasoft is a recognized European leader in pharmaceutical logistics, trusted to orchestrate high-volume, temperature-sensitive supply chains across multiple regulated markets with exceptional operational precision and reliability."
-- Paragraph 2: "We engineered two purpose-built AI agents designed to integrate seamlessly into their mission-critical infrastructure, operating under strict human-in-the-loop validation at every decision point."
+### Changements (fichier unique : `FloatingChatbot.tsx`)
 
-### Technical details
-- Single file edit: `src/components/landing/pharma/PharmaCaseStudy.tsx`, lines 28-38
-- Keep existing styling classes, just update text content
-- Remove any dash/tiret before paragraphs if present
+**1. Design general : clean & corporate**
+- Fond : blanc pur (`#ffffff`) au lieu du dark mode `#0a0f1a`
+- Supprimer tous les effets superflus : orbe anime, grid pattern, gradient mesh, shimmer, glow pulse
+- Typographie noire/gris sobre, pas de tracking exagere
+- Garder uniquement 2 animations : fade-in du panel + fade-in des messages
+
+**2. Trigger button**
+- Cercle blanc propre avec ombre, icone `MessageSquare` bleue (#0369A1)
+- Pas de label "Ask Aether", pas de glow -- juste un bouton clean avec hover scale subtil
+
+**3. Header**
+- Fond blanc, bordure bottom grise fine
+- Logo : petit cercle bleu avec icone, titre "Aether" en noir, sous-titre "AI Assistant" en gris
+- Pastille verte online simple (pas de ping animation)
+- Ajout d'un bouton expand (icone `Maximize2` / `Minimize2`) a cote du bouton close
+
+**4. Mode plein ecran**
+- Nouvel etat `isFullscreen` toggle via le bouton expand
+- Widget : `sm:w-[400px] sm:h-[560px] sm:bottom-5 sm:right-5 sm:rounded-2xl`
+- Plein ecran : `inset-0 w-full h-full rounded-none` avec contenu centre en `max-w-3xl`
+- Transition fluide entre les deux modes
+
+**5. Empty state**
+- Supprimer l'orbe -- remplacer par un simple cercle bleu avec icone
+- Titre : "How can we help?" en noir
+- Sous-titre : "Ask about our AI agents, services, or methodology" (pas de "proprietary knowledge engine")
+- Quick prompts : boutons plats, fond `gray-50`, bordure grise, hover `gray-100`, sans icone decorative
+
+**6. Messages**
+- User : fond bleu solide `#0369A1`, texte blanc, coins arrondis
+- Assistant : fond `#f7f8fa`, bordure grise fine, texte noir
+- Avatar assistant : petit cercle bleu avec "A" ou Sparkles, sans ring/pulse
+- Markdown styling adapte au theme clair
+
+**7. Input area**
+- Fond blanc, input avec bordure grise standard `border-gray-200`
+- Bouton send : cercle bleu solide, sans gradient multi-stop
+- Footer : "Powered by Aether" en gris tres discret
+
+### Details techniques
+- Fichier unique : `src/components/landing/FloatingChatbot.tsx`
+- Ajouter `isFullscreen` state + bouton toggle dans le header
+- Supprimer ~80% des keyframes (garder `chatPanelIn` simplifie + `msgFadeIn`)
+- Adapter les classes prose pour le theme clair (`prose-slate` au lieu de `prose-invert`)
 
