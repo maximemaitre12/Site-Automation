@@ -1,5 +1,6 @@
 import { Package, Users, Bot, CheckCircle } from "lucide-react";
 import farmasoftLogo from "@/assets/farmasoft-client-logo.png";
+import farmasoftWarehouse from "@/assets/farmasoft-warehouse.jpg";
 
 export function PharmaCaseStudy() {
   return (
@@ -15,6 +16,16 @@ export function PharmaCaseStudy() {
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-[#0369A1]">
             Enterprise deployment · Pharmaceutical logistics
           </span>
+        </div>
+
+        {/* Warehouse photo */}
+        <div className="mb-16 rounded-xl overflow-hidden">
+          <img
+            src={farmasoftWarehouse}
+            alt="Farmasoft pharmaceutical logistics warehouse"
+            className="w-full h-[280px] md:h-[400px] object-cover"
+            loading="lazy"
+          />
         </div>
 
         {/* Client header */}
