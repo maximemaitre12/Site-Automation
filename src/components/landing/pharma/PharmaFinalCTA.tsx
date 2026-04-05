@@ -13,24 +13,23 @@ export function PharmaFinalCTA() {
         <div className="absolute -bottom-36 -left-36 w-[550px] h-[550px] rounded-full" style={{ background: "rgba(255,255,255,0.03)" }} />
       </div>
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 z-10">
-        {/* Accent */}
         <div className="w-12 h-[3px] bg-white/30 mb-12" />
 
         <h2 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] text-white mb-6">
-          Prêt à transformer
+          Prêt à déployer
           <br />
-          vos opérations ?
+          l'IA dans vos opérations ?
         </h2>
         <p className="text-[15px] md:text-base max-w-[460px] mb-14 leading-[1.85]" style={{ color: "rgba(255,255,255,0.6)" }}>
-          Commencez par un <strong className="text-white font-medium">diagnostic</strong>.
-          Pas d'engagement. Juste une compréhension claire de votre situation pharma.
+          Commencez par un <strong className="text-white font-medium">diagnostic IA gratuit</strong>.
+          On analyse vos processus et on identifie les <strong className="text-white font-medium">gains immédiats</strong>.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             to="/contact"
             className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#0369A1] bg-white transition-all hover:bg-white/90"
           >
-            Demander un diagnostic
+            Diagnostic IA gratuit
           </Link>
           <a
             href="mailto:hello@aether-connect.com"

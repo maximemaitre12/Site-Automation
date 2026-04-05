@@ -1,19 +1,18 @@
 import pharmaProduction from "@/assets/pharma-production.jpg";
 
 const quality = [
-  { value: "100%", desc: "Réussite audits FDA sur les 12 dernières implémentations" },
-  { value: "0", desc: "Violations réglementaires en 18 ans d'opérations" },
-  { value: "95%", desc: "Clients qui reviennent pour des phases supplémentaires" },
-  { value: "4–6", desc: "Semaines pour le premier diagnostic complet" },
-  { value: "71%", desc: "Réduction moyenne du time-to-hire pharma" },
-  { value: "1760%", desc: "ROI moyen sur nos projets de transformation" },
+  { value: "200+", desc: "Projets IA déployés en production avec succès" },
+  { value: "95%", desc: "Clients qui reviennent pour de nouveaux projets" },
+  { value: "4–6", desc: "Semaines pour un premier prototype fonctionnel" },
+  { value: "10x", desc: "Accélération moyenne des processus automatisés" },
+  { value: "40+", desc: "Industries et secteurs accompagnés" },
+  { value: "18", desc: "Années d'expérience en intelligence artificielle" },
 ];
 
 export function PharmaMethodology() {
   return (
     <section className="py-28 md:py-36" style={{ background: "#EAF3F7" }}>
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
@@ -27,19 +26,20 @@ export function PharmaMethodology() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
               style={{ color: "#0F172A" }}
             >
-              Qualité &
+              L'IA qui
               <br />
-              résultats.
+              livre des résultats.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
-              Des <strong style={{ color: "#0F172A" }}>résultats mesurables</strong> à chaque engagement.
-              Notre processus est <strong style={{ color: "#0F172A" }}>éprouvé</strong>, sans disruption opérationnelle.
+              Pas de buzzwords, pas de POCs sans suite. Chaque projet est conçu pour un{" "}
+              <strong style={{ color: "#0F172A" }}>impact mesurable</strong> et un{" "}
+              <strong style={{ color: "#0F172A" }}>déploiement rapide</strong>.
             </p>
           </div>
           <div className="relative overflow-hidden">
             <img
               src={pharmaProduction}
-              alt="Ligne de production pharmaceutique"
+              alt="Intelligence artificielle en production"
               className="w-full h-[260px] lg:h-[300px] object-cover"
               loading="lazy"
               width={1280}
