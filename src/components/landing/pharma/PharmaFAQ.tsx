@@ -3,9 +3,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const faqs = [
   { q: "L'IA, c'est pour les grandes entreprises non ?", a: "Non. Nos solutions s'adaptent à toutes les tailles. PME, ETI, grands groupes — le ROI est le même. On commence petit, on scale vite." },
   { q: "Ça va interrompre nos opérations ?", a: "Jamais. Nos déploiements s'intègrent dans vos systèmes existants (SAP, ERP, CRM, legacy). Zéro disruption, c'est notre garantie." },
-  { q: "Combien de temps pour voir des résultats ?", a: "Premier prototype fonctionnel en 4-6 semaines. Déploiement complet en 12-16 semaines. Pas de projets qui traînent 18 mois." },
-  { q: "Vous travaillez dans quel secteur ?", a: "Pharma, finance, logistique, manufacturing, retail, santé... 40+ secteurs en 18 ans. Notre force, c'est de comprendre votre métier avant de coder." },
-  { q: "Quelle différence avec un cabinet de conseil classique ?", a: "On ne livre pas de slides. On livre des systèmes IA en production, avec des KPIs mesurables et un ROI garanti." },
+  { q: "Combien de temps pour voir des résultats ?", a: "Premier prototype fonctionnel en 4 à 6 semaines. Déploiement complet en 12 à 16 semaines. Pas de projets qui traînent." },
+  { q: "Vous travaillez dans quel secteur ?", a: "Industrie, finance, logistique, retail, santé, manufacturing... Notre force c'est de comprendre votre métier en profondeur avant de construire quoi que ce soit." },
+  { q: "Quelle différence avec un cabinet de conseil classique ?", a: "On ne livre pas de slides. On livre des systèmes IA en production, avec des KPIs mesurables et un ROI concret." },
 ];
 
 export function PharmaFAQ() {

@@ -7,7 +7,7 @@ export function PharmaTeam() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            À propos
+            L'équipe
           </span>
         </div>
 
@@ -29,15 +29,15 @@ export function PharmaTeam() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              18 ans à construire
+              Obsédés par
               <br />
-              l'intelligence.
+              l'exécution.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
-              Aether Connect est née de la conviction que l'<strong style={{ color: "#0F172A" }}>intelligence artificielle</strong> ne
-              doit pas rester un concept abstrait. Depuis <strong style={{ color: "#0F172A" }}>2008</strong>, nous concevons
-              des <strong style={{ color: "#0F172A" }}>systèmes IA opérationnels</strong> — pas des POCs qui restent dans un tiroir.
-              Notre force : <strong style={{ color: "#0F172A" }}>comprendre votre métier</strong> avant de coder quoi que ce soit.
+              Aether Connect, c'est une équipe d'<strong style={{ color: "#0F172A" }}>architectes IA</strong> qui
+              ne livrent pas des slides — mais des <strong style={{ color: "#0F172A" }}>systèmes en production</strong>.
+              Notre approche : <strong style={{ color: "#0F172A" }}>comprendre votre métier</strong> en profondeur,
+              puis construire l'IA qui <strong style={{ color: "#0F172A" }}>résout le vrai problème</strong>.
             </p>
           </div>
 
@@ -47,9 +47,10 @@ export function PharmaTeam() {
                 role: "Fondateur",
                 name: "Nicolas Parisi",
                 bio: <>
-                  Architecte de <strong style={{ color: "#0F172A" }}>systèmes IA</strong> depuis 18 ans.
-                  A piloté <strong style={{ color: "#0F172A" }}>200+ projets d'automatisation</strong> dans la pharma,
-                  la finance et l'industrie. Obsédé par le <strong style={{ color: "#0F172A" }}>ROI mesurable</strong>.
+                  Architecte de <strong style={{ color: "#0F172A" }}>systèmes IA</strong> et spécialiste
+                  de l'<strong style={{ color: "#0F172A" }}>automatisation opérationnelle</strong>.
+                  Construit des solutions qui <strong style={{ color: "#0F172A" }}>tournent en production</strong>,
+                  pas des prototypes.
                 </>,
               },
               {

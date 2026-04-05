@@ -8,7 +8,7 @@ export function PharmaCaseStudy() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px] bg-white/30" />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-white/40">
-            Cas d'étude
+            Cas client
           </span>
         </div>
 
@@ -23,7 +23,9 @@ export function PharmaCaseStudy() {
           />
           <div className="absolute inset-0 flex items-center">
             <h2 className="font-heading text-[40px] md:text-[56px] lg:text-[68px] font-bold leading-[1.05] text-white px-8 md:px-12">
-              Industrie pharma.
+              Automatisation
+              <br />
+              industrielle.
             </h2>
           </div>
           <div className="absolute bottom-0 left-0 w-24 h-1 bg-white/40" />
@@ -33,22 +35,21 @@ export function PharmaCaseStudy() {
           <div>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "rgba(255,255,255,0.6)" }}>
               <p>
-                Un <strong className="text-white font-medium">fabricant pharmaceutique</strong> de
-                <strong className="text-white font-medium"> 180 employés</strong> en pleine croissance
-                faisait face à des <strong className="text-white font-medium">goulots opérationnels critiques</strong> :
+                Un <strong className="text-white font-medium">fabricant industriel</strong> en
+                pleine croissance faisait face à des <strong className="text-white font-medium">goulots opérationnels</strong> :
                 traçabilité manuelle, recrutement lent, processus qualité non scalables.
               </p>
               <p>
                 Notre IA a <strong className="text-white font-medium">automatisé la traçabilité</strong>,
                 déployé un <strong className="text-white font-medium">système prédictif de staffing</strong> et
                 implémenté le <strong className="text-white font-medium">contrôle qualité par vision</strong> —
-                le tout en <strong className="text-white font-medium">16 semaines</strong>.
+                le tout en <strong className="text-white font-medium">quelques semaines</strong>.
               </p>
             </div>
 
             <div className="mt-14 pt-10" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
               <div className="font-heading text-[52px] md:text-[68px] font-bold leading-none mb-3 text-white">10x</div>
-              <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Accélération des processus de traçabilité · Déploiement en 16 semaines</p>
+              <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Accélération des processus de traçabilité</p>
             </div>
           </div>
 
@@ -59,7 +60,7 @@ export function PharmaCaseStudy() {
                 { val: "10x", label: "Accélération de la traçabilité batch" },
                 { val: "0", label: "Erreur de classification qualité depuis le déploiement" },
               ].map((m) => (
-                <div key={m.val} className="py-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                <div key={m.val + m.label} className="py-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <div className="font-heading text-[36px] md:text-[44px] font-bold mb-2 text-white">{m.val}</div>
                   <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>{m.label}</p>
                 </div>
@@ -68,7 +69,7 @@ export function PharmaCaseStudy() {
 
             <div className="relative pl-6" style={{ borderLeft: "2px solid rgba(255,255,255,0.2)" }}>
               <p className="text-base md:text-lg italic leading-relaxed mb-5 text-white/80">
-                "Aether a compris notre métier avant de parler technologie.
+                "Ils ont compris notre métier avant de parler technologie.
                 Leur IA ne remplace pas nos équipes — elle les rend invincibles."
               </p>
               <p className="text-sm font-semibold text-white/90">Directeur des Opérations</p>

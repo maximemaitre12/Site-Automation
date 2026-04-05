@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import pharmaQuality from "@/assets/pharma-quality.jpg";
 
 const domains = [
-  { name: "AUTOMATISATION INTELLIGENTE", tag: "Process" },
+  { name: "AGENTS IA AUTONOMES", tag: "Automatisation" },
   { name: "ANALYSE PRÉDICTIVE", tag: "Data" },
-  { name: "AGENTS IA AUTONOMES", tag: "Opérations" },
   { name: "VISION PAR ORDINATEUR", tag: "Qualité" },
-  { name: "NLP & TRAITEMENT DOCUMENTAIRE", tag: "Compliance" },
+  { name: "NLP & TRAITEMENT DOCUMENTAIRE", tag: "Process" },
+  { name: "INTÉGRATION SYSTÈMES", tag: "Infrastructure" },
 ];
 
 export function PharmaProblems() {
@@ -16,7 +16,7 @@ export function PharmaProblems() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Défis résolus par l'IA
+            Ce qu'on résout
           </span>
         </div>
 
@@ -26,27 +26,25 @@ export function PharmaProblems() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Les problèmes
+              Vos processus
               <br />
-              complexes exigent
+              manuels vous
               <br />
-              une IA sur mesure.
+              coûtent cher.
             </h2>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
               <p>
-                Vos <strong style={{ color: "#0F172A" }}>processus manuels</strong> ralentissent votre croissance.
-                Les <strong style={{ color: "#0F172A" }}>données dormantes</strong> dans vos systèmes valent des millions —
-                si elles sont correctement exploitées par l'IA.
+                Chaque <strong style={{ color: "#0F172A" }}>tâche répétitive</strong> est une opportunité d'automatisation.
+                Chaque <strong style={{ color: "#0F172A" }}>donnée inexploitée</strong> est un manque à gagner.
               </p>
               <p>
-                Nous construisons des <strong style={{ color: "#0F172A" }}>modèles sur mesure</strong> qui
-                s'intègrent dans vos outils existants, <strong style={{ color: "#0F172A" }}>sans disruption</strong>,
-                pour des <strong style={{ color: "#0F172A" }}>résultats mesurables en semaines</strong> — pas en mois.
+                On conçoit des <strong style={{ color: "#0F172A" }}>systèmes IA sur mesure</strong> qui
+                s'intègrent dans vos outils existants — <strong style={{ color: "#0F172A" }}>sans disruption</strong>,
+                avec des <strong style={{ color: "#0F172A" }}>résultats mesurables en semaines</strong>.
               </p>
               <p>
-                Qu'il s'agisse de <strong style={{ color: "#0F172A" }}>traçabilité automatisée</strong>,
-                de <strong style={{ color: "#0F172A" }}>prédiction de la demande</strong> ou de{" "}
-                <strong style={{ color: "#0F172A" }}>contrôle qualité par vision</strong> — notre IA s'adapte à votre réalité terrain.
+                Traçabilité, prédiction, contrôle qualité, traitement documentaire — notre IA
+                s'adapte à <strong style={{ color: "#0F172A" }}>votre réalité opérationnelle</strong>.
               </p>
             </div>
 

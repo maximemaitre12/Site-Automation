@@ -1,6 +1,6 @@
 const blocks = [
-  { title: "18 ANS D'EXPÉRIENCE", desc: "Nous ne sommes pas une startup IA de plus. 18 années de projets en production, dans des environnements réels et exigeants." },
-  { title: "IA SUR MESURE", desc: "Pas de solutions génériques. Chaque système est conçu pour votre réalité opérationnelle, vos données, vos contraintes." },
+  { title: "IA DE POINTE", desc: "On utilise les modèles les plus avancés du marché. Pas des outils no-code — de vrais systèmes architecturés pour performer." },
+  { title: "SUR MESURE", desc: "Pas de solutions génériques. Chaque système est conçu pour votre réalité opérationnelle, vos données, vos contraintes." },
   { title: "ZÉRO DISRUPTION", desc: "Nos déploiements s'intègrent dans vos systèmes existants. Vos opérations ne ralentissent jamais." },
   { title: "RÉSULTATS MESURABLES", desc: "KPIs définis dès le jour 1. Chaque projet est évalué sur son impact réel, pas sur des démos impressionnantes." },
 ];
@@ -20,9 +20,9 @@ export function PharmaTrust() {
           className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
           style={{ color: "#0F172A" }}
         >
-          Partenaire
+          Ce qui nous
           <br />
-          de confiance.
+          différencie.
         </h2>
 
         <div className="grid sm:grid-cols-2 gap-0">
