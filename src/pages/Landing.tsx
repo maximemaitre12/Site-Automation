@@ -19,10 +19,10 @@ export default function Landing() {
       <PharmaStats />
       <PharmaProblems />
       <PharmaTeam />
+      <PharmaCaseStudy />
       <PharmaExpertise />
       <PharmaAIPlatform />
       <PharmaMethodology />
-      <PharmaCaseStudy />
       <PharmaTrust />
       <PharmaFAQ />
       <PharmaFinalCTA />
