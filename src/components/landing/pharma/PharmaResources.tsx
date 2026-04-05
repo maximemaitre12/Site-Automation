@@ -6,68 +6,33 @@ const posts = [
   { title: "Talent Acquisition in Pharma: A Different Game", time: "8 min", date: "Janvier 2025" },
 ];
 
-const whitepapers = [
-  { title: "Compliance Maturity Model for Pharma", pages: "30 pages", desc: "Où êtes-vous sur le compliance journey?" },
-  { title: "GMP Implementation Roadmap", pages: "25 pages", desc: "Guide step-by-step avec templates & checklists" },
-];
-
 export function PharmaResources() {
   return (
-    <section id="resources" className="py-24" style={{ background: "#F9FBFC" }}>
-      <div className="max-w-[1400px] mx-auto px-6">
-        <h2 className="font-heading text-3xl md:text-4xl font-bold mb-12 text-center" style={{ color: "#1A3A6B" }}>
-          Insights pharma
-        </h2>
+    <section id="resources" className="py-24" style={{ background: "#FAFCFE" }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6" style={{ color: "#0F172A" }}>
+            Insights <span style={{ color: "#0891B2" }}>pharma</span>
+          </h2>
+        </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Blog */}
-          <div className="lg:col-span-2">
-            <h3 className="font-heading text-lg font-bold mb-6" style={{ color: "#1A3A6B" }}>Articles récents</h3>
-            <div className="grid sm:grid-cols-3 gap-4">
-              {posts.map((p) => (
-                <div key={p.title} className="bg-white rounded-lg border p-5 hover:shadow-md transition-shadow cursor-pointer" style={{ borderColor: "#E8EFF8" }}>
-                  <div className="text-xs mb-3" style={{ color: "#6B7C8C" }}>{p.date} · {p.time} read</div>
-                  <h4 className="text-sm font-bold mb-3" style={{ color: "#1A3A6B" }}>{p.title}</h4>
-                  <span className="text-sm font-medium flex items-center gap-1" style={{ color: "#0D8B5E" }}>
-                    Lire <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Whitepapers + Webinar */}
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-heading text-lg font-bold mb-4" style={{ color: "#1A3A6B" }}>Whitepapers</h3>
-              {whitepapers.map((w) => (
-                <div key={w.title} className="bg-white rounded-lg border p-4 mb-3 cursor-pointer hover:shadow-md transition-shadow" style={{ borderColor: "#E8EFF8" }}>
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-8 h-8 shrink-0" style={{ color: "#1A3A6B" }} />
-                    <div>
-                      <h4 className="text-sm font-bold" style={{ color: "#1A3A6B" }}>{w.title}</h4>
-                      <div className="text-xs" style={{ color: "#6B7C8C" }}>{w.pages}</div>
-                      <div className="text-xs mt-1" style={{ color: "#4A5568" }}>{w.desc}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-white rounded-lg border p-4" style={{ borderColor: "#E8EFF8" }}>
-              <div className="flex items-start gap-3">
-                <Video className="w-8 h-8 shrink-0" style={{ color: "#FF8A45" }} />
-                <div>
-                  <h4 className="text-sm font-bold" style={{ color: "#1A3A6B" }}>Webinaire</h4>
-                  <div className="text-xs" style={{ color: "#6B7C8C" }}>Jeudi 24 avril · 14h00 CET</div>
-                  <div className="text-xs mt-1" style={{ color: "#4A5568" }}>"Scaling Your Pharma Operations"</div>
-                  <span className="text-xs font-medium mt-2 inline-flex items-center gap-1" style={{ color: "#0D8B5E" }}>
-                    S'inscrire <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((p) => (
+            <div
+              key={p.title}
+              className="rounded-2xl p-6 bg-white transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer group"
+              style={{ border: "1px solid #E2E8F0" }}
+            >
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-5" style={{ background: "#E0F2FE" }}>
+                <FileText className="w-5 h-5" style={{ color: "#0891B2" }} />
               </div>
+              <div className="text-xs mb-3" style={{ color: "#94A3B8" }}>{p.date} · {p.time} read</div>
+              <h4 className="text-base font-bold mb-4 leading-snug" style={{ color: "#0F172A" }}>{p.title}</h4>
+              <span className="text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: "#0891B2" }}>
+                Lire <ArrowRight className="w-4 h-4" />
+              </span>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

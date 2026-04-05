@@ -1,77 +1,68 @@
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const services = [
   {
     title: "Diagnostic Audit",
-    price: "€8,000 - €15,000",
-    duration: "2-3 weeks",
-    desc: "Audit complet de votre réalité pharma.",
-    items: ["Process assessment", "Compliance gap analysis", "Regulatory risk scorecard", "Technology review", "Prioritized roadmap", "Executive presentation"],
-    livrable: "30-page diagnostic report + action plan",
-    ideal: "Companies planning expansion, FDA audit findings, scaling operations",
-    cta: "Demander un diagnostic",
-    border: "#0D8B5E",
-    bg: "#F0FFF4",
+    price: "€8k - €15k",
+    duration: "2-3 semaines",
+    desc: "Audit complet de votre réalité pharma avec rapport détaillé et roadmap priorisé.",
+    color: "#059669",
   },
   {
     title: "Transformation Project",
-    price: "€50,000 - €200,000+",
-    duration: "12-24 weeks",
-    desc: "Transformation complète: Assessment → Implementation.",
-    items: ["Full assessment & solution design", "Team training & change management", "System implementation & validation", "12 months support included", "Knowledge transfer", "Audit-ready documentation"],
-    livrable: "Transformed operations, compliant processes, trained team",
-    ideal: "Critical compliance gaps, significant scaling, R&D to manufacturing",
-    cta: "Discuter votre transformation",
-    border: "#1A3A6B",
-    bg: "#F3F4FF",
+    price: "€50k - €200k+",
+    duration: "12-24 semaines",
+    desc: "Transformation complète: assessment, implémentation, training, 12 mois support inclus.",
+    featured: true,
+    color: "#0891B2",
   },
   {
     title: "Ongoing Advisory",
-    price: "€5,000 - €15,000/mois",
-    duration: "12-36 months",
-    desc: "Soutien continu: stratégique + opérationnel.",
-    items: ["Monthly strategy meetings", "Issue resolution (24h SLA)", "Regulatory strategy guidance", "Team coaching & development", "Process optimization", "Audit preparation support"],
-    livrable: "1-2 days/month on-site + weekly calls + on-demand support",
-    ideal: "Growth phase, regulatory complexity, lacking senior pharma expertise",
-    cta: "Discuter advisory options",
-    border: "#FF8A45",
-    bg: "#FFF9F0",
+    price: "€5k - €15k/mois",
+    duration: "12-36 mois",
+    desc: "Soutien continu stratégique et opérationnel. Monthly meetings, issue resolution 24h SLA.",
+    color: "#1E40AF",
   },
 ];
 
 export function PharmaServices() {
   return (
-    <section id="services" className="py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-6">
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-[44px] font-bold mb-16 text-center" style={{ color: "#1A3A6B" }}>
-          Ce que nous offrons
-        </h2>
+    <section id="services" className="py-24" style={{ background: "#FAFCFE" }}>
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-20">
+          <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-6" style={{ color: "#0F172A" }}>
+            Nos <span style={{ color: "#0891B2" }}>services</span>
+          </h2>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {services.map((s) => (
-            <div key={s.title} className="rounded-lg p-8 border" style={{ background: s.bg, borderColor: "#E8EFF8", borderLeft: `4px solid ${s.border}` }}>
-              <h3 className="font-heading text-xl font-bold mb-1" style={{ color: "#1A3A6B" }}>{s.title}</h3>
-              <div className="text-2xl font-bold mb-1" style={{ color: s.border }}>{s.price}</div>
-              <div className="text-sm mb-4" style={{ color: "#6B7C8C" }}>{s.duration}</div>
-              <p className="text-sm mb-4" style={{ color: "#2C3E50" }}>{s.desc}</p>
-
-              <ul className="space-y-1.5 mb-5">
-                {s.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm" style={{ color: "#2C3E50" }}>
-                    <Check className="w-4 h-4 shrink-0 mt-0.5" style={{ color: s.border }} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="text-xs mb-4 p-3 rounded" style={{ background: "rgba(255,255,255,0.7)", color: "#4A5568" }}>
-                <span className="font-bold">Livrable:</span> {s.livrable}
+            <div
+              key={s.title}
+              className={`rounded-2xl p-8 transition-all hover:shadow-xl hover:-translate-y-1 ${s.featured ? "ring-2 ring-[#0891B2]" : ""}`}
+              style={{
+                background: s.featured ? "linear-gradient(135deg, #F0F9FF, #E0F2FE)" : "white",
+                border: "1px solid #E2E8F0",
+              }}
+            >
+              <div className="text-sm font-medium mb-4 px-3 py-1 rounded-full inline-block" style={{ background: `${s.color}12`, color: s.color }}>
+                {s.duration}
               </div>
+              <h3 className="font-heading text-xl font-bold mb-2" style={{ color: "#0F172A" }}>{s.title}</h3>
+              <div className="text-2xl font-bold mb-4" style={{ color: s.color }}>{s.price}</div>
+              <p className="text-sm leading-relaxed mb-8" style={{ color: "#64748B" }}>{s.desc}</p>
 
               <Link to="/contact">
-                <button className="w-full inline-flex items-center justify-center gap-2 h-11 text-sm font-bold text-white rounded transition-all hover:shadow-lg" style={{ background: s.border }}>
-                  {s.cta} <ArrowRight className="w-4 h-4" />
+                <button
+                  className="w-full inline-flex items-center justify-center gap-2 h-12 text-sm font-bold rounded-full transition-all hover:shadow-lg hover:scale-105"
+                  style={{
+                    background: s.featured ? "#0891B2" : "transparent",
+                    color: s.featured ? "white" : s.color,
+                    border: s.featured ? "none" : `2px solid ${s.color}`,
+                  }}
+                >
+                  En savoir plus <ArrowRight className="w-4 h-4" />
                 </button>
               </Link>
             </div>
