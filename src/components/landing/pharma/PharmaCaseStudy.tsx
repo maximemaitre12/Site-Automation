@@ -23,9 +23,9 @@ export function PharmaCaseStudy() {
             />
           </div>
           <h2 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-8 text-[#111]">
-            Two AI agents.
+            Farmasoft × Aether Connect
             <br />
-            <span className="text-[#0369A1]">One operational backbone.</span>
+            <span className="text-[#0369A1]">Two AI agents. One operational backbone.</span>
           </h2>
           <p className="text-[15px] md:text-base leading-[1.85] mb-6 text-[#6B6560] max-w-3xl">
             <strong className="text-[#111] font-medium">Farmasoft</strong> is a major European pharmaceutical
