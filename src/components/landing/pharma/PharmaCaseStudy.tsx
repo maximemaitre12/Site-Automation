@@ -1,5 +1,6 @@
 import { Package, Users, Bot, CheckCircle } from "lucide-react";
 import farmasoftLogo from "@/assets/farmasoft-client-logo.png";
+import farmasoftWarehouse from "@/assets/farmasoft-warehouse.jpg";
 
 export function PharmaCaseStudy() {
   return (
