@@ -18,11 +18,11 @@ export default function Landing() {
       <PharmaPartners />
       <PharmaStats />
       <PharmaProblems />
-      <PharmaCaseStudy />
       <PharmaTeam />
       <PharmaExpertise />
       <PharmaAIPlatform />
       <PharmaMethodology />
+      <PharmaCaseStudy />
       <PharmaTrust />
       <PharmaFAQ />
       <PharmaFinalCTA />
