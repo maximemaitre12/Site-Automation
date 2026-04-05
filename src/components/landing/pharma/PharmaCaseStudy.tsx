@@ -18,18 +18,8 @@ export function PharmaCaseStudy() {
           </span>
         </div>
 
-        {/* Warehouse photo */}
-        <div className="mb-16 rounded-xl overflow-hidden">
-          <img
-            src={farmasoftWarehouse}
-            alt="Farmasoft pharmaceutical logistics warehouse"
-            className="w-full h-[280px] md:h-[400px] object-cover"
-            loading="lazy"
-          />
-        </div>
-
         {/* Client header */}
-        <div className="mb-20">
+        <div className="mb-10">
           <div className="mb-10">
             <img
               src={farmasoftLogo}
@@ -56,6 +46,16 @@ export function PharmaCaseStudy() {
             existing systems and operate under <strong className="text-[#111] font-medium">strict human
             validation at every step</strong>.
           </p>
+        </div>
+
+        {/* Warehouse photo */}
+        <div className="mb-20 rounded-xl overflow-hidden">
+          <img
+            src={farmasoftWarehouse}
+            alt="Farmasoft pharmaceutical logistics warehouse"
+            className="w-full h-[280px] md:h-[400px] object-cover"
+            loading="lazy"
+          />
         </div>
 
         {/* Two agents */}
