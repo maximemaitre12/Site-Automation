@@ -30,7 +30,7 @@ export function LandingHeader() {
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 h-full flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <img src={aetherLogo} alt="Aether Connect" className="h-10 w-auto" />
+          <img src={aetherLogo} alt="Aether Connect" className="h-40 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-10">
