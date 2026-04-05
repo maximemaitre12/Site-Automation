@@ -67,7 +67,7 @@ export function PharmaProblems() {
               <div className="space-y-5 text-[15px] md:text-base leading-[1.85] mt-5" style={{ color: "#4a5568" }}>
                 <p>
                   The result:{" "}
-                  <strong style={{ color: "#0F172A" }}>your people focus on decisions</strong> — not
+                  <strong style={{ color: "#0F172A" }}>your people focus on decisions</strong>, not
                   on copying data between systems, chasing missing documents or formatting reports
                   that should have been automated years ago.
                 </p>
