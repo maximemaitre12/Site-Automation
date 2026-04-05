@@ -36,9 +36,9 @@ export function PharmaCaseStudy() {
           </ScrollReveal>
           <ScrollReveal delay={450}>
             <h2 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-8 text-[#111]">
-              Farmasoft × Aether Connect
+              Cas d'étude : Farmasoft
               <br />
-              <span className="text-[#0369A1]">Two AI agents. One operational backbone.</span>
+              <span className="text-[#0369A1]">Deux agents IA déployés par Aether Connect.</span>
             </h2>
           </ScrollReveal>
           <ScrollReveal delay={600}>
