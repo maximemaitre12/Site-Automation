@@ -30,7 +30,12 @@ export function LandingHeader() {
     >
       <div className="h-full flex items-center justify-between px-0">
         <Link to="/" className="flex items-center shrink-0 -ml-8">
-          <img src={aetherLogo} alt="Aether Connect" className="h-40 w-auto" />
+          <img
+            src={aetherLogo}
+            alt="Aether Connect"
+            className="h-40 w-auto transition-all duration-500"
+            style={scrolled ? { filter: "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)" } : {}}
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-10">
