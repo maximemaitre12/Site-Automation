@@ -6,13 +6,7 @@ export function PharmaCaseStudy() {
   return (
     <section id="case-study" className="py-16 md:py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="mb-6">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#0369A1]/10 text-[#0369A1] text-[11px] font-semibold tracking-[0.2em] uppercase">
-            Client case study
-          </span>
-        </div>
         <div className="flex items-center gap-4 mb-16">
-          <div className="w-8 h-[3px] bg-[#0369A1]" />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-[#0369A1]">
             Enterprise deployment · Pharmaceutical logistics
           </span>
