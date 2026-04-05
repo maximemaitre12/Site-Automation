@@ -1,12 +1,12 @@
 import pharmaProduction from "@/assets/pharma-production.jpg";
 
 const quality = [
-  { value: "200+", desc: "Projets IA déployés en production avec succès" },
-  { value: "95%", desc: "Clients qui reviennent pour de nouveaux projets" },
-  { value: "4–6", desc: "Semaines pour un premier prototype fonctionnel" },
   { value: "10x", desc: "Accélération moyenne des processus automatisés" },
-  { value: "40+", desc: "Industries et secteurs accompagnés" },
-  { value: "18", desc: "Années d'expérience en intelligence artificielle" },
+  { value: "–85%", desc: "Réduction du temps de traitement documentaire" },
+  { value: "4–6", desc: "Semaines pour un premier prototype fonctionnel" },
+  { value: "0", desc: "Disruption de vos opérations pendant le déploiement" },
+  { value: "24/7", desc: "Vos agents IA travaillent sans interruption" },
+  { value: "100%", desc: "Intégration dans vos systèmes existants" },
 ];
 
 export function PharmaMethodology() {

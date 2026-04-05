@@ -1,8 +1,8 @@
 const stats = [
-  { value: "18+", label: "Années", sub: "d'expertise en IA & tech" },
-  { value: "200+", label: "Projets", sub: "déployés avec succès" },
-  { value: "95%", label: "Fidélité", sub: "clients qui reviennent" },
-  { value: "40+", label: "Secteurs", sub: "industries accompagnées" },
+  { value: "10x", label: "Plus rapide", sub: "que le traitement manuel" },
+  { value: "4-6", label: "Semaines", sub: "pour un prototype en production" },
+  { value: "85%", label: "Réduction", sub: "du temps de traitement" },
+  { value: "0", label: "Disruption", sub: "intégration dans vos outils" },
 ];
 
 export function PharmaStats() {
@@ -12,11 +12,10 @@ export function PharmaStats() {
         <div className="flex items-start gap-8 mb-24">
           <div className="w-16 h-px mt-3 shrink-0" style={{ background: "#0369A1" }} />
           <p className="text-base md:text-[17px] leading-[1.85] max-w-[620px]" style={{ color: "#4a5568" }}>
-            Depuis <strong style={{ color: "#0F172A" }}>18 ans</strong>, nous développons des
-            <strong style={{ color: "#0F172A" }}> solutions d'intelligence artificielle</strong> pour
-            les entreprises qui veulent <strong style={{ color: "#0F172A" }}>automatiser</strong>,{" "}
-            <strong style={{ color: "#0F172A" }}>prédire</strong> et{" "}
-            <strong style={{ color: "#0F172A" }}>scaler</strong> leurs opérations — de la pharma à la finance, en passant par la logistique.
+            On ne vend pas du conseil. On <strong style={{ color: "#0F172A" }}>construit des systèmes IA</strong> qui
+            tournent en production — <strong style={{ color: "#0F172A" }}>agents autonomes</strong>,{" "}
+            <strong style={{ color: "#0F172A" }}>analyse prédictive</strong>,{" "}
+            <strong style={{ color: "#0F172A" }}>automatisation intelligente</strong>. Du concret, pas des slides.
           </p>
         </div>
 

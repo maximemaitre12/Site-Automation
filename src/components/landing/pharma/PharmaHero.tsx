@@ -23,23 +23,23 @@ export function PharmaHero() {
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-44 pb-36">
         <div className="max-w-[820px]">
           <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
-            18 ans d'intelligence artificielle appliquée
+            Architecture IA · Automatisation · Déploiement
           </p>
           <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-[92px] font-bold leading-[1.02] tracking-tight text-white mb-10">
-            L'IA au service
+            On construit
             <br />
-            de votre industrie.
+            l'IA qui travaille.
           </h1>
           <p className="text-lg md:text-xl text-white/65 max-w-[540px] leading-relaxed mb-16">
-            Nous concevons des <strong className="text-white font-medium">systèmes d'intelligence artificielle</strong> sur mesure
-            qui <strong className="text-white font-medium">automatisent</strong>, <strong className="text-white font-medium">prédisent</strong> et <strong className="text-white font-medium">optimisent</strong> vos opérations — dans tous les secteurs.
+            Des <strong className="text-white font-medium">systèmes d'intelligence artificielle</strong> sur mesure
+            qui <strong className="text-white font-medium">automatisent</strong>, <strong className="text-white font-medium">prédisent</strong> et <strong className="text-white font-medium">optimisent</strong> vos opérations — résultats en semaines, pas en mois.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               to="/contact"
               className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#0369A1] bg-white transition-all hover:bg-white/90"
             >
-              Demander une présentation
+              Réserver un appel découverte
             </Link>
             <a
               href="#case-study"
