@@ -43,7 +43,7 @@ export function PharmaProblems() {
             <ScrollReveal delay={350}>
               <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
                 <p>
-                  Pharmaceutical companies operate under extraordinary pressure —{" "}
+                  Pharmaceutical companies operate under extraordinary pressure:{" "}
                   <strong style={{ color: "#0F172A" }}>tightening regulatory timelines</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>growing volumes</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>aging infrastructure</strong>. Yet most critical
@@ -58,7 +58,7 @@ export function PharmaProblems() {
                   We work with pharma operations teams to identify the processes that{" "}
                   <strong style={{ color: "#0F172A" }}>consume the most hours</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>generate the most errors</strong>, and{" "}
-                  <strong style={{ color: "#0F172A" }}>create the highest compliance risk</strong> — then
+                  <strong style={{ color: "#0F172A" }}>create the highest compliance risk</strong>, then
                   we deploy AI agents that handle them end-to-end.
                 </p>
               </div>
@@ -67,7 +67,7 @@ export function PharmaProblems() {
               <div className="space-y-5 text-[15px] md:text-base leading-[1.85] mt-5" style={{ color: "#4a5568" }}>
                 <p>
                   The result:{" "}
-                  <strong style={{ color: "#0F172A" }}>your people focus on decisions</strong> — not
+                  <strong style={{ color: "#0F172A" }}>your people focus on decisions</strong>, not
                   on copying data between systems, chasing missing documents or formatting reports
                   that should have been automated years ago.
                 </p>

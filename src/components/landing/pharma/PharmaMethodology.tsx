@@ -2,11 +2,11 @@ import pharmaProduction from "@/assets/pharma-production.jpg";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const quality = [
-  { value: "–72%", desc: "Document processing time through Operations Intelligence Agent" },
-  { value: "–65%", desc: "Time-to-hire via automated candidate sourcing and qualification" },
+  { value: "72%", desc: "Reduction in document processing time through Operations Intelligence Agent" },
+  { value: "65%", desc: "Reduction in time-to-hire via automated candidate sourcing and qualification" },
   { value: "3x", desc: "Faster inbound-to-dispatch cycle with AI-drafted preparation orders" },
   { value: "€1.5M+", desc: "Estimated annual value created across operations and recruitment" },
-  { value: "100%", desc: "Human-validated outputs — zero autonomous execution" },
+  { value: "100%", desc: "Human-validated outputs, zero autonomous execution" },
   { value: "< 6 wks", desc: "Full agent deployment cycle including system integration" },
 ];
 
@@ -38,7 +38,7 @@ export function PharmaMethodology() {
             <ScrollReveal delay={350}>
               <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
                 Every metric below comes from <strong style={{ color: "#0F172A" }}>production deployment</strong> at
-                Farmasoft — a pharmaceutical logistics enterprise processing thousands of operations daily.
+                Farmasoft, a pharmaceutical logistics enterprise processing thousands of operations daily.
                 Our agents are measured on <strong style={{ color: "#0F172A" }}>operational impact</strong>, not
                 demo scenarios.
               </p>

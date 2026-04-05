@@ -42,7 +42,7 @@ export function PharmaHero() {
               <strong className="text-white font-medium">Purpose-built AI agents</strong> that
               automate <strong className="text-white font-medium">document processing</strong>,
               streamline <strong className="text-white font-medium">logistics workflows</strong>, and
-              modernize <strong className="text-white font-medium">recruitment pipelines</strong> — deployed
+              modernize <strong className="text-white font-medium">recruitment pipelines</strong>, deployed
               on cloud-native infrastructure for regulated industries.
             </p>
           </ScrollReveal>
