@@ -1,34 +1,69 @@
 
 
-## Plan: Normalisation globale des couleurs — Violet/Bleu uniquement
+# Redesign Complet -- Style Farmak.ch
 
-### Problème
-La LP utilise trop de couleurs (emerald, amber, orange, red, yellow, teal, cyan) qui créent un patchwork visuel non professionnel.
+## Analyse de Farmak.ch
 
-### Direction
-- **2 couleurs principales** : Violet (`primary` / `hsl(260 70% 60%)`) et Bleu clair (`hsl(200 80% 55%)`)
-- **Fond blanc** partout — supprimer `bg-slate-50`, `bg-slate-900`, `bg-slate-950`
-- **Emerald** gardé UNIQUEMENT pour les petits dots "Live" / "Actif" (1.5px pulsants)
-- Tout le reste (barres, métriques, accents, badges, sparklines) → violet/bleu
+Farmak.ch utilise un style tres specifique:
+- **Hero immersif** avec des images de produits qui se chevauchent dans des cercles, un grand titre en deux lignes avec line-break, et des decorations circulaires
+- **Stats en ligne** avec de tres grands chiffres (pas de cartes, juste une rangee horizontale)
+- **Paragraphes narratifs** avec des **mots en gras** inline -- pas de bullet points
+- **Listes de categories** cliquables avec titres en majuscules
+- **Sections "Globale Prasenz"** avec des facts inline en gras dans des phrases
+- **Section Qualite** avec de grands chiffres et descriptions courtes en tableau
+- **Section Partenaire** avec des titres ALL-CAPS et descriptions courtes -- pas de numeros, pas d'icones
+- **Enormes espaces** entre sections (120-160px)
+- **Fond blanc partout** avec tres peu de variation de couleur de fond
+- **Pas de dividers visibles** (pas de divide-x, divide-y)
+- **CTA "Prasentation Anfordern"** repete plusieurs fois
 
-### Fichiers modifiés (9 fichiers)
+## Changements Majeurs
 
-| Fichier | Changements clés |
-|---------|-----------------|
-| **ProblemsSection.tsx** | `bg-slate-50` → `bg-white`. Barres critical/warning/optimal → gradient violet (intensité selon score). Badges → violet shades. Scores texte → primary/violet |
-| **ImpactSection.tsx** | `barColor` emerald/amber → primary/violet/bleu. Sparkline colors → all primary/bleu. Supprimer orange/amber |
-| **PositioningSection.tsx** | `bg-slate-50` → `bg-white`. Sidebar `bg-slate-900` → `bg-slate-800` (garder dark car c'est un IDE) |
-| **MethodSection.tsx** | `bg-slate-950` → `bg-white`, texte dark. Accent "emerald" step 3 → bleu clair `hsl(200 80% 55%)`. Supprimer emerald bar/glow/numBg. Duration dots → primary au lieu d'emerald |
-| **UseCasesSection.tsx** | Toutes les `text-emerald-400` métriques → `text-primary`. Hero metric glow → primary shadow. Active borders → primary. "LIVE" badges → primary pulse |
-| **DifferentiationSection.tsx** | Status "Opérationnel" emerald → primary. "6/6 active" → primary |
-| **PartnersSection.tsx** | "Actif"/"Live"/"Connecté" emerald → garder emerald UNIQUEMENT sur les petits dots 1.5px. Texte labels → primary |
-| **TrainingsSection.tsx** | Sidebar `bg-slate-900` → garder dark (IDE style). Normaliser gradients formations → violet/bleu |
-| **FinalCTASection.tsx** | `bg-slate-900` → `bg-white`. Texte blanc → `text-slate-900`. `text-slate-400` → `text-slate-500`. Ligne via-slate-700 → via-slate-200. CTA glow inchangé |
+### Philosophie
+Supprimer tout ce qui fait "consulting agency template": numeros `01/02/03`, dividers `divide-x/divide-y`, grilles 3-colonnes avec separateurs, labels uppercase "Defis/Expertise/etc". Remplacer par du contenu narratif avec mots en gras, des grands chiffres nus, et beaucoup plus de blanc.
 
-### Règle uniformisée
-- `emerald-400/500` pour métriques/barres/badges → `text-primary` / `bg-primary`
-- `amber-400`, `orange-400`, `yellow-400/500` → `hsl(200 80% 55%)` (bleu clair)
-- `red-400/500` barres → `hsl(260 70% 60%)` (violet moyen) à faible opacité
-- `teal-500`, `cyan-*` → supprimés
-- Seule exception : traffic lights macOS (`red-400`, `yellow-400`, `green-400`) restent intacts
+### Reduction des sections
+Passer de 13 sections a 8-9 en fusionnant:
+1. **Hero** -- garder le gradient, ajouter des images circulaires decoratives qui se chevauchent (comme Farmak), titre plus grand
+2. **Stats** -- juste 4 grands chiffres en ligne, pas de cartes/bordures/ombres
+3. **Intro narrative + Expertise** -- un grand paragraphe avec **mots en gras** + liste de domaines cliquables en majuscules (comme les therapeutische Bereiche de Farmak)
+4. **Equipe/Presence** -- style "Globale Prasenz" de Farmak: facts en gras dans des phrases courtes
+5. **Qualite/Methodologie** -- grands chiffres + descriptions courtes en grille, comme la section qualite de Farmak
+6. **Cas d'etude** -- plus narratif, garder le testimonial
+7. **Partenaire** -- 4 blocs titre ALL-CAPS + description (comme "Verlasslicher Geschaftspartner" de Farmak)
+8. **CTA Final**
+
+### Fichiers a modifier
+
+**PharmaHero.tsx** -- Ajouter des cercles decoratifs avec images (ou motifs) qui se chevauchent comme Farmak. Titre plus grand (text-7xl+). Bouton "Mehr sehen" style vertical a droite.
+
+**PharmaStats.tsx** -- Supprimer tout styling de carte. Juste des grands chiffres (text-7xl) en rangee sur fond blanc avec un trait fin en-dessous. Pas d'ombre, pas de fond gris.
+
+**PharmaProblems.tsx** -- Transformer en section narrative: un grand paragraphe avec **bold keywords** suivi d'une liste de domaines en majuscules cliquables (style Farmak "therapeutische Bereiche"). Supprimer les colonnes avec separateurs.
+
+**PharmaTeam.tsx** -- Transformer en section "presence/equipe" avec des facts en gras dans des phrases (style Farmak "Globale Prasenz"). Ex: "**15 ans** d'experience chez **Sanofi et Novartis**" etc. Pas de cartes separees.
+
+**PharmaExpertise.tsx** -- Fusionner avec la section Problems ou supprimer. Le contenu migre dans la section narrative.
+
+**PharmaMethodology.tsx** -- Transformer en grille de chiffres comme la section "Qualitat" de Farmak: grands chiffres + description d'une ligne. Pas de timeline.
+
+**PharmaCaseStudy.tsx** -- Garder mais simplifier. Plus de texte narratif, moins de tableaux. Grand testimonial.
+
+**PharmaTrust.tsx** -- Transformer en section "Partenaire" style Farmak: 4 blocs avec titre ALL-CAPS et description courte. Pas de numeros.
+
+**Supprimer/fusionner**: PharmaPortfolio (integrer dans CaseStudy), PharmaServices (integrer dans CTA ou supprimer), PharmaResources (supprimer -- pas dans Farmak), PharmaFAQ (garder mais simplifier).
+
+**Landing.tsx** -- Reduire a ~8 sections.
+
+**LandingHeader.tsx** -- Supprimer rounded-full sur les boutons. Plus minimaliste.
+
+**LandingFooter.tsx** -- Supprimer les icones rondes pour les reseaux sociaux. Plus epure.
+
+### Details de style
+- Padding sections: 140-180px vertical (au lieu de 100-120px)
+- Fond: blanc partout, supprimer les alternances `#FAFCFE`
+- Pas de `divide-x`, `divide-y`, pas de bordures entre elements
+- Grands chiffres: `text-7xl md:text-8xl` en couleur primaire
+- Paragraphes avec `<strong>` pour les mots cles
+- Boutons: rectangulaires (pas rounded-full), plus de presence
 
