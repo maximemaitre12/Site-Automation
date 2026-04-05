@@ -7,7 +7,7 @@ export function PharmaTeam() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Notre approche
+            Architecture opérationnelle
           </span>
         </div>
 
@@ -29,42 +29,48 @@ export function PharmaTeam() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              L'exécution
+              Ingénierie IA
               <br />
-              avant tout.
+              de grade industriel.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
-              Aether Connect réunit des <strong style={{ color: "#0F172A" }}>architectes systèmes</strong>,
-              des <strong style={{ color: "#0F172A" }}>ingénieurs IA</strong> et des{" "}
-              <strong style={{ color: "#0F172A" }}>spécialistes data</strong> autour d'une obsession commune :
-              livrer des <strong style={{ color: "#0F172A" }}>systèmes qui tournent en production</strong>,
-              pas des prototypes qui restent dans un tiroir.
+              Nos <strong style={{ color: "#0F172A" }}>pipelines de machine learning</strong> sont
+              conçus pour des environnements <strong style={{ color: "#0F172A" }}>GxP-compatibles</strong> et
+              des workflows <strong style={{ color: "#0F172A" }}>FDA 21 CFR Part 11</strong>. Chaque modèle
+              est versionné, auditable et déployé via des <strong style={{ color: "#0F172A" }}>CI/CD validés</strong> sur
+              infrastructure <strong style={{ color: "#0F172A" }}>SOC 2 Type II</strong>.
             </p>
           </div>
 
           <div className="space-y-0">
             {[
               {
-                title: "MÉTHODOLOGIE",
+                title: "ORCHESTRATION MLOps",
                 desc: <>
-                  Chaque projet commence par un <strong style={{ color: "#0F172A" }}>audit opérationnel</strong> de
-                  vos processus. On identifie les <strong style={{ color: "#0F172A" }}>leviers d'automatisation</strong> à
-                  fort impact avant d'écrire une seule ligne de code.
+                  <strong style={{ color: "#0F172A" }}>Feature stores</strong> centralisés,{" "}
+                  <strong style={{ color: "#0F172A" }}>model registry</strong> avec versioning sémantique,{" "}
+                  <strong style={{ color: "#0F172A" }}>pipelines d'inférence</strong> containerisés
+                  sur Kubernetes. Monitoring drift en temps réel via <strong style={{ color: "#0F172A" }}>Prometheus/Grafana</strong>.
                 </>,
               },
               {
-                title: "INFRASTRUCTURE",
+                title: "AGENTS AUTONOMES & RAG",
                 desc: <>
-                  Nos systèmes sont déployés sur des <strong style={{ color: "#0F172A" }}>infrastructures cloud</strong> de
-                  niveau entreprise — <strong style={{ color: "#0F172A" }}>AWS, Azure, GCP</strong> — avec
-                  monitoring, scaling automatique et <strong style={{ color: "#0F172A" }}>SLA garanti</strong>.
+                  Architectures <strong style={{ color: "#0F172A" }}>multi-agents</strong> avec{" "}
+                  <strong style={{ color: "#0F172A" }}>retrieval-augmented generation</strong>,{" "}
+                  <strong style={{ color: "#0F172A" }}>vector databases</strong> (Pinecone, pgvector),
+                  chaînes de raisonnement <strong style={{ color: "#0F172A" }}>LangChain/LlamaIndex</strong> et
+                  orchestration <strong style={{ color: "#0F172A" }}>event-driven</strong>.
                 </>,
               },
               {
-                title: "ACCOMPAGNEMENT",
+                title: "INFRASTRUCTURE & COMPLIANCE",
                 desc: <>
-                  Un <strong style={{ color: "#0F172A" }}>interlocuteur dédié</strong> du diagnostic au déploiement.
-                  Formation de vos équipes et <strong style={{ color: "#0F172A" }}>support continu</strong> post-lancement.
+                  Déploiement <strong style={{ color: "#0F172A" }}>multi-cloud</strong> (AWS, Azure, GCP)
+                  avec <strong style={{ color: "#0F172A" }}>IaC Terraform</strong>,{" "}
+                  <strong style={{ color: "#0F172A" }}>encryption at rest/in transit</strong>,{" "}
+                  <strong style={{ color: "#0F172A" }}>audit trails</strong> immutables et{" "}
+                  <strong style={{ color: "#0F172A" }}>RBAC</strong> granulaire. Conformité RGPD, HIPAA, ISO 27001.
                 </>,
               },
             ].map((item) => (
