@@ -19,7 +19,7 @@ export function PharmaProblems() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            What we automate
+            Pharmaceutical operations
           </span>
         </div>
 
@@ -29,36 +29,34 @@ export function PharmaProblems() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Any process.
+              Your operations
               <br />
-              Any system.
+              deserve better
               <br />
-              Any scale.
+              than spreadsheets.
             </h2>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
               <p>
-                From <strong style={{ color: "#0F172A" }}>logistics operations</strong> and{" "}
-                <strong style={{ color: "#0F172A" }}>regulatory submissions</strong> to{" "}
-                <strong style={{ color: "#0F172A" }}>talent acquisition</strong> and{" "}
-                <strong style={{ color: "#0F172A" }}>quality management</strong> — we build
-                AI agents that plug into your existing stack and automate the workflows
-                that slow your teams down.
+                Pharmaceutical companies operate under extraordinary pressure —{" "}
+                <strong style={{ color: "#0F172A" }}>tightening regulatory timelines</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>growing volumes</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>aging infrastructure</strong>. Yet most critical
+                workflows still depend on manual handling, disconnected tools and tribal knowledge
+                trapped in individual contributors.
               </p>
               <p>
-                Our agents handle <strong style={{ color: "#0F172A" }}>document processing</strong>,{" "}
-                <strong style={{ color: "#0F172A" }}>data extraction</strong>,{" "}
-                <strong style={{ color: "#0F172A" }}>ERP integration</strong>,{" "}
-                <strong style={{ color: "#0F172A" }}>compliance monitoring</strong>,{" "}
-                <strong style={{ color: "#0F172A" }}>pharmacovigilance</strong>,{" "}
-                <strong style={{ color: "#0F172A" }}>cloud migration</strong> and{" "}
-                <strong style={{ color: "#0F172A" }}>infrastructure modernization</strong>.
-                Whatever your operational bottleneck — we've built an agent for it.
+                We work with pharma operations teams to identify the processes that{" "}
+                <strong style={{ color: "#0F172A" }}>consume the most hours</strong>,{" "}
+                <strong style={{ color: "#0F172A" }}>generate the most errors</strong>, and{" "}
+                <strong style={{ color: "#0F172A" }}>create the highest compliance risk</strong> — then
+                we deploy AI agents that handle them end-to-end, integrated into the systems
+                your teams already use.
               </p>
               <p>
-                Every deployment starts with a <strong style={{ color: "#0F172A" }}>free audit</strong> of your
-                current workflows. We identify the <strong style={{ color: "#0F172A" }}>highest-impact automation
-                opportunities</strong>, prototype in <strong style={{ color: "#0F172A" }}>4–6 weeks</strong>, and
-                scale from there — always with <strong style={{ color: "#0F172A" }}>human validation</strong> at every step.
+                The result:{" "}
+                <strong style={{ color: "#0F172A" }}>your people focus on decisions</strong> — not
+                on copying data between systems, chasing missing documents or formatting reports
+                that should have been automated years ago.
               </p>
             </div>
 
@@ -77,7 +75,7 @@ export function PharmaProblems() {
             <div className="relative mb-14 overflow-hidden">
               <img
                 src={pharmaQuality}
-                alt="Enterprise automation at scale"
+                alt="Pharmaceutical operations"
                 className="w-full h-[300px] lg:h-[360px] object-cover"
                 loading="lazy"
                 width={800}
