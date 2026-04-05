@@ -35,10 +35,12 @@ export function LandingFooter() {
 
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#94A3B8" }}>Contact</p>
-            <a href="mailto:hello@aether-connect.com" className="block text-sm mb-2" style={{ color: "#475569" }}>
-              hello@aether-connect.com
+            <a href="mailto:youriy.strashnyi@edu.em-lyon.com" className="block text-sm mb-2 hover:text-[#0891B2] transition-colors" style={{ color: "#475569" }}>
+              youriy.strashnyi@edu.em-lyon.com
             </a>
-            <p className="text-xs" style={{ color: "#94A3B8" }}>Mon-Fri: 9am-6pm (CET)</p>
+            <a href="mailto:maxime.maitre@edu.em-lyon.com" className="block text-sm" style={{ color: "#475569" }} >
+              maxime.maitre@edu.em-lyon.com
+            </a>
           </div>
         </div>
 
