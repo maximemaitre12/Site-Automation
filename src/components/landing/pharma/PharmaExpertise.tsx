@@ -22,7 +22,7 @@ export function PharmaExpertise() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={100}>
+        <ScrollReveal delay={200}>
           <h2
             className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
             style={{ color: "#0F172A" }}
@@ -35,7 +35,7 @@ export function PharmaExpertise() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-0">
           {areas.map((a, i) => (
-            <ScrollReveal key={a.title} delay={i * 80}>
+            <ScrollReveal key={a.title} delay={i * 150}>
               <div
                 className="group cursor-default p-8 transition-colors hover:bg-[#f5f9fb]"
                 style={{

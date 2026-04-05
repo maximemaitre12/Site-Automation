@@ -28,7 +28,7 @@ export function PharmaProblems() {
 
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div>
-            <ScrollReveal>
+            <ScrollReveal delay={150}>
               <h2
                 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
                 style={{ color: "#0F172A" }}
@@ -40,7 +40,7 @@ export function PharmaProblems() {
                 than spreadsheets.
               </h2>
             </ScrollReveal>
-            <ScrollReveal delay={150}>
+            <ScrollReveal delay={350}>
               <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
                 <p>
                   Pharmaceutical companies operate under extraordinary pressure —{" "}
@@ -50,14 +50,21 @@ export function PharmaProblems() {
                   workflows still depend on manual handling, disconnected tools and tribal knowledge
                   trapped in individual contributors.
                 </p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={550}>
+              <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
                 <p>
                   We work with pharma operations teams to identify the processes that{" "}
                   <strong style={{ color: "#0F172A" }}>consume the most hours</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>generate the most errors</strong>, and{" "}
                   <strong style={{ color: "#0F172A" }}>create the highest compliance risk</strong> — then
-                  we deploy AI agents that handle them end-to-end, integrated into the systems
-                  your teams already use.
+                  we deploy AI agents that handle them end-to-end.
                 </p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={750}>
+              <div className="space-y-5 text-[15px] md:text-base leading-[1.85] mt-5" style={{ color: "#4a5568" }}>
                 <p>
                   The result:{" "}
                   <strong style={{ color: "#0F172A" }}>your people focus on decisions</strong> — not
@@ -67,7 +74,7 @@ export function PharmaProblems() {
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={300}>
+            <ScrollReveal delay={900}>
               <div className="mt-12">
                 <Link
                   to="/contact"
@@ -95,14 +102,14 @@ export function PharmaProblems() {
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={100}>
+            <ScrollReveal delay={200}>
               <p className="text-[11px] font-semibold tracking-[0.3em] uppercase mb-8" style={{ color: "#94a3b8" }}>
                 Domains of intervention
               </p>
             </ScrollReveal>
             <div className="space-y-0">
               {domains.map((d, i) => (
-                <ScrollReveal key={d.name} delay={150 + i * 60}>
+                <ScrollReveal key={d.name} delay={300 + i * 100}>
                   <a
                     href="#expertise"
                     className="flex items-center justify-between py-4 transition-opacity hover:opacity-60 group"

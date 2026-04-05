@@ -25,7 +25,7 @@ export function PharmaStats() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
           {stats.map((s, i) => (
-            <ScrollReveal key={s.label} delay={i * 120}>
+            <ScrollReveal key={s.label} delay={i * 200}>
               <div className="relative pl-6">
                 <div className="w-8 h-[3px] mb-6" style={{ background: "#0369A1" }} />
                 <div

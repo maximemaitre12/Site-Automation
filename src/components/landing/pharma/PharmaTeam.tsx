@@ -14,7 +14,7 @@ export function PharmaTeam() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal>
+        <ScrollReveal delay={200}>
           <div className="relative mb-20">
             <img
               src={pharmaTeamMeeting}
@@ -30,7 +30,7 @@ export function PharmaTeam() {
 
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div>
-            <ScrollReveal>
+            <ScrollReveal delay={100}>
               <h2
                 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
                 style={{ color: "#0F172A" }}
@@ -40,7 +40,7 @@ export function PharmaTeam() {
                 AI engineering.
               </h2>
             </ScrollReveal>
-            <ScrollReveal delay={150}>
+            <ScrollReveal delay={300}>
               <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
                 Our <strong style={{ color: "#0F172A" }}>agents</strong> are not prototypes — they are
                 <strong style={{ color: "#0F172A" }}> production systems</strong> integrated into your
@@ -84,7 +84,7 @@ export function PharmaTeam() {
                 </>,
               },
             ].map((item, i) => (
-              <ScrollReveal key={item.title} delay={i * 120}>
+              <ScrollReveal key={item.title} delay={i * 200}>
                 <div className="py-8" style={{ borderBottom: "1px solid rgba(3,105,161,0.15)" }}>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-2 h-2 rounded-full" style={{ background: "#0369A1" }} />

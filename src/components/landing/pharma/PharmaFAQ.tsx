@@ -25,7 +25,7 @@ export function PharmaFAQ() {
 
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div>
-            <ScrollReveal>
+            <ScrollReveal delay={150}>
               <h2
                 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
                 style={{ color: "#0F172A" }}
@@ -35,7 +35,7 @@ export function PharmaFAQ() {
                 asked questions.
               </h2>
             </ScrollReveal>
-            <ScrollReveal delay={100}>
+            <ScrollReveal delay={300}>
               <p className="text-[15px] leading-[1.85]" style={{ color: "#4a5568" }}>
                 Everything your <strong style={{ color: "#0F172A" }}>Regulatory Affairs and Quality Assurance</strong> teams
                 need to know before deploying our platform.
@@ -46,7 +46,7 @@ export function PharmaFAQ() {
           <div>
             <Accordion type="single" collapsible>
               {faqs.map((faq, i) => (
-                <ScrollReveal key={i} delay={i * 80}>
+                <ScrollReveal key={i} delay={i * 120}>
                   <AccordionItem
                     value={`faq-${i}`}
                     className="border-b py-0"

@@ -25,7 +25,7 @@ export function PharmaMethodology() {
 
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 mb-20">
           <div>
-            <ScrollReveal>
+            <ScrollReveal delay={150}>
               <h2
                 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
                 style={{ color: "#0F172A" }}
@@ -35,7 +35,7 @@ export function PharmaMethodology() {
                 Not prototypes.
               </h2>
             </ScrollReveal>
-            <ScrollReveal delay={150}>
+            <ScrollReveal delay={350}>
               <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
                 Every metric below comes from <strong style={{ color: "#0F172A" }}>production deployment</strong> at
                 Farmasoft — a pharmaceutical logistics enterprise processing thousands of operations daily.
@@ -44,7 +44,7 @@ export function PharmaMethodology() {
               </p>
             </ScrollReveal>
           </div>
-          <ScrollReveal>
+          <ScrollReveal delay={200}>
             <div className="relative overflow-hidden">
               <img
                 src={pharmaProduction}
@@ -61,7 +61,7 @@ export function PharmaMethodology() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-0">
           {quality.map((q, i) => (
-            <ScrollReveal key={q.desc} delay={i * 80}>
+            <ScrollReveal key={q.desc} delay={i * 150}>
               <div
                 className="p-8"
                 style={{

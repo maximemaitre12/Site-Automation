@@ -13,6 +13,8 @@ export function PharmaCaseStudy() {
               Client case study
             </span>
           </div>
+        </ScrollReveal>
+        <ScrollReveal delay={150}>
           <div className="flex items-center gap-4 mb-16">
             <div className="w-8 h-[3px] bg-[#0369A1]" />
             <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-[#0369A1]">
@@ -21,9 +23,8 @@ export function PharmaCaseStudy() {
           </div>
         </ScrollReveal>
 
-        {/* Client header */}
         <div className="mb-10">
-          <ScrollReveal>
+          <ScrollReveal delay={300}>
             <div className="mb-10">
               <img
                 src={farmasoftLogo}
@@ -33,19 +34,21 @@ export function PharmaCaseStudy() {
               />
             </div>
           </ScrollReveal>
-          <ScrollReveal delay={100}>
+          <ScrollReveal delay={450}>
             <h2 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-8 text-[#111]">
               Farmasoft × Aether Connect
               <br />
               <span className="text-[#0369A1]">Two AI agents. One operational backbone.</span>
             </h2>
           </ScrollReveal>
-          <ScrollReveal delay={200}>
+          <ScrollReveal delay={600}>
             <p className="text-[15px] md:text-base leading-[1.85] mb-6 text-[#6B6560] max-w-3xl">
               <strong className="text-[#111] font-medium">Farmasoft</strong> is a major European pharmaceutical
               logistics operator managing <strong className="text-[#111] font-medium">high-volume inbound and
               outbound flows</strong> across regulated supply chains.
             </p>
+          </ScrollReveal>
+          <ScrollReveal delay={750}>
             <p className="text-[15px] md:text-base leading-[1.85] text-[#6B6560] max-w-3xl">
               We deployed <strong className="text-[#111] font-medium">two purpose-built AI agents</strong> —
               designed to integrate directly into their existing systems and operate under{" "}
@@ -54,7 +57,6 @@ export function PharmaCaseStudy() {
           </ScrollReveal>
         </div>
 
-        {/* Warehouse photo */}
         <ScrollReveal>
           <div className="mb-20 rounded-xl overflow-hidden">
             <img
@@ -66,9 +68,8 @@ export function PharmaCaseStudy() {
           </div>
         </ScrollReveal>
 
-        {/* Two agents — compact */}
         <div className="grid md:grid-cols-2 gap-6 mb-20">
-          <ScrollReveal>
+          <ScrollReveal direction="left">
             <div className="p-6 lg:p-8 rounded-xl border border-[#eae7e2] bg-[#FAFAF9] h-full">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
@@ -100,7 +101,7 @@ export function PharmaCaseStudy() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={150}>
+          <ScrollReveal direction="right">
             <div className="p-6 lg:p-8 rounded-xl border border-[#eae7e2] bg-[#FAFAF9] h-full">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
@@ -133,7 +134,6 @@ export function PharmaCaseStudy() {
           </ScrollReveal>
         </div>
 
-        {/* Testimonial */}
         <ScrollReveal>
           <div className="max-w-2xl">
             <div className="relative pl-6 border-l-2 border-[#0369A1]/30">

@@ -23,12 +23,12 @@ export function PharmaHero() {
 
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-44 pb-36">
         <div className="max-w-[820px]">
-          <ScrollReveal delay={100}>
+          <ScrollReveal delay={200}>
             <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
               AI Automation · Cloud Infrastructure · Pharma Operations
             </p>
           </ScrollReveal>
-          <ScrollReveal delay={250}>
+          <ScrollReveal delay={500}>
             <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-[92px] font-bold leading-[1.02] tracking-tight text-white mb-10">
               Intelligent agents
               <br />
@@ -37,7 +37,7 @@ export function PharmaHero() {
               operations.
             </h1>
           </ScrollReveal>
-          <ScrollReveal delay={400}>
+          <ScrollReveal delay={800}>
             <p className="text-lg md:text-xl text-white/65 max-w-[540px] leading-relaxed mb-16">
               <strong className="text-white font-medium">Purpose-built AI agents</strong> that
               automate <strong className="text-white font-medium">document processing</strong>,
@@ -46,7 +46,7 @@ export function PharmaHero() {
               on cloud-native infrastructure for regulated industries.
             </p>
           </ScrollReveal>
-          <ScrollReveal delay={550}>
+          <ScrollReveal delay={1100}>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/contact"
