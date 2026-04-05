@@ -58,120 +58,79 @@ export function PharmaCaseStudy() {
           />
         </div>
 
-        {/* Two agents */}
-        <div className="grid lg:grid-cols-2 gap-0 mb-20">
+        {/* Two agents — compact */}
+        <div className="grid md:grid-cols-2 gap-6 mb-20">
           {/* Agent 1 — Operations */}
-          <div className="p-10 lg:p-12 border-r border-b border-[#eae7e2]">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
-                <Package className="w-5 h-5 text-[#0369A1]" />
+          <div className="p-6 lg:p-8 rounded-xl border border-[#eae7e2] bg-[#FAFAF9]">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
+                <Package className="w-4 h-4 text-[#0369A1]" />
               </div>
               <div>
                 <span className="text-[10px] font-semibold tracking-[0.2em] uppercase block text-[#0369A1]">Agent 01</span>
-                <h3 className="font-heading text-lg font-bold text-[#111]">Operations Intelligence</h3>
+                <h3 className="font-heading text-base font-bold text-[#111]">Operations Intelligence</h3>
               </div>
             </div>
 
-            <p className="text-[14px] leading-[1.8] mb-8 text-[#6B6560]">
-              Automates inbound and outbound logistics flows through a single unified intelligence
-              layer — eliminating manual data entry and reducing order preparation errors.
+            <p className="text-[13px] leading-[1.75] mb-5 text-[#6B6560]">
+              Automates inbound/outbound logistics — document ingestion, data extraction,
+              ERP draft orders and inventory matching.
             </p>
 
-            <div className="space-y-4 mb-8">
-              <div>
-                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#111]/70 block mb-2">Inbound — Reception</span>
-                <ul className="space-y-2">
-                  {[
-                    "Email and document ingestion (PDF, scans, EDI)",
-                    "Key data extraction — lot numbers, quantities, expiry dates",
-                    "Automated draft reception orders in ERP",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-[13px] text-[#6B6560]">
-                      <CheckCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[#0369A1]" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#111]/70 block mb-2">Outbound — Dispatch</span>
-                <ul className="space-y-2">
-                  {[
-                    "Client request analysis (email, Excel, API)",
-                    "Product identification and inventory matching",
-                    "Draft pick & pack preparation orders",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-[13px] text-[#6B6560]">
-                      <CheckCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[#0369A1]" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <ul className="space-y-2 mb-5">
+              {[
+                "Email & PDF ingestion, lot/expiry extraction",
+                "Automated draft reception & dispatch orders",
+                "Product identification & inventory matching",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-[12px] text-[#6B6560]">
+                  <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#0369A1]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
 
-            <div className="flex items-center gap-2 px-3 py-2 rounded bg-[#0369A1]/5">
-              <Bot className="w-4 h-4 text-[#0369A1]" />
-              <span className="text-[12px] text-[#6B6560]">
-                All outputs are <strong className="text-[#111] font-medium">draft-only</strong> — human validation before execution
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#0369A1]/5">
+              <Bot className="w-3.5 h-3.5 text-[#0369A1]" />
+              <span className="text-[11px] text-[#6B6560]">
+                All outputs are <strong className="text-[#111] font-medium">draft-only</strong> — human validation required
               </span>
             </div>
           </div>
 
           {/* Agent 2 — Talent */}
-          <div className="p-10 lg:p-12 border-b border-[#eae7e2]">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
-                <Users className="w-5 h-5 text-[#0369A1]" />
+          <div className="p-6 lg:p-8 rounded-xl border border-[#eae7e2] bg-[#FAFAF9]">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
+                <Users className="w-4 h-4 text-[#0369A1]" />
               </div>
               <div>
                 <span className="text-[10px] font-semibold tracking-[0.2em] uppercase block text-[#0369A1]">Agent 02</span>
-                <h3 className="font-heading text-lg font-bold text-[#111]">Talent Intelligence</h3>
+                <h3 className="font-heading text-base font-bold text-[#111]">Talent Intelligence</h3>
               </div>
             </div>
 
-            <p className="text-[14px] leading-[1.8] mb-8 text-[#6B6560]">
-              Continuously scans the employment market to identify and qualify the most relevant
-              profiles — reducing time-to-hire and improving candidate quality for critical pharma roles.
+            <p className="text-[13px] leading-[1.75] mb-5 text-[#6B6560]">
+              Continuously scans the employment market to identify, qualify, and rank
+              the most relevant profiles for critical pharma roles.
             </p>
 
-            <div className="space-y-4 mb-8">
-              <div>
-                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#111]/70 block mb-2">Intelligence engine</span>
-                <ul className="space-y-2">
-                  {[
-                    "Automated market monitoring across job boards and networks",
-                    "Filtering by role, location, salary range, certifications",
-                    "Qualified shortlists with AI-scored candidate profiles",
-                    "Actionable HR recommendations with priority ranking",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-[13px] text-[#6B6560]">
-                      <CheckCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[#0369A1]" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#111]/70 block mb-2">Deliverables</span>
-                <ul className="space-y-2">
-                  {[
-                    "Structured candidate synthesis cards",
-                    "Profile prioritization based on operational fit",
-                    "Integration-ready data for existing HRIS",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-[13px] text-[#6B6560]">
-                      <CheckCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[#0369A1]" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <ul className="space-y-2 mb-5">
+              {[
+                "Automated monitoring across job boards & networks",
+                "AI-scored candidate profiles & priority ranking",
+                "Structured synthesis cards, HRIS-ready data",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-[12px] text-[#6B6560]">
+                  <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#0369A1]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
 
-            <div className="flex items-center gap-2 px-3 py-2 rounded bg-[#0369A1]/5">
-              <Bot className="w-4 h-4 text-[#0369A1]" />
-              <span className="text-[12px] text-[#6B6560]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#0369A1]/5">
+              <Bot className="w-3.5 h-3.5 text-[#0369A1]" />
+              <span className="text-[11px] text-[#6B6560]">
                 Human decision required <strong className="text-[#111] font-medium">before any candidate interaction</strong>
               </span>
             </div>
