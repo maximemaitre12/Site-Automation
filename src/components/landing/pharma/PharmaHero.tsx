@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import pharmaLab from "@/assets/pharma-lab.jpg";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export function PharmaHero() {
   return (
@@ -22,37 +23,45 @@ export function PharmaHero() {
 
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-44 pb-36">
         <div className="max-w-[820px]">
-          <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
-            AI Automation · Cloud Infrastructure · Pharma Operations
-          </p>
-          <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-[92px] font-bold leading-[1.02] tracking-tight text-white mb-10">
-            Intelligent agents
-            <br />
-            that run your
-            <br />
-            operations.
-          </h1>
-          <p className="text-lg md:text-xl text-white/65 max-w-[540px] leading-relaxed mb-16">
-            <strong className="text-white font-medium">Purpose-built AI agents</strong> that
-            automate <strong className="text-white font-medium">document processing</strong>,
-            streamline <strong className="text-white font-medium">logistics workflows</strong>, and
-            modernize <strong className="text-white font-medium">recruitment pipelines</strong> — deployed
-            on cloud-native infrastructure for regulated industries.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              to="/contact"
-              className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#0369A1] bg-white transition-all hover:bg-white/90"
-            >
-              Request a free automation audit
-            </Link>
-            <a
-              href="#case-study"
-              className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-medium tracking-[0.1em] uppercase text-white border border-white/25 transition-all hover:bg-white/10"
-            >
-              See our case study
-            </a>
-          </div>
+          <ScrollReveal delay={100}>
+            <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
+              AI Automation · Cloud Infrastructure · Pharma Operations
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={250}>
+            <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-[92px] font-bold leading-[1.02] tracking-tight text-white mb-10">
+              Intelligent agents
+              <br />
+              that run your
+              <br />
+              operations.
+            </h1>
+          </ScrollReveal>
+          <ScrollReveal delay={400}>
+            <p className="text-lg md:text-xl text-white/65 max-w-[540px] leading-relaxed mb-16">
+              <strong className="text-white font-medium">Purpose-built AI agents</strong> that
+              automate <strong className="text-white font-medium">document processing</strong>,
+              streamline <strong className="text-white font-medium">logistics workflows</strong>, and
+              modernize <strong className="text-white font-medium">recruitment pipelines</strong> — deployed
+              on cloud-native infrastructure for regulated industries.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={550}>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#0369A1] bg-white transition-all hover:bg-white/90"
+              >
+                Request a free automation audit
+              </Link>
+              <a
+                href="#case-study"
+                className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-medium tracking-[0.1em] uppercase text-white border border-white/25 transition-all hover:bg-white/10"
+              >
+                See our case study
+              </a>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
 

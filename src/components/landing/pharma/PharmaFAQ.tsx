@@ -1,4 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const faqs = [
   { q: "Is your AI compliant with 21 CFR Part 11 and Annex 11?", a: "Yes. Every system is deployed with electronic signatures, immutable audit trails and RBAC access control. Our IQ/OQ/PQ validation protocols are delivered with each release and documented in a Validation Master Plan." },
@@ -13,50 +14,57 @@ export function PharmaFAQ() {
   return (
     <section className="py-28 md:py-36 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="flex items-center gap-4 mb-16">
-          <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-          <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Regulatory & technical questions
-          </span>
-        </div>
+        <ScrollReveal>
+          <div className="flex items-center gap-4 mb-16">
+            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+              Regulatory & technical questions
+            </span>
+          </div>
+        </ScrollReveal>
 
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div>
-            <h2
-              className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
-              style={{ color: "#0F172A" }}
-            >
-              Frequently
-              <br />
-              asked questions.
-            </h2>
-            <p className="text-[15px] leading-[1.85]" style={{ color: "#4a5568" }}>
-              Everything your <strong style={{ color: "#0F172A" }}>Regulatory Affairs and Quality Assurance</strong> teams
-              need to know before deploying our platform.
-            </p>
+            <ScrollReveal>
+              <h2
+                className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
+                style={{ color: "#0F172A" }}
+              >
+                Frequently
+                <br />
+                asked questions.
+              </h2>
+            </ScrollReveal>
+            <ScrollReveal delay={100}>
+              <p className="text-[15px] leading-[1.85]" style={{ color: "#4a5568" }}>
+                Everything your <strong style={{ color: "#0F172A" }}>Regulatory Affairs and Quality Assurance</strong> teams
+                need to know before deploying our platform.
+              </p>
+            </ScrollReveal>
           </div>
 
           <div>
             <Accordion type="single" collapsible>
               {faqs.map((faq, i) => (
-                <AccordionItem
-                  key={i}
-                  value={`faq-${i}`}
-                  className="border-b py-0"
-                  style={{ borderColor: "#e8ecf1" }}
-                >
-                  <AccordionTrigger
-                    className="font-heading text-[15px] font-bold hover:no-underline py-6 text-left"
-                    style={{ color: "#0F172A" }}
+                <ScrollReveal key={i} delay={i * 80}>
+                  <AccordionItem
+                    value={`faq-${i}`}
+                    className="border-b py-0"
+                    style={{ borderColor: "#e8ecf1" }}
                   >
-                    {faq.q}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <p className="text-[14px] leading-[1.8] pb-4" style={{ color: "#5a6577" }}>
-                      {faq.a}
-                    </p>
-                  </AccordionContent>
-                </AccordionItem>
+                    <AccordionTrigger
+                      className="font-heading text-[15px] font-bold hover:no-underline py-6 text-left"
+                      style={{ color: "#0F172A" }}
+                    >
+                      {faq.q}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-[14px] leading-[1.8] pb-4" style={{ color: "#5a6577" }}>
+                        {faq.a}
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </ScrollReveal>
               ))}
             </Accordion>
           </div>

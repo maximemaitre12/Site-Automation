@@ -4,9 +4,10 @@ interface ScrollRevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
+  direction?: "up" | "left" | "right";
 }
 
-export function ScrollReveal({ children, className = "", delay = 0 }: ScrollRevealProps) {
+export function ScrollReveal({ children, className = "", delay = 0, direction = "up" }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -21,12 +22,18 @@ export function ScrollReveal({ children, className = "", delay = 0 }: ScrollReve
           observer.unobserve(el);
         }
       },
-      { rootMargin: "0px 0px -80px 0px", threshold: 0.05 }
+      { rootMargin: "0px 0px -60px 0px", threshold: 0.01 }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  const transforms: Record<string, string> = {
+    up: "translateY(32px)",
+    left: "translateX(-32px)",
+    right: "translateX(32px)",
+  };
 
   return (
     <div
@@ -34,8 +41,8 @@ export function ScrollReveal({ children, className = "", delay = 0 }: ScrollReve
       className={className}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: isVisible ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.5s ease-out ${delay}ms, transform 0.5s ease-out ${delay}ms`,
+        transform: isVisible ? "translate(0)" : transforms[direction],
+        transition: `opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
       }}
     >
       {children}
