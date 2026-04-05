@@ -3,37 +3,39 @@ import { Link } from "react-router-dom";
 export function PharmaFinalCTA() {
   return (
     <section
-      className="relative py-36 md:py-44 overflow-hidden"
+      className="relative py-32 md:py-44 overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, #064E6E 0%, #0891B2 40%, #22D3EE 100%)",
+        background: "linear-gradient(160deg, #042f3d 0%, #064E6E 50%, #0c7792 100%)",
       }}
     >
-      {/* Decorative circles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 w-[400px] h-[400px] rounded-full" style={{ background: "rgba(255,255,255,0.05)" }} />
-        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full" style={{ background: "rgba(255,255,255,0.03)" }} />
+        <div className="absolute -top-24 -right-24 w-[450px] h-[450px] rounded-full" style={{ background: "rgba(255,255,255,0.03)" }} />
+        <div className="absolute -bottom-36 -left-36 w-[550px] h-[550px] rounded-full" style={{ background: "rgba(255,255,255,0.02)" }} />
       </div>
 
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 z-10">
-        <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] text-white mb-8">
+        <p className="text-[11px] font-semibold tracking-[0.3em] uppercase mb-8" style={{ color: "#4a8fa3" }}>
+          Prochaine étape
+        </p>
+        <h2 className="font-heading text-[36px] md:text-5xl lg:text-[56px] font-bold leading-[1.08] text-white mb-6">
           Prêt à transformer
           <br />
           vos opérations ?
         </h2>
-        <p className="text-lg text-white/70 max-w-[500px] mb-14 leading-relaxed">
-          Commencez par un <strong className="text-white font-semibold">diagnostic</strong>.
+        <p className="text-[15px] md:text-base max-w-[480px] mb-14 leading-[1.8]" style={{ color: "#8db4c2" }}>
+          Commencez par un <strong className="text-white/90 font-medium">diagnostic</strong>.
           Pas d'engagement. Juste une compréhension claire de votre situation pharma.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             to="/contact"
-            className="inline-flex items-center justify-center h-14 px-10 text-sm font-bold tracking-wide uppercase text-[#064E6E] bg-white transition-all hover:bg-white/90"
+            className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#042f3d] bg-white transition-all hover:bg-white/90"
           >
             Demander un diagnostic
           </Link>
           <a
             href="mailto:hello@aether-connect.com"
-            className="inline-flex items-center justify-center h-14 px-10 text-sm font-semibold tracking-wide uppercase text-white border border-white/30 transition-all hover:bg-white/10"
+            className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-medium tracking-[0.1em] uppercase text-white/80 border border-white/20 transition-all hover:bg-white/5"
           >
             Nous contacter
           </a>
