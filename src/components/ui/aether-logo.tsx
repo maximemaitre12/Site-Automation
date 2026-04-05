@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import aetherLogo from "@/assets/aether-new-logo.jpeg";
+import aetherLogo from "@/assets/aether-logo-final.png";
 
 interface AetherLogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg';
