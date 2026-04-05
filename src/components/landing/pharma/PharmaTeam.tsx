@@ -7,14 +7,14 @@ export function PharmaTeam() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Architecture opérationnelle
+            Operational architecture
           </span>
         </div>
 
         <div className="relative mb-20">
           <img
             src={pharmaTeamMeeting}
-            alt="Équipe Aether Connect"
+            alt="Aether Connect engineering team"
             className="w-full h-[280px] md:h-[380px] object-cover"
             loading="lazy"
             width={1280}
@@ -29,48 +29,51 @@ export function PharmaTeam() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Ingénierie IA
+              Industrial-grade
               <br />
-              de grade industriel.
+              AI engineering.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
-              Nos <strong style={{ color: "#0F172A" }}>pipelines de machine learning</strong> sont
-              conçus pour des environnements <strong style={{ color: "#0F172A" }}>GxP-compatibles</strong> et
-              des workflows <strong style={{ color: "#0F172A" }}>FDA 21 CFR Part 11</strong>. Chaque modèle
-              est versionné, auditable et déployé via des <strong style={{ color: "#0F172A" }}>CI/CD validés</strong> sur
-              infrastructure <strong style={{ color: "#0F172A" }}>SOC 2 Type II</strong>.
+              Our <strong style={{ color: "#0F172A" }}>machine learning pipelines</strong> are
+              built for <strong style={{ color: "#0F172A" }}>GxP-compliant</strong> environments and
+              <strong style={{ color: "#0F172A" }}> FDA 21 CFR Part 11</strong> workflows. Every model
+              is versioned, auditable and deployed through <strong style={{ color: "#0F172A" }}>validated CI/CD</strong> on
+              <strong style={{ color: "#0F172A" }}> SOC 2 Type II</strong> cloud infrastructure — eliminating manual handoffs
+              and accelerating your path from data to production.
             </p>
           </div>
 
           <div className="space-y-0">
             {[
               {
-                title: "ORCHESTRATION MLOps",
+                title: "MLOps ORCHESTRATION",
                 desc: <>
-                  <strong style={{ color: "#0F172A" }}>Feature stores</strong> centralisés,{" "}
-                  <strong style={{ color: "#0F172A" }}>model registry</strong> avec versioning sémantique,{" "}
-                  <strong style={{ color: "#0F172A" }}>pipelines d'inférence</strong> containerisés
-                  sur Kubernetes. Monitoring drift en temps réel via <strong style={{ color: "#0F172A" }}>Prometheus/Grafana</strong>.
+                  Centralized <strong style={{ color: "#0F172A" }}>feature stores</strong>,{" "}
+                  <strong style={{ color: "#0F172A" }}>model registry</strong> with semantic versioning,{" "}
+                  containerized <strong style={{ color: "#0F172A" }}>inference pipelines</strong> on
+                  Kubernetes. Real-time drift monitoring via <strong style={{ color: "#0F172A" }}>Prometheus/Grafana</strong>.
+                  Scalable from single-tenant to enterprise multi-cloud.
                 </>,
               },
               {
-                title: "AGENTS AUTONOMES & RAG",
+                title: "AUTONOMOUS AGENTS & RAG",
                 desc: <>
-                  Architectures <strong style={{ color: "#0F172A" }}>multi-agents</strong> avec{" "}
+                  <strong style={{ color: "#0F172A" }}>Multi-agent architectures</strong> with{" "}
                   <strong style={{ color: "#0F172A" }}>retrieval-augmented generation</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>vector databases</strong> (Pinecone, pgvector),
-                  chaînes de raisonnement <strong style={{ color: "#0F172A" }}>LangChain/LlamaIndex</strong> et
-                  orchestration <strong style={{ color: "#0F172A" }}>event-driven</strong>.
+                  reasoning chains via <strong style={{ color: "#0F172A" }}>LangChain/LlamaIndex</strong> and
+                  <strong style={{ color: "#0F172A" }}> event-driven</strong> orchestration — automating regulatory document processing at scale.
                 </>,
               },
               {
-                title: "INFRASTRUCTURE & COMPLIANCE",
+                title: "CLOUD INFRASTRUCTURE & COMPLIANCE",
                 desc: <>
-                  Déploiement <strong style={{ color: "#0F172A" }}>multi-cloud</strong> (AWS, Azure, GCP)
-                  avec <strong style={{ color: "#0F172A" }}>IaC Terraform</strong>,{" "}
+                  <strong style={{ color: "#0F172A" }}>Multi-cloud deployment</strong> (AWS, Azure, GCP)
+                  with <strong style={{ color: "#0F172A" }}>IaC Terraform</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>encryption at rest/in transit</strong>,{" "}
-                  <strong style={{ color: "#0F172A" }}>audit trails</strong> immutables et{" "}
-                  <strong style={{ color: "#0F172A" }}>RBAC</strong> granulaire. Conformité RGPD, HIPAA, ISO 27001.
+                  immutable <strong style={{ color: "#0F172A" }}>audit trails</strong> and{" "}
+                  granular <strong style={{ color: "#0F172A" }}>RBAC</strong>. GDPR, HIPAA, ISO 27001 compliant.
+                  Seamless migration from legacy on-premise systems.
                 </>,
               },
             ].map((item) => (

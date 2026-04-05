@@ -1,8 +1,8 @@
 const stats = [
-  { value: "40%", label: "Réduction", sub: "du time-to-market préclinique" },
-  { value: "21", label: "CFR Part 11", sub: "conformité native FDA" },
-  { value: "99.7%", label: "Précision", sub: "classification adverse events" },
-  { value: "ICH", label: "Q8-Q12", sub: "frameworks intégrés par défaut" },
+  { value: "40%", label: "Reduction", sub: "in preclinical time-to-market" },
+  { value: "21", label: "CFR Part 11", sub: "native FDA compliance" },
+  { value: "99.7%", label: "Accuracy", sub: "adverse event classification" },
+  { value: "ICH", label: "Q8–Q12", sub: "frameworks integrated by default" },
 ];
 
 export function PharmaStats() {
@@ -12,11 +12,11 @@ export function PharmaStats() {
         <div className="flex items-start gap-8 mb-24">
           <div className="w-16 h-px mt-3 shrink-0" style={{ background: "#0369A1" }} />
           <p className="text-base md:text-[17px] leading-[1.85] max-w-[620px]" style={{ color: "#4a5568" }}>
-            Nos <strong style={{ color: "#0F172A" }}>pipelines de machine learning</strong> sont architecturés pour des
-            environnements <strong style={{ color: "#0F172A" }}>GMP/GLP/GCP-compatibles</strong> — de la{" "}
-            <strong style={{ color: "#0F172A" }}>découverte de cibles thérapeutiques</strong> à la{" "}
-            <strong style={{ color: "#0F172A" }}>soumission eCTD</strong>, chaque modèle est versionné, auditable et
-            déployé via des <strong style={{ color: "#0F172A" }}>CI/CD validés IQ/OQ/PQ</strong>.
+            Our <strong style={{ color: "#0F172A" }}>machine learning pipelines</strong> are architected for
+            <strong style={{ color: "#0F172A" }}> GMP/GLP/GCP-compliant</strong> environments — from{" "}
+            <strong style={{ color: "#0F172A" }}>therapeutic target discovery</strong> to{" "}
+            <strong style={{ color: "#0F172A" }}>eCTD submission</strong>. Every model is versioned, auditable and
+            deployed through <strong style={{ color: "#0F172A" }}>IQ/OQ/PQ-validated CI/CD</strong> on cloud-native infrastructure.
           </p>
         </div>
 

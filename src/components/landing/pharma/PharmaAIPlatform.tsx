@@ -1,27 +1,27 @@
 const capabilities = [
   {
-    title: "MOTEUR NLP RÉGLEMENTAIRE",
-    desc: "Entraîné sur plus de 12 000 documents ICH, FDA Guidance, EMA Guidelines et Pharmacopées. Compréhension contextuelle des terminologies CTD, MedDRA, WHO-DD et ATC. Extraction d'entités nommées pharmaceutiques avec une précision de 99.2%.",
+    title: "REGULATORY NLP ENGINE",
+    desc: "Trained on over 12,000 ICH documents, FDA Guidance, EMA Guidelines and Pharmacopoeias. Contextual understanding of CTD, MedDRA, WHO-DD and ATC terminologies. Pharmaceutical named entity extraction with 99.2% accuracy. Cloud-hosted for instant scalability.",
   },
   {
-    title: "MODULE PHARMACOVIGILANCE",
-    desc: "Ingestion automatique des ICSRs depuis E2B(R3), détection de signaux par algorithmes de disproportionnalité multi-dimensionnels (PRR, ROR, MGPS/EBGM), génération automatisée des PSURs/PBRERs et Line Listings conformes.",
+    title: "PHARMACOVIGILANCE MODULE",
+    desc: "Automatic ingestion of ICSRs from E2B(R3), signal detection via multi-dimensional disproportionality algorithms (PRR, ROR, MGPS/EBGM), automated PSUR/PBRER and Line Listing generation. Connects directly to your safety database via API.",
   },
   {
-    title: "PIPELINE DRUG DISCOVERY",
-    desc: "Screening virtuel par graph neural networks sur bibliothèques moléculaires. Prédiction ADMET, analyse de druggability, identification de cibles par réseaux d'interactions protéine-protéine. Intégration directe avec vos plateformes HTS.",
+    title: "DRUG DISCOVERY PIPELINE",
+    desc: "Virtual screening through graph neural networks across molecular libraries. ADMET prediction, druggability analysis, target identification via protein-protein interaction networks. Direct integration with your HTS platforms and cloud data warehouses.",
   },
   {
-    title: "COMPUTER VISION QUALITÉ",
-    desc: "Modèles de détection d'anomalies entraînés sur données GMP réelles : particules en solution injectable, défauts de sertissage, intégrité des blisters. Seuils de détection inférieurs aux spécifications pharmacopéiques.",
+    title: "QUALITY COMPUTER VISION",
+    desc: "Anomaly detection models trained on real GMP data: particles in injectable solutions, crimp defects, blister integrity. Detection thresholds below pharmacopoeial specifications. Deployable on edge devices or cloud depending on your line throughput.",
   },
   {
-    title: "COMPILATEUR eCTD INTELLIGENT",
-    desc: "Assemblage automatique des modules eCTD avec cross-référencement dynamique. Pré-validation des soumissions contre les business rules FDA ESG et EMA eSubmission Gateway. Détection proactive des incohérences inter-modules.",
+    title: "INTELLIGENT eCTD COMPILER",
+    desc: "Automatic assembly of eCTD modules with dynamic cross-referencing. Pre-validation of submissions against FDA ESG and EMA eSubmission Gateway business rules. Proactive detection of inter-module inconsistencies — reducing filing cycles by months.",
   },
   {
-    title: "MOTEUR DE CONFORMITÉ TEMPS RÉEL",
-    desc: "Monitoring continu des déviations GMP, CAPAs ouvertes et change controls. Scoring de risque qualité automatisé basé sur ICH Q9. Alertes prédictives avant escalade réglementaire.",
+    title: "REAL-TIME COMPLIANCE ENGINE",
+    desc: "Continuous monitoring of GMP deviations, open CAPAs and change controls. Automated quality risk scoring based on ICH Q9. Predictive alerts before regulatory escalation. Full dashboard visibility across your entire operations footprint.",
   },
 ];
 
@@ -32,7 +32,7 @@ export function PharmaAIPlatform() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#22D3EE" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#22D3EE" }}>
-            Notre plateforme propriétaire
+            Our proprietary platform
           </span>
         </div>
 
@@ -43,33 +43,34 @@ export function PharmaAIPlatform() {
             >
               Aether Pharma AI.
               <br />
-              <span style={{ color: "#22D3EE" }}>Conçu pour la science.</span>
+              <span style={{ color: "#22D3EE" }}>Built for science.</span>
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85] mb-8" style={{ color: "rgba(255,255,255,0.55)" }}>
-              Notre plateforme d'intelligence artificielle est le résultat de{" "}
-              <strong className="text-white font-medium">recherches approfondies en NLP biomédical</strong>,
-              en <strong className="text-white font-medium">modélisation moléculaire computationnelle</strong> et
-              en <strong className="text-white font-medium">ingénierie réglementaire</strong>.
+              Our artificial intelligence platform is the result of{" "}
+              <strong className="text-white font-medium">deep research in biomedical NLP</strong>,
+              <strong className="text-white font-medium"> computational molecular modeling</strong> and
+              <strong className="text-white font-medium"> regulatory engineering</strong> — deployed on
+              cloud-native infrastructure designed for enterprise-scale pharma operations.
             </p>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "rgba(255,255,255,0.55)" }}>
-              Chaque module est <strong className="text-white font-medium">spécifiquement fine-tuné sur des corpus pharmaceutiques</strong> —
-              pas un LLM généraliste adapté a posteriori.{" "}
-              <strong className="text-white font-medium">Aether Pharma AI</strong> comprend nativement les
-              terminologies <strong className="text-white font-medium">MedDRA</strong>,{" "}
+              Every module is <strong className="text-white font-medium">specifically fine-tuned on pharmaceutical corpora</strong> —
+              not a generalist LLM adapted after the fact.{" "}
+              <strong className="text-white font-medium">Aether Pharma AI</strong> natively understands{" "}
+              <strong className="text-white font-medium">MedDRA</strong>,{" "}
               <strong className="text-white font-medium">WHO-DD</strong>,{" "}
-              <strong className="text-white font-medium">SNOMED CT</strong> et les structures{" "}
-              <strong className="text-white font-medium">eCTD/CTD</strong>.
+              <strong className="text-white font-medium">SNOMED CT</strong> and{" "}
+              <strong className="text-white font-medium">eCTD/CTD</strong> structures.
             </p>
           </div>
 
           <div className="flex flex-col justify-center">
             <div className="space-y-6">
               {[
-                { label: "Corpus réglementaire indexé", value: "12 000+" },
-                { label: "Précision classification MedDRA", value: "99.2%" },
-                { label: "Langues supportées (NLP médical)", value: "14" },
-                { label: "Temps moyen de compilation eCTD", value: "< 4h" },
-                { label: "Conformité frameworks intégrés", value: "ICH · FDA · EMA · ANSM" },
+                { label: "Regulatory corpus indexed", value: "12,000+" },
+                { label: "MedDRA classification accuracy", value: "99.2%" },
+                { label: "Languages supported (medical NLP)", value: "14" },
+                { label: "Average eCTD compilation time", value: "< 4h" },
+                { label: "Integrated compliance frameworks", value: "ICH · FDA · EMA · ANSM" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <span className="text-[14px]" style={{ color: "rgba(255,255,255,0.5)" }}>{item.label}</span>

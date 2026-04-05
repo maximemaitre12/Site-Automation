@@ -1,8 +1,8 @@
 const blocks = [
-  { title: "GxP-NATIVE PAR DESIGN", desc: "Chaque composant de notre stack est conçu pour des environnements GMP, GLP et GCP. Pas d'adaptation a posteriori — la conformité est architecturale, pas cosmétique." },
-  { title: "VALIDATION CSV INTÉGRÉE", desc: "Protocoles IQ/OQ/PQ automatisés, rapports de validation générés à chaque release. Traçabilité complète du code source aux résultats d'inférence, conforme Annexe 11 et 21 CFR Part 11." },
-  { title: "MODÈLES ENTRAÎNÉS SUR DONNÉES PHARMA", desc: "Nos modèles NLP sont fine-tunés sur des corpus réglementaires (ICH, FDA Guidance, EMA Scientific Guidelines) et des datasets de pharmacovigilance anonymisés." },
-  { title: "DÉPLOIEMENT SANS DISRUPTION", desc: "Intégration native avec vos LIMS, MES, ERP (SAP), EDMS et systèmes de pharmacovigilance (Argus, ArisGlobal). Architecture microservices containerisée, zero-downtime deployment." },
+  { title: "GxP-NATIVE BY DESIGN", desc: "Every component of our stack is engineered for GMP, GLP and GCP environments. No retrofitting — compliance is architectural, not cosmetic. Built for cloud-native deployment from the ground up." },
+  { title: "INTEGRATED CSV VALIDATION", desc: "Automated IQ/OQ/PQ protocols, validation reports generated with every release. Full traceability from source code to inference results, compliant with Annex 11 and 21 CFR Part 11." },
+  { title: "MODELS TRAINED ON PHARMA DATA", desc: "Our NLP models are fine-tuned on regulatory corpora (ICH, FDA Guidance, EMA Scientific Guidelines) and anonymized pharmacovigilance datasets — not generic internet data." },
+  { title: "ZERO-DISRUPTION DEPLOYMENT", desc: "Native integration with your LIMS, MES, ERP (SAP), EDMS and pharmacovigilance systems (Argus, ArisGlobal). Containerized microservices architecture with zero-downtime deployment. Cloud or hybrid, your choice." },
 ];
 
 export function PharmaTrust() {
@@ -12,7 +12,7 @@ export function PharmaTrust() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Garanties réglementaires
+            Regulatory guarantees
           </span>
         </div>
 
@@ -20,11 +20,11 @@ export function PharmaTrust() {
           className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
           style={{ color: "#0F172A" }}
         >
-          La conformité n'est pas
+          Compliance is not
           <br />
-          une feature. C'est
+          a feature. It's the
           <br />
-          l'architecture.
+          architecture.
         </h2>
 
         <div className="grid sm:grid-cols-2 gap-0">
