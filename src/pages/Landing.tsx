@@ -16,13 +16,13 @@ export default function Landing() {
     <div className="overflow-x-hidden">
       <PharmaHero />
       <PharmaPartners />
+      <PharmaCaseStudy />
       <PharmaStats />
       <PharmaProblems />
       <PharmaTeam />
       <PharmaExpertise />
       <PharmaAIPlatform />
       <PharmaMethodology />
-      <PharmaCaseStudy />
       <PharmaTrust />
       <PharmaFAQ />
       <PharmaFinalCTA />

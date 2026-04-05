@@ -1,27 +1,27 @@
 const capabilities = [
   {
-    title: "REGULATORY NLP ENGINE",
-    desc: "Trained on over 12,000 ICH documents, FDA Guidance, EMA Guidelines and Pharmacopoeias. Contextual understanding of CTD, MedDRA, WHO-DD and ATC terminologies. Pharmaceutical named entity extraction with 99.2% accuracy. Cloud-hosted for instant scalability.",
+    title: "MULTI-AGENT ORCHESTRATION",
+    desc: "Coordinated agent architecture where each agent owns a specific operational domain — logistics, recruitment, document processing. Shared intelligence layer ensures consistency. Event-driven communication between agents for complex multi-step workflows.",
   },
   {
-    title: "PHARMACOVIGILANCE MODULE",
-    desc: "Automatic ingestion of ICSRs from E2B(R3), signal detection via multi-dimensional disproportionality algorithms (PRR, ROR, MGPS/EBGM), automated PSUR/PBRER and Line Listing generation. Connects directly to your safety database via API.",
+    title: "DOCUMENT NLP ENGINE",
+    desc: "Purpose-trained models for pharmaceutical document understanding. Extracts structured data from unstructured inputs — PDFs, scanned documents, emails, Excel files, EDI feeds. Handles multi-language, multi-format inputs with high accuracy across lot numbers, quantities, dates and product codes.",
   },
   {
-    title: "DRUG DISCOVERY PIPELINE",
-    desc: "Virtual screening through graph neural networks across molecular libraries. ADMET prediction, druggability analysis, target identification via protein-protein interaction networks. Direct integration with your HTS platforms and cloud data warehouses.",
+    title: "RETRIEVAL-AUGMENTED GENERATION",
+    desc: "Vector database-powered retrieval (pgvector, Pinecone) for contextual document search and matching. Agents retrieve relevant precedents, product references and historical patterns before generating draft outputs — ensuring accuracy grounded in your actual data.",
   },
   {
-    title: "QUALITY COMPUTER VISION",
-    desc: "Anomaly detection models trained on real GMP data: particles in injectable solutions, crimp defects, blister integrity. Detection thresholds below pharmacopoeial specifications. Deployable on edge devices or cloud depending on your line throughput.",
+    title: "ERP DRAFT GENERATION",
+    desc: "Automatic creation of draft reception orders, dispatch orders and preparation orders directly in your ERP system. Pre-filled with extracted data, cross-referenced against inventory. Every draft requires human validation before execution — zero unvalidated actions.",
   },
   {
-    title: "INTELLIGENT eCTD COMPILER",
-    desc: "Automatic assembly of eCTD modules with dynamic cross-referencing. Pre-validation of submissions against FDA ESG and EMA eSubmission Gateway business rules. Proactive detection of inter-module inconsistencies — reducing filing cycles by months.",
+    title: "TALENT SCORING ENGINE",
+    desc: "AI-powered candidate evaluation across multiple criteria: experience fit, certification match, location, salary alignment. Produces structured synthesis cards with priority ranking. Integrates with existing HRIS for seamless workflow continuity.",
   },
   {
-    title: "REAL-TIME COMPLIANCE ENGINE",
-    desc: "Continuous monitoring of GMP deviations, open CAPAs and change controls. Automated quality risk scoring based on ICH Q9. Predictive alerts before regulatory escalation. Full dashboard visibility across your entire operations footprint.",
+    title: "REAL-TIME MONITORING",
+    desc: "Live dashboards tracking agent performance, processing volumes, validation rates and error patterns. Prometheus/Grafana observability stack. Alerting on anomalies, SLA breaches and processing bottlenecks. Full operational visibility across all deployed agents.",
   },
 ];
 
@@ -41,36 +41,36 @@ export function PharmaAIPlatform() {
             <h2
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-8 text-white"
             >
-              Aether Pharma AI.
+              Aether Agent Platform.
               <br />
-              <span style={{ color: "#22D3EE" }}>Built for science.</span>
+              <span style={{ color: "#22D3EE" }}>Built for operations.</span>
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85] mb-8" style={{ color: "rgba(255,255,255,0.55)" }}>
-              Our artificial intelligence platform is the result of{" "}
-              <strong className="text-white font-medium">deep research in biomedical NLP</strong>,
-              <strong className="text-white font-medium"> computational molecular modeling</strong> and
-              <strong className="text-white font-medium"> regulatory engineering</strong> — deployed on
-              cloud-native infrastructure designed for enterprise-scale pharma operations.
+              Our platform is the result of{" "}
+              <strong className="text-white font-medium">deep engineering in document intelligence</strong>,
+              <strong className="text-white font-medium"> multi-agent architecture</strong> and
+              <strong className="text-white font-medium"> enterprise system integration</strong> — deployed on
+              cloud-native infrastructure built for regulated industries.
             </p>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "rgba(255,255,255,0.55)" }}>
-              Every module is <strong className="text-white font-medium">specifically fine-tuned on pharmaceutical corpora</strong> —
-              not a generalist LLM adapted after the fact.{" "}
-              <strong className="text-white font-medium">Aether Pharma AI</strong> natively understands{" "}
-              <strong className="text-white font-medium">MedDRA</strong>,{" "}
-              <strong className="text-white font-medium">WHO-DD</strong>,{" "}
-              <strong className="text-white font-medium">SNOMED CT</strong> and{" "}
-              <strong className="text-white font-medium">eCTD/CTD</strong> structures.
+              Every agent is <strong className="text-white font-medium">purpose-built for a specific operational domain</strong> —
+              not a generic chatbot repurposed after the fact.{" "}
+              <strong className="text-white font-medium">Aether agents</strong> natively understand{" "}
+              your <strong className="text-white font-medium">document formats</strong>,{" "}
+              <strong className="text-white font-medium">ERP schemas</strong>,{" "}
+              <strong className="text-white font-medium">inventory structures</strong> and{" "}
+              <strong className="text-white font-medium">recruitment workflows</strong>.
             </p>
           </div>
 
           <div className="flex flex-col justify-center">
             <div className="space-y-6">
               {[
-                { label: "Regulatory corpus indexed", value: "12,000+" },
-                { label: "MedDRA classification accuracy", value: "99.2%" },
-                { label: "Languages supported (medical NLP)", value: "14" },
-                { label: "Average eCTD compilation time", value: "< 4h" },
-                { label: "Integrated compliance frameworks", value: "ICH · FDA · EMA · ANSM" },
+                { label: "Document formats supported", value: "PDF · Scan · Email · EDI · Excel" },
+                { label: "Data extraction accuracy", value: "99.2%" },
+                { label: "ERP integrations", value: "SAP · Oracle · Dynamics · Custom" },
+                { label: "Average deployment time", value: "4–6 weeks" },
+                { label: "Human validation model", value: "Draft-only · Zero auto-execute" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <span className="text-[14px]" style={{ color: "rgba(255,255,255,0.5)" }}>{item.label}</span>

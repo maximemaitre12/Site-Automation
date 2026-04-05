@@ -1,10 +1,10 @@
 const areas = [
-  { title: "PHARMACOVIGILANCE & SIGNAL DETECTION", desc: "Automated safety signal detection across ICSR databases. MedDRA classification, disproportionality scoring (PRR, ROR, EBGM) and generation of ICH E2E-compliant PSUR/PBRER reports — fully integrated with your existing safety data lake." },
-  { title: "CLINICAL TRIAL OPTIMIZATION", desc: "Patient-protocol matching through NLP on inclusion/exclusion criteria. Attrition prediction, cohort optimization and adaptive monitoring of primary and secondary endpoints. Cloud-based dashboards for real-time trial oversight." },
-  { title: "GMP COMPUTER VISION", desc: "Automated inspection of packaging lines: particle detection in injectable solutions, crimp integrity verification, batch number OCR. Annex 11 and 21 CFR Part 211 compliant. Deployed on edge or cloud depending on throughput requirements." },
-  { title: "AI-POWERED REGULATORY WRITING", desc: "AI-assisted generation of eCTD modules (Module 2.5, 2.7, 3.2.S/P). Automatic cross-referencing against ICH Q8-Q12, FDA and EMA guidelines. Pre-validation of submissions before gateway upload — cutting months off your filing timeline." },
-  { title: "DRUG DISCOVERY & REPURPOSING", desc: "Molecular docking models, ADMET prediction, virtual screening via graph neural networks. Identification of new therapeutic indications through biological network analysis. Direct integration with your HTS platforms and cloud data warehouses." },
-  { title: "DATA INTEGRITY & AUDIT TRAIL", desc: "Native ALCOA+ architecture. Immutable audit trails, electronic signatures compliant with 21 CFR Part 11, RBAC access control and AES-256 encryption at rest/in transit. Full traceability from raw data to automated decision — cloud or on-premise." },
+  { title: "DOCUMENT INTELLIGENCE", desc: "Automated extraction from PDFs, scans, emails and EDI files. Key data identification — lot numbers, quantities, expiry dates, product references. Structured output ready for ERP ingestion. Handles multi-format, multi-language documents at scale." },
+  { title: "LOGISTICS AUTOMATION", desc: "End-to-end inbound and outbound flow automation. Reception order drafting from supplier documents, dispatch order generation from client requests. Inventory matching, product identification and pick & pack preparation — all as validated drafts." },
+  { title: "TALENT INTELLIGENCE", desc: "Continuous market monitoring across job boards, professional networks and internal databases. AI-scored candidate profiles with qualification filtering by role, location, certifications and salary range. Structured shortlists and priority-ranked recommendations." },
+  { title: "ERP & SYSTEM INTEGRATION", desc: "Direct integration with your existing ERP, WMS, HRIS and email systems. API-first architecture that connects to SAP, Oracle, Microsoft Dynamics or custom platforms. No rip-and-replace — agents plug into your current stack." },
+  { title: "CLOUD MIGRATION & MODERNIZATION", desc: "Migration from legacy on-premise systems to cloud-native infrastructure. Multi-cloud support (AWS, Azure, GCP) with IaC deployment, auto-scaling and disaster recovery. Compliance-ready architecture for regulated environments." },
+  { title: "COMPLIANCE & AUDIT TRAIL", desc: "Native audit trail architecture with immutable logs. Every agent action is tracked, timestamped and attributed. Role-based access control, encryption at rest/in transit, and full traceability from raw input to automated draft output." },
 ];
 
 export function PharmaExpertise() {
@@ -14,7 +14,7 @@ export function PharmaExpertise() {
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Pharma-specialized AI capabilities
+            What our agents automate
           </span>
         </div>
 
@@ -22,7 +22,7 @@ export function PharmaExpertise() {
           className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
           style={{ color: "#0F172A" }}
         >
-          Pharmaceutical-grade
+          Enterprise-grade
           <br />
           AI automation.
         </h2>
