@@ -29,27 +29,29 @@ const faqs = [
 
 export function PharmaFAQ() {
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-[800px] mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6" style={{ color: "#0F172A" }}>
-            Questions <span style={{ color: "#0891B2" }}>fréquentes</span>
+    <section className="py-28 bg-white">
+      <div className="max-w-[700px] mx-auto px-6">
+        <div className="mb-16">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#0891B2" }}>
+            FAQ
+          </p>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold" style={{ color: "#0F172A" }}>
+            Questions fréquentes.
           </h2>
         </div>
 
-        <Accordion type="single" collapsible className="space-y-3">
+        <Accordion type="single" collapsible className="space-y-0 divide-y" style={{ borderColor: "#E2E8F0" }}>
           {faqs.map((faq, i) => (
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="rounded-2xl px-6 bg-white transition-shadow hover:shadow-md"
-              style={{ border: "1px solid #E2E8F0" }}
+              className="border-none py-0"
             >
-              <AccordionTrigger className="font-heading text-base font-bold hover:no-underline py-5" style={{ color: "#0F172A" }}>
+              <AccordionTrigger className="font-heading text-base font-bold hover:no-underline py-6" style={{ color: "#0F172A" }}>
                 {faq.q}
               </AccordionTrigger>
               <AccordionContent>
-                <p className="text-sm leading-relaxed pb-2" style={{ color: "#64748B" }}>
+                <p className="text-sm leading-relaxed pb-4" style={{ color: "#64748B" }}>
                   {faq.a}
                 </p>
               </AccordionContent>
