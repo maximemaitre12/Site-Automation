@@ -47,7 +47,7 @@ export function LandingHeader() {
               <Link
                 key={item.label}
                 to={item.href}
-                className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
+                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
               </Link>
