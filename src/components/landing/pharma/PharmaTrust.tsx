@@ -20,7 +20,7 @@ export function PharmaTrust() {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal delay={100}>
+        <ScrollReveal delay={200}>
           <h2
             className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
             style={{ color: "#0F172A" }}
@@ -35,7 +35,7 @@ export function PharmaTrust() {
 
         <div className="grid sm:grid-cols-2 gap-0">
           {blocks.map((b, i) => (
-            <ScrollReveal key={b.title} delay={i * 100}>
+            <ScrollReveal key={b.title} delay={i * 180}>
               <div
                 className="p-8 lg:p-10"
                 style={{

@@ -22,7 +22,7 @@ export function ScrollReveal({ children, className = "", delay = 0, direction = 
           observer.unobserve(el);
         }
       },
-      { rootMargin: "0px 0px -60px 0px", threshold: 0.01 }
+      { rootMargin: "0px 0px -120px 0px", threshold: 0.01 }
     );
 
     observer.observe(el);
@@ -30,9 +30,9 @@ export function ScrollReveal({ children, className = "", delay = 0, direction = 
   }, []);
 
   const transforms: Record<string, string> = {
-    up: "translateY(32px)",
-    left: "translateX(-32px)",
-    right: "translateX(32px)",
+    up: "translateY(40px)",
+    left: "translateX(-40px)",
+    right: "translateX(40px)",
   };
 
   return (
@@ -42,7 +42,7 @@ export function ScrollReveal({ children, className = "", delay = 0, direction = 
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? "translate(0)" : transforms[direction],
-        transition: `opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+        transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
       }}
     >
       {children}
