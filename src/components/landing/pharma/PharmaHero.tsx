@@ -16,7 +16,6 @@ export function PharmaHero() {
         <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full" style={{ background: "rgba(255,255,255,0.03)" }} />
       </div>
 
-      {/* Hero image circle — Farmak style */}
       <div className="absolute top-[18%] right-[6%] w-[300px] h-[300px] lg:w-[420px] lg:h-[420px] rounded-full overflow-hidden hidden md:block opacity-20 lg:opacity-25">
         <img src={pharmaLab} alt="" className="w-full h-full object-cover" />
       </div>
@@ -24,17 +23,16 @@ export function PharmaHero() {
       <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-44 pb-36">
         <div className="max-w-[820px]">
           <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
-            Conseil pharmaceutique spécialisé
+            18 ans d'intelligence artificielle appliquée
           </p>
           <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-[92px] font-bold leading-[1.02] tracking-tight text-white mb-10">
-            Transformer vos
+            L'IA au service
             <br />
-            opérations pharma.
+            de votre industrie.
           </h1>
           <p className="text-lg md:text-xl text-white/65 max-w-[540px] leading-relaxed mb-16">
-            De la <strong className="text-white font-medium">conformité GMP</strong> au{" "}
-            <strong className="text-white font-medium">recrutement des talents</strong>.
-            Nous résolvons les défis que les consultants génériques ne comprennent pas.
+            Nous concevons des <strong className="text-white font-medium">systèmes d'intelligence artificielle</strong> sur mesure
+            qui <strong className="text-white font-medium">automatisent</strong>, <strong className="text-white font-medium">prédisent</strong> et <strong className="text-white font-medium">optimisent</strong> vos opérations — dans tous les secteurs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link

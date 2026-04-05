@@ -1,21 +1,20 @@
 const areas = [
-  { title: "TALENT ACQUISITION & RETENTION", desc: "Recruter les meilleurs professionnels en regulatory, quality et manufacturing.", icon: "→" },
-  { title: "GMP & MANUFACTURING", desc: "Implémenter les systèmes GMP sans ralentir la production.", icon: "→" },
-  { title: "REGULATORY STRATEGY", desc: "Planifier votre expansion avec la compliance intégrée.", icon: "→" },
-  { title: "QUALITY MANAGEMENT", desc: "Construire des QMS robustes, auditables et scalables.", icon: "→" },
-  { title: "COMPLIANCE TECHNOLOGY", desc: "Implémenter la tech compliance-first, sans casser l'existant.", icon: "→" },
-  { title: "OPERATIONAL SCALING", desc: "Scaler vos opérations tout en maintenant la conformité.", icon: "→" },
+  { title: "AGENTS IA & AUTOMATISATION", desc: "Des agents autonomes qui exécutent vos workflows complexes 24/7 — sans intervention humaine." },
+  { title: "ANALYSE PRÉDICTIVE", desc: "Anticiper la demande, les pannes, les risques. Vos données deviennent votre avantage concurrentiel." },
+  { title: "VISION PAR ORDINATEUR", desc: "Contrôle qualité, inspection, tri automatisé. L'IA voit ce que l'œil humain manque." },
+  { title: "NLP & DOCUMENTS", desc: "Extraction, classification, génération. Vos documents traités en secondes, pas en heures." },
+  { title: "INTÉGRATION & SCALING", desc: "Vos systèmes actuels (SAP, ERP, CRM) + notre IA = performance décuplée, zéro disruption." },
+  { title: "CONFORMITÉ & TRAÇABILITÉ", desc: "Automatisez la compliance réglementaire. Chaque action tracée, chaque anomalie détectée." },
 ];
 
 export function PharmaExpertise() {
   return (
     <section id="expertise" className="py-28 md:py-36 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Expertise
+            Capacités IA
           </span>
         </div>
 
@@ -23,9 +22,9 @@ export function PharmaExpertise() {
           className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-20"
           style={{ color: "#0F172A" }}
         >
-          Domaines
+          Ce que notre IA
           <br />
-          d'expertise.
+          fait pour vous.
         </h2>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-0">

@@ -4,19 +4,17 @@ export function PharmaTeam() {
   return (
     <section id="team" className="py-28 md:py-36" style={{ background: "#D9EDF4" }}>
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Équipe fondatrice
+            À propos
           </span>
         </div>
 
-        {/* Full-width image with accent */}
         <div className="relative mb-20">
           <img
             src={pharmaTeamMeeting}
-            alt="Équipe Aether Connect en réunion stratégique"
+            alt="Équipe Aether Connect"
             className="w-full h-[280px] md:h-[380px] object-cover"
             loading="lazy"
             width={1280}
@@ -31,19 +29,15 @@ export function PharmaTeam() {
               className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-10"
               style={{ color: "#0F172A" }}
             >
-              Présence &
+              18 ans à construire
               <br />
-              expérience.
+              l'intelligence.
             </h2>
             <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
-              Notre équipe fondatrice combine <strong style={{ color: "#0F172A" }}>plus de 30 ans</strong> d'expérience
-              dans l'industrie pharmaceutique, avec des rôles opérationnels chez{" "}
-              <strong style={{ color: "#0F172A" }}>Sanofi</strong>,{" "}
-              <strong style={{ color: "#0F172A" }}>Novartis</strong> et{" "}
-              <strong style={{ color: "#0F172A" }}>GSK</strong>. Nous ne conseillons pas depuis
-              un bureau — nous avons <strong style={{ color: "#0F172A" }}>managé des usines</strong>,{" "}
-              <strong style={{ color: "#0F172A" }}>passé des audits FDA</strong> et{" "}
-              <strong style={{ color: "#0F172A" }}>recruté des équipes réglementaires</strong> de A à Z.
+              Aether Connect est née de la conviction que l'<strong style={{ color: "#0F172A" }}>intelligence artificielle</strong> ne
+              doit pas rester un concept abstrait. Depuis <strong style={{ color: "#0F172A" }}>2008</strong>, nous concevons
+              des <strong style={{ color: "#0F172A" }}>systèmes IA opérationnels</strong> — pas des POCs qui restent dans un tiroir.
+              Notre force : <strong style={{ color: "#0F172A" }}>comprendre votre métier</strong> avant de coder quoi que ce soit.
             </p>
           </div>
 
@@ -53,18 +47,19 @@ export function PharmaTeam() {
                 role: "Fondateur",
                 name: "Nicolas Parisi",
                 bio: <>
-                  <strong style={{ color: "#0F172A" }}>15 ans</strong> d'expérience opérationnelle pharma.
-                  Anciennement Head of Operations chez <strong style={{ color: "#0F172A" }}>Sanofi</strong> et
-                  consultant GMP chez <strong style={{ color: "#0F172A" }}>Novartis</strong>. Spécialiste FDA 21 CFR Part 11.
+                  Architecte de <strong style={{ color: "#0F172A" }}>systèmes IA</strong> depuis 18 ans.
+                  A piloté <strong style={{ color: "#0F172A" }}>200+ projets d'automatisation</strong> dans la pharma,
+                  la finance et l'industrie. Obsédé par le <strong style={{ color: "#0F172A" }}>ROI mesurable</strong>.
                 </>,
               },
               {
                 role: "Co-fondateur",
                 name: "Vladyslav Mazurkevych",
                 bio: <>
-                  <strong style={{ color: "#0F172A" }}>18 ans</strong> de consulting pharma & manufacturing.
-                  Expert en <strong style={{ color: "#0F172A" }}>quality management systems</strong> et
-                  scaling opérationnel. Background <strong style={{ color: "#0F172A" }}>GSK</strong>.
+                  Expert en <strong style={{ color: "#0F172A" }}>infrastructure IA</strong> et{" "}
+                  <strong style={{ color: "#0F172A" }}>scaling opérationnel</strong>.
+                  Spécialiste des <strong style={{ color: "#0F172A" }}>agents autonomes</strong> et
+                  de l'intégration dans les systèmes existants.
                 </>,
               },
             ].map((f) => (

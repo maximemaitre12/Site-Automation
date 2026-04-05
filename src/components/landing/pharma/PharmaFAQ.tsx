@@ -1,18 +1,17 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const faqs = [
-  { q: "On doit vraiment faire une transformation complète ?", a: "Non. Diagnostic seul (€8-15k), implémentation ciblée (€50k+), ou transformation complète (€100-200k+). Le diagnostic vous aide à décider." },
-  { q: "Ça va interrompre notre production ?", a: "Non, c'est une garantie. Planification « no disruption » dès le jour 1. Notre équipe inclut des vétérans ops qui comprennent vos contraintes." },
-  { q: "Combien de temps ça prend ?", a: "Diagnostic : 2-3 semaines. Transformation : 12-16 semaines. Scaling : 16-24 semaines. Pas de raccourcis." },
-  { q: "Vous travaillez avec nos systèmes actuels ?", a: "Toujours. SAP, Oracle, Salesforce, systèmes legacy. Nous optimisons l'existant, jamais d'imposition de nouveaux outils." },
-  { q: "Vous avez des références ?", a: "Oui, sous NDA. Nous pouvons vous connecter avec des clients de taille et secteur similaires." },
+  { q: "L'IA, c'est pour les grandes entreprises non ?", a: "Non. Nos solutions s'adaptent à toutes les tailles. PME, ETI, grands groupes — le ROI est le même. On commence petit, on scale vite." },
+  { q: "Ça va interrompre nos opérations ?", a: "Jamais. Nos déploiements s'intègrent dans vos systèmes existants (SAP, ERP, CRM, legacy). Zéro disruption, c'est notre garantie." },
+  { q: "Combien de temps pour voir des résultats ?", a: "Premier prototype fonctionnel en 4-6 semaines. Déploiement complet en 12-16 semaines. Pas de projets qui traînent 18 mois." },
+  { q: "Vous travaillez dans quel secteur ?", a: "Pharma, finance, logistique, manufacturing, retail, santé... 40+ secteurs en 18 ans. Notre force, c'est de comprendre votre métier avant de coder." },
+  { q: "Quelle différence avec un cabinet de conseil classique ?", a: "On ne livre pas de slides. On livre des systèmes IA en production, avec des KPIs mesurables et un ROI garanti." },
 ];
 
 export function PharmaFAQ() {
   return (
     <section className="py-28 md:py-36 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
@@ -31,7 +30,7 @@ export function PharmaFAQ() {
               fréquentes.
             </h2>
             <p className="text-[15px] leading-[1.85]" style={{ color: "#4a5568" }}>
-              Tout ce que vous devez savoir avant de <strong style={{ color: "#0F172A" }}>commencer un engagement</strong> avec nous.
+              Tout ce que vous devez savoir avant de <strong style={{ color: "#0F172A" }}>lancer un projet IA</strong> avec nous.
             </p>
           </div>
 

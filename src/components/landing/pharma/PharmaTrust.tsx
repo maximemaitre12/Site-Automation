@@ -1,19 +1,18 @@
 const blocks = [
-  { title: "EXPERTISE RÉELLE", desc: "18+ années d'expérience opérationnelle. Nous avons implémenté GMP dans de vraies usines et managé des audits FDA." },
-  { title: "ZÉRO INCIDENTS", desc: "En 18 ans: zéro regulatory incidents, zéro FDA warning letters. La compliance est notre fondation." },
-  { title: "ZÉRO DISRUPTION", desc: "Vos opérations ne ralentissent pas. Contingencies incluses dans chaque plan dès le jour 1." },
-  { title: "RÉSULTATS MESURABLES", desc: "ROI moyen de 1,760%. Chaque engagement commence par un diagnostic avec des KPIs définis." },
+  { title: "18 ANS D'EXPÉRIENCE", desc: "Nous ne sommes pas une startup IA de plus. 18 années de projets en production, dans des environnements réels et exigeants." },
+  { title: "IA SUR MESURE", desc: "Pas de solutions génériques. Chaque système est conçu pour votre réalité opérationnelle, vos données, vos contraintes." },
+  { title: "ZÉRO DISRUPTION", desc: "Nos déploiements s'intègrent dans vos systèmes existants. Vos opérations ne ralentissent jamais." },
+  { title: "RÉSULTATS MESURABLES", desc: "KPIs définis dès le jour 1. Chaque projet est évalué sur son impact réel, pas sur des démos impressionnantes." },
 ];
 
 export function PharmaTrust() {
   return (
     <section className="py-28 md:py-36" style={{ background: "#D9EDF4" }}>
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
-            Confiance
+            Pourquoi nous
           </span>
         </div>
 

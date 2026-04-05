@@ -5,7 +5,6 @@ export function PharmaCaseStudy() {
   return (
     <section id="case-study" className="py-28 md:py-36" style={{ background: "#0369A1" }}>
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Section label */}
         <div className="flex items-center gap-4 mb-16">
           <div className="w-8 h-[3px] bg-white/30" />
           <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-white/40">
@@ -13,11 +12,10 @@ export function PharmaCaseStudy() {
           </span>
         </div>
 
-        {/* Image banner */}
         <div className="relative mb-20 overflow-hidden">
           <img
             src={pharmaLab}
-            alt="Laboratoire Farmasoft"
+            alt="Projet IA industriel"
             className="w-full h-[220px] md:h-[300px] object-cover opacity-30"
             loading="lazy"
             width={1280}
@@ -25,7 +23,7 @@ export function PharmaCaseStudy() {
           />
           <div className="absolute inset-0 flex items-center">
             <h2 className="font-heading text-[40px] md:text-[56px] lg:text-[68px] font-bold leading-[1.05] text-white px-8 md:px-12">
-              Farmasoft UA.
+              Industrie pharma.
             </h2>
           </div>
           <div className="absolute bottom-0 left-0 w-24 h-1 bg-white/40" />
@@ -35,32 +33,31 @@ export function PharmaCaseStudy() {
           <div>
             <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "rgba(255,255,255,0.6)" }}>
               <p>
-                <strong className="text-white font-medium">Farmasoft UA</strong>, fabricant pharmaceutique
-                de <strong className="text-white font-medium">180 employés</strong> spécialisé en génériques et APIs,
-                connaissait une croissance de <strong className="text-white font-medium">40% par an</strong>.
-                L'infrastructure opérationnelle était devenue le <strong className="text-white font-medium">bottleneck critique</strong>.
+                Un <strong className="text-white font-medium">fabricant pharmaceutique</strong> de
+                <strong className="text-white font-medium"> 180 employés</strong> en pleine croissance
+                faisait face à des <strong className="text-white font-medium">goulots opérationnels critiques</strong> :
+                traçabilité manuelle, recrutement lent, processus qualité non scalables.
               </p>
               <p>
-                En <strong className="text-white font-medium">16 semaines</strong>, nous avons transformé
-                leur recruitment pipeline, implémenté la traçabilité GMP complète et préparé
-                l'organisation pour un <strong className="text-white font-medium">audit FDA</strong>.
+                Notre IA a <strong className="text-white font-medium">automatisé la traçabilité</strong>,
+                déployé un <strong className="text-white font-medium">système prédictif de staffing</strong> et
+                implémenté le <strong className="text-white font-medium">contrôle qualité par vision</strong> —
+                le tout en <strong className="text-white font-medium">16 semaines</strong>.
               </p>
             </div>
 
-            {/* Big result with accent */}
             <div className="mt-14 pt-10" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-              <div className="font-heading text-[52px] md:text-[68px] font-bold leading-none mb-3 text-white">€1.5M+</div>
-              <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Valeur totale créée · ROI: 1,760% · Payback: 0.7 mois</p>
+              <div className="font-heading text-[52px] md:text-[68px] font-bold leading-none mb-3 text-white">10x</div>
+              <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Accélération des processus de traçabilité · Déploiement en 16 semaines</p>
             </div>
           </div>
 
           <div>
-            {/* Metrics with lines */}
             <div className="space-y-0 mb-14">
               {[
-                { val: "71%", label: "Réduction du time-to-hire — de 28 à 8 semaines" },
-                { val: "+100%", label: "Capacité de production — de 100 à 200 unités/jour" },
-                { val: "0", label: "Findings à l'audit FDA — batch traceability 100%" },
+                { val: "–85%", label: "Temps de traitement documentaire grâce au NLP" },
+                { val: "10x", label: "Accélération de la traçabilité batch" },
+                { val: "0", label: "Erreur de classification qualité depuis le déploiement" },
               ].map((m) => (
                 <div key={m.val} className="py-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <div className="font-heading text-[36px] md:text-[44px] font-bold mb-2 text-white">{m.val}</div>
@@ -69,13 +66,12 @@ export function PharmaCaseStudy() {
               ))}
             </div>
 
-            {/* Testimonial with accent */}
             <div className="relative pl-6" style={{ borderLeft: "2px solid rgba(255,255,255,0.2)" }}>
               <p className="text-base md:text-lg italic leading-relaxed mb-5 text-white/80">
-                "Aether understood our pharma reality. They didn't just solve the problem —
-                they solved it the way a pharma operations person would."
+                "Aether a compris notre métier avant de parler technologie.
+                Leur IA ne remplace pas nos équipes — elle les rend invincibles."
               </p>
-              <p className="text-sm font-semibold text-white/90">CEO/COO, Farmasoft UA</p>
+              <p className="text-sm font-semibold text-white/90">Directeur des Opérations</p>
               <div className="flex items-center gap-0.5 mt-3">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star key={i} className="w-3.5 h-3.5 fill-current" style={{ color: "#FBBF24" }} />
