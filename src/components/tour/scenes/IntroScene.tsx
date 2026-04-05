@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import aetherLogo from '@/assets/aether-new-logo.jpeg';
+import aetherLogo from '@/assets/aether-logo-final.png';
 
 interface IntroSceneProps {
   isActive: boolean;

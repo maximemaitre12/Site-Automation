@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import aetherLogo from "@/assets/aether-new-logo.jpeg";
+import aetherLogo from "@/assets/aether-logo-final.png";
 
 export function Navbar() {
   return (

@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebarState } from "@/hooks/useSidebar";
 import { toast } from "sonner";
-import aetherLogo from "@/assets/aether-new-logo.jpeg";
+import aetherLogo from "@/assets/aether-logo-final.png";
 
 const tools = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },

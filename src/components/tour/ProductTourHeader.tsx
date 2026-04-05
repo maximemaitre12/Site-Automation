@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import aetherLogo from '@/assets/aether-new-logo.jpeg';
+import aetherLogo from '@/assets/aether-logo-final.png';
 
 export const ProductTourHeader = () => {
   return (

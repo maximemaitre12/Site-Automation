@@ -1,7 +1,7 @@
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import aetherLogo from "@/assets/aether-logo.png";
+import aetherLogo from "@/assets/aether-logo-final.png";
 
 const navItems = [
   { label: "Expertise", href: "#expertise" },

@@ -7,7 +7,7 @@ import { Check, Zap, ArrowRight, Loader2, Sparkles, Crown, Rocket, X } from 'luc
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import aetherLogo from '@/assets/aether-new-logo.jpeg';
+import aetherLogo from '@/assets/aether-logo-final.png';
 import {
   AlertDialog,
   AlertDialogAction,

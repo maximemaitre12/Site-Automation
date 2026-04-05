@@ -8,7 +8,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { z } from "zod";
-import aetherLogo from "@/assets/aether-new-logo.jpeg";
+import aetherLogo from "@/assets/aether-logo-final.png";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
