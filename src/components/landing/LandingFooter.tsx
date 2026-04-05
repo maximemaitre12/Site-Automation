@@ -10,7 +10,7 @@ export function LandingFooter() {
               AETHER CONNECT
             </Link>
             <p className="text-sm mt-4 leading-relaxed" style={{ color: "#64748B" }}>
-              Cabinet de conseil spécialisé dans la transformation opérationnelle pharma.
+              Consulting firm specializing in AI-driven operational transformation for pharma.
             </p>
           </div>
 
@@ -27,8 +27,8 @@ export function LandingFooter() {
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#94A3B8" }}>Company</p>
             <div className="space-y-3 text-sm" style={{ color: "#475569" }}>
-              <a href="#team" className="block hover:text-[#0891B2] transition-colors">À propos</a>
-              <a href="#case-study" className="block hover:text-[#0891B2] transition-colors">Cas d'étude</a>
+              <a href="#team" className="block hover:text-[#0891B2] transition-colors">About</a>
+              <a href="#case-study" className="block hover:text-[#0891B2] transition-colors">Case Study</a>
               <Link to="/contact" className="block hover:text-[#0891B2] transition-colors">Contact</Link>
             </div>
           </div>
@@ -38,7 +38,7 @@ export function LandingFooter() {
             <a href="mailto:hello@aether-connect.com" className="block text-sm mb-2" style={{ color: "#475569" }}>
               hello@aether-connect.com
             </a>
-            <p className="text-xs" style={{ color: "#94A3B8" }}>Lun–Ven: 9h–18h (CET)</p>
+            <p className="text-xs" style={{ color: "#94A3B8" }}>Mon-Fri: 9am-6pm (CET)</p>
           </div>
         </div>
 
