@@ -7,9 +7,9 @@ const stats = [
 
 export function PharmaStats() {
   return (
-    <section className="py-36 md:py-44 bg-white">
+    <section className="py-32 md:py-40" style={{ background: "#F7F8FA" }}>
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <p className="text-base md:text-lg leading-relaxed max-w-[700px] mb-20" style={{ color: "#475569" }}>
+        <p className="text-base md:text-[17px] leading-[1.8] max-w-[660px] mb-20" style={{ color: "#5a6577" }}>
           Depuis <strong style={{ color: "#0F172A" }}>plus de 18 ans</strong>, nous accompagnons
           les entreprises pharmaceutiques dans leur <strong style={{ color: "#0F172A" }}>transformation opérationnelle</strong>.
           Notre expertise couvre la <strong style={{ color: "#0F172A" }}>conformité réglementaire</strong>,
@@ -17,16 +17,16 @@ export function PharmaStats() {
           l'<strong style={{ color: "#0F172A" }}>optimisation des processus GMP</strong>.
         </p>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-16 gap-x-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
           {stats.map((s) => (
             <div key={s.label}>
               <div
-                className="font-heading text-6xl md:text-7xl lg:text-8xl font-bold leading-none mb-4"
-                style={{ color: "#0891B2" }}
+                className="font-heading text-[56px] md:text-7xl lg:text-[80px] font-bold leading-none mb-3"
+                style={{ color: "#064E6E" }}
               >
                 {s.value}
               </div>
-              <div className="text-sm" style={{ color: "#64748B" }}>
+              <div className="text-[13px] tracking-wide" style={{ color: "#7a8599" }}>
                 {s.label}
               </div>
             </div>
