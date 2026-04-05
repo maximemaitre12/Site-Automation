@@ -829,6 +829,48 @@ export type Database = {
           },
         ]
       }
+      chatbot_knowledge: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          keywords: string[] | null
+          language: string | null
+          priority: number | null
+          search_vector: unknown
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          language?: string | null
+          priority?: number | null
+          search_vector?: unknown
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keywords?: string[] | null
+          language?: string | null
+          priority?: number | null
+          search_vector?: unknown
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           created_at: string
