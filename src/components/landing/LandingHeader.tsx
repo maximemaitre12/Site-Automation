@@ -84,9 +84,9 @@ export function LandingHeader() {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? (
-            <X className={`w-6 h-6 ${scrolled ? "text-gray-700" : "text-white"}`} />
+            <X className={`w-6 h-6 ${useDarkMode ? "text-gray-700" : "text-white"}`} />
           ) : (
-            <Menu className={`w-6 h-6 ${scrolled ? "text-gray-700" : "text-white"}`} />
+            <Menu className={`w-6 h-6 ${useDarkMode ? "text-gray-700" : "text-white"}`} />
           )}
         </button>
       </div>
