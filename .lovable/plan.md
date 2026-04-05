@@ -1,69 +1,60 @@
 
 
-# Redesign Complet -- Style Farmak.ch
+# Plan: Translate entire landing page to English + refocus on real pharma automation & cloud needs
 
-## Analyse de Farmak.ch
+## What changes
 
-Farmak.ch utilise un style tres specifique:
-- **Hero immersif** avec des images de produits qui se chevauchent dans des cercles, un grand titre en deux lignes avec line-break, et des decorations circulaires
-- **Stats en ligne** avec de tres grands chiffres (pas de cartes, juste une rangee horizontale)
-- **Paragraphes narratifs** avec des **mots en gras** inline -- pas de bullet points
-- **Listes de categories** cliquables avec titres en majuscules
-- **Sections "Globale Prasenz"** avec des facts inline en gras dans des phrases
-- **Section Qualite** avec de grands chiffres et descriptions courtes en tableau
-- **Section Partenaire** avec des titres ALL-CAPS et descriptions courtes -- pas de numeros, pas d'icones
-- **Enormes espaces** entre sections (120-160px)
-- **Fond blanc partout** avec tres peu de variation de couleur de fond
-- **Pas de dividers visibles** (pas de divide-x, divide-y)
-- **CTA "Prasentation Anfordern"** repete plusieurs fois
+Translate all 12 pharma landing components from French to English, and shift the messaging to focus more on **real enterprise pain points**: cloud migration, operational automation, data pipeline modernization, and AI-driven compliance — not just regulatory jargon.
 
-## Changements Majeurs
+## Files to edit (11 components)
 
-### Philosophie
-Supprimer tout ce qui fait "consulting agency template": numeros `01/02/03`, dividers `divide-x/divide-y`, grilles 3-colonnes avec separateurs, labels uppercase "Defis/Expertise/etc". Remplacer par du contenu narratif avec mots en gras, des grands chiffres nus, et beaucoup plus de blanc.
+### 1. PharmaHero.tsx
+- Headline: "AI systems that accelerate your R&D pipeline."
+- Subtitle refocused on: cloud-native automation, regulatory compliance at scale, operational efficiency
+- CTAs: "Request a free AI audit" / "See our clinical results"
 
-### Reduction des sections
-Passer de 13 sections a 8-9 en fusionnant:
-1. **Hero** -- garder le gradient, ajouter des images circulaires decoratives qui se chevauchent (comme Farmak), titre plus grand
-2. **Stats** -- juste 4 grands chiffres en ligne, pas de cartes/bordures/ombres
-3. **Intro narrative + Expertise** -- un grand paragraphe avec **mots en gras** + liste de domaines cliquables en majuscules (comme les therapeutische Bereiche de Farmak)
-4. **Equipe/Presence** -- style "Globale Prasenz" de Farmak: facts en gras dans des phrases courtes
-5. **Qualite/Methodologie** -- grands chiffres + descriptions courtes en grille, comme la section qualite de Farmak
-6. **Cas d'etude** -- plus narratif, garder le testimonial
-7. **Partenaire** -- 4 blocs titre ALL-CAPS + description (comme "Verlasslicher Geschaftspartner" de Farmak)
-8. **CTA Final**
+### 2. PharmaPartners.tsx
+- Label: "Technology partners"
 
-### Fichiers a modifier
+### 3. PharmaStats.tsx
+- Intro paragraph + stats all in English
+- Stats reframed around real business value: time-to-market reduction, compliance coverage, classification accuracy, integrated frameworks
 
-**PharmaHero.tsx** -- Ajouter des cercles decoratifs avec images (ou motifs) qui se chevauchent comme Farmak. Titre plus grand (text-7xl+). Bouton "Mehr sehen" style vertical a droite.
+### 4. PharmaProblems.tsx
+- Headline: "Your CTD filings take 18 months. We do 4."
+- Rewrite pain points in English focusing on: manual regulatory writing bottlenecks, siloed batch data, fragmented pharmacovigilance — and how AI automation + cloud infrastructure solve them
+- Domain list in English
+- CTA: "Free regulatory audit"
 
-**PharmaStats.tsx** -- Supprimer tout styling de carte. Juste des grands chiffres (text-7xl) en rangee sur fond blanc avec un trait fin en-dessous. Pas d'ombre, pas de fond gris.
+### 5. PharmaTeam.tsx
+- "Industrial-grade AI engineering" section fully in English
+- Pillar descriptions (MLOps, Autonomous Agents & RAG, Infrastructure & Compliance) rewritten to emphasize cloud automation and enterprise needs: scalable data pipelines, real-time monitoring, multi-cloud deployment
 
-**PharmaProblems.tsx** -- Transformer en section narrative: un grand paragraphe avec **bold keywords** suivi d'une liste de domaines en majuscules cliquables (style Farmak "therapeutische Bereiche"). Supprimer les colonnes avec separateurs.
+### 6. PharmaExpertise.tsx
+- All 6 expertise areas translated, with more emphasis on automation value and cloud infrastructure alongside pharma terminology
 
-**PharmaTeam.tsx** -- Transformer en section "presence/equipe" avec des facts en gras dans des phrases (style Farmak "Globale Prasenz"). Ex: "**15 ans** d'experience chez **Sanofi et Novartis**" etc. Pas de cartes separees.
+### 7. PharmaAIPlatform.tsx
+- "Aether Pharma AI. Built for science." — all capabilities and stats in English
+- Add emphasis on cloud-native architecture and enterprise data integration needs
 
-**PharmaExpertise.tsx** -- Fusionner avec la section Problems ou supprimer. Le contenu migre dans la section narrative.
+### 8. PharmaMethodology.tsx
+- KPI section in English, refocused on operational ROI metrics pharma companies actually care about
 
-**PharmaMethodology.tsx** -- Transformer en grille de chiffres comme la section "Qualitat" de Farmak: grands chiffres + description d'une ligne. Pas de timeline.
+### 9. PharmaCaseStudy.tsx
+- Case study narrative + testimonial in English
+- More focus on automation impact and cloud migration benefits
 
-**PharmaCaseStudy.tsx** -- Garder mais simplifier. Plus de texte narratif, moins de tableaux. Grand testimonial.
+### 10. PharmaTrust.tsx
+- Compliance guarantees in English with stronger cloud/automation angle
 
-**PharmaTrust.tsx** -- Transformer en section "Partenaire" style Farmak: 4 blocs avec titre ALL-CAPS et description courte. Pas de numeros.
+### 11. PharmaFAQ.tsx
+- All Q&A in English, adding questions about cloud infrastructure, data migration, and automation ROI
 
-**Supprimer/fusionner**: PharmaPortfolio (integrer dans CaseStudy), PharmaServices (integrer dans CTA ou supprimer), PharmaResources (supprimer -- pas dans Farmak), PharmaFAQ (garder mais simplifier).
+### 12. PharmaFinalCTA.tsx
+- CTAs in English: "Free regulatory audit" / "Contact the R&D team"
 
-**Landing.tsx** -- Reduire a ~8 sections.
-
-**LandingHeader.tsx** -- Supprimer rounded-full sur les boutons. Plus minimaliste.
-
-**LandingFooter.tsx** -- Supprimer les icones rondes pour les reseaux sociaux. Plus epure.
-
-### Details de style
-- Padding sections: 140-180px vertical (au lieu de 100-120px)
-- Fond: blanc partout, supprimer les alternances `#FAFCFE`
-- Pas de `divide-x`, `divide-y`, pas de bordures entre elements
-- Grands chiffres: `text-7xl md:text-8xl` en couleur primaire
-- Paragraphes avec `<strong>` pour les mots cles
-- Boutons: rectangulaires (pas rounded-full), plus de presence
+## Tone shift
+- Everything in English
+- Keep ultra-technical pharma terminology (GxP, eCTD, MedDRA, ICH) but balance it with **real enterprise automation language**: cloud migration, data pipeline orchestration, legacy system modernization, operational cost reduction, scalable infrastructure
+- Position Aether Connect as solving the gap between pharma's regulatory complexity and modern cloud/AI capabilities
 
