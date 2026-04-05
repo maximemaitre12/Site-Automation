@@ -43,7 +43,7 @@ export function PharmaProblems() {
             <ScrollReveal delay={350}>
               <div className="space-y-5 text-[15px] md:text-base leading-[1.85]" style={{ color: "#4a5568" }}>
                 <p>
-                  Pharmaceutical companies operate under extraordinary pressure —{" "}
+                  Pharmaceutical companies operate under extraordinary pressure:{" "}
                   <strong style={{ color: "#0F172A" }}>tightening regulatory timelines</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>growing volumes</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>aging infrastructure</strong>. Yet most critical

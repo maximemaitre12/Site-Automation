@@ -38,7 +38,7 @@ export function PharmaMethodology() {
             <ScrollReveal delay={350}>
               <p className="text-[15px] md:text-base leading-[1.85] max-w-[520px]" style={{ color: "#4a5568" }}>
                 Every metric below comes from <strong style={{ color: "#0F172A" }}>production deployment</strong> at
-                Farmasoft — a pharmaceutical logistics enterprise processing thousands of operations daily.
+                Farmasoft, a pharmaceutical logistics enterprise processing thousands of operations daily.
                 Our agents are measured on <strong style={{ color: "#0F172A" }}>operational impact</strong>, not
                 demo scenarios.
               </p>

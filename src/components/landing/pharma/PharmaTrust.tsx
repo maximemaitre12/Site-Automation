@@ -1,9 +1,10 @@
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const blocks = [
-  { title: "GxP-NATIVE BY DESIGN", desc: "Every component of our stack is engineered for GMP, GLP and GCP environments. No retrofitting — compliance is architectural, not cosmetic. Built for cloud-native deployment from the ground up." },
+  { title: "GxP NATIVE BY DESIGN", desc: "Every component of our stack is engineered for GMP, GLP and GCP environments. No retrofitting, compliance is architectural, not cosmetic. Built for cloud-native deployment from the ground up." },
   { title: "INTEGRATED CSV VALIDATION", desc: "Automated IQ/OQ/PQ protocols, validation reports generated with every release. Full traceability from source code to inference results, compliant with Annex 11 and 21 CFR Part 11." },
-  { title: "MODELS TRAINED ON PHARMA DATA", desc: "Our NLP models are fine-tuned on regulatory corpora (ICH, FDA Guidance, EMA Scientific Guidelines) and anonymized pharmacovigilance datasets — not generic internet data." },
+  { title: "MODELS TRAINED ON PHARMA DATA", desc: "Our NLP models are fine-tuned on regulatory corpora (ICH, FDA Guidance, EMA Scientific Guidelines) and anonymized pharmacovigilance datasets, not generic internet data." },
+  { title: "ZERO DISRUPTION DEPLOYMENT", desc: "Native integration with your LIMS, MES, ERP (SAP), EDMS and pharmacovigilance systems (Argus, ArisGlobal). Containerized microservices architecture with zero-downtime deployment. Cloud or hybrid, your choice." },
   { title: "ZERO-DISRUPTION DEPLOYMENT", desc: "Native integration with your LIMS, MES, ERP (SAP), EDMS and pharmacovigilance systems (Argus, ArisGlobal). Containerized microservices architecture with zero-downtime deployment. Cloud or hybrid, your choice." },
 ];
 
