@@ -22,7 +22,7 @@ export function ScrollReveal({ children, className = "", delay = 0, direction = 
           observer.unobserve(el);
         }
       },
-      { rootMargin: "0px 0px -120px 0px", threshold: 0.01 }
+      { rootMargin: "0px 0px -220px 0px", threshold: 0.01 }
     );
 
     observer.observe(el);
