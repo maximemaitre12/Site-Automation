@@ -10,22 +10,45 @@ import { PharmaTrust } from "@/components/landing/pharma/PharmaTrust";
 import { PharmaFAQ } from "@/components/landing/pharma/PharmaFAQ";
 import { PharmaFinalCTA } from "@/components/landing/pharma/PharmaFinalCTA";
 import { PharmaPartners } from "@/components/landing/pharma/PharmaPartners";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export default function Landing() {
   return (
     <div className="overflow-x-hidden">
       <PharmaHero />
-      <PharmaPartners />
-      <PharmaStats />
-      <PharmaProblems />
-      <PharmaTeam />
-      <PharmaCaseStudy />
-      <PharmaExpertise />
-      <PharmaAIPlatform />
-      <PharmaMethodology />
-      <PharmaTrust />
-      <PharmaFAQ />
-      <PharmaFinalCTA />
+      <ScrollReveal>
+        <PharmaPartners />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaStats />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaProblems />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaTeam />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaCaseStudy />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaExpertise />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaAIPlatform />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaMethodology />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaTrust />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaFAQ />
+      </ScrollReveal>
+      <ScrollReveal>
+        <PharmaFinalCTA />
+      </ScrollReveal>
     </div>
   );
 }
