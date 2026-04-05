@@ -2,11 +2,11 @@ import pharmaProduction from "@/assets/pharma-production.jpg";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const quality = [
-  { value: "–72%", desc: "Document processing time through Operations Intelligence Agent" },
-  { value: "–65%", desc: "Time-to-hire via automated candidate sourcing and qualification" },
+  { value: "72%", desc: "Reduction in document processing time through Operations Intelligence Agent" },
+  { value: "65%", desc: "Reduction in time-to-hire via automated candidate sourcing and qualification" },
   { value: "3x", desc: "Faster inbound-to-dispatch cycle with AI-drafted preparation orders" },
   { value: "€1.5M+", desc: "Estimated annual value created across operations and recruitment" },
-  { value: "100%", desc: "Human-validated outputs — zero autonomous execution" },
+  { value: "100%", desc: "Human-validated outputs, zero autonomous execution" },
   { value: "< 6 wks", desc: "Full agent deployment cycle including system integration" },
 ];
 
