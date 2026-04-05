@@ -10,18 +10,29 @@ const faqs = [
 
 export function PharmaFAQ() {
   return (
-    <section className="py-32 md:py-40 bg-white">
+    <section className="py-28 md:py-36 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-28">
+        {/* Section label */}
+        <div className="flex items-center gap-4 mb-16">
+          <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
+          <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            FAQ
+          </span>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div>
             <h2
-              className="font-heading text-[36px] md:text-5xl lg:text-[56px] font-bold leading-[1.08]"
+              className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-6"
               style={{ color: "#0F172A" }}
             >
               Questions
               <br />
               fréquentes.
             </h2>
+            <p className="text-[15px] leading-[1.85]" style={{ color: "#4a5568" }}>
+              Tout ce que vous devez savoir avant de <strong style={{ color: "#0F172A" }}>commencer un engagement</strong> avec nous.
+            </p>
           </div>
 
           <div>
@@ -31,7 +42,7 @@ export function PharmaFAQ() {
                   key={i}
                   value={`faq-${i}`}
                   className="border-b py-0"
-                  style={{ borderColor: "#e5e7eb" }}
+                  style={{ borderColor: "#e8ecf1" }}
                 >
                   <AccordionTrigger
                     className="font-heading text-[15px] font-bold hover:no-underline py-6 text-left"
@@ -40,7 +51,7 @@ export function PharmaFAQ() {
                     {faq.q}
                   </AccordionTrigger>
                   <AccordionContent>
-                    <p className="text-[14px] leading-[1.75] pb-4" style={{ color: "#6b7688" }}>
+                    <p className="text-[14px] leading-[1.8] pb-4" style={{ color: "#5a6577" }}>
                       {faq.a}
                     </p>
                   </AccordionContent>
