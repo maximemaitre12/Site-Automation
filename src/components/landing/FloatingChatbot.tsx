@@ -335,6 +335,10 @@ export function FloatingChatbot() {
           0%, 100% { opacity: 0.4; transform: scale(0.8); }
           50% { opacity: 1; transform: scale(1.2); }
         }
+        @keyframes aetherShimmer {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 0.8; }
+        }
       `}</style>
     </>
   );
