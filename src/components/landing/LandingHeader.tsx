@@ -115,9 +115,9 @@ export function LandingHeader() {
                   {item.label}
                 </Link>
               ) : (
-                <a key={item.label} href={item.href} onClick={() => setIsMenuOpen(false)} className="text-sm font-medium py-2 text-gray-700">
+                <button key={item.label} onClick={() => { handleHashClick(item.href); setIsMenuOpen(false); }} className="text-sm font-medium py-2 text-gray-700 text-left">
                   {item.label}
-                </a>
+                </button>
               )
             )}
             <Link
