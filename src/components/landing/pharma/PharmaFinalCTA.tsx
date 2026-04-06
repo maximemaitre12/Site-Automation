@@ -6,7 +6,7 @@ export function PharmaFinalCTA() {
     <section
       className="relative py-28 md:py-40 overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, #0369A1 0%, #0891B2 50%, #06B6D4 100%)",
+        background: "linear-gradient(160deg, #0369A1 0%, #0369A1 50%, #0369A1 100%)",
       }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
