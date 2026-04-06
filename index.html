@@ -39,12 +39,9 @@
         opacity: 0;
         pointer-events: none;
       }
-      #app-loader span {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        font-size: 18px;
-        font-weight: 600;
-        letter-spacing: -0.02em;
-        color: #0f172a;
+      #app-loader img {
+        height: 44px;
+        width: auto;
       }
     </style>
     <meta property="og:title" content="AETHER - Intelligent automation for enterprise">
@@ -54,7 +51,7 @@
 </head>
 
   <body>
-    <div id="app-loader"><span>AETHER</span></div>
+    <div id="app-loader"><img src="/aether-logo-final.png" alt="AETHER" /></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
