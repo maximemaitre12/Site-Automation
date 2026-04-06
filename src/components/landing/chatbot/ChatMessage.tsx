@@ -1,13 +1,30 @@
 import { AetherMarkdownRenderer } from "./AetherMarkdownRenderer";
+import { WidgetShimmer } from "./WidgetShimmer";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
 interface ChatMessageProps {
   message: Msg;
   index: number;
+  isStreaming?: boolean;
 }
 
-export function ChatMessage({ message, index }: ChatMessageProps) {
+/**
+ * Split assistant content into widget segments using --- or ## boundaries.
+ * Each segment is rendered independently with staggered fade-in.
+ */
+function splitWidgetSegments(content: string): string[] {
+  // Split on horizontal rules or ## headers (keep headers with their content)
+  const raw = content.split(/\n---\n/);
+  const segments: string[] = [];
+  for (const part of raw) {
+    const trimmed = part.trim();
+    if (trimmed) segments.push(trimmed);
+  }
+  return segments.length > 0 ? segments : [content];
+}
+
+export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
   const isUser = message.role === "user";
 
   if (isUser) {
@@ -26,7 +43,9 @@ export function ChatMessage({ message, index }: ChatMessageProps) {
     );
   }
 
-  // Assistant: render as widget stack with spacing
+  // Assistant: progressive widget rendering
+  const segments = splitWidgetSegments(message.content);
+
   return (
     <div
       className="mt-7 first:mt-0 min-w-0"
@@ -35,7 +54,21 @@ export function ChatMessage({ message, index }: ChatMessageProps) {
         animationDelay: `${Math.min(index * 30, 120)}ms`,
       }}
     >
-      <AetherMarkdownRenderer content={message.content} />
+      {segments.map((segment, i) => (
+        <div
+          key={i}
+          className={i > 0 ? "mt-4" : ""}
+          style={{
+            animation: "aetherMsgIn 220ms ease-out both",
+            animationDelay: `${i * 60}ms`,
+          }}
+        >
+          <AetherMarkdownRenderer content={segment} />
+        </div>
+      ))}
+
+      {/* Trailing shimmer while still streaming */}
+      {isStreaming && <WidgetShimmer />}
     </div>
   );
 }
