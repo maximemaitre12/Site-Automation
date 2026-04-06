@@ -26,11 +26,17 @@ export function LandingHeader() {
   }, []);
 
   const handleHashClick = useCallback((href: string) => {
+    setIsMenuOpen(false);
     if (isLandingPage) {
       const el = document.querySelector(href);
       el?.scrollIntoView({ behavior: "smooth" });
     } else {
-      navigate("/" + href);
+      navigate("/");
+      // Wait for navigation, then scroll to section
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        el?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
     }
   }, [isLandingPage, navigate]);
 
