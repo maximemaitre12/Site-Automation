@@ -99,7 +99,7 @@ const components: Components = {
 export function AetherMarkdownRenderer({ content }: AetherMarkdownRendererProps) {
   return (
     <div className="aether-md text-[13.5px] leading-[1.7] text-[#0F172A] min-w-0 overflow-hidden break-words">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={components}>
         {content}
       </ReactMarkdown>
     </div>
