@@ -327,6 +327,10 @@ export function FloatingChatbot() {
           from { opacity: 0; transform: translateY(6px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes aetherWidgetIn {
+          from { opacity: 0; transform: translateY(8px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes aetherPulse {
           0%, 100% { opacity: 0.6; }
           50% { opacity: 1; }
@@ -338,6 +342,11 @@ export function FloatingChatbot() {
         @keyframes aetherShimmer {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 0.8; }
+        }
+        @keyframes aetherSweep {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(100%); }
+          100% { transform: translateX(100%); }
         }
       `}</style>
     </>
