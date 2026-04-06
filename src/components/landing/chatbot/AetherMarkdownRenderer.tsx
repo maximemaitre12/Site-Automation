@@ -9,22 +9,52 @@ interface AetherMarkdownRendererProps {
   onSendMessage?: (message: string) => void;
 }
 
-/** Recursively extract all text from React children (including nested <strong>, <em>, etc.) */
-function extractText(children: React.ReactNode): string {
+function extractTextWithBreaks(children: React.ReactNode): string {
   let text = "";
+
   React.Children.forEach(children, (child) => {
-    if (typeof child === "string") {
-      text += child;
-    } else if (typeof child === "number") {
+    if (typeof child === "string" || typeof child === "number") {
       text += String(child);
-    } else if (React.isValidElement(child) && child.props?.children) {
-      text += extractText(child.props.children);
+      return;
+    }
+
+    if (!React.isValidElement(child)) return;
+
+    const tagName = typeof child.type === "string" ? child.type : null;
+
+    if (tagName === "br") {
+      text += "\n";
+      return;
+    }
+
+    if (child.props?.children) {
+      text += extractTextWithBreaks(child.props.children);
+    }
+
+    if (tagName === "p" || tagName === "li" || tagName === "blockquote" || tagName === "div") {
+      text += "\n";
     }
   });
+
   return text;
 }
 
-/** Render a clickable action button for → lines */
+function parseActionContent(children: React.ReactNode) {
+  const lines = extractTextWithBreaks(children)
+    .split("\n")
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+
+  const actionLines = lines
+    .filter((line) => line.startsWith("→"))
+    .map((line) => line.replace(/^→\s*/, "").trim())
+    .filter(Boolean);
+
+  const textLines = lines.filter((line) => !line.startsWith("→"));
+
+  return { actionLines, textLines };
+}
+
 function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) => void }) {
   return (
     <button
@@ -33,6 +63,7 @@ function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) =>
       style={{
         background: "linear-gradient(135deg, rgba(3,105,161,0.06) 0%, rgba(56,189,248,0.04) 100%)",
         border: "1px solid rgba(3,105,161,0.12)",
+        boxShadow: "0 1px 3px rgba(15,23,42,0.04), 0 10px 24px rgba(3,105,161,0.04)",
       }}
     >
       <span
@@ -51,14 +82,41 @@ function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) =>
   );
 }
 
-/** Check if children represent a → action line, return cleaned text or null */
-function getActionText(children: React.ReactNode): string | null {
-  const text = extractText(children).trim();
-  if (text.startsWith("→")) {
-    const actionText = text.replace(/^→\s*/, "").trim();
-    return actionText || null;
-  }
-  return null;
+function ActionGroup({
+  textLines,
+  actionLines,
+  onSend,
+  compact = false,
+}: {
+  textLines: string[];
+  actionLines: string[];
+  onSend: (msg: string) => void;
+  compact?: boolean;
+}) {
+  const [title, ...details] = textLines;
+
+  return (
+    <div className={compact ? "my-2" : "my-4"}>
+      {title && (
+        <div className="mb-3">
+          <div className="text-[9.5px] font-bold tracking-[0.16em] uppercase" style={{ color: "#0369A1" }}>
+            {title}
+          </div>
+          {details.length > 0 && (
+            <p className="mt-2 text-[12px] leading-[1.8] whitespace-pre-line text-[#475569]">
+              {details.join("\n")}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {actionLines.map((action, index) => (
+          <ActionButton key={`${action}-${index}`} text={action} onSend={onSend} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function buildComponents(onSendMessage?: (msg: string) => void): Components {
@@ -87,10 +145,12 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       </div>
     ),
     p: ({ children }) => {
-      const actionText = onSendMessage ? getActionText(children) : null;
-      if (actionText) {
-        return <ActionButton text={actionText} onSend={onSendMessage!} />;
+      const { actionLines, textLines } = onSendMessage ? parseActionContent(children) : { actionLines: [], textLines: [] };
+
+      if (actionLines.length > 0 && onSendMessage) {
+        return <ActionGroup textLines={textLines} actionLines={actionLines} onSend={onSendMessage} compact />;
       }
+
       return (
         <p className="my-2 first:mt-0 last:mb-0 text-[12.5px] leading-[1.8] break-words whitespace-pre-line text-[#475569]">
           {children}
@@ -107,14 +167,16 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       <ol className="my-2.5 space-y-2 pl-4 list-decimal marker:text-[#94A3B8] marker:text-[11px]">{children}</ol>
     ),
     li: ({ children }) => {
-      const actionText = onSendMessage ? getActionText(children) : null;
-      if (actionText) {
+      const { actionLines, textLines } = onSendMessage ? parseActionContent(children) : { actionLines: [], textLines: [] };
+
+      if (actionLines.length > 0 && onSendMessage) {
         return (
           <li className="list-none pl-0">
-            <ActionButton text={actionText} onSend={onSendMessage!} />
+            <ActionGroup textLines={textLines} actionLines={actionLines} onSend={onSendMessage} compact />
           </li>
         );
       }
+
       return (
         <li className="flex items-start gap-2.5 text-[12.5px] leading-[1.7]">
           <span
@@ -126,40 +188,10 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       );
     },
     blockquote: ({ children }) => {
-      // Check if ALL children inside are → actions — if so, render as action group
-      const childArray = React.Children.toArray(children);
-      const actionChildren: { text: string; key: string | number }[] = [];
-      let hasNonAction = false;
+      const { actionLines, textLines } = onSendMessage ? parseActionContent(children) : { actionLines: [], textLines: [] };
 
-      childArray.forEach((child, i) => {
-        if (React.isValidElement(child)) {
-          const text = getActionText(child.props?.children);
-          if (text) {
-            actionChildren.push({ text, key: i });
-          } else {
-            // Check if it's an empty/whitespace-only element
-            const t = extractText(child.props?.children).trim();
-            if (t.length > 0) hasNonAction = true;
-          }
-        } else if (typeof child === "string" && child.trim()) {
-          const t = child.trim();
-          if (t.startsWith("→")) {
-            actionChildren.push({ text: t.replace(/^→\s*/, "").trim(), key: i });
-          } else {
-            hasNonAction = true;
-          }
-        }
-      });
-
-      // If blockquote is purely actions, render as action group
-      if (actionChildren.length > 0 && !hasNonAction && onSendMessage) {
-        return (
-          <div className="my-4 space-y-2.5">
-            {actionChildren.map((a) => (
-              <ActionButton key={a.key} text={a.text} onSend={onSendMessage} />
-            ))}
-          </div>
-        );
+      if (actionLines.length > 0 && onSendMessage) {
+        return <ActionGroup textLines={textLines} actionLines={actionLines} onSend={onSendMessage} />;
       }
 
       return (
