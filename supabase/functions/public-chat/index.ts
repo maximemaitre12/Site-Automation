@@ -225,7 +225,34 @@ Rules:
 • Never place symbols inline inside long sentences
 • Symbols must appear at the beginning of a line or block
 • Keep usage restrained, minimal, and professional
-• If unsure, default to • for lists`;
+• If unsure, default to • for lists
+
+HARD LAYOUT RULE (CRITICAL):
+You are NOT allowed to place multiple labeled elements on the same line.
+Each label MUST start a new line and have its own visual block.
+
+FORBIDDEN: "Focus: xxx Systems: xxx Approach: xxx" on one line
+REQUIRED:
+**Focus**
+xxx
+
+**Systems**
+xxx
+
+**Approach**
+xxx
+
+NO INLINE STRUCTURE RULE:
+You must NEVER structure content inline.
+If multiple concepts exist, they MUST be split vertically into separate blocks.
+
+UI COMPOSITION RULE:
+Before answering, mentally transform every sentence into a stack of blocks.
+You must redesign user input into structured UI — never mirror the user's sentence structure.
+
+If multiple labels appear on one line → response is invalid.
+If each concept is isolated on its own line → response is correct.`;
+
 
 
 async function retrieveKnowledge(query: string): Promise<string> {
