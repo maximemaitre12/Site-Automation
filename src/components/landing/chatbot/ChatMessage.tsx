@@ -8,6 +8,7 @@ interface ChatMessageProps {
   message: Msg;
   index: number;
   isStreaming?: boolean;
+  onSendMessage?: (message: string) => void;
 }
 
 function splitWidgetSegments(content: string): string[] {
@@ -23,7 +24,7 @@ function splitWidgetSegments(content: string): string[] {
   return segments.length > 0 ? segments : [content.trim()];
 }
 
-export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
+export function ChatMessage({ message, index, isStreaming, onSendMessage }: ChatMessageProps) {
   const isUser = message.role === "user";
 
   if (isUser) {
@@ -90,7 +91,7 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
                   padding: "14px 16px",
                 }}
               >
-                <AetherMarkdownRenderer content={segment} />
+                <AetherMarkdownRenderer content={segment} onSendMessage={onSendMessage} />
               </div>
             )}
           </div>
