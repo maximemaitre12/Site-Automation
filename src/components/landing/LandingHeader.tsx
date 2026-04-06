@@ -29,13 +29,12 @@ export function LandingHeader() {
     setIsMenuOpen(false);
     if (isLandingPage) {
       const el = document.querySelector(href);
-      el?.scrollIntoView({ behavior: "smooth" });
+      el?.scrollIntoView({ behavior: "instant" });
     } else {
       navigate("/");
-      // Wait for navigation, then scroll to section
       setTimeout(() => {
         const el = document.querySelector(href);
-        el?.scrollIntoView({ behavior: "smooth" });
+        el?.scrollIntoView({ behavior: "instant" });
       }, 300);
     }
   }, [isLandingPage, navigate]);
