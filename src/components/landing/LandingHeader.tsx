@@ -43,7 +43,7 @@ export function LandingHeader() {
       }}
     >
       <div className="h-full flex items-center justify-between px-0">
-        <Link to="/" className="flex items-center shrink-0 ml-4">
+        <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center shrink-0 ml-4">
           <img
             src={aetherLogo}
             alt="Aether Connect"
