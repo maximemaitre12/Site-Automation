@@ -24,7 +24,7 @@ function splitWidgetSegments(content: string): string[] {
   return segments.length > 0 ? segments : [content.trim()];
 }
 
-export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
+export function ChatMessage({ message, index, isStreaming, onSendMessage }: ChatMessageProps) {
   const isUser = message.role === "user";
 
   if (isUser) {
