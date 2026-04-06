@@ -205,7 +205,27 @@ STRUCTURE ENFORCEMENT RULE (CRITICAL):
 PROGRESSIVE BUILD RULE:
 Order your widgets from most important to least important.
 The front-end reveals them progressively during streaming.
-Put the summary or key insight first, details second, action block last.`;
+Put the summary or key insight first, details second, action block last.
+
+SYMBOL USAGE RULE:
+You may use a small, controlled set of symbols for scanability and visual hierarchy.
+
+Allowed symbols:
+• — simple lists
+▢ — key-value blocks or important points
+◇ — insights
+→ — actions or next steps
+↓ — vertical process flows
+✓ — validated benefits
+⚠ — risks or warnings
+
+Rules:
+• Symbols must improve structure, not decorate text
+• Use only one symbol logic per block (do not mix)
+• Never place symbols inline inside long sentences
+• Symbols must appear at the beginning of a line or block
+• Keep usage restrained, minimal, and professional
+• If unsure, default to • for lists`;
 
 
 async function retrieveKnowledge(query: string): Promise<string> {
