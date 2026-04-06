@@ -19,8 +19,8 @@ export function PharmaPartners() {
     <section className="py-24 md:py-32 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex items-center gap-4 mb-16">
-          <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-          <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+          <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+          <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
             Technology partners
           </span>
         </div>

@@ -12,7 +12,7 @@ export function PharmaStats() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-start gap-8 mb-24">
-            <div className="w-16 h-px mt-3 shrink-0" style={{ background: "#0369A1" }} />
+            <div className="w-16 h-px mt-3 shrink-0" style={{ background: "#1E4D8C" }} />
             <p className="text-base md:text-[17px] leading-[1.85] max-w-[620px]" style={{ color: "#4a5568" }}>
               Our <strong style={{ color: "#0F172A" }}>AI agents</strong> are designed to integrate directly into your
               <strong style={{ color: "#0F172A" }}> existing systems</strong> — ERP, HRIS, email workflows. Every output is a
@@ -26,10 +26,10 @@ export function PharmaStats() {
           {stats.map((s, i) => (
             <ScrollReveal key={s.label} delay={i * 200}>
               <div className="relative pl-6">
-                <div className="w-8 h-[3px] mb-6" style={{ background: "#0369A1" }} />
+                <div className="w-8 h-[3px] mb-6" style={{ background: "#1E4D8C" }} />
                 <div
                   className="font-heading text-[52px] md:text-[64px] lg:text-[72px] font-bold leading-none mb-2"
-                  style={{ color: "#0369A1" }}
+                  style={{ color: "#1E4D8C" }}
                 >
                   {s.value}
                 </div>

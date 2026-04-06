@@ -19,8 +19,8 @@ export function PharmaProblems() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-center gap-4 mb-16">
-            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
               Pharmaceutical operations
             </span>
           </div>
@@ -79,7 +79,7 @@ export function PharmaProblems() {
                 <Link
                   to="/contact"
                   className="inline-flex items-center justify-center h-12 px-8 text-[13px] font-bold tracking-[0.1em] uppercase text-white transition-all hover:opacity-90"
-                  style={{ background: "#0369A1" }}
+                  style={{ background: "#1E4D8C" }}
                 >
                   Free automation audit
                 </Link>
@@ -98,7 +98,7 @@ export function PharmaProblems() {
                   width={800}
                   height={1000}
                 />
-                <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#0369A1" }} />
+                <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#1E4D8C" }} />
               </div>
             </ScrollReveal>
 

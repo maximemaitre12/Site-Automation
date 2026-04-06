@@ -14,8 +14,8 @@ export function PharmaTrust() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-center gap-4 mb-16">
-            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
               Regulatory guarantees
             </span>
           </div>
@@ -45,7 +45,7 @@ export function PharmaTrust() {
                 }}
               >
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-2 h-2 rounded-full" style={{ background: "#0369A1" }} />
+                  <div className="w-2 h-2 rounded-full" style={{ background: "#1E4D8C" }} />
                   <h3 className="font-heading text-[12px] font-bold tracking-[0.15em]" style={{ color: "#0F172A" }}>{b.title}</h3>
                 </div>
                 <p className="text-[15px] leading-[1.85]" style={{ color: "#3d5060" }}>{b.desc}</p>

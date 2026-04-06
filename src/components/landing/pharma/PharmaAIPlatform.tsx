@@ -7,8 +7,8 @@ export function PharmaAIPlatform() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-center gap-4 mb-12">
-            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
               Proprietary AI · Pharma R&D
             </span>
           </div>
@@ -20,7 +20,7 @@ export function PharmaAIPlatform() {
               <h2 className="font-heading text-[32px] md:text-[44px] lg:text-[48px] font-bold leading-[1.08] mb-6 text-white">
                 Aether Pharma AI.
                 <br />
-                <span style={{ color: "#0369A1" }}>Built from research.</span>
+                <span style={{ color: "#1E4D8C" }}>Built from research.</span>
               </h2>
             </ScrollReveal>
             <ScrollReveal delay={150}>
@@ -60,7 +60,7 @@ export function PharmaAIPlatform() {
         <ScrollReveal>
           <div className="rounded-xl p-6 md:p-10 lg:p-12" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
             <div className="text-center mb-8">
-              <span className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: "#0369A1" }}>
+              <span className="text-[10px] font-semibold tracking-[0.25em] uppercase" style={{ color: "#1E4D8C" }}>
                 Platform architecture
               </span>
             </div>
@@ -84,7 +84,7 @@ export function PharmaAIPlatform() {
 
             <div className="rounded-lg p-5 md:p-6 mb-3" style={{ background: "rgba(34,211,238,0.05)", border: "1px solid rgba(34,211,238,0.15)" }}>
               <div className="text-center mb-4">
-                <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: "#0369A1" }}>
+                <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: "#1E4D8C" }}>
                   Aether Core Engine
                 </span>
               </div>
@@ -95,7 +95,7 @@ export function PharmaAIPlatform() {
                   { icon: FileSearch, label: "Vector DB" },
                 ].map((m) => (
                   <div key={m.label} className="flex flex-col items-center gap-2 py-3 rounded-md" style={{ background: "rgba(255,255,255,0.04)" }}>
-                    <m.icon className="w-4 h-4" style={{ color: "#0369A1" }} />
+                    <m.icon className="w-4 h-4" style={{ color: "#1E4D8C" }} />
                     <span className="text-[10px] font-semibold text-white">{m.label}</span>
                   </div>
                 ))}
@@ -120,7 +120,7 @@ export function PharmaAIPlatform() {
                   { icon: Eye, label: "Observability", sub: "Live dashboards" },
                 ].map((a) => (
                   <div key={a.label} className="flex flex-col items-center text-center gap-1.5 py-3 px-2 rounded-md" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <a.icon className="w-3.5 h-3.5" style={{ color: "#0369A1" }} />
+                    <a.icon className="w-3.5 h-3.5" style={{ color: "#1E4D8C" }} />
                     <span className="text-[10px] font-bold text-white leading-tight">{a.label}</span>
                     <span className="text-[9px] leading-tight" style={{ color: "rgba(255,255,255,0.4)" }}>{a.sub}</span>
                   </div>
@@ -133,7 +133,7 @@ export function PharmaAIPlatform() {
             </div>
 
             <div className="flex items-center justify-center gap-3 py-3 rounded-md" style={{ background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.12)" }}>
-              <ShieldCheck className="w-4 h-4" style={{ color: "#0369A1" }} />
+              <ShieldCheck className="w-4 h-4" style={{ color: "#1E4D8C" }} />
               <span className="text-[11px] font-semibold text-white">Human-in-the-loop governance</span>
               <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>— all outputs are drafts</span>
             </div>
@@ -158,7 +158,7 @@ export function PharmaAIPlatform() {
               <ScrollReveal key={p.title} delay={i * 100}>
                 <div className="p-5 rounded-lg h-full" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="w-8 h-8 flex items-center justify-center rounded-md mb-3" style={{ background: "rgba(34,211,238,0.1)" }}>
-                    <p.icon className="w-4 h-4" style={{ color: "#0369A1" }} />
+                    <p.icon className="w-4 h-4" style={{ color: "#1E4D8C" }} />
                   </div>
                   <h4 className="font-heading text-[13px] font-bold text-white mb-1.5">{p.title}</h4>
                   <p className="text-[12px] leading-[1.7]" style={{ color: "rgba(255,255,255,0.45)" }}>{p.desc}</p>

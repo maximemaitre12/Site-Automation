@@ -7,7 +7,7 @@ export function PharmaCaseStudy() {
     <section id="case-study" className="py-16 md:py-24 bg-white">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex items-center gap-4 mb-16">
-          <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-[#0369A1]">
+          <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-[#1E4D8C]">
             Enterprise deployment · Pharmaceutical logistics
           </span>
         </div>
@@ -24,7 +24,7 @@ export function PharmaCaseStudy() {
           <h2 className="font-heading text-[34px] md:text-5xl lg:text-[52px] font-bold leading-[1.08] mb-8 text-[#111]">
             Case Study: Farmasoft
             <br />
-            <span className="text-[#0369A1]">Two AI agents deployed by Aether Connect</span>
+            <span className="text-[#1E4D8C]">Two AI agents deployed by Aether Connect</span>
           </h2>
           <p className="text-[15px] md:text-base leading-[1.85] mb-6 text-[#6B6560] max-w-3xl">
             <strong className="text-[#111] font-medium">Farmasoft</strong> is a recognized European leader in pharmaceutical logistics, trusted to orchestrate <strong className="text-[#111] font-medium">high-volume, temperature-sensitive supply chains</strong> across multiple regulated markets with exceptional operational precision and reliability.
@@ -46,11 +46,11 @@ export function PharmaCaseStudy() {
         <div className="grid md:grid-cols-2 gap-6 mb-20">
           <div className="p-6 lg:p-8 rounded-xl border border-[#eae7e2] bg-[#FAFAF9] h-full">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
-                <Package className="w-4 h-4 text-[#0369A1]" />
+              <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#1E4D8C]/10">
+                <Package className="w-4 h-4 text-[#1E4D8C]" />
               </div>
               <div>
-                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase block text-[#0369A1]">Agent 01</span>
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase block text-[#1E4D8C]">Agent 01</span>
                 <h3 className="font-heading text-base font-bold text-[#111]">Operations Intelligence</h3>
               </div>
             </div>
@@ -61,13 +61,13 @@ export function PharmaCaseStudy() {
             <ul className="space-y-2 mb-5">
               {["Email & PDF ingestion, lot/expiry extraction", "Automated draft reception & dispatch orders", "Product identification & inventory matching"].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-[12px] text-[#6B6560]">
-                  <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#0369A1]" />
+                  <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#1E4D8C]" />
                   {item}
                 </li>
               ))}
             </ul>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#0369A1]/5">
-              <Bot className="w-3.5 h-3.5 text-[#0369A1]" />
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#1E4D8C]/5">
+              <Bot className="w-3.5 h-3.5 text-[#1E4D8C]" />
               <span className="text-[11px] text-[#6B6560]">
                 All outputs are <strong className="text-[#111] font-medium">draft-only</strong>, human validation required
               </span>
@@ -76,11 +76,11 @@ export function PharmaCaseStudy() {
 
           <div className="p-6 lg:p-8 rounded-xl border border-[#eae7e2] bg-[#FAFAF9] h-full">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#0369A1]/10">
-                <Users className="w-4 h-4 text-[#0369A1]" />
+              <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#1E4D8C]/10">
+                <Users className="w-4 h-4 text-[#1E4D8C]" />
               </div>
               <div>
-                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase block text-[#0369A1]">Agent 02</span>
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase block text-[#1E4D8C]">Agent 02</span>
                 <h3 className="font-heading text-base font-bold text-[#111]">Talent Intelligence</h3>
               </div>
             </div>
@@ -91,13 +91,13 @@ export function PharmaCaseStudy() {
             <ul className="space-y-2 mb-5">
               {["Automated monitoring across job boards & networks", "AI-scored candidate profiles & priority ranking", "Structured synthesis cards, HRIS-ready data"].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-[12px] text-[#6B6560]">
-                  <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#0369A1]" />
+                  <CheckCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-[#1E4D8C]" />
                   {item}
                 </li>
               ))}
             </ul>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#0369A1]/5">
-              <Bot className="w-3.5 h-3.5 text-[#0369A1]" />
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-[#1E4D8C]/5">
+              <Bot className="w-3.5 h-3.5 text-[#1E4D8C]" />
               <span className="text-[11px] text-[#6B6560]">
                 Human decision required <strong className="text-[#111] font-medium">before any candidate interaction</strong>
               </span>
@@ -106,7 +106,7 @@ export function PharmaCaseStudy() {
         </div>
 
         <div className="max-w-2xl">
-          <div className="relative pl-6 border-l-2 border-[#0369A1]/30">
+          <div className="relative pl-6 border-l-2 border-[#1E4D8C]/30">
             <p className="text-base md:text-lg italic leading-relaxed mb-5 text-[#111]/80">
               "We didn't need another SaaS dashboard. We needed intelligence that plugs into our
               existing systems and lets our teams focus on decisions, not data entry. That's exactly

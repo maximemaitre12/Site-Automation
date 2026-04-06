@@ -40,7 +40,7 @@ export function ChatMessage({ message, index, isStreaming, onSendMessage }: Chat
           className="max-w-[85%] px-4 py-2.5 text-white text-[13px] leading-relaxed break-words relative overflow-hidden"
           style={{
             borderRadius: "18px 18px 6px 18px",
-            background: "linear-gradient(135deg, #0369A1 0%, #0369A1 100%)",
+            background: "linear-gradient(135deg, #1E4D8C 0%, #1E4D8C 100%)",
             boxShadow: "0 2px 12px rgba(2,132,199,0.2), 0 1px 3px rgba(0,0,0,0.08)",
           }}
         >

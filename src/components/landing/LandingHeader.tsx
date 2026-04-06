@@ -56,7 +56,7 @@ export function LandingHeader() {
             style={{
               filter: (!isContactPage && !scrolled)
                 ? "brightness(0) invert(1)"
-                : "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(180deg)"
+                : "brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(195deg)"
             }}
           />
         </Link>
@@ -67,7 +67,7 @@ export function LandingHeader() {
               <Link
                 key={item.label}
                 to={item.href}
-                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0369A1]" : "text-white/80 hover:text-white"}`}
+                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#1E4D8C]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
               </Link>
@@ -75,7 +75,7 @@ export function LandingHeader() {
               <button
                 key={item.label}
                 onClick={() => handleHashClick(item.href)}
-                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0369A1]" : "text-white/80 hover:text-white"}`}
+                className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#1E4D8C]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
               </button>
@@ -86,14 +86,14 @@ export function LandingHeader() {
         <div className="hidden md:flex items-center gap-4">
           <Link
             to="/auth?mode=login&redirect=/farmasoft"
-            className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-600 hover:text-[#0369A1]" : "text-white/70 hover:text-white"}`}
+            className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-600 hover:text-[#1E4D8C]" : "text-white/70 hover:text-white"}`}
           >
             Log in
           </Link>
           <Link
             to="/contact"
             className="text-sm font-semibold px-6 py-2.5 text-white transition-all hover:opacity-90"
-            style={{ background: "#0369A1" }}
+            style={{ background: "#1E4D8C" }}
           >
             Book a Demo
           </Link>
@@ -129,7 +129,7 @@ export function LandingHeader() {
               to="/contact"
               onClick={() => setIsMenuOpen(false)}
               className="w-full py-3 px-4 text-sm font-bold text-white text-center mt-2"
-              style={{ background: "#0369A1" }}
+              style={{ background: "#1E4D8C" }}
             >
               Book a Demo
             </Link>
