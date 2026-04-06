@@ -154,7 +154,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       // If blockquote is purely actions, render as action group
       if (actionChildren.length > 0 && !hasNonAction && onSendMessage) {
         return (
-          <div className="my-4 space-y-1.5">
+          <div className="my-4 space-y-2.5">
             {actionChildren.map((a) => (
               <ActionButton key={a.key} text={a.text} onSend={onSendMessage} />
             ))}
