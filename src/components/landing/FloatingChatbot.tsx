@@ -261,7 +261,12 @@ export function FloatingChatbot() {
               {/* Messages */}
               <div className="min-w-0">
                 {messages.map((msg, i) => (
-                  <ChatMessage key={i} message={msg} index={i} />
+                  <ChatMessage
+                    key={i}
+                    message={msg}
+                    index={i}
+                    isStreaming={isLoading && msg.role === "assistant" && i === messages.length - 1}
+                  />
                 ))}
               </div>
 
