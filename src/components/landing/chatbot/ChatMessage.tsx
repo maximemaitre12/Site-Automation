@@ -1,5 +1,6 @@
 import { AetherMarkdownRenderer } from "./AetherMarkdownRenderer";
 import { WidgetShimmer } from "./WidgetShimmer";
+import { normalizeAetherMarkdown } from "./normalizeAetherMarkdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -9,19 +10,17 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
-/**
- * Split assistant content into widget segments using --- or ## boundaries.
- * Each segment is rendered independently with staggered fade-in.
- */
 function splitWidgetSegments(content: string): string[] {
-  // Split on horizontal rules or ## headers (keep headers with their content)
-  const raw = content.split(/\n---\n/);
-  const segments: string[] = [];
-  for (const part of raw) {
-    const trimmed = part.trim();
-    if (trimmed) segments.push(trimmed);
-  }
-  return segments.length > 0 ? segments : [content];
+  const segments = content
+    .split(/\n\s*---\s*\n/g)
+    .flatMap((part) =>
+      part
+        .split(/(?=^##\s)/m)
+        .map((segment) => segment.trim())
+        .filter(Boolean)
+    );
+
+  return segments.length > 0 ? segments : [content.trim()];
 }
 
 export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
@@ -43,8 +42,8 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
     );
   }
 
-  // Assistant: progressive widget rendering
-  const segments = splitWidgetSegments(message.content);
+  const normalizedContent = normalizeAetherMarkdown(message.content);
+  const segments = splitWidgetSegments(normalizedContent);
 
   return (
     <div
@@ -67,7 +66,6 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
         </div>
       ))}
 
-      {/* Trailing shimmer while still streaming */}
       {isStreaming && <WidgetShimmer />}
     </div>
   );

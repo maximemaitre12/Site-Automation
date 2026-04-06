@@ -23,7 +23,7 @@ const components: Components = {
     </div>
   ),
   p: ({ children }) => (
-    <p className="my-2 first:mt-0 last:mb-0 text-[13px] leading-[1.75] break-words">{children}</p>
+    <p className="my-2 first:mt-0 last:mb-0 text-[13px] leading-[1.75] break-words whitespace-pre-line">{children}</p>
   ),
   strong: ({ children }) => (
     <strong className="font-semibold text-[#0F172A]">{children}</strong>
@@ -37,12 +37,12 @@ const components: Components = {
   li: ({ children }) => (
     <li className="flex items-start gap-2 text-[13px] leading-[1.65]">
       <span className="w-1 h-1 rounded-full bg-[#94A3B8] mt-[9px] shrink-0" />
-      <span className="flex-1 min-w-0 break-words">{children}</span>
+      <span className="flex-1 min-w-0 break-words whitespace-pre-line">{children}</span>
     </li>
   ),
   blockquote: ({ children }) => (
     <div className="my-4 px-4 py-3.5 bg-[#F8FAFC] border border-[#F1F5F9] rounded-xl">
-      <div className="text-[12.5px] text-[#334155] leading-[1.7]">{children}</div>
+      <div className="text-[12.5px] text-[#334155] leading-[1.7] whitespace-pre-line">{children}</div>
     </div>
   ),
   pre: ({ children }) => (
