@@ -9,6 +9,58 @@ interface AetherMarkdownRendererProps {
   onSendMessage?: (message: string) => void;
 }
 
+/** Recursively extract all text from React children (including nested <strong>, <em>, etc.) */
+function extractText(children: React.ReactNode): string {
+  let text = "";
+  React.Children.forEach(children, (child) => {
+    if (typeof child === "string") {
+      text += child;
+    } else if (typeof child === "number") {
+      text += String(child);
+    } else if (React.isValidElement(child) && child.props?.children) {
+      text += extractText(child.props.children);
+    }
+  });
+  return text;
+}
+
+/** Render a clickable action button for → lines */
+function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) => void }) {
+  return (
+    <button
+      onClick={() => onSend(text)}
+      className="group w-full text-left flex items-center gap-2.5 my-1.5 px-3.5 py-2.5 rounded-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
+      style={{
+        background: "linear-gradient(135deg, rgba(3,105,161,0.06) 0%, rgba(56,189,248,0.04) 100%)",
+        border: "1px solid rgba(3,105,161,0.12)",
+      }}
+    >
+      <span
+        className="w-5 h-5 rounded-md flex items-center justify-center text-[11px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+        style={{ background: "linear-gradient(135deg, #0369A1, #38BDF8)", color: "white" }}
+      >
+        →
+      </span>
+      <span className="flex-1 text-[12px] font-medium text-[#0369A1] group-hover:text-[#0284C7] transition-colors">
+        {text}
+      </span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#0369A1]/40 group-hover:text-[#0369A1]/70 transition-colors shrink-0">
+        <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    </button>
+  );
+}
+
+/** Check if children represent a → action line, return cleaned text or null */
+function getActionText(children: React.ReactNode): string | null {
+  const text = extractText(children).trim();
+  if (text.startsWith("→")) {
+    const actionText = text.replace(/^→\s*/, "").trim();
+    return actionText || null;
+  }
+  return null;
+}
+
 function buildComponents(onSendMessage?: (msg: string) => void): Components {
   return {
     h1: ({ children }) => (
@@ -35,45 +87,10 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       </div>
     ),
     p: ({ children }) => {
-      // Check if this paragraph contains a "→" action line
-      const childArray = React.Children.toArray(children);
-      const textContent = childArray
-        .map(c => (typeof c === "string" ? c : ""))
-        .join("")
-        .trim();
-
-      if (textContent.startsWith("→") && onSendMessage) {
-        const actionText = textContent.replace(/^→\s*/, "").trim();
-        if (actionText) {
-          return (
-            <button
-              onClick={() => onSendMessage(actionText)}
-              className="group w-full text-left flex items-center gap-2.5 my-1.5 px-3.5 py-2.5 rounded-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
-              style={{
-                background: "linear-gradient(135deg, rgba(3,105,161,0.06) 0%, rgba(56,189,248,0.04) 100%)",
-                border: "1px solid rgba(3,105,161,0.12)",
-              }}
-            >
-              <span
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[11px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-                style={{
-                  background: "linear-gradient(135deg, #0369A1, #38BDF8)",
-                  color: "white",
-                }}
-              >
-                →
-              </span>
-              <span className="flex-1 text-[12px] font-medium text-[#0369A1] group-hover:text-[#0284C7] transition-colors">
-                {actionText}
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#0369A1]/40 group-hover:text-[#0369A1]/70 transition-colors shrink-0">
-                <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          );
-        }
+      const actionText = onSendMessage ? getActionText(children) : null;
+      if (actionText) {
+        return <ActionButton text={actionText} onSend={onSendMessage!} />;
       }
-
       return (
         <p className="my-2 first:mt-0 last:mb-0 text-[12.5px] leading-[1.8] break-words whitespace-pre-line text-[#475569]">
           {children}
@@ -89,33 +106,81 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
     ol: ({ children }) => (
       <ol className="my-2.5 space-y-2 pl-4 list-decimal marker:text-[#94A3B8] marker:text-[11px]">{children}</ol>
     ),
-    li: ({ children }) => (
-      <li className="flex items-start gap-2.5 text-[12.5px] leading-[1.7]">
-        <span
-          className="w-[5px] h-[5px] rounded-full mt-[8px] shrink-0"
-          style={{ background: "linear-gradient(135deg, #0369A1, #38BDF8)" }}
-        />
-        <span className="flex-1 min-w-0 break-words whitespace-pre-line text-[#475569]">{children}</span>
-      </li>
-    ),
-    blockquote: ({ children }) => (
-      <div
-        className="my-4 rounded-xl overflow-hidden flex"
-        style={{
-          background: "linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.7) 100%)",
-          border: "1px solid rgba(226,232,240,0.6)",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.02), 0 4px 16px rgba(3,105,161,0.03)",
-        }}
-      >
+    li: ({ children }) => {
+      const actionText = onSendMessage ? getActionText(children) : null;
+      if (actionText) {
+        return (
+          <li className="list-none pl-0">
+            <ActionButton text={actionText} onSend={onSendMessage!} />
+          </li>
+        );
+      }
+      return (
+        <li className="flex items-start gap-2.5 text-[12.5px] leading-[1.7]">
+          <span
+            className="w-[5px] h-[5px] rounded-full mt-[8px] shrink-0"
+            style={{ background: "linear-gradient(135deg, #0369A1, #38BDF8)" }}
+          />
+          <span className="flex-1 min-w-0 break-words whitespace-pre-line text-[#475569]">{children}</span>
+        </li>
+      );
+    },
+    blockquote: ({ children }) => {
+      // Check if ALL children inside are → actions — if so, render as action group
+      const childArray = React.Children.toArray(children);
+      const actionChildren: { text: string; key: string | number }[] = [];
+      let hasNonAction = false;
+
+      childArray.forEach((child, i) => {
+        if (React.isValidElement(child)) {
+          const text = getActionText(child.props?.children);
+          if (text) {
+            actionChildren.push({ text, key: i });
+          } else {
+            // Check if it's an empty/whitespace-only element
+            const t = extractText(child.props?.children).trim();
+            if (t.length > 0) hasNonAction = true;
+          }
+        } else if (typeof child === "string" && child.trim()) {
+          const t = child.trim();
+          if (t.startsWith("→")) {
+            actionChildren.push({ text: t.replace(/^→\s*/, "").trim(), key: i });
+          } else {
+            hasNonAction = true;
+          }
+        }
+      });
+
+      // If blockquote is purely actions, render as action group
+      if (actionChildren.length > 0 && !hasNonAction && onSendMessage) {
+        return (
+          <div className="my-4 space-y-1.5">
+            {actionChildren.map((a) => (
+              <ActionButton key={a.key} text={a.text} onSend={onSendMessage} />
+            ))}
+          </div>
+        );
+      }
+
+      return (
         <div
-          className="w-[3px] shrink-0 rounded-l-xl"
-          style={{ background: "linear-gradient(180deg, #0369A1 0%, #38BDF8 60%, #7DD3FC 100%)" }}
-        />
-        <div className="px-4 py-3.5 flex-1 min-w-0">
-          <div className="text-[12px] text-[#334155] leading-[1.85] whitespace-pre-line">{children}</div>
+          className="my-4 rounded-xl overflow-hidden flex"
+          style={{
+            background: "linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.7) 100%)",
+            border: "1px solid rgba(226,232,240,0.6)",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.02), 0 4px 16px rgba(3,105,161,0.03)",
+          }}
+        >
+          <div
+            className="w-[3px] shrink-0 rounded-l-xl"
+            style={{ background: "linear-gradient(180deg, #0369A1 0%, #38BDF8 60%, #7DD3FC 100%)" }}
+          />
+          <div className="px-4 py-3.5 flex-1 min-w-0">
+            <div className="text-[12px] text-[#334155] leading-[1.85] whitespace-pre-line">{children}</div>
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
     pre: ({ children }) => (
       <div
         className="my-4 rounded-xl text-[11.5px] font-mono p-4 overflow-x-auto max-w-full relative"
