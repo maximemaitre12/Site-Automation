@@ -161,7 +161,7 @@ export function FloatingChatbot() {
           <div
             className="relative w-[54px] h-[54px] rounded-2xl flex items-center justify-center transition-all duration-300 ease-out hover:scale-[1.06] active:scale-[0.95]"
             style={{
-              background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+              background: "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)",
               boxShadow: "0 4px 20px -4px rgba(15,23,42,0.35), 0 8px 32px -8px rgba(3,105,161,0.2)",
             }}
           >
