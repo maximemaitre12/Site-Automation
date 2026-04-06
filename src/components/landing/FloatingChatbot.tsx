@@ -330,6 +330,7 @@ export function FloatingChatbot() {
                     message={msg}
                     index={i}
                     isStreaming={isLoading && msg.role === "assistant" && i === messages.length - 1}
+                    onSendMessage={send}
                   />
                 ))}
               </div>

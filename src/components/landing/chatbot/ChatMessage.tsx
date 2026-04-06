@@ -91,7 +91,7 @@ export function ChatMessage({ message, index, isStreaming, onSendMessage }: Chat
                   padding: "14px 16px",
                 }}
               >
-                <AetherMarkdownRenderer content={segment} />
+                <AetherMarkdownRenderer content={segment} onSendMessage={onSendMessage} />
               </div>
             )}
           </div>
