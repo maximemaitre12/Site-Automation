@@ -378,8 +378,8 @@ export function FloatingChatbot() {
                     disabled={isLoading || !input.trim()}
                     className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 disabled:opacity-20"
                     style={{
-                      background: isLoading || !input.trim() ? "#E2E8F0" : "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-                      boxShadow: isLoading || !input.trim() ? "none" : "0 2px 8px rgba(15,23,42,0.2)",
+                      background: isLoading || !input.trim() ? "#E2E8F0" : "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)",
+                      boxShadow: isLoading || !input.trim() ? "none" : "0 2px 8px rgba(2,132,199,0.3)",
                     }}
                   >
                     {isLoading ? (
