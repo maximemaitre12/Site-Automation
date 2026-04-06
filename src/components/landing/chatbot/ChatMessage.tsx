@@ -53,20 +53,33 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
         animationDelay: `${Math.min(index * 30, 120)}ms`,
       }}
     >
-      {segments.map((segment, i) => (
-        <div
-          key={i}
-          className={i > 0 ? "mt-4" : ""}
-          style={{
-            animation: "aetherMsgIn 220ms ease-out both",
-            animationDelay: `${i * 60}ms`,
-          }}
-        >
-          <AetherMarkdownRenderer content={segment} />
-        </div>
-      ))}
+      {segments.map((segment, i) => {
+        // During streaming, the last segment is still being written — show shimmer overlay
+        const isLastSegment = i === segments.length - 1;
+        const showShimmerOverlay = isStreaming && isLastSegment && segment.length < 40;
 
-      {isStreaming && <WidgetShimmer />}
+        return (
+          <div
+            key={i}
+            className={`relative ${i > 0 ? "mt-4" : ""}`}
+            style={{
+              animation: "aetherWidgetIn 280ms ease-out both",
+              animationDelay: `${i * 80}ms`,
+            }}
+          >
+            {showShimmerOverlay ? (
+              <WidgetShimmer />
+            ) : (
+              <AetherMarkdownRenderer content={segment} />
+            )}
+          </div>
+        );
+      })}
+
+      {/* Trailing shimmer for the next widget that hasn't started yet */}
+      {isStreaming && (
+        <WidgetShimmer />
+      )}
     </div>
   );
 }
