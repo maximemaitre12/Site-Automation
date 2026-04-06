@@ -161,7 +161,7 @@ export function FloatingChatbot() {
           <div
             className="relative w-[54px] h-[54px] rounded-2xl flex items-center justify-center transition-all duration-300 ease-out hover:scale-[1.06] active:scale-[0.95]"
             style={{
-              background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+              background: "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)",
               boxShadow: "0 4px 20px -4px rgba(15,23,42,0.35), 0 8px 32px -8px rgba(3,105,161,0.2)",
             }}
           >
@@ -199,7 +199,7 @@ export function FloatingChatbot() {
           <div
             className="shrink-0 px-5 py-3.5 flex items-center justify-between"
             style={{
-              background: "linear-gradient(180deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.92) 100%)",
+              background: "linear-gradient(160deg, rgba(3,132,199,0.95) 0%, rgba(8,145,178,0.92) 100%)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
             }}
@@ -308,7 +308,7 @@ export function FloatingChatbot() {
                         }}
                       >
                         <span className="w-8 h-8 rounded-lg flex items-center justify-center text-[14px] shrink-0"
-                          style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)", color: "#38BDF8" }}
+                          style={{ background: "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)", color: "#fff" }}
                         >
                           {icon}
                         </span>
@@ -378,8 +378,8 @@ export function FloatingChatbot() {
                     disabled={isLoading || !input.trim()}
                     className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 disabled:opacity-20"
                     style={{
-                      background: isLoading || !input.trim() ? "#E2E8F0" : "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-                      boxShadow: isLoading || !input.trim() ? "none" : "0 2px 8px rgba(15,23,42,0.2)",
+                      background: isLoading || !input.trim() ? "#E2E8F0" : "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)",
+                      boxShadow: isLoading || !input.trim() ? "none" : "0 2px 8px rgba(2,132,199,0.3)",
                     }}
                   >
                     {isLoading ? (
