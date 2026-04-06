@@ -1,7 +1,7 @@
 export function ThinkingIndicator() {
   return (
     <div
-      className="absolute bottom-0 left-0 right-0 z-20 px-5 pb-3 pointer-events-none"
+      className="shrink-0 px-5 py-2 pointer-events-none"
       style={{ animation: "aetherMsgIn 150ms ease-out" }}
     >
       <div

@@ -23,16 +23,24 @@ export function FloatingChatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to bottom only on new messages, not every chunk
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
 
   useEffect(() => {
     if (open && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 200);
+    }
+  }, [open]);
+
+  // Lock body scroll when panel is open on mobile
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
     }
   }, [open]);
 
@@ -139,7 +147,7 @@ export function FloatingChatbot() {
   }, [input, isLoading, messages]);
 
   const panelClasses = isFullscreen
-    ? "fixed inset-0 z-50 flex flex-col bg-white"
+    ? "fixed inset-0 z-50 flex flex-col bg-white overflow-hidden"
     : "fixed z-50 flex flex-col overflow-hidden bottom-0 right-0 w-full h-[100dvh] sm:bottom-5 sm:right-5 sm:w-[420px] sm:h-[600px] sm:rounded-2xl bg-white sm:shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_8px_40px_-8px_rgba(0,0,0,0.12),0_20px_60px_-15px_rgba(0,0,0,0.06)]";
 
   return (
@@ -162,7 +170,10 @@ export function FloatingChatbot() {
       {open && (
         <div
           className={panelClasses}
-          style={{ animation: "aetherPanelIn 280ms cubic-bezier(0.16, 1, 0.3, 1)" }}
+          style={{
+            animation: "aetherPanelIn 280ms cubic-bezier(0.16, 1, 0.3, 1)",
+            overscrollBehavior: "contain",
+          }}
         >
           {/* Header — FIXED */}
           <div
@@ -180,7 +191,7 @@ export function FloatingChatbot() {
             <div className="flex items-center gap-0.5">
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F8FAFC] transition-colors duration-150"
+                className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center hover:bg-[#F8FAFC] transition-colors duration-150"
               >
                 {isFullscreen ? (
                   <Minimize2 className="w-[15px] h-[15px] text-[#94A3B8]" />
@@ -197,11 +208,15 @@ export function FloatingChatbot() {
             </div>
           </div>
 
-          {/* Messages area — SCROLLABLE with relative positioning for overlay */}
-          <div className="flex-1 overflow-y-auto relative" ref={scrollRef} style={{ scrollBehavior: "smooth" }}>
-            {/* Watermark */}
+          {/* Messages area — SCROLLABLE, locked horizontal */}
+          <div
+            className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative"
+            ref={scrollRef}
+            style={{ overscrollBehavior: "contain" }}
+          >
+            {/* Watermark — clipped inside scroll area */}
             <div
-              className="pointer-events-none absolute bottom-0 right-0 w-[280px] h-[280px] translate-x-[20%] translate-y-[10%]"
+              className="pointer-events-none absolute bottom-0 right-0 w-[280px] h-[280px] overflow-hidden"
               style={{
                 opacity: isLoading ? 0.07 : 0.035,
                 transition: "opacity 1.5s ease-in-out",
@@ -215,7 +230,7 @@ export function FloatingChatbot() {
               />
             </div>
 
-            <div className={`relative z-10 px-5 py-5 ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
+            <div className={`relative z-10 px-5 py-5 min-w-0 ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
               {/* Assistant label */}
               {messages.length > 0 && (
                 <p className="text-[10px] text-[#94A3B8] tracking-wide mb-5">
@@ -244,25 +259,23 @@ export function FloatingChatbot() {
               )}
 
               {/* Messages */}
-              <div>
+              <div className="min-w-0">
                 {messages.map((msg, i) => (
                   <ChatMessage key={i} message={msg} index={i} />
                 ))}
               </div>
 
-              {/* Bottom padding for thinking overlay */}
-              {isLoading && messages[messages.length - 1]?.role === "user" && (
-                <div className="h-12" />
-              )}
+              {/* Scroll anchor */}
+              <div ref={bottomRef} className="h-px" />
             </div>
-
-            {/* Thinking overlay — ABSOLUTE, never pushes layout */}
-            {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <ThinkingIndicator />
-            )}
           </div>
 
-          {/* Input — FIXED */}
+          {/* Thinking overlay — ABSOLUTE over input, zero layout impact */}
+          {isLoading && messages[messages.length - 1]?.role === "user" && (
+            <ThinkingIndicator />
+          )}
+
+          {/* Input — FIXED at bottom */}
           <div className="shrink-0 border-t border-[#F1F5F9] bg-white">
             <div className={`px-4 py-3 ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
               <div className="flex items-center gap-2">
@@ -273,7 +286,7 @@ export function FloatingChatbot() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
                   placeholder="Ask anything…"
-                  className="flex-1 text-[13px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#F1F5F9] outline-none transition-all duration-150 placeholder:text-[#94A3B8] focus:border-[#0369A1]/25 focus:bg-white focus:shadow-[0_0_0_3px_rgba(3,105,161,0.06)] text-[#0F172A]"
+                  className="flex-1 min-w-0 text-[13px] px-4 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#F1F5F9] outline-none transition-all duration-150 placeholder:text-[#94A3B8] focus:border-[#0369A1]/25 focus:bg-white focus:shadow-[0_0_0_3px_rgba(3,105,161,0.06)] text-[#0F172A]"
                   disabled={isLoading}
                 />
                 <button
@@ -290,7 +303,7 @@ export function FloatingChatbot() {
               </div>
             </div>
             {/* Trust footer */}
-            <div className={`px-5 pb-3 ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
+            <div className={`px-5 pb-3 pb-[max(12px,env(safe-area-inset-bottom))] ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
               <p className="text-[9px] leading-[1.5] text-[#CBD5E1] text-center">
                 Outputs are indicative and based on typical industry setups.
                 Detailed audit required for precise assessment.
