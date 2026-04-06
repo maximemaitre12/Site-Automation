@@ -36,13 +36,18 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
         }}
       >
         <div
-          className="max-w-[85%] px-4 py-2.5 text-white text-[13px] leading-relaxed break-words"
+          className="max-w-[85%] px-4 py-2.5 text-white text-[13px] leading-relaxed break-words relative overflow-hidden"
           style={{
             borderRadius: "18px 18px 6px 18px",
             background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-            boxShadow: "0 2px 8px rgba(15,23,42,0.15)",
+            boxShadow: "0 2px 12px rgba(15,23,42,0.18), 0 1px 3px rgba(0,0,0,0.08)",
           }}
         >
+          {/* Subtle top shine */}
+          <div
+            className="absolute top-0 left-0 right-0 h-px"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)" }}
+          />
           {message.content}
         </div>
       </div>
@@ -67,7 +72,7 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
         return (
           <div
             key={i}
-            className={`relative ${i > 0 ? "mt-3" : ""}`}
+            className={`relative ${i > 0 ? "mt-4" : ""}`}
             style={{
               animation: "aetherWidgetIn 300ms ease-out both",
               animationDelay: `${i * 90}ms`,
@@ -76,7 +81,17 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
             {showShimmerOverlay ? (
               <WidgetShimmer />
             ) : (
-              <AetherMarkdownRenderer content={segment} />
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{
+                  background: "linear-gradient(160deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.8) 100%)",
+                  border: "1px solid rgba(226,232,240,0.5)",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.02), 0 4px 16px rgba(3,105,161,0.015)",
+                  padding: "14px 16px",
+                }}
+              >
+                <AetherMarkdownRenderer content={segment} />
+              </div>
             )}
           </div>
         );
