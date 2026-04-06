@@ -115,7 +115,7 @@ FLOW RULE:
 Flows must NEVER be crammed inline. Use vertical format with ↓ between steps.
 Maximum 4–5 steps, short labels.
 
-TEXT DENSITY: Max 2 lines per paragraph. Prefer bullets and blocks.
+TEXT DENSITY: Max 4 lines per paragraph. Use bullets and blocks but include enough detail to be useful.
 VISUAL BREATHING: Add spacing between every block. No compact stacking.
 MOBILE-FIRST (400px): Tables max 3 columns, flows max 5 steps, blockquotes max 8 lines.
 
