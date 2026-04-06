@@ -68,11 +68,11 @@ function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) =>
     >
       <span
         className="w-5 h-5 rounded-md flex items-center justify-center text-[11px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-        style={{ background: "linear-gradient(135deg, #0369A1, #0284C7)", color: "white" }}
+        style={{ background: "linear-gradient(135deg, #0369A1, #0369A1)", color: "white" }}
       >
         →
       </span>
-      <span className="flex-1 text-[12px] font-medium text-[#0369A1] group-hover:text-[#0284C7] transition-colors">
+      <span className="flex-1 text-[12px] font-medium text-[#0369A1] group-hover:text-[#0369A1] transition-colors">
         {text}
       </span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#0369A1]/40 group-hover:text-[#0369A1]/70 transition-colors shrink-0">
@@ -132,7 +132,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       <div className="flex items-center gap-2.5 mt-6 mb-3 first:mt-0">
         <div
           className="w-[3px] h-[16px] rounded-full shrink-0"
-          style={{ background: "linear-gradient(180deg, #0369A1 0%, #0284C7 100%)" }}
+          style={{ background: "linear-gradient(180deg, #0369A1 0%, #0369A1 100%)" }}
         />
         <span className="text-[9.5px] font-bold tracking-[0.16em] uppercase" style={{ color: "#0369A1" }}>
           {children}
@@ -181,7 +181,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         <li className="flex items-start gap-2.5 text-[12.5px] leading-[1.7]">
           <span
             className="w-[5px] h-[5px] rounded-full mt-[8px] shrink-0"
-            style={{ background: "linear-gradient(135deg, #0369A1, #0284C7)" }}
+            style={{ background: "linear-gradient(135deg, #0369A1, #0369A1)" }}
           />
           <span className="flex-1 min-w-0 break-words whitespace-pre-line text-[#475569]">{children}</span>
         </li>
@@ -205,7 +205,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         >
           <div
             className="w-[3px] shrink-0 rounded-l-xl"
-            style={{ background: "linear-gradient(180deg, #0369A1 0%, #0284C7 60%, #7DD3FC 100%)" }}
+            style={{ background: "linear-gradient(180deg, #0369A1 0%, #0369A1 60%, #5BA3C9 100%)" }}
           />
           <div className="px-4 py-3.5 flex-1 min-w-0">
             <div className="text-[12px] text-[#334155] leading-[1.85] whitespace-pre-line">{children}</div>
@@ -286,7 +286,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E2E8F0] to-transparent" />
         <div
           className="w-1 h-1 rounded-full shrink-0"
-          style={{ background: "linear-gradient(135deg, #0369A1, #0284C7)" }}
+          style={{ background: "linear-gradient(135deg, #0369A1, #0369A1)" }}
         />
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E2E8F0] to-transparent" />
       </div>
