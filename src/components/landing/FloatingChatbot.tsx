@@ -164,7 +164,7 @@ export function FloatingChatbot() {
           className={panelClasses}
           style={{ animation: "aetherPanelIn 280ms cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
-          {/* Header */}
+          {/* Header — FIXED */}
           <div
             className="shrink-0 px-5 py-3.5 flex items-center justify-between border-b border-[#F1F5F9]"
             style={{ backgroundColor: "rgba(255,255,255,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
@@ -197,8 +197,8 @@ export function FloatingChatbot() {
             </div>
           </div>
 
-          {/* Messages area */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto relative" style={{ scrollBehavior: "smooth" }}>
+          {/* Messages area — SCROLLABLE with relative positioning for overlay */}
+          <div className="flex-1 overflow-y-auto relative" ref={scrollRef} style={{ scrollBehavior: "smooth" }}>
             {/* Watermark */}
             <div
               className="pointer-events-none absolute bottom-0 right-0 w-[280px] h-[280px] translate-x-[20%] translate-y-[10%]"
@@ -218,7 +218,7 @@ export function FloatingChatbot() {
             <div className={`relative z-10 px-5 py-5 ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
               {/* Assistant label */}
               {messages.length > 0 && (
-                <p className="text-[10px] text-[#94A3B8] tracking-wide mb-4">
+                <p className="text-[10px] text-[#94A3B8] tracking-wide mb-5">
                   Aether Assistant • Live
                 </p>
               )}
@@ -244,19 +244,25 @@ export function FloatingChatbot() {
               )}
 
               {/* Messages */}
-              <div className="space-y-3">
+              <div>
                 {messages.map((msg, i) => (
                   <ChatMessage key={i} message={msg} index={i} />
                 ))}
-
-                {isLoading && messages[messages.length - 1]?.role === "user" && (
-                  <ThinkingIndicator />
-                )}
               </div>
+
+              {/* Bottom padding for thinking overlay */}
+              {isLoading && messages[messages.length - 1]?.role === "user" && (
+                <div className="h-12" />
+              )}
             </div>
+
+            {/* Thinking overlay — ABSOLUTE, never pushes layout */}
+            {isLoading && messages[messages.length - 1]?.role === "user" && (
+              <ThinkingIndicator />
+            )}
           </div>
 
-          {/* Input */}
+          {/* Input — FIXED */}
           <div className="shrink-0 border-t border-[#F1F5F9] bg-white">
             <div className={`px-4 py-3 ${isFullscreen ? "max-w-3xl mx-auto" : ""}`}>
               <div className="flex items-center gap-2">
@@ -307,10 +313,9 @@ export function FloatingChatbot() {
           0%, 100% { opacity: 0.6; }
           50% { opacity: 1; }
         }
-        @keyframes aetherProgress {
-          0% { width: 0%; }
-          50% { width: 100%; }
-          100% { width: 0%; }
+        @keyframes aetherDot {
+          0%, 100% { opacity: 0.4; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
         }
       `}</style>
     </>
