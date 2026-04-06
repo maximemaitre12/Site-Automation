@@ -29,7 +29,7 @@ function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) =>
   return (
     <button
       onClick={() => onSend(text)}
-      className="group w-full text-left flex items-center gap-2.5 my-1.5 px-3.5 py-2.5 rounded-lg transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
+      className="group w-full text-left flex items-center gap-2.5 px-3.5 py-3 rounded-xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] cursor-pointer"
       style={{
         background: "linear-gradient(135deg, rgba(3,105,161,0.06) 0%, rgba(56,189,248,0.04) 100%)",
         border: "1px solid rgba(3,105,161,0.12)",
@@ -154,7 +154,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       // If blockquote is purely actions, render as action group
       if (actionChildren.length > 0 && !hasNonAction && onSendMessage) {
         return (
-          <div className="my-4 space-y-1.5">
+          <div className="my-4 space-y-2.5">
             {actionChildren.map((a) => (
               <ActionButton key={a.key} text={a.text} onSend={onSendMessage} />
             ))}
