@@ -199,7 +199,7 @@ export function FloatingChatbot() {
           <div
             className="shrink-0 px-5 py-3.5 flex items-center justify-between"
             style={{
-              background: "linear-gradient(160deg, rgba(3,132,199,0.95) 0%, rgba(8,145,178,0.92) 100%)",
+              background: "#1E4D8C",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
             }}
