@@ -67,13 +67,13 @@ export function LandingHeader() {
                 {item.label}
               </Link>
             ) : (
-              <a
+              <button
                 key={item.label}
-                href={item.href}
+                onClick={() => handleHashClick(item.href)}
                 className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
-              </a>
+              </button>
             )
           )}
         </nav>
