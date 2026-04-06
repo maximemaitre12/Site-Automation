@@ -3,6 +3,7 @@ import { X, Send, Loader2, Maximize2, Minimize2 } from "lucide-react";
 import { ChatMessage } from "./chatbot/ChatMessage";
 import { ThinkingIndicator } from "./chatbot/ThinkingIndicator";
 import aetherWatermark from "@/assets/aether-watermark.png";
+import aetherLogoIcon from "@/assets/aether-logo-icon.png";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -204,14 +205,13 @@ export function FloatingChatbot() {
             }}
           >
             <div className="flex items-center gap-3">
-              {/* Status dot */}
-              <div className="relative">
-                <div className="w-2 h-2 rounded-full bg-[#38BDF8]" />
-                <div
-                  className="absolute inset-0 w-2 h-2 rounded-full bg-[#38BDF8]"
-                  style={{ animation: "aetherStatusPing 2s ease-out infinite" }}
-                />
-              </div>
+              {/* Logo icon */}
+              <img
+                src={aetherLogoIcon}
+                alt="Aether"
+                className="w-7 h-7"
+                style={{ filter: "brightness(0) invert(1)" }}
+              />
               <div>
                 <p className="text-[13.5px] font-semibold text-white tracking-[-0.01em]">
                   Aether Assistant
