@@ -7,7 +7,7 @@ export function PharmaHero() {
     <section
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, #0369A1 0%, #0891B2 35%, #06B6D4 70%, #22D3EE 100%)",
+        background: "linear-gradient(160deg, #0369A1 0%, #0369A1 35%, #0369A1 70%, #0369A1 100%)",
       }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

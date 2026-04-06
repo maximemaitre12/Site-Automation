@@ -17,25 +17,25 @@ export function LandingFooter() {
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#94A3B8" }}>Expertise</p>
             <div className="space-y-3 text-sm" style={{ color: "#475569" }}>
-              <a href="#expertise" className="block hover:text-[#0891B2] transition-colors">Talent Pharma</a>
-              <a href="#expertise" className="block hover:text-[#0891B2] transition-colors">GMP Operations</a>
-              <a href="#expertise" className="block hover:text-[#0891B2] transition-colors">Regulatory Strategy</a>
-              <a href="#expertise" className="block hover:text-[#0891B2] transition-colors">Quality Systems</a>
+              <a href="#expertise" className="block hover:text-[#0369A1] transition-colors">Talent Pharma</a>
+              <a href="#expertise" className="block hover:text-[#0369A1] transition-colors">GMP Operations</a>
+              <a href="#expertise" className="block hover:text-[#0369A1] transition-colors">Regulatory Strategy</a>
+              <a href="#expertise" className="block hover:text-[#0369A1] transition-colors">Quality Systems</a>
             </div>
           </div>
 
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#94A3B8" }}>Company</p>
             <div className="space-y-3 text-sm" style={{ color: "#475569" }}>
-              <a href="#team" className="block hover:text-[#0891B2] transition-colors">About</a>
-              <a href="#case-study" className="block hover:text-[#0891B2] transition-colors">Case Study</a>
-              <Link to="/contact" className="block hover:text-[#0891B2] transition-colors">Contact</Link>
+              <a href="#team" className="block hover:text-[#0369A1] transition-colors">About</a>
+              <a href="#case-study" className="block hover:text-[#0369A1] transition-colors">Case Study</a>
+              <Link to="/contact" className="block hover:text-[#0369A1] transition-colors">Contact</Link>
             </div>
           </div>
 
           <div>
             <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#94A3B8" }}>Contact</p>
-            <a href="mailto:youriy.strashnyi@edu.em-lyon.com" className="block text-sm mb-2 hover:text-[#0891B2] transition-colors" style={{ color: "#475569" }}>
+            <a href="mailto:youriy.strashnyi@edu.em-lyon.com" className="block text-sm mb-2 hover:text-[#0369A1] transition-colors" style={{ color: "#475569" }}>
               youriy.strashnyi@edu.em-lyon.com
             </a>
             <a href="mailto:maxime.maitre@edu.em-lyon.com" className="block text-sm" style={{ color: "#475569" }} >
