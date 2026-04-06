@@ -308,7 +308,7 @@ export function TrainingsSection() {
 
                 {/* CTA */}
                 <a
-                  href="mailto:contact@aether-connect.com?subject=Formation IA — Demande d'information"
+                  href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA — Demande d'information"
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-white text-xs font-bold shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   <Download className="w-4 h-4" />
