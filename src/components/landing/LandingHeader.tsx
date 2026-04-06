@@ -25,7 +25,15 @@ export function LandingHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  return (
+  const handleHashClick = useCallback((href: string) => {
+    if (isLandingPage) {
+      const el = document.querySelector(href);
+      el?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/" + href);
+    }
+  }, [isLandingPage, navigate]);
+
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${(scrolled || isContactPage) ? "shadow-sm backdrop-blur-md" : ""}`}
       style={{
