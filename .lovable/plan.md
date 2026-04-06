@@ -1,64 +1,63 @@
 
-Objectif
 
-Stabiliser complètement le chatbot sur mobile et faire en sorte que les réponses ressemblent enfin à une pile de widgets premium, pas à un simple message markdown.
+## Plan: Shimmer Widgets + Structure Enforcement
 
-Constat actuel
+### What changes
 
-- `FloatingChatbot.tsx` a encore un faux “reserve space” pendant le streaming (`h-12`) : ça recrée du jump au moment du thinking state.
-- La zone messages ne bloque pas assez l’overflow horizontal : un tableau, un flow long, ou du code inline peuvent déclencher un glissement droite/gauche.
-- `AetherMarkdownRenderer.tsx` rend bien du markdown, mais pas encore de vrais “widgets”. En plus, la détection block code / inline code est trop fragile, donc certains flows peuvent sortir du cadre.
-- `supabase/functions/public-chat/index.ts` pousse vers des réponses structurées, mais pas encore assez “renderer-aware” pour produire des modules vraiment propres et compacts.
+Two areas: (1) front-end shimmer/progressive widget loading during streaming, and (2) system prompt update with shimmer generation + structure enforcement rules.
 
-Plan d’implémentation
+### 1. Front-end: Progressive shimmer widgets during streaming
 
-1. Stabiliser la coque mobile du chatbot
-- Garder `header` et `input` fixes.
-- Donner à la zone messages une hauteur interne stable avec scroll vertical uniquement.
-- Supprimer l’espace ajouté dynamiquement pendant le loading.
-- Faire du thinking state un vrai overlay absolu au-dessus de l’input, sans aucun impact sur le layout.
-- Ajouter les garde-fous mobile : `overflow-x-hidden`, `min-w-0`, et verrouillage du pan horizontal.
+**File: `src/components/landing/chatbot/ChatMessage.tsx`**
 
-2. Corriger la vraie source du “ça bouge à droite à gauche”
-- Encapsuler les tableaux dans un scroll horizontal interne au widget, jamais au niveau du panneau.
-- Faire wrap / clamp des flows longs et des contenus inline.
-- Corriger le renderer `code` pour distinguer correctement inline vs block, afin d’éviter les blocs qui élargissent le layout.
-- Vérifier aussi les largeurs max des messages et des widgets pour qu’aucun module ne puisse dépasser la largeur utile mobile.
+During streaming (content still arriving), split the assistant's streamed content by widget boundaries (double newlines / section headers). Widgets whose content is complete get rendered normally. The "next" widget that hasn't arrived yet shows as a shimmer skeleton placeholder. This creates the progressive build effect.
 
-3. Transformer les réponses en vraie stack de widgets
-- Renforcer la séparation entre modules dans `ChatMessage.tsx`.
-- Faire ressortir les cartes système, blocs résumé, blocs décision, recommandations, risques.
-- Donner plus de rythme visuel entre sections, tableaux, flows et cards.
-- Garder l’ensemble compact et scannable, sans retomber dans une grosse bulle uniforme.
+Logic:
+- Parse streamed markdown into segments (split on `## ` headers or `---` or double blank lines)
+- Fully received segments → render via `AetherMarkdownRenderer`
+- If still streaming → append 1 shimmer skeleton block after the last real segment
+- Each segment fades in with a staggered animation
 
-4. Aligner le prompt avec le renderer
-- Remplacer le prompt actuel par ta nouvelle version “premium response widgets”.
-- Forcer des patterns stables que le front sait bien styliser : titres de section, blockquotes/cartes, tableaux compacts, flows courts, decision blocks, recommendation panels.
-- Ajouter une contrainte de compacité pour éviter les tableaux trop larges et les longs paragraphes qui cassent le mobile.
+**File: `src/components/landing/chatbot/WidgetShimmer.tsx`** (new)
 
-5. Validation ciblée
-- Vérifier en viewport mobile réel (440px) :
-  - ouverture / fermeture
-  - quick actions
-  - réponse courte
-  - réponse avec plusieurs cards
-  - tableau
-  - flow
-  - streaming / thinking state
-- Critères de réussite :
-  - plus aucun shift horizontal
-  - plus aucun jump au démarrage / arrêt du thinking
-  - widgets lisibles, respirants, et bien séparés
-  - rendu assistant perçu comme un outil, pas comme un chat
+A small component rendering 3-4 animated skeleton lines with a pulse animation, styled to match the widget card aesthetic (rounded corners, `#F8FAFC` background, subtle border).
 
-Détails techniques
+**File: `src/components/landing/FloatingChatbot.tsx`**
 
-Fichiers principaux à modifier :
-- `src/components/landing/FloatingChatbot.tsx`
-- `src/components/landing/chatbot/ThinkingIndicator.tsx`
-- `src/components/landing/chatbot/AetherMarkdownRenderer.tsx`
-- `src/components/landing/chatbot/ChatMessage.tsx`
-- `supabase/functions/public-chat/index.ts`
+Pass `isStreaming` prop to `ChatMessage` for the last assistant message so it knows when to show the trailing shimmer.
 
-Ajustement de secours seulement si nécessaire :
-- clamp horizontal scoped au layout public / CSS global, mais seulement si le drift persiste après les fixes locaux du chatbot.
+### 2. System prompt: Shimmer + Structure enforcement
+
+**File: `supabase/functions/public-chat/index.ts`**
+
+Append to `BASE_SYSTEM_PROMPT`:
+
+- **SHIMMER GENERATION RULE**: Instruct the model to separate widgets with `---` (horizontal rule) so the front-end can reliably split segments. Each widget block must be self-contained between separators.
+
+- **STRUCTURE ENFORCEMENT RULE**: 
+  - Each data point on its own line
+  - Key-value format: Label on one line, value on next line
+  - Bullets always on separate lines
+  - Bold as visual anchor only, never inline decoration
+  - Cards: title → spacing → content (max 4-5 items) → spacing
+  - Max density: split into multiple cards if >5 items
+
+- **PROGRESSIVE BUILD RULE**: Order widgets from most important to least important so the progressive reveal feels intentional.
+
+### Technical details
+
+- The shimmer component uses Tailwind's `animate-pulse` on rounded bars
+- Widget segmentation uses a simple regex split on `\n---\n` or `\n## ` patterns
+- Each rendered segment gets a `fade-in` animation with staggered delay
+- The trailing shimmer disappears when streaming ends (no layout jump — it's simply removed)
+- `isStreaming` is determined by checking if the current message is the last one and `isLoading` is true
+
+### Files
+
+| File | Action |
+|------|--------|
+| `src/components/landing/chatbot/WidgetShimmer.tsx` | Create |
+| `src/components/landing/chatbot/ChatMessage.tsx` | Edit — add streaming segmentation + shimmer |
+| `src/components/landing/FloatingChatbot.tsx` | Edit — pass `isStreaming` to last assistant message |
+| `supabase/functions/public-chat/index.ts` | Edit — add shimmer/structure rules to prompt |
+
