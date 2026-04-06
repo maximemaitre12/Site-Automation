@@ -1,6 +1,6 @@
 import { Menu, X } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import aetherLogo from "@/assets/aether-logo-final.png";
 
 const navItems = [
@@ -14,7 +14,9 @@ export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isContactPage = location.pathname === "/contact";
+  const isLandingPage = location.pathname === "/" || location.pathname === "/index";
   const useDarkMode = scrolled || isContactPage;
 
   useEffect(() => {
@@ -22,6 +24,15 @@ export function LandingHeader() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleHashClick = useCallback((href: string) => {
+    if (isLandingPage) {
+      const el = document.querySelector(href);
+      el?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/" + href);
+    }
+  }, [isLandingPage, navigate]);
 
   return (
     <header
@@ -56,13 +67,13 @@ export function LandingHeader() {
                 {item.label}
               </Link>
             ) : (
-              <a
+              <button
                 key={item.label}
-                href={item.href}
+                onClick={() => handleHashClick(item.href)}
                 className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-700 hover:text-[#0891B2]" : "text-white/80 hover:text-white"}`}
               >
                 {item.label}
-              </a>
+              </button>
             )
           )}
         </nav>
@@ -104,9 +115,9 @@ export function LandingHeader() {
                   {item.label}
                 </Link>
               ) : (
-                <a key={item.label} href={item.href} onClick={() => setIsMenuOpen(false)} className="text-sm font-medium py-2 text-gray-700">
+                <button key={item.label} onClick={() => { handleHashClick(item.href); setIsMenuOpen(false); }} className="text-sm font-medium py-2 text-gray-700 text-left">
                   {item.label}
-                </a>
+                </button>
               )
             )}
             <Link
