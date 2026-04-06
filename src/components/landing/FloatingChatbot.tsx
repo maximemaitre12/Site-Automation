@@ -245,7 +245,10 @@ export function FloatingChatbot() {
           <div
             className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative"
             ref={scrollRef}
-            style={{ overscrollBehavior: "contain" }}
+            style={{
+              overscrollBehavior: "contain",
+              background: "linear-gradient(165deg, rgba(3,105,161,0.04) 0%, rgba(56,189,248,0.03) 30%, rgba(214,238,245,0.05) 60%, transparent 100%)",
+            }}
           >
             {/* Watermark */}
             <div
