@@ -31,11 +31,18 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
       <div
         className="flex justify-end mt-5 first:mt-0"
         style={{
-          animation: "aetherMsgIn 180ms ease-out both",
+          animation: "aetherMsgIn 220ms ease-out both",
           animationDelay: `${Math.min(index * 30, 120)}ms`,
         }}
       >
-        <div className="max-w-[85%] px-4 py-2.5 rounded-[18px] rounded-br-[6px] bg-[#0369A1] text-white text-[13.5px] leading-relaxed break-words">
+        <div
+          className="max-w-[85%] px-4 py-2.5 text-white text-[13px] leading-relaxed break-words"
+          style={{
+            borderRadius: "18px 18px 6px 18px",
+            background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+            boxShadow: "0 2px 8px rgba(15,23,42,0.15)",
+          }}
+        >
           {message.content}
         </div>
       </div>
@@ -49,22 +56,21 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
     <div
       className="mt-7 first:mt-0 min-w-0"
       style={{
-        animation: "aetherMsgIn 180ms ease-out both",
+        animation: "aetherMsgIn 220ms ease-out both",
         animationDelay: `${Math.min(index * 30, 120)}ms`,
       }}
     >
       {segments.map((segment, i) => {
-        // During streaming, the last segment is still being written — show shimmer overlay
         const isLastSegment = i === segments.length - 1;
         const showShimmerOverlay = isStreaming && isLastSegment && segment.length < 40;
 
         return (
           <div
             key={i}
-            className={`relative ${i > 0 ? "mt-4" : ""}`}
+            className={`relative ${i > 0 ? "mt-3" : ""}`}
             style={{
-              animation: "aetherWidgetIn 280ms ease-out both",
-              animationDelay: `${i * 80}ms`,
+              animation: "aetherWidgetIn 300ms ease-out both",
+              animationDelay: `${i * 90}ms`,
             }}
           >
             {showShimmerOverlay ? (
@@ -76,10 +82,7 @@ export function ChatMessage({ message, index, isStreaming }: ChatMessageProps) {
         );
       })}
 
-      {/* Trailing shimmer for the next widget that hasn't started yet */}
-      {isStreaming && (
-        <WidgetShimmer />
-      )}
+      {isStreaming && <WidgetShimmer />}
     </div>
   );
 }
