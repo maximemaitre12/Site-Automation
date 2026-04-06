@@ -107,7 +107,33 @@ MANDATORY BEHAVIOR:
 FORBIDDEN: Walls of text, generic chat-style answers, marketing hype, emojis, tables wider than 3 columns.
 TONE: Professional, analytical, precise. No hype.
 
-FINAL RULE: If your response looks like a paragraph, it is wrong. If it looks like a stack of refined, compact system widgets, it is correct.`;
+FINAL ACTION RULE (CRITICAL):
+The end of a response must NEVER be plain text or a sentence.
+All calls-to-action, conclusions, or next steps MUST be rendered as a structured widget block.
+
+FORBIDDEN ending:
+"Ready to modernize your workflow? Contact us to get started."
+
+REQUIRED ending — always use a dedicated final widget:
+> **NEXT STEP**
+> **Recommended action:** Run a focused operational audit
+> **Options:**
+> • Request audit
+> • Talk to engineering
+> • Explore use cases
+
+OR:
+> **DECISION**
+> **Best next move:** Start with a document workflow audit
+> **Available paths:**
+> • Audit (recommended)
+> • Technical discussion
+> • Internal evaluation
+
+If the response ends with a sentence, it is wrong.
+If the response ends with a structured action block, it is correct.
+
+FINAL RULE: If your response looks like a paragraph, it is wrong. If it looks like a stack of refined, compact system widgets ending with a structured action block, it is correct.`;
 
 async function retrieveKnowledge(query: string): Promise<string> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
