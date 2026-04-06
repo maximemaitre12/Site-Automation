@@ -161,7 +161,7 @@ export function FloatingChatbot() {
           <div
             className="relative w-[54px] h-[54px] rounded-2xl flex items-center justify-center transition-all duration-300 ease-out hover:scale-[1.06] active:scale-[0.95]"
             style={{
-              background: "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)",
+              background: "linear-gradient(135deg, #0369A1 0%, #0369A1 100%)",
               boxShadow: "0 4px 20px -4px rgba(15,23,42,0.35), 0 8px 32px -8px rgba(3,105,161,0.2)",
             }}
           >
@@ -176,9 +176,9 @@ export function FloatingChatbot() {
             {/* Icon */}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white relative z-10">
               <path d="M12 2C6.48 2 2 5.92 2 10.67c0 2.73 1.52 5.17 3.93 6.77-.1 1.4-.68 2.82-1.78 3.93a.5.5 0 00.35.85c2.17-.02 4.04-.83 5.3-1.73.7.13 1.43.2 2.2.2 5.52 0 10-3.92 10-8.69S17.52 2 12 2z" fill="currentColor" opacity="0.9"/>
-              <circle cx="8" cy="11" r="1.2" fill="#38BDF8"/>
-              <circle cx="12" cy="11" r="1.2" fill="#38BDF8"/>
-              <circle cx="16" cy="11" r="1.2" fill="#38BDF8"/>
+              <circle cx="8" cy="11" r="1.2" fill="#0284C7"/>
+              <circle cx="12" cy="11" r="1.2" fill="#0284C7"/>
+              <circle cx="16" cy="11" r="1.2" fill="#0284C7"/>
             </svg>
           </div>
         </button>
@@ -284,7 +284,7 @@ export function FloatingChatbot() {
                   {/* Greeting */}
                   <div className="mb-10">
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0F172A]/5 mb-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#0284C7]" />
                       <span className="text-[10px] text-[#64748B] tracking-wide uppercase font-medium">Online</span>
                     </div>
                     <h2 className="text-[20px] font-semibold text-[#0F172A] tracking-[-0.025em] leading-[1.3]">
@@ -308,7 +308,7 @@ export function FloatingChatbot() {
                         }}
                       >
                         <span className="w-8 h-8 rounded-lg flex items-center justify-center text-[14px] shrink-0"
-                          style={{ background: "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)", color: "#fff" }}
+                          style={{ background: "linear-gradient(135deg, #0369A1 0%, #0369A1 100%)", color: "#fff" }}
                         >
                           {icon}
                         </span>
@@ -378,7 +378,7 @@ export function FloatingChatbot() {
                     disabled={isLoading || !input.trim()}
                     className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 disabled:opacity-20"
                     style={{
-                      background: isLoading || !input.trim() ? "#E2E8F0" : "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)",
+                      background: isLoading || !input.trim() ? "#E2E8F0" : "linear-gradient(135deg, #0369A1 0%, #0369A1 100%)",
                       boxShadow: isLoading || !input.trim() ? "none" : "0 2px 8px rgba(2,132,199,0.3)",
                     }}
                   >

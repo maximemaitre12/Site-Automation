@@ -68,14 +68,14 @@ function ActionButton({ text, onSend }: { text: string; onSend: (msg: string) =>
     >
       <span
         className="w-5 h-5 rounded-md flex items-center justify-center text-[11px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-        style={{ background: "linear-gradient(135deg, #0284C7, #38BDF8)", color: "white" }}
+        style={{ background: "linear-gradient(135deg, #0369A1, #0284C7)", color: "white" }}
       >
         →
       </span>
-      <span className="flex-1 text-[12px] font-medium text-[#0284C7] group-hover:text-[#38BDF8] transition-colors">
+      <span className="flex-1 text-[12px] font-medium text-[#0369A1] group-hover:text-[#0284C7] transition-colors">
         {text}
       </span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#0284C7]/40 group-hover:text-[#0284C7]/70 transition-colors shrink-0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#0369A1]/40 group-hover:text-[#0369A1]/70 transition-colors shrink-0">
         <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </button>
@@ -99,7 +99,7 @@ function ActionGroup({
     <div className={compact ? "my-2" : "my-4"}>
       {title && (
         <div className="mb-3">
-          <div className="text-[9.5px] font-bold tracking-[0.16em] uppercase" style={{ color: "#0284C7" }}>
+          <div className="text-[9.5px] font-bold tracking-[0.16em] uppercase" style={{ color: "#0369A1" }}>
             {title}
           </div>
           {details.length > 0 && (
@@ -123,7 +123,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
   return {
     h1: ({ children }) => (
       <div className="text-[9.5px] font-bold tracking-[0.16em] uppercase mt-7 mb-3 first:mt-0"
-        style={{ color: "#0284C7" }}
+        style={{ color: "#0369A1" }}
       >
         {children}
       </div>
@@ -132,9 +132,9 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
       <div className="flex items-center gap-2.5 mt-6 mb-3 first:mt-0">
         <div
           className="w-[3px] h-[16px] rounded-full shrink-0"
-          style={{ background: "linear-gradient(180deg, #0284C7 0%, #38BDF8 100%)" }}
+          style={{ background: "linear-gradient(180deg, #0369A1 0%, #0284C7 100%)" }}
         />
-        <span className="text-[9.5px] font-bold tracking-[0.16em] uppercase" style={{ color: "#0284C7" }}>
+        <span className="text-[9.5px] font-bold tracking-[0.16em] uppercase" style={{ color: "#0369A1" }}>
           {children}
         </span>
       </div>
@@ -181,7 +181,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         <li className="flex items-start gap-2.5 text-[12.5px] leading-[1.7]">
           <span
             className="w-[5px] h-[5px] rounded-full mt-[8px] shrink-0"
-            style={{ background: "linear-gradient(135deg, #0284C7, #38BDF8)" }}
+            style={{ background: "linear-gradient(135deg, #0369A1, #0284C7)" }}
           />
           <span className="flex-1 min-w-0 break-words whitespace-pre-line text-[#475569]">{children}</span>
         </li>
@@ -205,7 +205,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         >
           <div
             className="w-[3px] shrink-0 rounded-l-xl"
-            style={{ background: "linear-gradient(180deg, #0284C7 0%, #38BDF8 60%, #7DD3FC 100%)" }}
+            style={{ background: "linear-gradient(180deg, #0369A1 0%, #0284C7 60%, #7DD3FC 100%)" }}
           />
           <div className="px-4 py-3.5 flex-1 min-w-0">
             <div className="text-[12px] text-[#334155] leading-[1.85] whitespace-pre-line">{children}</div>
@@ -239,7 +239,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
           className="text-[11.5px] font-mono px-1.5 py-0.5 rounded-md break-all"
           style={{
             background: "linear-gradient(135deg, #F1F5F9, #E8F4F8)",
-            color: "#0284C7",
+            color: "#0369A1",
             boxShadow: "inset 0 0 0 1px rgba(3,105,161,0.08)",
           }}
         >
@@ -271,7 +271,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
     th: ({ children }) => (
       <th
         className="text-left px-3.5 py-2.5 text-[9px] font-bold tracking-[0.14em] uppercase break-words"
-        style={{ color: "#0284C7" }}
+        style={{ color: "#0369A1" }}
       >
         {children}
       </th>
@@ -286,7 +286,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E2E8F0] to-transparent" />
         <div
           className="w-1 h-1 rounded-full shrink-0"
-          style={{ background: "linear-gradient(135deg, #0284C7, #38BDF8)" }}
+          style={{ background: "linear-gradient(135deg, #0369A1, #0284C7)" }}
         />
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#E2E8F0] to-transparent" />
       </div>
@@ -296,7 +296,7 @@ function buildComponents(onSendMessage?: (msg: string) => void): Components {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[#0284C7] underline decoration-[#0284C7]/20 underline-offset-2 hover:decoration-[#0284C7]/50 transition-colors font-medium"
+        className="text-[#0369A1] underline decoration-[#0369A1]/20 underline-offset-2 hover:decoration-[#0369A1]/50 transition-colors font-medium"
       >
         {children}
       </a>
