@@ -386,7 +386,7 @@ export function TrainingsSection() {
                       </div>
                     </div>
                     <a
-                      href="mailto:contact@aether-connect.com?subject=Formation IA — Demande d'information"
+                      href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA — Demande d'information"
                       className="hidden lg:inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-[0_0_16px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_24px_hsl(var(--primary)/0.5)] hover:scale-[1.03] active:scale-[0.97] transition-all shrink-0"
                     >
                       <Download className="w-3.5 h-3.5" />
