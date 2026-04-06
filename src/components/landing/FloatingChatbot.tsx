@@ -308,7 +308,7 @@ export function FloatingChatbot() {
                         }}
                       >
                         <span className="w-8 h-8 rounded-lg flex items-center justify-center text-[14px] shrink-0"
-                          style={{ background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)", color: "#38BDF8" }}
+                          style={{ background: "linear-gradient(135deg, #0284C7 0%, #0891B2 100%)", color: "#fff" }}
                         >
                           {icon}
                         </span>
