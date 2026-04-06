@@ -16,8 +16,8 @@ export function PharmaMethodology() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-center gap-4 mb-16">
-            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
               Measured outcomes
             </span>
           </div>
@@ -54,7 +54,7 @@ export function PharmaMethodology() {
                 width={1280}
                 height={720}
               />
-              <div className="absolute bottom-0 left-0 w-24 h-1" style={{ background: "#0369A1" }} />
+              <div className="absolute bottom-0 left-0 w-24 h-1" style={{ background: "#1E4D8C" }} />
             </div>
           </ScrollReveal>
         </div>
@@ -71,7 +71,7 @@ export function PharmaMethodology() {
               >
                 <div
                   className="font-heading text-[44px] md:text-[52px] lg:text-[58px] font-bold leading-none mb-3"
-                  style={{ color: "#0369A1" }}
+                  style={{ color: "#1E4D8C" }}
                 >
                   {q.value}
                 </div>

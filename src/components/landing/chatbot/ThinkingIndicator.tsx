@@ -20,7 +20,7 @@ export function ThinkingIndicator() {
               key={i}
               className="w-[4px] h-[4px] rounded-full"
               style={{
-                background: "#0369A1",
+                background: "#1E4D8C",
                 animation: `aetherDot 1.4s ease-in-out ${i * 0.15}s infinite`,
               }}
             />

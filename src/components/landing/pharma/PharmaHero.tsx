@@ -7,7 +7,7 @@ export function PharmaHero() {
     <section
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, #0369A1 0%, #0369A1 35%, #0369A1 70%, #0369A1 100%)",
+        background: "linear-gradient(160deg, #1E4D8C 0%, #1E4D8C 35%, #1E4D8C 70%, #1E4D8C 100%)",
       }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -50,7 +50,7 @@ export function PharmaHero() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#0369A1] bg-white transition-all hover:bg-white/90"
+                className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#1E4D8C] bg-white transition-all hover:bg-white/90"
               >
                 Request a free automation audit
               </Link>

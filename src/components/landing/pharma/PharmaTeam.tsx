@@ -7,8 +7,8 @@ export function PharmaTeam() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-center gap-4 mb-16">
-            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
               How we build
             </span>
           </div>
@@ -24,7 +24,7 @@ export function PharmaTeam() {
               width={1280}
               height={720}
             />
-            <div className="absolute bottom-0 left-0 w-24 h-1" style={{ background: "#0369A1" }} />
+            <div className="absolute bottom-0 left-0 w-24 h-1" style={{ background: "#1E4D8C" }} />
           </div>
         </ScrollReveal>
 
@@ -87,8 +87,8 @@ export function PharmaTeam() {
               <ScrollReveal key={item.title} delay={i * 200}>
                 <div className="py-8" style={{ borderBottom: "1px solid rgba(3,105,161,0.15)" }}>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-2 h-2 rounded-full" style={{ background: "#0369A1" }} />
-                    <span className="text-[11px] tracking-[0.25em] uppercase font-semibold" style={{ color: "#0369A1" }}>{item.title}</span>
+                    <div className="w-2 h-2 rounded-full" style={{ background: "#1E4D8C" }} />
+                    <span className="text-[11px] tracking-[0.25em] uppercase font-semibold" style={{ color: "#1E4D8C" }}>{item.title}</span>
                   </div>
                   <p className="text-[15px] leading-[1.85]" style={{ color: "#334155" }}>{item.desc}</p>
                 </div>

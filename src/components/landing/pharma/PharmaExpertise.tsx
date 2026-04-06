@@ -15,8 +15,8 @@ export function PharmaExpertise() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <ScrollReveal>
           <div className="flex items-center gap-4 mb-16">
-            <div className="w-8 h-[3px]" style={{ background: "#0369A1" }} />
-            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#0369A1" }}>
+            <div className="w-8 h-[3px]" style={{ background: "#1E4D8C" }} />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase" style={{ color: "#1E4D8C" }}>
               What our agents automate
             </span>
           </div>
@@ -43,7 +43,7 @@ export function PharmaExpertise() {
                   borderBottom: i < 3 ? "1px solid #e8ecf1" : "none",
                 }}
               >
-                <div className="w-6 h-[2px] mb-6" style={{ background: "#0369A1" }} />
+                <div className="w-6 h-[2px] mb-6" style={{ background: "#1E4D8C" }} />
                 <h3
                   className="font-heading text-[12px] font-bold tracking-[0.15em] mb-4"
                   style={{ color: "#0F172A" }}
