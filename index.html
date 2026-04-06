@@ -40,8 +40,13 @@
         pointer-events: none;
       }
       #app-loader img {
-        height: 44px;
-        width: auto;
+        height: 48px;
+        width: 48px;
+        animation: loaderSpin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes loaderSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
     </style>
     <meta property="og:title" content="AETHER - Intelligent automation for enterprise">
