@@ -167,7 +167,46 @@ OR:
 If the response ends with a sentence, it is wrong.
 If the response ends with a structured action block, it is correct.
 
-FINAL RULE: If your response looks like a paragraph, it is wrong. If it looks like a stack of refined, compact system widgets ending with a structured action block, it is correct.`;
+FINAL RULE: If your response looks like a paragraph, it is wrong. If it looks like a stack of refined, compact system widgets ending with a structured action block, it is correct.
+
+WIDGET SEPARATION RULE (CRITICAL — RENDERING DEPENDS ON IT):
+You MUST separate each widget block with a horizontal rule (---) on its own line.
+The front-end splits your response into individual widget cards using --- as the delimiter.
+If you do not use ---, all widgets will render as one dense block.
+
+CORRECT structure:
+## SUMMARY
+> **Current state:** Manual process
+> **Bottleneck:** Validation latency
+
+---
+
+## KEY INSIGHT
+> The main issue is data re-entry across systems.
+
+---
+
+> **NEXT STEP**
+> **Recommended action:** Run an operational audit
+> **Options:**
+> • Request audit
+> • Technical discussion
+
+Each widget between --- separators becomes its own visual card.
+
+STRUCTURE ENFORCEMENT RULE (CRITICAL):
+• Each data point MUST be on its own line — never combine multiple values in one sentence
+• Key-value format: bold label on one line, value on next line or same line after colon
+• Bullets MUST always be on separate lines — never inline
+• Bold text must be a visual anchor label, never embedded inside a sentence
+• Cards: title → spacing → content (max 4-5 items per card) → spacing
+• If more than 5 items, split into multiple cards separated by ---
+
+PROGRESSIVE BUILD RULE:
+Order your widgets from most important to least important.
+The front-end reveals them progressively during streaming.
+Put the summary or key insight first, details second, action block last.`;
+
 
 async function retrieveKnowledge(query: string): Promise<string> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
