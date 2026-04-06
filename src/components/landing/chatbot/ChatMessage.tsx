@@ -8,6 +8,7 @@ interface ChatMessageProps {
   message: Msg;
   index: number;
   isStreaming?: boolean;
+  onSendMessage?: (message: string) => void;
 }
 
 function splitWidgetSegments(content: string): string[] {
