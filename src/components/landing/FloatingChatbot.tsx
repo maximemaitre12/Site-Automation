@@ -3,6 +3,7 @@ import { X, Send, Loader2, Maximize2, Minimize2 } from "lucide-react";
 import { ChatMessage } from "./chatbot/ChatMessage";
 import { ThinkingIndicator } from "./chatbot/ThinkingIndicator";
 import aetherWatermark from "@/assets/aether-watermark.png";
+import aetherLogoIcon from "@/assets/aether-logo-icon.png";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
