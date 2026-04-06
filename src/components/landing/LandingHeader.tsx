@@ -14,7 +14,9 @@ export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isContactPage = location.pathname === "/contact";
+  const isLandingPage = location.pathname === "/" || location.pathname === "/index";
   const useDarkMode = scrolled || isContactPage;
 
   useEffect(() => {
