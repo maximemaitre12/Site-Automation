@@ -11,7 +11,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <LandingFooter />
-      {/* <FloatingChatbot /> */}
+      <FloatingChatbot />
     </div>
   );
 }
