@@ -10,10 +10,10 @@ type Msg = { role: "user" | "assistant"; content: string };
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-chat`;
 
 const QUICK_ACTIONS = [
-  { label: "Document processing", icon: "◇" },
-  { label: "Logistics operations", icon: "→" },
-  { label: "Recruitment workflows", icon: "▢" },
-  { label: "Compliance & reporting", icon: "⚠" },
+  { label: "Document processing", icon: "📄" },
+  { label: "Logistics operations", icon: "🚚" },
+  { label: "Recruitment workflows", icon: "👥" },
+  { label: "Compliance & reporting", icon: "🛡️" },
 ];
 
 export function FloatingChatbot() {
