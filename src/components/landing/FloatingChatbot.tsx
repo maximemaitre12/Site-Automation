@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Loader2, Maximize2, Minimize2 } from "lucide-react";
+import { X, Send, Loader2, Maximize2, Minimize2, FileText, Truck, Users, ShieldCheck, LucideIcon } from "lucide-react";
 import { ChatMessage } from "./chatbot/ChatMessage";
 import { ThinkingIndicator } from "./chatbot/ThinkingIndicator";
 import aetherWatermark from "@/assets/aether-watermark.png";
@@ -10,10 +10,10 @@ type Msg = { role: "user" | "assistant"; content: string };
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-chat`;
 
 const QUICK_ACTIONS = [
-  { label: "Document processing", icon: "📄" },
-  { label: "Logistics operations", icon: "🚚" },
-  { label: "Recruitment workflows", icon: "👥" },
-  { label: "Compliance & reporting", icon: "🛡️" },
+  { label: "Document processing", icon: FileText },
+  { label: "Logistics operations", icon: Truck },
+  { label: "Recruitment workflows", icon: Users },
+  { label: "Compliance & reporting", icon: ShieldCheck },
 ];
 
 export function FloatingChatbot() {
@@ -297,7 +297,7 @@ export function FloatingChatbot() {
 
                   {/* Quick actions */}
                   <div className="space-y-2">
-                    {QUICK_ACTIONS.map(({ label, icon }) => (
+                    {QUICK_ACTIONS.map(({ label, icon: Icon }) => (
                       <button
                         key={label}
                         onClick={() => send(label)}
@@ -307,10 +307,10 @@ export function FloatingChatbot() {
                           background: "linear-gradient(135deg, rgba(248,250,252,0.8) 0%, rgba(241,245,249,0.4) 100%)",
                         }}
                       >
-                        <span className="w-8 h-8 rounded-lg flex items-center justify-center text-[14px] shrink-0"
-                          style={{ background: "linear-gradient(135deg, #1E4D8C 0%, #1E4D8C 100%)", color: "#fff" }}
+                        <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ background: "linear-gradient(135deg, #1E4D8C 0%, #1E4D8C 100%)" }}
                         >
-                          {icon}
+                          <Icon className="w-4 h-4 text-white" />
                         </span>
                         <span className="text-[12.5px] text-[#334155] font-medium group-hover:text-[#0F172A] transition-colors">
                           {label}
