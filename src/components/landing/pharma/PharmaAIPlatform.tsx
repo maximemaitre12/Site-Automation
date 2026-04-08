@@ -26,7 +26,7 @@ export function PharmaAIPlatform() {
             <ScrollReveal delay={150}>
               <p className="text-[14px] md:text-[15px] leading-[1.8]" style={{ color: "rgba(255,255,255,0.55)" }}>
                 <strong className="text-white font-medium">Aether Pharma AI</strong> is the product of{" "}
-                <strong className="text-white font-medium">dedicated R&D in pharmaceutical intelligence</strong> —
+                <strong className="text-white font-medium">dedicated R&D in pharmaceutical intelligence</strong>,
                 from regulatory corpus training to domain-specific model evaluation.
                 Every model natively understands{" "}
                 <strong className="text-white font-medium">MedDRA</strong>,{" "}
@@ -135,7 +135,7 @@ export function PharmaAIPlatform() {
             <div className="flex items-center justify-center gap-3 py-3 rounded-md" style={{ background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.12)" }}>
               <ShieldCheck className="w-4 h-4" style={{ color: "#1E4D8C" }} />
               <span className="text-[11px] font-semibold text-white">Human-in-the-loop governance</span>
-              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>— all outputs are drafts</span>
+              <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>All outputs are drafts</span>
             </div>
           </div>
         </ScrollReveal>

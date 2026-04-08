@@ -208,7 +208,7 @@ export function TrainingsSection() {
         )}>
           <MacWindow
             variant="dark"
-            title="AETHER LEARNING STUDIO v3.0 — Formation IA"
+            title="AETHER LEARNING STUDIO v3.0 | Formation IA"
             toolbar={
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-4">
@@ -308,7 +308,7 @@ export function TrainingsSection() {
 
                 {/* CTA */}
                 <a
-                  href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA — Demande d'information"
+                  href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA Demande d'information"
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-white text-xs font-bold shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
                   <Download className="w-4 h-4" />
@@ -386,7 +386,7 @@ export function TrainingsSection() {
                       </div>
                     </div>
                     <a
-                      href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA — Demande d'information"
+                      href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA Demande d'information"
                       className="hidden lg:inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-[0_0_16px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_24px_hsl(var(--primary)/0.5)] hover:scale-[1.03] active:scale-[0.97] transition-all shrink-0"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -432,7 +432,7 @@ export function TrainingsSection() {
                 {/* Mobile CTA for sm breakpoint */}
                 <div className="px-5 pb-5 lg:hidden">
                   <a
-                    href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA — Demande d'information"
+                    href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Formation IA Demande d'information"
                     className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-[0_0_16px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_24px_hsl(var(--primary)/0.5)] transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />

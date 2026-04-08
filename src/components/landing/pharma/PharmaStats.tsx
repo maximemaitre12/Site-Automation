@@ -14,7 +14,7 @@ export function PharmaStats() {
           <div className="mb-24">
             <p className="text-base md:text-[17px] leading-[1.85] max-w-[620px]" style={{ color: "#4a5568" }}>
               Our <strong style={{ color: "#0F172A" }}>AI agents</strong> are designed to integrate directly into your
-              <strong style={{ color: "#0F172A" }}> existing systems</strong> — ERP, HRIS, email workflows. Every output is a
+              <strong style={{ color: "#0F172A" }}> existing systems</strong> such as ERP, HRIS and email workflows. Every output is a
               <strong style={{ color: "#0F172A" }}> draft requiring human validation</strong>, deployed on{" "}
               <strong style={{ color: "#0F172A" }}>scalable cloud infrastructure</strong> compliant with pharmaceutical regulations.
             </p>
