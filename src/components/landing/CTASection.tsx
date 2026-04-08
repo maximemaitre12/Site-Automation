@@ -22,7 +22,7 @@ export function CTASection() {
           {EMAILS.map((email) => (
             <a
               key={email}
-              href={`mailto:${email}?subject=AETHER — Demande de démo`}
+              href={`mailto:${email}?subject=AETHER Demande de démo`}
               className="inline-flex items-center gap-2.5 px-7 py-3.5 text-sm font-medium text-primary-foreground bg-foreground rounded-full hover:bg-foreground/90 transition-all duration-300 hover:shadow-xl hover:shadow-foreground/10 active:scale-[0.97] group min-w-[280px] justify-center"
             >
               <Mail className="w-4 h-4" />

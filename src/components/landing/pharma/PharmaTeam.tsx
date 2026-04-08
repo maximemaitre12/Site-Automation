@@ -42,7 +42,7 @@ export function PharmaTeam() {
             </ScrollReveal>
             <ScrollReveal delay={300}>
               <p className="text-[15px] md:text-base leading-[1.85]" style={{ color: "#334155" }}>
-                Our <strong style={{ color: "#0F172A" }}>agents</strong> are not prototypes — they are
+                Our <strong style={{ color: "#0F172A" }}>agents</strong> are not prototypes. They are
                 <strong style={{ color: "#0F172A" }}> production systems</strong> integrated into your
                 operational stack. Every model is versioned, every action is auditable, and every
                 deployment follows <strong style={{ color: "#0F172A" }}>validated CI/CD pipelines</strong> on
@@ -60,7 +60,7 @@ export function PharmaTeam() {
                   <strong style={{ color: "#0F172A" }}>Multi-agent orchestration</strong> with{" "}
                   <strong style={{ color: "#0F172A" }}>retrieval-augmented generation</strong>,{" "}
                   <strong style={{ color: "#0F172A" }}>vector databases</strong> and
-                  <strong style={{ color: "#0F172A" }}> event-driven</strong> processing — each agent handles
+                  <strong style={{ color: "#0F172A" }}> event-driven</strong> processing. Each agent handles
                   a specific operational domain while sharing a unified intelligence layer.
                 </>,
               },
@@ -77,7 +77,7 @@ export function PharmaTeam() {
               {
                 title: "HUMAN-IN-THE-LOOP GOVERNANCE",
                 desc: <>
-                  Every agent output is a <strong style={{ color: "#0F172A" }}>draft</strong> — no automated
+                  Every agent output is a <strong style={{ color: "#0F172A" }}>draft</strong>. No automated
                   action executes without <strong style={{ color: "#0F172A" }}>explicit human validation</strong>.
                   Full traceability, audit logs, and <strong style={{ color: "#0F172A" }}>role-based access control</strong> at
                   every step of the pipeline.

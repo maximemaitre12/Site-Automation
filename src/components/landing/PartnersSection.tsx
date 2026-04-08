@@ -279,7 +279,7 @@ export function PartnersSection() {
         )}>
           <MacWindow
             variant="dark"
-            title="AETHER NETWORK v3.0 — Partner Hub"
+            title="AETHER NETWORK v3.0 | Partner Hub"
             toolbar={
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-4">

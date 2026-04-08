@@ -1,10 +1,10 @@
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 const areas = [
-  { title: "DOCUMENT INTELLIGENCE", desc: "Automated extraction from PDFs, scans, emails and EDI files. Key data identification — lot numbers, quantities, expiry dates, product references. Structured output ready for ERP ingestion. Handles multi-format, multi-language documents at scale." },
-  { title: "LOGISTICS AUTOMATION", desc: "End-to-end inbound and outbound flow automation. Reception order drafting from supplier documents, dispatch order generation from client requests. Inventory matching, product identification and pick & pack preparation — all as validated drafts." },
+  { title: "DOCUMENT INTELLIGENCE", desc: "Automated extraction from PDFs, scans, emails and EDI files. Key data identification including lot numbers, quantities, expiry dates and product references. Structured output ready for ERP ingestion. Handles multi-format, multi-language documents at scale." },
+  { title: "LOGISTICS AUTOMATION", desc: "End-to-end inbound and outbound flow automation. Reception order drafting from supplier documents, dispatch order generation from client requests. Inventory matching, product identification and pick & pack preparation, all delivered as validated drafts." },
   { title: "TALENT INTELLIGENCE", desc: "Continuous market monitoring across job boards, professional networks and internal databases. AI-scored candidate profiles with qualification filtering by role, location, certifications and salary range. Structured shortlists and priority-ranked recommendations." },
-  { title: "ERP & SYSTEM INTEGRATION", desc: "Direct integration with your existing ERP, WMS, HRIS and email systems. API-first architecture that connects to SAP, Oracle, Microsoft Dynamics or custom platforms. No rip-and-replace — agents plug into your current stack." },
+  { title: "ERP & SYSTEM INTEGRATION", desc: "Direct integration with your existing ERP, WMS, HRIS and email systems. API-first architecture that connects to SAP, Oracle, Microsoft Dynamics or custom platforms. No rip-and-replace: agents plug into your current stack." },
   { title: "CLOUD MIGRATION & MODERNIZATION", desc: "Migration from legacy on-premise systems to cloud-native infrastructure. Multi-cloud support (AWS, Azure, GCP) with IaC deployment, auto-scaling and disaster recovery. Compliance-ready architecture for regulated environments." },
   { title: "COMPLIANCE & AUDIT TRAIL", desc: "Native audit trail architecture with immutable logs. Every agent action is tracked, timestamped and attributed. Role-based access control, encryption at rest/in transit, and full traceability from raw input to automated draft output." },
 ];
