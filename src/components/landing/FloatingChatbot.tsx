@@ -25,6 +25,23 @@ export function FloatingChatbot() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        chatContainerRef.current && !chatContainerRef.current.contains(e.target as Node) &&
+        fabRef.current && !fabRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -153,7 +170,8 @@ export function FloatingChatbot() {
     <>
       {/* ── Trigger Button ── */}
       {!open && (
-        <button
+         <button
+           ref={fabRef}
           onClick={() => setOpen(true)}
           className="fixed bottom-5 right-5 z-50 group"
           aria-label="Open chat"
@@ -186,7 +204,8 @@ export function FloatingChatbot() {
 
       {/* ── Panel ── */}
       {open && (
-        <div
+         <div
+           ref={chatContainerRef}
           className={panelClasses}
           style={{
             animation: "aetherPanelIn 320ms cubic-bezier(0.16, 1, 0.3, 1)",
