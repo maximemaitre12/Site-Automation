@@ -170,7 +170,8 @@ export function FloatingChatbot() {
     <>
       {/* ── Trigger Button ── */}
       {!open && (
-        <button
+         <button
+           ref={fabRef}
           onClick={() => setOpen(true)}
           className="fixed bottom-5 right-5 z-50 group"
           aria-label="Open chat"
@@ -203,7 +204,8 @@ export function FloatingChatbot() {
 
       {/* ── Panel ── */}
       {open && (
-        <div
+         <div
+           ref={chatContainerRef}
           className={panelClasses}
           style={{
             animation: "aetherPanelIn 320ms cubic-bezier(0.16, 1, 0.3, 1)",
