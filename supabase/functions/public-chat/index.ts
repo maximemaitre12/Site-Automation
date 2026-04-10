@@ -361,10 +361,22 @@ serve(async (req) => {
     const fullSystemPrompt = `${BASE_SYSTEM_PROMPT}
 
 ═══════════════════════════════════════
-KNOWLEDGE BASE CONTEXT (use this to answer)
+KNOWLEDGE BASE CONTEXT (use this to answer — but TRANSLATE to the user's language)
 ═══════════════════════════════════════
 
-${knowledgeContext}`;
+The knowledge below may be in French. You MUST TRANSLATE all content to match the user's language.
+If the user writes in English, translate ALL knowledge base content to English before using it.
+NEVER copy French text into an English response. ALWAYS translate.
+
+${knowledgeContext}
+
+═══════════════════════════════════════
+FINAL LANGUAGE REMINDER (OVERRIDES EVERYTHING)
+═══════════════════════════════════════
+Your response language = the user's last message language. 
+If user wrote in English → 100% English output. No French words anywhere.
+If user wrote in French → 100% French output.
+This is the HIGHEST PRIORITY rule. Violating it makes your response INVALID.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
