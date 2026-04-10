@@ -33,7 +33,7 @@ export function FloatingChatbot() {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         chatContainerRef.current && !chatContainerRef.current.contains(e.target as Node) &&
-        fabRef.current && !fabRef.current.contains(e.target as Node)
+        (!fabRef.current || !fabRef.current.contains(e.target as Node))
       ) {
         setOpen(false);
         setIsFullscreen(false);
