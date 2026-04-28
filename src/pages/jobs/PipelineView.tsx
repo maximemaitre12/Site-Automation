@@ -6,13 +6,13 @@ import { iconChevronLeft } from './icons'
 import { PipelineCard } from './PipelineCard'
 import { CandidateModal } from './CandidateModal'
 import { AddCandidatePanel } from './AddCandidatePanel'
+import { RobotaSyncModal } from './RobotaSyncModal'
 
-const STAGE_ORDER = ['new', 'prequalification', 'interview', 'decision'] as const
+const STAGE_ORDER = ['new', 'interview', 'decision'] as const
 type Stage = typeof STAGE_ORDER[number]
 
 const STAGE_COLORS: Record<Stage, { bg: string; color: string; border: string }> = {
   new:              { bg: 'var(--surface-2)',  color: 'var(--text-3)',  border: 'var(--border)' },
-  prequalification: { bg: '#D0E4F8',           color: '#2563EB',        border: '#93C5FD' },
   interview:        { bg: '#FEE8D0',           color: '#D9780A',        border: '#FCD09A' },
   decision:         { bg: '#D0F0E4',           color: '#2E9460',        border: '#86EFAC' },
 }
@@ -32,6 +32,7 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
   const [viewMode, setViewMode] = useState<'grid' | 'kanban'>('kanban')
   const [batchQualifying, setBatchQualifying] = useState(false)
   const [qualifyProgress, setQualifyProgress] = useState<{ done: number; total: number } | null>(null)
+  const [showRobotaSync, setShowRobotaSync] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -154,14 +155,6 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
                 </button>
               ))}
             </div>
-            {unscoredCount > 0 && (
-              <button className="btn btn-secondary" onClick={batchQualify} disabled={batchQualifying} style={{ fontSize: 11 }}>
-                {batchQualifying && qualifyProgress
-                  ? `${tp.qualifying} ${qualifyProgress.done}/${qualifyProgress.total}`
-                  : tp.qualifyAll(unscoredCount)
-                }
-              </button>
-            )}
             <button className="btn btn-secondary" onClick={exportCSV} style={{ fontSize: 11 }}>
               {tj.exportCSV}
             </button>
@@ -298,6 +291,16 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
           job={job}
           onAdd={newOnes => { addCandidates(newOnes) }}
           onClose={() => setShowAdd(false)}
+        />
+      )}
+
+      {showRobotaSync && (
+        <RobotaSyncModal
+          job={job}
+          onClose={() => setShowRobotaSync(false)}
+          onImported={() => {
+            api.candidates.list(job.id).then(r => { if (r.data) setCandidates(r.data) })
+          }}
         />
       )}
 

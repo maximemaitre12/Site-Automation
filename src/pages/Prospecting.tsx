@@ -5,6 +5,17 @@ import { T } from '../i18n'
 
 const PLATFORMS = ['work.ua', 'robota.ua', 'djinni.co', 'hh.ua']
 const CITIES = ['Kyiv', 'Kharkiv', 'Lviv', 'Odesa', 'Dnipro', 'Zaporizhzhia', 'Vinnytsia', 'Poltava', 'Remote']
+const CITY_IDS: Record<string, number> = {
+  Kyiv: 1, Kharkiv: 2, Lviv: 3, Odesa: 4, Dnipro: 7,
+  Zaporizhzhia: 8, Vinnytsia: 10, Poltava: 16,
+}
+const EXPERIENCE_OPTIONS = [
+  { label: 'Peu importe', value: undefined },
+  { label: 'Sans expérience', value: 0 },
+  { label: '1 an+', value: 1 },
+  { label: '2 ans+', value: 2 },
+  { label: '5 ans+', value: 3 },
+]
 
 const STATUS_CHIP: Record<string, string> = {
   new: '',
@@ -140,10 +151,22 @@ export function Prospecting() {
   const [error, setError] = useState('')
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null)
 
+  // Scraping mode
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState('Kyiv')
   const [count, setCount] = useState(20)
   const [platforms, setPlatforms] = useState<string[]>(['work.ua', 'robota.ua'])
+
+  // CV database mode
+  const [mode, setMode] = useState<'scraping' | 'cvdb'>('cvdb')
+  const [cvKeywords, setCvKeywords] = useState('')
+  const [cvCity, setCvCity] = useState('Kyiv')
+  const [cvSalaryFrom, setCvSalaryFrom] = useState('')
+  const [cvSalaryTo, setCvSalaryTo] = useState('')
+  const [cvExperience, setCvExperience] = useState<number | undefined>(undefined)
+  const [cvCount, setCvCount] = useState(20)
+  const [cvTotal, setCvTotal] = useState<number | null>(null)
+  const [cvPage, setCvPage] = useState(0)
 
   useEffect(() => {
     api.jobs.list().then((res) => {
@@ -158,7 +181,7 @@ export function Prospecting() {
     setPlatforms((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p])
   }
 
-  async function search() {
+  async function searchScraping() {
     if (!query.trim()) { setError(tp.errorQuery); return }
     if (platforms.length === 0) { setError(tp.errorPlatform); return }
     setSearching(true)
@@ -167,8 +190,34 @@ export function Prospecting() {
     if (res.error) { setError(res.error); setSearching(false); return }
     if (res.data) {
       setCandidates(res.data)
+      setCvTotal(null)
       setConfigOpen(false)
       api.analytics.log('search_launched', { jobId: selectedJob, platforms, count })
+    }
+    setSearching(false)
+  }
+
+  async function searchCvdb(page = 0) {
+    if (!cvKeywords.trim()) { setError('Mots-clés requis'); return }
+    setSearching(true)
+    setError('')
+    setCvPage(page)
+    const res = await api.robota.cvdbSearch({
+      keywords: cvKeywords,
+      cityId: CITY_IDS[cvCity],
+      salaryFrom: cvSalaryFrom ? parseInt(cvSalaryFrom) : undefined,
+      salaryTo: cvSalaryTo ? parseInt(cvSalaryTo) : undefined,
+      experienceId: cvExperience,
+      count: cvCount,
+      page,
+      jobId: selectedJob,
+    })
+    if (res.error) { setError(res.error); setSearching(false); return }
+    const result = res.data as unknown as { data: Candidate[]; total: number }
+    if (result?.data) {
+      setCandidates(page === 0 ? result.data : [...candidates, ...result.data])
+      setCvTotal(result.total ?? null)
+      setConfigOpen(false)
     }
     setSearching(false)
   }
@@ -187,9 +236,27 @@ export function Prospecting() {
         <p className="page-desc">{tp.desc}</p>
       </div>
 
+      {/* Mode toggle */}
+      <div className="flex gap-8 mb-16">
+        <button
+          className={`btn btn-sm ${mode === 'cvdb' ? 'btn-primary' : 'btn-ghost'}`}
+          onClick={() => { setMode('cvdb'); setConfigOpen(true) }}
+        >
+          Base CV robota.ua
+        </button>
+        <button
+          className={`btn btn-sm ${mode === 'scraping' ? 'btn-primary' : 'btn-ghost'}`}
+          onClick={() => { setMode('scraping'); setConfigOpen(true) }}
+        >
+          Scraping web
+        </button>
+      </div>
+
       <div className="search-config">
         <div className="search-config-header" onClick={() => setConfigOpen((v) => !v)}>
-          <span className="t-13 medium">{tp.configTitle}</span>
+          <span className="t-13 medium">
+            {mode === 'cvdb' ? 'Recherche dans la base CV robota.ua' : tp.configTitle}
+          </span>
           <svg
             width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
             style={{ transform: configOpen ? 'rotate(180deg)' : 'none', transition: 'transform 150ms ease', opacity: 0.5 }}
@@ -198,7 +265,71 @@ export function Prospecting() {
           </svg>
         </div>
 
-        {configOpen && (
+        {configOpen && mode === 'cvdb' && (
+          <div className="search-config-body">
+            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#1D4ED8' }}>
+              Accès direct à +100 000 CVs robota.ua — sans annonce nécessaire. Les profils trouvés sont importés dans Farmasoft.
+            </div>
+            <div className="form-grid mb-20">
+              <div className="field">
+                <label className="label">Poste / Mots-clés</label>
+                <input
+                  className="input"
+                  value={cvKeywords}
+                  onChange={(e) => setCvKeywords(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && searchCvdb(0)}
+                  placeholder="ex: водій, менеджер, бухгалтер…"
+                />
+              </div>
+              <div className="field">
+                <label className="label">{tp.labelJob}</label>
+                <select className="select" value={selectedJob || ''} onChange={(e) => setSelectedJob(e.target.value ? +e.target.value : undefined)}>
+                  <option value="">{tp.noJob}</option>
+                  {jobs.map((j) => <option key={j.id} value={j.id}>{j.title}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label className="label">Ville</label>
+                <select className="select" value={cvCity} onChange={(e) => setCvCity(e.target.value)}>
+                  {CITIES.filter(c => c !== 'Remote').map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label className="label">Expérience</label>
+                <select className="select" value={cvExperience ?? ''} onChange={(e) => setCvExperience(e.target.value !== '' ? +e.target.value : undefined)}>
+                  {EXPERIENCE_OPTIONS.map((o) => (
+                    <option key={String(o.value)} value={o.value ?? ''}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label className="label">Salaire min (UAH)</label>
+                <input className="input" type="number" value={cvSalaryFrom} onChange={(e) => setCvSalaryFrom(e.target.value)} placeholder="ex: 15000" />
+              </div>
+              <div className="field">
+                <label className="label">Salaire max (UAH)</label>
+                <input className="input" type="number" value={cvSalaryTo} onChange={(e) => setCvSalaryTo(e.target.value)} placeholder="ex: 40000" />
+              </div>
+              <div className="field">
+                <label className="label">Nombre de résultats</label>
+                <select className="select" value={cvCount} onChange={(e) => setCvCount(+e.target.value)}>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+            </div>
+
+            {error && <p className="msg-error mb-12">{error}</p>}
+
+            <button className="btn btn-primary mt-20" onClick={() => searchCvdb(0)} disabled={searching}>
+              {searching ? <span className="spinner" /> : null}
+              {searching ? 'Recherche en cours…' : 'Rechercher dans la base CV'}
+            </button>
+          </div>
+        )}
+
+        {configOpen && mode === 'scraping' && (
           <div className="search-config-body">
             <div className="form-grid mb-20">
               <div className="field">
@@ -207,7 +338,7 @@ export function Prospecting() {
                   className="input"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && search()}
+                  onKeyDown={(e) => e.key === 'Enter' && searchScraping()}
                   placeholder={tp.queryPlaceholder}
                 />
               </div>
@@ -251,7 +382,7 @@ export function Prospecting() {
 
             {error && <p className="msg-error mb-12">{error}</p>}
 
-            <button className="btn btn-primary mt-20" onClick={search} disabled={searching}>
+            <button className="btn btn-primary mt-20" onClick={searchScraping} disabled={searching}>
               {searching ? <span className="spinner" /> : null}
               {searching ? tp.searching : tp.startSearch}
             </button>
@@ -266,7 +397,16 @@ export function Prospecting() {
       ) : (
         <>
           <div className="flex items-center justify-between mb-16">
-            <span className="t-13 c-2">{tp.profiles(candidates.length)}</span>
+            <span className="t-13 c-2">
+              {cvTotal !== null
+                ? `${candidates.length} profils affichés sur ${cvTotal.toLocaleString()} disponibles`
+                : tp.profiles(candidates.length)}
+            </span>
+            {mode === 'cvdb' && cvTotal !== null && candidates.length < cvTotal && (
+              <button className="btn btn-secondary btn-sm" onClick={() => searchCvdb(cvPage + 1)} disabled={searching}>
+                {searching ? <span className="spinner" /> : 'Charger plus'}
+              </button>
+            )}
           </div>
           <div className="candidate-grid">
             {candidates.map((c) => (

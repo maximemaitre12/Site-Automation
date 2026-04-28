@@ -12,6 +12,7 @@ import scraperRouter from './routes/scraper'
 import aiRouter from './routes/ai'
 import interviewsRouter from './routes/interviews'
 import cvRouter from './routes/cv'
+import robotaRouter, { runFollowUps, runFullSync } from './routes/robota'
 import { apiAuth } from './middleware/auth'
 
 const app = express()
@@ -34,6 +35,7 @@ app.use('/api/scraper', scraperRouter)
 app.use('/api/ai', aiRouter)
 app.use('/api/interviews', interviewsRouter)
 app.use('/api/cv', cvRouter)
+app.use('/api/robota', robotaRouter)
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(process.cwd(), 'dist')))
@@ -67,4 +69,40 @@ if ((stale.changes as number) > 0) {
 
 app.listen(PORT, () => {
   console.log(`Farmasoft RH server running on http://localhost:${PORT}`)
+  startCron()
+
+  // Auto-trigger full sync on startup if robota.ua is connected
+  const robotaConnected = db.prepare("SELECT value FROM settings WHERE key = 'robota_email'").get() as { value: string } | undefined
+  if (robotaConnected?.value) {
+    console.log('[startup] robota.ua connected — triggering automatic full sync')
+    runFullSync().catch(e => console.error('[startup full-sync]', (e as Error).message))
+  }
 })
+
+function startCron() {
+  // Full bidirectional sync every 15 min — discovers:
+  //  • new vacancies on robota.ua → imports as Farmasoft jobs
+  //  • new active Farmasoft jobs → publishes to robota.ua
+  //  • new candidates for any linked vacancy → imports + scores
+  //  • updates to existing vacancies (state changes, content edits)
+  setInterval(async () => {
+    try {
+      const robotaConnected = db.prepare("SELECT value FROM settings WHERE key = 'robota_email'").get() as { value: string } | undefined
+      if (!robotaConnected?.value) return
+
+      console.log('[cron] Running full bidirectional sync')
+      await runFullSync().catch(e => console.error('[cron full-sync]', (e as Error).message))
+    } catch (e) {
+      console.error('[cron] Auto-sync error:', (e as Error).message)
+    }
+  }, 15 * 60 * 1000)
+
+  // Follow-up check every 6 hours
+  setInterval(async () => {
+    try {
+      await runFollowUps()
+    } catch (e) {
+      console.error('[cron] Follow-up error:', (e as Error).message)
+    }
+  }, 6 * 60 * 60 * 1000)
+}

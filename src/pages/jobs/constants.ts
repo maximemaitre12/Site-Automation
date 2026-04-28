@@ -19,16 +19,14 @@ export const PLATFORM_COLOR: Record<string, string> = {
 
 export const STAGE_LABELS: Record<string, string> = {
   new: 'Nouveau',
-  prequalification: 'Préqualification',
   interview: 'Entretien',
   decision: 'Décision',
 }
-export const STAGES = ['new', 'prequalification', 'interview', 'decision'] as const
+export const STAGES = ['new', 'interview', 'decision'] as const
 export type Stage = typeof STAGES[number]
 
 export const STAGE_COLORS: Record<Stage, string> = {
   new: 'var(--text-3)',
-  prequalification: '#2563eb',
   interview: '#d97706',
   decision: '#16a34a',
 }

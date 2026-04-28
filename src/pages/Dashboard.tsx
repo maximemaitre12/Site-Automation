@@ -168,47 +168,6 @@ export function Dashboard() {
         />
       </div>
 
-      {/* ── Action items ── */}
-      <div style={{
-        background: todoItems.length > 0 ? '#FFF8EE' : 'var(--surface)',
-        border: `1px solid ${todoItems.length > 0 ? '#FDDFA0' : 'var(--border)'}`,
-        borderRadius: 12, padding: '12px 18px', marginBottom: 14, flexShrink: 0,
-        display: 'flex', alignItems: 'flex-start', gap: 12,
-      }}>
-        <div style={{
-          width: 24, height: 24, borderRadius: '50%', flexShrink: 0, marginTop: 1,
-          background: todoItems.length > 0 ? '#FDDFA0' : 'var(--surface-2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          {todoItems.length > 0 ? (
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M8 2v5l3 3"/><circle cx="8" cy="8" r="6"/>
-            </svg>
-          ) : (
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="var(--ok)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="2,8 6,12 14,4"/>
-            </svg>
-          )}
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: todoItems.length > 0 ? 6 : 0, color: todoItems.length > 0 ? '#92400E' : 'var(--ok)' }}>
-            {d.todo}
-          </div>
-          {todoItems.length === 0 ? (
-            <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{d.todoEmpty}</span>
-          ) : (
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {todoItems.map((item, i) => (
-                <li key={i} style={{ fontSize: 12, color: '#92400E', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#D97706', flexShrink: 0 }} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-
       {/* ── Middle row ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 14, flex: 1, minHeight: 0 }}>
 

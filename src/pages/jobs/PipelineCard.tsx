@@ -8,7 +8,6 @@ import { useAppStore } from '../../store/useAppStore'
 
 const STAGE_COLORS: Record<string, { bg: string; color: string }> = {
   new:              { bg: 'var(--surface-3)',  color: 'var(--text-3)' },
-  prequalification: { bg: '#D0E4F8',           color: '#2563EB' },
   interview:        { bg: '#FEE8D0',           color: '#D9780A' },
   decision:         { bg: '#D0F0E4',           color: '#2E9460' },
 }
@@ -31,7 +30,7 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
     : candidate.qualification_score >= 40 ? '#d97706'
     : 'var(--err)'
 
-  const STAGE_ORDER = ['new', 'prequalification', 'interview', 'decision'] as const
+  const STAGE_ORDER = ['new', 'interview', 'decision'] as const
   const currentStageIdx = STAGE_ORDER.indexOf(candidate.stage as typeof STAGE_ORDER[number])
   const nextStage = currentStageIdx < STAGE_ORDER.length - 1 ? STAGE_ORDER[currentStageIdx + 1] : null
   const stageConf = STAGE_COLORS[candidate.stage] || STAGE_COLORS.new
@@ -52,16 +51,27 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
       {/* Top row: avatar + name + score */}
       <div className="flex items-center justify-between" style={{ gap: 8, overflow: 'hidden' }}>
         <div className="flex items-center gap-8" style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, fontWeight: 600, color: 'var(--text-1)', flexShrink: 0,
-          }}>
-            {candidate.initials || '?'}
-          </div>
+          {candidate.photo_url ? (
+            <img
+              src={candidate.photo_url}
+              alt=""
+              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+            />
+          ) : (
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 600, color: 'var(--text-1)', flexShrink: 0,
+            }}>
+              {candidate.initials || '?'}
+            </div>
+          )}
           <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
-            <div className="t-12 medium truncate">{candidate.role}</div>
-            <div className="t-11 c-3 truncate">{candidate.location}</div>
+            <div className="t-12 medium truncate">{candidate.full_name || candidate.role}</div>
+            <div className="t-11 c-3 truncate">
+              {candidate.full_name ? candidate.role : candidate.location || '—'}
+            </div>
           </div>
         </div>
 
@@ -101,6 +111,28 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
           </div>
         )}
       </div>
+
+      {/* Contact info — visible directly on the card */}
+      {(candidate.email || candidate.phone) && (
+        <div className="flex flex-wrap gap-4" style={{ fontSize: 10, color: 'var(--text-2)' }}>
+          {candidate.email && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M2.5 4l5.5 4 5.5-4"/>
+              </svg>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{candidate.email}</span>
+            </span>
+          )}
+          {candidate.phone && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M3 2h2.5l1.5 4-2 1c.8 1.7 2.1 3 3.8 3.8l1-2 4 1.5V13a1.5 1.5 0 0 1-1.5 1.5C6.6 14.5 1.5 9.4 1.5 3.5A1.5 1.5 0 0 1 3 2z"/>
+              </svg>
+              {candidate.phone}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Skills preview */}
       {profile?.skills?.length > 0 && (

@@ -1,14 +1,11 @@
 import { Router, Request, Response } from 'express'
-import axios from 'axios'
 import { getDb } from '../db'
+import { callLLM } from '../lib/llm'
 
 const router = Router()
 
 const VALID_STATUSES = ['new', 'viewed', 'contacted', 'rejected']
-const VALID_STAGES = ['new', 'prequalification', 'interview', 'decision']
-
-const GEMINI_KEY = process.env.GEMINI_KEY
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
+const VALID_STAGES = ['new', 'interview', 'decision']
 
 router.get('/', (req: Request, res: Response) => {
   try {
@@ -152,21 +149,12 @@ ${candidateLines}
 Réponds UNIQUEMENT en JSON valide sans markdown, sans texte avant ou après :
 {"score": <entier 0-100>, "notes": "<2-3 points clés concis sur l'adéquation au poste>"}`
 
-    const response = await axios.post(
-      GEMINI_URL,
-      { contents: [{ parts: [{ text: prompt }] }] },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 30000 },
-    )
-    const text: string = response.data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-    const cleaned = text.replace(/```json|```/g, '').trim()
-    // Extract JSON object even if there's surrounding text
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error('No JSON object in AI response')
-    const parsed = JSON.parse(jsonMatch[0]) as { score: number; notes: string }
+    const text = await callLLM(prompt, { jsonMode: true, timeoutMs: 30000 })
+    const parsed = JSON.parse(text) as { score: number; notes: string }
     if (typeof parsed.score !== 'number') throw new Error('Invalid score in AI response')
 
-    db.prepare('UPDATE candidates SET qualification_score = ?, qualification_notes = ?, stage = ? WHERE id = ?')
-      .run(parsed.score, parsed.notes, 'prequalification', id)
+    db.prepare('UPDATE candidates SET qualification_score = ?, qualification_notes = ? WHERE id = ?')
+      .run(parsed.score, parsed.notes, id)
 
     const updated = db.prepare('SELECT * FROM candidates WHERE id = ?').get(id)
     res.json({ data: updated })

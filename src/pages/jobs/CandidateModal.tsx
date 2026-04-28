@@ -118,16 +118,29 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
           <div style={{ padding: '20px 24px 0', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
             <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
               <div className="flex items-center gap-14">
-                <div style={{
-                  width: 44, height: 44, borderRadius: '50%', background: 'var(--surface-2)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 600, color: 'var(--text-1)', flexShrink: 0,
-                }}>
-                  {candidate.initials || '?'}
-                </div>
+                {candidate.photo_url ? (
+                  <img
+                    src={candidate.photo_url}
+                    alt=""
+                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%', background: 'var(--surface-2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 14, fontWeight: 600, color: 'var(--text-1)', flexShrink: 0,
+                  }}>
+                    {candidate.initials || '?'}
+                  </div>
+                )}
                 <div>
-                  <div className="t-15 medium">{candidate.role}</div>
-                  <div className="t-11 c-2 mt-4">{candidate.location}{candidate.experience_years > 0 ? ` · ${tm.years(candidate.experience_years)}` : ''}</div>
+                  <div className="t-15 medium">{candidate.full_name || candidate.role}</div>
+                  <div className="t-11 c-2 mt-4">
+                    {candidate.full_name ? `${candidate.role} · ` : ''}
+                    {candidate.location}
+                    {candidate.experience_years > 0 ? ` · ${tm.years(candidate.experience_years)}` : ''}
+                  </div>
                 </div>
               </div>
               <div className="flex gap-8 items-center">
@@ -222,6 +235,29 @@ export function CandidateModal({ candidate: initial, job, onClose, onUpdate, onD
                         {tm.interviewDecision}: {candidate.decision === 'hire' ? '✓ ' + tc.hired : '✗ ' + tc.rejected}
                       </span>
                     )}
+                  </div>
+                )}
+
+                {/* Outreach history banner */}
+                {candidate.outreach_count > 0 && (
+                  <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+                      <circle cx="8" cy="8" r="7"/><line x1="8" y1="5" x2="8" y2="8"/><circle cx="8" cy="11" r="0.5" fill="#2563EB"/>
+                    </svg>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#1D4ED8' }}>
+                        {candidate.outreach_count === 1 ? 'Contacté automatiquement 1 fois' : `Contacté automatiquement ${candidate.outreach_count} fois`}
+                        {candidate.outreach_count >= 2 && ' — limite atteinte'}
+                      </div>
+                      {candidate.contacted_at && (
+                        <div style={{ fontSize: 11, color: '#3B82F6', marginTop: 2 }}>
+                          Dernier envoi : {new Date(candidate.contacted_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                        SMS + email en ukrainien avec lien Calendly. Tout nouvel envoi automatique est bloqué.
+                      </div>
+                    </div>
                   </div>
                 )}
 

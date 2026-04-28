@@ -1,10 +1,7 @@
 import { Router, Request, Response } from 'express'
-import axios from 'axios'
+import { callLLM } from '../lib/llm'
 
 const router = Router()
-
-const GEMINI_KEY = process.env.GEMINI_KEY
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
 
 const FARMASOFT_CONTEXT = `
 Tu travailles pour Farmasoft UA, entreprise ukrainienne spécialisée dans les logiciels
@@ -13,15 +10,6 @@ Les salaires sont en hryvnias ukrainiennes (UAH). Adapte toujours tes réponses
 au contexte ukrainien : marché du travail local, plateformes Work.ua/Robota.ua,
 culture professionnelle ukrainienne.
 `
-
-async function callGemini(prompt: string): Promise<string> {
-  const response = await axios.post(
-    GEMINI_URL,
-    { contents: [{ parts: [{ text: prompt }] }] },
-    { headers: { 'Content-Type': 'application/json' }, timeout: 30000 },
-  )
-  return response.data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-}
 
 router.post('/generate-job', async (req: Request, res: Response) => {
   try {
@@ -56,9 +44,8 @@ Salaires de référence marché Ukraine 2025 :
 - Technicien maintenance : 18 000–30 000 UAH/mois
 - Commercial / Business Dev : 25 000–50 000 UAH/mois`
 
-    const text = await callGemini(prompt)
-    const cleaned = text.replace(/```json|```/g, '').trim()
-    const parsed = JSON.parse(cleaned)
+    const text = await callLLM(prompt, { jsonMode: true, timeoutMs: 30000 })
+    const parsed = JSON.parse(text)
     res.json({ data: parsed })
   } catch (err: unknown) {
     const msg = (err as Error).message
@@ -128,7 +115,7 @@ STRICT RULES:
 
 Reply with ONLY the message text, nothing else.`
 
-    const text = await callGemini(prompt)
+    const text = await callLLM(prompt, { timeoutMs: 30000 })
     res.json({ data: text.trim() })
   } catch (err: unknown) {
     res.json({ error: `AI error: ${(err as Error).message}` })

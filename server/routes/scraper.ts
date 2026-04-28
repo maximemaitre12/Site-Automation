@@ -3,14 +3,12 @@ import axios from 'axios'
 import * as cheerio from 'cheerio'
 import https from 'https'
 import { getDb } from '../db'
+import { callLLM } from '../lib/llm'
 
 const router = Router()
 
 // Disable SSL verification for corporate/Windows certificate issues
 const httpsAgent = new https.Agent({ rejectUnauthorized: false })
-
-const GEMINI_KEY = process.env.GEMINI_KEY
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
 
 // Google CSE — fallback if work.ua HTTP fails (requires billing active)
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
@@ -187,15 +185,14 @@ function ukrainianToSlug(text: string): string {
     .replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '')
 }
 
-// Translate query to Ukrainian via Gemini
+// Translate query to Ukrainian via LLM
 async function translateToUkrainian(query: string): Promise<string> {
   try {
-    const { data } = await axios.post(
-      GEMINI_URL,
-      { contents: [{ parts: [{ text: `Translate to Ukrainian (1-4 words, nominative case, no explanation): "${query}". Reply ONLY with Ukrainian. Examples: "driver"→"водій", "truck driver"→"водій вантажного автомобіля", "pharmacist"→"фармацевт"` }] }] },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 8000 },
+    const text = await callLLM(
+      `Translate to Ukrainian (1-4 words, nominative case, no explanation): "${query}". Reply ONLY with Ukrainian. Examples: "driver"→"водій", "truck driver"→"водій вантажного автомобіля", "pharmacist"→"фармацевт"`,
+      { timeoutMs: 8000, maxTokens: 30 },
     )
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || query
+    return text.trim() || query
   } catch {
     return query
   }
@@ -389,19 +386,12 @@ ${candidateLines}
 
 Réponds UNIQUEMENT en JSON valide sans markdown : {"score": <entier 0-100>, "notes": "<2-3 points clés concis sur l'adéquation au poste>"}`
 
-      const response = await axios.post(
-        GEMINI_URL,
-        { contents: [{ parts: [{ text: prompt }] }] },
-        { headers: { 'Content-Type': 'application/json' }, timeout: 30000 },
-      )
-      const text: string = response.data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-      const jsonMatch = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)
-      if (!jsonMatch) return
-      const parsed = JSON.parse(jsonMatch[0]) as { score: number; notes: string }
+      const text = await callLLM(prompt, { jsonMode: true, timeoutMs: 30000, maxTokens: 200 })
+      const parsed = JSON.parse(text) as { score: number; notes: string }
       if (typeof parsed.score !== 'number') return
 
-      db.prepare('UPDATE candidates SET qualification_score = ?, qualification_notes = ?, stage = ? WHERE id = ?')
-        .run(parsed.score, parsed.notes, 'prequalification', id)
+      db.prepare('UPDATE candidates SET qualification_score = ?, qualification_notes = ? WHERE id = ?')
+        .run(parsed.score, parsed.notes, id)
 
       console.log(`[qualify] Candidate ${id} scored ${parsed.score}/100`)
     } catch {

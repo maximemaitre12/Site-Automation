@@ -1,11 +1,9 @@
 import { Router, Request, Response } from 'express'
 import axios from 'axios'
 import { getDb } from '../db'
+import { callLLM } from '../lib/llm'
 
 const router = Router()
-
-const GEMINI_KEY = process.env.GEMINI_KEY
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
 
 // Parse a CV (PDF or text) and create a candidate record
 router.post('/parse', async (req: Request, res: Response) => {
@@ -40,21 +38,16 @@ Réponds UNIQUEMENT en JSON valide sans markdown ni backticks :
   }
 }`
 
-    const parts = mimeType === 'application/pdf'
-      ? [{ inlineData: { mimeType, data: content } }, { text: prompt }]
-      : [{ text: `${prompt}\n\nContenu du CV :\n${content}` }]
+    if (mimeType === 'application/pdf') {
+      return res.json({ error: 'PDF non supporté avec OpenAI — convertissez en .txt avant import (ou installez pdf-parse pour extraction automatique).' })
+    }
 
-    const response = await axios.post(
-      GEMINI_URL,
-      { contents: [{ parts }] },
-      { headers: { 'Content-Type': 'application/json' }, timeout: 60000 },
-    )
-    const text: string = response.data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-    const cleaned = text.replace(/```json|```/g, '').trim()
+    const fullPrompt = `${prompt}\n\nContenu du CV :\n${content}`
+    const text = await callLLM(fullPrompt, { jsonMode: true, timeoutMs: 60000 })
 
     let parsed: Record<string, unknown>
     try {
-      parsed = JSON.parse(cleaned)
+      parsed = JSON.parse(text)
     } catch {
       return res.json({ error: 'Réponse IA invalide, réessayez.' })
     }

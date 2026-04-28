@@ -91,6 +91,21 @@ export function getDb(): DatabaseSync {
   try { db.exec('ALTER TABLE candidates ADD COLUMN cv_text TEXT') } catch { /* already exists */ }
   try { db.exec('ALTER TABLE candidates ADD COLUMN rejection_reason TEXT') } catch { /* already exists */ }
   try { db.exec("ALTER TABLE candidates ADD COLUMN decision TEXT DEFAULT 'pending'") } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN robota_apply_id TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN email TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN phone TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN outreach_count INTEGER DEFAULT 0') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN full_name TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN photo_url TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE candidates ADD COLUMN birth_date TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN robota_vacancy_id INTEGER') } catch { /* already exists */ }
+
+  // Prevent importing the same robota application twice for the same job
+  try {
+    db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_candidates_robota_apply
+             ON candidates(robota_apply_id, job_id)
+             WHERE robota_apply_id IS NOT NULL`)
+  } catch { /* already exists */ }
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS interviews (

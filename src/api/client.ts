@@ -83,6 +83,37 @@ export const api = {
     set: (key: string, value: string) =>
       req<{ success: boolean }>(`/settings/${key}`, { method: 'PUT', ...body({ value }) }),
   },
+  robota: {
+    config: () => req<RobotaConfig>('/robota/config'),
+    saveConfig: (cfg: { turbosms_token?: string; turbosms_sender?: string; calendly_url?: string; auto_outreach?: string; outreach_score_threshold?: number | string; followup_days?: number | string }) =>
+      req<{ success: boolean }>('/robota/config', { method: 'POST', ...body(cfg) }),
+    auth: (email: string, password: string) =>
+      req<{ success: boolean }>('/robota/auth', { method: 'POST', ...body({ email, password }) }),
+    disconnect: () =>
+      req<{ success: boolean }>('/robota/disconnect', { method: 'POST' }),
+    smtpConfig: (cfg: SmtpConfig) =>
+      req<{ success: boolean }>('/robota/smtp-config', { method: 'POST', ...body(cfg) }),
+    sync: (jobId: number, params: { robota_vacancy_id?: number; auto_qualify?: boolean }) =>
+      req<{ imported: number; outreached: number }>(`/robota/sync/${jobId}`, { method: 'POST', ...body(params) }),
+    outreach: (candidateId: number, isFollowUp?: boolean) =>
+      req<{ smsSent: boolean; emailSent: boolean }>(`/robota/outreach/${candidateId}`, { method: 'POST', ...body({ is_follow_up: isFollowUp }) }),
+    sendEmail: (candidateId: number, subject: string, emailBody: string) =>
+      req<Candidate>(`/robota/send-email/${candidateId}`, { method: 'POST', ...body({ subject, body: emailBody }) }),
+    publishVacancy: (jobId: number, params: { publish_type?: string; contact_email?: string; work_types?: string[]; employment_types?: string[] }) =>
+      req<{ success: boolean; robota_vacancy_id: number }>(`/robota/publish-vacancy/${jobId}`, { method: 'POST', ...body(params) }),
+    myVacancies: () => req<VacancyStatus[]>('/robota/my-vacancies'),
+    vacancyState: (robotaVacancyId: number, state: string) =>
+      req<{ success: boolean; state: string }>(`/robota/vacancy-state/${robotaVacancyId}`, { method: 'POST', ...body({ state }) }),
+    updateVacancy: (jobId: number) =>
+      req<{ success: boolean; robota_vacancy_id: number }>(`/robota/vacancy/${jobId}`, { method: 'PUT' }),
+    deleteVacancy: (robotaVacancyId: number) =>
+      req<{ success: boolean }>(`/robota/vacancy/${robotaVacancyId}`, { method: 'DELETE' }),
+    employerVacancies: () => req<EmployerVacancy[]>('/robota/employer-vacancies'),
+    fullSync: () => req<{ started: boolean }>('/robota/full-sync', { method: 'POST' }),
+    fullSyncStatus: () => req<FullSyncProgress>('/robota/full-sync/status'),
+    cvdbSearch: (params: { keywords: string; cityId?: number; salaryFrom?: number; salaryTo?: number; experienceId?: number; page?: number; count?: number; jobId?: number }) =>
+      req<{ data: Candidate[]; total: number }>('/robota/cvdb/search', { method: 'POST', ...body(params) }),
+  },
 }
 
 // Shared types
@@ -106,6 +137,9 @@ export interface Candidate {
   id: number
   job_id: number | null
   initials: string
+  full_name: string | null
+  photo_url: string | null
+  birth_date: string | null
   role: string
   location: string
   experience_years: number
@@ -117,16 +151,42 @@ export interface Candidate {
   profile_data: string | null
   status: 'new' | 'viewed' | 'contacted' | 'rejected'
   source_type: 'scraped' | 'upload'
-  stage: 'new' | 'prequalification' | 'interview' | 'decision'
+  stage: 'new' | 'interview' | 'decision'
   qualification_score: number | null
   qualification_notes: string | null
   cv_filename: string | null
   cv_text: string | null
   rejection_reason: string | null
   decision: 'pending' | 'hire' | 'reject' | null
+  robota_apply_id: string | null
+  email: string | null
+  phone: string | null
+  outreach_count: number
   viewed_at: string | null
   contacted_at: string | null
   created_at: string
+}
+
+export interface RobotaConfig {
+  robota_configured: boolean
+  smtp_configured: boolean
+  turbosms_configured: boolean
+  calendly_configured: boolean
+  auto_outreach: boolean
+  robota_email: string | null
+  smtp_from: string | null
+  calendly_url: string | null
+  outreach_score_threshold: number
+  followup_days: number
+  last_auto_sync: string | null
+}
+
+export interface SmtpConfig {
+  host?: string
+  port?: string
+  user?: string
+  pass?: string
+  from?: string
 }
 
 export interface Interview {
@@ -209,6 +269,39 @@ export interface SearchHistory {
   platforms: string
   candidates_found: number
   created_at: string
+}
+
+export interface VacancyStatus {
+  id: number
+  title: string
+  location: string
+  robota_vacancy_id: number
+  robota_status: string | null
+  robota_name?: string
+  error?: string
+}
+
+export interface EmployerVacancy {
+  id: number
+  name: string
+  state: string
+  cityName?: string
+  salaryRange?: { amountFrom?: number; amountTo?: number }
+  linked: boolean
+  farmasoft_job_id: number | null
+  farmasoft_job_title: string | null
+}
+
+export interface FullSyncProgress {
+  status: 'idle' | 'running' | 'done' | 'error'
+  vacanciesTotal: number
+  vacanciesDone: number
+  candidatesImported: number
+  candidatesOutreached: number
+  currentVacancy: string
+  startedAt: string | null
+  finishedAt: string | null
+  error?: string
 }
 
 export interface CandidateMessageEvent {

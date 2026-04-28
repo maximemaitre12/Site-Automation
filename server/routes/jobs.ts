@@ -20,9 +20,8 @@ router.get('/with-counts', (_req: Request, res: Response) => {
       SELECT j.*, COUNT(c.id) as candidate_count
       FROM jobs j
       LEFT JOIN candidates c ON c.job_id = j.id
-      WHERE j.is_active = 1
       GROUP BY j.id
-      ORDER BY j.created_at DESC
+      ORDER BY j.is_active DESC, j.created_at DESC
     `).all()
     res.json({ data: jobs })
   } catch (err: unknown) {
