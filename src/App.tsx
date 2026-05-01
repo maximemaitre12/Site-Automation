@@ -42,6 +42,7 @@ import Documentation from "./pages/resources/Documentation";
 import Privacy from "./pages/legal/Privacy";
 import Terms from "./pages/legal/Terms";
 import Security from "./pages/legal/Security";
+import LegalNotice from "./pages/legal/LegalNotice";
 
 // Product Tour
 import ProductTour from "./pages/ProductTour";
@@ -104,6 +105,7 @@ const App = () => {
                 <Route path="/legal/privacy" element={<Privacy />} />
                 <Route path="/legal/terms" element={<Terms />} />
                 <Route path="/legal/security" element={<Security />} />
+                <Route path="/legal/mentions" element={<LegalNotice />} />
               </Route>
 
               {/* Product Tour (own layout) */}

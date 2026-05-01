@@ -30,6 +30,7 @@ export function LandingFooter() {
               <a href="#team" className="block hover:text-[#1E4D8C] transition-colors">About</a>
               <a href="#case-study" className="block hover:text-[#1E4D8C] transition-colors">Case Study</a>
               <Link to="/contact" className="block hover:text-[#1E4D8C] transition-colors">Contact</Link>
+              <Link to="/legal/mentions" className="block hover:text-[#1E4D8C] transition-colors">Mentions Légales</Link>
             </div>
           </div>
 
