@@ -50,6 +50,19 @@ export function PharmaTeam() {
                 pharmaceutical industry standards.
               </p>
             </ScrollReveal>
+            <ScrollReveal delay={400}>
+              <div className="mt-10 p-6 rounded-2xl" style={{ background: "rgba(30,77,140,0.06)", border: "1px solid rgba(30,77,140,0.12)" }}>
+                <p className="text-[11px] tracking-[0.25em] uppercase font-semibold mb-3" style={{ color: "#1E4D8C" }}>
+                  About AETHER Group
+                </p>
+                <div className="space-y-1.5 text-[13px] leading-relaxed" style={{ color: "#334155" }}>
+                  <p><strong style={{ color: "#0F172A" }}>AETHER Group</strong> — Conseil en transformation opérationnelle par l'IA</p>
+                  <p>66 Avenue des Champs-Élysées, 75008 Paris</p>
+                  <p>SIREN 104 445 424 · APE 70.22Z</p>
+                  <p style={{ color: "#64748B" }}>Représentant légal : Youriy Strashnyi</p>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
 
           <div className="space-y-0">
