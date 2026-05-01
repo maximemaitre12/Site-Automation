@@ -42,6 +42,7 @@ import Documentation from "./pages/resources/Documentation";
 import Privacy from "./pages/legal/Privacy";
 import Terms from "./pages/legal/Terms";
 import Security from "./pages/legal/Security";
+import LegalNotice from "./pages/legal/LegalNotice";
 
 // Product Tour
 import ProductTour from "./pages/ProductTour";
