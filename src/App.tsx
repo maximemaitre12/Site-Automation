@@ -105,6 +105,7 @@ const App = () => {
                 <Route path="/legal/privacy" element={<Privacy />} />
                 <Route path="/legal/terms" element={<Terms />} />
                 <Route path="/legal/security" element={<Security />} />
+                <Route path="/legal/mentions" element={<LegalNotice />} />
               </Route>
 
               {/* Product Tour (own layout) */}
