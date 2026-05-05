@@ -79,23 +79,23 @@ const steps = [
 const faqs = [
   {
     q: "Le bracelet est-il vraiment gratuit ?",
-    a: "Oui, le bracelet Oreon est offert. Vous souscrivez un abonnement sans engagement avec prélèvement trimestriel de 11,97€ (Précommande) ou 14,97€ (Livraison directe) par SEPA ou carte bancaire.",
+    a: "Oui, le bracelet Oreon est offert. Vous payez uniquement 3,99€ (Précommande) ou 4,99€ (Livraison directe) en paiement unique par SEPA ou carte bancaire.",
   },
   {
     q: "Quelle est la différence entre les deux offres ?",
-    a: "L'offre Précommande à 3,99€/mois vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€/mois inclut une expédition sous 48h et des fonctionnalités avancées.",
+    a: "L'offre Précommande à 3,99€ vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€ inclut une expédition sous 48h et des fonctionnalités avancées.",
   },
   {
-    q: "Comment fonctionne le prélèvement SEPA ?",
-    a: "En scannant le QR code fourni, vous autorisez un mandat de prélèvement SEPA. Le montant est débité automatiquement tous les 3 mois de votre compte bancaire.",
+    q: "Comment fonctionne le paiement ?",
+    a: "Le paiement est unique. Vous réglez une seule fois par carte bancaire ou SEPA, et vous recevez votre bracelet Oreon avec accès complet à la plateforme.",
   },
   {
     q: "Puis-je payer par carte bancaire ?",
-    a: "Oui, vous pouvez choisir le paiement par carte bancaire en cliquant sur le bouton correspondant dans la section tarifs. Le prélèvement sera effectué tous les 3 mois automatiquement.",
+    a: "Oui, vous pouvez choisir le paiement par carte bancaire en cliquant sur le bouton correspondant dans la section tarifs.",
   },
   {
-    q: "Puis-je résilier mon abonnement ?",
-    a: "L'abonnement est sans engagement. Vous pouvez résilier à tout moment, la résiliation prend effet à la fin du trimestre en cours.",
+    q: "Y a-t-il un abonnement ou des frais récurrents ?",
+    a: "Non, il n'y a aucun abonnement ni frais récurrents. Le paiement est unique et vous donne accès à l'ensemble des fonctionnalités.",
   },
   {
     q: "Mes données sont-elles protégées ?",
