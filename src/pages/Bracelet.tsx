@@ -229,9 +229,6 @@ export default function Bracelet() {
       {/* Bracelet Showcase Section */}
       <BraceletShowcaseSection />
 
-      {/* Transition Zone */}
-      <SectionTransitionZone />
-
       {/* Technical Specs — Animated */}
       <AnimatedSpecsSection specsSrc={oreonSpecs} />
 
