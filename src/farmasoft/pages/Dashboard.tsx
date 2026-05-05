@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, KPIs, Interview } from '../api/client'
+import { api, Candidate, KPIs, Interview } from '../api/client'
 import { useAppStore } from '../store/useAppStore'
 import { T } from '../i18n'
 
@@ -42,6 +42,7 @@ export function Dashboard() {
   const [kpis, setKpis] = useState<KPIs | null>(null)
   const [interviews, setInterviews] = useState<Interview[]>([])
   const [pendingCVs, setPendingCVs] = useState(0)
+  const [allCandidates, setAllCandidates] = useState<Candidate[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export function Dashboard() {
         setInterviews(upcoming)
       }
       if (cands.data) {
+        setAllCandidates(cands.data)
         setPendingCVs(cands.data.filter(c => c.source_type === 'upload' && c.stage === 'new').length)
       }
       setLoading(false)
@@ -65,6 +67,22 @@ export function Dashboard() {
 
   const todayInterviews = interviews.filter(i => isToday(i.scheduled_at))
   const nextInterviews  = interviews.filter(i => !isToday(i.scheduled_at)).slice(0, 5)
+
+  // Action items
+  const hotUncontacted = allCandidates.filter(c =>
+    c.qualification_score != null && c.qualification_score >= 70 &&
+    c.status !== 'contacted' && c.status !== 'rejected'
+  ).length
+  const soon24h = interviews.filter(i => {
+    const ms = new Date(i.scheduled_at).getTime() - Date.now()
+    return ms > 0 && ms <= 24 * 60 * 60 * 1000
+  }).length
+  const jobsEmpty = kpis ? kpis.byJob.filter(j => j.count === 0).length : 0
+  const todoItems = [
+    hotUncontacted > 0 && d.todoHotCandidates(hotUncontacted),
+    soon24h > 0 && d.todoInterviewsSoon(soon24h),
+    jobsEmpty > 0 && d.todoJobsEmpty(jobsEmpty),
+  ].filter(Boolean) as string[]
 
   const activeJobs   = kpis?.activeJobs ?? 0
   const contacted    = kpis?.totalContacted ?? 0
