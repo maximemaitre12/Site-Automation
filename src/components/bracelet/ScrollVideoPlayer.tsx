@@ -83,8 +83,8 @@ export default function ScrollVideoPlayer() {
         const stickyTravel = Math.max(1, rect.height - viewH + earlyStart);
         const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
 
-        // First 80% of scroll: rotate from back to logo. Last 20%: hold on logo.
-        const rotateProgress = Math.min(1, progress / 0.95);
+        // Use the full scroll distance so the bracelet keeps rotating until the end.
+        const rotateProgress = progress;
         const frameOffset = Math.round(rotateProgress * travelFrames) * direction;
         const frameIndex = ((START_INDEX + frameOffset) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
