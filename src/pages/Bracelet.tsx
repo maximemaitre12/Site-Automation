@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, CreditCard, Loader2 } from "lucide-react";
+import PrecommanderReveal from "@/components/bracelet/PrecommanderReveal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
@@ -203,12 +204,11 @@ export default function Bracelet() {
             </p>
 
             <div className="flex flex-wrap gap-3">
-              <a
-                href="#pricing"
-                className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-bold tracking-[0.15em] uppercase text-[#0a1e46] bg-white rounded-none transition-all hover:bg-white/90"
-              >
-                Précommander
-              </a>
+              <PrecommanderReveal
+                plans={plans}
+                onCardPayment={handleCardPayment}
+                loadingPlan={loadingPlan}
+              />
               <a
                 href="#features"
                 className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
