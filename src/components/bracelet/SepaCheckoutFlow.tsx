@@ -111,7 +111,6 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
             background: inputBg,
             border: `1px solid ${inputBorder}`,
             color: inputText,
-            focusRingColor: accentColor,
           }}
           autoComplete="name"
         />
