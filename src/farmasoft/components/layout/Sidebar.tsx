@@ -549,9 +549,17 @@ function CalendlyConnectModal({ initial, onClose }: { initial: string; onClose: 
 export function Sidebar() {
   const { currentPage, setPage, uiLang, sidebarOpen } = useAppStore()
   const t = T[uiLang]
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [connected, setConnected] = useState(false)
+  const [showLogout, setShowLogout] = useState(false)
   const refreshRef = useRef(0)
+
+  const handleLogout = async () => {
+    await signOut()
+    navigate('/')
+  }
 
   useEffect(() => {
     api.robota.config().then(r => setConnected(!!r.data?.robota_configured))
