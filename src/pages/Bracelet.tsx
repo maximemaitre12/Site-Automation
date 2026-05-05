@@ -163,7 +163,7 @@ export default function Bracelet() {
         </div>
 
         <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-32 pb-24">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="max-w-[700px] mx-auto text-center">
             <div>
               <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
                 Biometric Intelligence · AI Automation · Health Tracking
