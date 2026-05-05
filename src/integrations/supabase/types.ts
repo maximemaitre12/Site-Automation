@@ -606,6 +606,45 @@ export type Database = {
         }
         Relationships: []
       }
+      bracelet_orders: {
+        Row: {
+          amount: number
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          metadata: Json | null
+          payment_method: string
+          plan: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: string
+          plan: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       call_analyses: {
         Row: {
           created_at: string

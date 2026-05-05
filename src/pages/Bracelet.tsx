@@ -1,16 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, CreditCard, Loader2, ArrowLeft } from "lucide-react";
+import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, CreditCard, Loader2 } from "lucide-react";
 import PrecommanderReveal from "@/components/bracelet/PrecommanderReveal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
 import oreonSpecs from "@/assets/oreon-specs.png";
-import sepaQrCode from "@/assets/sepa-qrcode.jpg";
+
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
+import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
 
 const features = [
   {
@@ -363,22 +364,12 @@ export default function Bracelet() {
 
                 {/* Payment zone */}
                 {showSepaFor === plan.key ? (
-                  <div className="text-center py-4">
-                    <p className="text-sm font-semibold mb-3" style={{ color: "#0F172A" }}>
-                      Scannez pour activer le SEPA — {plan.name} ({plan.price}€)
-                    </p>
-                    <img src={sepaQrCode} alt={`QR Code SEPA ${plan.name}`} className="w-[160px] h-[160px] mx-auto rounded-lg border" style={{ borderColor: "#E2E8F0" }} />
-                    <p className="text-[11px] mt-3" style={{ color: "#94A3B8" }}>
-                      Mandat SEPA · AETHER GROUP (SIREN 104 445 424)
-                    </p>
-                    <button
-                      onClick={() => setShowSepaFor(null)}
-                      className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
-                      style={{ color: "#1E4D8C" }}
-                    >
-                      <ArrowLeft className="w-3 h-3" /> Retour aux options
-                    </button>
-                  </div>
+                  <SepaCheckoutFlow
+                    planName={plan.name}
+                    planKey={plan.key}
+                    price={plan.price}
+                    onBack={() => setShowSepaFor(null)}
+                  />
                 ) : (
                   <div className="space-y-3">
                     <button
