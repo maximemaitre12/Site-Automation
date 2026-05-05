@@ -191,7 +191,6 @@ export default function Bracelet() {
                   Découvrir les fonctionnalités
                 </a>
               </div>
-            </div>
           </div>
         </div>
       </section>
