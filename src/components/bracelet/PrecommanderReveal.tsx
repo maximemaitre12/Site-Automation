@@ -619,7 +619,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
       <AnimatePresence mode="wait">
         {!isOpen && (
           <MagneticButton onClick={handleClick}>
-            Réserver ma place
+            Précommander
           </MagneticButton>
         )}
       </AnimatePresence>
