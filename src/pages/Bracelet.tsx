@@ -172,13 +172,13 @@ export default function Bracelet() {
           background: "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)"
         }} />
 
-        <div className="relative w-full z-10 pb-16 md:pb-24 px-8 md:px-16 lg:px-24">
+        <div className="relative w-full z-10 pb-12 md:pb-16 px-8 md:px-16 lg:px-24">
           <div className="max-w-[900px]">
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2 mb-4">
               {["Biometric Intelligence", "AI Automation", "Health Tracking"].map((label) => (
                 <span
                   key={label}
-                  className="inline-flex items-center h-7 px-3.5 text-[9px] font-semibold tracking-[0.2em] uppercase text-white/70 rounded-full border border-white/15"
+                  className="inline-flex items-center h-6 px-3 text-[8px] font-semibold tracking-[0.2em] uppercase text-white/70 rounded-full border border-white/15"
                   style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}
                 >
                   <span className="w-1 h-1 rounded-full bg-white/40 mr-2" />
@@ -187,29 +187,29 @@ export default function Bracelet() {
               ))}
             </div>
 
-            <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.95] tracking-[-0.02em] text-white mb-6">
+            <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.02em] text-white mb-4">
               Oreon
             </h1>
 
-            <p className="text-base md:text-lg text-white/60 max-w-[480px] leading-relaxed mb-4 font-light">
+            <p className="text-sm md:text-base text-white/60 max-w-[440px] leading-relaxed mb-3 font-light">
               Le bracelet intelligent qui capture vos données biométriques et les transforme en
               <span className="text-white font-normal"> automatisations IA personnalisées</span> via notre plateforme AETHER
             </p>
 
-            <p className="text-xs text-white/35 mb-10 tracking-wide">
+            <p className="text-[11px] text-white/35 mb-6 tracking-wide">
               Bracelet offert · À partir de 3,99€ · Paiement unique
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               <a
                 href="#pricing"
-                className="inline-flex items-center justify-center h-12 px-8 text-[11px] font-bold tracking-[0.15em] uppercase text-[#0a1e46] bg-white rounded-none transition-all hover:bg-white/90"
+                className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-bold tracking-[0.15em] uppercase text-[#0a1e46] bg-white rounded-none transition-all hover:bg-white/90"
               >
                 Précommander
               </a>
               <a
                 href="#features"
-                className="inline-flex items-center justify-center h-12 px-8 text-[11px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
+                className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
               >
                 Explorer
               </a>
