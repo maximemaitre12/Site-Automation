@@ -24,7 +24,6 @@ const features = [
   },
 ];
 
-/* ─── Frame loader ─── */
 const FRAME_NUMBERS = [
   ...Array.from({ length: 242 }, (_, i) => i + 1),
   ...Array.from({ length: 25 }, (_, i) => i + 274),
@@ -45,7 +44,6 @@ export default function BraceletShowcaseSection() {
   const lastFrameRef = useRef(-1);
   const [visible, setVisible] = useState(false);
 
-  /* Preload frames */
   useEffect(() => {
     let mounted = true;
     const images: HTMLImageElement[] = [];
@@ -78,7 +76,6 @@ export default function BraceletShowcaseSection() {
     lastFrameRef.current = idx;
   };
 
-  /* Scroll-driven rotation */
   useEffect(() => {
     if (!loaded) return;
     const LOGO_INDEX = FRAME_NUMBERS.indexOf(LOGO_FRAME);
@@ -111,7 +108,6 @@ export default function BraceletShowcaseSection() {
     return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(rafId); };
   }, [loaded]);
 
-  /* Intersection observer for fade-in */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -123,59 +119,6 @@ export default function BraceletShowcaseSection() {
     return () => obs.disconnect();
   }, []);
 
-  /* Shared canvas element */
-  const canvasElement = (
-    <div className="relative flex items-center justify-center">
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: "80%",
-          paddingBottom: "80%",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          background: "radial-gradient(circle, rgba(168,221,255,0.08) 0%, transparent 70%)",
-          animation: "pulse 4s ease-in-out infinite",
-        }}
-      />
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            width: 3 + (i % 3),
-            height: 3 + (i % 3),
-            background: `rgba(168,221,255,${0.15 + (i % 3) * 0.05})`,
-            top: `${20 + i * 12}%`,
-            left: `${30 + (i * 7) % 40}%`,
-            animation: `float-particle-${i} ${6 + i * 1.5}s ease-in-out infinite`,
-          }}
-        />
-      ))}
-      <canvas
-        ref={canvasRef}
-        className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[520px] lg:max-h-[70vh] object-contain"
-        style={{
-          opacity: loaded ? 1 : 0,
-          transition: "opacity 0.6s",
-          filter: "drop-shadow(0 0 40px rgba(168,221,255,0.06))",
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-[30%] z-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse at center top, rgba(168,221,255,0.04) 0%, transparent 70%)",
-          filter: "blur(20px)",
-        }}
-      />
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center z-20">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <>
       <div
@@ -185,7 +128,7 @@ export default function BraceletShowcaseSection() {
           background: "radial-gradient(ellipse 80% 60% at 75% 50%, #0e3a8a 0%, #0a2d6e 45%, #071e52 100%)",
         }}
       >
-        {/* Desktop: sticky scroll-driven layout */}
+        {/* Desktop: sticky with side-by-side layout */}
         <div className="hidden lg:block" style={{ height: "110vh" }}>
           <div className="sticky top-0 h-screen flex items-center overflow-hidden">
             <div className="w-full max-w-[1440px] mx-auto px-8 md:px-12 lg:px-20 flex flex-row items-center">
@@ -193,16 +136,16 @@ export default function BraceletShowcaseSection() {
                 <TextContent visible={visible} />
               </div>
               <div className="w-[55%] flex items-center justify-end relative">
-                {canvasElement}
+                <CanvasWrapper canvasRef={canvasRef} loaded={loaded} maxW="max-w-[520px] max-h-[70vh]" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mobile/tablet: simple stacked layout */}
-        <div className="lg:hidden px-6 py-16">
+        {/* Mobile/tablet: stacked, no sticky */}
+        <div className="lg:hidden px-6 py-14">
           <div className="flex items-center justify-center mb-10">
-            {canvasElement}
+            <CanvasWrapper canvasRef={canvasRef} loaded={loaded} maxW="max-w-[260px] sm:max-w-[320px]" />
           </div>
           <TextContent visible={visible} />
         </div>
@@ -217,6 +160,49 @@ export default function BraceletShowcaseSection() {
         @keyframes float-particle-5 { 0%,100% { transform: translate(0,0); opacity: 0.15; } 50% { transform: translate(-8px,-22px); opacity: 0.4; } }
       `}</style>
     </>
+  );
+}
+
+/* The canvas is only rendered once — the mobile/desktop toggle uses display:none,
+   so only one CanvasWrapper is actually mounted at a time, keeping the ref unique. */
+function CanvasWrapper({
+  canvasRef,
+  loaded,
+  maxW,
+}: {
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  loaded: boolean;
+  maxW: string;
+}) {
+  return (
+    <div className="relative flex items-center justify-center w-full">
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: "80%",
+          paddingBottom: "80%",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "radial-gradient(circle, rgba(168,221,255,0.08) 0%, transparent 70%)",
+          animation: "pulse 4s ease-in-out infinite",
+        }}
+      />
+      <canvas
+        ref={canvasRef}
+        className={`relative z-10 w-full ${maxW} object-contain`}
+        style={{
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.6s",
+          filter: "drop-shadow(0 0 40px rgba(168,221,255,0.06))",
+        }}
+      />
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
   );
 }
 
