@@ -129,7 +129,7 @@ export default function BraceletShowcaseSection() {
       <div
         ref={sectionRef}
         className="relative"
-        style={{ height: "120vh", background: "radial-gradient(ellipse 80% 60% at 75% 50%, #0e3a8a 0%, #0a2d6e 45%, #071e52 100%)" }}
+        style={{ height: "110vh", background: "radial-gradient(ellipse 80% 60% at 75% 50%, #0e3a8a 0%, #0a2d6e 45%, #071e52 100%)" }}
       >
         <div className="sticky top-0 h-screen flex items-center overflow-hidden">
           <div className="w-full max-w-[1440px] mx-auto px-8 md:px-12 lg:px-20 flex flex-col lg:flex-row items-center gap-8 lg:gap-0">
