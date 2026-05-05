@@ -110,6 +110,8 @@ export default function ScrollVideoPlayer() {
           style={{
             opacity: loaded ? 1 : 0,
             transition: "opacity 0.5s",
+            borderRadius: "50%",
+            overflow: "hidden",
           }}
         />
         {!loaded && (
