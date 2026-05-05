@@ -339,6 +339,17 @@ serve(async (req) => {
       return json({ data });
     }
 
+    if (path === "/jobs/with-counts" && method === "GET") {
+      const { data: jobs, error } = await supabase.from("farmasoft_jobs").select("*").eq("user_id", userId).eq("is_active", 1).order("created_at", { ascending: false });
+      if (error) return json({ error: error.message });
+      const withCounts = [];
+      for (const job of jobs || []) {
+        const { count } = await supabase.from("farmasoft_candidates").select("*", { count: "exact", head: true }).eq("job_id", job.id).eq("user_id", userId);
+        withCounts.push({ ...job, candidate_count: count || 0 });
+      }
+      return json({ data: withCounts });
+    }
+
     if (path === "/jobs" && method === "POST") {
       const { title, location, salary_min, salary_max, salary_currency, experience_years, skills, description, requirements } = body;
       if (!title) return json({ error: "Le titre est requis" });
@@ -755,6 +766,31 @@ Keep under 8 lines. Sign as "Команда Farmasoft UA". Reply with ONLY the m
       const { error } = await supabase.from("farmasoft_settings").upsert({ key, value, user_id: userId }, { onConflict: "key,user_id" });
       if (error) return json({ error: error.message });
       return json({ data: { success: true } });
+    }
+
+    // ─── ROBOTA STUBS (not yet implemented) ───
+    if (path === "/robota/config" && method === "GET") {
+      return json({ data: {
+        robota_configured: false, smtp_configured: false, turbosms_configured: false,
+        calendly_configured: false, auto_outreach: false, robota_email: null,
+        smtp_from: null, calendly_url: null, outreach_score_threshold: 70,
+        followup_days: 3, last_auto_sync: null,
+      } });
+    }
+
+    if (path === "/robota/full-sync/status" && method === "GET") {
+      return json({ data: {
+        status: "idle", vacanciesTotal: 0, vacanciesDone: 0,
+        candidatesImported: 0, candidatesOutreached: 0,
+        currentVacancy: "", startedAt: null, finishedAt: null,
+      } });
+    }
+
+    if (path === "/messaging/status" && method === "GET") {
+      return json({ data: {
+        whatsapp: { configured: false }, viber: { configured: false },
+        telegram: { configured: false }, email: { configured: false },
+      } });
     }
 
     return json({ error: `Route not found: ${method} ${path}` }, 404);
