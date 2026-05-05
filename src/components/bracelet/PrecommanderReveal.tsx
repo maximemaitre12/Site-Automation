@@ -1,8 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { Check, CreditCard, QrCode, X, Loader2, Lock, ArrowLeft } from "lucide-react";
-import SepaCheckoutFlow from "./SepaCheckoutFlow";
+import { X } from "lucide-react";
 
 /* ═══════════════════════════════════════════
    TYPES & DATA
