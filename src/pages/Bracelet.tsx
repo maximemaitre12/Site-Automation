@@ -4,6 +4,7 @@ import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, Credi
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
+import ScrollVideoPlayer from "@/components/bracelet/ScrollVideoPlayer";
 
 const features = [
   {
@@ -203,6 +204,9 @@ export default function Bracelet() {
           </div>
         </div>
       </section>
+
+      {/* Scroll Video Animation */}
+      <ScrollVideoPlayer />
 
       {/* Features */}
       <section id="features" className="py-28 bg-white">
