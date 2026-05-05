@@ -99,7 +99,7 @@ export default function BraceletShowcaseSection() {
         const earlyStart = viewH * 0.5;
         const stickyTravel = Math.max(1, rect.height - viewH + earlyStart);
         const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
-        const rotateProgress = progress;
+        const rotateProgress = Math.min(1, progress * 1.4);
         const frameOffset = Math.round(rotateProgress * travelFrames) * direction;
         const frameIndex = ((START_INDEX + frameOffset) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
