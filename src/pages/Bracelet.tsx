@@ -229,27 +229,11 @@ export default function Bracelet() {
       {/* Bracelet Showcase Section */}
       <BraceletShowcaseSection />
 
-      {/* Technical Specs Image */}
-      <section className="py-28" style={{ background: "#0a2d6e" }}>
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-          <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-white/45 mb-4">
-              Spécifications techniques
-            </p>
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-4">
-              Conçu pour la performance
-            </h2>
-            <p className="text-base text-white/60 max-w-[500px] mx-auto">
-              Chaque composant a été pensé pour allier durabilité, confort et sécurité cryptographique
-            </p>
-          </div>
-          <img
-            src={oreonSpecs}
-            alt="Spécifications techniques du bracelet Oreon — NFC, silicone, antenne intégrée"
-            className="w-full max-w-[1200px] mx-auto rounded-sm"
-          />
-        </div>
-      </section>
+      {/* Transition Zone */}
+      <SectionTransitionZone />
+
+      {/* Technical Specs — Animated */}
+      <AnimatedSpecsSection specsSrc={oreonSpecs} />
 
       {/* Features */}
       <section id="features" className="py-28 bg-white">
