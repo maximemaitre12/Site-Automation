@@ -219,12 +219,6 @@ export default function Bracelet() {
               >
                 Explorer
               </a>
-              <Link
-                to="/platform"
-                className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
-              >
-                Plateforme AETHER
-              </Link>
             </div>
           </div>
 
