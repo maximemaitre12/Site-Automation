@@ -288,8 +288,7 @@ export default function BraceletShowcaseSection() {
         </div>
       </div>
 
-      {/* Bottom gradient transition */}
-      <div style={{ height: 80, background: "linear-gradient(180deg, #0a2d6e 0%, #0a2d6e 100%)" }} />
+      {/* No bottom gradient — transition zone handles continuity */}
 
       {/* Particle keyframes */}
       <style>{`
