@@ -153,7 +153,7 @@ export default function Bracelet() {
   return (
     <div className="overflow-x-hidden">
       {/* Hero with Video */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative h-screen flex items-end overflow-hidden">
         {/* Video background */}
         <video
           autoPlay
@@ -163,38 +163,57 @@ export default function Bracelet() {
           className="absolute inset-0 w-full h-full object-cover"
           src="/bracelet-hero.mp4"
         />
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(10,45,110,0.55) 0%, rgba(10,45,110,0.75) 100%)" }} />
+        {/* Cinematic gradient overlay — darker at bottom for text */}
+        <div className="absolute inset-0" style={{
+          background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(10,30,70,0.7) 75%, rgba(5,15,40,0.92) 100%)"
+        }} />
+        {/* Subtle vignette */}
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)"
+        }} />
 
-        <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-32 pb-24">
-          <div className="max-w-[700px] mx-auto text-center">
-              <p className="text-xs font-semibold tracking-[0.35em] uppercase text-white/45 mb-8">
-                Biometric Intelligence · AI Automation · Health Tracking
-              </p>
-              <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.02] tracking-tight text-white mb-8">
-                Oreon
-              </h1>
-              <p className="text-lg md:text-xl text-white/65 max-w-[500px] leading-relaxed mb-6">
-                Le bracelet intelligent qui capture vos données biométriques et les transforme en
-                <strong className="text-white font-medium"> automatisations IA personnalisées</strong> via notre plateforme AETHER
-              </p>
-              <p className="text-sm text-white/50 mb-10">
-                Bracelet offert · À partir de 3,99€ · Paiement unique · SEPA ou Carte bancaire
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href="#pricing"
-                  className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#1E4D8C] bg-white transition-all hover:bg-white/90"
-                >
-                  Choisir mon offre
-                </a>
-                <a
-                  href="#features"
-                  className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-medium tracking-[0.1em] uppercase text-white border border-white/25 transition-all hover:bg-white/10"
-                >
-                  Découvrir les fonctionnalités
-                </a>
-              </div>
+        <div className="relative w-full z-10 pb-16 md:pb-24 px-8 md:px-16 lg:px-24">
+          <div className="max-w-[900px]">
+            {/* Accent line */}
+            <div className="w-12 h-[2px] bg-white/40 mb-6" />
+
+            <p className="text-[11px] font-medium tracking-[0.4em] uppercase text-white/50 mb-5">
+              Biometric Intelligence · AI Automation · Health Tracking
+            </p>
+
+            <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.95] tracking-[-0.02em] text-white mb-6">
+              Oreon
+            </h1>
+
+            <p className="text-base md:text-lg text-white/60 max-w-[480px] leading-relaxed mb-4 font-light">
+              Le bracelet intelligent qui capture vos données biométriques et les transforme en
+              <span className="text-white font-normal"> automatisations IA personnalisées</span> via notre plateforme AETHER
+            </p>
+
+            <p className="text-xs text-white/35 mb-10 tracking-wide">
+              Bracelet offert · À partir de 3,99€ · Paiement unique
+            </p>
+
+            <div className="flex flex-wrap gap-4">
+              <a
+                href="#pricing"
+                className="inline-flex items-center justify-center h-12 px-8 text-[11px] font-bold tracking-[0.15em] uppercase text-[#0a1e46] bg-white rounded-none transition-all hover:bg-white/90"
+              >
+                Précommander
+              </a>
+              <a
+                href="#features"
+                className="inline-flex items-center justify-center h-12 px-8 text-[11px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
+              >
+                Explorer
+              </a>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 right-8 md:right-16 lg:right-24 flex flex-col items-center gap-2">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-white/30 rotate-90 origin-center translate-y-4">Scroll</span>
+            <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent" />
           </div>
         </div>
       </section>
