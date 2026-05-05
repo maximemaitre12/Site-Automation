@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const TOTAL_FRAMES = 61;
+const TOTAL_FRAMES = 121;
 
 function getFrameSrc(index: number): string {
   const padded = String(index).padStart(3, "0");
