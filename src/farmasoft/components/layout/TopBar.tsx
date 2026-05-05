@@ -1,6 +1,5 @@
 import { useAppStore } from '../../store/useAppStore'
 import { Lang } from '../../i18n'
-import { useNavigate } from 'react-router-dom'
 import farmasoftLogo from '@/assets/farmasoft-logo.svg'
 
 const SIDEBAR_WIDTH = 224
@@ -14,15 +13,8 @@ const iconMenu = (
   </svg>
 )
 
-const iconBack = (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="10,3 5,8 10,13" />
-  </svg>
-)
-
 export function TopBar() {
   const { uiLang, setUiLang, sidebarOpen, toggleSidebar } = useAppStore()
-  const navigate = useNavigate()
 
   return (
     <div style={{
@@ -60,11 +52,9 @@ export function TopBar() {
 
       <div style={{
         flex: 1, height: '100%',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
         padding: '0 24px',
       }}>
-        <div />
-
         <div style={{
           display: 'flex', alignItems: 'center',
           background: 'var(--surface-2)', borderRadius: 8, padding: 3, gap: 2,
