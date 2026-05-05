@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { Check, CreditCard, QrCode, X, Loader2, Lock } from "lucide-react";
+import { Check, CreditCard, QrCode, X, Loader2, Lock, ArrowLeft } from "lucide-react";
+import sepaQrCode from "@/assets/sepa-qrcode.jpg";
 
 /* ═══════════════════════════════════════════
    TYPES & DATA
@@ -302,6 +303,7 @@ const FeatureRow = ({ text, delay, dark = false }: { text: string; delay: number
 const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
   plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
 }) => {
+  const [showSepa, setShowSepa] = useState(false);
   const baseDelay = 0.45;
 
   return (
@@ -373,52 +375,82 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
         ))}
       </ul>
 
-      <div className="space-y-3">
-        <motion.a
-          href="#qrcode"
-          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, #1A3FB8, #2451D9)",
-            color: "#fff",
-            borderRadius: 12,
-            letterSpacing: "0.06em",
-            fontSize: 14,
-            fontWeight: 600,
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)",
-          }}
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={{ scaleY: 1, opacity: 1 }}
-          transition={{ delay: baseDelay + 0.5, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-          whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(26,63,184,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}
-        >
-          <QrCode className="w-4 h-4" />
-          <span className="relative z-10">Prélèvement SEPA</span>
-        </motion.a>
+      <AnimatePresence mode="wait">
+        {showSepa ? (
+          <motion.div
+            key="sepa-qr"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="text-center py-4">
+              <p className="text-sm font-semibold mb-3" style={{ color: "#0A1C4A" }}>
+                Scannez pour activer le SEPA — {plan.name} ({plan.price}€)
+              </p>
+              <img src={sepaQrCode} alt={`QR Code SEPA ${plan.name}`} className="w-[160px] h-[160px] mx-auto rounded-lg" />
+              <p className="text-[11px] mt-3" style={{ color: "#8A92A6" }}>
+                Mandat SEPA · AETHER GROUP (SIREN 104 445 424)
+              </p>
+              <button
+                onClick={() => setShowSepa(false)}
+                className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
+                style={{ color: "#1A3FB8" }}
+              >
+                <ArrowLeft className="w-3 h-3" /> Retour aux options
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div key="buttons" className="space-y-3">
+            <motion.button
+              onClick={() => setShowSepa(true)}
+              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, #1A3FB8, #2451D9)",
+                color: "#fff",
+                borderRadius: 12,
+                letterSpacing: "0.06em",
+                fontSize: 14,
+                fontWeight: 600,
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)",
+              }}
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ delay: baseDelay + 0.5, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+              whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(26,63,184,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}
+            >
+              <QrCode className="w-4 h-4" />
+              <span className="relative z-10">Prélèvement SEPA</span>
+            </motion.button>
 
-        <motion.button
-          onClick={() => onCardPayment(plan.key)}
-          disabled={loadingPlan === plan.key}
-          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
-          style={{
-            background: "#fff",
-            color: "#0A1C4A",
-            border: "1.5px solid #D5DAE5",
-            borderRadius: 12,
-            fontSize: 14,
-          }}
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={{ scaleY: 1, opacity: 1 }}
-          transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-          whileHover={{ borderColor: "#1A3FB8" }}
-        >
-          {loadingPlan === plan.key ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <CreditCard className="w-4 h-4" />
-          )}
-          <span>Payer par carte</span>
-        </motion.button>
-      </div>
+            <motion.button
+              onClick={() => onCardPayment(plan.key)}
+              disabled={loadingPlan === plan.key}
+              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+              style={{
+                background: "#fff",
+                color: "#0A1C4A",
+                border: "1.5px solid #D5DAE5",
+                borderRadius: 12,
+                fontSize: 14,
+              }}
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+              whileHover={{ borderColor: "#1A3FB8" }}
+            >
+              {loadingPlan === plan.key ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CreditCard className="w-4 h-4" />
+              )}
+              <span>Payer par carte</span>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.p
         className="flex items-center justify-center gap-1.5 text-[11px] text-center mt-4"
@@ -440,6 +472,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
 const RightCard = ({ plan, onCardPayment, loadingPlan }: {
   plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
 }) => {
+  const [showSepa, setShowSepa] = useState(false);
   const baseDelay = 0.58;
 
   return (
@@ -571,52 +604,84 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
         ))}
       </ul>
 
-      <div className="space-y-3">
-        <motion.a
-          href="#qrcode"
-          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, #6FE0F5, #0BA5C7)",
-            color: "#0A1C4A",
-            borderRadius: 12,
-            letterSpacing: "0.06em",
-            fontSize: 14,
-            fontWeight: 700,
-            boxShadow: "0 4px 20px rgba(11,165,199,0.3)",
-          }}
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={{ scaleY: 1, opacity: 1 }}
-          transition={{ delay: baseDelay + 0.5, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-          whileHover={{ scale: 1.02, boxShadow: "0 8px 32px rgba(11,165,199,0.45)" }}
-        >
-          <QrCode className="w-4 h-4" />
-          <span className="relative z-10">Prélèvement SEPA</span>
-        </motion.a>
+      <AnimatePresence mode="wait">
+        {showSepa ? (
+          <motion.div
+            key="sepa-qr"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="text-center py-4">
+              <p className="text-sm font-semibold mb-3" style={{ color: "#fff" }}>
+                Scannez pour activer le SEPA — {plan.name} ({plan.price}€)
+              </p>
+              <div className="inline-block p-3 bg-white rounded-xl">
+                <img src={sepaQrCode} alt={`QR Code SEPA ${plan.name}`} className="w-[140px] h-[140px] mx-auto rounded" />
+              </div>
+              <p className="text-[11px] mt-3" style={{ color: "rgba(255,255,255,0.5)" }}>
+                Mandat SEPA · AETHER GROUP (SIREN 104 445 424)
+              </p>
+              <button
+                onClick={() => setShowSepa(false)}
+                className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
+                style={{ color: "#6FE0F5" }}
+              >
+                <ArrowLeft className="w-3 h-3" /> Retour aux options
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div key="buttons" className="space-y-3">
+            <motion.button
+              onClick={() => setShowSepa(true)}
+              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, #6FE0F5, #0BA5C7)",
+                color: "#0A1C4A",
+                borderRadius: 12,
+                letterSpacing: "0.06em",
+                fontSize: 14,
+                fontWeight: 700,
+                boxShadow: "0 4px 20px rgba(11,165,199,0.3)",
+              }}
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ delay: baseDelay + 0.5, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+              whileHover={{ scale: 1.02, boxShadow: "0 8px 32px rgba(11,165,199,0.45)" }}
+            >
+              <QrCode className="w-4 h-4" />
+              <span className="relative z-10">Prélèvement SEPA</span>
+            </motion.button>
 
-        <motion.button
-          onClick={() => onCardPayment(plan.key)}
-          disabled={loadingPlan === plan.key}
-          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
-          style={{
-            background: "transparent",
-            color: "#fff",
-            border: "1.5px solid rgba(255,255,255,0.2)",
-            borderRadius: 12,
-            fontSize: 14,
-          }}
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={{ scaleY: 1, opacity: 1 }}
-          transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-          whileHover={{ borderColor: "rgba(111,224,245,0.5)" }}
-        >
-          {loadingPlan === plan.key ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <CreditCard className="w-4 h-4" />
-          )}
-          <span>Payer par carte</span>
-        </motion.button>
-      </div>
+            <motion.button
+              onClick={() => onCardPayment(plan.key)}
+              disabled={loadingPlan === plan.key}
+              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+              style={{
+                background: "transparent",
+                color: "#fff",
+                border: "1.5px solid rgba(255,255,255,0.2)",
+                borderRadius: 12,
+                fontSize: 14,
+              }}
+              initial={{ scaleY: 0, opacity: 0 }}
+              animate={{ scaleY: 1, opacity: 1 }}
+              transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+              whileHover={{ borderColor: "rgba(111,224,245,0.5)" }}
+            >
+              {loadingPlan === plan.key ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CreditCard className="w-4 h-4" />
+              )}
+              <span>Payer par carte</span>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <motion.p
         className="flex items-center justify-center gap-1.5 text-[11px] text-center mt-4"
