@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode } from "lucide-react";
+import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, CreditCard, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
 
 const features = [
@@ -38,6 +41,7 @@ const features = [
 const plans = [
   {
     name: "Essentiel",
+    key: "essentiel",
     price: "8,97",
     monthly: "2,99",
     features: [
@@ -51,6 +55,7 @@ const plans = [
   },
   {
     name: "Premium",
+    key: "premium",
     price: "11,97",
     monthly: "3,99",
     popular: true,
@@ -76,11 +81,15 @@ const steps = [
 const faqs = [
   {
     q: "Le bracelet est-il vraiment gratuit ?",
-    a: "Oui, le bracelet Oreon est offert. Vous vous engagez à un abonnement d'un an avec prélèvement trimestriel de 8,97€ (Essentiel) ou 11,97€ (Premium) par SEPA.",
+    a: "Oui, le bracelet Oreon est offert. Vous vous engagez à un abonnement d'un an avec prélèvement trimestriel de 8,97€ (Essentiel) ou 11,97€ (Premium) par SEPA ou carte bancaire.",
   },
   {
     q: "Comment fonctionne le prélèvement SEPA ?",
     a: "En scannant le QR code fourni, vous autorisez un mandat de prélèvement SEPA. Le montant est débité automatiquement tous les 3 mois de votre compte bancaire.",
+  },
+  {
+    q: "Puis-je payer par carte bancaire ?",
+    a: "Oui, vous pouvez choisir le paiement par carte bancaire en cliquant sur le bouton correspondant dans la section tarifs. Le prélèvement sera effectué tous les 3 mois automatiquement.",
   },
   {
     q: "Puis-je résilier mon abonnement ?",
@@ -101,6 +110,42 @@ const faqs = [
 ];
 
 export default function Bracelet() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleCardPayment = async (planKey: string) => {
+    setLoadingPlan(planKey);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await supabase.functions.invoke("bracelet-checkout", {
+        body: { plan: planKey },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+      const { url } = response.data;
+      if (url) {
+        window.open(url, "_blank");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Erreur",
+        description: err.message || "Impossible de créer la session de paiement",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <div className="overflow-x-hidden">
       {/* Hero */}
@@ -127,7 +172,7 @@ export default function Bracelet() {
                 <strong className="text-white font-medium"> automatisations IA personnalisées</strong> via notre plateforme AETHER
               </p>
               <p className="text-sm text-white/50 mb-10">
-                Bracelet offert · À partir de 2,99€/mois · Prélèvement SEPA trimestriel · 12 mois d'engagement
+                Bracelet offert · À partir de 2,99€/mois · SEPA ou Carte bancaire · 12 mois d'engagement
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -251,19 +296,42 @@ export default function Bracelet() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="#qrcode"
-                  className="block text-center py-3.5 text-sm font-semibold tracking-wide uppercase transition-all"
-                  style={{
-                    background: plan.popular ? "#1E4D8C" : "transparent",
-                    color: plan.popular ? "#fff" : "#1E4D8C",
-                    border: plan.popular ? "none" : "1px solid #1E4D8C",
-                  }}
-                >
-                  Activer mon abonnement
-                </a>
+
+                {/* Two payment buttons */}
+                <div className="space-y-3">
+                  <button
+                    onClick={() => handleCardPayment(plan.key)}
+                    disabled={loadingPlan === plan.key}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+                    style={{
+                      background: plan.popular ? "#1E4D8C" : "transparent",
+                      color: plan.popular ? "#fff" : "#1E4D8C",
+                      border: plan.popular ? "none" : "1px solid #1E4D8C",
+                    }}
+                  >
+                    {loadingPlan === plan.key ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <CreditCard className="w-4 h-4" />
+                    )}
+                    Payer par carte
+                  </button>
+                  <a
+                    href="#qrcode"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all"
+                    style={{
+                      background: plan.popular ? "transparent" : "#1E4D8C",
+                      color: plan.popular ? "#1E4D8C" : "#fff",
+                      border: plan.popular ? "1px solid #1E4D8C" : "none",
+                    }}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    Prélèvement SEPA
+                  </a>
+                </div>
+
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  Prélèvement SEPA trimestriel · Engagement 12 mois
+                  Prélèvement trimestriel · Engagement 12 mois
                 </p>
               </div>
             ))}
