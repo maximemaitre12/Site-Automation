@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
 import oreonSpecs from "@/assets/oreon-specs.png";
+import sepaQrCode from "@/assets/sepa-qrcode.jpg";
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
@@ -394,40 +395,10 @@ export default function Bracelet() {
             Scannez le QR code ci-dessous avec votre téléphone pour autoriser le prélèvement mensuel et recevoir votre bracelet Oreon
           </p>
 
-          {/* Placeholder QR Code */}
           <div className="inline-block p-8 bg-white rounded-sm border" style={{ borderColor: "#E2E8F0" }}>
-            <svg width="200" height="200" viewBox="0 0 200 200" className="mx-auto">
-              {/* Placeholder QR pattern */}
-              <rect width="200" height="200" fill="white" />
-              {/* Corner squares */}
-              <rect x="10" y="10" width="50" height="50" fill="#0F172A" />
-              <rect x="16" y="16" width="38" height="38" fill="white" />
-              <rect x="22" y="22" width="26" height="26" fill="#0F172A" />
-              <rect x="140" y="10" width="50" height="50" fill="#0F172A" />
-              <rect x="146" y="16" width="38" height="38" fill="white" />
-              <rect x="152" y="22" width="26" height="26" fill="#0F172A" />
-              <rect x="10" y="140" width="50" height="50" fill="#0F172A" />
-              <rect x="16" y="146" width="38" height="38" fill="white" />
-              <rect x="22" y="152" width="26" height="26" fill="#0F172A" />
-              {/* Data pattern (placeholder) */}
-              {[70,80,90,100,110,120].map(x =>
-                [70,80,90,100,110,120].map(y => (
-                  <rect key={`${x}-${y}`} x={x} y={y} width="8" height="8" fill={(x+y) % 20 === 0 ? "white" : "#0F172A"} />
-                ))
-              )}
-              {[10,20,30,40,50,140,150,160,170,180].map(x =>
-                [70,80,90,100,110,120].map(y => (
-                  <rect key={`h-${x}-${y}`} x={x} y={y} width="8" height="8" fill={(x*y) % 3 === 0 ? "#0F172A" : "white"} />
-                ))
-              )}
-              {[70,80,90,100,110,120].map(x =>
-                [140,150,160,170,180].map(y => (
-                  <rect key={`v-${x}-${y}`} x={x} y={y} width="8" height="8" fill={(x+y) % 3 === 0 ? "#0F172A" : "white"} />
-                ))
-              )}
-            </svg>
+            <img src={sepaQrCode} alt="QR Code SEPA Oreon" className="w-[200px] h-[200px] mx-auto" />
             <p className="text-xs mt-6 font-medium" style={{ color: "#94A3B8" }}>
-              QR Code de démonstration — sera remplacé avant publication
+              Scannez pour activer votre mandat SEPA
             </p>
           </div>
 
