@@ -159,6 +159,7 @@ export default function Bracelet() {
       <section className="relative h-screen flex items-end overflow-hidden">
         {/* Video background */}
         <video
+          ref={(el) => { if (el) el.playbackRate = 1.5; }}
           autoPlay
           muted
           loop
