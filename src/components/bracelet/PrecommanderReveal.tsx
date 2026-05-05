@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { X } from "lucide-react";
+import { Check, CreditCard, QrCode, X, Loader2, Lock } from "lucide-react";
+import SepaCheckoutFlow from "./SepaCheckoutFlow";
 
 /* ═══════════════════════════════════════════
    TYPES & DATA
@@ -17,6 +18,8 @@ interface Plan {
 
 interface Props {
   plans: Plan[];
+  onCardPayment: (planKey: string) => void;
+  loadingPlan: string | null;
 }
 
 /* ═══════════════════════════════════════════
