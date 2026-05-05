@@ -755,7 +755,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
       <AnimatePresence mode="wait">
         {!isOpen && (
           <MagneticButton onClick={handleClick}>
-            Précommander
+            Réserver ma place
           </MagneticButton>
         )}
       </AnimatePresence>
@@ -836,7 +836,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                   
                   {/* Content */}
                   <div className="p-6 md:p-14 relative z-10">
-                    <div className="text-center mb-10">
+                    <div className="text-center mb-8">
                       <motion.div
                         className="inline-flex items-center gap-2 rounded-full mb-5"
                         style={{
@@ -853,43 +853,109 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                           style={{ background: "#6FE0F5", animation: "badge-pulse 2.5s ease-in-out infinite" }}
                         />
                         <span style={{ color: "#1A3FB8", fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                          Tarifs
+                          Lancement officiel
                         </span>
                       </motion.div>
                       
                       <motion.h2
-                        className="font-heading text-[28px] sm:text-[36px] font-semibold mb-3"
-                        style={{ color: "#0A1C4A", letterSpacing: "-0.02em", lineHeight: 1.15 }}
+                        className="font-heading text-[32px] sm:text-[42px] font-bold mb-2"
+                        style={{ color: "#0A1C4A", letterSpacing: "-0.02em", lineHeight: 1.1 }}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        Bracelet offert<span style={{ color: "#1A3FB8" }}>,</span> abonnement simple
+                        1er Juin 2026
                       </motion.h2>
                       
                       <motion.p
-                        className="text-[16px] max-w-[540px] mx-auto"
+                        className="text-[18px] font-medium mb-2"
+                        style={{ color: "#1A3FB8" }}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        Soyez parmi les 1000 premiers
+                      </motion.p>
+                      
+                      <motion.p
+                        className="text-[14px] max-w-[480px] mx-auto"
                         style={{ color: "#5A6478", lineHeight: 1.55 }}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.35, duration: 0.5 }}
                       >
-                        Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
+                        Premier mois offert · Bracelet livré dès lancement · Tarif early-bird verrouillé à vie
                       </motion.p>
-                      
-                      <motion.div
-                        className="mx-auto mt-6 h-px"
-                        style={{ background: "rgba(111,224,245,0.4)", width: 60 }}
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                      />
                     </div>
                     
-                    <div className="grid md:grid-cols-2 gap-6 pt-4">
-                      <LeftCard plan={leftPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
-                      <RightCard plan={rightPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
-                    </div>
+                    {/* Pricing cards */}
+                    <motion.div
+                      className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <div className="p-6 rounded-2xl border text-center" style={{ borderColor: "#E5E8F0", minWidth: 200, background: "#fff" }}>
+                        <p className="text-[11px] font-semibold tracking-[0.15em] uppercase mb-2" style={{ color: "#64748B" }}>SEPA</p>
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="font-heading text-[40px] font-bold" style={{ color: "#1A3FB8" }}>19€</span>
+                          <span className="text-sm" style={{ color: "#64748B" }}>/mois</span>
+                        </div>
+                        <p className="text-sm mt-1 line-through" style={{ color: "#94A3B8" }}>21,25€</p>
+                      </div>
+                      <span className="text-sm font-medium" style={{ color: "#94A3B8" }}>ou</span>
+                      <div className="p-6 rounded-2xl border-2 text-center" style={{ borderColor: "#1A3FB8", minWidth: 200, background: "#fff" }}>
+                        <p className="text-[11px] font-semibold tracking-[0.15em] uppercase mb-2" style={{ color: "#64748B" }}>Carte bancaire</p>
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="font-heading text-[40px] font-bold" style={{ color: "#1A3FB8" }}>22€</span>
+                          <span className="text-sm" style={{ color: "#64748B" }}>/mois</span>
+                        </div>
+                        <p className="text-sm mt-1" style={{ color: "#94A3B8" }}>au lieu de <span className="line-through">25€</span></p>
+                      </div>
+                    </motion.div>
+
+                    {/* Progress bar */}
+                    <motion.div
+                      className="max-w-[400px] mx-auto mb-8"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold" style={{ color: "#0A1C4A" }}>812 places réservées sur 1000</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "#E5E8F0" }}>
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{ background: "linear-gradient(90deg, #1A3FB8, #0BA5C7)" }}
+                          initial={{ width: 0 }}
+                          animate={{ width: "81.2%" }}
+                          transition={{ delay: 0.6, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                        />
+                      </div>
+                      <p className="text-xs mt-3 font-medium text-center" style={{ color: "#F59E0B" }}>
+                        Bientôt disponible
+                      </p>
+                    </motion.div>
+
+                    {/* Disabled CTA */}
+                    <motion.div
+                      className="text-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.65 }}
+                    >
+                      <button
+                        disabled
+                        className="px-10 py-4 text-sm font-semibold tracking-wide uppercase rounded-xl opacity-50 cursor-not-allowed"
+                        style={{ background: "linear-gradient(135deg, #1A3FB8, #2451D9)", color: "#fff" }}
+                      >
+                        Réserver ma place
+                      </button>
+                      <p className="text-[11px] mt-3" style={{ color: "#94A3B8" }}>
+                        Les réservations ouvriront prochainement
+                      </p>
+                    </motion.div>
                   </div>
                 </motion.div>
               </div>
