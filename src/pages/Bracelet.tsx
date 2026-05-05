@@ -199,7 +199,7 @@ export default function Bracelet() {
       <ScrollVideoPlayer />
 
       {/* Technical Specs Image */}
-      <section className="py-28" style={{ background: "#1E4D8C" }}>
+      <section className="py-28" style={{ background: "#00296d" }}>
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase text-white/45 mb-4">
