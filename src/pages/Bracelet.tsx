@@ -120,6 +120,7 @@ const faqs = [
 
 export default function Bracelet() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [showSepaFor, setShowSepaFor] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleCardPayment = async (planKey: string) => {
