@@ -60,16 +60,17 @@ export default function ScrollVideoPlayer() {
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
 
-        // Progress: 0 when top of container hits bottom of viewport,
-        // 1 when bottom of container hits top of viewport
+        // Remap so frame 60 (logo facing user) lands at progress=0.5 (center of viewport)
+        // Animation plays from frame 60+121=181 down to frame 60-121=0, wrapping around
         const scrollRange = rect.height + viewH;
         const scrolled = viewH - rect.top;
         const progress = Math.max(0, Math.min(1, scrolled / scrollRange));
 
-        const frameIndex = Math.min(
-          TOTAL_FRAMES - 1,
-          Math.floor((1 - progress) * TOTAL_FRAMES)
-        );
+        // Map progress to frame: at 0.5 we want frame 60 (logo facing)
+        // Full rotation is 242 frames. Offset so center = frame 60
+        const LOGO_FRAME = 60;
+        const mapped = (LOGO_FRAME + Math.round((progress - 0.5) * TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
+        const frameIndex = Math.min(TOTAL_FRAMES - 1, Math.max(0, mapped));
         drawFrame(frameIndex);
       });
     };
