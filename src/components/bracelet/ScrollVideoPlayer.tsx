@@ -100,7 +100,7 @@ export default function ScrollVideoPlayer() {
   }, [loaded]);
 
   return (
-    <div ref={containerRef} className="relative" style={{ height: "80vh", background: "#0a2d6e" }}>
+    <div ref={containerRef} className="relative" style={{ height: "150vh", background: "#0a2d6e" }}>
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden"
         style={{ background: "#0a2d6e" }}
       >
