@@ -23,8 +23,8 @@ export default function AnimatedSpecsSection({ specsSrc }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="relative py-28 overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #0a2d6e 0%, #081f4a 100%)" }}
+      className="relative pt-20 pb-28 overflow-hidden"
+      style={{ background: "#0a2d6e" }}
     >
       {/* Floating particles continuing */}
       {[...Array(5)].map((_, i) => (
