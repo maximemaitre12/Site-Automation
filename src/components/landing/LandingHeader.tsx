@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import aetherLogo from "@/assets/aether-logo-final.png";
 
 const navItems = [
-  { label: "Solutions", href: "/platform" },
+  { label: "Pharma Solutions", href: "/platform" },
   { label: "Oreon", href: "/bracelet" },
 ];
 
