@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { Check, CreditCard, QrCode, X, Loader2 } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { Check, CreditCard, QrCode, X, Loader2, Lock } from "lucide-react";
 
 /* ═══════════════════════════════════════════
    TYPES & DATA
@@ -92,7 +92,6 @@ function useSparkles() {
         ctx.globalAlpha = p.opacity;
         ctx.fill();
         
-        // Glow
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * p.life * 3, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
@@ -167,49 +166,25 @@ const PriceCounter = ({ target, delay }: { target: string; delay: number }) => {
 };
 
 /* ═══════════════════════════════════════════
-   AMBIENT FLOATING PARTICLES (CSS)
+   MODAL AMBIENT PARTICLES (subtle shimmer)
    ═══════════════════════════════════════════ */
-const AmbientParticles = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {[...Array(50)].map((_, i) => (
+const ModalAmbientParticles = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-[28px]">
+    {[...Array(5)].map((_, i) => (
       <div
         key={i}
         className="absolute rounded-full"
         style={{
-          width: 1.5 + (i % 4) * 0.8,
-          height: 1.5 + (i % 4) * 0.8,
-          background: `rgba(168,221,255,${0.15 + (i % 5) * 0.06})`,
-          left: `${(i * 17.3) % 100}%`,
-          top: `${(i * 23.7) % 100}%`,
-          animation: `ambient-float-${i % 8} ${12 + (i % 6) * 3}s ease-in-out infinite`,
-          animationDelay: `${(i * 0.7) % 6}s`,
+          width: 80 + i * 30,
+          height: 80 + i * 30,
+          background: `radial-gradient(circle, rgba(111,224,245,${0.04 + (i % 3) * 0.015}) 0%, transparent 70%)`,
+          left: `${10 + (i * 22) % 70}%`,
+          top: `${15 + (i * 19) % 60}%`,
+          animation: `modal-particle-${i} ${14 + i * 3}s ease-in-out infinite`,
         }}
       />
     ))}
   </div>
-);
-
-/* ═══════════════════════════════════════════
-   AURORA GRADIENT BACKGROUND
-   ═══════════════════════════════════════════ */
-const AuroraBackground = () => (
-  <motion.div
-    className="absolute inset-0 pointer-events-none"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 0.4 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.6 }}
-  >
-    <div className="absolute inset-0" style={{
-      background: `
-        radial-gradient(ellipse 120% 80% at 20% 30%, rgba(30,77,140,0.4) 0%, transparent 60%),
-        radial-gradient(ellipse 100% 60% at 80% 70%, rgba(100,180,255,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 80% 90% at 50% 50%, rgba(80,40,180,0.08) 0%, transparent 60%)
-      `,
-      animation: "aurora-drift 20s ease-in-out infinite",
-    }} />
-    <AmbientParticles />
-  </motion.div>
 );
 
 /* ═══════════════════════════════════════════
@@ -268,17 +243,13 @@ const MagneticButton = ({ onClick, children }: { onClick: (e: React.MouseEvent) 
       whileTap={{ scale: 0.94 }}
       transition={{ type: "spring", stiffness: 400, damping: 15 }}
     >
-      {/* Shimmer effect */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%)",
           animation: hovered ? "shimmer-sweep 2s ease-in-out infinite" : "shimmer-sweep 4s ease-in-out infinite",
-          animationDelay: "0s",
         }}
       />
-      
-      {/* Cyan aura on hover */}
       {hovered && (
         <motion.div
           className="absolute -inset-2 pointer-events-none"
@@ -290,21 +261,6 @@ const MagneticButton = ({ onClick, children }: { onClick: (e: React.MouseEvent) 
           }}
         />
       )}
-      
-      {/* Rotating conic border */}
-      <div
-        className="absolute -inset-[1px] pointer-events-none"
-        style={{
-          background: "conic-gradient(from var(--conic-angle, 0deg), transparent, rgba(168,221,255,0.3), transparent, rgba(168,221,255,0.15), transparent)",
-          animation: "conic-rotate 20s linear infinite",
-          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          maskComposite: "exclude",
-          WebkitMaskComposite: "xor",
-          padding: "1px",
-        }}
-      />
-      
       <span className="relative z-10">{children}</span>
     </motion.button>
   );
@@ -313,199 +269,363 @@ const MagneticButton = ({ onClick, children }: { onClick: (e: React.MouseEvent) 
 /* ═══════════════════════════════════════════
    FEATURE ROW WITH ANIMATION
    ═══════════════════════════════════════════ */
-const FeatureRow = ({ text, delay }: { text: string; delay: number }) => (
+const FeatureRow = ({ text, delay, dark = false }: { text: string; delay: number; dark?: boolean }) => (
   <motion.li
-    className="flex items-start gap-3 text-sm"
-    style={{ color: "#334155" }}
+    className="flex items-center gap-3 py-[10px]"
+    style={{ 
+      color: dark ? "rgba(255,255,255,0.9)" : "#2A3147",
+      borderBottom: dark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(15,30,80,0.04)",
+    }}
     initial={{ opacity: 0, x: -8 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ delay, duration: 0.3, ease: "easeOut" }}
   >
     <motion.div
+      className="flex-shrink-0 w-[22px] h-[22px] rounded-full flex items-center justify-center"
+      style={{
+        background: dark ? "rgba(111,224,245,0.15)" : "rgba(26,63,184,0.08)",
+      }}
       initial={{ scale: 0 }}
       animate={{ scale: [0, 1.3, 1] }}
       transition={{ delay, duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
     >
-      <Check className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#1E4D8C" }} />
+      <Check className="w-3 h-3" style={{ color: dark ? "#6FE0F5" : "#1A3FB8" }} strokeWidth={2.5} />
     </motion.div>
-    {text}
+    <span className="text-[15px]" style={{ fontWeight: 450 }}>{text}</span>
   </motion.li>
 );
 
 /* ═══════════════════════════════════════════
-   PRICING CARD
+   LEFT PRICING CARD (Précommande)
    ═══════════════════════════════════════════ */
-const PricingCard = ({ plan, index, onCardPayment, loadingPlan }: {
-  plan: Plan; index: number; onCardPayment: (key: string) => void; loadingPlan: string | null;
+const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
+  plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
 }) => {
-  const [hovered, setHovered] = useState(false);
-  const isLeft = index === 0;
-  const baseDelay = isLeft ? 0.45 : 0.58;
+  const baseDelay = 0.45;
 
   return (
     <motion.div
-      className="relative p-10 rounded-sm overflow-hidden"
+      className="relative overflow-visible"
       style={{
-        borderColor: plan.popular ? "#1E4D8C" : "#E2E8F0",
-        borderWidth: plan.popular ? 2 : 1,
-        borderStyle: "solid",
-        background: "rgba(255,255,255,0.96)",
-        backdropFilter: "blur(40px)",
+        background: "#FFFFFF",
+        border: "1px solid #E5E8F0",
+        borderRadius: 20,
+        padding: 36,
+        boxShadow: "0 1px 3px rgba(15,30,80,0.04), 0 12px 32px rgba(15,30,80,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
       }}
-      initial={{ opacity: 0, x: isLeft ? -40 : 40, scale: 0.94 }}
-      animate={{
-        opacity: hovered ? 1 : 1,
-        x: 0,
-        scale: hovered ? 1.02 : 1,
-        y: hovered ? -6 : 0,
-      }}
-      transition={{
-        type: "spring", stiffness: 220, damping: 26, mass: 1.1,
-        delay: baseDelay,
-        y: { type: "spring", stiffness: 300, damping: 20, delay: 0 },
-        scale: { type: "spring", stiffness: 300, damping: 20, delay: 0 },
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      initial={{ opacity: 0, x: -40, scale: 0.94 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 220, damping: 26, mass: 1.1, delay: baseDelay }}
     >
-      {/* Hover rim glow */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none rounded-sm"
-        style={{
-          boxShadow: hovered
-            ? "inset 0 0 0 1px rgba(168,221,255,0.3), 0 0 30px rgba(168,221,255,0.1)"
-            : "none",
-        }}
-        animate={{ opacity: hovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-      />
-
-      {/* Recommandé badge */}
-      {plan.popular && (
-        <motion.span
-          className="absolute -top-3 left-10 px-4 py-1 text-xs font-semibold text-white tracking-wider uppercase"
-          style={{ background: "#1E4D8C" }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ delay: baseDelay + 0.2, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-        >
-          Recommandé
-        </motion.span>
-      )}
-      
-      {/* Rotating border for popular card */}
-      {plan.popular && (
-        <div
-          className="absolute -inset-[2px] pointer-events-none"
-          style={{
-            background: "conic-gradient(from var(--conic-angle, 0deg), transparent 40%, rgba(30,77,140,0.3) 50%, transparent 60%)",
-            animation: "conic-rotate 10s linear infinite",
-            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            maskComposite: "exclude",
-            WebkitMaskComposite: "xor",
-            padding: "2px",
-            borderRadius: "2px",
-          }}
-        />
-      )}
-
       <motion.h3
-        className="font-heading text-2xl font-bold mb-2"
-        style={{ color: "#0F172A" }}
+        className="font-heading text-[20px] font-semibold mb-2"
+        style={{ color: "#0A1C4A" }}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: baseDelay + 0.1, duration: 0.4 }}
+        transition={{ delay: baseDelay + 0.1 }}
       >
         {plan.name}
       </motion.h3>
-      
+
+      <motion.span
+        className="inline-block mb-5 text-[11px] font-semibold uppercase tracking-[0.12em] rounded-full"
+        style={{
+          color: "#1A3FB8",
+          background: "rgba(26,63,184,0.08)",
+          padding: "4px 10px",
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: baseDelay + 0.15 }}
+      >
+        Disponible bientôt
+      </motion.span>
+
       <motion.div
-        className="flex items-baseline gap-1 mb-1"
+        className="flex items-baseline gap-2 mb-1"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: baseDelay + 0.15, duration: 0.4 }}
+        transition={{ delay: baseDelay + 0.2 }}
       >
-        <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>
-          <PriceCounter target={plan.price} delay={(baseDelay + 0.2) * 1000} />€
+        <span style={{ color: "#1A3FB8", fontWeight: 700, fontSize: 52, letterSpacing: "-0.04em", lineHeight: 1 }}>
+          <PriceCounter target={plan.price} delay={(baseDelay + 0.25) * 1000} />
+          <span style={{ fontSize: 40, verticalAlign: "super", marginLeft: 2 }}>€</span>
         </span>
         <span className="text-sm" style={{ color: "#64748B" }}>paiement unique</span>
       </motion.div>
-      
+
       <motion.p
-        className="text-xs mb-8"
-        style={{ color: "#94A3B8" }}
+        className="text-xs mb-6"
+        style={{ color: "#8A92A6" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: baseDelay + 0.2, duration: 0.3 }}
+        transition={{ delay: baseDelay + 0.25 }}
       >
-        Bracelet offert · Paiement en une seule fois
+        Bracelet offert · Aucun engagement
       </motion.p>
-      
-      <ul className="space-y-3 mb-10">
+
+      <div className="w-full h-px mb-5" style={{ background: "#EEF0F5" }} />
+
+      <ul className="mb-8" style={{ listStyle: "none", padding: 0, margin: 0 }}>
         {plan.features.map((f, i) => (
-          <FeatureRow key={f} text={f} delay={baseDelay + 0.25 + i * 0.06} />
+          <FeatureRow key={f} text={f} delay={baseDelay + 0.3 + i * 0.06} />
         ))}
       </ul>
 
-      {/* Payment buttons */}
       <div className="space-y-3">
-        <motion.button
-          onClick={() => onCardPayment(plan.key)}
-          disabled={loadingPlan === plan.key}
-          className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60 relative overflow-hidden"
+        <motion.a
+          href="#qrcode"
+          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
           style={{
-            background: plan.popular ? "#1E4D8C" : "transparent",
-            color: plan.popular ? "#fff" : "#1E4D8C",
-            border: plan.popular ? "none" : "1px solid #1E4D8C",
+            background: "linear-gradient(135deg, #1A3FB8, #2451D9)",
+            color: "#fff",
+            borderRadius: 12,
+            letterSpacing: "0.06em",
+            fontSize: 14,
+            fontWeight: 600,
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)",
           }}
           initial={{ scaleY: 0, opacity: 0 }}
           animate={{ scaleY: 1, opacity: 1 }}
           transition={{ delay: baseDelay + 0.5, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(26,63,184,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}
         >
-          {/* Button shimmer on hover */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `linear-gradient(105deg, transparent 35%, ${plan.popular ? 'rgba(255,255,255,0.15)' : 'rgba(30,77,140,0.08)'} 50%, transparent 65%)`,
-              animation: "shimmer-sweep 3s ease-in-out infinite",
-            }}
-          />
+          <QrCode className="w-4 h-4" />
+          <span className="relative z-10">Prélèvement SEPA</span>
+        </motion.a>
+
+        <motion.button
+          onClick={() => onCardPayment(plan.key)}
+          disabled={loadingPlan === plan.key}
+          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+          style={{
+            background: "#fff",
+            color: "#0A1C4A",
+            border: "1.5px solid #D5DAE5",
+            borderRadius: 12,
+            fontSize: 14,
+          }}
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ scaleY: 1, opacity: 1 }}
+          transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+          whileHover={{ borderColor: "#1A3FB8" }}
+        >
           {loadingPlan === plan.key ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <CreditCard className="w-4 h-4" />
           )}
-          <span className="relative z-10">Payer par carte</span>
+          <span>Payer par carte</span>
         </motion.button>
-        
+      </div>
+
+      <motion.p
+        className="flex items-center justify-center gap-1.5 text-[11px] text-center mt-4"
+        style={{ color: "#94A3B8" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: baseDelay + 0.65 }}
+      >
+        <Lock className="w-3 h-3" />
+        Paiement chiffré · Satisfait ou remboursé 14 jours
+      </motion.p>
+    </motion.div>
+  );
+};
+
+/* ═══════════════════════════════════════════
+   RIGHT PRICING CARD (Recommandé)
+   ═══════════════════════════════════════════ */
+const RightCard = ({ plan, onCardPayment, loadingPlan }: {
+  plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
+}) => {
+  const baseDelay = 0.58;
+
+  return (
+    <motion.div
+      className="relative overflow-visible"
+      style={{
+        background: "linear-gradient(160deg, #0A1C4A 0%, #1A3FB8 60%, #14338F 100%)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 20,
+        padding: 36,
+        paddingTop: 48,
+        boxShadow: "0 16px 48px rgba(11,165,199,0.20), 0 32px 64px rgba(15,30,80,0.30)",
+      }}
+      initial={{ opacity: 0, x: 40, scale: 0.94 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 220, damping: 26, mass: 1.1, delay: baseDelay }}
+    >
+      {/* Aurora swirl top-right */}
+      <div className="absolute top-0 right-0 w-[200px] h-[200px] pointer-events-none overflow-hidden rounded-tr-[20px]">
+        <div
+          className="w-full h-full"
+          style={{
+            background: "radial-gradient(ellipse at 80% 20%, rgba(111,224,245,0.12) 0%, rgba(26,63,184,0.05) 40%, transparent 70%)",
+            animation: "aurora-drift 20s ease-in-out infinite",
+          }}
+        />
+      </div>
+
+      {/* Floating bubbles */}
+      {[
+        { left: "15%", bottom: "20%", size: 2, dur: 12, op: 0.25 },
+        { left: "70%", bottom: "30%", size: 1.5, dur: 10, op: 0.3 },
+        { left: "40%", bottom: "15%", size: 2, dur: 14, op: 0.2 },
+        { left: "85%", bottom: "40%", size: 1.5, dur: 11, op: 0.35 },
+      ].map((b, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: b.left,
+            bottom: b.bottom,
+            width: b.size,
+            height: b.size,
+            background: `rgba(255,255,255,${b.op})`,
+            animation: `right-card-bubble-${i} ${b.dur}s ease-in-out infinite`,
+          }}
+        />
+      ))}
+
+      {/* Caustic pattern */}
+      <div className="absolute inset-0 pointer-events-none rounded-[20px] overflow-hidden" style={{ opacity: 0.08 }}>
+        <div className="absolute inset-0" style={{
+          background: "repeating-conic-gradient(rgba(111,224,245,0.3) 0% 25%, transparent 0% 50%) 50% / 60px 60px",
+          filter: "blur(20px)",
+          animation: "caustic-shift 30s linear infinite",
+        }} />
+      </div>
+
+      {/* RECOMMANDÉ badge */}
+      <motion.span
+        className="absolute -top-[14px] left-8 px-5 py-[6px] text-[11px] font-bold tracking-[0.14em] uppercase rounded-full z-10"
+        style={{
+          background: "linear-gradient(135deg, #6FE0F5, #0BA5C7)",
+          color: "#0A1C4A",
+          boxShadow: "0 4px 16px rgba(11,165,199,0.35), 0 0 0 3px rgba(111,224,245,0.2)",
+        }}
+        initial={{ scaleX: 0, opacity: 0 }}
+        animate={{ scaleX: 1, opacity: 1 }}
+        transition={{ delay: baseDelay + 0.2, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+      >
+        <span className="flex items-center gap-2">
+          <span className="w-[6px] h-[6px] rounded-full bg-white" style={{ animation: "badge-pulse 2s ease-in-out infinite" }} />
+          Recommandé
+        </span>
+      </motion.span>
+
+      <motion.h3
+        className="font-heading text-[20px] font-semibold mb-2"
+        style={{ color: "#fff" }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: baseDelay + 0.1 }}
+      >
+        {plan.name}
+      </motion.h3>
+
+      <motion.span
+        className="inline-block mb-5 text-[11px] font-semibold uppercase tracking-[0.12em] rounded-full"
+        style={{
+          color: "#6FE0F5",
+          background: "rgba(111,224,245,0.1)",
+          padding: "4px 10px",
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: baseDelay + 0.15 }}
+      >
+        Livraison express
+      </motion.span>
+
+      <motion.div
+        className="flex items-baseline gap-2 mb-1"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: baseDelay + 0.2 }}
+      >
+        <span style={{ color: "#fff", fontWeight: 700, fontSize: 52, letterSpacing: "-0.04em", lineHeight: 1 }}>
+          <PriceCounter target={plan.price} delay={(baseDelay + 0.25) * 1000} />
+          <span style={{ fontSize: 40, verticalAlign: "super", marginLeft: 2 }}>€</span>
+        </span>
+        <span className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>paiement unique</span>
+      </motion.div>
+
+      <motion.p
+        className="text-xs mb-6"
+        style={{ color: "rgba(255,255,255,0.45)" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: baseDelay + 0.25 }}
+      >
+        Bracelet offert · Aucun engagement
+      </motion.p>
+
+      <div className="w-full h-px mb-5" style={{ background: "rgba(255,255,255,0.1)" }} />
+
+      <ul className="mb-8" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        {plan.features.map((f, i) => (
+          <FeatureRow key={f} text={f} delay={baseDelay + 0.3 + i * 0.06} dark />
+        ))}
+      </ul>
+
+      <div className="space-y-3">
         <motion.a
           href="#qrcode"
-          className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
+          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all relative overflow-hidden"
           style={{
-            background: plan.popular ? "transparent" : "#1E4D8C",
-            color: plan.popular ? "#1E4D8C" : "#fff",
-            border: plan.popular ? "1px solid #1E4D8C" : "none",
+            background: "linear-gradient(135deg, #6FE0F5, #0BA5C7)",
+            color: "#0A1C4A",
+            borderRadius: 12,
+            letterSpacing: "0.06em",
+            fontSize: 14,
+            fontWeight: 700,
+            boxShadow: "0 4px 20px rgba(11,165,199,0.3)",
           }}
           initial={{ scaleY: 0, opacity: 0 }}
           animate={{ scaleY: 1, opacity: 1 }}
-          transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-          whileHover={{ scale: 1.02 }}
+          transition={{ delay: baseDelay + 0.5, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+          whileHover={{ scale: 1.02, boxShadow: "0 8px 32px rgba(11,165,199,0.45)" }}
         >
           <QrCode className="w-4 h-4" />
           <span className="relative z-10">Prélèvement SEPA</span>
         </motion.a>
+
+        <motion.button
+          onClick={() => onCardPayment(plan.key)}
+          disabled={loadingPlan === plan.key}
+          className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+          style={{
+            background: "transparent",
+            color: "#fff",
+            border: "1.5px solid rgba(255,255,255,0.2)",
+            borderRadius: 12,
+            fontSize: 14,
+          }}
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ scaleY: 1, opacity: 1 }}
+          transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+          whileHover={{ borderColor: "rgba(111,224,245,0.5)" }}
+        >
+          {loadingPlan === plan.key ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <CreditCard className="w-4 h-4" />
+          )}
+          <span>Payer par carte</span>
+        </motion.button>
       </div>
 
       <motion.p
-        className="text-xs text-center mt-4"
-        style={{ color: "#94A3B8" }}
+        className="flex items-center justify-center gap-1.5 text-[11px] text-center mt-4"
+        style={{ color: "rgba(255,255,255,0.4)" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: baseDelay + 0.65, duration: 0.3 }}
+        transition={{ delay: baseDelay + 0.65 }}
       >
-        Paiement unique · Bracelet offert · Satisfait ou remboursé
+        <Lock className="w-3 h-3" />
+        Paiement chiffré · Satisfait ou remboursé 14 jours
       </motion.p>
     </motion.div>
   );
@@ -529,7 +649,6 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
     return () => mq.removeEventListener("change", handler);
   }, []);
   
-  // Lock body scroll
   useEffect(() => {
     if (isOpen) {
       const scrollY = window.scrollY;
@@ -545,7 +664,6 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
     }
   }, [isOpen]);
   
-  // Escape key
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
@@ -563,22 +681,22 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
       setTimeout(() => setShowShockwave(false), 800);
     }
     
-    // Small delay for the punch animation
     setTimeout(() => setIsOpen(true), prefersReduced ? 0 : 80);
   };
   
+  const leftPlan = plans[0];
+  const rightPlan = plans[1] || plans[0];
+
   return (
     <>
       <GooFilter />
       
-      {/* Sparkle canvas — always mounted, full viewport */}
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-[10000]"
         style={{ width: "100vw", height: "100vh" }}
       />
       
-      {/* Shockwave rings */}
       <AnimatePresence>
         {showShockwave && (
           <>
@@ -588,7 +706,6 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
         )}
       </AnimatePresence>
       
-      {/* THE BUTTON — only visible when modal is closed */}
       <AnimatePresence mode="wait">
         {!isOpen && (
           <MagneticButton onClick={handleClick}>
@@ -601,146 +718,133 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop — deep navy + strong blur + spotlight */}
             <motion.div
               className="fixed inset-0 z-[9990]"
-              initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-              animate={{ opacity: 1, backdropFilter: "blur(24px)" }}
-              exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-              transition={{ duration: prefersReduced ? 0.2 : 0.4 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.28, ease: "easeOut" }}
               onClick={() => setIsOpen(false)}
-              style={{ background: "rgba(0,0,0,0.65)" }}
+              style={{
+                background: "rgba(5, 12, 35, 0.72)",
+                backdropFilter: "blur(28px) saturate(1.2)",
+                WebkitBackdropFilter: "blur(28px) saturate(1.2)",
+              }}
             >
-              {/* Vignette */}
+              {/* Spotlight radial glow */}
               <div className="absolute inset-0" style={{
-                background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.3) 100%)"
+                background: "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(111,224,245,0.08) 0%, transparent 70%)"
               }} />
             </motion.div>
             
-            {/* Aurora + particles */}
-            {!prefersReduced && (
-              <div className="fixed inset-0 z-[9991] pointer-events-none">
-                <AuroraBackground />
-              </div>
-            )}
-            
-            {/* Modal */}
-            <div className="fixed inset-0 z-[9995] flex items-center justify-center pointer-events-none px-4">
+            {/* Modal — centered, constrained, branded */}
+            <div className="fixed inset-0 z-[9995] flex items-center justify-center pointer-events-none" style={{ padding: 24 }}>
               <motion.div
                 layoutId="precommander-portal"
-                className="relative w-full max-w-[960px] max-h-[90vh] overflow-y-auto pointer-events-auto"
+                className="relative w-full pointer-events-auto"
                 style={{
-                  background: "rgba(255,255,255,0.94)",
-                  backdropFilter: "blur(40px)",
-                  borderRadius: 20,
-                  boxShadow: "0 40px 120px -20px rgba(0,0,0,0.5), 0 0 60px rgba(168,221,255,0.08)",
+                  maxWidth: 1080,
+                  maxHeight: "92vh",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  background: "#FAFBFE",
+                  border: "1px solid rgba(26,63,184,0.08)",
+                  borderRadius: 28,
+                  boxShadow: `
+                    0 1px 2px rgba(15,30,80,0.06),
+                    0 16px 32px rgba(15,30,80,0.12),
+                    0 48px 96px rgba(15,30,80,0.24),
+                    inset 0 0 0 1px rgba(255,255,255,0.6)
+                  `,
                 }}
                 initial={prefersReduced ? { opacity: 0, scale: 0.95 } : undefined}
                 animate={prefersReduced ? { opacity: 1, scale: 1 } : undefined}
                 exit={prefersReduced ? { opacity: 0, scale: 0.95 } : undefined}
-                transition={{
-                  type: "spring",
-                  stiffness: 220,
-                  damping: 26,
-                  mass: 1.1,
-                }}
+                transition={{ type: "spring", stiffness: 220, damping: 26, mass: 1.1 }}
               >
-                {/* Internal cyan light sweep */}
-                {!prefersReduced && (
-                  <motion.div
-                    className="absolute inset-0 pointer-events-none rounded-[20px] overflow-hidden"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 0 }}
-                    transition={{ delay: 0.6, duration: 0.8 }}
-                  >
-                    <motion.div
-                      className="absolute inset-0"
-                      style={{
-                        background: "radial-gradient(circle at var(--light-x, 50%) var(--light-y, 50%), rgba(168,221,255,0.08) 0%, transparent 60%)",
-                      }}
-                      initial={{ "--light-x": "30%", "--light-y": "80%" } as any}
-                      animate={{ "--light-x": "70%", "--light-y": "20%" } as any}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
-                    />
-                  </motion.div>
-                )}
+                {/* Top cyan glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] pointer-events-none" style={{
+                  background: "radial-gradient(ellipse at center top, rgba(111,224,245,0.10) 0%, transparent 70%)",
+                  borderRadius: "28px 28px 0 0",
+                }} />
+
+                {/* Ambient particles */}
+                {!prefersReduced && <ModalAmbientParticles />}
                 
                 {/* Close button */}
                 <motion.button
                   className="absolute top-5 right-5 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-colors"
-                  style={{ background: "rgba(0,0,0,0.05)" }}
+                  style={{ background: "rgba(10,28,74,0.06)" }}
                   onClick={() => setIsOpen(false)}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
-                  whileHover={{ scale: 1.1, background: "rgba(0,0,0,0.1)" }}
+                  whileHover={{ scale: 1.1, background: "rgba(10,28,74,0.12)" }}
                 >
-                  <X className="w-4 h-4" style={{ color: "#64748B" }} />
+                  <X className="w-4 h-4" style={{ color: "#5A6478" }} />
                 </motion.button>
                 
                 {/* Content */}
-                <div className="p-8 md:p-12">
-                  {/* Title */}
+                <div className="p-6 md:p-14 relative z-10">
+                  {/* Header */}
                   <div className="text-center mb-10">
-                    <motion.p
-                      className="text-xs font-semibold tracking-[0.3em] uppercase mb-4"
-                      style={{ color: "#1E4D8C" }}
+                    {/* TARIFS pill */}
+                    <motion.div
+                      className="inline-flex items-center gap-2 rounded-full mb-5"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(26,63,184,0.08), rgba(11,165,199,0.08))",
+                        border: "1px solid rgba(26,63,184,0.15)",
+                        padding: "6px 16px",
+                      }}
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.5 }}
                     >
-                      Tarifs
-                    </motion.p>
+                      <span
+                        className="w-[6px] h-[6px] rounded-full"
+                        style={{ background: "#6FE0F5", animation: "badge-pulse 2.5s ease-in-out infinite" }}
+                      />
+                      <span style={{ color: "#1A3FB8", fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                        Tarifs
+                      </span>
+                    </motion.div>
                     
                     <motion.h2
-                      className="font-heading text-2xl sm:text-3xl font-bold mb-3"
-                      style={{ color: "#0F172A" }}
-                      initial={{ opacity: 0, y: 20, rotateX: -15 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                      className="font-heading text-[28px] sm:text-[36px] font-semibold mb-3"
+                      style={{ color: "#0A1C4A", letterSpacing: "-0.02em", lineHeight: 1.15 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      Bracelet offert, abonnement simple
+                      Bracelet offert<span style={{ color: "#1A3FB8" }}>,</span> abonnement simple
                     </motion.h2>
                     
                     <motion.p
-                      className="text-sm max-w-[420px] mx-auto"
-                      style={{ color: "#64748B" }}
-                      initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      className="text-[16px] max-w-[540px] mx-auto"
+                      style={{ color: "#5A6478", lineHeight: 1.55 }}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.35, duration: 0.5 }}
                     >
                       Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
                     </motion.p>
                     
-                    {/* Accent line */}
+                    {/* Cyan accent line */}
                     <motion.div
-                      className="mx-auto mt-5 h-px"
-                      style={{ background: "rgba(168,221,255,0.5)", width: 80 }}
+                      className="mx-auto mt-6 h-px"
+                      style={{ background: "rgba(111,224,245,0.4)", width: 60 }}
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </div>
                   
-                  {/* Cards */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {plans.map((plan, i) => (
-                      <PricingCard
-                        key={plan.key}
-                        plan={plan}
-                        index={i}
-                        onCardPayment={onCardPayment}
-                        loadingPlan={loadingPlan}
-                      />
-                    ))}
+                  {/* Cards — extra top padding for badge overflow */}
+                  <div className="grid md:grid-cols-2 gap-6 pt-4">
+                    <LeftCard plan={leftPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
+                    <RightCard plan={rightPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
                   </div>
-                  
-                  {/* Settle bounce */}
-                  <motion.div
-                    initial={{}}
-                    animate={{ scale: [1, 1.005, 1] }}
-                    transition={{ delay: 1.2, duration: 0.3, ease: "easeInOut" }}
-                  />
                 </div>
               </motion.div>
             </div>
@@ -758,26 +862,31 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
           0%, 100% { opacity: 0.6; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.05); }
         }
-        @keyframes conic-rotate {
-          0% { --conic-angle: 0deg; }
-          100% { --conic-angle: 360deg; }
-        }
-        @property --conic-angle {
-          syntax: '<angle>';
-          initial-value: 0deg;
-          inherits: false;
-        }
         @keyframes aurora-drift {
           0%, 100% { transform: translate(0, 0) scale(1); }
           25% { transform: translate(3%, -2%) scale(1.02); }
           50% { transform: translate(-2%, 3%) scale(0.98); }
           75% { transform: translate(2%, 1%) scale(1.01); }
         }
-        ${[...Array(8)].map((_, i) => `
-          @keyframes ambient-float-${i} {
-            0%, 100% { transform: translate(0, 0); opacity: ${0.1 + (i % 4) * 0.04}; }
-            33% { transform: translate(${8 - i * 2}px, ${-12 + i * 3}px); opacity: ${0.2 + (i % 3) * 0.05}; }
-            66% { transform: translate(${-6 + i}px, ${10 - i * 2}px); opacity: ${0.15 + (i % 5) * 0.03}; }
+        @keyframes badge-pulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes caustic-shift {
+          from { transform: translate(0, 0); }
+          to { transform: translate(30px, 30px); }
+        }
+        ${[0,1,2,3].map(i => `
+          @keyframes right-card-bubble-${i} {
+            0%, 100% { transform: translateY(0); opacity: 0.15; }
+            50% { transform: translateY(-${12 + i * 4}px); opacity: 0.35; }
+          }
+        `).join("")}
+        ${[0,1,2,3,4].map(i => `
+          @keyframes modal-particle-${i} {
+            0%, 100% { transform: translate(0, 0); opacity: ${0.03 + i * 0.01}; }
+            33% { transform: translate(${8 - i * 3}px, ${-6 + i * 2}px); opacity: ${0.05 + i * 0.01}; }
+            66% { transform: translate(${-5 + i * 2}px, ${8 - i * 2}px); opacity: ${0.04 + i * 0.01}; }
           }
         `).join("")}
       `}</style>
