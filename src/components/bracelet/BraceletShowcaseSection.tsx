@@ -170,7 +170,7 @@ export default function BraceletShowcaseSection() {
                 }}
               />
               <canvas
-                ref={!isMobile ? undefined : canvasRef}
+                ref={canvasRef}
                 className="relative z-10 w-full max-w-[320px]"
                 style={{
                   opacity: loaded ? 1 : 0,
