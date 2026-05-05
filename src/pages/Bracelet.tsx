@@ -121,43 +121,6 @@ const faqs = [
 ];
 
 export default function Bracelet() {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  
-  const { toast } = useToast();
-
-  const handleCardPayment = async (planKey: string) => {
-    setLoadingPlan(planKey);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const response = await supabase.functions.invoke("bracelet-checkout", {
-        body: { plan: planKey },
-      });
-
-      if (response.error) throw new Error(response.error.message);
-      const { url } = response.data;
-      if (url) {
-        window.open(url, "_blank");
-      }
-    } catch (err: any) {
-      toast({
-        title: "Erreur",
-        description: err.message || "Impossible de créer la session de paiement",
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingPlan(null);
-    }
-  };
-
   return (
     <div className="overflow-x-hidden">
       {/* Hero with Video */}
