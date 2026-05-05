@@ -60,6 +60,14 @@ export default function ScrollVideoPlayer() {
     if (!loaded) return;
 
     const LOGO_INDEX = FRAME_NUMBERS.indexOf(LOGO_FRAME);
+    const START_INDEX = FRAME_NUMBERS.indexOf(INITIAL_FRAME);
+
+    // Compute shortest rotation path from start to logo
+    const forwardDist = ((LOGO_INDEX - START_INDEX) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
+    const backwardDist = TOTAL_FRAMES - forwardDist;
+    // direction: +1 = forward, -1 = backward (whichever is shorter)
+    const direction = forwardDist <= backwardDist ? 1 : -1;
+    const travelFrames = Math.min(forwardDist, backwardDist);
 
     let rafId: number;
     const onScroll = () => {
@@ -70,16 +78,15 @@ export default function ScrollVideoPlayer() {
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
 
-        // Start earlier: begin when section is half a viewport away
+        // Start when section is half a viewport away
         const earlyStart = viewH * 0.5;
         const stickyTravel = Math.max(1, rect.height - viewH + earlyStart);
         const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
 
-        // 2x rotation speed, reverse direction, logo centered at progress 0.5
-        const SPEED = 2;
-        const centeredOffset = LOGO_INDEX - Math.round(TOTAL_FRAMES * SPEED * 0.5);
-        const rawIndex = Math.round((1 - progress) * TOTAL_FRAMES * SPEED) + centeredOffset;
-        const frameIndex = ((rawIndex % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
+        // First 50% of scroll: rotate from back to logo. Last 50%: hold on logo.
+        const rotateProgress = Math.min(1, progress / 0.5);
+        const frameOffset = Math.round(rotateProgress * travelFrames) * direction;
+        const frameIndex = ((START_INDEX + frameOffset) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
       });
     };
