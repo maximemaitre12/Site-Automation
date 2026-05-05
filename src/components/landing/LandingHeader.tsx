@@ -4,12 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import aetherLogo from "@/assets/aether-logo-final.png";
 
 const navItems = [
-  { label: "Expertise", href: "#expertise" },
-  { label: "Case Study", href: "#case-study" },
   { label: "Solutions", href: "/platform" },
   { label: "Oreon", href: "/bracelet" },
-  { label: "About", href: "#team" },
-  { label: "Contact", href: "/contact" },
 ];
 
 export function LandingHeader() {
