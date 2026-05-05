@@ -42,8 +42,7 @@ const plans = [
   {
     name: "Précommande",
     key: "precommande",
-    price: "11,97",
-    monthly: "3,99",
+    price: "3,99",
     features: [
       "Bracelet Oreon offert",
       "Suivi biométrique complet",
@@ -56,8 +55,7 @@ const plans = [
   {
     name: "Livraison directe",
     key: "livraison",
-    price: "14,97",
-    monthly: "4,99",
+    price: "4,99",
     popular: true,
     features: [
       "Bracelet Oreon offert",
