@@ -85,7 +85,7 @@ export default function ScrollVideoPlayer() {
   return (
     <div ref={containerRef} className="relative" style={{ height: "300vh" }}>
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden"
-        style={{ background: "linear-gradient(160deg, #1E4D8C 0%, #152d52 100%)" }}
+        style={{ background: "#082b6c" }}
       >
         <canvas
           ref={canvasRef}
