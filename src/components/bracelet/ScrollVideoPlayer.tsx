@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-const TOTAL_FRAMES = 242;
-const LOGO_FRAME = 55; // Frame where logo faces user
+const FRAME_NUMBERS = [
+  ...Array.from({ length: 242 }, (_, index) => index + 1),
+  ...Array.from({ length: 25 }, (_, index) => index + 274),
+];
+const TOTAL_FRAMES = FRAME_NUMBERS.length;
+const LOGO_FRAME = 55; // Actual frame number where the logo faces the user
+const INITIAL_FRAME = 205;
 
 function getFrameSrc(index: number): string {
   const padded = String(index).padStart(3, "0");
@@ -21,15 +26,15 @@ export default function ScrollVideoPlayer() {
     const images: HTMLImageElement[] = [];
     let count = 0;
 
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+    for (const frameNumber of FRAME_NUMBERS) {
       const img = new Image();
-      img.src = getFrameSrc(i);
+      img.src = getFrameSrc(frameNumber);
       img.onload = () => {
         count++;
         if (count === TOTAL_FRAMES && mounted) {
           imagesRef.current = images;
           setLoaded(true);
-          drawFrame(LOGO_FRAME);
+          drawFrame(INITIAL_FRAME);
         }
       };
       images.push(img);
@@ -38,16 +43,16 @@ export default function ScrollVideoPlayer() {
     return () => { mounted = false; };
   }, []);
 
-  const drawFrame = (index: number) => {
-    if (index === lastFrameRef.current) return;
+  const drawFrame = (frameNumber: number) => {
+    if (frameNumber === lastFrameRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    const img = imagesRef.current[index];
+    const img = imagesRef.current[FRAME_NUMBERS.indexOf(frameNumber)];
     if (!canvas || !ctx || !img) return;
     canvas.width = 720;
     canvas.height = 720;
     ctx.drawImage(img, 0, 0, 720, 720);
-    lastFrameRef.current = index;
+    lastFrameRef.current = frameNumber;
   };
 
   // Scroll-driven frame selection
@@ -63,20 +68,16 @@ export default function ScrollVideoPlayer() {
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
 
-        // progress 0 = section just entering viewport from bottom
-        // progress 0.5 = section perfectly centered
-        // progress 1 = section leaving viewport at top
-        const scrollRange = rect.height + viewH;
-        const scrolled = viewH - rect.top;
-        const progress = Math.max(0, Math.min(1, scrolled / scrollRange));
+        // Only track the pinned part of the section.
+        // progress 0 = sticky section arrives, 0.5 = section centered, 1 = sticky section ends.
+        const stickyTravel = Math.max(1, rect.height - viewH);
+        const progress = Math.max(0, Math.min(1, -rect.top / stickyTravel));
 
-        // At progress 0.5, show LOGO_FRAME (55)
-        // Full scroll maps to one full rotation (242 frames)
-        // offset so that progress=0.5 → frame 55
-        const centerOffset = LOGO_FRAME - Math.floor(TOTAL_FRAMES * 0.5);
-        const rawFrame = Math.floor(progress * TOTAL_FRAMES) + centerOffset;
-        const frameIndex = ((rawFrame % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
-        drawFrame(Math.min(frameIndex, TOTAL_FRAMES - 1));
+        const logoIndex = FRAME_NUMBERS.indexOf(LOGO_FRAME);
+        const centeredOffset = logoIndex - Math.round(TOTAL_FRAMES * 0.5);
+        const rawIndex = Math.round(progress * TOTAL_FRAMES) + centeredOffset;
+        const frameIndex = ((rawIndex % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
+        drawFrame(FRAME_NUMBERS[frameIndex]);
       });
     };
 
