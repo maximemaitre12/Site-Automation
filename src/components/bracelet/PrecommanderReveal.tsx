@@ -131,40 +131,6 @@ const Shockwave = ({ x, y, delay = 0 }: { x: number; y: number; delay?: number }
   </motion.div>
 );
 
-/* ═══════════════════════════════════════════
-   ANIMATED PRICE COUNTER
-   ═══════════════════════════════════════════ */
-const PriceCounter = ({ target, delay }: { target: string; delay: number }) => {
-  const [display, setDisplay] = useState("0,00");
-  const [started, setStarted] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-  
-  useEffect(() => {
-    if (!started) return;
-    const [intPart, decPart] = target.split(",");
-    const targetVal = parseFloat(`${intPart}.${decPart}`);
-    const duration = 500;
-    const startTime = performance.now();
-    
-    const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = targetVal * eased;
-      const formatted = current.toFixed(2).replace(".", ",");
-      setDisplay(formatted);
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-    
-    requestAnimationFrame(tick);
-  }, [started, target]);
-  
-  return <>{display}</>;
-};
 
 /* ═══════════════════════════════════════════
    MODAL AMBIENT PARTICLES (subtle shimmer)
