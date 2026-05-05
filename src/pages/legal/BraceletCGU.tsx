@@ -21,7 +21,7 @@ Le Bracelet reste la propriété de l'Éditeur pendant les 12 premiers mois d'ab
   },
   {
     title: "3. Prélèvement SEPA",
-    content: `Le paiement de l'abonnement s'effectue exclusivement par prélèvement SEPA (Single Euro Payments Area).
+    content: `Le paiement de l'abonnement s'effectue par prélèvement SEPA (Single Euro Payments Area) ou par carte bancaire via notre prestataire de paiement sécurisé Stripe.
 
 En scannant le QR code fourni, l'Abonné autorise l'Éditeur à émettre des ordres de prélèvement SEPA sur le compte bancaire indiqué. Ce mandat de prélèvement est conforme au règlement (UE) n°260/2012.
 
