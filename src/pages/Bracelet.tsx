@@ -155,7 +155,7 @@ export default function Bracelet() {
       {/* Hero */}
       <section
         className="relative min-h-screen flex items-center overflow-hidden"
-        style={{ background: "linear-gradient(160deg, #1E4D8C 0%, #152d52 100%)" }}
+        style={{ background: "#0a2d6e" }}
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-20 right-[8%] w-[480px] h-[480px] rounded-full" style={{ background: "rgba(255,255,255,0.06)" }} />
