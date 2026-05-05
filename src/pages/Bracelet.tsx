@@ -6,6 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
 import oreonSpecs from "@/assets/oreon-specs.png";
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
+import SectionTransitionZone from "@/components/bracelet/SectionTransitionZone";
+import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 
 const features = [
   {
