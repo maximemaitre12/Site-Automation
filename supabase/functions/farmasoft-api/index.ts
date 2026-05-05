@@ -339,6 +339,17 @@ serve(async (req) => {
       return json({ data });
     }
 
+    if (path === "/jobs/with-counts" && method === "GET") {
+      const { data: jobs, error } = await supabase.from("farmasoft_jobs").select("*").eq("user_id", userId).eq("is_active", 1).order("created_at", { ascending: false });
+      if (error) return json({ error: error.message });
+      const withCounts = [];
+      for (const job of jobs || []) {
+        const { count } = await supabase.from("farmasoft_candidates").select("*", { count: "exact", head: true }).eq("job_id", job.id).eq("user_id", userId);
+        withCounts.push({ ...job, candidate_count: count || 0 });
+      }
+      return json({ data: withCounts });
+    }
+
     if (path === "/jobs" && method === "POST") {
       const { title, location, salary_min, salary_max, salary_currency, experience_years, skills, description, requirements } = body;
       if (!title) return json({ error: "Le titre est requis" });
