@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import { Check, CreditCard, QrCode, X, Loader2, Lock } from "lucide-react";
 
@@ -693,7 +694,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
       
       <canvas
         ref={canvasRef}
-        className="fixed inset-0 pointer-events-none z-[10000]"
+        className="fixed inset-0 pointer-events-none z-[100000]"
         style={{ width: "100vw", height: "100vh" }}
       />
       
@@ -714,143 +715,144 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
         )}
       </AnimatePresence>
       
-      {/* THE MODAL OVERLAY */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop — deep navy + strong blur + spotlight */}
-            <motion.div
-              className="fixed inset-0 z-[9990]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.28, ease: "easeOut" }}
-              onClick={() => setIsOpen(false)}
-              style={{
-                background: "rgba(5, 12, 35, 0.72)",
-                backdropFilter: "blur(28px) saturate(1.2)",
-                WebkitBackdropFilter: "blur(28px) saturate(1.2)",
-              }}
-            >
-              {/* Spotlight radial glow */}
-              <div className="absolute inset-0" style={{
-                background: "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(111,224,245,0.08) 0%, transparent 70%)"
-              }} />
-            </motion.div>
-            
-            {/* Modal — centered, constrained, branded */}
-            <div className="fixed inset-0 z-[9995] flex items-center justify-center pointer-events-none" style={{ padding: 24 }}>
+      {/* THE MODAL OVERLAY — rendered via portal to escape stacking contexts */}
+      {createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              {/* Backdrop */}
               <motion.div
-                layoutId="precommander-portal"
-                className="relative w-full pointer-events-auto"
+                className="fixed inset-0"
                 style={{
-                  maxWidth: 1080,
-                  maxHeight: "92vh",
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                  background: "#FAFBFE",
-                  border: "1px solid rgba(26,63,184,0.08)",
-                  borderRadius: 28,
-                  boxShadow: `
-                    0 1px 2px rgba(15,30,80,0.06),
-                    0 16px 32px rgba(15,30,80,0.12),
-                    0 48px 96px rgba(15,30,80,0.24),
-                    inset 0 0 0 1px rgba(255,255,255,0.6)
-                  `,
+                  zIndex: 99998,
+                  background: "rgba(5, 12, 35, 0.72)",
+                  backdropFilter: "blur(28px) saturate(1.2)",
+                  WebkitBackdropFilter: "blur(28px) saturate(1.2)",
                 }}
-                initial={prefersReduced ? { opacity: 0, scale: 0.95 } : undefined}
-                animate={prefersReduced ? { opacity: 1, scale: 1 } : undefined}
-                exit={prefersReduced ? { opacity: 0, scale: 0.95 } : undefined}
-                transition={{ type: "spring", stiffness: 220, damping: 26, mass: 1.1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: "easeOut" }}
+                onClick={() => setIsOpen(false)}
               >
-                {/* Top cyan glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] pointer-events-none" style={{
-                  background: "radial-gradient(ellipse at center top, rgba(111,224,245,0.10) 0%, transparent 70%)",
-                  borderRadius: "28px 28px 0 0",
+                <div className="absolute inset-0" style={{
+                  background: "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(111,224,245,0.08) 0%, transparent 70%)"
                 }} />
-
-                {/* Ambient particles */}
-                {!prefersReduced && <ModalAmbientParticles />}
-                
-                {/* Close button */}
-                <motion.button
-                  className="absolute top-5 right-5 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-colors"
-                  style={{ background: "rgba(10,28,74,0.06)" }}
-                  onClick={() => setIsOpen(false)}
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
-                  whileHover={{ scale: 1.1, background: "rgba(10,28,74,0.12)" }}
-                >
-                  <X className="w-4 h-4" style={{ color: "#5A6478" }} />
-                </motion.button>
-                
-                {/* Content */}
-                <div className="p-6 md:p-14 relative z-10">
-                  {/* Header */}
-                  <div className="text-center mb-10">
-                    {/* TARIFS pill */}
-                    <motion.div
-                      className="inline-flex items-center gap-2 rounded-full mb-5"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(26,63,184,0.08), rgba(11,165,199,0.08))",
-                        border: "1px solid rgba(26,63,184,0.15)",
-                        padding: "6px 16px",
-                      }}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                    >
-                      <span
-                        className="w-[6px] h-[6px] rounded-full"
-                        style={{ background: "#6FE0F5", animation: "badge-pulse 2.5s ease-in-out infinite" }}
-                      />
-                      <span style={{ color: "#1A3FB8", fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                        Tarifs
-                      </span>
-                    </motion.div>
-                    
-                    <motion.h2
-                      className="font-heading text-[28px] sm:text-[36px] font-semibold mb-3"
-                      style={{ color: "#0A1C4A", letterSpacing: "-0.02em", lineHeight: 1.15 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      Bracelet offert<span style={{ color: "#1A3FB8" }}>,</span> abonnement simple
-                    </motion.h2>
-                    
-                    <motion.p
-                      className="text-[16px] max-w-[540px] mx-auto"
-                      style={{ color: "#5A6478", lineHeight: 1.55 }}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35, duration: 0.5 }}
-                    >
-                      Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
-                    </motion.p>
-                    
-                    {/* Cyan accent line */}
-                    <motion.div
-                      className="mx-auto mt-6 h-px"
-                      style={{ background: "rgba(111,224,245,0.4)", width: 60 }}
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    />
-                  </div>
-                  
-                  {/* Cards — extra top padding for badge overflow */}
-                  <div className="grid md:grid-cols-2 gap-6 pt-4">
-                    <LeftCard plan={leftPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
-                    <RightCard plan={rightPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
-                  </div>
-                </div>
               </motion.div>
-            </div>
-          </>
-        )}
-      </AnimatePresence>
+              
+              {/* Modal */}
+              <div
+                className="fixed inset-0 flex items-center justify-center pointer-events-none"
+                style={{ zIndex: 99999, padding: 24 }}
+              >
+                <motion.div
+                  layoutId="precommander-portal"
+                  className="relative w-full pointer-events-auto"
+                  style={{
+                    maxWidth: 1080,
+                    maxHeight: "92vh",
+                    overflowY: "auto",
+                    overflowX: "hidden",
+                    background: "#FAFBFE",
+                    border: "1px solid rgba(26,63,184,0.08)",
+                    borderRadius: 28,
+                    boxShadow: `
+                      0 1px 2px rgba(15,30,80,0.06),
+                      0 16px 32px rgba(15,30,80,0.12),
+                      0 48px 96px rgba(15,30,80,0.24),
+                      inset 0 0 0 1px rgba(255,255,255,0.6)
+                    `,
+                  }}
+                  initial={prefersReduced ? { opacity: 0, scale: 0.95 } : undefined}
+                  animate={prefersReduced ? { opacity: 1, scale: 1 } : undefined}
+                  exit={prefersReduced ? { opacity: 0, scale: 0.95 } : undefined}
+                  transition={{ type: "spring", stiffness: 220, damping: 26, mass: 1.1 }}
+                >
+                  {/* Top cyan glow */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] pointer-events-none" style={{
+                    background: "radial-gradient(ellipse at center top, rgba(111,224,245,0.10) 0%, transparent 70%)",
+                    borderRadius: "28px 28px 0 0",
+                  }} />
+
+                  {!prefersReduced && <ModalAmbientParticles />}
+                  
+                  {/* Close button */}
+                  <motion.button
+                    className="absolute top-5 right-5 z-50 w-9 h-9 flex items-center justify-center rounded-full transition-colors"
+                    style={{ background: "rgba(10,28,74,0.06)" }}
+                    onClick={() => setIsOpen(false)}
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
+                    whileHover={{ scale: 1.1, background: "rgba(10,28,74,0.12)" }}
+                  >
+                    <X className="w-4 h-4" style={{ color: "#5A6478" }} />
+                  </motion.button>
+                  
+                  {/* Content */}
+                  <div className="p-6 md:p-14 relative z-10">
+                    <div className="text-center mb-10">
+                      <motion.div
+                        className="inline-flex items-center gap-2 rounded-full mb-5"
+                        style={{
+                          background: "linear-gradient(135deg, rgba(26,63,184,0.08), rgba(11,165,199,0.08))",
+                          border: "1px solid rgba(26,63,184,0.15)",
+                          padding: "6px 16px",
+                        }}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                      >
+                        <span
+                          className="w-[6px] h-[6px] rounded-full"
+                          style={{ background: "#6FE0F5", animation: "badge-pulse 2.5s ease-in-out infinite" }}
+                        />
+                        <span style={{ color: "#1A3FB8", fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                          Tarifs
+                        </span>
+                      </motion.div>
+                      
+                      <motion.h2
+                        className="font-heading text-[28px] sm:text-[36px] font-semibold mb-3"
+                        style={{ color: "#0A1C4A", letterSpacing: "-0.02em", lineHeight: 1.15 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        Bracelet offert<span style={{ color: "#1A3FB8" }}>,</span> abonnement simple
+                      </motion.h2>
+                      
+                      <motion.p
+                        className="text-[16px] max-w-[540px] mx-auto"
+                        style={{ color: "#5A6478", lineHeight: 1.55 }}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.35, duration: 0.5 }}
+                      >
+                        Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
+                      </motion.p>
+                      
+                      <motion.div
+                        className="mx-auto mt-6 h-px"
+                        style={{ background: "rgba(111,224,245,0.4)", width: 60 }}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                      />
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6 pt-4">
+                      <LeftCard plan={leftPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
+                      <RightCard plan={rightPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
       
       {/* GLOBAL ANIMATION STYLES */}
       <style>{`
