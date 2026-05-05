@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const PRICES: Record<string, string> = {
-  essentiel: "price_1TTikIH0Zbdp95xino8nfWpI",
-  premium: "price_1TTikfH0Zbdp95xiwmw87XKD",
+  precommande: "price_1TTiqrH0Zbdp95xi6K5MFyyl",
+  livraison: "price_1TTirGH0Zbdp95xiDEuybMn9",
 };
 
 serve(async (req) => {
@@ -27,7 +27,6 @@ serve(async (req) => {
     const priceId = PRICES[plan];
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Try to get authenticated user, but allow guest checkout
     let customerEmail = email;
     const authHeader = req.headers.get("Authorization");
     if (authHeader) {
@@ -42,7 +41,6 @@ serve(async (req) => {
       }
     }
 
-    // Check existing customer
     let customerId: string | undefined;
     if (customerEmail) {
       const customers = await stripe.customers.list({ email: customerEmail, limit: 1 });

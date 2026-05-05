@@ -13,11 +13,11 @@ En scannant le QR code d'activation et en souscrivant à l'abonnement, l'utilisa
 
 • La mise à disposition gratuite d'un bracelet connecté Oreon
 • L'accès à l'application AETHER de suivi biométrique et d'automatisations IA
-• Un abonnement avec engagement de 12 mois et prélèvement trimestriel selon la formule choisie :
-  — Formule Essentiel : 8,97€ TTC par trimestre (soit 2,99€/mois)
-  — Formule Premium : 11,97€ TTC par trimestre (soit 3,99€/mois)
+• Un abonnement sans engagement avec prélèvement trimestriel selon la formule choisie :
+  — Formule Précommande : 11,97€ TTC par trimestre (soit 3,99€/mois)
+  — Formule Livraison directe : 14,97€ TTC par trimestre (soit 4,99€/mois)
 
-Le Bracelet reste la propriété de l'Éditeur pendant les 12 premiers mois d'abonnement. Au-delà de cette période, la propriété est transférée à l'Abonné.`,
+Le Bracelet est offert et devient la propriété de l'Abonné dès réception.`,
   },
   {
     title: "3. Prélèvement SEPA",
@@ -33,20 +33,13 @@ L'Abonné peut contester un prélèvement auprès de sa banque dans un délai de
   },
   {
     title: "4. Durée et résiliation",
-    content: `L'abonnement est souscrit pour une durée de 12 mois avec renouvellement tacite par périodes de 3 mois.
+    content: `L'abonnement est souscrit sans durée d'engagement minimale, avec renouvellement tacite par périodes de 3 mois.
 
-Le prélèvement SEPA est effectué tous les 3 mois (trimestriellement).
+Le prélèvement (SEPA ou carte bancaire) est effectué tous les 3 mois (trimestriellement).
 
-Pendant la période d'engagement (12 premiers mois) :
-• L'Abonné ne peut pas résilier sauf motif légitime (déménagement hors zone, incapacité médicale)
-• En cas de résiliation anticipée pour motif légitime, des frais de restitution du Bracelet d'un montant de 29€ TTC seront facturés
-• L'Abonné devra retourner le Bracelet à ses frais dans un délai de 15 jours
+L'Abonné peut résilier à tout moment sans frais et sans motif. La résiliation prend effet à la fin du trimestre en cours.
 
-Après la période d'engagement :
-• L'Abonné peut résilier à tout moment sans frais avec un préavis de 30 jours
-• Le Bracelet devient la propriété de l'Abonné
-
-La résiliation prend effet à la fin du trimestre en cours. L'Abonné peut résilier en envoyant un email à contact@aether-connect.com ou via l'application.`,
+L'Abonné peut résilier en envoyant un email à contact@aether-connect.com ou via l'application.`,
   },
   {
     title: "5. Collecte et traitement des données biométriques",

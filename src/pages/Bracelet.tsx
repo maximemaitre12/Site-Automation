@@ -40,32 +40,32 @@ const features = [
 
 const plans = [
   {
-    name: "Essentiel",
-    key: "essentiel",
-    price: "8,97",
-    monthly: "2,99",
+    name: "Précommande",
+    key: "precommande",
+    price: "11,97",
+    monthly: "3,99",
     features: [
       "Bracelet Oreon offert",
       "Suivi biométrique complet",
       "Tableau de bord santé",
-      "Historique 30 jours",
-      "Alertes de base",
-      "1 automatisation IA",
+      "Alertes intelligentes IA",
+      "Automatisations IA",
+      "Livraison dès disponibilité",
     ],
   },
   {
-    name: "Premium",
-    key: "premium",
-    price: "11,97",
-    monthly: "3,99",
+    name: "Livraison directe",
+    key: "livraison",
+    price: "14,97",
+    monthly: "4,99",
     popular: true,
     features: [
       "Bracelet Oreon offert",
       "Suivi biométrique complet",
       "Tableau de bord santé avancé",
-      "Historique illimité",
       "Alertes intelligentes IA",
       "Automatisations IA illimitées",
+      "Livraison sous 48h",
       "Rapports hebdomadaires",
       "Support prioritaire",
     ],
@@ -81,7 +81,11 @@ const steps = [
 const faqs = [
   {
     q: "Le bracelet est-il vraiment gratuit ?",
-    a: "Oui, le bracelet Oreon est offert. Vous vous engagez à un abonnement d'un an avec prélèvement trimestriel de 8,97€ (Essentiel) ou 11,97€ (Premium) par SEPA ou carte bancaire.",
+    a: "Oui, le bracelet Oreon est offert. Vous souscrivez un abonnement sans engagement avec prélèvement trimestriel de 11,97€ (Précommande) ou 14,97€ (Livraison directe) par SEPA ou carte bancaire.",
+  },
+  {
+    q: "Quelle est la différence entre les deux offres ?",
+    a: "L'offre Précommande à 3,99€/mois vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€/mois inclut une expédition sous 48h et des fonctionnalités avancées.",
   },
   {
     q: "Comment fonctionne le prélèvement SEPA ?",
@@ -93,7 +97,7 @@ const faqs = [
   },
   {
     q: "Puis-je résilier mon abonnement ?",
-    a: "L'abonnement comporte un engagement de 12 mois. Au-delà, vous pouvez résilier à tout moment avec un préavis de 30 jours. En cas de résiliation anticipée, des frais de restitution du bracelet (29€) peuvent s'appliquer.",
+    a: "L'abonnement est sans engagement. Vous pouvez résilier à tout moment, la résiliation prend effet à la fin du trimestre en cours.",
   },
   {
     q: "Mes données sont-elles protégées ?",
@@ -172,7 +176,7 @@ export default function Bracelet() {
                 <strong className="text-white font-medium"> automatisations IA personnalisées</strong> via notre plateforme AETHER
               </p>
               <p className="text-sm text-white/50 mb-10">
-                Bracelet offert · À partir de 2,99€/mois · SEPA ou Carte bancaire · 12 mois d'engagement
+                Bracelet offert · À partir de 3,99€/mois · SEPA ou Carte bancaire · Sans engagement
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -287,7 +291,7 @@ export default function Bracelet() {
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
                   <span className="text-sm" style={{ color: "#64748B" }}>/trimestre</span>
                 </div>
-                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>soit {plan.monthly}€/mois · Engagement 12 mois</p>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>soit {plan.monthly}€/mois · Sans engagement</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -331,7 +335,7 @@ export default function Bracelet() {
                 </div>
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  Prélèvement trimestriel · Engagement 12 mois
+                  Prélèvement trimestriel · Sans engagement · Résiliable à tout moment
                 </p>
               </div>
             ))}
