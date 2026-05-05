@@ -155,7 +155,7 @@ export default function Bracelet() {
       {/* Hero */}
       <section
         className="relative min-h-screen flex items-center overflow-hidden"
-        style={{ background: "linear-gradient(160deg, #1E4D8C 0%, #152d52 100%)" }}
+        style={{ background: "#0a2d6e" }}
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-20 right-[8%] w-[480px] h-[480px] rounded-full" style={{ background: "rgba(255,255,255,0.06)" }} />
@@ -199,7 +199,7 @@ export default function Bracelet() {
       <ScrollVideoPlayer />
 
       {/* Technical Specs Image */}
-      <section className="py-28" style={{ background: "#00296d" }}>
+      <section className="py-28" style={{ background: "#0a2d6e" }}>
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase text-white/45 mb-4">

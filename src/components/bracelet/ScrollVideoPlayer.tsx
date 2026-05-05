@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const TOTAL_FRAMES = 242;
+const LOGO_FRAME = 55; // Frame where logo faces user
 
 function getFrameSrc(index: number): string {
   const padded = String(index).padStart(3, "0");
@@ -12,6 +13,7 @@ export default function ScrollVideoPlayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const lastFrameRef = useRef(-1);
 
   // Preload all frames
   useEffect(() => {
@@ -27,8 +29,7 @@ export default function ScrollVideoPlayer() {
         if (count === TOTAL_FRAMES && mounted) {
           imagesRef.current = images;
           setLoaded(true);
-          // Draw first frame
-          drawFrame(0);
+          drawFrame(LOGO_FRAME);
         }
       };
       images.push(img);
@@ -38,6 +39,7 @@ export default function ScrollVideoPlayer() {
   }, []);
 
   const drawFrame = (index: number) => {
+    if (index === lastFrameRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     const img = imagesRef.current[index];
@@ -45,6 +47,7 @@ export default function ScrollVideoPlayer() {
     canvas.width = 720;
     canvas.height = 720;
     ctx.drawImage(img, 0, 0, 720, 720);
+    lastFrameRef.current = index;
   };
 
   // Scroll-driven frame selection
@@ -60,17 +63,20 @@ export default function ScrollVideoPlayer() {
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
 
+        // progress 0 = section just entering viewport from bottom
+        // progress 0.5 = section perfectly centered
+        // progress 1 = section leaving viewport at top
         const scrollRange = rect.height + viewH;
         const scrolled = viewH - rect.top;
         const progress = Math.max(0, Math.min(1, scrolled / scrollRange));
 
-        // Logo faces user at frame 55. Map progress 0→242, 0.5→55
-        // Use wrapping so it rotates continuously
-        const LOGO_FRAME = 55;
-        const offset = LOGO_FRAME - Math.round(0.5 * TOTAL_FRAMES);
-        const raw = Math.round(progress * TOTAL_FRAMES) + offset;
-        const frameIndex = ((raw % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
-        drawFrame(frameIndex);
+        // At progress 0.5, show LOGO_FRAME (55)
+        // Full scroll maps to one full rotation (242 frames)
+        // offset so that progress=0.5 → frame 55
+        const centerOffset = LOGO_FRAME - Math.floor(TOTAL_FRAMES * 0.5);
+        const rawFrame = Math.floor(progress * TOTAL_FRAMES) + centerOffset;
+        const frameIndex = ((rawFrame % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
+        drawFrame(Math.min(frameIndex, TOTAL_FRAMES - 1));
       });
     };
 
@@ -85,7 +91,7 @@ export default function ScrollVideoPlayer() {
   return (
     <div ref={containerRef} className="relative" style={{ height: "300vh" }}>
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden"
-        style={{ background: "#082b6c" }}
+        style={{ background: "#0a2d6e" }}
       >
         <canvas
           ref={canvasRef}
