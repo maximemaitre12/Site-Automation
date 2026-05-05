@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
 import oreonSpecs from "@/assets/oreon-specs.png";
-import ScrollVideoPlayer from "@/components/bracelet/ScrollVideoPlayer";
+import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 
 const features = [
   {
