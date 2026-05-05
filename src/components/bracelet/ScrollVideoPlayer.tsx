@@ -84,7 +84,8 @@ export default function ScrollVideoPlayer() {
         const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
 
         // Use the full scroll distance so the bracelet keeps rotating until the end.
-        const rotateProgress = progress;
+        // Ease-in: slow at start, fast at end
+        const rotateProgress = progress * progress;
         const frameOffset = Math.round(rotateProgress * travelFrames) * direction;
         const frameIndex = ((START_INDEX + frameOffset) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
@@ -101,7 +102,7 @@ export default function ScrollVideoPlayer() {
 
   return (
     <div ref={containerRef} className="relative" style={{ height: "90vh", background: "#0a2d6e" }}>
-      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden"
+      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden pl-16"
         style={{ background: "#0a2d6e" }}
       >
         <canvas
