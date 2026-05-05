@@ -1,8 +1,5 @@
-import { useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check } from "lucide-react";
 import PrecommanderReveal from "@/components/bracelet/PrecommanderReveal";
-import oreonBracelet from "@/assets/oreon-bracelet.png";
 import oreonSpecs from "@/assets/oreon-specs.png";
 
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
