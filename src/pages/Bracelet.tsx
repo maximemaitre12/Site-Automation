@@ -367,38 +367,57 @@ export default function Bracelet() {
                   ))}
                 </ul>
 
-                {/* Two payment buttons */}
-                <div className="space-y-3">
-                  <button
-                    onClick={() => handleCardPayment(plan.key)}
-                    disabled={loadingPlan === plan.key}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
-                    style={{
-                      background: plan.popular ? "#1E4D8C" : "transparent",
-                      color: plan.popular ? "#fff" : "#1E4D8C",
-                      border: plan.popular ? "none" : "1px solid #1E4D8C",
-                    }}
-                  >
-                    {loadingPlan === plan.key ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <CreditCard className="w-4 h-4" />
-                    )}
-                    Payer par carte
-                  </button>
-                  <a
-                    href="#qrcode"
-                    className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all"
-                    style={{
-                      background: plan.popular ? "transparent" : "#1E4D8C",
-                      color: plan.popular ? "#1E4D8C" : "#fff",
-                      border: plan.popular ? "1px solid #1E4D8C" : "none",
-                    }}
-                  >
-                    <QrCode className="w-4 h-4" />
-                    Prélèvement SEPA
-                  </a>
-                </div>
+                {/* Payment zone */}
+                {showSepaFor === plan.key ? (
+                  <div className="text-center py-4">
+                    <p className="text-sm font-semibold mb-3" style={{ color: "#0F172A" }}>
+                      Scannez pour activer le SEPA — {plan.name} ({plan.price}€)
+                    </p>
+                    <img src={sepaQrCode} alt={`QR Code SEPA ${plan.name}`} className="w-[160px] h-[160px] mx-auto rounded-lg border" style={{ borderColor: "#E2E8F0" }} />
+                    <p className="text-[11px] mt-3" style={{ color: "#94A3B8" }}>
+                      Mandat SEPA · AETHER GROUP (SIREN 104 445 424)
+                    </p>
+                    <button
+                      onClick={() => setShowSepaFor(null)}
+                      className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
+                      style={{ color: "#1E4D8C" }}
+                    >
+                      <ArrowLeft className="w-3 h-3" /> Retour aux options
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setShowSepaFor(plan.key)}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all"
+                      style={{
+                        background: plan.popular ? "transparent" : "#1E4D8C",
+                        color: plan.popular ? "#1E4D8C" : "#fff",
+                        border: plan.popular ? "1px solid #1E4D8C" : "none",
+                      }}
+                    >
+                      <QrCode className="w-4 h-4" />
+                      Prélèvement SEPA
+                    </button>
+                    <button
+                      onClick={() => handleCardPayment(plan.key)}
+                      disabled={loadingPlan === plan.key}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+                      style={{
+                        background: plan.popular ? "#1E4D8C" : "transparent",
+                        color: plan.popular ? "#fff" : "#1E4D8C",
+                        border: plan.popular ? "none" : "1px solid #1E4D8C",
+                      }}
+                    >
+                      {loadingPlan === plan.key ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="w-4 h-4" />
+                      )}
+                      Payer par carte
+                    </button>
+                  </div>
+                )}
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
                   Paiement unique · Bracelet offert · Satisfait ou remboursé
