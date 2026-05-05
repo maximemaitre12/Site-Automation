@@ -83,8 +83,8 @@ export default function ScrollVideoPlayer() {
         const stickyTravel = Math.max(1, rect.height - viewH + earlyStart);
         const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
 
-        // First 50% of scroll: rotate from back to logo. Last 50%: hold on logo.
-        const rotateProgress = Math.min(1, progress / 0.5);
+        // First 80% of scroll: rotate from back to logo. Last 20%: hold on logo.
+        const rotateProgress = Math.min(1, progress / 0.8);
         const frameOffset = Math.round(rotateProgress * travelFrames) * direction;
         const frameIndex = ((START_INDEX + frameOffset) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
@@ -100,7 +100,7 @@ export default function ScrollVideoPlayer() {
   }, [loaded]);
 
   return (
-    <div ref={containerRef} className="relative" style={{ height: "200vh", background: "#0a2d6e" }}>
+    <div ref={containerRef} className="relative" style={{ height: "125vh", background: "#0a2d6e" }}>
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden"
         style={{ background: "#0a2d6e" }}
       >
