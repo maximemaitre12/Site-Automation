@@ -385,22 +385,13 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="text-center py-4">
-              <p className="text-sm font-semibold mb-3" style={{ color: "#0A1C4A" }}>
-                Scannez pour activer le SEPA — {plan.name} ({plan.price}€)
-              </p>
-              <img src={sepaQrCode} alt={`QR Code SEPA ${plan.name}`} className="w-[160px] h-[160px] mx-auto rounded-lg" />
-              <p className="text-[11px] mt-3" style={{ color: "#8A92A6" }}>
-                Mandat SEPA · AETHER GROUP (SIREN 104 445 424)
-              </p>
-              <button
-                onClick={() => setShowSepa(false)}
-                className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
-                style={{ color: "#1A3FB8" }}
-              >
-                <ArrowLeft className="w-3 h-3" /> Retour aux options
-              </button>
-            </div>
+            <SepaCheckoutFlow
+              planName={plan.name}
+              planKey={plan.key}
+              price={plan.price}
+              onBack={() => setShowSepa(false)}
+              dark={false}
+            />
           </motion.div>
         ) : (
           <motion.div key="buttons" className="space-y-3">
