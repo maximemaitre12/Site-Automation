@@ -152,15 +152,19 @@ export default function Bracelet() {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Hero */}
-      <section
-        className="relative min-h-screen flex items-center overflow-hidden"
-        style={{ background: "#0a2d6e" }}
-      >
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 right-[8%] w-[480px] h-[480px] rounded-full" style={{ background: "rgba(255,255,255,0.06)" }} />
-          <div className="absolute bottom-[5%] left-[10%] w-[300px] h-[300px] rounded-full" style={{ background: "rgba(255,255,255,0.04)" }} />
-        </div>
+      {/* Hero with Video */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Video background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/bracelet-hero.mp4"
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(10,45,110,0.55) 0%, rgba(10,45,110,0.75) 100%)" }} />
 
         <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12 w-full z-10 pt-32 pb-24">
           <div className="max-w-[700px] mx-auto text-center">
