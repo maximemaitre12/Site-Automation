@@ -258,12 +258,23 @@ export default function Bracelet() {
       {/* Business Model Section */}
       <BusinessModelSection />
 
-      {/* Wave → Features */}
+      {/* Wave → Oreon Model */}
       <OceanWaveDivider
         backColor="#0a2d6e"
         midColor="#1A3FB8"
-        frontColor="#ffffff"
+        frontColor="#1A3FB8"
         variant="b"
+      />
+
+      {/* LE MODÈLE OREON */}
+      <OreonModelSection />
+
+      {/* Wave → Features */}
+      <OceanWaveDivider
+        backColor="#1A3FB8"
+        midColor="#1A3FB8"
+        frontColor="#ffffff"
+        variant="a"
       />
 
       {/* Features */}
