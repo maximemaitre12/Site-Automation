@@ -172,7 +172,7 @@ export default function Bracelet() {
                 <strong className="text-white font-medium"> automatisations IA personnalisées</strong> via notre plateforme AETHER
               </p>
               <p className="text-sm text-white/50 mb-10">
-                Bracelet offert · À partir de 2,99€/mois · SEPA ou Carte bancaire · 12 mois d'engagement
+                Bracelet offert · À partir de 3,99€/mois · SEPA ou Carte bancaire · Sans engagement
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -287,7 +287,7 @@ export default function Bracelet() {
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
                   <span className="text-sm" style={{ color: "#64748B" }}>/trimestre</span>
                 </div>
-                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>soit {plan.monthly}€/mois · Engagement 12 mois</p>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>soit {plan.monthly}€/mois · Sans engagement</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -331,7 +331,7 @@ export default function Bracelet() {
                 </div>
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  Prélèvement trimestriel · Engagement 12 mois
+                  Prélèvement trimestriel · Sans engagement · Résiliable à tout moment
                 </p>
               </div>
             ))}
