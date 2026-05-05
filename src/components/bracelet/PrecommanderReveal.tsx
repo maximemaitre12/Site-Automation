@@ -593,6 +593,9 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
     setTimeout(() => setIsOpen(true), prefersReduced ? 0 : 80);
   };
   
+  const leftPlan = plans[0];
+  const rightPlan = plans[1] || plans[0];
+
 
   return (
     <>
