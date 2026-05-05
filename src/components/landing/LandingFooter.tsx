@@ -34,6 +34,7 @@ export function LandingFooter() {
             <div className="space-y-3 text-sm" style={{ color: "#475569" }}>
               <a href="#team" className="block hover:text-[#1E4D8C] transition-colors">About</a>
               <a href="#case-study" className="block hover:text-[#1E4D8C] transition-colors">Case Study</a>
+              <Link to="/bracelet" className="block hover:text-[#1E4D8C] transition-colors">Bracelet Oreon</Link>
               <Link to="/contact" className="block hover:text-[#1E4D8C] transition-colors">Contact</Link>
             </div>
           </div>

@@ -43,6 +43,10 @@ import Privacy from "./pages/legal/Privacy";
 import Terms from "./pages/legal/Terms";
 import Security from "./pages/legal/Security";
 import LegalNotice from "./pages/legal/LegalNotice";
+import BraceletCGU from "./pages/legal/BraceletCGU";
+
+// Product pages
+import Bracelet from "./pages/Bracelet";
 
 // Product Tour
 import ProductTour from "./pages/ProductTour";
@@ -106,6 +110,8 @@ const App = () => {
                 <Route path="/legal/terms" element={<Terms />} />
                 <Route path="/legal/security" element={<Security />} />
                 <Route path="/legal/mentions" element={<LegalNotice />} />
+                <Route path="/legal/bracelet-cgu" element={<BraceletCGU />} />
+                <Route path="/bracelet" element={<Bracelet />} />
               </Route>
 
               {/* Product Tour (own layout) */}

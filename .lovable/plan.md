@@ -1,60 +1,56 @@
 
-## Objectif
+## Bracelet Oreon — New Product Page
 
-Importer le code Farmasoft à jour depuis `maximemaitre12/Site-Automation` (branche `main`) dans le dossier `src/farmasoft/` du projet Lovable. Le repo GitHub a une structure standalone (`src/`) qu'il faut mapper vers `src/farmasoft/`.
+### Overview
+Create a complete `/bracelet` page for the "Oreon" smart bracelet product. The bracelet is free; the user commits to a monthly SEPA subscription (2.99€ or 3.99€). A QR code triggers the SEPA mandate. The page matches the existing site design (Royal Blue #1E4D8C, Inter/Montserrat fonts, clean editorial style).
 
-## Changements identifiés
+### What will be built
 
-Le repo GitHub contient des modifications majeures par rapport au code actuel :
+**1. New page: `src/pages/Bracelet.tsx`**
+Full product landing page with the following sections:
+- **Hero** — Dark Royal Blue gradient background (same as PharmaHero), product name "Oreon", tagline about biometric tracking + AI automations, CTA to scroll to pricing
+- **Product Image** — AI-generated image of a sleek smart bracelet (generated via Lovable AI, saved as asset)
+- **Features Grid** — 4-6 feature cards: biometric capture, real-time health tracking, AI automation workflows, app integration, data privacy, battery life
+- **Pricing Section** — Two plan cards (2.99€/month and 3.99€/month), bracelet marked as "Offert" (free), SEPA direct debit mention
+- **QR Code Section** — Placeholder QR code image with instructions: "Scan to activate your SEPA mandate". You'll replace the QR before publishing
+- **How It Works** — 3-step flow: Receive bracelet → Scan QR code → Start tracking
+- **FAQ** — Common questions about the bracelet, subscription, SEPA, cancellation
 
-### Fichiers modifiés (contenu différent)
-- `api/client.ts` — 380 lignes vs 205 (ajout messaging API, robota config, etc.)
-- `components/layout/Sidebar.tsx` — refonte complète avec ProfileMenu, connexions channels (Telegram, WhatsApp, Viber, Calendly, robota.ua)
-- `components/layout/TopBar.tsx` — à comparer et mettre à jour
-- `pages/JobDescriptions.tsx` — 263 lignes vs 1243 (réécriture, sous-composants extraits)
-- `pages/Dashboard.tsx` — mis à jour
-- `pages/Interviews.tsx` — mis à jour
-- `pages/Messages.tsx` — mis à jour
-- `pages/Settings.tsx` — mis à jour
-- `i18n.ts` — mis à jour
-- `store/useAppStore.ts` — Page type réduit à `'dashboard' | 'jobs'`
+**2. New legal page: `src/pages/legal/BraceletCGU.tsx`**
+Dedicated Terms & Conditions for the Oreon bracelet subscription covering:
+- Subscription terms (monthly SEPA debit, 2.99€ or 3.99€)
+- Free bracelet conditions (commitment to subscription)
+- SEPA mandate details and cancellation policy
+- Biometric data collection and privacy (GDPR)
+- Return/refund policy
+- Warranty and liability
 
-### Nouveaux fichiers à ajouter
-- `pages/jobs/AddCandidatePanel.tsx`
-- `pages/jobs/CandidateModal.tsx`
-- `pages/jobs/JobForm.tsx`
-- `pages/jobs/PipelineCard.tsx`
-- `pages/jobs/PipelineView.tsx`
-- `pages/jobs/PublishModal.tsx`
-- `pages/jobs/RobotaSyncModal.tsx`
-- `pages/jobs/ScheduleModal.tsx`
-- `pages/jobs/constants.ts`
-- `pages/jobs/helpers.ts`
-- `pages/jobs/icons.tsx`
-- `pages/Analytics.tsx`
-- `types/analytics.types.ts`
-- `types/candidate.types.ts`
-- `types/job.types.ts`
+**3. Navigation updates**
+- Add "Bracelet" link in `LandingHeader.tsx` nav items
+- Add "Bracelet" link in `LandingFooter.tsx`
+- Add routes in `App.tsx`: `/bracelet` (public, inside PublicLayout) and `/legal/bracelet-cgu`
 
-### Fichiers à supprimer
-- `pages/Prospecting.tsx` — supprimé sur GitHub
+**4. AI-generated product image**
+- Generate a premium product photo of a sleek black/dark smart bracelet using Lovable AI image generation
+- Save as `src/assets/oreon-bracelet.png`
+- Used in hero and product sections
 
-### Fichiers ignorés (backend, non applicable)
-- `server/` — Le projet Lovable utilise Supabase Edge Functions, pas un serveur Node
-- `src/main.tsx`, `src/App.tsx` — Le point d'entrée est `FarmasoftApp.tsx` dans Lovable
+**5. Placeholder QR code**
+- Create or embed a simple placeholder QR code image (pointing to example.com)
+- You replace it before publishing
 
-## Plan d'exécution
+### Design Details
+- Same Royal Blue (#1E4D8C) gradient hero as landing page
+- White sections with subtle borders for features/pricing
+- Cards with slight shadows matching existing component style
+- Typography: Montserrat headings, Inter body
+- Responsive layout matching existing pages
+- All text in French
 
-1. **Télécharger tous les fichiers source** depuis GitHub via curl
-2. **Adapter les imports** : les chemins relatifs du repo standalone (`../../store`, `../../api`) doivent rester cohérents dans `src/farmasoft/`
-3. **Remplacer les fichiers existants** modifiés (api/client.ts, Sidebar, TopBar, pages, i18n, store)
-4. **Ajouter les nouveaux fichiers** (pages/jobs/*, types/*, Analytics)
-5. **Supprimer Prospecting.tsx**
-6. **Mettre à jour FarmasoftApp.tsx** pour refléter les nouvelles pages (retirer prospecting/interviews/messages/settings des routes si le nouveau App.tsx ne les a plus)
-7. **Adapter le CSS** : fusionner `index.css` du repo avec `farmasoft.css` existant
-8. **Corriger les imports spécifiques Lovable** (supabase client, useAuth, react-router) qui n'existent pas dans le repo standalone
-9. **Vérifier la compilation** et corriger les erreurs TypeScript
-
-## Note technique
-
-Le Sidebar du repo GitHub importe des APIs messaging (Telegram, WhatsApp, Viber) et robota.ua qui passent par un backend Node.js (`server/`). Ces appels API devront pointer vers l'Edge Function `farmasoft-api` existante, ou être adaptés si les endpoints n'existent pas encore côté backend.
+### Files created/modified
+- `src/pages/Bracelet.tsx` (new)
+- `src/pages/legal/BraceletCGU.tsx` (new)
+- `src/components/landing/LandingHeader.tsx` (add nav item)
+- `src/components/landing/LandingFooter.tsx` (add link)
+- `src/App.tsx` (add routes)
+- `src/assets/oreon-bracelet.png` (AI-generated image)
