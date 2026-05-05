@@ -24,7 +24,7 @@ export default function OceanWaveDivider({
       };
 
   return (
-    <div className="relative w-full" style={{ marginTop: -2, marginBottom: -2, zIndex: 5 }}>
+    <div className="relative w-full" style={{ marginTop: -2, marginBottom: -2, zIndex: 1 }}>
       <div className="relative w-full" style={{ height: "clamp(70px, 10vw, 120px)" }}>
         {/* Back wave */}
         <svg
