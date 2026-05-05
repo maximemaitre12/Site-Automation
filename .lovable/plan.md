@@ -1,45 +1,60 @@
 
+## Objectif
 
-## Plan: Consolidate Formatting Rules in System Prompt
+Importer le code Farmasoft à jour depuis `maximemaitre12/Site-Automation` (branche `main`) dans le dossier `src/farmasoft/` du projet Lovable. Le repo GitHub a une structure standalone (`src/`) qu'il faut mapper vers `src/farmasoft/`.
 
-### Problem
+## Changements identifiés
 
-The `BASE_SYSTEM_PROMPT` has accumulated overlapping and sometimes contradictory formatting rules across multiple updates (rendering discipline, structure enforcement, hard layout, symbol usage). The user's latest message is a definitive, consolidated ruleset that should replace all the scattered formatting instructions.
+Le repo GitHub contient des modifications majeures par rapport au code actuel :
 
-### What changes
+### Fichiers modifiés (contenu différent)
+- `api/client.ts` — 380 lignes vs 205 (ajout messaging API, robota config, etc.)
+- `components/layout/Sidebar.tsx` — refonte complète avec ProfileMenu, connexions channels (Telegram, WhatsApp, Viber, Calendly, robota.ua)
+- `components/layout/TopBar.tsx` — à comparer et mettre à jour
+- `pages/JobDescriptions.tsx` — 263 lignes vs 1243 (réécriture, sous-composants extraits)
+- `pages/Dashboard.tsx` — mis à jour
+- `pages/Interviews.tsx` — mis à jour
+- `pages/Messages.tsx` — mis à jour
+- `pages/Settings.tsx` — mis à jour
+- `i18n.ts` — mis à jour
+- `store/useAppStore.ts` — Page type réduit à `'dashboard' | 'jobs'`
 
-**File: `supabase/functions/public-chat/index.ts`**
+### Nouveaux fichiers à ajouter
+- `pages/jobs/AddCandidatePanel.tsx`
+- `pages/jobs/CandidateModal.tsx`
+- `pages/jobs/JobForm.tsx`
+- `pages/jobs/PipelineCard.tsx`
+- `pages/jobs/PipelineView.tsx`
+- `pages/jobs/PublishModal.tsx`
+- `pages/jobs/RobotaSyncModal.tsx`
+- `pages/jobs/ScheduleModal.tsx`
+- `pages/jobs/constants.ts`
+- `pages/jobs/helpers.ts`
+- `pages/jobs/icons.tsx`
+- `pages/Analytics.tsx`
+- `types/analytics.types.ts`
+- `types/candidate.types.ts`
+- `types/job.types.ts`
 
-Rewrite the `BASE_SYSTEM_PROMPT` to consolidate all formatting rules into one clean, non-redundant block. Keep the functional parts (identity, knowledge/sales guidelines, widget separation rule for `---` delimiters, progressive build). Replace the scattered formatting sections (rendering discipline, structure enforcement, hard layout, bold rule, etc.) with the user's definitive ruleset as a single authoritative block.
+### Fichiers à supprimer
+- `pages/Prospecting.tsx` — supprimé sur GitHub
 
-Structure of the new prompt:
+### Fichiers ignorés (backend, non applicable)
+- `server/` — Le projet Lovable utilise Supabase Edge Functions, pas un serveur Node
+- `src/main.tsx`, `src/App.tsx` — Le point d'entrée est `FarmasoftApp.tsx` dans Lovable
 
-1. **Identity** — Aether Assistant intro + widget composer role (keep existing, ~5 lines)
-2. **Widget types** — The 11 widget patterns (keep existing list)
-3. **Widget composition** — Stack of 2-4 widgets (keep)
-4. **Widget separation** — `---` delimiter rule for front-end splitting (keep)
-5. **Progressive build** — Most important first (keep)
-6. **Symbol usage** — Allowed symbols (keep)
-7. **LAYOUT RULES** — Replace ALL scattered formatting rules with the user's consolidated block:
-   - Line break rule (each element own line)
-   - Bullet rule (new line per bullet)
-   - Label format rule (label then value, never inline)
-   - Bold rule (titles/anchors only, never inline)
-   - Card structure rule
-   - Flow rule (vertical or spaced)
-   - Text density rule (max 2 lines/paragraph)
-   - Visual breathing rule (spacing between blocks)
-   - Mobile-first rule
-   - Creative structure / UI composition rule
-   - Final action rule (end with structured block)
-   - Fail condition / validation checklist
-8. **Knowledge & sales guidelines** (keep existing)
-9. **Tone** (keep)
+## Plan d'exécution
 
-### Technical details
+1. **Télécharger tous les fichiers source** depuis GitHub via curl
+2. **Adapter les imports** : les chemins relatifs du repo standalone (`../../store`, `../../api`) doivent rester cohérents dans `src/farmasoft/`
+3. **Remplacer les fichiers existants** modifiés (api/client.ts, Sidebar, TopBar, pages, i18n, store)
+4. **Ajouter les nouveaux fichiers** (pages/jobs/*, types/*, Analytics)
+5. **Supprimer Prospecting.tsx**
+6. **Mettre à jour FarmasoftApp.tsx** pour refléter les nouvelles pages (retirer prospecting/interviews/messages/settings des routes si le nouveau App.tsx ne les a plus)
+7. **Adapter le CSS** : fusionner `index.css` du repo avec `farmasoft.css` existant
+8. **Corriger les imports spécifiques Lovable** (supabase client, useAuth, react-router) qui n'existent pas dans le repo standalone
+9. **Vérifier la compilation** et corriger les erreurs TypeScript
 
-- Single file edit: `supabase/functions/public-chat/index.ts` lines 9-254
-- Remove duplicate/overlapping sections: "RENDERING DISCIPLINE", "STRUCTURE ENFORCEMENT RULE", "HARD LAYOUT RULE", "NO INLINE STRUCTURE RULE", "UI COMPOSITION RULE"
-- The prompt will be shorter and cleaner with no contradictions
-- Edge function will auto-deploy
+## Note technique
 
+Le Sidebar du repo GitHub importe des APIs messaging (Telegram, WhatsApp, Viber) et robota.ua qui passent par un backend Node.js (`server/`). Ces appels API devront pointer vers l'Edge Function `farmasoft-api` existante, ou être adaptés si les endpoints n'existent pas encore côté backend.
