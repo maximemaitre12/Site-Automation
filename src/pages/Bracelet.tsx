@@ -11,6 +11,7 @@ import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSecti
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
+import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
 
 const features = [
   {
