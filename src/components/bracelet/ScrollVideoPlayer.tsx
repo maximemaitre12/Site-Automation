@@ -70,12 +70,15 @@ export default function ScrollVideoPlayer() {
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
 
-        const stickyTravel = Math.max(1, rect.height - viewH);
-        const progress = Math.max(0, Math.min(1, -rect.top / stickyTravel));
+        // Start earlier: begin when section is half a viewport away
+        const earlyStart = viewH * 0.5;
+        const stickyTravel = Math.max(1, rect.height - viewH + earlyStart);
+        const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
 
-        // Reverse direction: progress 0.5 → logo faces user
-        const centeredOffset = LOGO_INDEX - Math.round(TOTAL_FRAMES * 0.5);
-        const rawIndex = Math.round((1 - progress) * TOTAL_FRAMES) + centeredOffset;
+        // 2x rotation speed, reverse direction, logo centered at progress 0.5
+        const SPEED = 2;
+        const centeredOffset = LOGO_INDEX - Math.round(TOTAL_FRAMES * SPEED * 0.5);
+        const rawIndex = Math.round((1 - progress) * TOTAL_FRAMES * SPEED) + centeredOffset;
         const frameIndex = ((rawIndex % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
       });
