@@ -54,12 +54,6 @@ export function PharmaHero() {
               >
                 Request a free automation audit
               </Link>
-              <a
-                href="#case-study"
-                className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-medium tracking-[0.1em] uppercase text-white border border-white/25 transition-all hover:bg-white/10"
-              >
-                See our case study
-              </a>
             </div>
           </ScrollReveal>
         </div>
