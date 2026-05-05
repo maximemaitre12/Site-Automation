@@ -17,8 +17,6 @@ interface Plan {
 
 interface Props {
   plans: Plan[];
-  onCardPayment: (planKey: string) => void;
-  loadingPlan: string | null;
 }
 
 /* ═══════════════════════════════════════════
@@ -236,7 +234,7 @@ const MagneticButton = ({ onClick, children }: { onClick: (e: React.MouseEvent) 
 /* ═══════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════ */
-export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }: Props) {
+export default function PrecommanderReveal({ plans }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [clickPos, setClickPos] = useState({ x: 0, y: 0 });
   const [showShockwave, setShowShockwave] = useState(false);
