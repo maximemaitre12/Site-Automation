@@ -65,8 +65,8 @@ export default function ScrollVideoPlayer() {
     // Compute shortest rotation path from start to logo
     const forwardDist = ((LOGO_INDEX - START_INDEX) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
     const backwardDist = TOTAL_FRAMES - forwardDist;
-    // direction: +1 = forward, -1 = backward (whichever is shorter)
-    const direction = forwardDist <= backwardDist ? 1 : -1;
+    // direction: invert to rotate the other way
+    const direction = forwardDist <= backwardDist ? -1 : 1;
     const travelFrames = Math.min(forwardDist, backwardDist);
 
     let rafId: number;
