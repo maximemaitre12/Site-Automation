@@ -246,6 +246,25 @@ export default function Bracelet() {
       {/* Technical Specs — Animated */}
       <AnimatedSpecsSection specsSrc={oreonSpecs} />
 
+      {/* Wave → Business Model */}
+      <OceanWaveDivider
+        backColor="#0F1F4F"
+        midColor="#1A3FB8"
+        frontColor="#0a2d6e"
+        variant="a"
+      />
+
+      {/* Business Model Section */}
+      <BusinessModelSection />
+
+      {/* Wave → Features */}
+      <OceanWaveDivider
+        backColor="#0a2d6e"
+        midColor="#1A3FB8"
+        frontColor="#ffffff"
+        variant="b"
+      />
+
       {/* Features */}
       <section id="features" className="py-28 bg-white">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
