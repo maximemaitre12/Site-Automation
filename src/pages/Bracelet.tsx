@@ -9,6 +9,7 @@ import oreonSpecs from "@/assets/oreon-specs.png";
 import sepaQrCode from "@/assets/sepa-qrcode.jpg";
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
+import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
 
 const features = [
