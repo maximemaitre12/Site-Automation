@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, CreditCard, Loader2 } from "lucide-react";
+import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check } from "lucide-react";
 import PrecommanderReveal from "@/components/bracelet/PrecommanderReveal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,7 @@ import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSecti
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
-import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
+
 
 const features = [
   {
@@ -122,7 +122,7 @@ const faqs = [
 
 export default function Bracelet() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [showSepaFor, setShowSepaFor] = useState<string | null>(null);
+  
   const { toast } = useToast();
 
   const handleCardPayment = async (planKey: string) => {
