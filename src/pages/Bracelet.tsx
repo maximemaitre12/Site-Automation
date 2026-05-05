@@ -127,7 +127,7 @@ export default function Bracelet() {
                 <strong className="text-white font-medium"> automatisations IA personnalisées</strong> via notre plateforme AETHER
               </p>
               <p className="text-sm text-white/50 mb-10">
-                Bracelet offert · À partir de 2,99€/mois · Prélèvement SEPA
+                Bracelet offert · À partir de 2,99€/mois · Prélèvement SEPA trimestriel · 12 mois d'engagement
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -238,10 +238,11 @@ export default function Bracelet() {
                   </span>
                 )}
                 <h3 className="font-heading text-2xl font-bold mb-2" style={{ color: "#0F172A" }}>{plan.name}</h3>
-                <div className="flex items-baseline gap-1 mb-8">
+                <div className="flex items-baseline gap-1 mb-1">
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
-                  <span className="text-sm" style={{ color: "#64748B" }}>/mois</span>
+                  <span className="text-sm" style={{ color: "#64748B" }}>/trimestre</span>
                 </div>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>soit {plan.monthly}€/mois · Engagement 12 mois</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -262,7 +263,7 @@ export default function Bracelet() {
                   Activer mon abonnement
                 </a>
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  Prélèvement SEPA · Sans engagement après 12 mois
+                  Prélèvement SEPA trimestriel · Engagement 12 mois
                 </p>
               </div>
             ))}
