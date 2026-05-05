@@ -428,35 +428,7 @@ export default function Bracelet() {
         </div>
       </section>
 
-      {/* QR Code */}
-      <section id="qrcode" className="py-28" style={{ background: "#F8FAFC" }}>
-        <div className="max-w-[800px] mx-auto px-6 lg:px-12 text-center">
-          <div className="w-16 h-16 rounded-sm flex items-center justify-center mx-auto mb-8" style={{ background: "#1E4D8C10" }}>
-            <QrCode className="w-8 h-8" style={{ color: "#1E4D8C" }} />
-          </div>
-          <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
-            Activez votre mandat SEPA
-          </h2>
-          <p className="text-base mb-12 max-w-[500px] mx-auto" style={{ color: "#64748B" }}>
-            Scannez le QR code ci-dessous avec votre téléphone pour autoriser le prélèvement mensuel et recevoir votre bracelet Oreon
-          </p>
 
-          <div className="inline-block p-8 bg-white rounded-sm border" style={{ borderColor: "#E2E8F0" }}>
-            <img src={sepaQrCode} alt="QR Code SEPA Oreon" className="w-[200px] h-[200px] mx-auto" />
-            <p className="text-xs mt-6 font-medium" style={{ color: "#94A3B8" }}>
-              Scannez pour activer votre mandat SEPA
-            </p>
-          </div>
-
-          <p className="text-xs mt-8 max-w-[400px] mx-auto leading-relaxed" style={{ color: "#94A3B8" }}>
-            En scannant ce QR code, vous autorisez AETHER GROUP (SIREN 104 445 424) à émettre des prélèvements SEPA
-            sur votre compte bancaire conformément aux{" "}
-            <Link to="/legal/bracelet-cgu" className="underline hover:text-[#1E4D8C]">
-              conditions générales d'utilisation
-            </Link>
-          </p>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section className="py-28 bg-white">
