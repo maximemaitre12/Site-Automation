@@ -81,7 +81,11 @@ const steps = [
 const faqs = [
   {
     q: "Le bracelet est-il vraiment gratuit ?",
-    a: "Oui, le bracelet Oreon est offert. Vous vous engagez à un abonnement d'un an avec prélèvement trimestriel de 8,97€ (Essentiel) ou 11,97€ (Premium) par SEPA ou carte bancaire.",
+    a: "Oui, le bracelet Oreon est offert. Vous souscrivez un abonnement sans engagement avec prélèvement trimestriel de 11,97€ (Précommande) ou 14,97€ (Livraison directe) par SEPA ou carte bancaire.",
+  },
+  {
+    q: "Quelle est la différence entre les deux offres ?",
+    a: "L'offre Précommande à 3,99€/mois vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€/mois inclut une expédition sous 48h et des fonctionnalités avancées.",
   },
   {
     q: "Comment fonctionne le prélèvement SEPA ?",
@@ -93,7 +97,7 @@ const faqs = [
   },
   {
     q: "Puis-je résilier mon abonnement ?",
-    a: "L'abonnement comporte un engagement de 12 mois. Au-delà, vous pouvez résilier à tout moment avec un préavis de 30 jours. En cas de résiliation anticipée, des frais de restitution du bracelet (29€) peuvent s'appliquer.",
+    a: "L'abonnement est sans engagement. Vous pouvez résilier à tout moment, la résiliation prend effet à la fin du trimestre en cours.",
   },
   {
     q: "Mes données sont-elles protégées ?",
