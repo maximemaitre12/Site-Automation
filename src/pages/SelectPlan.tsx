@@ -320,7 +320,7 @@ export default function SelectPlan() {
           
           <p className="text-center text-sm text-muted-foreground mt-4">
             <a href="/contact" className="text-primary hover:underline transition-colors">
-              Need help? <a href="mailto:maxime.maitre@edu.em-lyon.com">Email us</a>
+              Need help? <a href="mailto:contact@aether-connect.com">Email us</a>
             </a>
           </p>
         </div>

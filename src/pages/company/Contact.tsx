@@ -1,6 +1,6 @@
 import { Mail, ArrowRight, Clock, Shield, Zap } from "lucide-react";
 
-const EMAILS = ["maxime.maitre@edu.em-lyon.com", "youriy.strashnyi@edu.em-lyon.com"];
+const EMAILS = ["contact@aether-connect.com", "youriy.strashnyi@edu.em-lyon.com"];
 
 const reasons = [
   { icon: Clock, title: "Fast response", desc: "We respond within 24 hours on business days" },

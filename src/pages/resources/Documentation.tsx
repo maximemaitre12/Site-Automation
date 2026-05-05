@@ -30,7 +30,7 @@ export default function Documentation() {
             <h2 className="text-base font-semibold text-foreground mb-1.5">Documentation Coming Soon</h2>
             <p className="text-sm text-muted-foreground">
               We're working on comprehensive documentation. In the meantime, email us at{" "}
-              <a href="mailto:maxime.maitre@edu.em-lyon.com" className="text-foreground font-medium hover:underline">maxime.maitre@edu.em-lyon.com</a>.
+              <a href="mailto:contact@aether-connect.com" className="text-foreground font-medium hover:underline">contact@aether-connect.com</a>.
             </p>
           </div>
 

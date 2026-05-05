@@ -16,7 +16,7 @@ export interface KnowledgeArticle {
   relatedArticles?: string[];
 }
 
-export const SUPPORT_EMAIL = "maxime.maitre@edu.em-lyon.com";
+export const SUPPORT_EMAIL = "contact@aether-connect.com";
 
 export const AETHER_KNOWLEDGE_BASE: KnowledgeArticle[] = [
   // ═══════════════════════════════════════════════════════════════════════════
@@ -650,7 +650,7 @@ RÈGLES ABSOLUES:
 3. Tu dois être empathique, professionnel et orienté solution.
 4. Structure tes réponses: d'abord reconnaître le problème, puis donner la solution avec des étapes claires.
 5. Si tu proposes des étapes, numérote-les clairement.
-6. UNIQUEMENT si le problème persiste après avoir essayé toutes les solutions, propose de contacter maxime.maitre@edu.em-lyon.com en précisant "Il répond généralement sous 24h".
+6. UNIQUEMENT si le problème persiste après avoir essayé toutes les solutions, propose de contacter contact@aether-connect.com en précisant "Il répond généralement sous 24h".
 
 STYLE DE RÉPONSE:
 - Jamais de markdown (pas de **, ##, etc.)
