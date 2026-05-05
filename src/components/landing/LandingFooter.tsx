@@ -43,8 +43,8 @@ export function LandingFooter() {
             <a href="mailto:youriy.strashnyi@edu.em-lyon.com" className="block text-sm mb-2 hover:text-[#1E4D8C] transition-colors" style={{ color: "#475569" }}>
               youriy.strashnyi@edu.em-lyon.com
             </a>
-            <a href="mailto:maxime.maitre@edu.em-lyon.com" className="block text-sm mb-3 hover:text-[#1E4D8C] transition-colors" style={{ color: "#475569" }}>
-              maxime.maitre@edu.em-lyon.com
+            <a href="mailto:contact@aether-connect.com" className="block text-sm mb-3 hover:text-[#1E4D8C] transition-colors" style={{ color: "#475569" }}>
+              contact@aether-connect.com
             </a>
             <a href="tel:+33787248402" className="block text-sm hover:text-[#1E4D8C] transition-colors" style={{ color: "#475569" }}>
               +33 7 87 24 84 02

@@ -12,7 +12,7 @@ export function HeroSection() {
           We help companies reduce costs, strengthen operations and identify measurable gains within weeks.
         </p>
 
-        <a href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com">
+        <a href="mailto:contact@aether-connect.com,youriy.strashnyi@edu.em-lyon.com">
           <button className="inline-flex items-center gap-2 h-11 px-6 text-sm font-medium text-white bg-foreground rounded-full hover:opacity-90 transition-opacity">
             <Mail className="w-5 h-5" />
             Request a conversation

@@ -42,7 +42,7 @@ export function PharmaFinalCTA() {
               Free automation audit
             </Link>
             <a
-              href="mailto:maxime.maitre@edu.em-lyon.com,youriy.strashnyi@edu.em-lyon.com?subject=Contact%20Aether%20Connect"
+              href="mailto:contact@aether-connect.com,youriy.strashnyi@edu.em-lyon.com?subject=Contact%20Aether%20Connect"
               className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-medium tracking-[0.1em] uppercase text-white border border-white/25 transition-all hover:bg-white/10"
             >
               Contact our team
