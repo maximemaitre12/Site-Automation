@@ -125,8 +125,6 @@ export default function BraceletShowcaseSection() {
 
   return (
     <>
-      {/* Top gradient transition from hero */}
-      <div style={{ height: 80, background: "linear-gradient(180deg, rgba(5,15,40,0.92) 0%, #0a2d6e 100%)" }} />
 
       <div
         ref={sectionRef}
