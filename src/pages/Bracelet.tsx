@@ -1,12 +1,15 @@
-import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check } from "lucide-react";
+import { useState } from "react";
+import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check, QrCode, CreditCard, Loader2 } from "lucide-react";
 import PrecommanderReveal from "@/components/bracelet/PrecommanderReveal";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import oreonSpecs from "@/assets/oreon-specs.png";
 
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
-
+import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
 
 const features = [
   {
@@ -43,24 +46,22 @@ const features = [
 
 const plans = [
   {
-    name: "SEPA",
-    key: "sepa",
-    price: "19",
-    oldPrice: "21,25",
+    name: "Précommande",
+    key: "precommande",
+    price: "3,99",
     features: [
       "Bracelet Oreon offert",
       "Suivi biométrique complet",
       "Tableau de bord santé",
       "Alertes intelligentes IA",
       "Automatisations IA",
-      "Tarif early-bird verrouillé à vie",
+      "Livraison dès disponibilité",
     ],
   },
   {
-    name: "Carte bancaire",
-    key: "carte",
-    price: "22",
-    oldPrice: "25",
+    name: "Livraison directe",
+    key: "livraison",
+    price: "4,99",
     popular: true,
     features: [
       "Bracelet Oreon offert",
@@ -74,6 +75,7 @@ const plans = [
     ],
   },
 ];
+
 const steps = [
   { num: "01", title: "Recevez votre bracelet", desc: "Commandez gratuitement votre Oreon, livré sous 48h en France métropolitaine" },
   { num: "02", title: "Scannez le QR code", desc: "Activez votre mandat SEPA en scannant le code avec votre téléphone" },
@@ -116,6 +118,43 @@ const faqs = [
 ];
 
 export default function Bracelet() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [showSepaFor, setShowSepaFor] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleCardPayment = async (planKey: string) => {
+    setLoadingPlan(planKey);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await supabase.functions.invoke("bracelet-checkout", {
+        body: { plan: planKey },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+      const { url } = response.data;
+      if (url) {
+        window.open(url, "_blank");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Erreur",
+        description: err.message || "Impossible de créer la session de paiement",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <div className="overflow-x-hidden">
       {/* Hero with Video */}
@@ -164,11 +203,15 @@ export default function Bracelet() {
             </p>
 
             <p className="text-[11px] text-white/35 mb-6 tracking-wide">
-              Bracelet offert · À partir de 19€/mois · Premier mois offert
+              Bracelet offert · À partir de 3,99€ · Paiement unique
             </p>
 
             <div className="flex flex-wrap gap-3">
-              <PrecommanderReveal plans={plans} />
+              <PrecommanderReveal
+                plans={plans}
+                onCardPayment={handleCardPayment}
+                loadingPlan={loadingPlan}
+              />
               <a
                 href="#features"
                 className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
@@ -269,77 +312,104 @@ export default function Bracelet() {
         </div>
       </section>
 
-      {/* Launch Section */}
+      {/* Pricing */}
       <section id="pricing" className="py-28 bg-white">
-        <div className="max-w-[800px] mx-auto px-6 lg:px-12 text-center">
-          <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "#1E4D8C" }}>
-            Lancement officiel
-          </p>
-          <h2 className="font-heading text-4xl sm:text-5xl font-bold mb-2" style={{ color: "#0F172A" }}>
-            1er Juin 2026
-          </h2>
-          <p className="text-lg font-medium mb-6" style={{ color: "#1E4D8C" }}>
-            Soyez parmi les 1000 premiers
-          </p>
-          <p className="text-sm mb-10 max-w-[520px] mx-auto" style={{ color: "#64748B" }}>
-            Premier mois offert · Bracelet livré dès lancement · Tarif early-bird verrouillé à vie
-          </p>
-
-          {/* Pricing display */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10">
-            <div className="p-6 rounded-sm border text-center" style={{ borderColor: "#E2E8F0", minWidth: 220 }}>
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-2" style={{ color: "#64748B" }}>SEPA</p>
-              <div className="flex items-baseline justify-center gap-2">
-                <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>19€</span>
-                <span className="text-sm" style={{ color: "#64748B" }}>/mois</span>
-              </div>
-              <p className="text-sm mt-1 line-through" style={{ color: "#94A3B8" }}>21,25€</p>
-            </div>
-            <div className="text-sm font-medium" style={{ color: "#94A3B8" }}>ou</div>
-            <div className="p-6 rounded-sm border-2 text-center" style={{ borderColor: "#1E4D8C", minWidth: 220 }}>
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-2" style={{ color: "#64748B" }}>Carte bancaire</p>
-              <div className="flex items-baseline justify-center gap-2">
-                <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>22€</span>
-                <span className="text-sm" style={{ color: "#64748B" }}>/mois</span>
-              </div>
-              <p className="text-sm mt-1" style={{ color: "#94A3B8" }}>au lieu de <span className="line-through">25€</span></p>
-            </div>
-          </div>
-
-          {/* CTA Buttons — disabled */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-            <button
-              disabled
-              className="px-8 py-3.5 text-sm font-semibold tracking-wide uppercase opacity-50 cursor-not-allowed"
-              style={{ background: "#1E4D8C", color: "#fff" }}
-            >
-              Réserver ma place
-            </button>
-            <a
-              href="#features"
-              className="px-8 py-3.5 text-sm font-semibold tracking-wide uppercase border transition-all hover:bg-gray-50"
-              style={{ borderColor: "#1E4D8C", color: "#1E4D8C" }}
-            >
-              En savoir plus
-            </a>
-          </div>
-
-          {/* Counter */}
-          <div className="max-w-[400px] mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold" style={{ color: "#0F172A" }}>812 places réservées sur 1000</span>
-            </div>
-            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "#E2E8F0" }}>
-              <div className="h-full rounded-full" style={{ width: "81.2%", background: "linear-gradient(90deg, #1E4D8C, #1A3FB8)" }} />
-            </div>
-            <p className="text-xs mt-3 font-medium" style={{ color: "#F59E0B" }}>
-              Bientôt disponible
+        <div className="max-w-[1000px] mx-auto px-6 lg:px-12">
+          <div className="text-center mb-16">
+            <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "#1E4D8C" }}>
+              Tarifs
             </p>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
+              Bracelet offert, paiement unique
+            </h2>
+            <p className="text-base max-w-[500px] mx-auto" style={{ color: "#64748B" }}>
+              Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className="relative p-10 rounded-sm border"
+                style={{
+                  borderColor: plan.popular ? "#1E4D8C" : "#E2E8F0",
+                  borderWidth: plan.popular ? 2 : 1,
+                }}
+              >
+                {plan.popular && (
+                  <span
+                    className="absolute -top-3 left-10 px-4 py-1 text-xs font-semibold text-white tracking-wider uppercase"
+                    style={{ background: "#1E4D8C" }}
+                  >
+                    Recommandé
+                  </span>
+                )}
+                <h3 className="font-heading text-2xl font-bold mb-2" style={{ color: "#0F172A" }}>{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
+                  <span className="text-sm" style={{ color: "#64748B" }}>paiement unique</span>
+                </div>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>Bracelet offert · Paiement en une seule fois</p>
+                <ul className="space-y-3 mb-10">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "#1E4D8C" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Payment zone */}
+                {showSepaFor === plan.key ? (
+                  <SepaCheckoutFlow
+                    planName={plan.name}
+                    planKey={plan.key}
+                    price={plan.price}
+                    onBack={() => setShowSepaFor(null)}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setShowSepaFor(plan.key)}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all"
+                      style={{
+                        background: plan.popular ? "transparent" : "#1E4D8C",
+                        color: plan.popular ? "#1E4D8C" : "#fff",
+                        border: plan.popular ? "1px solid #1E4D8C" : "none",
+                      }}
+                    >
+                      <QrCode className="w-4 h-4" />
+                      Prélèvement SEPA
+                    </button>
+                    <button
+                      onClick={() => handleCardPayment(plan.key)}
+                      disabled={loadingPlan === plan.key}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
+                      style={{
+                        background: plan.popular ? "#1E4D8C" : "transparent",
+                        color: plan.popular ? "#fff" : "#1E4D8C",
+                        border: plan.popular ? "none" : "1px solid #1E4D8C",
+                      }}
+                    >
+                      {loadingPlan === plan.key ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="w-4 h-4" />
+                      )}
+                      Payer par carte
+                    </button>
+                  </div>
+                )}
+
+                <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
+                  Paiement unique · Bracelet offert · Satisfait ou remboursé
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-
-
 
       {/* FAQ */}
       <section className="py-28 bg-white">
