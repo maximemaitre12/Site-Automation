@@ -43,21 +43,23 @@ export default function ScrollVideoPlayer() {
     return () => { mounted = false; };
   }, []);
 
-  const drawFrame = (frameNumber: number) => {
-    if (frameNumber === lastFrameRef.current) return;
+  const drawFrameByIndex = (idx: number) => {
+    if (idx === lastFrameRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    const img = imagesRef.current[FRAME_NUMBERS.indexOf(frameNumber)];
+    const img = imagesRef.current[idx];
     if (!canvas || !ctx || !img) return;
-    canvas.width = 720;
-    canvas.height = 720;
-    ctx.drawImage(img, 0, 0, 720, 720);
-    lastFrameRef.current = frameNumber;
+    if (canvas.width !== img.naturalWidth) canvas.width = img.naturalWidth;
+    if (canvas.height !== img.naturalHeight) canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+    lastFrameRef.current = idx;
   };
 
   // Scroll-driven frame selection
   useEffect(() => {
     if (!loaded) return;
+
+    const LOGO_INDEX = FRAME_NUMBERS.indexOf(LOGO_FRAME);
 
     let rafId: number;
     const onScroll = () => {
@@ -68,16 +70,14 @@ export default function ScrollVideoPlayer() {
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
 
-        // Only track the pinned part of the section.
-        // progress 0 = sticky section arrives, 0.5 = section centered, 1 = sticky section ends.
         const stickyTravel = Math.max(1, rect.height - viewH);
         const progress = Math.max(0, Math.min(1, -rect.top / stickyTravel));
 
-        const logoIndex = FRAME_NUMBERS.indexOf(LOGO_FRAME);
-        const centeredOffset = logoIndex - Math.round(TOTAL_FRAMES * 0.5);
-        const rawIndex = Math.round(progress * TOTAL_FRAMES) + centeredOffset;
+        // Reverse direction: progress 0.5 → logo faces user
+        const centeredOffset = LOGO_INDEX - Math.round(TOTAL_FRAMES * 0.5);
+        const rawIndex = Math.round((1 - progress) * TOTAL_FRAMES) + centeredOffset;
         const frameIndex = ((rawIndex % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
-        drawFrame(FRAME_NUMBERS[frameIndex]);
+        drawFrameByIndex(frameIndex);
       });
     };
 
