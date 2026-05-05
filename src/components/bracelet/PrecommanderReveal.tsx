@@ -303,6 +303,7 @@ const FeatureRow = ({ text, delay, dark = false }: { text: string; delay: number
 const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
   plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
 }) => {
+  const [showSepa, setShowSepa] = useState(false);
   const baseDelay = 0.45;
 
   return (
