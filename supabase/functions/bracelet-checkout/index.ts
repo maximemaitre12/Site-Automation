@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const PRICES: Record<string, string> = {
-  precommande: "price_1TTiqrH0Zbdp95xi6K5MFyyl",
-  livraison: "price_1TTirGH0Zbdp95xiDEuybMn9",
+  precommande: "price_1TTivoH0Zbdp95xiiItwYobN",
+  livraison: "price_1TTivpH0Zbdp95xioHpG333B",
 };
 
 serve(async (req) => {
@@ -55,7 +55,7 @@ serve(async (req) => {
       customer: customerId,
       customer_email: customerId ? undefined : customerEmail || undefined,
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
+      mode: "payment",
       success_url: `${origin}/bracelet?checkout=success`,
       cancel_url: `${origin}/bracelet?checkout=canceled`,
     });

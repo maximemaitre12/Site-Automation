@@ -42,8 +42,7 @@ const plans = [
   {
     name: "Précommande",
     key: "precommande",
-    price: "11,97",
-    monthly: "3,99",
+    price: "3,99",
     features: [
       "Bracelet Oreon offert",
       "Suivi biométrique complet",
@@ -56,8 +55,7 @@ const plans = [
   {
     name: "Livraison directe",
     key: "livraison",
-    price: "14,97",
-    monthly: "4,99",
+    price: "4,99",
     popular: true,
     features: [
       "Bracelet Oreon offert",
@@ -81,23 +79,23 @@ const steps = [
 const faqs = [
   {
     q: "Le bracelet est-il vraiment gratuit ?",
-    a: "Oui, le bracelet Oreon est offert. Vous souscrivez un abonnement sans engagement avec prélèvement trimestriel de 11,97€ (Précommande) ou 14,97€ (Livraison directe) par SEPA ou carte bancaire.",
+    a: "Oui, le bracelet Oreon est offert. Vous payez uniquement 3,99€ (Précommande) ou 4,99€ (Livraison directe) en paiement unique par SEPA ou carte bancaire.",
   },
   {
     q: "Quelle est la différence entre les deux offres ?",
-    a: "L'offre Précommande à 3,99€/mois vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€/mois inclut une expédition sous 48h et des fonctionnalités avancées.",
+    a: "L'offre Précommande à 3,99€ vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€ inclut une expédition sous 48h et des fonctionnalités avancées.",
   },
   {
-    q: "Comment fonctionne le prélèvement SEPA ?",
-    a: "En scannant le QR code fourni, vous autorisez un mandat de prélèvement SEPA. Le montant est débité automatiquement tous les 3 mois de votre compte bancaire.",
+    q: "Comment fonctionne le paiement ?",
+    a: "Le paiement est unique. Vous réglez une seule fois par carte bancaire ou SEPA, et vous recevez votre bracelet Oreon avec accès complet à la plateforme.",
   },
   {
     q: "Puis-je payer par carte bancaire ?",
-    a: "Oui, vous pouvez choisir le paiement par carte bancaire en cliquant sur le bouton correspondant dans la section tarifs. Le prélèvement sera effectué tous les 3 mois automatiquement.",
+    a: "Oui, vous pouvez choisir le paiement par carte bancaire en cliquant sur le bouton correspondant dans la section tarifs.",
   },
   {
-    q: "Puis-je résilier mon abonnement ?",
-    a: "L'abonnement est sans engagement. Vous pouvez résilier à tout moment, la résiliation prend effet à la fin du trimestre en cours.",
+    q: "Y a-t-il un abonnement ou des frais récurrents ?",
+    a: "Non, il n'y a aucun abonnement ni frais récurrents. Le paiement est unique et vous donne accès à l'ensemble des fonctionnalités.",
   },
   {
     q: "Mes données sont-elles protégées ?",
@@ -176,7 +174,7 @@ export default function Bracelet() {
                 <strong className="text-white font-medium"> automatisations IA personnalisées</strong> via notre plateforme AETHER
               </p>
               <p className="text-sm text-white/50 mb-10">
-                Bracelet offert · À partir de 3,99€/mois · SEPA ou Carte bancaire · Sans engagement
+                Bracelet offert · À partir de 3,99€ · Paiement unique · SEPA ou Carte bancaire
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
@@ -289,9 +287,9 @@ export default function Bracelet() {
                 <h3 className="font-heading text-2xl font-bold mb-2" style={{ color: "#0F172A" }}>{plan.name}</h3>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
-                  <span className="text-sm" style={{ color: "#64748B" }}>/trimestre</span>
+                  <span className="text-sm" style={{ color: "#64748B" }}>paiement unique</span>
                 </div>
-                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>soit {plan.monthly}€/mois · Sans engagement</p>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>Bracelet offert · Paiement en une seule fois</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -335,7 +333,7 @@ export default function Bracelet() {
                 </div>
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  Prélèvement trimestriel · Sans engagement · Résiliable à tout moment
+                  Paiement unique · Bracelet offert · Satisfait ou remboursé
                 </p>
               </div>
             ))}

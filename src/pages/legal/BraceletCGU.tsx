@@ -13,33 +13,27 @@ En scannant le QR code d'activation et en souscrivant à l'abonnement, l'utilisa
 
 • La mise à disposition gratuite d'un bracelet connecté Oreon
 • L'accès à l'application AETHER de suivi biométrique et d'automatisations IA
-• Un abonnement sans engagement avec prélèvement trimestriel selon la formule choisie :
-  — Formule Précommande : 11,97€ TTC par trimestre (soit 3,99€/mois)
-  — Formule Livraison directe : 14,97€ TTC par trimestre (soit 4,99€/mois)
+• Un paiement unique selon la formule choisie :
+  — Formule Précommande : 3,99€ TTC (paiement unique)
+  — Formule Livraison directe : 4,99€ TTC (paiement unique)
 
 Le Bracelet est offert et devient la propriété de l'Abonné dès réception.`,
   },
   {
-    title: "3. Prélèvement SEPA",
-    content: `Le paiement de l'abonnement s'effectue par prélèvement SEPA (Single Euro Payments Area) ou par carte bancaire via notre prestataire de paiement sécurisé Stripe.
+    title: "3. Paiement",
+    content: `Le paiement s'effectue en une seule fois par carte bancaire ou prélèvement SEPA (Single Euro Payments Area) via notre prestataire de paiement sécurisé Stripe.
 
-En scannant le QR code fourni, l'Abonné autorise l'Éditeur à émettre des ordres de prélèvement SEPA sur le compte bancaire indiqué. Ce mandat de prélèvement est conforme au règlement (UE) n°260/2012.
+Le montant est débité une seule fois lors de la commande. Aucun prélèvement récurrent ne sera effectué.
 
-L'identifiant créancier SEPA (ICS) de l'Éditeur sera communiqué sur le mandat.
-
-Le prélèvement est effectué le 5 du premier mois de chaque trimestre. En cas de rejet du prélèvement, l'Abonné dispose de 10 jours pour régulariser sa situation, faute de quoi l'accès aux services pourra être suspendu.
+En cas de paiement par SEPA, l'Abonné autorise l'Éditeur à émettre un ordre de prélèvement unique sur le compte bancaire indiqué. Ce mandat de prélèvement est conforme au règlement (UE) n°260/2012.
 
 L'Abonné peut contester un prélèvement auprès de sa banque dans un délai de 8 semaines suivant le débit, conformément à la réglementation SEPA.`,
   },
   {
-    title: "4. Durée et résiliation",
-    content: `L'abonnement est souscrit sans durée d'engagement minimale, avec renouvellement tacite par périodes de 3 mois.
+    title: "4. Accès aux services",
+    content: `L'accès à l'application AETHER et aux fonctionnalités associées est accordé dès validation du paiement, sans limitation de durée.
 
-Le prélèvement (SEPA ou carte bancaire) est effectué tous les 3 mois (trimestriellement).
-
-L'Abonné peut résilier à tout moment sans frais et sans motif. La résiliation prend effet à la fin du trimestre en cours.
-
-L'Abonné peut résilier en envoyant un email à contact@aether-connect.com ou via l'application.`,
+L'Éditeur se réserve le droit de suspendre l'accès en cas d'utilisation frauduleuse ou contraire aux présentes CGU.`,
   },
   {
     title: "5. Collecte et traitement des données biométriques",
