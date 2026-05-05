@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-const TOTAL_FRAMES = 298;
+const FRAME_NUMBERS = [
+  ...Array.from({ length: 242 }, (_, index) => index + 1),
+  ...Array.from({ length: 25 }, (_, index) => index + 274),
+];
+const TOTAL_FRAMES = FRAME_NUMBERS.length;
 const LOGO_FRAME = 55; // Actual frame number where the logo faces the user
 const INITIAL_FRAME = 205;
 
@@ -22,9 +26,9 @@ export default function ScrollVideoPlayer() {
     const images: HTMLImageElement[] = [];
     let count = 0;
 
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+    for (const frameNumber of FRAME_NUMBERS) {
       const img = new Image();
-      img.src = getFrameSrc(i);
+      img.src = getFrameSrc(frameNumber);
       img.onload = () => {
         count++;
         if (count === TOTAL_FRAMES && mounted) {
@@ -43,7 +47,7 @@ export default function ScrollVideoPlayer() {
     if (frameNumber === lastFrameRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    const img = imagesRef.current[frameNumber - 1];
+    const img = imagesRef.current[FRAME_NUMBERS.indexOf(frameNumber)];
     if (!canvas || !ctx || !img) return;
     canvas.width = 720;
     canvas.height = 720;
@@ -69,10 +73,11 @@ export default function ScrollVideoPlayer() {
         const stickyTravel = Math.max(1, rect.height - viewH);
         const progress = Math.max(0, Math.min(1, -rect.top / stickyTravel));
 
-        const centeredOffset = LOGO_FRAME - Math.round(TOTAL_FRAMES * 0.5);
-        const rawFrame = Math.round(progress * TOTAL_FRAMES) + centeredOffset;
-        const frameNumber = ((((rawFrame - 1) % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES) + 1;
-        drawFrame(frameNumber);
+        const logoIndex = FRAME_NUMBERS.indexOf(LOGO_FRAME);
+        const centeredOffset = logoIndex - Math.round(TOTAL_FRAMES * 0.5);
+        const rawIndex = Math.round(progress * TOTAL_FRAMES) + centeredOffset;
+        const frameIndex = ((rawIndex % TOTAL_FRAMES) + TOTAL_FRAMES) % TOTAL_FRAMES;
+        drawFrame(FRAME_NUMBERS[frameIndex]);
       });
     };
 
