@@ -4,8 +4,6 @@ import { Activity, Brain, Zap, Smartphone, Shield, Battery, Check } from "lucide
 import PrecommanderReveal from "@/components/bracelet/PrecommanderReveal";
 import oreonBracelet from "@/assets/oreon-bracelet.png";
 import oreonSpecs from "@/assets/oreon-specs.png";
-import oreonBracelet from "@/assets/oreon-bracelet.png";
-import oreonSpecs from "@/assets/oreon-specs.png";
 
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
