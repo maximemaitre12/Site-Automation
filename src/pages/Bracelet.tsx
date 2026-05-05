@@ -193,6 +193,7 @@ export default function Bracelet() {
                 </a>
               </div>
             </div>
+          </div>
         </div>
       </section>
 
