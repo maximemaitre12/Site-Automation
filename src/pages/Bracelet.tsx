@@ -224,8 +224,8 @@ export default function Bracelet() {
         </div>
       </section>
 
-      {/* Scroll Video Animation */}
-      <ScrollVideoPlayer />
+      {/* Bracelet Showcase Section */}
+      <BraceletShowcaseSection />
 
       {/* Technical Specs Image */}
       <section className="py-28" style={{ background: "#0a2d6e" }}>
