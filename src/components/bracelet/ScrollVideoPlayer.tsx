@@ -34,7 +34,7 @@ export default function ScrollVideoPlayer() {
         if (count === TOTAL_FRAMES && mounted) {
           imagesRef.current = images;
           setLoaded(true);
-          drawFrame(INITIAL_FRAME);
+          drawFrameByIndex(FRAME_NUMBERS.indexOf(INITIAL_FRAME));
         }
       };
       images.push(img);
