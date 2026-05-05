@@ -177,7 +177,7 @@ export default function Bracelet() {
             {/* Accent line */}
             <div className="w-12 h-[2px] bg-white/40 mb-6" />
 
-            <p className="text-[11px] font-medium tracking-[0.4em] uppercase text-white/50 mb-5">
+            <p className="text-[9px] font-medium tracking-[0.35em] uppercase text-white/50 mb-5">
               Biometric Intelligence · AI Automation · Health Tracking
             </p>
 
