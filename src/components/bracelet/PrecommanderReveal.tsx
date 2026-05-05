@@ -472,6 +472,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
 const RightCard = ({ plan, onCardPayment, loadingPlan }: {
   plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
 }) => {
+  const [showSepa, setShowSepa] = useState(false);
   const baseDelay = 0.58;
 
   return (
