@@ -38,7 +38,8 @@ const features = [
 const plans = [
   {
     name: "Essentiel",
-    price: "2,99",
+    price: "8,97",
+    monthly: "2,99",
     features: [
       "Bracelet Oreon offert",
       "Suivi biométrique complet",
@@ -50,7 +51,8 @@ const plans = [
   },
   {
     name: "Premium",
-    price: "3,99",
+    price: "11,97",
+    monthly: "3,99",
     popular: true,
     features: [
       "Bracelet Oreon offert",
