@@ -205,6 +205,9 @@ export default function Bracelet() {
         </div>
       </section>
 
+      {/* Scroll Video Animation */}
+      <ScrollVideoPlayer />
+
       {/* Features */}
       <section id="features" className="py-28 bg-white">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
