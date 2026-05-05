@@ -112,6 +112,7 @@ const App = () => {
                 <Route path="/legal/mentions" element={<LegalNotice />} />
                 <Route path="/legal/bracelet-cgu" element={<BraceletCGU />} />
                 <Route path="/bracelet" element={<Bracelet />} />
+                <Route path="/platform" element={<Landing />} />
               </Route>
 
               {/* Product Tour (own layout) */}
