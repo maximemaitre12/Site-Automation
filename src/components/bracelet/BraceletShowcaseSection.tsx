@@ -44,15 +44,6 @@ export default function BraceletShowcaseSection() {
   const [loaded, setLoaded] = useState(false);
   const lastFrameRef = useRef(-1);
   const [visible, setVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  /* Detect mobile */
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1024);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   /* Preload frames */
   useEffect(() => {
@@ -132,66 +123,91 @@ export default function BraceletShowcaseSection() {
     return () => obs.disconnect();
   }, []);
 
+  /* Shared canvas element */
+  const canvasElement = (
+    <div className="relative flex items-center justify-center">
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: "80%",
+          paddingBottom: "80%",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "radial-gradient(circle, rgba(168,221,255,0.08) 0%, transparent 70%)",
+          animation: "pulse 4s ease-in-out infinite",
+        }}
+      />
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: 3 + (i % 3),
+            height: 3 + (i % 3),
+            background: `rgba(168,221,255,${0.15 + (i % 3) * 0.05})`,
+            top: `${20 + i * 12}%`,
+            left: `${30 + (i * 7) % 40}%`,
+            animation: `float-particle-${i} ${6 + i * 1.5}s ease-in-out infinite`,
+          }}
+        />
+      ))}
+      <canvas
+        ref={canvasRef}
+        className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[520px] lg:max-h-[70vh] object-contain"
+        style={{
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.6s",
+          filter: "drop-shadow(0 0 40px rgba(168,221,255,0.06))",
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-[30%] z-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center top, rgba(168,221,255,0.04) 0%, transparent 70%)",
+          filter: "blur(20px)",
+        }}
+      />
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <>
       <div
         ref={sectionRef}
         className="relative"
         style={{
-          height: isMobile ? "auto" : "110vh",
-          minHeight: isMobile ? "auto" : undefined,
           background: "radial-gradient(ellipse 80% 60% at 75% 50%, #0e3a8a 0%, #0a2d6e 45%, #071e52 100%)",
         }}
       >
         {/* Desktop: sticky scroll-driven layout */}
-        {!isMobile && (
+        <div className="hidden lg:block" style={{ height: "110vh" }}>
           <div className="sticky top-0 h-screen flex items-center overflow-hidden">
             <div className="w-full max-w-[1440px] mx-auto px-8 md:px-12 lg:px-20 flex flex-row items-center">
-              <LeftColumn visible={visible} />
-              <RightColumn canvasRef={canvasRef} loaded={loaded} />
+              <div className="w-[45%] flex flex-col justify-center">
+                <TextContent visible={visible} />
+              </div>
+              <div className="w-[55%] flex items-center justify-end relative">
+                {canvasElement}
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Mobile: simple stacked layout, no sticky */}
-        {isMobile && (
-          <div className="px-6 py-16">
-            {/* Canvas first on mobile for visual impact */}
-            <div className="flex items-center justify-center mb-10 relative">
-              <div
-                className="absolute rounded-full pointer-events-none"
-                style={{
-                  width: "80%",
-                  paddingBottom: "80%",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  background: "radial-gradient(circle, rgba(168,221,255,0.08) 0%, transparent 70%)",
-                }}
-              />
-              <canvas
-                ref={canvasRef}
-                className="relative z-10 w-full max-w-[320px]"
-                style={{
-                  opacity: loaded ? 1 : 0,
-                  transition: "opacity 0.6s",
-                  filter: "drop-shadow(0 0 40px rgba(168,221,255,0.06))",
-                }}
-              />
-              {!loaded && (
-                <div className="absolute inset-0 flex items-center justify-center z-20">
-                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                </div>
-              )}
-            </div>
-
-            {/* Text content */}
-            <LeftColumn visible={visible} />
+        {/* Mobile/tablet: simple stacked layout */}
+        <div className="lg:hidden px-6 py-16">
+          <div className="flex items-center justify-center mb-10">
+            {canvasElement}
           </div>
-        )}
+          <TextContent visible={visible} />
+        </div>
       </div>
 
-      {/* Particle keyframes */}
       <style>{`
         @keyframes float-particle-0 { 0%,100% { transform: translate(0,0); opacity: 0.3; } 50% { transform: translate(12px,-18px); opacity: 0.6; } }
         @keyframes float-particle-1 { 0%,100% { transform: translate(0,0); opacity: 0.2; } 50% { transform: translate(-10px,14px); opacity: 0.5; } }
@@ -204,11 +220,9 @@ export default function BraceletShowcaseSection() {
   );
 }
 
-/* ─── Extracted sub-components ─── */
-
-function LeftColumn({ visible }: { visible: boolean }) {
+function TextContent({ visible }: { visible: boolean }) {
   return (
-    <div className="w-full lg:w-[45%] flex flex-col justify-center">
+    <>
       <span
         className="text-[11px] font-semibold tracking-[0.25em] uppercase mb-6"
         style={{
@@ -290,65 +304,6 @@ function LeftColumn({ visible }: { visible: boolean }) {
           <span className="inline-block transition-transform duration-300 group-hover/link:translate-x-1">→</span>
         </a>
       </div>
-    </div>
-  );
-}
-
-function RightColumn({ canvasRef, loaded }: { canvasRef: React.RefObject<HTMLCanvasElement>; loaded: boolean }) {
-  return (
-    <div className="w-full lg:w-[55%] flex items-center justify-center lg:justify-end relative">
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: "70%",
-          paddingBottom: "70%",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          background: "radial-gradient(circle, rgba(168,221,255,0.08) 0%, transparent 70%)",
-          animation: "pulse 4s ease-in-out infinite",
-        }}
-      />
-
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            width: 3 + (i % 3),
-            height: 3 + (i % 3),
-            background: `rgba(168,221,255,${0.15 + (i % 3) * 0.05})`,
-            top: `${20 + i * 12}%`,
-            left: `${30 + (i * 7) % 40}%`,
-            animation: `float-particle-${i} ${6 + i * 1.5}s ease-in-out infinite`,
-          }}
-        />
-      ))}
-
-      <canvas
-        ref={canvasRef}
-        className="relative z-10 w-full max-w-[520px] max-h-[70vh] object-contain"
-        style={{
-          opacity: loaded ? 1 : 0,
-          transition: "opacity 0.6s",
-          borderRadius: "50%",
-          filter: "drop-shadow(0 0 40px rgba(168,221,255,0.06))",
-        }}
-      />
-
-      <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-[30%] z-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse at center top, rgba(168,221,255,0.04) 0%, transparent 70%)",
-          filter: "blur(20px)",
-        }}
-      />
-
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center z-20">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        </div>
-      )}
-    </div>
+    </>
   );
 }
