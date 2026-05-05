@@ -13,6 +13,8 @@ import aiRouter from './routes/ai'
 import interviewsRouter from './routes/interviews'
 import cvRouter from './routes/cv'
 import robotaRouter, { runFollowUps, runFullSync } from './routes/robota'
+import messagingRouter from './routes/messaging'
+import { reloadTelegramSession } from './lib/messaging'
 import { apiAuth } from './middleware/auth'
 
 const app = express()
@@ -36,6 +38,7 @@ app.use('/api/ai', aiRouter)
 app.use('/api/interviews', interviewsRouter)
 app.use('/api/cv', cvRouter)
 app.use('/api/robota', robotaRouter)
+app.use('/api/messaging', messagingRouter)
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(process.cwd(), 'dist')))
@@ -77,6 +80,9 @@ app.listen(PORT, () => {
     console.log('[startup] robota.ua connected — triggering automatic full sync')
     runFullSync().catch(e => console.error('[startup full-sync]', (e as Error).message))
   }
+
+  // Reload Telegram session if previously authenticated
+  reloadTelegramSession().catch(e => console.error('[startup telegram]', (e as Error).message))
 })
 
 function startCron() {

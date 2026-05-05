@@ -53,21 +53,59 @@ interface RobotaApply {
   fileName?: string
 }
 
-// Reverse city map: cityId → cityName (loaded from data/cities.json at startup; falls back to in-memory minimal map)
+// Reverse city map: cityId → cityName — loaded from stable cache, or fetched from robota.ua on first run
 const CITY_ID_TO_NAME: Record<number, string> = {}
+import * as fsMod from 'fs'
+import * as pathMod from 'path'
+import * as osMod from 'os'
+
+const CITIES_CACHE_DIR = process.env.APPDATA
+  ? pathMod.join(process.env.APPDATA, 'Farmasoft', 'data')
+  : pathMod.join(osMod.homedir(), '.farmasoft', 'data')
+const CITIES_CACHE_PATH = pathMod.join(CITIES_CACHE_DIR, 'cities.json')
+
+function loadCitiesIntoMap(arr: Array<{ id: number; nameUkr?: string; name?: string }>) {
+  for (const c of arr) {
+    if (c.id) CITY_ID_TO_NAME[c.id] = c.nameUkr || c.name || ''
+  }
+}
+
+// Try cache first
 try {
-  const fs = require('fs') as typeof import('fs')
-  const path = require('path') as typeof import('path')
-  const file = path.join(process.cwd(), 'data', 'cities.json')
-  if (fs.existsSync(file)) {
-    const arr = JSON.parse(fs.readFileSync(file, 'utf8')) as Array<{ id: number; nameUkr?: string; name?: string }>
-    for (const c of arr) {
-      if (c.id) CITY_ID_TO_NAME[c.id] = c.nameUkr || c.name || ''
+  if (fsMod.existsSync(CITIES_CACHE_PATH)) {
+    const arr = JSON.parse(fsMod.readFileSync(CITIES_CACHE_PATH, 'utf8')) as Array<{ id: number; nameUkr?: string; name?: string }>
+    loadCitiesIntoMap(arr)
+    console.log(`[robota] Loaded ${arr.length} cities from cache`)
+  } else {
+    // Legacy fallback
+    const legacyPath = pathMod.join(process.cwd(), 'data', 'cities.json')
+    if (fsMod.existsSync(legacyPath)) {
+      const arr = JSON.parse(fsMod.readFileSync(legacyPath, 'utf8')) as Array<{ id: number; nameUkr?: string; name?: string }>
+      loadCitiesIntoMap(arr)
+      fsMod.mkdirSync(CITIES_CACHE_DIR, { recursive: true })
+      fsMod.copyFileSync(legacyPath, CITIES_CACHE_PATH)
+      console.log(`[robota] Migrated cities cache → ${CITIES_CACHE_PATH}`)
     }
-    console.log(`[robota] Loaded ${arr.length} cities`)
   }
 } catch (e) {
-  console.warn('[robota] cities.json not loaded:', (e as Error).message)
+  console.warn('[robota] cities cache not loaded:', (e as Error).message)
+}
+
+// Async fetch cities from robota.ua if cache missing — runs once first sync
+async function ensureCitiesCache(token: string): Promise<void> {
+  if (Object.keys(CITY_ID_TO_NAME).length > 100) return
+  try {
+    const { data } = await axios.get(`${API_URL}/values/citylist`, {
+      headers: { Authorization: `Bearer ${token}` }, timeout: 15000,
+    })
+    const arr = data as Array<{ id: number; nameUkr?: string; name?: string }>
+    loadCitiesIntoMap(arr)
+    fsMod.mkdirSync(CITIES_CACHE_DIR, { recursive: true })
+    fsMod.writeFileSync(CITIES_CACHE_PATH, JSON.stringify(arr), 'utf8')
+    console.log(`[robota] Fetched ${arr.length} cities from robota.ua, cached at ${CITIES_CACHE_PATH}`)
+  } catch (e) {
+    console.warn('[robota] cities fetch failed:', (e as Error).message)
+  }
 }
 
 function computeExperienceYears(experiences?: RobotaApply['experiences'], isHaveNoExperience?: boolean): number {
@@ -197,6 +235,110 @@ async function getToken(db: ReturnType<typeof getDb>): Promise<string> {
   saveSetting(db, 'robota_token', token)
   saveSetting(db, 'robota_token_expires', new Date(Date.now() + 23 * 60 * 60 * 1000).toISOString())
   return token
+}
+
+// ─── Build robota.ua vacancy payload from a Farmasoft job record ─────────────
+function buildVacancyPayload(job: Record<string, unknown>, db: ReturnType<typeof getDb>) {
+  const skills: string[] = (() => { try { return JSON.parse(job.skills as string || '[]') } catch { return [] } })()
+  const employmentTypes: string[] = (() => { try { return JSON.parse(job.employment_types as string || '["FullTime"]') } catch { return ['FullTime'] } })()
+  const workTypes: string[] = (() => { try { return JSON.parse(job.work_types as string || '["Office"]') } catch { return ['Office'] } })()
+  const branchIds: number[] = (() => { try { return JSON.parse(job.branch_ids as string || '[]') } catch { return [] } })()
+  const languages: Array<{ id: number; level: number }> = (() => { try { return JSON.parse(job.languages as string || '[]') } catch { return [] } })()
+
+  const cityId = (job.city_id as number) || CITY_MAP[job.location as string] || 1
+  const expYears = (job.experience_years as number) || 0
+
+  const rawDesc = [job.description, job.requirements, skills.length ? `Навички: ${skills.join(', ')}` : '']
+    .filter(Boolean).join('\n\n')
+  const minDesc = rawDesc.length >= 150 ? rawDesc
+    : `${rawDesc}\n\nКомпанія Farmasoft UA запрошує кандидатів на посаду "${job.title as string}". Ми пропонуємо конкурентну заробітну плату, офіційне оформлення та комфортні умови праці. Надсилайте своє резюме — ми розглянемо кожну заявку.`.substring(0, Math.max(rawDesc.length + 300, 300))
+
+  const salaryAvg = (job.salary_min && job.salary_max)
+    ? Math.round(((job.salary_min as number) + (job.salary_max as number)) / 2)
+    : ((job.salary_min as number) || 0)
+
+  return {
+    id: (job.robota_vacancy_id as number) || 0,
+    cityId,
+    name: job.title,
+    description: minDesc,
+    salary: salaryAvg,
+    salaryRange: (job.salary_min && job.salary_max)
+      ? { amountFrom: job.salary_min, amountTo: job.salary_max } : undefined,
+    currencyId: 1,
+    experienceId: (job.experience_id as number) ?? expYearsToId(expYears),
+    educationId: (job.education_id as number) ?? 0,
+    scheduleId: (job.schedule_id as number) || 1,
+    publishType: (job.publish_type as string) || getSetting(db, 'robota_publish_type') || 'Anonym',
+    sendResumeType: '1',
+    contactEMail: (job.contact_email as string) || getSetting(db, 'robota_email') || '',
+    contactPerson: (job.contact_person as string) || getSetting(db, 'robota_contact_person') || 'HR Farmasoft UA',
+    employmentTypes,
+    workTypes,
+    branchIds: branchIds.length ? branchIds : undefined,
+    languages: languages.length ? languages : undefined,
+    endingType: 'CloseAndNotify',
+  }
+}
+
+// ─── Sync a Farmasoft job to robota.ua (publish/update/close) ────────────────
+export async function syncJobToRobota(
+  jobId: number,
+  action: 'publish' | 'update' | 'close',
+): Promise<{ vacancyId?: number; state?: string; error?: string }> {
+  const db = getDb()
+  const job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(jobId) as Record<string, unknown> | undefined
+  if (!job) return { error: 'Poste introuvable' }
+
+  let token: string
+  try { token = await getToken(db) } catch (e) { return { error: `Non connecté à robota.ua: ${(e as Error).message}` } }
+
+  try {
+    if (action === 'close') {
+      const robotaId = job.robota_vacancy_id as number | null
+      if (!robotaId) return { error: 'Aucune vacancy robota.ua liée' }
+      const { data } = await axios.post(`${API_URL}/vacancy/state/${robotaId}?state=Closed`, {},
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 })
+      if (data?.success === false) return { error: (data?.message || 'Échec fermeture').replace('[CUSTOM ERROR] ', '') }
+      db.prepare("UPDATE jobs SET robota_state = 'Closed' WHERE id = ?").run(jobId)
+      return { vacancyId: robotaId, state: 'Closed' }
+    }
+
+    // publish or update — upsert vacancy
+    const payload = buildVacancyPayload(job, db)
+    const { data: createResp } = await axios.post(`${API_URL}/vacancy/add`, payload, {
+      headers: { Authorization: `Bearer ${token}` }, timeout: 15000,
+    })
+    if (createResp?.success === false) {
+      const msg = (createResp.error || createResp.message || 'Publication refusée').replace('[CUSTOM ERROR] ', '')
+      return { error: msg }
+    }
+    const vacancyId = (createResp?.vacancyId as number) || (createResp?.id as number) || (job.robota_vacancy_id as number)
+    if (!vacancyId) return { error: 'ID vacancy non retourné par robota.ua' }
+
+    // Set state to Publicated
+    const { data: stateResp } = await axios.post(
+      `${API_URL}/vacancy/state/${vacancyId}?state=Publicated`, {},
+      { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 },
+    )
+    if (stateResp?.success === false) {
+      // Vacancy was created/updated but couldn't go live — save the link for retry
+      db.prepare("UPDATE jobs SET robota_vacancy_id = ?, robota_state = 'NotPublicated' WHERE id = ?").run(vacancyId, jobId)
+      const msg = (stateResp.message || 'Publication refusée').replace('[CUSTOM ERROR] ', '')
+      return { vacancyId, state: 'NotPublicated', error: msg }
+    }
+
+    db.prepare("UPDATE jobs SET robota_vacancy_id = ?, robota_state = 'Publicated' WHERE id = ?").run(vacancyId, jobId)
+    db.prepare('INSERT INTO events (type, job_id, metadata) VALUES (?, ?, ?)').run(
+      action === 'publish' ? 'vacancy_published' : 'vacancy_updated', jobId,
+      JSON.stringify({ robota_vacancy_id: vacancyId, action }),
+    )
+    return { vacancyId, state: 'Publicated' }
+  } catch (err: unknown) {
+    const status = (err as { response?: { status: number } }).response?.status
+    if (status === 401) return { error: 'Token expiré — reconnectez-vous' }
+    return { error: (err as Error).message }
+  }
 }
 
 // ─── Update apply folder on robota.ua (Invited, Uninteresting…) ───────────────
@@ -1127,17 +1269,13 @@ router.post('/cvdb/search', async (req: Request, res: Response) => {
     })
 
     const documents = (data?.documents ?? []) as Record<string, unknown>[]
-    if (documents.length === 0) return res.json({ data: [], total: 0 })
+    if (documents.length === 0) return res.json({ data: { candidates: [], total: 0 } })
 
-    // Import as candidates (dedup by profile_url)
+    // Import as candidates — link to current job, even if already in DB under another job
     const imported: number[] = []
     for (const doc of documents) {
       const resumeId = doc.resumeId as number
       const profileUrl = `https://robota.ua/ua/cv/${resumeId}`
-
-      // Skip if already in DB
-      const existing = db.prepare('SELECT id FROM candidates WHERE profile_url = ?').get(profileUrl)
-      if (existing) { imported.push((existing as { id: number }).id); continue }
 
       const name     = (doc.displayName ?? doc.fullName ?? '') as string
       const role     = (doc.speciality ?? '') as string
@@ -1145,6 +1283,25 @@ router.post('/cvdb/search', async (req: Request, res: Response) => {
       const salary   = parseInt(String(doc.salary ?? '0').replace(/\D/g, '')) || 0
       const expYears = Array.isArray(doc.experience) ? doc.experience.length : 0
 
+      // 1. Already linked to THIS job? → reuse
+      if (jobId) {
+        const existingForJob = db.prepare(
+          'SELECT id FROM candidates WHERE profile_url = ? AND job_id = ?'
+        ).get(profileUrl, jobId) as { id: number } | undefined
+        if (existingForJob) { imported.push(existingForJob.id); continue }
+      }
+
+      // 2. Orphan (no job_id) with same profile_url? → adopt
+      const orphan = db.prepare(
+        'SELECT id FROM candidates WHERE profile_url = ? AND job_id IS NULL'
+      ).get(profileUrl) as { id: number } | undefined
+      if (orphan && jobId) {
+        db.prepare('UPDATE candidates SET job_id = ? WHERE id = ?').run(jobId, orphan.id)
+        imported.push(orphan.id)
+        continue
+      }
+
+      // 3. Insert new row for this job (allowing same candidate under multiple jobs)
       const r = db.prepare(`
         INSERT INTO candidates (job_id, initials, role, location, salary_expectation, experience_years,
           source_platform, profile_url, tags, status, stage, source_type)
@@ -1163,7 +1320,134 @@ router.post('/cvdb/search', async (req: Request, res: Response) => {
       JSON.stringify({ keywords, count: imported.length, total: data?.total ?? 0 }),
     )
 
-    res.json({ data: candidates, total: data?.total ?? 0 })
+    res.json({ data: { candidates, total: data?.total ?? 0 } })
+  } catch (err: unknown) {
+    const status = (err as { response?: { status: number } }).response?.status
+    if (status === 401) return res.json({ error: 'Token expiré — reconnectez-vous' })
+    res.json({ error: (err as Error).message })
+  }
+})
+
+// ─── CV credits info (how many "open contacts" available) ───────────────────
+router.get('/credits', async (_req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const token = await getToken(db)
+    const [count, services] = await Promise.all([
+      axios.get(`${API_URL}/resume/open-contacts-count`, { headers: { Authorization: `Bearer ${token}` }, timeout: 8000 }),
+      axios.get(`${API_URL}/api/service/cvdb`, { headers: { Authorization: `Bearer ${token}` }, timeout: 8000 }),
+    ])
+    const packs = (Array.isArray(services.data) ? services.data : []) as Array<Record<string, unknown>>
+    const totalAllocated = packs.reduce((sum, p) => sum + ((p.openContactCount as number) || 0), 0)
+    const totalUsed = packs.reduce((sum, p) => sum + ((p.usedContactCount as number) || 0), 0)
+    const earliestExpiry = packs
+      .map(p => p.activationEndDate as string)
+      .filter(d => d && d !== '0001-01-01T00:00:00')
+      .sort()[0] || null
+
+    res.json({
+      data: {
+        available: count.data?.availableContacts || 0,
+        totalAllocated,
+        totalUsed,
+        expiresAt: earliestExpiry,
+        packs: packs.map(p => ({
+          name:    p.serviceTypeNameUkr || p.serviceTypeName,
+          allocated: p.openContactCount,
+          used:    p.usedContactCount,
+          expiresAt: p.activationEndDate,
+        })),
+      },
+    })
+  } catch (err: unknown) {
+    const status = (err as { response?: { status: number } }).response?.status
+    if (status === 401) return res.json({ error: 'Token expiré — reconnectez-vous' })
+    res.json({ error: (err as Error).message })
+  }
+})
+
+// ─── Open a CV (consumes 1 credit, fetches full structured data) ─────────────
+router.post('/cvdb/open/:resumeId', async (req: Request, res: Response) => {
+  try {
+    const db = getDb()
+    const resumeId = parseInt(req.params.resumeId)
+    const { jobId } = req.body as { jobId?: number }
+    if (!resumeId) return res.json({ error: 'resumeId requis' })
+
+    const token = await getToken(db)
+
+    // Step 1: open the resume (consumes 1 credit)
+    try {
+      await axios.post(`${API_URL}/resume/open/${resumeId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }, timeout: 10000,
+      })
+    } catch (e: unknown) {
+      const status = (e as { response?: { status: number; data?: unknown } }).response?.status
+      if (status === 402 || status === 403) return res.json({ error: 'Plus de crédits disponibles' })
+      // 200/204 may also reach here if already opened — continue
+    }
+
+    // Step 2: fetch the full resume
+    const { data: resume } = await axios.get(`${API_URL}/resume/${resumeId}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, timeout: 10000,
+    })
+    if (!resume || !resume.resumeId) return res.json({ error: 'CV introuvable après ouverture' })
+
+    const r = resume as Record<string, unknown>
+    const fullName = [r.surname, r.name, r.fatherName].filter(Boolean).join(' ').trim() || null
+    const profileUrl = `https://robota.ua/ua/cv/${resumeId}`
+
+    // Upsert candidate (link to existing if same profile_url, else insert new)
+    const existing = db.prepare('SELECT id FROM candidates WHERE profile_url = ?').get(profileUrl) as { id: number } | undefined
+    const profileData = JSON.stringify({
+      surname: r.surname, fatherName: r.fatherName,
+      sex: r.sex, age: r.age,
+      educationId: r.educationId, profLevelId: r.profLevelId,
+      branchIds: r.branchIds, language: r.language, skype: r.skype,
+      diiaCertificate: r.diiaCertificate,
+      isFullyOpened: true,
+      openedAt: new Date().toISOString(),
+    })
+
+    let candidateId: number
+    if (existing) {
+      db.prepare(`
+        UPDATE candidates SET full_name = COALESCE(?, full_name),
+          email = COALESCE(?, email), phone = COALESCE(?, phone),
+          photo_url = COALESCE(?, photo_url), birth_date = COALESCE(?, birth_date),
+          location = COALESCE(?, location), salary_expectation = COALESCE(?, salary_expectation),
+          role = COALESCE(?, role), profile_data = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(
+        fullName, r.email || null, r.phone || null,
+        r.photo || null, r.birthDate || null,
+        CITY_ID_TO_NAME[r.cityId as number] || null,
+        parseInt(String(r.salary || '0').replace(/\D/g, '')) || null,
+        r.speciality || null, profileData, existing.id,
+      )
+      candidateId = existing.id
+    } else {
+      const result = db.prepare(`
+        INSERT INTO candidates (job_id, initials, full_name, role, location, salary_expectation,
+          source_platform, profile_url, photo_url, birth_date, tags, status, stage, source_type,
+          email, phone, profile_data)
+        VALUES (?, ?, ?, ?, ?, ?, 'robota.ua', ?, ?, ?, '[]', 'new', 'new', 'scraped', ?, ?, ?)
+      `).run(
+        jobId ?? null, generateInitials(fullName as string), fullName,
+        r.speciality || 'Кандидат', CITY_ID_TO_NAME[r.cityId as number] || null,
+        parseInt(String(r.salary || '0').replace(/\D/g, '')) || 0,
+        profileUrl, r.photo || null, r.birthDate || null,
+        r.email || null, r.phone || null, profileData,
+      )
+      candidateId = result.lastInsertRowid as number
+    }
+
+    db.prepare('INSERT INTO events (type, candidate_id, metadata) VALUES (?, ?, ?)').run(
+      'cv_opened', candidateId, JSON.stringify({ resumeId, fullName }),
+    )
+
+    const candidate = db.prepare('SELECT * FROM candidates WHERE id = ?').get(candidateId)
+    res.json({ data: candidate })
   } catch (err: unknown) {
     const status = (err as { response?: { status: number } }).response?.status
     if (status === 401) return res.json({ error: 'Token expiré — reconnectez-vous' })
@@ -1190,6 +1474,9 @@ export async function runFullSync(): Promise<void> {
 
   try {
     const token = await getToken(db)
+
+    // Ensure cities cache (auto-fetched on first run, persists across restarts)
+    await ensureCitiesCache(token)
 
     // ── STEP 1: Farmasoft → robota.ua (publish active jobs not yet on robota.ua) ──
     fullSyncProgress.currentVacancy = 'Publication des postes Farmasoft...'
@@ -1272,21 +1559,23 @@ export async function runFullSync(): Promise<void> {
       // Find or create+update the linked Farmasoft job
       let job = db.prepare('SELECT * FROM jobs WHERE robota_vacancy_id = ?').get(v.id) as Record<string, unknown> | undefined
 
+      // is_active reflects the current state on robota.ua
+      const isActive = ['Publicated', 'Waiting'].includes(state) ? 1 : 0
+
       if (!job) {
         const r = db.prepare(`
           INSERT INTO jobs (title, location, salary_min, salary_max, salary_currency, description, is_active, robota_vacancy_id)
-          VALUES (?, ?, ?, ?, 'UAH', ?, 1, ?)
-        `).run(title, location, salaryMin, salaryMax, description, v.id)
+          VALUES (?, ?, ?, ?, 'UAH', ?, ?, ?)
+        `).run(title, location, salaryMin, salaryMax, description, isActive, v.id)
 
         job = db.prepare('SELECT * FROM jobs WHERE id = ?').get(r.lastInsertRowid) as Record<string, unknown>
 
         db.prepare('INSERT INTO events (type, job_id, metadata) VALUES (?, ?, ?)').run(
           'job_imported_from_robota', r.lastInsertRowid,
-          JSON.stringify({ robota_vacancy_id: v.id, title }),
+          JSON.stringify({ robota_vacancy_id: v.id, title, state }),
         )
       } else {
         // Update existing Farmasoft job with latest robota.ua data
-        const isActive = ['Publicated', 'Waiting'].includes(state) ? 1 : 0
         db.prepare(`
           UPDATE jobs SET title = ?, location = ?, salary_min = ?, salary_max = ?,
           description = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP

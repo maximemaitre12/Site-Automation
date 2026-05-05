@@ -1,10 +1,27 @@
 import { DatabaseSync } from 'node:sqlite'
 import path from 'path'
 import fs from 'fs'
+import os from 'os'
 
-const DATA_DIR = path.join(process.cwd(), 'data')
-fs.mkdirSync(DATA_DIR, { recursive: true })
-const DB_PATH = path.join(DATA_DIR, 'farmasoft.db')
+// Persist DB outside OneDrive sync zone — survives folder cleanups and OneDrive resets
+const STABLE_DATA_DIR = process.env.APPDATA
+  ? path.join(process.env.APPDATA, 'Farmasoft', 'data')
+  : path.join(os.homedir(), '.farmasoft', 'data')
+
+fs.mkdirSync(STABLE_DATA_DIR, { recursive: true })
+
+const DB_PATH = path.join(STABLE_DATA_DIR, 'farmasoft.db')
+
+// One-time migration: if DB exists in legacy in-project location, copy it to the stable path
+const LEGACY_DB = path.join(process.cwd(), 'data', 'farmasoft.db')
+if (fs.existsSync(LEGACY_DB) && !fs.existsSync(DB_PATH)) {
+  try {
+    fs.copyFileSync(LEGACY_DB, DB_PATH)
+    console.log(`[db] Migrated legacy DB → ${DB_PATH}`)
+  } catch (e) { console.error('[db] Migration failed:', (e as Error).message) }
+}
+
+console.log(`[db] Using ${DB_PATH}`)
 
 let db: DatabaseSync
 
@@ -99,6 +116,20 @@ export function getDb(): DatabaseSync {
   try { db.exec('ALTER TABLE candidates ADD COLUMN photo_url TEXT') } catch { /* already exists */ }
   try { db.exec('ALTER TABLE candidates ADD COLUMN birth_date TEXT') } catch { /* already exists */ }
   try { db.exec('ALTER TABLE jobs ADD COLUMN robota_vacancy_id INTEGER') } catch { /* already exists */ }
+  // Robota.ua-aligned fields (used at publication time)
+  try { db.exec('ALTER TABLE jobs ADD COLUMN city_id INTEGER') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN experience_id INTEGER DEFAULT 0') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN education_id INTEGER DEFAULT 0') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN schedule_id INTEGER DEFAULT 1') } catch { /* already exists */ }
+  try { db.exec("ALTER TABLE jobs ADD COLUMN employment_types TEXT DEFAULT '[\"FullTime\"]'") } catch { /* already exists */ }
+  try { db.exec("ALTER TABLE jobs ADD COLUMN work_types TEXT DEFAULT '[\"Office\"]'") } catch { /* already exists */ }
+  try { db.exec("ALTER TABLE jobs ADD COLUMN branch_ids TEXT DEFAULT '[]'") } catch { /* already exists */ }
+  try { db.exec("ALTER TABLE jobs ADD COLUMN publish_type TEXT DEFAULT 'Anonym'") } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN contact_person TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN contact_email TEXT') } catch { /* already exists */ }
+  try { db.exec("ALTER TABLE jobs ADD COLUMN languages TEXT DEFAULT '[]'") } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN robota_state TEXT') } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE jobs ADD COLUMN robota_error TEXT') } catch { /* already exists */ }
 
   // Prevent importing the same robota application twice for the same job
   try {

@@ -66,8 +66,8 @@ export const api = {
   ai: {
     generateJob: (title: string) =>
       req<Partial<Job>>('/ai/generate-job', { method: 'POST', ...body({ title }) }),
-    generateMessage: (job: Partial<Job>, candidate: Candidate, language: string) =>
-      req<string>('/ai/generate-message', { method: 'POST', ...body({ job, candidate, language }) }),
+    generateMessage: (job: Partial<Job>, candidate: Candidate, language: string, channel?: 'whatsapp' | 'telegram' | 'viber' | 'email', calendlyUrl?: string) =>
+      req<string>('/ai/generate-message', { method: 'POST', ...body({ job, candidate, language, channel, calendlyUrl }) }),
   },
   analytics: {
     kpis: () => req<KPIs>('/analytics/kpis'),
@@ -112,8 +112,62 @@ export const api = {
     fullSync: () => req<{ started: boolean }>('/robota/full-sync', { method: 'POST' }),
     fullSyncStatus: () => req<FullSyncProgress>('/robota/full-sync/status'),
     cvdbSearch: (params: { keywords: string; cityId?: number; salaryFrom?: number; salaryTo?: number; experienceId?: number; page?: number; count?: number; jobId?: number }) =>
-      req<{ data: Candidate[]; total: number }>('/robota/cvdb/search', { method: 'POST', ...body(params) }),
+      req<{ candidates: Candidate[]; total: number }>('/robota/cvdb/search', { method: 'POST', ...body(params) }),
+    credits: () => req<CreditsInfo>('/robota/credits'),
+    openCv: (resumeId: number, jobId?: number) =>
+      req<Candidate>(`/robota/cvdb/open/${resumeId}`, { method: 'POST', ...body({ jobId }) }),
   },
+}
+
+// ─── Messaging (WhatsApp / Telegram / Viber) ─────────────────────────────
+export const messagingApi = {
+  status: () => req<MessagingStatus>('/messaging/status'),
+
+  whatsapp: {
+    connect: (params: { accountSid: string; authToken: string; fromNumber: string }) =>
+      req<{ ok: boolean }>('/messaging/whatsapp/connect', { method: 'POST', ...body(params) }),
+    testSend: (to: string, text: string) =>
+      req<{ ok: boolean; sid?: string }>('/messaging/whatsapp/test-send', { method: 'POST', ...body({ to, body: text }) }),
+    disconnect: () => req<{ ok: boolean }>('/messaging/whatsapp/disconnect', { method: 'POST' }),
+  },
+  viber: {
+    connect: (params: { token: string; senderName: string }) =>
+      req<{ ok: boolean }>('/messaging/viber/connect', { method: 'POST', ...body(params) }),
+    testSend: (to: string, text: string) =>
+      req<{ ok: boolean }>('/messaging/viber/test-send', { method: 'POST', ...body({ to, body: text }) }),
+    disconnect: () => req<{ ok: boolean }>('/messaging/viber/disconnect', { method: 'POST' }),
+  },
+  telegram: {
+    start: (params: { apiId: number; apiHash: string; phone: string }) =>
+      req<{ ok: boolean; message?: string }>('/messaging/telegram/start', { method: 'POST', ...body(params) }),
+    code: (code: string) =>
+      req<{ ok?: boolean; needsPassword?: boolean; identity?: { username?: string; firstName?: string } }>(
+        '/messaging/telegram/code', { method: 'POST', ...body({ code }) }),
+    password: (password: string) =>
+      req<{ ok: boolean; identity?: { username?: string; firstName?: string } }>(
+        '/messaging/telegram/password', { method: 'POST', ...body({ password }) }),
+    testSend: (to: string, text: string) =>
+      req<{ ok: boolean; messageId?: number }>('/messaging/telegram/test-send', { method: 'POST', ...body({ to, body: text }) }),
+    disconnect: () => req<{ ok: boolean }>('/messaging/telegram/disconnect', { method: 'POST' }),
+  },
+
+  send: (candidateId: number, params: { message: string; ctaUrl?: string; channels: ('telegram'|'whatsapp'|'viber'|'email')[]; stopOnFirstSuccess?: boolean }) =>
+    req<Array<{ channel: string; ok: boolean; id?: string; error?: string }>>(`/messaging/send/${candidateId}`, { method: 'POST', ...body(params) }),
+}
+
+export interface MessagingStatus {
+  whatsapp: { configured: boolean; connected?: boolean; identity?: string; error?: string }
+  viber:    { configured: boolean; connected?: boolean; identity?: string; error?: string }
+  telegram: { configured: boolean; connected?: boolean; identity?: string; error?: string }
+  email:    { configured: boolean; connected?: boolean; identity?: string; error?: string }
+}
+
+export interface CreditsInfo {
+  available: number
+  totalAllocated: number
+  totalUsed: number
+  expiresAt: string | null
+  packs: Array<{ name: string; allocated: number; used: number; expiresAt: string | null }>
 }
 
 // Shared types
@@ -131,6 +185,21 @@ export interface Job {
   is_active: number
   created_at: string
   updated_at: string
+  // Robota.ua-aligned fields
+  robota_vacancy_id?: number | null
+  city_id?: number | null
+  experience_id?: number
+  education_id?: number
+  schedule_id?: number
+  employment_types?: string
+  work_types?: string
+  branch_ids?: string
+  publish_type?: string
+  contact_person?: string | null
+  contact_email?: string | null
+  languages?: string
+  robota_state?: string | null
+  robota_error?: string | null
 }
 
 export interface Candidate {

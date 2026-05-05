@@ -11,6 +11,7 @@ export const T = {
       analytics: 'Analytics',
       settings: 'Settings',
       prospecting: 'Prospecting',
+      cvSearch: 'CV Search',
     },
     user: { name: 'User', role: 'Admin' },
 
@@ -124,7 +125,7 @@ export const T = {
         allStages: 'All',
         allPlatforms: 'All platforms',
         filterLabel: 'Filter',
-        searchPlaceholder: 'Search role or location…',
+        searchPlaceholder: 'Search by name, role, city, email or phone…',
         advanceStage: 'Advance stage',
         stageChanged: 'Stage updated',
         noMatch: 'No candidates match the current filters.',
@@ -282,6 +283,7 @@ export const T = {
       analytics: 'Аналітика',
       settings: 'Налаштування',
       prospecting: 'Проспектинг',
+      cvSearch: 'Пошук CV',
     },
     user: { name: 'Користувач', role: 'Адмін' },
 
@@ -395,7 +397,7 @@ export const T = {
         allStages: 'Всі',
         allPlatforms: 'Всі платформи',
         filterLabel: 'Фільтр',
-        searchPlaceholder: 'Пошук по ролі або місту…',
+        searchPlaceholder: 'Пошук по імені, ролі, місту, email чи телефону…',
         advanceStage: 'Просунути етап',
         stageChanged: 'Етап оновлено',
         noMatch: 'Немає кандидатів, що відповідають фільтрам.',

@@ -1,39 +1,46 @@
 import { useState } from 'react'
-import { Candidate, Job } from '../../api/client'
-import { PLATFORM_COLOR } from './constants'
+import { api, Candidate, Job } from '../../api/client'
 import { iconStar, iconTrash } from './icons'
 import { parseProfile } from './helpers'
-import { T } from '../../i18n'
-import { useAppStore } from '../../store/useAppStore'
 
-const STAGE_COLORS: Record<string, { bg: string; color: string }> = {
-  new:              { bg: 'var(--surface-3)',  color: 'var(--text-3)' },
-  interview:        { bg: '#FEE8D0',           color: '#D9780A' },
-  decision:         { bg: '#D0F0E4',           color: '#2E9460' },
+const STAGE_STRIPE: Record<string, string> = {
+  new:        'var(--text-3)',
+  interview:  '#D9780A',
+  decision:   '#2E9460',
 }
 
-export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageAdvance }: {
+export function PipelineCard({ candidate, job: _job, onDelete, onClick, onUpdate }: {
   candidate: Candidate
   job: Job
   onDelete: (id: number) => void
   onClick: () => void
   onStageAdvance?: (id: number, newStage: string) => void
+  onUpdate?: (c: Candidate) => void
 }) {
-  const { uiLang } = useAppStore()
-  const stages = T[uiLang].stages
   const profile = parseProfile(candidate.profile_data)
   const [showNotes, setShowNotes] = useState(false)
-  const platformColor = PLATFORM_COLOR[candidate.source_platform] || 'var(--text-3)'
-
+  const [opening, setOpening] = useState(false)
   const scoreColor = candidate.qualification_score == null ? 'var(--text-3)'
     : candidate.qualification_score >= 70 ? 'var(--ok)'
     : candidate.qualification_score >= 40 ? '#d97706'
     : 'var(--err)'
 
-  const STAGE_ORDER = ['new', 'interview', 'decision'] as const
-  const currentStageIdx = STAGE_ORDER.indexOf(candidate.stage as typeof STAGE_ORDER[number])
-  const nextStage = currentStageIdx < STAGE_ORDER.length - 1 ? STAGE_ORDER[currentStageIdx + 1] : null
-  const stageConf = STAGE_COLORS[candidate.stage] || STAGE_COLORS.new
+  const stripeColor = STAGE_STRIPE[candidate.stage] || 'var(--text-3)'
+
+  // Detect anonymous (sourced but not yet opened) candidate from robota.ua CV DB
+  const resumeIdMatch = candidate.profile_url?.match(/\/cv\/(\d+)/)
+  const isLocked = !!resumeIdMatch && !candidate.full_name && !candidate.email && !candidate.phone
+
+  async function unlockCv(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!resumeIdMatch) return
+    if (!confirm('Open full CV? This will use 1 credit from your robota.ua quota.')) return
+    setOpening(true)
+    const r = await api.robota.openCv(parseInt(resumeIdMatch[1]), candidate.job_id || undefined)
+    setOpening(false)
+    if (r.error) { alert('Error: ' + r.error); return }
+    if (r.data && onUpdate) onUpdate(r.data)
+  }
 
   return (
     <div
@@ -43,7 +50,7 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
         padding: '12px 14px', cursor: 'pointer', position: 'relative',
         transition: 'box-shadow 150ms ease',
         display: 'flex', flexDirection: 'column', gap: 8,
-        borderTop: `3px solid ${stageConf.color}`,
+        borderTop: `3px solid ${stripeColor}`,
       }}
       onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--shadow)')}
       onMouseLeave={e => (e.currentTarget.style.boxShadow = 'var(--shadow-sm)')}
@@ -102,14 +109,7 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
               </div>
             )}
           </div>
-        ) : (
-          <div style={{
-            fontSize: 10, color: 'var(--text-3)', flexShrink: 0,
-            padding: '3px 8px', borderRadius: 8, background: 'var(--surface-2)',
-          }}>
-            —
-          </div>
-        )}
+        ) : null}
       </div>
 
       {/* Contact info — visible directly on the card */}
@@ -143,43 +143,45 @@ export function PipelineCard({ candidate, job: _job, onDelete, onClick, onStageA
         </div>
       )}
 
-      {/* Bottom row: platform + stage + actions */}
-      <div className="flex items-center justify-between" style={{ marginTop: 'auto' }}>
-        <div className="flex items-center gap-6">
-          <span style={{
-            fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 3,
-            background: platformColor + '22', color: platformColor,
-          }}>
-            {candidate.source_platform === 'cv_import' ? 'CV' : candidate.source_platform}
-          </span>
-          <span style={{
-            fontSize: 9, fontWeight: 600, padding: '2px 6px', borderRadius: 3,
-            background: stageConf.bg, color: stageConf.color,
-          }}>
-            {stages[candidate.stage as keyof typeof stages] || candidate.stage}
-          </span>
+      {/* Unlock CV — subtle button matching platform style (only for sourced candidates) */}
+      {isLocked && (
+        <div onClick={e => e.stopPropagation()}>
+          <button
+            onClick={unlockCv}
+            disabled={opening}
+            style={{
+              width: '100%', padding: '7px 10px', borderRadius: 8, fontWeight: 500, fontSize: 11,
+              background: 'transparent',
+              color: 'var(--accent)',
+              border: '1px solid var(--accent)',
+              cursor: opening ? 'wait' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+              transition: 'background 120ms, color 120ms',
+            }}
+            onMouseEnter={e => { if (!opening) { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.color = '#fff' } }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--accent)' }}
+          >
+            {opening ? (
+              <><span className="spinner" style={{ width: 11, height: 11 }} /> Unlocking…</>
+            ) : (
+              <>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="11" width="16" height="11" rx="2"/>
+                  <path d="M8 11V7a4 4 0 0 1 8 0"/>
+                </svg>
+                Unlock full profile · 1 credit
+              </>
+            )}
+          </button>
         </div>
+      )}
 
-        <div className="flex items-center gap-4" onClick={e => e.stopPropagation()}>
-          {/* Advance stage button */}
-          {nextStage && onStageAdvance && (
-            <button
-              onClick={() => onStageAdvance(candidate.id, nextStage)}
-              title={`→ ${stages[nextStage as keyof typeof stages]}`}
-              style={{
-                background: 'var(--surface-2)', border: 'none', borderRadius: 4, cursor: 'pointer',
-                color: 'var(--text-2)', padding: '2px 6px', fontSize: 9, fontWeight: 600,
-                display: 'flex', alignItems: 'center', gap: 2,
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = stageConf.bg; e.currentTarget.style.color = stageConf.color }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-2)' }}
-            >
-              → {stages[nextStage as keyof typeof stages]}
-            </button>
-          )}
+      {/* Bottom row: actions only */}
+      <div className="flex items-center justify-end" style={{ marginTop: 'auto' }} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-4">
           <button
             onClick={() => onDelete(candidate.id)}
-            title="Supprimer"
+            title="Delete"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', padding: '2px 4px', display: 'flex', alignItems: 'center' }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--err)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-3)')}>

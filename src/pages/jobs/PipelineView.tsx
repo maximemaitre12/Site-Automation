@@ -8,28 +8,17 @@ import { CandidateModal } from './CandidateModal'
 import { AddCandidatePanel } from './AddCandidatePanel'
 import { RobotaSyncModal } from './RobotaSyncModal'
 
-const STAGE_ORDER = ['new', 'interview', 'decision'] as const
-type Stage = typeof STAGE_ORDER[number]
-
-const STAGE_COLORS: Record<Stage, { bg: string; color: string; border: string }> = {
-  new:              { bg: 'var(--surface-2)',  color: 'var(--text-3)',  border: 'var(--border)' },
-  interview:        { bg: '#FEE8D0',           color: '#D9780A',        border: '#FCD09A' },
-  decision:         { bg: '#D0F0E4',           color: '#2E9460',        border: '#86EFAC' },
-}
 
 export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) {
   const { uiLang } = useAppStore()
   const tj = T[uiLang].jobs
   const tp = T[uiLang].jobs.pipeline
-  const stages = T[uiLang].stages
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null)
   const [search, setSearch] = useState('')
-  const [filterStage, setFilterStage] = useState<string>('all')
-  const [filterPlatform, setFilterPlatform] = useState<string>('all')
-  const [viewMode, setViewMode] = useState<'grid' | 'kanban'>('kanban')
+  const [sourceTab, setSourceTab] = useState<'applicants' | 'sourced'>('applicants')
   const [batchQualifying, setBatchQualifying] = useState(false)
   const [qualifyProgress, setQualifyProgress] = useState<{ done: number; total: number } | null>(null)
   const [showRobotaSync, setShowRobotaSync] = useState(false)
@@ -87,39 +76,69 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
   }
 
   function exportCSV() {
-    const headers = ['ID', 'Role', 'Location', 'Experience', 'Stage', 'Score', 'Platform', 'Status', 'Salary']
+    // Use semicolon as separator (Excel default in EU) and CRLF for compatibility
+    const SEP = ';'
+    const NL  = '\r\n'
+    const esc = (v: unknown) => {
+      const s = v == null ? '' : String(v)
+      // Quote if contains separator, quote, newline, or starts with risky char (formula injection)
+      if (/[";\r\n,]/.test(s) || /^[=+\-@]/.test(s)) return `"${s.replace(/"/g, '""')}"`
+      return s
+    }
+
+    const headers = [
+      'ID', 'Full name', 'Role', 'Location', 'Email', 'Phone',
+      'Experience (yrs)', 'Expected salary (UAH)', 'Stage', 'Status',
+      'AI score', 'AI notes', 'Profile URL', 'Created at',
+    ]
     const rows = candidates.map(c => [
       c.id,
-      `"${(c.role || '').replace(/"/g, '""')}"`,
-      `"${(c.location || '').replace(/"/g, '""')}"`,
+      c.full_name || c.initials || '',
+      c.role || '',
+      c.location || '',
+      c.email || '',
+      c.phone || '',
       c.experience_years ?? '',
+      c.salary_expectation || '',
       c.stage,
-      c.qualification_score ?? '',
-      c.source_platform,
       c.status,
-      c.salary_expectation ?? '',
-    ])
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      c.qualification_score ?? '',
+      c.qualification_notes || '',
+      c.profile_url || '',
+      c.created_at || '',
+    ].map(esc))
+
+    const csv = [headers.map(esc).join(SEP), ...rows.map(r => r.join(SEP))].join(NL)
+    // UTF-8 BOM so Excel detects the encoding correctly (Cyrillic readable)
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${job.title.replace(/[^a-z0-9]/gi, '_')}_candidates.csv`
+    const safeName = job.title.replace(/[^a-zA-Z0-9Ѐ-ӿ_]/g, '_').replace(/_+/g, '_')
+    a.download = `${safeName}_candidates_${new Date().toISOString().slice(0,10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  const platforms = Array.from(new Set(candidates.map(c => c.source_platform))).filter(Boolean)
   const unscoredCount = candidates.filter(c => c.qualification_score == null).length
 
-  const filtered = candidates.filter(c => {
-    if (filterStage !== 'all' && c.stage !== filterStage) return false
-    if (filterPlatform !== 'all' && c.source_platform !== filterPlatform) return false
-    if (search) {
-      const q = search.toLowerCase()
-      if (!c.role?.toLowerCase().includes(q) && !c.location?.toLowerCase().includes(q)) return false
-    }
-    return true
+  // Split candidates into two groups: applicants (postulated) vs sourced (found by us)
+  const applicants = candidates.filter(c => !!c.robota_apply_id)
+  const sourced    = candidates.filter(c => !c.robota_apply_id)
+
+  const visibleSet = sourceTab === 'applicants' ? applicants : sourced
+
+  const filtered = visibleSet.filter(c => {
+    if (!search) return true
+    const q = search.toLowerCase().trim()
+    return (
+      c.full_name?.toLowerCase().includes(q) ||
+      c.role?.toLowerCase().includes(q) ||
+      c.location?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q) ||
+      c.phone?.toLowerCase().includes(q) ||
+      c.initials?.toLowerCase().includes(q)
+    )
   })
 
   return (
@@ -137,68 +156,101 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
             </button>
             <div>
               <h1 className="page-title" style={{ marginBottom: 2 }}>{job.title}</h1>
-              <p className="t-11 c-3">{job.location} · {job.salary_min?.toLocaleString()}–{job.salary_max?.toLocaleString()} UAH · {tj.candidates(candidates.length)}</p>
+              <p className="t-11 c-3">
+                {[
+                  job.location,
+                  (job.salary_min || job.salary_max)
+                    ? (job.salary_min === job.salary_max
+                        ? `${job.salary_min?.toLocaleString()} UAH`
+                        : `${(job.salary_min || 0).toLocaleString()}–${(job.salary_max || 0).toLocaleString()} UAH`)
+                    : null,
+                  `${candidates.length} total`,
+                ].filter(Boolean).join(' · ')}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-8">
-            {/* View toggle */}
-            <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 8, padding: 2 }}>
-              {(['kanban', 'grid'] as const).map(m => (
-                <button key={m} onClick={() => setViewMode(m)} style={{
-                  background: viewMode === m ? 'var(--surface)' : 'transparent',
-                  border: 'none', borderRadius: 6, padding: '4px 10px',
-                  cursor: 'pointer', fontSize: 11, fontWeight: 500,
-                  color: viewMode === m ? 'var(--text-1)' : 'var(--text-3)',
-                  boxShadow: viewMode === m ? 'var(--shadow-sm)' : 'none',
-                }}>
-                  {m === 'kanban' ? tp.kanban : tp.grid}
-                </button>
-              ))}
-            </div>
             <button className="btn btn-secondary" onClick={exportCSV} style={{ fontSize: 11 }}>
               {tj.exportCSV}
             </button>
-            <button className="btn btn-primary" onClick={() => setShowAdd(true)}>
-              {tj.addCandidate}
-            </button>
+            {sourceTab === 'sourced' && (
+              <button className="btn btn-primary" onClick={() => setShowAdd(true)}>
+                {tj.addCandidate}
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Filter bar */}
-        <div className="flex items-center gap-8" style={{ flexWrap: 'wrap' }}>
-          <input
-            className="input"
-            style={{ width: 200, fontSize: 12 }}
-            placeholder={tp.searchPlaceholder}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <select
-            className="input"
-            style={{ width: 130, fontSize: 12 }}
-            value={filterStage}
-            onChange={e => setFilterStage(e.target.value)}
-          >
-            <option value="all">{tp.allStages}</option>
-            {STAGE_ORDER.map(s => (
-              <option key={s} value={s}>{stages[s]}</option>
-            ))}
-          </select>
-          {platforms.length > 1 && (
-            <select
-              className="input"
-              style={{ width: 140, fontSize: 12 }}
-              value={filterPlatform}
-              onChange={e => setFilterPlatform(e.target.value)}
+        {/* Source tabs */}
+        <div style={{
+          display: 'flex', gap: 0, marginBottom: 12,
+          borderBottom: '1px solid var(--border)',
+        }}>
+          {([
+            ['applicants', 'Applicants',  applicants.length],
+            ['sourced',    'Sourced',     sourced.length],
+          ] as const).map(([id, label, n]) => (
+            <button
+              key={id}
+              onClick={() => setSourceTab(id)}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: '8px 18px', fontSize: 13, fontWeight: 500,
+                color: sourceTab === id ? 'var(--accent)' : 'var(--text-3)',
+                borderBottom: sourceTab === id ? '2px solid var(--accent)' : '2px solid transparent',
+                marginBottom: -1, display: 'flex', alignItems: 'center', gap: 6,
+                transition: 'color 120ms',
+              }}>
+              {label}
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 10,
+                background: sourceTab === id ? 'var(--accent)' : 'var(--surface-2)',
+                color:      sourceTab === id ? '#fff' : 'var(--text-3)',
+              }}>{n}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Search bar */}
+        <div className="flex items-center gap-12" style={{ flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', width: 360, maxWidth: '100%' }}>
+            <svg
+              width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+              strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
+              style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-3)', pointerEvents: 'none' }}
             >
-              <option value="all">{tp.allPlatforms}</option>
-              {platforms.map(p => (
-                <option key={p} value={p}>{p === 'cv_import' ? 'CV' : p}</option>
-              ))}
-            </select>
-          )}
-          {(search || filterStage !== 'all' || filterPlatform !== 'all') && (
-            <span className="t-11 c-3">{filtered.length} / {candidates.length}</span>
+              <circle cx="7" cy="7" r="5" /><path d="M11 11l3 3" />
+            </svg>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={tp.searchPlaceholder}
+              style={{
+                width: '100%', padding: '9px 36px 9px 36px', fontSize: 13,
+                borderRadius: 22, border: '1px solid var(--border)',
+                background: 'var(--surface)', outline: 'none', boxSizing: 'border-box',
+                transition: 'border-color 150ms, box-shadow 150ms',
+              }}
+              onFocus={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(34, 139, 86, 0.12)' }}
+              onBlur={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none' }}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                title="Effacer"
+                style={{
+                  position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                  background: 'var(--surface-2)', border: 'none', borderRadius: '50%',
+                  width: 20, height: 20, cursor: 'pointer', color: 'var(--text-2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
+                }}
+              >×</button>
+            )}
+          </div>
+          {search && (
+            <span style={{ fontSize: 11, color: 'var(--text-3)' }}>
+              {filtered.length} / {candidates.length}
+            </span>
           )}
         </div>
       </div>
@@ -218,55 +270,6 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
         </div>
       ) : filtered.length === 0 ? (
         <div className="empty-state"><p className="t-13 c-2">{tp.noMatch}</p></div>
-      ) : viewMode === 'kanban' ? (
-        /* ── Kanban view ── */
-        <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0, overflowX: 'auto' }}>
-          {STAGE_ORDER.map(stage => {
-            const stageCands = filtered.filter(c => c.stage === stage)
-            const conf = STAGE_COLORS[stage]
-            const avgScore = stageCands.filter(c => c.qualification_score != null).length > 0
-              ? Math.round(stageCands.filter(c => c.qualification_score != null).reduce((a, c) => a + c.qualification_score!, 0) / stageCands.filter(c => c.qualification_score != null).length)
-              : null
-            return (
-              <div key={stage} style={{ flex: '1 1 0', minWidth: 240, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                {/* Column header */}
-                <div style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '8px 12px', marginBottom: 8,
-                  background: conf.bg, borderRadius: 10, border: `1px solid ${conf.border}`,
-                  flexShrink: 0,
-                }}>
-                  <div className="flex items-center gap-6">
-                    <span style={{ fontSize: 11, fontWeight: 600, color: conf.color }}>{stages[stage]}</span>
-                    <span style={{
-                      fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 10,
-                      background: conf.color + '20', color: conf.color,
-                    }}>{stageCands.length}</span>
-                  </div>
-                  {avgScore !== null && (
-                    <span style={{ fontSize: 10, color: conf.color, opacity: 0.7 }}>∅ {avgScore}</span>
-                  )}
-                </div>
-                {/* Cards */}
-                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {stageCands.map(c => (
-                    <PipelineCard
-                      key={c.id}
-                      candidate={c}
-                      job={job}
-                      onDelete={deleteCandidate}
-                      onClick={() => setSelectedCandidate(c)}
-                      onStageAdvance={advanceStage}
-                    />
-                  ))}
-                  {stageCands.length === 0 && (
-                    <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 11 }}>—</div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
       ) : (
         /* ── Grid view ── */
         <div style={{
@@ -281,6 +284,7 @@ export function PipelineView({ job, onBack }: { job: Job; onBack: () => void }) 
               onDelete={deleteCandidate}
               onClick={() => setSelectedCandidate(c)}
               onStageAdvance={advanceStage}
+              onUpdate={updated => setCandidates(prev => prev.map(x => x.id === updated.id ? updated : x))}
             />
           ))}
         </div>

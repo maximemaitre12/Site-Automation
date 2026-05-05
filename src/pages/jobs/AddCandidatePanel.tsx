@@ -1,9 +1,32 @@
-import { useRef, useState } from 'react'
-import { api, Candidate, Job } from '../../api/client'
+import { useEffect, useRef, useState } from 'react'
+import { api, Candidate, CreditsInfo, Job } from '../../api/client'
 import { useAppStore } from '../../store/useAppStore'
 import { T } from '../../i18n'
-import { CITIES } from './constants'
 import { iconClose, iconUpload } from './icons'
+
+const POPULAR_CITIES = [
+  { id: 1,  name: 'Київ' },     { id: 2,  name: 'Харків' }, { id: 21, name: 'Львів' },
+  { id: 3,  name: 'Одеса' },    { id: 4,  name: 'Дніпро' }, { id: 9,  name: 'Запоріжжя' },
+  { id: 10, name: 'Вінниця' },  { id: 16, name: 'Полтава' },{ id: 6,  name: 'Донецьк' },
+]
+
+const EXPERIENCE_OPTIONS = [
+  { label: 'Any',           value: undefined },
+  { label: 'No experience', value: 0 },
+  { label: '1 year+',       value: 1 },
+  { label: '2 years+',      value: 2 },
+  { label: '5 years+',      value: 3 },
+]
+
+// Map job.experience_years to the closest robota.ua experienceId
+function yearsToExperienceId(y: number | null | undefined): number | undefined {
+  if (y == null || y < 0) return undefined
+  if (y === 0) return 0
+  if (y === 1) return 1
+  if (y <= 2) return 2
+  if (y <= 5) return 3
+  return 3
+}
 
 export function AddCandidatePanel({ job, onAdd, onClose }: {
   job: Job
@@ -12,44 +35,77 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
 }) {
   const { uiLang } = useAppStore()
   const tap = T[uiLang].jobs.addPanel
-  const [mode, setMode] = useState<'scraper' | 'cv'>('scraper')
+  const [mode, setMode] = useState<'cvSearch' | 'cvImport'>('cvSearch')
 
-  // Scraper state
-  const [query, setQuery] = useState(job.title)
-  const [location, setLocation] = useState(job.location || 'Kyiv')
-  const [count, setCount] = useState(5)
-  const [platforms, setPlatforms] = useState<string[]>(['work.ua'])
-  const [salaryMin, setSalaryMin] = useState(job.salary_min || 0)
-  const [salaryMax, setSalaryMax] = useState(job.salary_max || 0)
-  const [experienceMin, setExperienceMin] = useState(job.experience_years || 0)
-  const [skills, setSkills] = useState(() => {
-    try { const arr = JSON.parse(job.skills || '[]'); return Array.isArray(arr) ? arr.join(', ') : (job.skills || '') } catch { return job.skills || '' }
-  })
+  // CV Search state — pre-filled from the position
+  const [keywords, setKeywords] = useState(job.title || '')
+  const [cityId, setCityId] = useState<number>(job.city_id || POPULAR_CITIES.find(c => c.name === job.location)?.id || 1)
+  const [salaryFrom, setSalaryFrom] = useState<string>(job.salary_min ? String(job.salary_min) : '')
+  const [salaryTo, setSalaryTo] = useState<string>(job.salary_max ? String(job.salary_max) : '')
+  const [experienceId, setExperienceId] = useState<number | undefined>(yearsToExperienceId(job.experience_years))
+  const [count, setCount] = useState(20)
+  const [page, setPage] = useState(0)
+  const [total, setTotal] = useState<number | null>(null)
+  const [results, setResults] = useState<Candidate[]>([])
   const [searching, setSearching] = useState(false)
-  const [searchResults, setSearchResults] = useState<Candidate[]>([])
-  const [searched, setSearched] = useState(false)
   const [searchError, setSearchError] = useState('')
+  const [credits, setCredits] = useState<CreditsInfo | null>(null)
+  const [openingId, setOpeningId] = useState<number | null>(null)
 
-  // CV state
+  // CV Import (PDF) state
   const [dragging, setDragging] = useState(false)
   const [parsing, setParsing] = useState(false)
   const [parseError, setParseError] = useState('')
   const [parsedFile, setParsedFile] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const ALL_PLATFORMS = ['work.ua', 'robota.ua', 'djinni.co', 'hh.ua']
-  function togglePlatform(p: string) {
-    setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])
+  useEffect(() => {
+    api.robota.credits().then(r => { if (r.data) setCredits(r.data) })
+  }, [])
+
+  async function refreshCredits() {
+    const r = await api.robota.credits()
+    if (r.data) setCredits(r.data)
   }
 
-  async function doSearch() {
-    if (!query || platforms.length === 0) return
-    setSearching(true); setSearchError(''); setSearched(false)
-    const res = await api.scraper.search({ query, location, count, platforms, jobId: job.id, salaryMin, salaryMax, experienceMin, skills })
-    setSearching(false); setSearched(true)
-    if (res.error) { setSearchError(res.error); return }
-    setSearchResults(res.data || [])
-    if (res.data && res.data.length > 0) onAdd(res.data)
+  async function search(p = 0) {
+    if (!keywords.trim()) { setSearchError('Keywords required'); return }
+    setSearching(true); setSearchError(''); setPage(p)
+    const r = await api.robota.cvdbSearch({
+      keywords, cityId,
+      salaryFrom: salaryFrom ? parseInt(salaryFrom) : undefined,
+      salaryTo:   salaryTo   ? parseInt(salaryTo)   : undefined,
+      experienceId, count, page: p, jobId: job.id,
+    })
+    setSearching(false)
+    if (r.error) { setSearchError(r.error); return }
+    if (r.data?.candidates) {
+      const newList = p === 0 ? r.data.candidates : [...results, ...r.data.candidates]
+      setResults(newList)
+      setTotal(r.data.total ?? null)
+      onAdd(r.data.candidates)
+    }
+  }
+
+  async function openCv(c: Candidate) {
+    const m = c.profile_url?.match(/\/cv\/(\d+)/)
+    const resumeId = m ? parseInt(m[1]) : null
+    if (!resumeId) { alert('CV ID not found'); return }
+    if (!credits || credits.available <= 0) {
+      alert('No credits available. Purchase a pack on robota.ua.')
+      return
+    }
+    if (!confirm(`Open full CV?\n\nThis will use 1 credit.\nCredits remaining after: ${credits.available - 1}`)) return
+
+    setOpeningId(c.id)
+    const r = await api.robota.openCv(resumeId, job.id)
+    setOpeningId(null)
+    if (r.error) { alert('Error: ' + r.error); return }
+    if (r.data) {
+      setResults(results.map(x => x.id === c.id ? r.data! : x))
+      onAdd([r.data])
+      await refreshCredits()
+    }
   }
 
   async function handleFile(file: File) {
@@ -81,16 +137,13 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
       setParsing(false)
     }
 
-    if (mimeType === 'application/pdf') {
-      reader.readAsArrayBuffer(file)
-    } else {
-      reader.readAsText(file)
-    }
+    if (mimeType === 'application/pdf') reader.readAsArrayBuffer(file)
+    else reader.readAsText(file)
   }
 
   return (
     <div style={{
-      position: 'fixed', top: 0, right: 0, bottom: 0, width: 440,
+      position: 'fixed', top: 0, right: 0, bottom: 0, width: 480,
       background: 'var(--surface)', boxShadow: 'var(--shadow-lg)',
       display: 'flex', flexDirection: 'column', zIndex: 100,
     }}>
@@ -101,8 +154,8 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', padding: 4 }}>{iconClose}</button>
         </div>
         <div style={{ display: 'flex', gap: 0, background: 'var(--surface-2)', borderRadius: 10, padding: 3 }}>
-          {[['scraper', tap.modeSearch], ['cv', tap.modeCV]].map(([v, l]) => (
-            <button key={v} onClick={() => setMode(v as 'scraper' | 'cv')} style={{
+          {[['cvSearch', 'CV Search'], ['cvImport', tap.modeCV]].map(([v, l]) => (
+            <button key={v} onClick={() => setMode(v as 'cvSearch' | 'cvImport')} style={{
               flex: 1, background: mode === v ? 'var(--surface)' : 'none',
               border: 'none', borderRadius: 8, padding: '7px 0', fontSize: 12,
               fontWeight: 500, cursor: 'pointer', color: mode === v ? 'var(--text-1)' : 'var(--text-2)',
@@ -110,107 +163,182 @@ export function AddCandidatePanel({ job, onAdd, onClose }: {
             }}>{l}</button>
           ))}
         </div>
+        {credits && mode === 'cvSearch' && (
+          <div style={{
+            marginTop: 12, padding: '8px 12px', background: '#EFF6FF', border: '1px solid #BFDBFE',
+            borderRadius: 8, fontSize: 11, color: '#1D4ED8',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <span><strong>{credits.available}</strong> credits available</span>
+            {credits.expiresAt && (
+              <span style={{ color: '#6B7280' }}>
+                expires {new Date(credits.expiresAt).toLocaleDateString()}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Body */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
 
-        {mode === 'scraper' && (
+        {mode === 'cvSearch' && (
           <div>
             <div style={{ marginBottom: 12 }}>
-              <label className="form-label">{tap.search}</label>
-              <input className="form-input" value={query} onChange={e => setQuery(e.target.value)} placeholder={tap.searchPlaceholder} />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 72px', gap: 10, marginBottom: 12 }}>
-              <div>
-                <label className="form-label">{tap.city}</label>
-                <select className="form-input" value={location} onChange={e => setLocation(e.target.value)}>
-                  {CITIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="form-label">{tap.count}</label>
-                <input className="form-input" type="number" value={count} onChange={e => setCount(Math.max(1, parseInt(e.target.value) || 1))} style={{ MozAppearance: 'textfield' } as React.CSSProperties} />
-              </div>
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label className="form-label">{tap.skills}</label>
-              <input className="form-input" value={skills} onChange={e => setSkills(e.target.value)} placeholder={tap.searchPlaceholder} />
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label className="form-label">{tap.experienceMin}</label>
-              <input className="form-input" type="number" min={0} max={30} value={experienceMin} onChange={e => setExperienceMin(+e.target.value)} />
+              <label className="form-label">Keywords</label>
+              <input
+                className="form-input"
+                value={keywords}
+                onChange={e => setKeywords(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && search(0)}
+                placeholder="e.g. бухгалтер, водій, програміст"
+              />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
               <div>
-                <label className="form-label">{tap.salaryMin}</label>
-                <input className="form-input" type="number" min={0} step={1000} value={salaryMin} onChange={e => setSalaryMin(+e.target.value)} />
+                <label className="form-label">City</label>
+                <select className="form-input" value={cityId} onChange={e => setCityId(+e.target.value)}>
+                  {POPULAR_CITIES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
               </div>
               <div>
-                <label className="form-label">{tap.salaryMax}</label>
-                <input className="form-input" type="number" min={0} step={1000} value={salaryMax} onChange={e => setSalaryMax(+e.target.value)} />
+                <label className="form-label">Experience</label>
+                <select className="form-input" value={experienceId ?? ''} onChange={e => setExperienceId(e.target.value !== '' ? +e.target.value : undefined)}>
+                  {EXPERIENCE_OPTIONS.map(o => (
+                    <option key={String(o.value)} value={o.value ?? ''}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+              <div>
+                <label className="form-label">Min salary (UAH)</label>
+                <input className="form-input" type="number" value={salaryFrom} onChange={e => setSalaryFrom(e.target.value)} placeholder="15000" />
+              </div>
+              <div>
+                <label className="form-label">Max salary (UAH)</label>
+                <input className="form-input" type="number" value={salaryTo} onChange={e => setSalaryTo(e.target.value)} placeholder="40000" />
               </div>
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <label className="form-label">{tap.platforms}</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-                {ALL_PLATFORMS.map(p => (
-                  <div
-                    key={p}
-                    onClick={() => togglePlatform(p)}
-                    style={{
-                      padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 500, cursor: 'pointer',
-                      background: platforms.includes(p) ? 'var(--accent)' : 'var(--surface-2)',
-                      color: platforms.includes(p) ? '#fff' : 'var(--text-2)',
-                      border: `1px solid ${platforms.includes(p) ? 'var(--accent)' : 'var(--border)'}`,
-                      transition: 'all 120ms ease',
-                    }}
-                  >{p}</div>
-                ))}
-              </div>
+              <label className="form-label">Number of results</label>
+              <input
+                className="form-input"
+                type="number"
+                min={1}
+                max={500}
+                value={count}
+                onChange={e => {
+                  const v = parseInt(e.target.value)
+                  if (isNaN(v)) setCount(1)
+                  else setCount(Math.min(Math.max(v, 1), 500))
+                }}
+                placeholder="e.g. 50"
+              />
             </div>
 
-            <button className="btn btn-primary" onClick={doSearch}
-              disabled={searching || !query} style={{ width: '100%' }}>
+            {searchError && <p style={{ color: 'var(--err)', fontSize: 12, marginBottom: 12 }}>{searchError}</p>}
+
+            <button
+              className="btn btn-primary"
+              onClick={() => search(0)}
+              disabled={searching || !keywords}
+              style={{ width: '100%' }}
+            >
               {searching
                 ? <span className="spinner" />
-                : <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+                : <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="6.5" cy="6.5" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/>
+                  </svg>
               }
-              {searching ? tap.searching : tap.startSearch}
+              {searching ? 'Searching…' : 'Search robota.ua CV database'}
             </button>
 
-            {searchError && <p style={{ color: 'var(--err)', fontSize: 12, marginTop: 12 }}>{searchError}</p>}
-
-            {searched && searchResults.length === 0 && (
-              <div className="empty-state" style={{ padding: 24, marginTop: 20 }}>
-                <p className="t-12">{tap.noResults}</p>
-              </div>
-            )}
-
-            {searched && searchResults.length > 0 && (
+            {results.length > 0 && (
               <div style={{ marginTop: 16 }}>
-                <p className="t-12 c-2 mb-12">{tap.resultsAdded(searchResults.length)}</p>
-                {searchResults.map(c => (
-                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>
-                      {c.initials || '?'}
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div className="t-12 medium truncate">{c.role}</div>
-                      <div className="t-11 c-3">{c.location}</div>
-                    </div>
-                  </div>
-                ))}
+                <div className="flex items-center justify-between mb-12">
+                  <p className="t-12 c-2" style={{ margin: 0 }}>
+                    {total !== null
+                      ? `${results.length} shown out of ${total.toLocaleString()}`
+                      : `${results.length} candidates`}
+                  </p>
+                  {total !== null && results.length < total && (
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => search(page + 1)}
+                      disabled={searching}
+                      style={{ fontSize: 11 }}
+                    >
+                      {searching ? '…' : 'Load more'}
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {results.map(c => {
+                    const isOpened = (() => {
+                      try {
+                        const pd = c.profile_data ? JSON.parse(c.profile_data) : null
+                        return !!pd?.isFullyOpened
+                      } catch { return false }
+                    })()
+                    return (
+                      <div key={c.id} style={{
+                        padding: 10, borderRadius: 10,
+                        background: 'var(--surface)',
+                        border: `1px solid ${isOpened ? '#86EFAC' : 'var(--border)'}`,
+                        display: 'flex', gap: 10, alignItems: 'center',
+                      }}>
+                        {c.photo_url ? (
+                          <img src={c.photo_url} alt=""
+                            style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                        ) : (
+                          <div style={{
+                            width: 36, height: 36, borderRadius: '50%', background: 'var(--surface-2)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 11, fontWeight: 600, flexShrink: 0,
+                          }}>{c.initials || '?'}</div>
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="t-12 medium truncate">{c.full_name || c.role}</div>
+                          <div className="t-11 c-3 truncate">
+                            {c.full_name ? c.role : c.location || '—'}
+                            {c.salary_expectation > 0 && ` · ${c.salary_expectation.toLocaleString()} UAH`}
+                            {c.experience_years > 0 && ` · ${c.experience_years} yr`}
+                          </div>
+                        </div>
+                        {isOpened ? (
+                          <span style={{
+                            fontSize: 9, fontWeight: 700, padding: '3px 7px', borderRadius: 4,
+                            background: '#DCFCE7', color: '#15803D', flexShrink: 0,
+                          }}>OPENED</span>
+                        ) : (
+                          <button
+                            onClick={() => openCv(c)}
+                            disabled={openingId === c.id || !credits || credits.available <= 0}
+                            style={{
+                              fontSize: 11, padding: '5px 10px', borderRadius: 6, fontWeight: 600,
+                              background: 'var(--accent)', color: '#fff', border: 'none',
+                              cursor: 'pointer', flexShrink: 0,
+                              opacity: !credits || credits.available <= 0 ? 0.5 : 1,
+                            }}>
+                            {openingId === c.id ? '…' : 'Open (1)'}
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {mode === 'cv' && (
+        {mode === 'cvImport' && (
           <div>
             <p className="t-12 c-2 mb-20">{tap.cvImportHint}</p>
 

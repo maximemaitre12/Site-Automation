@@ -186,11 +186,24 @@ export function JobDescriptions() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                  <span className="t-11 c-2">{job.salary_min?.toLocaleString()}–{job.salary_max?.toLocaleString()} UAH</span>
-                  <span className="t-11 c-3">·</span>
-                  <span className="t-11 c-2">{tj.expYears(job.experience_years)}</span>
-                </div>
+                {(() => {
+                  const hasSalary = job.salary_min || job.salary_max
+                  const hasExp = job.experience_years && job.experience_years > 0
+                  if (!hasSalary && !hasExp) return null
+                  return (
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                      {hasSalary && (
+                        <span className="t-11 c-2">
+                          {job.salary_min === job.salary_max
+                            ? `${job.salary_min?.toLocaleString()} UAH`
+                            : `${(job.salary_min || 0).toLocaleString()}–${(job.salary_max || 0).toLocaleString()} UAH`}
+                        </span>
+                      )}
+                      {hasSalary && hasExp && <span className="t-11 c-3">·</span>}
+                      {hasExp && <span className="t-11 c-2">{tj.expYears(job.experience_years)}</span>}
+                    </div>
+                  )
+                })()}
 
                 {skills.length > 0 && (
                   <div className="flex flex-wrap gap-4" style={{ marginBottom: 12 }}>
@@ -205,13 +218,20 @@ export function JobDescriptions() {
                   <span style={{ fontSize: 11, color: 'var(--text-3)' }}>
                     {tj.candidates(count)}
                   </span>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, padding: '4px 11px', borderRadius: 20,
-                    background: job.is_active ? '#DCFCE7' : '#FEE2E2',
-                    color:      job.is_active ? '#15803D' : '#B91C1C',
-                    border: `1px solid ${job.is_active ? '#86EFAC' : '#FCA5A5'}`,
-                    textTransform: 'uppercase', letterSpacing: 0.4,
-                  }}>
+                  <span
+                    style={{
+                      fontSize: 10, fontWeight: 700, padding: '4px 11px', borderRadius: 20,
+                      background: job.is_active ? '#DCFCE7' : '#FEE2E2',
+                      color:      job.is_active ? '#15803D' : '#B91C1C',
+                      border: `1px solid ${job.is_active ? '#86EFAC' : '#FCA5A5'}`,
+                      textTransform: 'uppercase', letterSpacing: 0.4,
+                    }}
+                    title={job.robota_error
+                      ? `Erreur robota.ua : ${job.robota_error}`
+                      : job.robota_state === 'Waiting' ? 'En attente de modération robota.ua'
+                      : job.robota_state === 'Publicated' ? 'Publiée sur robota.ua'
+                      : ''}
+                  >
                     {job.is_active ? tj.active : tj.inactive}
                   </span>
                 </div>
