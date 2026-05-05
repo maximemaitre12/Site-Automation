@@ -227,6 +227,9 @@ export default function Bracelet() {
         </div>
       </section>
 
+      {/* Ocean wave transition */}
+      <OceanWaveDivider />
+
       {/* Bracelet Showcase Section */}
       <BraceletShowcaseSection />
 
