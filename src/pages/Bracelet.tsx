@@ -9,6 +9,7 @@ import oreonSpecs from "@/assets/oreon-specs.png";
 import sepaQrCode from "@/assets/sepa-qrcode.jpg";
 import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSection";
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
+import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
 
 const features = [
@@ -244,6 +245,25 @@ export default function Bracelet() {
 
       {/* Technical Specs — Animated */}
       <AnimatedSpecsSection specsSrc={oreonSpecs} />
+
+      {/* Wave → Business Model */}
+      <OceanWaveDivider
+        backColor="#0F1F4F"
+        midColor="#1A3FB8"
+        frontColor="#0a2d6e"
+        variant="a"
+      />
+
+      {/* Business Model Section */}
+      <BusinessModelSection />
+
+      {/* Wave → Features */}
+      <OceanWaveDivider
+        backColor="#0a2d6e"
+        midColor="#1A3FB8"
+        frontColor="#ffffff"
+        variant="b"
+      />
 
       {/* Features */}
       <section id="features" className="py-28 bg-white">
