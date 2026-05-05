@@ -68,7 +68,7 @@ export default function ScrollVideoPlayer() {
 
         const frameIndex = Math.min(
           TOTAL_FRAMES - 1,
-          Math.floor(progress * TOTAL_FRAMES)
+          Math.floor((1 - progress) * TOTAL_FRAMES)
         );
         drawFrame(frameIndex);
       });
