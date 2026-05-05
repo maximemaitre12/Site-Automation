@@ -174,12 +174,18 @@ export default function Bracelet() {
 
         <div className="relative w-full z-10 pb-16 md:pb-24 px-8 md:px-16 lg:px-24">
           <div className="max-w-[900px]">
-            {/* Accent line */}
-            <div className="w-12 h-[2px] bg-white/40 mb-6" />
-
-            <p className="text-[9px] font-medium tracking-[0.35em] uppercase text-white/50 mb-5">
-              Biometric Intelligence · AI Automation · Health Tracking
-            </p>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {["Biometric Intelligence", "AI Automation", "Health Tracking"].map((label) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center h-7 px-3.5 text-[9px] font-semibold tracking-[0.2em] uppercase text-white/70 rounded-full border border-white/15"
+                  style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}
+                >
+                  <span className="w-1 h-1 rounded-full bg-white/40 mr-2" />
+                  {label}
+                </span>
+              ))}
+            </div>
 
             <h1 className="font-heading text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold leading-[0.95] tracking-[-0.02em] text-white mb-6">
               Oreon
