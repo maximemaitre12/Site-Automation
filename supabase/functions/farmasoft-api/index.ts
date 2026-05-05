@@ -768,6 +768,31 @@ Keep under 8 lines. Sign as "Команда Farmasoft UA". Reply with ONLY the m
       return json({ data: { success: true } });
     }
 
+    // ─── ROBOTA STUBS (not yet implemented) ───
+    if (path === "/robota/config" && method === "GET") {
+      return json({ data: {
+        robota_configured: false, smtp_configured: false, turbosms_configured: false,
+        calendly_configured: false, auto_outreach: false, robota_email: null,
+        smtp_from: null, calendly_url: null, outreach_score_threshold: 70,
+        followup_days: 3, last_auto_sync: null,
+      } });
+    }
+
+    if (path === "/robota/full-sync/status" && method === "GET") {
+      return json({ data: {
+        status: "idle", vacanciesTotal: 0, vacanciesDone: 0,
+        candidatesImported: 0, candidatesOutreached: 0,
+        currentVacancy: "", startedAt: null, finishedAt: null,
+      } });
+    }
+
+    if (path === "/messaging/status" && method === "GET") {
+      return json({ data: {
+        whatsapp: { configured: false }, viber: { configured: false },
+        telegram: { configured: false }, email: { configured: false },
+      } });
+    }
+
     return json({ error: `Route not found: ${method} ${path}` }, 404);
   } catch (err) {
     console.error("farmasoft-api error:", err);
