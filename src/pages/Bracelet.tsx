@@ -193,16 +193,6 @@ export default function Bracelet() {
                 </a>
               </div>
             </div>
-            <div className="flex justify-center">
-              <img
-                src={oreonBracelet}
-                alt="Bracelet Oreon"
-                width={1024}
-                height={1024}
-                className="w-full max-w-[480px] drop-shadow-2xl"
-              />
-            </div>
-          </div>
         </div>
       </section>
 
