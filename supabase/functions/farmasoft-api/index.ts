@@ -786,6 +786,10 @@ Keep under 8 lines. Sign as "Команда Farmasoft UA". Reply with ONLY the m
       } });
     }
 
+    if (path === "/robota/auth" && method === "POST") {
+      return json({ success: true });
+    }
+
     if (path === "/messaging/status" && method === "GET") {
       return json({ data: {
         whatsapp: { configured: false }, viber: { configured: false },
