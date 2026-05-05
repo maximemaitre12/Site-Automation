@@ -233,6 +233,14 @@ export default function Bracelet() {
       {/* Bracelet Showcase Section */}
       <BraceletShowcaseSection />
 
+      {/* Ocean wave transition — showcase → specs */}
+      <OceanWaveDivider
+        backColor="#0F1F4F"
+        midColor="#1A3FB8"
+        frontColor="#0a2d6e"
+        variant="b"
+      />
+
       {/* Technical Specs — Animated */}
       <AnimatedSpecsSection specsSrc={oreonSpecs} />
 
