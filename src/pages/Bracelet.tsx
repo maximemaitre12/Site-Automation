@@ -169,7 +169,7 @@ export default function Bracelet() {
         />
         {/* Cinematic gradient overlay — darker at bottom for text */}
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(10,30,70,0.7) 75%, rgba(5,15,40,0.92) 100%)"
+          background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(10,20,50,0.65) 70%, rgba(8,16,42,0.95) 100%)"
         }} />
         {/* Subtle vignette */}
         <div className="absolute inset-0" style={{
