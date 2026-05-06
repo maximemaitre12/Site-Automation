@@ -329,15 +329,15 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
         {plan.name}
       </motion.h3>
 
-      <motion.span
-        className="inline-block mb-5 text-[11px] font-semibold uppercase tracking-[0.12em] rounded-full"
-        style={{ color: "#1A3FB8", background: "rgba(26,63,184,0.08)", padding: "4px 10px" }}
+      <motion.p
+        className="mb-5 text-[11px] tracking-wide"
+        style={{ color: "#64748B" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: baseDelay + 0.15 }}
       >
-        Available soon
-      </motion.span>
+        Delivery address will be requested by email around June 1st
+      </motion.p>
 
       <motion.div
         className="flex items-baseline gap-2 mb-1"
