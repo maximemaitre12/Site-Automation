@@ -6,13 +6,13 @@ const features = [
     id: "flow",
     icon: Workflow,
     title: "Aether Flow",
-    subtitle: "Orchestration IA avancée",
-    description: "Créez des workflows intelligents en quelques clics grâce au builder visuel drag & drop et à la génération par IA.",
+    subtitle: "Advanced AI orchestration",
+    description: "Build intelligent workflows in a few clicks with the visual drag & drop builder and AI-powered generation.",
     highlights: [
-      "Builder visuel drag & drop intuitif",
-      "Génération de workflows par IA",
-      "Connecteurs: Email, Slack, CRM, ERP",
-      "Scalable et multi-tenant",
+      "Intuitive visual drag & drop builder",
+      "AI-powered workflow generation",
+      "Connectors: Email, Slack, CRM, ERP",
+      "Scalable and multi-tenant",
     ],
     path: "/tools/flow",
   },
@@ -20,13 +20,13 @@ const features = [
     id: "doc",
     icon: FileSearch,
     title: "Aether Doc",
-    subtitle: "Intelligence documentaire",
-    description: "Transformez vos documents en données exploitables avec extraction automatique et classification intelligente.",
+    subtitle: "Document intelligence",
+    description: "Transform your documents into actionable data with automatic extraction and intelligent classification.",
     highlights: [
-      "Extraction automatisée de données",
-      "Lecture PDF, mails, images",
-      "Résumés intelligents par IA",
-      "Classement et indexation automatique",
+      "Automated data extraction",
+      "PDF, email, image reading",
+      "AI-powered smart summaries",
+      "Automatic sorting and indexing",
     ],
     path: "/tools/brain",
   },
@@ -34,13 +34,13 @@ const features = [
     id: "agents",
     icon: Bot,
     title: "Aether Agents",
-    subtitle: "Agents IA autonomes",
-    description: "Déployez des agents IA qui exécutent des tâches complexes 24/7 avec une supervision intelligente.",
+    subtitle: "Autonomous AI agents",
+    description: "Deploy AI agents that execute complex tasks 24/7 with intelligent supervision.",
     highlights: [
-      "Création d'agents enterprise",
-      "Exécution continue 24/7",
-      "Auto-apprentissage supervisé",
-      "Observabilité complète et logs",
+      "Enterprise agent creation",
+      "Continuous 24/7 execution",
+      "Supervised self-learning",
+      "Full observability and logs",
     ],
     path: "/tools/flow",
   },
@@ -56,13 +56,13 @@ export function FeaturesSection() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-in">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Nos solutions</span>
+            <span className="text-sm font-medium text-primary">Our solutions</span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Ce que fait <span className="text-gradient">AETHER</span>
+            What <span className="text-gradient">AETHER</span> does
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Trois piliers pour une automatisation complète de vos opérations métier
+            Three pillars for complete automation of your business operations
           </p>
         </div>
         
@@ -112,7 +112,7 @@ export function FeaturesSection() {
                   to={feature.path}
                   className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors group/link"
                 >
-                  Découvrir
+                  Discover
                   <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                 </Link>
               </div>

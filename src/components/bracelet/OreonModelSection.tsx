@@ -34,7 +34,7 @@ export default function OreonModelSection() {
         background: "radial-gradient(ellipse at 50% 30%, #2550D0 0%, #1A3FB8 40%, #142E8C 100%)",
       }}
     >
-      {/* ═══ BLOCK 1 — HEADER ═══ */}
+      {/* BLOCK 1 — HEADER */}
       <div className="max-w-[1200px] mx-auto px-6 lg:px-12 pt-28 md:pt-32 pb-16 text-center">
         <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}>
           {/* Eyebrow pill */}
@@ -48,7 +48,7 @@ export default function OreonModelSection() {
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
-            LE MODÈLE OREON
+            THE OREON MODEL
           </span>
         </motion.div>
 
@@ -57,7 +57,7 @@ export default function OreonModelSection() {
           style={{ letterSpacing: "-0.02em" }}
           variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}
         >
-          Le bracelet est libre.<br className="hidden md:block" /> L'intelligence est dans AETHER.
+          The bracelet is free.<br className="hidden md:block" /> The intelligence is in AETHER.
         </motion.h2>
 
         <motion.p
@@ -65,19 +65,19 @@ export default function OreonModelSection() {
           style={{ fontSize: 18, maxWidth: 720 }}
           variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2}
         >
-          Notre conviction : l'objet doit être simple, durable, et accessible à tous.
-          La vraie valeur n'est pas dans le silicone — elle est dans la plateforme qui transforme
-          vos signaux biométriques en automatisations intelligentes. C'est pour cela que nous offrons
-          le bracelet et que nous facturons l'intelligence.
+          Our conviction: the object should be simple, durable, and accessible to all.
+          The real value is not in the silicone — it is in the platform that transforms
+          your biometric signals into intelligent automations. That is why we offer
+          the bracelet for free and charge for the intelligence.
         </motion.p>
 
         <div className="w-20 h-px mx-auto" style={{ background: "rgba(14,165,233,0.4)" }} />
       </div>
 
-      {/* ═══ BLOCK 2 — TWO COLUMNS WITH IPHONE ═══ */}
+      {/* BLOCK 2 — TWO COLUMNS WITH IPHONE */}
       <div className="max-w-[1200px] mx-auto px-6 lg:px-12 pb-24">
         <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-0">
-          {/* LEFT — L'OBJET */}
+          {/* LEFT — THE OBJECT */}
           <motion.div
             className="flex-1 lg:max-w-[380px]"
             variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}
@@ -88,8 +88,8 @@ export default function OreonModelSection() {
             >
               <GlassCard className="p-8 md:p-10 h-full flex flex-col">
                 <Nfc style={{ width: 32, height: 32, color: "#0EA5E9" }} />
-                <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mt-4 mb-1" style={{ color: "#0EA5E9" }}>L'OBJET</p>
-                <h3 className="text-white font-semibold text-2xl mb-6">Bracelet Oreon</h3>
+                <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mt-4 mb-1" style={{ color: "#0EA5E9" }}>THE OBJECT</p>
+                <h3 className="text-white font-semibold text-2xl mb-6">Oreon Bracelet</h3>
 
                 {/* Bracelet silhouette placeholder */}
                 <div className="flex items-center justify-center py-6">
@@ -103,16 +103,16 @@ export default function OreonModelSection() {
                   />
                 </div>
 
-                <p className="text-white font-bold mb-0.5" style={{ fontSize: 56 }}>OFFERT</p>
-                <p style={{ fontSize: 14, color: "#0EA5E9" }}>À l'inscription</p>
+                <p className="text-white font-bold mb-0.5" style={{ fontSize: 56 }}>FREE</p>
+                <p style={{ fontSize: 14, color: "#0EA5E9" }}>Upon registration</p>
 
                 <p className="text-white/80 mt-4 mb-6 leading-relaxed" style={{ fontSize: 14 }}>
-                  Un design minimaliste. Une puce NFC chiffrée. Aucune électronique active, aucune batterie,
-                  aucune obsolescence. Le bracelet est votre clé d'identité — rien de plus, rien de moins.
+                  A minimalist design. An encrypted NFC chip. No active electronics, no battery,
+                  no planned obsolescence. The bracelet is your identity key — nothing more, nothing less.
                 </p>
 
                 <div className="space-y-2.5 mt-auto">
-                  {["Étanche, indestructible", "Sans batterie, sans charge", "Garantie à vie"].map((t) => (
+                  {["Waterproof, indestructible", "No battery, no charging", "Lifetime warranty"].map((t) => (
                     <div key={t} className="flex items-center gap-2.5">
                       <Check style={{ width: 16, height: 16, color: "#0EA5E9" }} />
                       <span className="text-white/90" style={{ fontSize: 14 }}>{t}</span>
@@ -141,7 +141,7 @@ export default function OreonModelSection() {
               animate={{ top: ["10%", "90%"] }}
               transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
             />
-            <p className="absolute text-white/50 italic whitespace-nowrap" style={{ fontSize: 11, bottom: "42%", transform: "rotate(-90deg)" }}>+ requiert</p>
+            <p className="absolute text-white/50 italic whitespace-nowrap" style={{ fontSize: 11, bottom: "42%", transform: "rotate(-90deg)" }}>+ requires</p>
           </div>
 
           {/* Mobile connector */}
@@ -153,7 +153,7 @@ export default function OreonModelSection() {
             <div className="h-px flex-1" style={{ background: "repeating-linear-gradient(90deg, rgba(14,165,233,0.3) 0, rgba(14,165,233,0.3) 6px, transparent 6px, transparent 12px)" }} />
           </div>
 
-          {/* RIGHT — L'INTELLIGENCE */}
+          {/* RIGHT — THE INTELLIGENCE */}
           <motion.div
             className="flex-1"
             variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2}
@@ -167,15 +167,15 @@ export default function OreonModelSection() {
             >
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: "#0EA5E9" }}>L'INTELLIGENCE</p>
-                  <h3 className="text-white font-semibold text-2xl mt-1">Plateforme AETHER</h3>
+                  <p className="text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: "#0EA5E9" }}>THE INTELLIGENCE</p>
+                  <h3 className="text-white font-semibold text-2xl mt-1">AETHER Platform</h3>
                 </div>
                 <span
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-semibold tracking-wider uppercase"
                   style={{ background: "rgba(14,165,233,0.1)", border: "1px solid rgba(14,165,233,0.25)", color: "#0EA5E9" }}
                 >
                   <Calendar style={{ width: 10, height: 10 }} />
-                  DISPONIBLE LE 1ER JUIN 2026
+                  AVAILABLE JUNE 1ST, 2026
                 </span>
               </div>
 
@@ -191,23 +191,23 @@ export default function OreonModelSection() {
               {/* Price */}
               <div className="mt-4 mb-3">
                 <span className="text-white font-bold" style={{ fontSize: 48 }}>25€</span>
-                <span className="text-white/70 ml-1" style={{ fontSize: 20 }}>/mois</span>
+                <span className="text-white/70 ml-1" style={{ fontSize: 20 }}>/month</span>
               </div>
-              <p style={{ fontSize: 14, color: "#0EA5E9" }}>Sans engagement · Premier mois offert</p>
+              <p style={{ fontSize: 14, color: "#0EA5E9" }}>No commitment · First month free</p>
 
               <p className="text-white/80 mt-4 mb-5 leading-relaxed" style={{ fontSize: 14 }}>
-                L'agent IA qui transforme vos données biométriques en actions concrètes.
-                Coach proactif, automatisations illimitées, marketplace de flows,
-                intégrations smart-home, mises à jour à vie.
+                The AI agent that transforms your biometric data into concrete actions.
+                Proactive coach, unlimited automations, flow marketplace,
+                smart-home integrations, lifetime updates.
               </p>
 
               <div className="space-y-2.5">
                 {[
-                  "AETHER Coach — agent IA conversationnel",
-                  "Automatisations illimitées (Aether Flows)",
-                  "Marketplace + intégrations Spotify, HomeKit, Calendar...",
-                  "Hébergement EU · chiffrement bout-en-bout",
-                  "Mises à jour à vie · support prioritaire",
+                  "AETHER Coach — conversational AI agent",
+                  "Unlimited automations (Aether Flows)",
+                  "Marketplace + Spotify, HomeKit, Calendar integrations...",
+                  "EU hosted · end-to-end encryption",
+                  "Lifetime updates · priority support",
                 ].map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
                     <Check className="mt-0.5 flex-shrink-0" style={{ width: 16, height: 16, color: "#0EA5E9" }} />
@@ -220,20 +220,20 @@ export default function OreonModelSection() {
         </div>
       </div>
 
-      {/* ═══ BLOCK 3 — PAYMENT METHODS ═══ */}
+      {/* BLOCK 3 — PAYMENT METHODS */}
       <div className="max-w-[1200px] mx-auto px-6 lg:px-12 pb-24">
         <div className="text-center mb-12">
           <div className="w-20 h-px mx-auto mb-6" style={{ background: "rgba(14,165,233,0.4)" }} />
-          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#0EA5E9" }}>COMMENT ON PAIE</p>
+          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: "#0EA5E9" }}>HOW YOU PAY</p>
           <motion.h2
             className="font-heading text-2xl md:text-[38px] font-semibold text-white leading-tight mb-4"
             style={{ letterSpacing: "-0.01em" }}
             variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}
           >
-            Deux façons de payer. Une seule philosophie : la transparence.
+            Two ways to pay. One philosophy: transparency.
           </motion.h2>
           <p className="text-white/75 mx-auto" style={{ fontSize: 17, maxWidth: 640 }}>
-            Pas de coût caché, pas de palier piège, pas d'engagement. Choisissez le moyen de paiement qui vous correspond.
+            No hidden costs, no pricing traps, no commitment. Choose the payment method that suits you.
           </p>
         </div>
 
@@ -248,22 +248,22 @@ export default function OreonModelSection() {
                 className="absolute -top-3 left-8 px-3 py-1 rounded-full text-[9px] font-semibold tracking-wider uppercase"
                 style={{ background: "#0EA5E9", color: "#0A1C3A" }}
               >
-                RECOMMANDÉ · -15%
+                RECOMMENDED · -15%
               </span>
               <Building2 className="mb-4" style={{ width: 28, height: 28, color: "#0EA5E9" }} />
-              <h3 className="text-white font-semibold mb-1" style={{ fontSize: 22 }}>Prélèvement SEPA</h3>
-              <p style={{ fontSize: 14, color: "#0EA5E9" }} className="mb-4">21,25€/mois — économisez 3,75€/mois</p>
+              <h3 className="text-white font-semibold mb-1" style={{ fontSize: 22 }}>SEPA Direct Debit</h3>
+              <p style={{ fontSize: 14, color: "#0EA5E9" }} className="mb-4">21.25€/month — save 3.75€/month</p>
               <p className="text-white/80 leading-relaxed mb-6" style={{ fontSize: 15 }}>
-                Le standard des abonnements européens. Vous autorisez un prélèvement automatique mensuel
-                depuis votre compte bancaire, comme Netflix ou Spotify avec votre IBAN.
-                Plus économique pour nous, donc 15% moins cher pour vous.
+                The European subscription standard. You authorize an automatic monthly debit
+                from your bank account, just like Netflix or Spotify with your IBAN.
+                More cost-effective for us, so 15% cheaper for you.
               </p>
               <div className="space-y-2.5 mb-6">
                 {[
-                  "15% de réduction permanente",
-                  "Aucune carte à mettre à jour à l'expiration",
-                  "Mandat révocable à tout moment depuis votre app",
-                  "Garantie SEPA : remboursement intégral sous 8 semaines en cas de litige",
+                  "Permanent 15% discount",
+                  "No card to update on expiration",
+                  "Mandate revocable at any time from your app",
+                  "SEPA guarantee: full refund within 8 weeks in case of dispute",
                 ].map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
                     <Check className="mt-0.5 flex-shrink-0" style={{ width: 16, height: 16, color: "#0EA5E9" }} />
@@ -271,7 +271,7 @@ export default function OreonModelSection() {
                   </div>
                 ))}
               </div>
-              <p className="text-white/50" style={{ fontSize: 12 }}>Conforme au règlement SEPA Direct Debit · IBAN européen requis</p>
+              <p className="text-white/50" style={{ fontSize: 12 }}>Compliant with SEPA Direct Debit regulation · European IBAN required</p>
             </GlassCard>
           </motion.div>
 
@@ -279,19 +279,19 @@ export default function OreonModelSection() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
             <GlassCard className="p-8 md:p-10 h-full transition-transform duration-300 hover:-translate-y-1">
               <CreditCard className="mb-4" style={{ width: 28, height: 28, color: "#0EA5E9" }} />
-              <h3 className="text-white font-semibold mb-1" style={{ fontSize: 22 }}>Carte bancaire</h3>
-              <p className="text-white/60 mb-4" style={{ fontSize: 14 }}>25€/mois — Visa, Mastercard, Amex</p>
+              <h3 className="text-white font-semibold mb-1" style={{ fontSize: 22 }}>Credit card</h3>
+              <p className="text-white/60 mb-4" style={{ fontSize: 14 }}>25€/month — Visa, Mastercard, Amex</p>
               <p className="text-white/80 leading-relaxed mb-6" style={{ fontSize: 15 }}>
-                Le paiement classique, instantané, accepté partout.
-                Vos coordonnées sont chiffrées et tokenisées via Stripe.
-                Aucune carte n'est stockée chez nous.
+                The classic, instant payment method, accepted everywhere.
+                Your details are encrypted and tokenized via Stripe.
+                No card is stored on our end.
               </p>
               <div className="space-y-2.5 mb-6">
                 {[
-                  "Activation instantanée à l'inscription",
-                  "Compatible avec toutes les cartes (Visa, Mastercard, Amex)",
-                  "Sécurisé par 3D Secure 2 (authentification forte)",
-                  "Annulation libre depuis votre app",
+                  "Instant activation upon registration",
+                  "Compatible with all cards (Visa, Mastercard, Amex)",
+                  "Secured by 3D Secure 2 (strong authentication)",
+                  "Free cancellation from your app",
                 ].map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
                     <Check className="mt-0.5 flex-shrink-0" style={{ width: 16, height: 16, color: "#0EA5E9" }} />
@@ -299,25 +299,25 @@ export default function OreonModelSection() {
                   </div>
                 ))}
               </div>
-              <p className="text-white/50" style={{ fontSize: 12 }}>Paiement traité par Stripe · Conforme PCI-DSS niveau 1</p>
+              <p className="text-white/50" style={{ fontSize: 12 }}>Payment processed by Stripe · PCI-DSS Level 1 compliant</p>
             </GlassCard>
           </motion.div>
         </div>
 
         <p className="text-center text-white/60 italic" style={{ fontSize: 14 }}>
-          Pourquoi le SEPA est moins cher ? Parce que les frais bancaires de prélèvement sont 5× moins élevés
-          que ceux d'une transaction carte. Nous vous reversons cette économie directement.
+          Why is SEPA cheaper? Because direct debit bank fees are 5x lower
+          than card transaction fees. We pass this saving directly to you.
         </p>
       </div>
 
-      {/* ═══ BLOCK 4 — PRICE ANCHORING ═══ */}
+      {/* BLOCK 4 — PRICE ANCHORING */}
       <div className="max-w-[1000px] mx-auto px-6 lg:px-12 pb-28 md:pb-32">
         <motion.div
           className="text-center mb-10"
           variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}
         >
           <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-6" style={{ color: "#0EA5E9" }}>
-            LE PRIX DE L'INTELLIGENCE BIOMÉTRIQUE
+            THE PRICE OF BIOMETRIC INTELLIGENCE
           </p>
         </motion.div>
 
@@ -326,8 +326,8 @@ export default function OreonModelSection() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}>
             <GlassCard className="p-6 text-center h-full transition-all duration-300 hover:brightness-110">
               <p className="text-white/50 font-bold tracking-wider mb-4" style={{ fontSize: 14 }}>WHOOP</p>
-              <p className="text-white font-bold mb-1" style={{ fontSize: 28 }}>30€/mois</p>
-              <p className="text-white/50" style={{ fontSize: 13 }}>+ pas de hardware inclus</p>
+              <p className="text-white font-bold mb-1" style={{ fontSize: 28 }}>30€/month</p>
+              <p className="text-white/50" style={{ fontSize: 13 }}>+ no hardware included</p>
             </GlassCard>
           </motion.div>
 
@@ -335,9 +335,9 @@ export default function OreonModelSection() {
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
             <GlassCard className="p-6 text-center h-full transition-all duration-300 hover:brightness-110">
               <p className="text-white/50 font-bold tracking-wider mb-4" style={{ fontSize: 14 }}>OURA RING</p>
-              <p className="text-white font-bold mb-1" style={{ fontSize: 28 }}>5,99€/mois</p>
-              <p className="text-white/50" style={{ fontSize: 13 }}>+ 349€ pour la bague</p>
-              <p className="italic mt-1" style={{ fontSize: 13, color: "#0EA5E9" }}>= ~25€/mois sur 2 ans</p>
+              <p className="text-white font-bold mb-1" style={{ fontSize: 28 }}>5.99€/month</p>
+              <p className="text-white/50" style={{ fontSize: 13 }}>+ 349€ for the ring</p>
+              <p className="italic mt-1" style={{ fontSize: 13, color: "#0EA5E9" }}>= ~25€/month over 2 years</p>
             </GlassCard>
           </motion.div>
 
@@ -352,13 +352,13 @@ export default function OreonModelSection() {
               }}
             >
               <p className="text-white font-bold tracking-wider mb-4" style={{ fontSize: 14 }}>OREON</p>
-              <p className="font-bold mb-1" style={{ fontSize: 24, color: "#0EA5E9" }}>21,25€/mois en SEPA</p>
-              <p className="text-white/60 mb-2" style={{ fontSize: 14 }}>ou 25€/mois en CB</p>
+              <p className="font-bold mb-1" style={{ fontSize: 24, color: "#0EA5E9" }}>21.25€/month via SEPA</p>
+              <p className="text-white/60 mb-2" style={{ fontSize: 14 }}>or 25€/month by card</p>
               <div className="flex items-center justify-center gap-1.5 mb-3">
                 <Check style={{ width: 14, height: 14, color: "#0EA5E9" }} />
-                <span style={{ fontSize: 13, color: "#0EA5E9" }}>+ bracelet offert</span>
+                <span style={{ fontSize: 13, color: "#0EA5E9" }}>+ bracelet included free</span>
               </div>
-              <p className="text-white/70 italic" style={{ fontSize: 12 }}>Le meilleur rapport intelligence/prix du marché</p>
+              <p className="text-white/70 italic" style={{ fontSize: 12 }}>Best intelligence-to-price ratio on the market</p>
             </GlassCard>
           </motion.div>
         </div>

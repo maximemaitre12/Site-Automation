@@ -15,106 +15,106 @@ import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
 const features = [
   {
     icon: Activity,
-    title: "Capteurs biométriques avancés",
-    desc: "Fréquence cardiaque, SpO2, température corporelle, variabilité cardiaque et qualité du sommeil en continu",
+    title: "Advanced biometric sensors",
+    desc: "Heart rate, SpO2, body temperature, heart rate variability and continuous sleep tracking",
   },
   {
     icon: Brain,
-    title: "Automatisations IA intégrées",
-    desc: "Créez des workflows intelligents déclenchés par vos données biométriques via notre plateforme AETHER",
+    title: "Built-in AI automations",
+    desc: "Create intelligent workflows triggered by your biometric data via our AETHER platform",
   },
   {
     icon: Zap,
-    title: "Alertes en temps réel",
-    desc: "Notifications instantanées en cas d'anomalie détectée par nos algorithmes de machine learning",
+    title: "Real-time alerts",
+    desc: "Instant notifications when anomalies are detected by our machine learning algorithms",
   },
   {
     icon: Smartphone,
-    title: "Application connectée",
-    desc: "Tableau de bord complet pour suivre vos tendances, historiques et prédictions santé",
+    title: "Connected app",
+    desc: "Complete dashboard to track your trends, history and health predictions",
   },
   {
     icon: Shield,
-    title: "Données chiffrées RGPD",
-    desc: "Vos données biométriques sont chiffrées de bout en bout et hébergées en Europe",
+    title: "GDPR encrypted data",
+    desc: "Your biometric data is end-to-end encrypted and hosted in Europe",
   },
   {
     icon: Battery,
-    title: "Autonomie 14 jours",
-    desc: "Batterie longue durée avec charge rapide USB-C, résistant à l'eau IP68",
+    title: "14-day battery life",
+    desc: "Long-lasting battery with USB-C fast charging, IP68 water resistant",
   },
 ];
 
 const plans = [
   {
-    name: "Précommande",
+    name: "Pre-order",
     key: "precommande",
     price: "3,99",
     features: [
-      "Bracelet Oreon offert",
-      "Suivi biométrique complet",
-      "Tableau de bord santé",
-      "Alertes intelligentes IA",
-      "Automatisations IA",
-      "Livraison dès disponibilité",
+      "Oreon bracelet included free",
+      "Full biometric tracking",
+      "Health dashboard",
+      "AI smart alerts",
+      "AI automations",
+      "Delivered when available",
     ],
   },
   {
-    name: "Livraison directe",
+    name: "Express delivery",
     key: "livraison",
     price: "4,99",
     popular: true,
     features: [
-      "Bracelet Oreon offert",
-      "Suivi biométrique complet",
-      "Tableau de bord santé avancé",
-      "Alertes intelligentes IA",
-      "Automatisations IA illimitées",
-      "Livraison sous 48h",
-      "Rapports hebdomadaires",
-      "Support prioritaire",
+      "Oreon bracelet included free",
+      "Full biometric tracking",
+      "Advanced health dashboard",
+      "AI smart alerts",
+      "Unlimited AI automations",
+      "Delivery within 48h",
+      "Weekly reports",
+      "Priority support",
     ],
   },
 ];
 
 const steps = [
-  { num: "01", title: "Recevez votre bracelet", desc: "Commandez gratuitement votre Oreon, livré sous 48h en France métropolitaine" },
-  { num: "02", title: "Scannez le QR code", desc: "Activez votre mandat SEPA en scannant le code avec votre téléphone" },
-  { num: "03", title: "Commencez le suivi", desc: "Connectez le bracelet à l'application et créez vos premières automatisations IA" },
+  { num: "01", title: "Receive your bracelet", desc: "Order your Oreon for free, delivered within 48h" },
+  { num: "02", title: "Scan the QR code", desc: "Activate your SEPA mandate by scanning the code with your phone" },
+  { num: "03", title: "Start tracking", desc: "Connect the bracelet to the app and create your first AI automations" },
 ];
 
 const faqs = [
   {
-    q: "Le bracelet est-il vraiment gratuit ?",
-    a: "Oui, le bracelet Oreon est offert. Vous payez uniquement 3,99€ (Précommande) ou 4,99€ (Livraison directe) en paiement unique par SEPA ou carte bancaire.",
+    q: "Is the bracelet really free?",
+    a: "Yes, the Oreon bracelet is included at no cost. You only pay a one-time fee of 3.99€ (Pre-order) or 4.99€ (Express delivery) via SEPA or credit card.",
   },
   {
-    q: "Quelle est la différence entre les deux offres ?",
-    a: "L'offre Précommande à 3,99€ vous permet de réserver votre bracelet à tarif réduit, livré dès disponibilité. L'offre Livraison directe à 4,99€ inclut une expédition sous 48h et des fonctionnalités avancées.",
+    q: "What is the difference between the two plans?",
+    a: "The Pre-order plan at 3.99€ lets you reserve your bracelet at a reduced price, delivered when available. The Express delivery plan at 4.99€ includes shipping within 48h and advanced features.",
   },
   {
-    q: "Comment fonctionne le paiement ?",
-    a: "Le paiement est unique. Vous réglez une seule fois par carte bancaire ou SEPA, et vous recevez votre bracelet Oreon avec accès complet à la plateforme.",
+    q: "How does the payment work?",
+    a: "The payment is one-time. You pay once by credit card or SEPA, and you receive your Oreon bracelet with full access to the platform.",
   },
   {
-    q: "Puis-je payer par carte bancaire ?",
-    a: "Oui, vous pouvez choisir le paiement par carte bancaire en cliquant sur le bouton correspondant dans la section tarifs.",
+    q: "Can I pay by credit card?",
+    a: "Yes, you can choose credit card payment by clicking the corresponding button in the pricing section.",
   },
   {
-    q: "Y a-t-il un abonnement ou des frais récurrents ?",
-    a: "Non, il n'y a aucun abonnement ni frais récurrents. Le paiement est unique et vous donne accès à l'ensemble des fonctionnalités.",
+    q: "Is there a subscription or recurring fees?",
+    a: "No, there is no subscription or recurring fees. The payment is one-time and gives you access to all features.",
   },
   {
-    q: "Mes données sont-elles protégées ?",
-    a: "Absolument. Toutes les données biométriques sont chiffrées AES-256, hébergées en Europe et traitées conformément au RGPD. Vous pouvez demander la suppression à tout moment.",
+    q: "Is my data protected?",
+    a: "Absolutely. All biometric data is AES-256 encrypted, hosted in Europe and processed in compliance with GDPR. You can request deletion at any time.",
   },
   {
-    q: "Le bracelet est-il étanche ?",
-    a: "Oui, l'Oreon est certifié IP68 : résistant à l'eau jusqu'à 50 mètres. Vous pouvez le porter sous la douche et en piscine.",
+    q: "Is the bracelet waterproof?",
+    a: "Yes, the Oreon is IP68 certified: water resistant up to 50 meters. You can wear it in the shower and in the pool.",
   },
   {
-    q: "Quelles automatisations IA sont disponibles ?",
-    a: "Exemples : alerte si votre rythme cardiaque dépasse un seuil, rapport automatique envoyé à votre médecin, ajustement de votre agenda selon votre qualité de sommeil.",
+    q: "What AI automations are available?",
+    a: "Examples: alert if your heart rate exceeds a threshold, automatic report sent to your doctor, schedule adjustments based on your sleep quality.",
   },
 ];
 
@@ -147,8 +147,8 @@ export default function Bracelet() {
       }
     } catch (err: any) {
       toast({
-        title: "Erreur",
-        description: err.message || "Impossible de créer la session de paiement",
+        title: "Error",
+        description: err.message || "Unable to create payment session",
         variant: "destructive",
       });
     } finally {
@@ -170,7 +170,7 @@ export default function Bracelet() {
           className="absolute inset-0 w-full h-full object-cover"
           src="/bracelet-hero.mp4"
         />
-        {/* Cinematic gradient overlay — darker at bottom for text */}
+        {/* Cinematic gradient overlay */}
         <div className="absolute inset-0" style={{
           background: "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(10,20,50,0.65) 70%, rgba(8,16,42,0.95) 100%)"
         }} />
@@ -199,12 +199,12 @@ export default function Bracelet() {
             </h1>
 
             <p className="text-sm md:text-base text-white/60 max-w-[440px] leading-relaxed mb-3 font-light">
-              Le bracelet intelligent qui capture vos données biométriques et les transforme en
-              <span className="text-white font-normal"> automatisations IA personnalisées</span> via notre plateforme AETHER
+              The smart bracelet that captures your biometric data and transforms it into
+              <span className="text-white font-normal"> personalized AI automations</span> via our AETHER platform
             </p>
 
             <p className="text-[11px] text-white/35 mb-6 tracking-wide">
-              Bracelet offert · À partir de 3,99€ · Paiement unique
+              Bracelet included free · Starting at 3.99€ · One-time payment
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -217,7 +217,7 @@ export default function Bracelet() {
                 href="#features"
                 className="inline-flex items-center justify-center h-10 px-6 text-[10px] font-medium tracking-[0.15em] uppercase text-white/80 border border-white/20 rounded-none transition-all hover:bg-white/10 hover:border-white/40"
               >
-                Explorer
+                Explore
               </a>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function Bracelet() {
       {/* Bracelet Showcase Section */}
       <BraceletShowcaseSection />
 
-      {/* Ocean wave transition — showcase → specs */}
+      {/* Ocean wave transition */}
       <OceanWaveDivider
         backColor="#0F1F4F"
         midColor="#1A3FB8"
@@ -244,10 +244,10 @@ export default function Bracelet() {
         variant="b"
       />
 
-      {/* Technical Specs — Animated */}
+      {/* Technical Specs */}
       <AnimatedSpecsSection specsSrc={oreonSpecs} />
 
-      {/* Wave → Business Model */}
+      {/* Wave */}
       <OceanWaveDivider
         backColor="#0F1F4F"
         midColor="#1A3FB8"
@@ -258,7 +258,7 @@ export default function Bracelet() {
       {/* Business Model Section */}
       <BusinessModelSection />
 
-      {/* Wave → Oreon Model */}
+      {/* Wave */}
       <OceanWaveDivider
         backColor="#0a2d6e"
         midColor="#1A3FB8"
@@ -266,10 +266,10 @@ export default function Bracelet() {
         variant="b"
       />
 
-      {/* LE MODÈLE OREON */}
+      {/* THE OREON MODEL */}
       <OreonModelSection />
 
-      {/* Wave → Features */}
+      {/* Wave */}
       <OceanWaveDivider
         backColor="#1A3FB8"
         midColor="#1A3FB8"
@@ -281,13 +281,13 @@ export default function Bracelet() {
       <section id="features" className="py-28 bg-white">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "#1E4D8C" }}>
-            Fonctionnalités
+            Features
           </p>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
-            Technologie de pointe au poignet
+            Cutting-edge technology on your wrist
           </h2>
           <p className="text-base mb-16 max-w-[600px]" style={{ color: "#64748B" }}>
-            Oreon combine capteurs biomédicaux de dernière génération et intelligence artificielle pour un suivi santé sans compromis
+            Oreon combines next-generation biomedical sensors and artificial intelligence for uncompromising health tracking
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((f) => (
@@ -307,10 +307,10 @@ export default function Bracelet() {
       <section className="py-28" style={{ background: "#F8FAFC" }}>
         <div className="max-w-[1200px] mx-auto px-6 lg:px-12">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "#1E4D8C" }}>
-            Comment ça marche
+            How it works
           </p>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-16" style={{ color: "#0F172A" }}>
-            Trois étapes pour commencer
+            Three steps to get started
           </h2>
           <div className="grid md:grid-cols-3 gap-12">
             {steps.map((s) => (
@@ -329,13 +329,13 @@ export default function Bracelet() {
         <div className="max-w-[1000px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
             <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "#1E4D8C" }}>
-              Tarifs
+              Pricing
             </p>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
-              Bracelet offert, paiement unique
+              Free bracelet, one-time payment
             </h2>
             <p className="text-base max-w-[500px] mx-auto" style={{ color: "#64748B" }}>
-              Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
+              No purchase cost. Choose your plan and receive your Oreon for free
             </p>
           </div>
 
@@ -354,15 +354,15 @@ export default function Bracelet() {
                     className="absolute -top-3 left-10 px-4 py-1 text-xs font-semibold text-white tracking-wider uppercase"
                     style={{ background: "#1E4D8C" }}
                   >
-                    Recommandé
+                    Recommended
                   </span>
                 )}
                 <h3 className="font-heading text-2xl font-bold mb-2" style={{ color: "#0F172A" }}>{plan.name}</h3>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
-                  <span className="text-sm" style={{ color: "#64748B" }}>paiement unique</span>
+                  <span className="text-sm" style={{ color: "#64748B" }}>one-time payment</span>
                 </div>
-                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>Bracelet offert · Paiement en une seule fois</p>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>Free bracelet · Single payment</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -392,7 +392,7 @@ export default function Bracelet() {
                       }}
                     >
                       <QrCode className="w-4 h-4" />
-                      Prélèvement SEPA
+                      SEPA Direct Debit
                     </button>
                     <button
                       onClick={() => handleCardPayment(plan.key)}
@@ -409,13 +409,13 @@ export default function Bracelet() {
                       ) : (
                         <CreditCard className="w-4 h-4" />
                       )}
-                      Payer par carte
+                      Pay by card
                     </button>
                   </div>
                 )}
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  Paiement unique · Bracelet offert · Satisfait ou remboursé
+                  One-time payment · Free bracelet · Satisfaction guaranteed
                 </p>
               </div>
             ))}
@@ -427,10 +427,10 @@ export default function Bracelet() {
       <section className="py-28 bg-white">
         <div className="max-w-[800px] mx-auto px-6 lg:px-12">
           <p className="text-xs font-semibold tracking-[0.3em] uppercase mb-4" style={{ color: "#1E4D8C" }}>
-            Questions fréquentes
+            Frequently asked questions
           </p>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-16" style={{ color: "#0F172A" }}>
-            Tout savoir sur Oreon
+            Everything about Oreon
           </h2>
           <div className="space-y-8">
             {faqs.map((faq) => (
@@ -447,16 +447,16 @@ export default function Bracelet() {
       <section className="py-28" style={{ background: "#1E4D8C" }}>
         <div className="max-w-[800px] mx-auto px-6 lg:px-12 text-center">
           <h2 className="font-heading text-3xl sm:text-4xl font-bold text-white mb-6">
-            Prêt à transformer vos données en intelligence
+            Ready to turn your data into intelligence
           </h2>
           <p className="text-lg text-white/65 mb-10 max-w-[500px] mx-auto">
-            Recevez votre bracelet Oreon gratuitement et commencez à créer vos automatisations IA dès aujourd'hui
+            Get your Oreon bracelet for free and start creating your AI automations today
           </p>
           <a
             href="#pricing"
             className="inline-flex items-center justify-center h-14 px-10 text-[13px] font-bold tracking-[0.1em] uppercase text-[#1E4D8C] bg-white transition-all hover:bg-white/90"
           >
-            Commander mon Oreon
+            Order my Oreon
           </a>
         </div>
       </section>

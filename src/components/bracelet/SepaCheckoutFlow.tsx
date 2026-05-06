@@ -30,11 +30,11 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
     setError("");
 
     if (!fullName.trim() || fullName.trim().length < 2) {
-      setError("Veuillez entrer votre nom complet");
+      setError("Please enter your full name");
       return;
     }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Veuillez entrer une adresse email valide");
+      setError("Please enter a valid email address");
       return;
     }
 
@@ -53,7 +53,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
       if (insertError) throw insertError;
       setStep("qr");
     } catch (err: any) {
-      setError(err.message || "Une erreur est survenue");
+      setError(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -66,26 +66,26 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
           <Check className="w-5 h-5" style={{ color: accentColor }} />
         </div>
         <p className="text-sm font-semibold mb-1" style={{ color: textColor }}>
-          Commande enregistrée
+          Order confirmed
         </p>
         <p className="text-xs mb-4" style={{ color: subColor }}>
           {planName} — {price}€ · {fullName}
         </p>
         <p className="text-sm font-medium mb-3" style={{ color: textColor }}>
-          Scannez pour activer votre mandat SEPA
+          Scan to activate your SEPA mandate
         </p>
         <div className={`inline-block p-3 rounded-xl ${dark ? "bg-white" : "bg-white border"}`} style={{ borderColor: dark ? undefined : "#E2E8F0" }}>
-          <img src={sepaQrCode} alt={`QR Code SEPA ${planName}`} className="w-[140px] h-[140px] mx-auto rounded" />
+          <img src={sepaQrCode} alt={`SEPA QR Code ${planName}`} className="w-[140px] h-[140px] mx-auto rounded" />
         </div>
         <p className="text-[11px] mt-3" style={{ color: subColor }}>
-          Mandat SEPA · AETHER GROUP (SIREN 104 445 424)
+          SEPA Mandate · AETHER GROUP (SIREN 104 445 424)
         </p>
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
           style={{ color: accentColor }}
         >
-          <ArrowLeft className="w-3 h-3" /> Retour aux options
+          <ArrowLeft className="w-3 h-3" /> Back to options
         </button>
       </div>
     );
@@ -94,16 +94,16 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   return (
     <form onSubmit={handleSubmit} className="py-4">
       <p className="text-sm font-semibold mb-1 text-center" style={{ color: textColor }}>
-        Prélèvement SEPA — {planName}
+        SEPA Direct Debit — {planName}
       </p>
       <p className="text-xs mb-4 text-center" style={{ color: subColor }}>
-        Renseignez vos informations pour valider votre commande de {price}€
+        Enter your details to confirm your {price}€ order
       </p>
 
       <div className="space-y-3 mb-4">
         <input
           type="text"
-          placeholder="Nom complet"
+          placeholder="Full name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
@@ -116,7 +116,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         />
         <input
           type="email"
-          placeholder="Adresse email"
+          placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
@@ -143,7 +143,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         }}
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-        Valider et afficher le QR code
+        Confirm and show QR code
       </button>
 
       <button
@@ -152,7 +152,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
         style={{ color: accentColor }}
       >
-        <ArrowLeft className="w-3 h-3" /> Retour aux options
+        <ArrowLeft className="w-3 h-3" /> Back to options
       </button>
     </form>
   );

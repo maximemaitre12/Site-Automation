@@ -64,7 +64,7 @@ export default function AnimatedSpecsSection({ specsSrc }: Props) {
               transition: "opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s",
             }}
           >
-            Spécifications techniques
+            Technical specifications
           </p>
           <h2
             className="font-heading text-3xl sm:text-4xl font-bold text-white mb-4"
@@ -74,7 +74,7 @@ export default function AnimatedSpecsSection({ specsSrc }: Props) {
               transition: "opacity 0.6s ease 0.25s, transform 0.6s ease 0.25s",
             }}
           >
-            Conçu pour la performance
+            Engineered for performance
           </h2>
           <p
             className="text-base text-white/60 max-w-[500px] mx-auto"
@@ -84,7 +84,7 @@ export default function AnimatedSpecsSection({ specsSrc }: Props) {
               transition: "opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s",
             }}
           >
-            Chaque composant a été pensé pour allier durabilité, confort et sécurité cryptographique
+            Every component is designed to combine durability, comfort and cryptographic security
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function AnimatedSpecsSection({ specsSrc }: Props) {
         >
           <img
             src={specsSrc}
-            alt="Spécifications techniques du bracelet Oreon — NFC, silicone, antenne intégrée"
+            alt="Oreon bracelet technical specifications — NFC, silicone, integrated antenna"
             className="w-full max-w-[1200px] mx-auto rounded-sm"
             onLoad={() => setImageLoaded(true)}
           />
