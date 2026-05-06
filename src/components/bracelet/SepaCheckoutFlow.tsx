@@ -41,6 +41,18 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
       setError("Please enter a valid email address");
       return;
     }
+    if (!address.trim() || address.trim().length < 5) {
+      setError("Please enter your delivery address");
+      return;
+    }
+    if (!city.trim() || city.trim().length < 2) {
+      setError("Please enter your city");
+      return;
+    }
+    if (!postalCode.trim() || postalCode.trim().length < 3) {
+      setError("Please enter your postal code");
+      return;
+    }
 
     setLoading(true);
     try {
