@@ -138,6 +138,15 @@ export default function BraceletCGU() {
             </div>
           ))}
         </div>
+
+        <div className="mt-16 pt-8 border-t" style={{ borderColor: "#E2E8F0" }}>
+          <p className="text-sm" style={{ color: "#64748B" }}>
+            Voir également :{" "}
+            <Link to="/legal/bracelet-cgv" className="underline hover:no-underline" style={{ color: "#1E4D8C" }}>
+              Conditions Générales de Vente
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
