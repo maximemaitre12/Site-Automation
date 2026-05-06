@@ -139,39 +139,42 @@ export default function OreonModelSection() {
               animate={{ y: [0, -2, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             >
-              <GlassCard className="p-8 md:p-10 h-full flex flex-col">
-                <Nfc style={{ width: 32, height: 32, color: "#0EA5E9" }} />
-                <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mt-4 mb-1" style={{ color: "#0EA5E9" }}>THE OBJECT</p>
-                <h3 className="text-white font-semibold text-2xl mb-6">Oreon Bracelet</h3>
+              <GlassCard className="p-5 sm:p-8 md:p-10 h-full flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <Nfc style={{ width: 28, height: 28, color: "#0EA5E9" }} />
+                  <div>
+                    <p className="text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: "#0EA5E9" }}>THE OBJECT</p>
+                    <h3 className="text-white font-semibold text-xl sm:text-2xl">Oreon Bracelet</h3>
+                  </div>
+                </div>
 
-                <div className="flex items-center justify-center py-4">
+                <div className="flex items-center gap-4 sm:flex-col sm:items-center mb-4">
                   <img
                     src={oreonBraceletDark}
                     alt="Oreon Bracelet"
-                    className="w-[180px] h-[180px] object-contain drop-shadow-[0_0_30px_rgba(14,165,233,0.15)]"
+                    className="w-[100px] h-[100px] sm:w-[160px] sm:h-[160px] object-contain drop-shadow-[0_0_30px_rgba(14,165,233,0.15)] flex-shrink-0"
                   />
+                  <div className="sm:text-center">
+                    <p className="text-white font-bold text-[32px] sm:text-[48px] leading-none mb-1">3,99 €</p>
+                    <p className="text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: "#0EA5E9" }}>ONE-TIME PAYMENT</p>
+                    <p className="italic mt-1" style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>Pre-order 3,99 € · Express 4,99 €</p>
+                  </div>
                 </div>
 
-                <div className="mb-1">
-                  <p className="text-white font-bold mb-1" style={{ fontSize: 56 }}>From 3,99 €</p>
-                  <p className="text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: "#0EA5E9" }}>ONE-TIME PAYMENT</p>
-                  <p className="italic mt-1" style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>Pre-order 3,99 € · Express delivery 4,99 €</p>
-                </div>
-
-                <p className="text-white/80 mt-4 mb-3 leading-relaxed" style={{ fontSize: 14 }}>
-                  A minimalist design. An encrypted NFC chip. No active electronics, no battery,
-                  no planned obsolescence. The bracelet is your identity key — nothing more, nothing less.
+                <p className="text-white/80 mb-3 leading-relaxed" style={{ fontSize: 13 }}>
+                  Minimalist design. Encrypted NFC chip. No electronics, no battery,
+                  no planned obsolescence. Your identity key.
                 </p>
 
-                <p className="text-white/50 mb-6" style={{ fontSize: 12 }}>
-                  Intelligence activates when paired with an AETHER subscription.
+                <p className="text-white/50 mb-4" style={{ fontSize: 12 }}>
+                  Intelligence activates with an AETHER subscription.
                 </p>
 
-                <div className="space-y-2.5 mt-auto">
+                <div className="space-y-2 mt-auto">
                   {["Waterproof, indestructible", "No battery, no charging", "Lifetime warranty"].map((t) => (
-                    <div key={t} className="flex items-center gap-2.5">
-                      <Check style={{ width: 16, height: 16, color: "#0EA5E9" }} />
-                      <span className="text-white/90" style={{ fontSize: 14 }}>{t}</span>
+                    <div key={t} className="flex items-center gap-2">
+                      <Check style={{ width: 14, height: 14, color: "#0EA5E9" }} />
+                      <span className="text-white/90" style={{ fontSize: 13 }}>{t}</span>
                     </div>
                   ))}
                 </div>
