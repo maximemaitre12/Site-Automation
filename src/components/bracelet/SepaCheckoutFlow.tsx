@@ -15,6 +15,10 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   const [step, setStep] = useState<"form" | "qr">("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country, setCountry] = useState("France");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
