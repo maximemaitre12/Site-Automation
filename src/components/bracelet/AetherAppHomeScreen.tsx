@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function AetherAppHomeScreen() {
   return (
-    <div className="flex flex-col min-h-full" style={{ background: "linear-gradient(180deg, #0A1C3A, #14225C)", fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="flex flex-col h-full" style={{ background: "linear-gradient(180deg, #0A1C3A, #14225C)", fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* Status bar */}
       <div className="flex items-center justify-between px-6 pt-14 pb-1" style={{ height: 50 }}>
         <span className="text-white font-semibold" style={{ fontSize: 14 }}>9:41</span>
