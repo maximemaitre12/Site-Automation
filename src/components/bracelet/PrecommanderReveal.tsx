@@ -738,7 +738,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.35, duration: 0.5 }}
                       >
-                        No purchase cost. Choose your plan and receive your Oreon for free
+                        Choose your one-time bracelet payment. No AETHER subscription is charged today
                       </motion.p>
                       
                       <motion.div
