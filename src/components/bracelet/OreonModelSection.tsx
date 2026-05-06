@@ -363,7 +363,7 @@ export default function OreonModelSection() {
               <p className="text-white/60 mb-2" style={{ fontSize: 14 }}>or 25€/month by card</p>
               <div className="flex items-center justify-center gap-1.5 mb-3">
                 <Check style={{ width: 14, height: 14, color: "#0EA5E9" }} />
-                <span style={{ fontSize: 13, color: "#0EA5E9" }}>+ bracelet included free</span>
+                <span style={{ fontSize: 13, color: "#0EA5E9" }}>+ bracelet from 3,99 €</span>
               </div>
               <p className="text-white/70 italic" style={{ fontSize: 12 }}>Best intelligence-to-price ratio on the market</p>
             </GlassCard>
