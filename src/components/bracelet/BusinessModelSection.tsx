@@ -36,7 +36,7 @@ export default function BusinessModelSection() {
     <section
       className="relative w-full overflow-hidden"
       style={{
-        background: "radial-gradient(ellipse at 50% 40%, #1e45c8 0%, #1A3FB8 35%, #0F1F4F 100%)",
+        background: "#0a2d6e",
       }}
     >
       {/* Ambient aurora */}

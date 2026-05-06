@@ -96,7 +96,7 @@ export default function HowItWorksSection() {
     <section
       className="relative overflow-hidden"
       style={{
-        background: "radial-gradient(ellipse at 50% 20%, rgba(14,165,233,0.06) 0%, #0F1F4F 50%, #0F1F4F 100%)",
+        background: "#0a2d6e",
       }}
     >
       {/* Ambient particles */}
