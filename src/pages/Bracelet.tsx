@@ -71,15 +71,15 @@ const plans = [
 ];
 
 const steps = [
-  { num: "01", title: "Receive your bracelet", desc: "Order your Oreon for free, delivered within 48h" },
+  { num: "01", title: "Receive your bracelet", desc: "Order your Oreon from 3,99 €, delivered within 48h" },
   { num: "02", title: "Scan the QR code", desc: "Activate your SEPA mandate by scanning the code with your phone" },
   { num: "03", title: "Start tracking", desc: "Connect the bracelet to the app and create your first AI automations" },
 ];
 
 const faqs = [
   {
-    q: "Is the bracelet really free?",
-    a: "Yes, the Oreon bracelet is included at no cost. You only pay a one-time fee of 3.99€ (Pre-order) or 4.99€ (Express delivery) via SEPA or credit card.",
+    q: "How much does the bracelet cost?",
+    a: "The Oreon bracelet is sold as a one-time payment: 3,99 € for pre-order or 4,99 € for express delivery. The AETHER platform subscription opens separately on June 1st, 2026.",
   },
   {
     q: "What is the difference between the two plans?",
@@ -87,7 +87,7 @@ const faqs = [
   },
   {
     q: "How does the payment work?",
-    a: "The payment is one-time. You pay once by credit card or SEPA, and you receive your Oreon bracelet with full access to the platform.",
+    a: "The bracelet payment is one-time. You pay once by credit card or SEPA, receive your Oreon bracelet, then subscribe to AETHER separately when the platform opens on June 1st, 2026.",
   },
   {
     q: "Can I pay by credit card?",
@@ -95,7 +95,7 @@ const faqs = [
   },
   {
     q: "Is there a subscription or recurring fees?",
-    a: "No, there is no subscription or recurring fees. The payment is one-time and gives you access to all features.",
+    a: "There is no subscription charged today. The bracelet is a one-time payment; the AETHER platform subscription becomes available separately on June 1st, 2026.",
   },
   {
     q: "Is my data protected?",
