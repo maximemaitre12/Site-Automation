@@ -27,7 +27,7 @@ export default function AetherAppHomeScreen() {
 
       {/* Greeting */}
       <div className="px-5 pt-1 pb-3">
-        <p className="text-white font-semibold" style={{ fontSize: 20 }}>Good morning Youriy</p>
+        <p className="text-white font-semibold" style={{ fontSize: 20 }}>Good morning Alex</p>
         <p className="text-white/60 mt-0.5" style={{ fontSize: 12 }}>You seem calm this morning.</p>
         <div className="flex items-center gap-1 mt-1">
           <motion.div
