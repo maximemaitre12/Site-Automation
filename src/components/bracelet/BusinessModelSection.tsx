@@ -68,12 +68,12 @@ export default function BusinessModelSection() {
           </div>
 
           <h2 className="text-white font-semibold text-[32px] md:text-[52px] leading-[1.1] tracking-[-0.02em] mb-6 max-w-[800px] mx-auto">
-            The bracelet is free.{" "}
+            The bracelet is the key.{" "}
             <span className="text-cyan-400">The intelligence is in AETHER.</span>
           </h2>
 
           <p className="text-white/75 text-base md:text-lg leading-[1.55] max-w-[720px] mx-auto mb-8">
-            Our conviction: the object should be simple, durable, and accessible to all. The real value is not in the silicone — it is in the platform that transforms your biometric signals into intelligent automations. That is why we offer the bracelet for free and charge for the intelligence.
+            Our conviction: the object should be simple, durable, and accessible to all. The real value is not in the silicone — it is in the platform that transforms your biometric signals into intelligent automations. That is why the bracelet is offered at an accessible price, while the intelligence remains a monthly subscription.
           </p>
 
           <div className="w-20 h-[1px] bg-cyan-400/40 mx-auto" />
@@ -95,24 +95,30 @@ export default function BusinessModelSection() {
             <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">The object</span>
             <h3 className="text-white font-semibold text-[28px] mb-1">Oreon Bracelet</h3>
             <div className="mb-4">
-              <span className="text-white font-bold text-[56px] leading-none">FREE</span>
-              <span className="block text-cyan-400 text-sm mt-1">Upon registration</span>
+              <span className="text-white font-bold text-[56px] leading-none tracking-[-0.04em]">From 3,99 €</span>
+              <span className="block text-cyan-400 text-[13px] font-semibold tracking-[0.14em] uppercase mt-1">One-time payment</span>
+              <span className="block text-white/65 text-[13px] italic mt-1" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
+                Pre-order 3,99 €  ·  Express delivery 4,99 €
+              </span>
             </div>
             <p className="text-white/80 text-[15px] leading-relaxed mb-6">
-              A minimalist design. An encrypted NFC chip. No active electronics, no battery, no planned obsolescence. The bracelet is your identity key — nothing more, nothing less.
+              A minimalist design. An encrypted NFC chip. No active electronics, no battery, no planned obsolescence. The bracelet is your identity key — but its intelligence lives in AETHER.
             </p>
-            <ul className="space-y-3 mt-auto">
-              {["Waterproof, indestructible", "No battery, no charging", "Lifetime warranty"].map(t => (
+            <ul className="space-y-3">
+              {["Oreon physical bracelet", "Shipping included", "Lifetime warranty"].map(t => (
                 <li key={t} className="flex items-center gap-3 text-white/90 text-sm">
                   <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" /> {t}
                 </li>
               ))}
             </ul>
+            <p className="text-cyan-400/70 text-xs italic mt-4">
+              Requires an active AETHER subscription to unlock all features.
+            </p>
           </div>
 
           {/* CENTER CONNECTOR */}
           <div className="hidden md:flex flex-col items-center justify-center px-6 relative" style={{ minWidth: 80 }}>
-            <span className="text-cyan-400/70 text-xs italic mb-3">+ requires</span>
+            <span className="text-cyan-400/70 text-xs mb-3" style={{ fontFamily: "'EB Garamond', Georgia, serif", fontStyle: "italic" }}>unlocks</span>
             <div className="relative w-full h-[2px]">
               <div className="absolute inset-0 border-t-2 border-dashed border-cyan-400/30" />
               <div
@@ -175,7 +181,7 @@ export default function BusinessModelSection() {
               <p className="text-cyan-400 text-sm mb-4">No commitment · First month free</p>
 
               <p className="text-white/80 text-[15px] leading-relaxed mb-6">
-                The AI agent that transforms your biometric data into concrete actions. Proactive coach, unlimited automations, flow marketplace, smart-home integrations, lifetime updates.
+                The AI agent that activates your Oreon bracelet and transforms your biometric data into concrete actions. Proactive coach, unlimited automations, flow marketplace, smart-home integrations, lifetime updates.
               </p>
 
               <ul className="space-y-3 mt-auto">
@@ -316,7 +322,7 @@ export default function BusinessModelSection() {
               <p className="text-cyan-400 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Oreon</p>
               <p className="text-white font-bold text-3xl mb-1">21.25€<span className="text-lg font-normal text-white/70">/month via SEPA</span></p>
               <p className="text-white/60 text-sm mb-2">or 25€/month by card</p>
-              <p className="text-cyan-400 text-sm font-medium">+ bracelet included free</p>
+              <p className="text-cyan-400 text-sm font-medium">+ bracelet from 3,99 €</p>
               <div className="flex items-center justify-center gap-2 mt-4">
                 <Check className="w-4 h-4 text-cyan-400" />
                 <span className="text-cyan-400 text-xs">Best intelligence-to-price ratio on the market</span>
@@ -326,6 +332,10 @@ export default function BusinessModelSection() {
 
           <p className="text-center text-white/70 text-sm mt-8 max-w-[700px] mx-auto">
             More comprehensive than the leaders. Cheaper than direct competitors. And without 300€ hardware to buy upfront.
+          </p>
+
+          <p className="text-center text-white/65 text-[18px] italic mt-6" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
+            Two purchases. One ecosystem. Built to work together.
           </p>
         </div>
 
@@ -428,8 +438,8 @@ export default function BusinessModelSection() {
         </div>
 
         {/* Section footer */}
-        <p className="text-center text-white/60 text-sm italic mt-16">
-          Transparent model · No commitment · Built to last.
+        <p className="text-center text-white/65 text-[18px] italic mt-16" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
+          Two purchases. One ecosystem. Built to work together.
         </p>
       </div>
 
