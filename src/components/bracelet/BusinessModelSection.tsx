@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, CreditCard, Calendar, Brain, Fingerprint, ChevronDown, Rocket, ArrowRight, Lock, Shield, ShoppingCart, Package, Zap } from "lucide-react";
+import oreonBraceletImg from "@/assets/oreon-bracelet.png";
 
 const faqItems = [
   {
