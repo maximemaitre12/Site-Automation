@@ -248,6 +248,17 @@ export default function Bracelet() {
       {/* Wave */}
       <OceanWaveDivider
         backColor="#0F1F4F"
+        midColor="#2550D0"
+        frontColor="#1A3FB8"
+        variant="b"
+      />
+
+      {/* AETHER Platform Section */}
+      <OreonModelSection />
+
+      {/* Wave */}
+      <OceanWaveDivider
+        backColor="#0F1F4F"
         midColor="#1A3FB8"
         frontColor="#0a2d6e"
         variant="a"
