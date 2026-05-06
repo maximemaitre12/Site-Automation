@@ -197,7 +197,7 @@ export default function Bracelet() {
             </p>
 
             <p className="text-[11px] text-white/35 mb-6 tracking-wide">
-              Bracelet included free · Starting at 3.99€ · One-time payment
+              Bracelet from 3,99 € · One-time payment · Subscription opens June 1st, 2026
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -443,7 +443,7 @@ export default function Bracelet() {
             Ready to turn your data into intelligence
           </h2>
           <p className="text-lg text-white/65 mb-10 max-w-[500px] mx-auto">
-            Get your Oreon bracelet for free and start creating your AI automations today
+            Pre-order your Oreon bracelet from 3,99 € and unlock AETHER when the platform opens
           </p>
           <a
             href="#pricing"
