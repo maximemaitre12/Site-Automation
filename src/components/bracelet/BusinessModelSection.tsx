@@ -360,33 +360,26 @@ export default function BusinessModelSection() {
             />
           </div>
 
-          <div className="relative z-10 grid md:grid-cols-[auto_1fr_auto] gap-8 items-center">
+          <div className="relative z-10 grid md:grid-cols-[1fr_auto] gap-8 items-center">
             {/* Left */}
             <div className="text-center md:text-left">
-              <Rocket className="w-6 h-6 text-cyan-400 mb-2 mx-auto md:mx-0" />
-              <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase block">Official launch</span>
-              <p className="text-white font-bold text-[28px] md:text-[32px]">June 1st, 2026</p>
-            </div>
-
-            {/* Center */}
-            <div className="text-center md:text-left">
-              <h4 className="text-white font-semibold text-xl md:text-2xl mb-2">Be among the first 1,000</h4>
-              <p className="text-white/80 text-[15px] mb-3">
-                First month free · Bracelet delivered at launch · Early-bird price locked for life
-              </p>
-              <div className="mb-1">
-                <span className="text-cyan-400 font-bold text-[28px]">19€</span>
-                <span className="text-white/70 text-lg">/month via SEPA</span>
-                <span className="text-white/50 text-sm line-through ml-3">21.25€</span>
+              <div className="flex items-center gap-3 mb-3 justify-center md:justify-start">
+                <Rocket className="w-6 h-6 text-cyan-400" />
+                <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase">Pre-order now</span>
               </div>
-              <p className="text-white/60 text-sm">or 22€/month by card (instead of 25€)</p>
+              <h4 className="text-white font-semibold text-xl md:text-2xl mb-2">Get your Oreon bracelet from 3,99 €</h4>
+              <p className="text-white/80 text-[15px] mb-3">
+                One-time payment · Shipping included · Bracelet delivered around June 1st, when the AETHER platform goes live
+              </p>
+              <p className="text-white/60 text-sm">
+                Your delivery address will be requested by email around mid-May
+              </p>
             </div>
 
             {/* Right */}
-            <div className="flex flex-col items-center gap-3">
-              <p className="text-white/60 text-sm text-center max-w-[320px]">
-                Your delivery address will be requested by email around mid-May
-              </p>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-cyan-400 font-bold text-[32px]">3,99 €</span>
+              <span className="text-white/60 text-xs">or 4,99 € express</span>
             </div>
           </div>
         </div>
