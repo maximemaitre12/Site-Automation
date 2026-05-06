@@ -63,7 +63,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         amount: parseFloat(price.replace(",", ".")),
         payment_method: "sepa",
         status: "pending",
-        metadata: { plan_name: planName },
+        metadata: { plan_name: planName, shipping_address: address.trim(), shipping_city: city.trim(), shipping_postal_code: postalCode.trim(), shipping_country: country.trim() },
       });
 
       if (insertError) throw insertError;
