@@ -335,7 +335,7 @@ export default function OreonModelSection() {
                       {m.label}
                     </span>
                   </div>
-                  <p className="text-white/78 leading-relaxed" style={{ fontSize: 13, lineHeight: 1.55 }}>{m.desc}</p>
+                  <p className="text-white/80 leading-relaxed" style={{ fontSize: 13, lineHeight: 1.55 }}>{m.desc}</p>
                 </GlassCard>
               </motion.div>
             </motion.div>
