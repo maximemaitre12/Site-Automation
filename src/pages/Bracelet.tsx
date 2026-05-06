@@ -10,6 +10,7 @@ import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
 import HowItWorksSection from "@/components/bracelet/HowItWorksSection";
+import OreonModelSection from "@/components/bracelet/OreonModelSection";
 
 import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
 
@@ -243,6 +244,17 @@ export default function Bracelet() {
 
       {/* How It Works */}
       <HowItWorksSection />
+
+      {/* Wave */}
+      <OceanWaveDivider
+        backColor="#0F1F4F"
+        midColor="#2550D0"
+        frontColor="#1A3FB8"
+        variant="b"
+      />
+
+      {/* AETHER Platform Section */}
+      <OreonModelSection />
 
       {/* Wave */}
       <OceanWaveDivider
