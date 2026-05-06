@@ -144,14 +144,11 @@ export default function OreonModelSection() {
                 <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mt-4 mb-1" style={{ color: "#0EA5E9" }}>THE OBJECT</p>
                 <h3 className="text-white font-semibold text-2xl mb-6">Oreon Bracelet</h3>
 
-                <div className="flex items-center justify-center py-6">
-                  <div
-                    className="rounded-full"
-                    style={{
-                      width: 160, height: 160,
-                      border: "12px solid rgba(14,165,233,0.15)",
-                      boxShadow: "0 0 40px rgba(14,165,233,0.1), inset 0 0 30px rgba(14,165,233,0.05)",
-                    }}
+                <div className="flex items-center justify-center py-4">
+                  <img
+                    src={oreonBraceletDark}
+                    alt="Oreon Bracelet"
+                    className="w-[180px] h-[180px] object-contain drop-shadow-[0_0_30px_rgba(14,165,233,0.15)]"
                   />
                 </div>
 
