@@ -374,21 +374,9 @@ export default function BusinessModelSection() {
 
             {/* Right */}
             <div className="flex flex-col items-center gap-3">
-              <a
-                href="#pricing"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-cyan-400 text-[#0F1F4F] font-bold text-sm tracking-wide uppercase transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:scale-105"
-              >
-                Reserve my spot <ArrowRight className="w-4 h-4" />
-              </a>
-              <a href="#features" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/20 text-white/80 text-xs font-medium uppercase tracking-wide transition-all hover:bg-white/10">
-                Learn more
-              </a>
-              <div className="mt-2 w-full max-w-[200px]">
-                <p className="text-white/60 text-[11px] text-center mb-1">812 spots reserved out of 1,000</p>
-                <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full rounded-full bg-cyan-400/80 w-[81%]" style={{ animation: "pulse-glow 3s ease-in-out infinite" }} />
-                </div>
-              </div>
+              <span className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/10 border border-white/20 text-white/80 font-bold text-sm tracking-wide uppercase">
+                Available Soon
+              </span>
             </div>
           </div>
         </div>
