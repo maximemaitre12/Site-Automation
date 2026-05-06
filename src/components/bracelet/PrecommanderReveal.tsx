@@ -353,7 +353,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
       </motion.div>
 
       <motion.p className="text-xs mb-6" style={{ color: "#8A92A6" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.25 }}>
-        Free bracelet · No commitment
+        {plan.key === "precommande" ? "One-time payment" : "Free bracelet · No commitment"}
       </motion.p>
 
       <div className="w-full h-px mb-5" style={{ background: "#EEF0F5" }} />
@@ -484,7 +484,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
       </motion.div>
 
       <motion.p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.45)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.25 }}>
-        Free bracelet · No commitment
+        {plan.key === "precommande" ? "One-time payment" : "Free bracelet · No commitment"}
       </motion.p>
 
       <div className="w-full h-px mb-5" style={{ background: "rgba(255,255,255,0.1)" }} />
@@ -728,7 +728,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        Free bracelet<span style={{ color: "#1A3FB8" }}>,</span> one-time payment
+                        Choose your plan<span style={{ color: "#1A3FB8" }}>,</span> one-time payment
                       </motion.h2>
                       
                       <motion.p

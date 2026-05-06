@@ -51,12 +51,9 @@ const plans = [
     key: "precommande",
     price: "3,99",
     features: [
-      "Oreon bracelet included free",
-      "Full biometric tracking",
-      "Health dashboard",
-      "AI smart alerts",
-      "AI automations",
-      "Delivered when available",
+      "Oreon physical bracelet",
+      "Shipping included",
+      "Delivered around June 1st",
     ],
   },
   {
@@ -332,10 +329,10 @@ export default function Bracelet() {
               Pricing
             </p>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
-              Free bracelet, one-time payment
+              Choose your plan, one-time payment
             </h2>
             <p className="text-base max-w-[500px] mx-auto" style={{ color: "#64748B" }}>
-              No purchase cost. Choose your plan and receive your Oreon for free
+              Select the option that suits you best
             </p>
           </div>
 
@@ -362,7 +359,7 @@ export default function Bracelet() {
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
                   <span className="text-sm" style={{ color: "#64748B" }}>one-time payment</span>
                 </div>
-                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>Free bracelet · Single payment</p>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>{plan.key === "precommande" ? "One-time payment" : "Free bracelet · Single payment"}</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -415,7 +412,7 @@ export default function Bracelet() {
                 )}
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  One-time payment · Free bracelet · Satisfaction guaranteed
+                  {plan.key === "precommande" ? "One-time payment · Satisfaction guaranteed" : "One-time payment · Free bracelet · Satisfaction guaranteed"}
                 </p>
               </div>
             ))}
