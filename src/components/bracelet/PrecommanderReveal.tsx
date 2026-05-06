@@ -349,11 +349,11 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
           <PriceCounter target={plan.price} delay={(baseDelay + 0.25) * 1000} />
           <span style={{ fontSize: 40, verticalAlign: "super", marginLeft: 2 }}>€</span>
         </span>
-        <span className="text-sm" style={{ color: "#64748B" }}>paiement unique</span>
+        <span className="text-sm" style={{ color: "#64748B" }}>one-time payment</span>
       </motion.div>
 
       <motion.p className="text-xs mb-6" style={{ color: "#8A92A6" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.25 }}>
-        Bracelet offert · Aucun engagement
+        Free bracelet · No commitment
       </motion.p>
 
       <div className="w-full h-px mb-5" style={{ background: "#EEF0F5" }} />
@@ -381,7 +381,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
               whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(26,63,184,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}
             >
               <QrCode className="w-4 h-4" />
-              <span className="relative z-10">Prélèvement SEPA</span>
+              <span className="relative z-10">SEPA Direct Debit</span>
             </motion.button>
 
             <motion.button
@@ -395,7 +395,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
               whileHover={{ borderColor: "#1A3FB8" }}
             >
               {loadingPlan === plan.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-              <span>Payer par carte</span>
+              <span>Pay by card</span>
             </motion.button>
           </motion.div>
         )}
@@ -403,14 +403,14 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
 
       <motion.p className="flex items-center justify-center gap-1.5 text-[11px] text-center mt-4" style={{ color: "#94A3B8" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.65 }}>
         <Lock className="w-3 h-3" />
-        Paiement chiffré · Satisfait ou remboursé 14 jours
+        Encrypted payment · 14-day money-back guarantee
       </motion.p>
     </motion.div>
   );
 };
 
 /* ═══════════════════════════════════════════
-   RIGHT PRICING CARD (Recommandé)
+   RIGHT PRICING CARD (Recommended)
    ═══════════════════════════════════════════ */
 const RightCard = ({ plan, onCardPayment, loadingPlan }: {
   plan: Plan; onCardPayment: (key: string) => void; loadingPlan: string | null;
@@ -463,7 +463,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
       >
         <span className="flex items-center gap-2">
           <span className="w-[6px] h-[6px] rounded-full bg-white" style={{ animation: "badge-pulse 2s ease-in-out infinite" }} />
-          Recommandé
+          Recommended
         </span>
       </motion.span>
 
@@ -472,7 +472,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
       </motion.h3>
 
       <motion.span className="inline-block mb-5 text-[11px] font-semibold uppercase tracking-[0.12em] rounded-full" style={{ color: "#6FE0F5", background: "rgba(111,224,245,0.1)", padding: "4px 10px" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.15 }}>
-        Livraison express
+        Express delivery
       </motion.span>
 
       <motion.div className="flex items-baseline gap-2 mb-1" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: baseDelay + 0.2 }}>
@@ -480,11 +480,11 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
           <PriceCounter target={plan.price} delay={(baseDelay + 0.25) * 1000} />
           <span style={{ fontSize: 40, verticalAlign: "super", marginLeft: 2 }}>€</span>
         </span>
-        <span className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>paiement unique</span>
+        <span className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>one-time payment</span>
       </motion.div>
 
       <motion.p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.45)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.25 }}>
-        Bracelet offert · Aucun engagement
+        Free bracelet · No commitment
       </motion.p>
 
       <div className="w-full h-px mb-5" style={{ background: "rgba(255,255,255,0.1)" }} />
@@ -512,7 +512,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
               whileHover={{ scale: 1.02, boxShadow: "0 8px 32px rgba(11,165,199,0.45)" }}
             >
               <QrCode className="w-4 h-4" />
-              <span className="relative z-10">Prélèvement SEPA</span>
+              <span className="relative z-10">SEPA Direct Debit</span>
             </motion.button>
 
             <motion.button
@@ -526,7 +526,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
               whileHover={{ borderColor: "rgba(111,224,245,0.5)" }}
             >
               {loadingPlan === plan.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-              <span>Payer par carte</span>
+              <span>Pay by card</span>
             </motion.button>
           </motion.div>
         )}
@@ -534,7 +534,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
 
       <motion.p className="flex items-center justify-center gap-1.5 text-[11px] text-center mt-4" style={{ color: "rgba(255,255,255,0.4)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.65 }}>
         <Lock className="w-3 h-3" />
-        Paiement chiffré · Satisfait ou remboursé 14 jours
+        Encrypted payment · 14-day money-back guarantee
       </motion.p>
     </motion.div>
   );
@@ -619,7 +619,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
       <AnimatePresence mode="wait">
         {!isOpen && (
           <MagneticButton onClick={handleClick}>
-            Précommander
+            Pre-order
           </MagneticButton>
         )}
       </AnimatePresence>
@@ -717,7 +717,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                           style={{ background: "#6FE0F5", animation: "badge-pulse 2.5s ease-in-out infinite" }}
                         />
                         <span style={{ color: "#1A3FB8", fontSize: 11, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                          Tarifs
+                          Pricing
                         </span>
                       </motion.div>
                       
@@ -728,7 +728,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        Bracelet offert<span style={{ color: "#1A3FB8" }}>,</span> paiement unique
+                        Free bracelet<span style={{ color: "#1A3FB8" }}>,</span> one-time payment
                       </motion.h2>
                       
                       <motion.p
@@ -738,7 +738,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.35, duration: 0.5 }}
                       >
-                        Aucun frais d'achat. Choisissez votre formule et recevez votre Oreon gratuitement
+                        No purchase cost. Choose your plan and receive your Oreon for free
                       </motion.p>
                       
                       <motion.div
