@@ -115,7 +115,7 @@ export default function AetherAppHomeScreen() {
       </div>
 
       {/* Recent Moments */}
-      <div className="px-4 pt-3 pb-24">
+      <div className="px-4 pt-3 pb-4">
         <p className="uppercase tracking-widest mb-2 px-1" style={{ fontSize: 8, color: "#0EA5E9" }}>RECENT MOMENTS</p>
         {[
           { title: "Wake up", sub: "HRV 68 · Energy restored", time: "8:42" },
