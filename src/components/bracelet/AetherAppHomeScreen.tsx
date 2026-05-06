@@ -139,8 +139,8 @@ export default function AetherAppHomeScreen() {
 
       {/* Bottom nav */}
       <div
-        className="absolute bottom-0 left-0 right-0 flex items-center justify-around"
-        style={{ height: 60, background: "rgba(10,28,58,0.85)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        className="flex-shrink-0 flex items-center justify-around mt-auto"
+        style={{ height: 60, background: "rgba(10,28,58,0.95)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
         {[
           { icon: Home, label: "Home", active: true },
