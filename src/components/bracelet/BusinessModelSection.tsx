@@ -147,58 +147,6 @@ export default function BusinessModelSection() {
           </p>
         </div>
 
-        {/* BEAT 4 — PRICE ANCHORING */}
-        <div className="mb-20 md:mb-28">
-          <div className="text-center mb-10">
-            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">The price of biometric intelligence</span>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Whoop */}
-            <div className="rounded-3xl p-8 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)" }}>
-              <p className="text-white/50 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Whoop 4.0</p>
-              <p className="text-white/70 font-bold text-3xl mb-2">30€<span className="text-lg font-normal">/month</span></p>
-              <p className="text-white/50 text-sm">+ no hardware included</p>
-            </div>
-
-            {/* Oura */}
-            <div className="rounded-3xl p-8 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)" }}>
-              <p className="text-white/50 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Oura Ring</p>
-              <p className="text-white/70 font-bold text-3xl mb-2">5.99€<span className="text-lg font-normal">/month</span></p>
-              <p className="text-white/50 text-sm">+ 349€ for the ring</p>
-              <p className="text-white/40 text-xs mt-2">= ~25€/month over 2 years</p>
-            </div>
-
-            {/* OREON */}
-            <div
-              className="rounded-3xl p-8 text-center relative"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1.5px solid rgba(34,211,238,0.35)",
-                backdropFilter: "blur(12px)",
-                boxShadow: "0 0 30px rgba(34,211,238,0.1)",
-                transform: "translateY(-4px)",
-              }}
-            >
-              <p className="text-cyan-400 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Oreon</p>
-              <p className="text-white font-bold text-3xl mb-1">21.25€<span className="text-lg font-normal text-white/70">/month via SEPA</span></p>
-              <p className="text-white/60 text-sm mb-2">or 25€/month by card</p>
-              <p className="text-cyan-400 text-sm font-medium">+ bracelet from 3,99 €</p>
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <Check className="w-4 h-4 text-cyan-400" />
-                <span className="text-cyan-400 text-xs">Best intelligence-to-price ratio on the market</span>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-center text-white/70 text-sm mt-8 max-w-[700px] mx-auto">
-            More comprehensive than the leaders. Cheaper than direct competitors. And without 300€ hardware to buy upfront.
-          </p>
-
-          <p className="text-center text-white/65 text-[18px] italic mt-6" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
-            Two purchases. One ecosystem. Built to work together.
-          </p>
-        </div>
 
         {/* BEAT 5 — EARLY-BIRD OFFER */}
         <div className="mb-20 md:mb-28">
