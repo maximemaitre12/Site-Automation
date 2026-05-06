@@ -353,7 +353,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
       </motion.div>
 
       <motion.p className="text-xs mb-6" style={{ color: "#8A92A6" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.25 }}>
-        {plan.key === "precommande" ? "One-time payment" : "Free bracelet · No commitment"}
+        One-time payment
       </motion.p>
 
       <div className="w-full h-px mb-5" style={{ background: "#EEF0F5" }} />
