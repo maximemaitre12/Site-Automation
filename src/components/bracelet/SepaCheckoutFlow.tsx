@@ -62,27 +62,18 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   if (step === "qr") {
     return (
       <div className="text-center py-4">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: dark ? "rgba(111,224,245,0.15)" : "rgba(26,63,184,0.08)" }}>
-          <Check className="w-5 h-5" style={{ color: accentColor }} />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: dark ? "rgba(255,180,50,0.15)" : "rgba(234,179,8,0.1)" }}>
+          <span className="text-lg">⚠</span>
         </div>
-        <p className="text-sm font-semibold mb-1" style={{ color: textColor }}>
-          Order confirmed
+        <p className="text-sm font-semibold mb-2" style={{ color: textColor }}>
+          Temporarily Unavailable
         </p>
-        <p className="text-xs mb-4" style={{ color: subColor }}>
-          {planName} — {price}€ · {fullName}
-        </p>
-        <p className="text-sm font-medium mb-3" style={{ color: textColor }}>
-          Scan to activate your SEPA mandate
-        </p>
-        <div className={`inline-block p-3 rounded-xl ${dark ? "bg-white" : "bg-white border"}`} style={{ borderColor: dark ? undefined : "#E2E8F0" }}>
-          <img src={sepaQrCode} alt={`SEPA QR Code ${planName}`} className="w-[140px] h-[140px] mx-auto rounded" />
-        </div>
-        <p className="text-[11px] mt-3" style={{ color: subColor }}>
-          SEPA Mandate · AETHER GROUP (SIREN 104 445 424)
+        <p className="text-xs leading-relaxed max-w-[260px] mx-auto mb-4" style={{ color: subColor }}>
+          Unfortunately, this service is momentarily unavailable. We are actively working to resolve this. Please try again later.
         </p>
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
+          className="flex items-center gap-1.5 mx-auto mt-2 text-xs font-medium transition-colors hover:opacity-80"
           style={{ color: accentColor }}
         >
           <ArrowLeft className="w-3 h-3" /> Back to options
