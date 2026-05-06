@@ -15,6 +15,10 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   const [step, setStep] = useState<"form" | "qr">("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country, setCountry] = useState("France");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -37,6 +41,18 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
       setError("Please enter a valid email address");
       return;
     }
+    if (!address.trim() || address.trim().length < 5) {
+      setError("Please enter your delivery address");
+      return;
+    }
+    if (!city.trim() || city.trim().length < 2) {
+      setError("Please enter your city");
+      return;
+    }
+    if (!postalCode.trim() || postalCode.trim().length < 3) {
+      setError("Please enter your postal code");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -47,7 +63,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         amount: parseFloat(price.replace(",", ".")),
         payment_method: "sepa",
         status: "pending",
-        metadata: { plan_name: planName },
+        metadata: { plan_name: planName, shipping_address: address.trim(), shipping_city: city.trim(), shipping_postal_code: postalCode.trim(), shipping_country: country.trim() },
       });
 
       if (insertError) throw insertError;
@@ -117,6 +133,60 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
             color: inputText,
           }}
           autoComplete="email"
+        />
+        <input
+          type="text"
+          placeholder="Delivery address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+          style={{
+            background: inputBg,
+            border: `1px solid ${inputBorder}`,
+            color: inputText,
+          }}
+          autoComplete="street-address"
+        />
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="flex-1 px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+            style={{
+              background: inputBg,
+              border: `1px solid ${inputBorder}`,
+              color: inputText,
+            }}
+            autoComplete="address-level2"
+          />
+          <input
+            type="text"
+            placeholder="Postal code"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            className="w-[120px] px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+            style={{
+              background: inputBg,
+              border: `1px solid ${inputBorder}`,
+              color: inputText,
+            }}
+            autoComplete="postal-code"
+          />
+        </div>
+        <input
+          type="text"
+          placeholder="Country"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+          style={{
+            background: inputBg,
+            border: `1px solid ${inputBorder}`,
+            color: inputText,
+          }}
+          autoComplete="country-name"
         />
       </div>
 
