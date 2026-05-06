@@ -4,6 +4,7 @@ import {
 } from "lucide-react";
 import IPhoneMockup from "./IPhoneMockup";
 import AetherAppHomeScreen from "./AetherAppHomeScreen";
+import oreonBraceletDark from "@/assets/oreon-bracelet-dark.png";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
