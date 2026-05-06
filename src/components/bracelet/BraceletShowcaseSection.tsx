@@ -171,7 +171,7 @@ export default function BraceletShowcaseSection() {
                 ))}
                 <canvas
                   ref={canvasRef}
-                  className="relative z-10 w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[520px] lg:max-h-[70vh] object-contain rounded-full lg:rounded-none"
+                  className="relative z-10 w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[520px] lg:max-h-[70vh] object-contain rounded-full"
                   style={{
                     opacity: loaded ? 1 : 0,
                     transition: "opacity 0.6s",
