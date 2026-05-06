@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function AetherAppHomeScreen() {
   return (
-    <div className="flex flex-col min-h-full" style={{ background: "linear-gradient(180deg, #0A1C3A, #14225C)", fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="flex flex-col h-full" style={{ background: "linear-gradient(180deg, #0A1C3A, #14225C)", fontFamily: "'Inter', system-ui, sans-serif" }}>
       {/* Status bar */}
       <div className="flex items-center justify-between px-6 pt-14 pb-1" style={{ height: 50 }}>
         <span className="text-white font-semibold" style={{ fontSize: 14 }}>9:41</span>
@@ -115,7 +115,7 @@ export default function AetherAppHomeScreen() {
       </div>
 
       {/* Recent Moments */}
-      <div className="px-4 pt-3 pb-24">
+      <div className="px-4 pt-3 pb-4">
         <p className="uppercase tracking-widest mb-2 px-1" style={{ fontSize: 8, color: "#0EA5E9" }}>RECENT MOMENTS</p>
         {[
           { title: "Wake up", sub: "HRV 68 · Energy restored", time: "8:42" },
@@ -139,8 +139,8 @@ export default function AetherAppHomeScreen() {
 
       {/* Bottom nav */}
       <div
-        className="absolute bottom-0 left-0 right-0 flex items-center justify-around"
-        style={{ height: 60, background: "rgba(10,28,58,0.85)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        className="flex-shrink-0 flex items-center justify-around mt-auto"
+        style={{ height: 60, background: "rgba(10,28,58,0.95)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
         {[
           { icon: Home, label: "Home", active: true },
