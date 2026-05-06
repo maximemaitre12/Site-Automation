@@ -95,8 +95,8 @@ export default function BusinessModelSection() {
             <Fingerprint className="w-8 h-8 text-cyan-400 mb-4" />
             <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">The object</span>
             <h3 className="text-white font-semibold text-[28px] mb-4">Oreon Bracelet</h3>
-            <div className="flex justify-center mb-6">
-              <img src={oreonBraceletImg} alt="Oreon Bracelet" className="w-48 h-48 object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.15)]" />
+            <div className="flex justify-center my-6">
+              <img src={oreonBraceletImg} alt="Oreon Bracelet" className="w-56 h-56 object-contain drop-shadow-[0_0_40px_rgba(34,211,238,0.2)]" />
             </div>
             <div className="mb-4">
               <span className="text-white font-bold text-[56px] leading-none tracking-[-0.04em]">From 3,99 €</span>
