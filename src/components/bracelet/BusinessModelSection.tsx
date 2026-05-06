@@ -375,7 +375,7 @@ export default function BusinessModelSection() {
             {/* Right */}
             <div className="flex flex-col items-center gap-3">
               <p className="text-white/60 text-sm text-center max-w-[320px]">
-                Your delivery address will be requested by email around June 1st
+                Your delivery address will be requested by email around mid-May
               </p>
             </div>
           </div>
