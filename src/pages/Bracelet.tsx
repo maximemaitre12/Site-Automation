@@ -240,6 +240,9 @@ export default function Bracelet() {
       {/* Technical Specs */}
       <AnimatedSpecsSection specsSrc={oreonSpecs} />
 
+      {/* How It Works */}
+      <HowItWorksSection />
+
       {/* Wave */}
       <OceanWaveDivider
         backColor="#0F1F4F"
