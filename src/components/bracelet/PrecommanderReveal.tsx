@@ -336,7 +336,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
         animate={{ opacity: 1 }}
         transition={{ delay: baseDelay + 0.15 }}
       >
-        Delivery address will be requested by email around June 1st
+        Delivery address will be requested by email around mid-May
       </motion.p>
 
       <motion.div
