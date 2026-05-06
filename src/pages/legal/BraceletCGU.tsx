@@ -11,13 +11,13 @@ En scannant le QR code d'activation et en souscrivant à l'abonnement, l'utilisa
     title: "2. Description de l'offre",
     content: `L'offre Oreon comprend :
 
-• La mise à disposition gratuite d'un bracelet connecté Oreon
+• L'achat d'un bracelet connecté Oreon à prix accessible
 • L'accès à l'application AETHER de suivi biométrique et d'automatisations IA
 • Un paiement unique selon la formule choisie :
   — Formule Précommande : 3,99€ TTC (paiement unique)
   — Formule Livraison directe : 4,99€ TTC (paiement unique)
 
-Le Bracelet est offert et devient la propriété de l'Abonné dès réception.`,
+Le Bracelet est acheté par l'Abonné et devient sa propriété dès réception.`,
   },
   {
     title: "3. Paiement",
