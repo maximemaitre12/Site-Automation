@@ -57,7 +57,7 @@ export default function OreonModelSection() {
           style={{ letterSpacing: "-0.02em" }}
           variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}
         >
-          The bracelet is free.<br className="hidden md:block" /> The intelligence is in AETHER.
+          The bracelet starts at 3,99 €.<br className="hidden md:block" /> The intelligence is in AETHER.
         </motion.h2>
 
         <motion.p
@@ -67,8 +67,8 @@ export default function OreonModelSection() {
         >
           Our conviction: the object should be simple, durable, and accessible to all.
           The real value is not in the silicone — it is in the platform that transforms
-          your biometric signals into intelligent automations. That is why we offer
-          the bracelet for free and charge for the intelligence.
+          your biometric signals into intelligent automations. That is why the bracelet
+          is sold at an accessible one-time price, while the intelligence remains a subscription.
         </motion.p>
 
         <div className="w-20 h-px mx-auto" style={{ background: "rgba(14,165,233,0.4)" }} />
@@ -103,12 +103,19 @@ export default function OreonModelSection() {
                   />
                 </div>
 
-                <p className="text-white font-bold mb-0.5" style={{ fontSize: 56 }}>FREE</p>
-                <p style={{ fontSize: 14, color: "#0EA5E9" }}>Upon registration</p>
+                <div className="mb-1">
+                  <p className="text-white font-bold mb-1" style={{ fontSize: 56 }}>From 3,99 €</p>
+                  <p className="text-[10px] font-semibold tracking-[0.2em] uppercase" style={{ color: "#0EA5E9" }}>ONE-TIME PAYMENT</p>
+                  <p className="italic mt-1" style={{ fontSize: 13, color: "rgba(255,255,255,0.65)" }}>Pre-order 3,99 € · Express delivery 4,99 €</p>
+                </div>
 
-                <p className="text-white/80 mt-4 mb-6 leading-relaxed" style={{ fontSize: 14 }}>
+                <p className="text-white/80 mt-4 mb-3 leading-relaxed" style={{ fontSize: 14 }}>
                   A minimalist design. An encrypted NFC chip. No active electronics, no battery,
                   no planned obsolescence. The bracelet is your identity key — nothing more, nothing less.
+                </p>
+
+                <p className="text-white/50 mb-6" style={{ fontSize: 12 }}>
+                  Requires an active AETHER subscription to unlock all features.
                 </p>
 
                 <div className="space-y-2.5 mt-auto">
