@@ -484,7 +484,7 @@ const RightCard = ({ plan, onCardPayment, loadingPlan }: {
       </motion.div>
 
       <motion.p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.45)" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: baseDelay + 0.25 }}>
-        Free bracelet · No commitment
+        {plan.key === "precommande" ? "One-time payment" : "Free bracelet · No commitment"}
       </motion.p>
 
       <div className="w-full h-px mb-5" style={{ background: "rgba(255,255,255,0.1)" }} />
