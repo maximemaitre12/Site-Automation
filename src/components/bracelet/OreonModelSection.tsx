@@ -45,7 +45,7 @@ export default function OreonModelSection() {
     <section
       className="relative overflow-hidden"
       style={{
-        background: "radial-gradient(ellipse at 50% 30%, #2550D0 0%, #1A3FB8 40%, #142E8C 100%)",
+        background: "#0a2d6e",
       }}
     >
       {/* Ambient particles */}
