@@ -411,7 +411,7 @@ export default function OreonModelSection() {
                 <h3 className="text-white font-semibold mb-3" style={{ fontSize: 24 }}>
                   A beautiful object. Quietly waiting.
                 </h3>
-                <p className="text-white/78 leading-relaxed mb-4" style={{ fontSize: 15, lineHeight: 1.55 }}>
+                <p className="text-white leading-relaxed mb-4" style={{ fontSize: 15, lineHeight: 1.55 }}>
                   Without an active AETHER subscription, your Oreon bracelet remains exactly what it is physically — a durable, waterproof, lifetime-warranted piece of design. But it cannot trigger, learn or automate anything. The intelligence lives in AETHER. The bracelet is the key — AETHER is what unlocks every door behind it.
                 </p>
                 <p
