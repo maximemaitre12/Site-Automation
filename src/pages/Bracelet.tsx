@@ -329,10 +329,10 @@ export default function Bracelet() {
               Pricing
             </p>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#0F172A" }}>
-              Free bracelet, one-time payment
+              Choose your plan, one-time payment
             </h2>
             <p className="text-base max-w-[500px] mx-auto" style={{ color: "#64748B" }}>
-              No purchase cost. Choose your plan and receive your Oreon for free
+              Select the option that suits you best
             </p>
           </div>
 
