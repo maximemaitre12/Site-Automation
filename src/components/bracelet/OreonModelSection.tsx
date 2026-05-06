@@ -317,59 +317,6 @@ export default function OreonModelSection() {
         </p>
       </div>
 
-      {/* BLOCK 4 — PRICE ANCHORING */}
-      <div className="max-w-[1000px] mx-auto px-6 lg:px-12 pb-28 md:pb-32">
-        <motion.div
-          className="text-center mb-10"
-          variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}
-        >
-          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-6" style={{ color: "#0EA5E9" }}>
-            THE PRICE OF BIOMETRIC INTELLIGENCE
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {/* Whoop */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={0}>
-            <GlassCard className="p-6 text-center h-full transition-all duration-300 hover:brightness-110">
-              <p className="text-white/50 font-bold tracking-wider mb-4" style={{ fontSize: 14 }}>WHOOP</p>
-              <p className="text-white font-bold mb-1" style={{ fontSize: 28 }}>30€/month</p>
-              <p className="text-white/50" style={{ fontSize: 13 }}>+ no hardware included</p>
-            </GlassCard>
-          </motion.div>
-
-          {/* Oura */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
-            <GlassCard className="p-6 text-center h-full transition-all duration-300 hover:brightness-110">
-              <p className="text-white/50 font-bold tracking-wider mb-4" style={{ fontSize: 14 }}>OURA RING</p>
-              <p className="text-white font-bold mb-1" style={{ fontSize: 28 }}>5.99€/month</p>
-              <p className="text-white/50" style={{ fontSize: 13 }}>+ 349€ for the ring</p>
-              <p className="italic mt-1" style={{ fontSize: 13, color: "#0EA5E9" }}>= ~25€/month over 2 years</p>
-            </GlassCard>
-          </motion.div>
-
-          {/* OREON */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={2}>
-            <GlassCard
-              className="p-6 text-center h-full transition-all duration-300 hover:-translate-y-1"
-              style={{
-                border: "1.5px solid rgba(14,165,233,0.4)",
-                boxShadow: "0 0 40px rgba(14,165,233,0.15)",
-                transform: "scale(1.05)",
-              }}
-            >
-              <p className="text-white font-bold tracking-wider mb-4" style={{ fontSize: 14 }}>OREON</p>
-              <p className="font-bold mb-1" style={{ fontSize: 24, color: "#0EA5E9" }}>21.25€/month via SEPA</p>
-              <p className="text-white/60 mb-2" style={{ fontSize: 14 }}>or 25€/month by card</p>
-              <div className="flex items-center justify-center gap-1.5 mb-3">
-                <Check style={{ width: 14, height: 14, color: "#0EA5E9" }} />
-                <span style={{ fontSize: 13, color: "#0EA5E9" }}>+ bracelet from 3,99 €</span>
-              </div>
-              <p className="text-white/70 italic" style={{ fontSize: 12 }}>Best intelligence-to-price ratio on the market</p>
-            </GlassCard>
-          </motion.div>
-        </div>
-      </div>
     </section>
   );
 }
