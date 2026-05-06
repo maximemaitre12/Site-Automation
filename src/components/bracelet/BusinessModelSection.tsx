@@ -374,9 +374,9 @@ export default function BusinessModelSection() {
 
             {/* Right */}
             <div className="flex flex-col items-center gap-3">
-              <span className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/10 border border-white/20 text-white/80 font-bold text-sm tracking-wide uppercase">
-                Available Soon
-              </span>
+              <p className="text-white/60 text-sm text-center max-w-[320px]">
+                Your delivery address will be requested by email around June 1st
+              </p>
             </div>
           </div>
         </div>
