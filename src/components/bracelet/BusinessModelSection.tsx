@@ -3,28 +3,28 @@ import { Check, CreditCard, Calendar, Brain, Fingerprint, ChevronDown, Rocket, A
 
 const faqItems = [
   {
-    q: "Pourquoi un abonnement et pas un achat unique ?",
-    a: "Parce que l'intelligence artificielle évolue en permanence. Chaque mois, nous déployons de nouveaux algorithmes, de nouvelles intégrations et de nouvelles automatisations. Un achat unique fige le produit dans le temps. L'abonnement garantit que votre plateforme reste à la pointe, indéfiniment."
+    q: "Why a subscription instead of a one-time purchase?",
+    a: "Because artificial intelligence evolves constantly. Every month, we deploy new algorithms, new integrations and new automations. A one-time purchase freezes the product in time. The subscription ensures your platform stays cutting-edge, indefinitely."
   },
   {
-    q: "Que se passe-t-il si j'arrête mon abonnement ? Le bracelet fonctionne-t-il encore ?",
-    a: "Le bracelet reste votre propriété et continue de fonctionner comme identifiant NFC. Cependant, l'accès à la plateforme AETHER (coach IA, automatisations, analytics) sera suspendu jusqu'à réactivation de votre abonnement."
+    q: "What happens if I cancel my subscription? Does the bracelet still work?",
+    a: "The bracelet remains yours and continues to work as an NFC identifier. However, access to the AETHER platform (AI coach, automations, analytics) will be suspended until you reactivate your subscription."
   },
   {
-    q: "Pourquoi le SEPA est-il 15% moins cher ?",
-    a: "Les frais de traitement d'un prélèvement SEPA sont environ 5 fois inférieurs à ceux d'une transaction par carte bancaire. Plutôt que de garder cette marge, nous avons décidé de la reverser intégralement à nos utilisateurs sous forme de réduction."
+    q: "Why is SEPA 15% cheaper?",
+    a: "SEPA direct debit processing fees are about 5 times lower than credit card transaction fees. Rather than keeping this margin, we decided to pass the savings entirely to our users as a discount."
   },
   {
-    q: "Puis-je passer du SEPA à la carte (ou inversement) ?",
-    a: "Oui, à tout moment depuis votre espace personnel dans l'application. Le changement prend effet au prochain cycle de facturation."
+    q: "Can I switch from SEPA to card (or vice versa)?",
+    a: "Yes, at any time from your personal space in the app. The change takes effect at the next billing cycle."
   },
   {
-    q: "Comment annuler mon abonnement ?",
-    a: "En deux clics depuis votre application, sans justification, sans appel téléphonique, sans email. L'annulation est immédiate et vous conservez l'accès jusqu'à la fin de votre période en cours."
+    q: "How do I cancel my subscription?",
+    a: "In two clicks from your app, no justification needed, no phone call, no email. The cancellation is immediate and you keep access until the end of your current period."
   },
   {
-    q: "Mes données biométriques sont-elles vraiment privées ?",
-    a: "Absolument. Chiffrement AES-256 de bout en bout, hébergement exclusif en France (datacenter certifié SecNumCloud), conformité RGPD intégrale. Vos données ne sont jamais vendues, jamais partagées, jamais utilisées à des fins publicitaires. Vous pouvez demander leur suppression définitive à tout moment."
+    q: "Is my biometric data truly private?",
+    a: "Absolutely. End-to-end AES-256 encryption, hosted exclusively in France (SecNumCloud certified datacenter), full GDPR compliance. Your data is never sold, never shared, never used for advertising. You can request permanent deletion at any time."
   },
 ];
 
@@ -60,28 +60,28 @@ export default function BusinessModelSection() {
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-12 py-24 md:py-32">
 
-        {/* ═══ BEAT 1 — PHILOSOPHY ═══ */}
+        {/* BEAT 1 — PHILOSOPHY */}
         <div className="text-center mb-20 md:mb-28">
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-cyan-400/30 mb-8" style={{ background: "rgba(34,211,238,0.08)" }}>
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">Le modèle Oreon</span>
+            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">The Oreon model</span>
           </div>
 
           <h2 className="text-white font-semibold text-[32px] md:text-[52px] leading-[1.1] tracking-[-0.02em] mb-6 max-w-[800px] mx-auto">
-            Le bracelet est libre.{" "}
-            <span className="text-cyan-400">L'intelligence est dans AETHER.</span>
+            The bracelet is free.{" "}
+            <span className="text-cyan-400">The intelligence is in AETHER.</span>
           </h2>
 
           <p className="text-white/75 text-base md:text-lg leading-[1.55] max-w-[720px] mx-auto mb-8">
-            Notre conviction : l'objet doit être simple, durable, et accessible à tous. La vraie valeur n'est pas dans le silicone — elle est dans la plateforme qui transforme vos signaux biométriques en automatisations intelligentes. C'est pour cela que nous offrons le bracelet et que nous facturons l'intelligence.
+            Our conviction: the object should be simple, durable, and accessible to all. The real value is not in the silicone — it is in the platform that transforms your biometric signals into intelligent automations. That is why we offer the bracelet for free and charge for the intelligence.
           </p>
 
           <div className="w-20 h-[1px] bg-cyan-400/40 mx-auto" />
         </div>
 
-        {/* ═══ BEAT 2 — TWO COMPONENTS ═══ */}
+        {/* BEAT 2 — TWO COMPONENTS */}
         <div className="grid md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-0 items-stretch mb-20 md:mb-28">
-          {/* LEFT — L'OBJET */}
+          {/* LEFT — THE OBJECT */}
           <div
             className="rounded-3xl p-8 md:p-10 flex flex-col"
             style={{
@@ -92,17 +92,17 @@ export default function BusinessModelSection() {
             }}
           >
             <Fingerprint className="w-8 h-8 text-cyan-400 mb-4" />
-            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">L'objet</span>
-            <h3 className="text-white font-semibold text-[28px] mb-1">Bracelet Oreon</h3>
+            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">The object</span>
+            <h3 className="text-white font-semibold text-[28px] mb-1">Oreon Bracelet</h3>
             <div className="mb-4">
-              <span className="text-white font-bold text-[56px] leading-none">OFFERT</span>
-              <span className="block text-cyan-400 text-sm mt-1">À l'inscription</span>
+              <span className="text-white font-bold text-[56px] leading-none">FREE</span>
+              <span className="block text-cyan-400 text-sm mt-1">Upon registration</span>
             </div>
             <p className="text-white/80 text-[15px] leading-relaxed mb-6">
-              Un design minimaliste. Une puce NFC chiffrée. Aucune électronique active, aucune batterie, aucune obsolescence. Le bracelet est votre clé d'identité — rien de plus, rien de moins.
+              A minimalist design. An encrypted NFC chip. No active electronics, no battery, no planned obsolescence. The bracelet is your identity key — nothing more, nothing less.
             </p>
             <ul className="space-y-3 mt-auto">
-              {["Étanche, indestructible", "Sans batterie, sans charge", "Garantie à vie"].map(t => (
+              {["Waterproof, indestructible", "No battery, no charging", "Lifetime warranty"].map(t => (
                 <li key={t} className="flex items-center gap-3 text-white/90 text-sm">
                   <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" /> {t}
                 </li>
@@ -112,7 +112,7 @@ export default function BusinessModelSection() {
 
           {/* CENTER CONNECTOR */}
           <div className="hidden md:flex flex-col items-center justify-center px-6 relative" style={{ minWidth: 80 }}>
-            <span className="text-cyan-400/70 text-xs italic mb-3">+ requiert</span>
+            <span className="text-cyan-400/70 text-xs italic mb-3">+ requires</span>
             <div className="relative w-full h-[2px]">
               <div className="absolute inset-0 border-t-2 border-dashed border-cyan-400/30" />
               <div
@@ -135,7 +135,7 @@ export default function BusinessModelSection() {
             </div>
           </div>
 
-          {/* RIGHT — L'INTELLIGENCE */}
+          {/* RIGHT — THE INTELLIGENCE */}
           <div
             className="rounded-3xl p-8 md:p-10 flex flex-col relative overflow-hidden"
             style={{
@@ -162,29 +162,29 @@ export default function BusinessModelSection() {
               <div className="flex items-center gap-3 mb-4 flex-wrap">
                 <Brain className="w-8 h-8 text-cyan-400" />
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-cyan-400 text-[10px] font-semibold tracking-[0.15em] uppercase border border-cyan-400/30" style={{ background: "rgba(34,211,238,0.08)", animation: "badge-shimmer 8s ease-in-out infinite" }}>
-                  <Calendar className="w-3 h-3" /> Disponible le 1er juin 2026
+                  <Calendar className="w-3 h-3" /> Available June 1st, 2026
                 </span>
               </div>
 
-              <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">L'intelligence</span>
-              <h3 className="text-white font-semibold text-[28px] mb-1">Plateforme AETHER</h3>
+              <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">The intelligence</span>
+              <h3 className="text-white font-semibold text-[28px] mb-1">AETHER Platform</h3>
               <div className="mb-1">
                 <span className="text-white font-bold text-[56px] leading-none">25€</span>
-                <span className="text-white/70 text-2xl ml-1">/mois</span>
+                <span className="text-white/70 text-2xl ml-1">/month</span>
               </div>
-              <p className="text-cyan-400 text-sm mb-4">Sans engagement · Premier mois offert</p>
+              <p className="text-cyan-400 text-sm mb-4">No commitment · First month free</p>
 
               <p className="text-white/80 text-[15px] leading-relaxed mb-6">
-                L'agent IA qui transforme vos données biométriques en actions concrètes. Coach proactif, automatisations illimitées, marketplace de flows, intégrations smart-home, mises à jour à vie.
+                The AI agent that transforms your biometric data into concrete actions. Proactive coach, unlimited automations, flow marketplace, smart-home integrations, lifetime updates.
               </p>
 
               <ul className="space-y-3 mt-auto">
                 {[
-                  "AETHER Coach — agent IA conversationnel",
-                  "Automatisations illimitées (Aether Flows)",
-                  "Marketplace + intégrations Spotify, HomeKit, Calendar...",
-                  "Hébergement EU · chiffrement bout-en-bout",
-                  "Mises à jour à vie · support prioritaire",
+                  "AETHER Coach — conversational AI agent",
+                  "Unlimited automations (Aether Flows)",
+                  "Marketplace + Spotify, HomeKit, Calendar integrations...",
+                  "EU hosted · end-to-end encryption",
+                  "Lifetime updates · priority support",
                 ].map(t => (
                   <li key={t} className="flex items-start gap-3 text-white/90 text-sm">
                     <Check className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" /> {t}
@@ -195,16 +195,16 @@ export default function BusinessModelSection() {
           </div>
         </div>
 
-        {/* ═══ BEAT 3 — PAYMENT METHODS ═══ */}
+        {/* BEAT 3 — PAYMENT METHODS */}
         <div className="mb-20 md:mb-28">
           <div className="text-center mb-12">
             <div className="w-16 h-[1px] bg-cyan-400/40 mx-auto mb-6" />
-            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">Comment on paie</span>
+            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">How you pay</span>
             <h3 className="text-white font-semibold text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mt-4 mb-4">
-              Deux façons de payer. Une seule philosophie : la transparence.
+              Two ways to pay. One philosophy: transparency.
             </h3>
             <p className="text-white/75 text-[15px] md:text-[17px] max-w-[640px] mx-auto">
-              Pas de coût caché, pas de palier piège, pas d'engagement. Choisissez le moyen de paiement qui vous correspond.
+              No hidden costs, no pricing traps, no commitment. Choose the payment method that suits you.
             </p>
           </div>
 
@@ -220,27 +220,27 @@ export default function BusinessModelSection() {
               }}
             >
               <div className="absolute -top-3 left-8 px-4 py-1 rounded-full text-[10px] font-bold tracking-[0.1em] uppercase bg-cyan-400 text-[#0F1F4F]">
-                Recommandé · -15%
+                Recommended · -15%
               </div>
               <Shield className="w-7 h-7 text-cyan-400 mb-4 mt-2" />
-              <h4 className="text-white font-semibold text-[22px] mb-1">Prélèvement SEPA</h4>
-              <p className="text-cyan-400 text-sm font-medium mb-4">21,25€/mois — économisez 3,75€/mois</p>
+              <h4 className="text-white font-semibold text-[22px] mb-1">SEPA Direct Debit</h4>
+              <p className="text-cyan-400 text-sm font-medium mb-4">21.25€/month — save 3.75€/month</p>
               <p className="text-white/80 text-[15px] leading-relaxed mb-6">
-                Le standard des abonnements européens. Vous autorisez un prélèvement automatique mensuel depuis votre compte bancaire, comme Netflix ou Spotify avec votre IBAN. Plus économique pour nous, donc 15% moins cher pour vous.
+                The European subscription standard. You authorize an automatic monthly debit from your bank account, just like Netflix or Spotify with your IBAN. More cost-effective for us, so 15% cheaper for you.
               </p>
               <ul className="space-y-3 mb-6">
                 {[
-                  "15% de réduction permanente",
-                  "Aucune carte à mettre à jour à l'expiration",
-                  "Mandat révocable à tout moment depuis votre app",
-                  "Garantie SEPA : remboursement intégral sous 8 semaines en cas de litige",
+                  "Permanent 15% discount",
+                  "No card to update on expiration",
+                  "Mandate revocable at any time from your app",
+                  "SEPA guarantee: full refund within 8 weeks in case of dispute",
                 ].map(t => (
                   <li key={t} className="flex items-start gap-3 text-white/90 text-sm">
                     <Check className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" /> {t}
                   </li>
                 ))}
               </ul>
-              <p className="text-white/60 text-xs">Conforme au règlement SEPA Direct Debit · IBAN européen requis</p>
+              <p className="text-white/60 text-xs">Compliant with SEPA Direct Debit regulation · European IBAN required</p>
             </div>
 
             {/* CARD */}
@@ -254,52 +254,52 @@ export default function BusinessModelSection() {
               }}
             >
               <CreditCard className="w-7 h-7 text-cyan-400 mb-4" />
-              <h4 className="text-white font-semibold text-[22px] mb-1">Carte bancaire</h4>
-              <p className="text-white/70 text-sm font-medium mb-4">25€/mois — Visa, Mastercard, Amex</p>
+              <h4 className="text-white font-semibold text-[22px] mb-1">Credit card</h4>
+              <p className="text-white/70 text-sm font-medium mb-4">25€/month — Visa, Mastercard, Amex</p>
               <p className="text-white/80 text-[15px] leading-relaxed mb-6">
-                Le paiement classique, instantané, accepté partout. Vos coordonnées sont chiffrées et tokenisées via Stripe. Aucune carte n'est stockée chez nous.
+                The classic, instant payment method, accepted everywhere. Your details are encrypted and tokenized via Stripe. No card is stored on our end.
               </p>
               <ul className="space-y-3 mb-6">
                 {[
-                  "Activation instantanée à l'inscription",
-                  "Compatible avec toutes les cartes (Visa, Mastercard, Amex)",
-                  "Sécurisé par 3D Secure 2 (authentification forte)",
-                  "Annulation libre depuis votre app",
+                  "Instant activation upon registration",
+                  "Compatible with all cards (Visa, Mastercard, Amex)",
+                  "Secured by 3D Secure 2 (strong authentication)",
+                  "Free cancellation from your app",
                 ].map(t => (
                   <li key={t} className="flex items-start gap-3 text-white/90 text-sm">
                     <Check className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" /> {t}
                   </li>
                 ))}
               </ul>
-              <p className="text-white/60 text-xs">Paiement traité par Stripe · Conforme PCI-DSS niveau 1</p>
+              <p className="text-white/60 text-xs">Payment processed by Stripe · PCI-DSS Level 1 compliant</p>
             </div>
           </div>
 
           <p className="text-center text-white/70 text-sm italic mt-8 max-w-[700px] mx-auto">
-            Pourquoi le SEPA est moins cher ? Parce que les frais bancaires de prélèvement sont 5× moins élevés que ceux d'une transaction carte. Nous vous reversons cette économie directement.
+            Why is SEPA cheaper? Because direct debit bank fees are 5x lower than card transaction fees. We pass this saving directly to you.
           </p>
         </div>
 
-        {/* ═══ BEAT 4 — PRICE ANCHORING ═══ */}
+        {/* BEAT 4 — PRICE ANCHORING */}
         <div className="mb-20 md:mb-28">
           <div className="text-center mb-10">
-            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">Le prix de l'intelligence biométrique</span>
+            <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.2em] uppercase">The price of biometric intelligence</span>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Whoop */}
             <div className="rounded-3xl p-8 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)" }}>
               <p className="text-white/50 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Whoop 4.0</p>
-              <p className="text-white/70 font-bold text-3xl mb-2">30€<span className="text-lg font-normal">/mois</span></p>
-              <p className="text-white/50 text-sm">+ pas de hardware inclus</p>
+              <p className="text-white/70 font-bold text-3xl mb-2">30€<span className="text-lg font-normal">/month</span></p>
+              <p className="text-white/50 text-sm">+ no hardware included</p>
             </div>
 
             {/* Oura */}
             <div className="rounded-3xl p-8 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)" }}>
               <p className="text-white/50 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Oura Ring</p>
-              <p className="text-white/70 font-bold text-3xl mb-2">5,99€<span className="text-lg font-normal">/mois</span></p>
-              <p className="text-white/50 text-sm">+ 349€ pour la bague</p>
-              <p className="text-white/40 text-xs mt-2">= ~25€/mois sur 2 ans</p>
+              <p className="text-white/70 font-bold text-3xl mb-2">5.99€<span className="text-lg font-normal">/month</span></p>
+              <p className="text-white/50 text-sm">+ 349€ for the ring</p>
+              <p className="text-white/40 text-xs mt-2">= ~25€/month over 2 years</p>
             </div>
 
             {/* OREON */}
@@ -314,22 +314,22 @@ export default function BusinessModelSection() {
               }}
             >
               <p className="text-cyan-400 text-xs font-semibold tracking-[0.15em] uppercase mb-4">Oreon</p>
-              <p className="text-white font-bold text-3xl mb-1">21,25€<span className="text-lg font-normal text-white/70">/mois en SEPA</span></p>
-              <p className="text-white/60 text-sm mb-2">ou 25€/mois en CB</p>
-              <p className="text-cyan-400 text-sm font-medium">+ bracelet offert</p>
+              <p className="text-white font-bold text-3xl mb-1">21.25€<span className="text-lg font-normal text-white/70">/month via SEPA</span></p>
+              <p className="text-white/60 text-sm mb-2">or 25€/month by card</p>
+              <p className="text-cyan-400 text-sm font-medium">+ bracelet included free</p>
               <div className="flex items-center justify-center gap-2 mt-4">
                 <Check className="w-4 h-4 text-cyan-400" />
-                <span className="text-cyan-400 text-xs">Le meilleur rapport intelligence/prix du marché</span>
+                <span className="text-cyan-400 text-xs">Best intelligence-to-price ratio on the market</span>
               </div>
             </div>
           </div>
 
           <p className="text-center text-white/70 text-sm mt-8 max-w-[700px] mx-auto">
-            Plus complet que les leaders. Moins cher que la concurrence directe. Et sans hardware à 300€ à débourser.
+            More comprehensive than the leaders. Cheaper than direct competitors. And without 300€ hardware to buy upfront.
           </p>
         </div>
 
-        {/* ═══ BEAT 5 — CTA BANNER ═══ */}
+        {/* BEAT 5 — CTA BANNER */}
         <div
           className="rounded-3xl p-8 md:p-10 relative overflow-hidden mb-16 transition-all duration-300 hover:-translate-y-1"
           style={{
@@ -354,22 +354,22 @@ export default function BusinessModelSection() {
             {/* Left */}
             <div className="text-center md:text-left">
               <Rocket className="w-6 h-6 text-cyan-400 mb-2 mx-auto md:mx-0" />
-              <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase block">Lancement officiel</span>
-              <p className="text-white font-bold text-[28px] md:text-[32px]">1er Juin 2026</p>
+              <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase block">Official launch</span>
+              <p className="text-white font-bold text-[28px] md:text-[32px]">June 1st, 2026</p>
             </div>
 
             {/* Center */}
             <div className="text-center md:text-left">
-              <h4 className="text-white font-semibold text-xl md:text-2xl mb-2">Soyez parmi les 1000 premiers</h4>
+              <h4 className="text-white font-semibold text-xl md:text-2xl mb-2">Be among the first 1,000</h4>
               <p className="text-white/80 text-[15px] mb-3">
-                Premier mois offert · Bracelet livré dès lancement · Tarif early-bird verrouillé à vie
+                First month free · Bracelet delivered at launch · Early-bird price locked for life
               </p>
               <div className="mb-1">
                 <span className="text-cyan-400 font-bold text-[28px]">19€</span>
-                <span className="text-white/70 text-lg">/mois en SEPA</span>
-                <span className="text-white/50 text-sm line-through ml-3">21,25€</span>
+                <span className="text-white/70 text-lg">/month via SEPA</span>
+                <span className="text-white/50 text-sm line-through ml-3">21.25€</span>
               </div>
-              <p className="text-white/60 text-sm">ou 22€/mois en carte bancaire (au lieu de 25€)</p>
+              <p className="text-white/60 text-sm">or 22€/month by card (instead of 25€)</p>
             </div>
 
             {/* Right */}
@@ -378,13 +378,13 @@ export default function BusinessModelSection() {
                 href="#pricing"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-cyan-400 text-[#0F1F4F] font-bold text-sm tracking-wide uppercase transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:scale-105"
               >
-                Réserver ma place <ArrowRight className="w-4 h-4" />
+                Reserve my spot <ArrowRight className="w-4 h-4" />
               </a>
               <a href="#features" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/20 text-white/80 text-xs font-medium uppercase tracking-wide transition-all hover:bg-white/10">
-                En savoir plus
+                Learn more
               </a>
               <div className="mt-2 w-full max-w-[200px]">
-                <p className="text-white/60 text-[11px] text-center mb-1">812 places réservées sur 1000</p>
+                <p className="text-white/60 text-[11px] text-center mb-1">812 spots reserved out of 1,000</p>
                 <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div className="h-full rounded-full bg-cyan-400/80 w-[81%]" style={{ animation: "pulse-glow 3s ease-in-out infinite" }} />
                 </div>
@@ -395,16 +395,16 @@ export default function BusinessModelSection() {
 
         {/* Trust signals */}
         <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/60 text-xs mb-16">
-          <span className="flex items-center gap-1.5"><Lock className="w-3 h-3" /> Paiement sécurisé Stripe</span>
+          <span className="flex items-center gap-1.5"><Lock className="w-3 h-3" /> Secure payment via Stripe</span>
           <span>·</span>
-          <span>🇪🇺 Hébergé en France</span>
+          <span>🇪🇺 Hosted in France</span>
           <span>·</span>
-          <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> RGPD compliant</span>
+          <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> GDPR compliant</span>
           <span>·</span>
-          <span>↩ Annulation libre</span>
+          <span>↩ Free cancellation</span>
         </div>
 
-        {/* ═══ BEAT 6 — FAQ ═══ */}
+        {/* BEAT 6 — FAQ */}
         <div className="max-w-[800px] mx-auto">
           {faqItems.map((item, i) => (
             <div
@@ -441,7 +441,7 @@ export default function BusinessModelSection() {
 
         {/* Section footer */}
         <p className="text-center text-white/60 text-sm italic mt-16">
-          Modèle transparent · Sans engagement · Construit pour durer.
+          Transparent model · No commitment · Built to last.
         </p>
       </div>
 
