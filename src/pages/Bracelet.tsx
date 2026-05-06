@@ -62,13 +62,9 @@ const plans = [
     price: "4,99",
     popular: true,
     features: [
-      "Oreon bracelet included free",
-      "Full biometric tracking",
-      "Advanced health dashboard",
-      "AI smart alerts",
-      "Unlimited AI automations",
+      "Oreon physical bracelet",
+      "Shipping included",
       "Delivery within 48h",
-      "Weekly reports",
       "Priority support",
     ],
   },
@@ -359,7 +355,7 @@ export default function Bracelet() {
                   <span className="font-heading text-4xl font-bold" style={{ color: "#1E4D8C" }}>{plan.price}€</span>
                   <span className="text-sm" style={{ color: "#64748B" }}>one-time payment</span>
                 </div>
-                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>{plan.key === "precommande" ? "One-time payment" : "Free bracelet · Single payment"}</p>
+                <p className="text-xs mb-8" style={{ color: "#94A3B8" }}>One-time payment</p>
                 <ul className="space-y-3 mb-10">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm" style={{ color: "#334155" }}>
@@ -412,7 +408,7 @@ export default function Bracelet() {
                 )}
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  {plan.key === "precommande" ? "One-time payment · Satisfaction guaranteed" : "One-time payment · Free bracelet · Satisfaction guaranteed"}
+                  One-time payment · Satisfaction guaranteed
                 </p>
               </div>
             ))}
