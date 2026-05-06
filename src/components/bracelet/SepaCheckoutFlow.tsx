@@ -134,6 +134,60 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
           }}
           autoComplete="email"
         />
+        <input
+          type="text"
+          placeholder="Delivery address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+          style={{
+            background: inputBg,
+            border: `1px solid ${inputBorder}`,
+            color: inputText,
+          }}
+          autoComplete="street-address"
+        />
+        <div className="flex gap-3">
+          <input
+            type="text"
+            placeholder="City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="flex-1 px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+            style={{
+              background: inputBg,
+              border: `1px solid ${inputBorder}`,
+              color: inputText,
+            }}
+            autoComplete="address-level2"
+          />
+          <input
+            type="text"
+            placeholder="Postal code"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            className="w-[120px] px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+            style={{
+              background: inputBg,
+              border: `1px solid ${inputBorder}`,
+              color: inputText,
+            }}
+            autoComplete="postal-code"
+          />
+        </div>
+        <input
+          type="text"
+          placeholder="Country"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
+          style={{
+            background: inputBg,
+            border: `1px solid ${inputBorder}`,
+            color: inputText,
+          }}
+          autoComplete="country-name"
+        />
       </div>
 
       {error && (
