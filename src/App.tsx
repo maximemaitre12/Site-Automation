@@ -44,6 +44,7 @@ import Terms from "./pages/legal/Terms";
 import Security from "./pages/legal/Security";
 import LegalNotice from "./pages/legal/LegalNotice";
 import BraceletCGU from "./pages/legal/BraceletCGU";
+import BraceletCGV from "./pages/legal/BraceletCGV";
 
 // Product pages
 import Bracelet from "./pages/Bracelet";
@@ -111,6 +112,7 @@ const App = () => {
                 <Route path="/legal/security" element={<Security />} />
                 <Route path="/legal/mentions" element={<LegalNotice />} />
                 <Route path="/legal/bracelet-cgu" element={<BraceletCGU />} />
+                <Route path="/legal/bracelet-cgv" element={<BraceletCGV />} />
                 <Route path="/bracelet" element={<Bracelet />} />
                 <Route path="/platform" element={<Landing />} />
               </Route>
