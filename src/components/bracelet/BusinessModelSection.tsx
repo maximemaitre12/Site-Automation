@@ -339,60 +339,207 @@ export default function BusinessModelSection() {
           </p>
         </div>
 
-        {/* BEAT 5 — CTA BANNER */}
-        <div
-          className="rounded-3xl p-8 md:p-10 relative overflow-hidden mb-16 transition-all duration-300 hover:-translate-y-1"
-          style={{
-            background: "linear-gradient(135deg, #0A1C4A, #1A3FB8)",
-            boxShadow: "0 0 40px rgba(34,211,238,0.1), 0 20px 60px rgba(0,0,0,0.3)",
-            border: "1px solid rgba(34,211,238,0.2)",
-          }}
-        >
-          {/* Aurora */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-            <div
-              className="absolute w-[400px] h-[400px] rounded-full opacity-[0.08]"
-              style={{
-                background: "radial-gradient(circle, #22d3ee, transparent 70%)",
-                top: "-30%", right: "-10%",
-                animation: "aurora-drift 18s ease-in-out infinite alternate",
-              }}
-            />
-          </div>
-
-          <div className="relative z-10 grid md:grid-cols-[1fr_auto] gap-8 items-center">
-            {/* Left */}
-            <div className="text-center md:text-left">
-              <div className="flex items-center gap-3 mb-3 justify-center md:justify-start">
-                <Rocket className="w-6 h-6 text-cyan-400" />
-                <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase">Pre-order now</span>
+        {/* BEAT 5 — EARLY-BIRD OFFER */}
+        <div className="mb-20 md:mb-28">
+          {/* Eyebrow pill + counter */}
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-cyan-400/30 mb-4" style={{ background: "rgba(34,211,238,0.08)" }}>
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-cyan-400 text-[11px] font-semibold tracking-[0.18em] uppercase">Early-bird offer · Limited to 1,000 pre-orders</span>
+            </div>
+            <div className="max-w-[280px] mx-auto">
+              <p className="text-cyan-400/80 text-xs font-medium mb-1.5">812 / 1,000 bracelets reserved</p>
+              <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                <div className="h-full rounded-full bg-cyan-400/70" style={{ width: "81%", animation: "pulse-glow 3s ease-in-out infinite" }} />
               </div>
-              <h4 className="text-white font-semibold text-xl md:text-2xl mb-2">Get your Oreon bracelet from 3,99 €</h4>
-              <p className="text-white/80 text-[15px] mb-3">
-                One-time payment · Shipping included · Bracelet delivered around June 1st, when the AETHER platform goes live
-              </p>
-              <p className="text-white/60 text-sm">
-                Your delivery address will be requested by email around mid-May
-              </p>
-            </div>
-
-            {/* Right */}
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-cyan-400 font-bold text-[32px]">3,99 €</span>
-              <span className="text-white/60 text-xs">or 4,99 € express</span>
             </div>
           </div>
-        </div>
 
-        {/* Trust signals */}
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/60 text-xs mb-16">
-          <span className="flex items-center gap-1.5"><Lock className="w-3 h-3" /> Secure payment via Stripe</span>
-          <span>·</span>
-          <span>🇪🇺 Hosted in France</span>
-          <span>·</span>
-          <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> GDPR compliant</span>
-          <span>·</span>
-          <span>↩ Free cancellation</span>
+          {/* Headline */}
+          <h3 className="text-white font-semibold text-[28px] md:text-[44px] leading-[1.1] tracking-[-0.02em] text-center mb-5 max-w-[800px] mx-auto">
+            Pre-order today. Lock the early-bird AETHER price for life.
+          </h3>
+
+          {/* Subtitle */}
+          <p className="text-white/75 text-[15px] md:text-[17px] leading-[1.6] text-center max-w-[720px] mx-auto mb-14">
+            The Oreon bracelet is a separate product from the AETHER platform. Pre-order your bracelet now, and when AETHER opens on June 1st 2026, you will keep the early-bird subscription price forever — 19 €/month via SEPA or 22 €/month by card, instead of the standard 21,25 € / 25 €. This offer is reserved for the first 1,000 bracelet pre-orderers.
+          </p>
+
+          {/* TIMELINE */}
+          <div className="relative grid md:grid-cols-3 gap-6 md:gap-0 mb-14">
+            {/* Connecting line — desktop */}
+            <div className="hidden md:block absolute top-1/2 left-[16.66%] right-[16.66%] -translate-y-1/2 z-0" style={{ height: 2 }}>
+              <div className="absolute inset-0 border-t-2 border-dashed border-cyan-400/25" />
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-cyan-400/60"
+                style={{ animation: "dot-travel 4s ease-in-out infinite" }}
+              />
+            </div>
+
+            {/* Step 1 — TODAY */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="rounded-2xl p-6 md:p-8 w-full max-w-[320px] flex flex-col items-center text-center"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backdropFilter: "blur(20px)",
+                }}
+              >
+                <ShoppingCart className="w-7 h-7 text-cyan-400 mb-3" />
+                <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase mb-2">Today</span>
+                <h4 className="text-white font-semibold text-lg mb-3">Pre-order your bracelet</h4>
+                <p className="text-white/70 text-sm leading-relaxed">
+                  From 3,99 € · one-time payment
+                </p>
+                <p className="text-white/50 text-xs mt-1">
+                  Pre-order (3,99 €) or Express (4,99 €)
+                </p>
+              </div>
+              {/* Mobile connector */}
+              <div className="md:hidden flex flex-col items-center py-3">
+                <div className="w-[2px] h-8 border-l-2 border-dashed border-cyan-400/25" />
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400/50 animate-pulse" />
+              </div>
+            </div>
+
+            {/* Step 2 — MAY 2026 */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="rounded-2xl p-6 md:p-8 w-full max-w-[320px] flex flex-col items-center text-center"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backdropFilter: "blur(20px)",
+                }}
+              >
+                <Package className="w-7 h-7 text-cyan-400 mb-3" />
+                <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase mb-2">May 2026</span>
+                <h4 className="text-white font-semibold text-lg mb-3">Receive your bracelet</h4>
+                <p className="text-white/70 text-sm leading-relaxed">
+                  Express delivery within 48h after order
+                </p>
+                <p className="text-white/50 text-xs mt-1">
+                  Pre-order delivery: late May / early June
+                </p>
+              </div>
+              {/* Mobile connector */}
+              <div className="md:hidden flex flex-col items-center py-3">
+                <div className="w-[2px] h-8 border-l-2 border-dashed border-cyan-400/25" />
+                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400/50 animate-pulse" />
+              </div>
+            </div>
+
+            {/* Step 3 — JUNE 1ST 2026 */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div
+                className="rounded-2xl p-6 md:p-8 w-full max-w-[320px] flex flex-col items-center text-center relative overflow-hidden"
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1.5px solid rgba(34,211,238,0.35)",
+                  backdropFilter: "blur(20px)",
+                  boxShadow: "0 0 30px rgba(34,211,238,0.08)",
+                }}
+              >
+                {/* Aurora inside */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                  <div
+                    className="absolute w-[200px] h-[200px] rounded-full opacity-[0.06]"
+                    style={{
+                      background: "radial-gradient(circle, #22d3ee, transparent 70%)",
+                      top: "-20%", right: "-10%",
+                      animation: "aurora-drift 15s ease-in-out infinite alternate",
+                    }}
+                  />
+                </div>
+                {/* Badge */}
+                <div className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-cyan-400 text-[9px] font-semibold tracking-[0.1em] uppercase border border-cyan-400/30" style={{ background: "rgba(34,211,238,0.08)", animation: "badge-shimmer 8s ease-in-out infinite" }}>
+                  <Calendar className="w-2.5 h-2.5" /> June 1st
+                </div>
+                <div className="relative z-10 flex flex-col items-center">
+                  <Rocket className="w-7 h-7 text-cyan-400 mb-3" style={{ filter: "drop-shadow(0 0 6px rgba(34,211,238,0.4))" }} />
+                  <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.2em] uppercase mb-2">June 1st, 2026</span>
+                  <h4 className="text-white font-semibold text-lg mb-3">AETHER opens</h4>
+                  <p className="text-white/70 text-sm leading-relaxed">
+                    Activate your subscription with the early-bird price locked for life
+                  </p>
+                  <p className="text-cyan-400 text-xs font-medium mt-2">
+                    19 €/month SEPA · 22 €/month card
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* PRICING COMPARISON */}
+          <div className="grid md:grid-cols-2 gap-6 max-w-[800px] mx-auto mb-10">
+            {/* Early-bird */}
+            <div
+              className="rounded-2xl p-6 text-center"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1.5px solid rgba(34,211,238,0.25)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              <span className="text-cyan-400 text-[10px] font-semibold tracking-[0.15em] uppercase block mb-3">Early-bird (first 1,000 pre-orderers)</span>
+              <p className="text-white font-bold text-2xl mb-1">19 €<span className="text-white/70 text-sm font-normal">/month via SEPA</span></p>
+              <p className="text-white/60 text-sm mb-3">22 €/month via card</p>
+              <p className="text-white/50 text-xs">Locked for life as long as your subscription remains active</p>
+              <p className="text-white/40 text-xs mt-1">Available from June 1st, 2026</p>
+            </div>
+
+            {/* Standard */}
+            <div
+              className="rounded-2xl p-6 text-center"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              <span className="text-white/50 text-[10px] font-semibold tracking-[0.15em] uppercase block mb-3">Standard pricing (after the first 1,000)</span>
+              <p className="text-white/70 font-bold text-2xl mb-1">21,25 €<span className="text-white/50 text-sm font-normal">/month via SEPA</span></p>
+              <p className="text-white/40 text-sm mb-3">25 €/month via card</p>
+              <p className="text-white/40 text-xs">Available from June 1st, 2026</p>
+            </div>
+          </div>
+
+          <p className="text-center text-white/65 text-sm italic mb-10" style={{ fontFamily: "'EB Garamond', Georgia, serif" }}>
+            A 10 % lifetime discount, just for trusting us early.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <a
+              href="#pricing"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-cyan-400 text-[#0F1F4F] font-semibold text-sm tracking-wide hover:bg-cyan-300 transition-colors"
+            >
+              Pre-order my bracelet <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="#faq"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border border-white/20 text-white/80 font-medium text-sm hover:border-cyan-400/40 hover:text-cyan-400 transition-colors"
+            >
+              Read the FAQ
+            </a>
+          </div>
+
+          {/* Counter */}
+          <p className="text-center text-white/50 text-xs mb-8">
+            <span className="text-cyan-400/80 font-medium" style={{ animation: "pulse-glow 3s ease-in-out infinite" }}>812 / 1,000</span> bracelets already reserved · Closes when full or on June 1st 2026
+          </p>
+
+          {/* Trust signals */}
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-white/60 text-xs">
+            <span className="flex items-center gap-1.5"><Lock className="w-3 h-3" /> Secure payment via Stripe & GoCardless</span>
+            <span>·</span>
+            <span>🇪🇺 Hosted in France</span>
+            <span>·</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3 h-3" /> GDPR compliant</span>
+            <span>·</span>
+            <span>↩ Free cancellation</span>
+          </div>
         </div>
 
         {/* BEAT 6 — FAQ */}
