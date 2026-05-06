@@ -412,7 +412,7 @@ export default function Bracelet() {
                 )}
 
                 <p className="text-xs text-center mt-4" style={{ color: "#94A3B8" }}>
-                  One-time payment · Free bracelet · Satisfaction guaranteed
+                  {plan.key === "precommande" ? "One-time payment · Satisfaction guaranteed" : "One-time payment · Free bracelet · Satisfaction guaranteed"}
                 </p>
               </div>
             ))}
