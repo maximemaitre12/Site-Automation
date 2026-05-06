@@ -728,7 +728,7 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.25, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        Free bracelet<span style={{ color: "#1A3FB8" }}>,</span> one-time payment
+                        Choose your plan<span style={{ color: "#1A3FB8" }}>,</span> one-time payment
                       </motion.h2>
                       
                       <motion.p
