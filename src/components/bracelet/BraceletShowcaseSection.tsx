@@ -93,10 +93,11 @@ export default function BraceletShowcaseSection() {
         if (!container) return;
         const rect = container.getBoundingClientRect();
         const viewH = window.innerHeight;
-        const earlyStart = viewH * 0.5;
+        const isMobile = viewH < 1024 && window.innerWidth < 1024;
+        const earlyStart = isMobile ? viewH * 0.85 : viewH * 0.5;
         const stickyTravel = Math.max(1, rect.height - viewH + earlyStart);
         const progress = Math.max(0, Math.min(1, (earlyStart - rect.top) / stickyTravel));
-        const rotateProgress = Math.min(1, progress * 1.4);
+        const rotateProgress = Math.min(1, progress * (isMobile ? 1.8 : 1.4));
         const frameOffset = Math.round(rotateProgress * travelFrames) * direction;
         const frameIndex = ((START_INDEX + frameOffset) % TOTAL_FRAMES + TOTAL_FRAMES) % TOTAL_FRAMES;
         drawFrameByIndex(frameIndex);
@@ -170,7 +171,7 @@ export default function BraceletShowcaseSection() {
                 ))}
                 <canvas
                   ref={canvasRef}
-                  className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[520px] lg:max-h-[70vh] object-contain"
+                  className="relative z-10 w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[520px] lg:max-h-[70vh] object-contain"
                   style={{
                     opacity: loaded ? 1 : 0,
                     transition: "opacity 0.6s",
