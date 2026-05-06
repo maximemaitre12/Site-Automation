@@ -336,7 +336,7 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
         animate={{ opacity: 1 }}
         transition={{ delay: baseDelay + 0.15 }}
       >
-        Disponible bientôt
+        Available soon
       </motion.span>
 
       <motion.div
