@@ -136,7 +136,7 @@ export default function Bracelet() {
       if (response.error) throw new Error(response.error.message);
       const { url } = response.data;
       if (url) {
-        window.open(url, "_blank");
+        window.location.href = url;
       }
     } catch (err: any) {
       toast({
