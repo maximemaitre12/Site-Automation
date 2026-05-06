@@ -51,12 +51,9 @@ const plans = [
     key: "precommande",
     price: "3,99",
     features: [
-      "Oreon bracelet included free",
-      "Full biometric tracking",
-      "Health dashboard",
-      "AI smart alerts",
-      "AI automations",
-      "Delivered when available",
+      "Oreon physical bracelet",
+      "Shipping included",
+      "Delivered around June 1st",
     ],
   },
   {
