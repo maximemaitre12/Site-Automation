@@ -9,7 +9,7 @@ import BraceletShowcaseSection from "@/components/bracelet/BraceletShowcaseSecti
 import AnimatedSpecsSection from "@/components/bracelet/AnimatedSpecsSection";
 import BusinessModelSection from "@/components/bracelet/BusinessModelSection";
 import OceanWaveDivider from "@/components/bracelet/OceanWaveDivider";
-import OreonModelSection from "@/components/bracelet/OreonModelSection";
+
 import SepaCheckoutFlow from "@/components/bracelet/SepaCheckoutFlow";
 
 const features = [
@@ -258,9 +258,6 @@ export default function Bracelet() {
         frontColor="#1A3FB8"
         variant="b"
       />
-
-      {/* THE OREON MODEL */}
-      <OreonModelSection />
 
       {/* Wave */}
       <OceanWaveDivider
