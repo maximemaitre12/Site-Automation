@@ -9,8 +9,8 @@ const corsHeaders = {
 };
 
 const PRICES: Record<string, string> = {
-  precommande: "price_1TTivoH0Zbdp95xiiItwYobN",
-  livraison: "price_1TTivpH0Zbdp95xioHpG333B",
+  precommande: "price_1TUPFQ5wHr6rOHUC45jOQU41",
+  livraison: "price_1TUuXl5wHr6rOHUC7cW9efjd",
 };
 
 serve(async (req) => {
