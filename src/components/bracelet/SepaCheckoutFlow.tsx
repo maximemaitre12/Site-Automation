@@ -159,8 +159,8 @@ function SepaForm({ planName, planKey, price, onBack, dark = false }: SepaChecko
 }
 
 function SepaConfirmStep({
-  fullName, email, price, dark, onBack, onSuccess,
-}: { fullName: string; email: string; price: string; dark: boolean; onBack: () => void; onSuccess: () => void }) {
+  clientSecret, fullName, email, price, dark, onBack, onSuccess,
+}: { clientSecret: string; fullName: string; email: string; price: string; dark: boolean; onBack: () => void; onSuccess: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -182,16 +182,12 @@ function SepaConfirmStep({
     const iban = elements.getElement(IbanElement);
     if (!iban) { setError("IBAN field not ready"); setSubmitting(false); return; }
 
-    const { error: confirmErr, paymentIntent } = await stripe.confirmSepaDebitPayment(
-      // @ts-ignore -- client secret comes from Elements provider
-      undefined as any,
-      {
-        payment_method: {
-          sepa_debit: iban,
-          billing_details: { name: fullName, email },
-        },
-      } as any,
-    );
+    const { error: confirmErr, paymentIntent } = await stripe.confirmSepaDebitPayment(clientSecret, {
+      payment_method: {
+        sepa_debit: iban,
+        billing_details: { name: fullName, email },
+      },
+    });
 
     if (confirmErr) {
       setError(confirmErr.message || "Mandate could not be authorized");
