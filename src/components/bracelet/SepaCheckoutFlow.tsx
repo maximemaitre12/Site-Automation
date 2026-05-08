@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Loader2, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { loadStripe, type Stripe as StripeJS } from "@stripe/stripe-js";
+import { Elements, IbanElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SepaCheckoutFlowProps {
@@ -10,7 +12,16 @@ interface SepaCheckoutFlowProps {
   dark?: boolean;
 }
 
-export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dark = false }: SepaCheckoutFlowProps) {
+interface IntentData {
+  client_secret: string;
+  publishable_key: string;
+}
+
+export default function SepaCheckoutFlow(props: SepaCheckoutFlowProps) {
+  return <SepaForm {...props} />;
+}
+
+function SepaForm({ planName, planKey, price, onBack, dark = false }: SepaCheckoutFlowProps) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
@@ -18,8 +29,11 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("France");
   const [acceptMandate, setAcceptMandate] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [creatingIntent, setCreatingIntent] = useState(false);
+  const [intent, setIntent] = useState<IntentData | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<StripeJS | null> | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const textColor = dark ? "#fff" : "#0F172A";
   const subColor = dark ? "rgba(255,255,255,0.6)" : "#64748B";
@@ -30,7 +44,7 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   const noticeBg = dark ? "rgba(111,224,245,0.08)" : "rgba(26,63,184,0.06)";
   const noticeBorder = dark ? "rgba(111,224,245,0.25)" : "rgba(26,63,184,0.2)";
 
-  const countryCode = (() => {
+  const countryCode = useMemo(() => {
     const c = country.trim().toLowerCase();
     if (["france", "fr"].includes(c)) return "FR";
     if (["belgium", "belgique", "be"].includes(c)) return "BE";
@@ -41,12 +55,11 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
     if (["luxembourg", "lu"].includes(c)) return "LU";
     if (["portugal", "pt"].includes(c)) return "PT";
     return country.trim().slice(0, 2).toUpperCase() || "FR";
-  })();
+  }, [country]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreateIntent = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     if (!fullName.trim() || fullName.trim().length < 2) return setError("Please enter your full name");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Please enter a valid email address");
     if (!address.trim() || address.trim().length < 5) return setError("Please enter your delivery address");
@@ -54,9 +67,9 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
     if (!postalCode.trim()) return setError("Please enter your postal code");
     if (!acceptMandate) return setError("You must authorize the SEPA direct debit mandate to proceed");
 
-    setLoading(true);
+    setCreatingIntent(true);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("bracelet-sepa-checkout", {
+      const { data, error: fnError } = await supabase.functions.invoke("bracelet-sepa-intent", {
         body: {
           plan: planKey,
           email: email.trim().toLowerCase(),
@@ -68,19 +81,48 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         },
       });
       if (fnError) throw fnError;
-      if (!data?.url) throw new Error("No checkout URL returned");
-      window.location.href = data.url;
+      if (!data?.client_secret || !data?.publishable_key) throw new Error("Missing Stripe configuration");
+      setIntent({ client_secret: data.client_secret, publishable_key: data.publishable_key });
+      setStripePromise(loadStripe(data.publishable_key));
     } catch (err: any) {
-      setError(err.message || "An error occurred while creating your SEPA mandate");
-      setLoading(false);
+      setError(err.message || "Could not initialize SEPA mandate");
+    } finally {
+      setCreatingIntent(false);
     }
   };
 
+  if (success) {
+    return (
+      <div className="text-center py-8">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: accentColor + "20" }}>
+          <CheckCircle2 className="w-6 h-6" style={{ color: accentColor }} />
+        </div>
+        <p className="text-sm font-semibold mb-2" style={{ color: textColor }}>Mandate authorized</p>
+        <p className="text-xs leading-relaxed max-w-[280px] mx-auto" style={{ color: subColor }}>
+          Your SEPA Direct Debit of {price}€ has been registered. Funds will be debited from your account within 24 hours. A confirmation email is on its way.
+        </p>
+      </div>
+    );
+  }
+
+  if (intent && stripePromise) {
+    return (
+      <Elements stripe={stripePromise} options={{ clientSecret: intent.client_secret, locale: "en" }}>
+        <SepaConfirmStep
+          fullName={fullName}
+          email={email}
+          price={price}
+          dark={dark}
+          onBack={() => { setIntent(null); setStripePromise(null); }}
+          onSuccess={() => setSuccess(true)}
+        />
+      </Elements>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="py-4">
-      <p className="text-sm font-semibold mb-1 text-center" style={{ color: textColor }}>
-        SEPA Direct Debit — {planName}
-      </p>
+    <form onSubmit={handleCreateIntent} className="py-4">
+      <p className="text-sm font-semibold mb-1 text-center" style={{ color: textColor }}>SEPA Direct Debit — {planName}</p>
       <p className="text-xs mb-4 text-center" style={{ color: subColor }}>
         Authorize a secure SEPA mandate of {price}€ — funds debited within 24 hours
       </p>
@@ -96,29 +138,116 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         <input type="text" placeholder="Country" value={country} onChange={(e) => setCountry(e.target.value)} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="country-name" />
       </div>
 
-      <div className="rounded-lg p-3 mb-3 text-[11px] leading-relaxed" style={{ background: noticeBg, border: `1px solid ${noticeBorder}`, color: subColor }}>
-        <div className="flex items-start gap-2">
-          <ShieldCheck className="w-3.5 h-3.5 mt-[1px] flex-shrink-0" style={{ color: accentColor }} />
-          <span style={{ color: textColor }}>
-            By confirming, you authorize <strong>AETHER</strong> and Stripe, our payment service provider, to send instructions to your bank to debit your account of <strong>{price}€</strong> for your Oreon bracelet order. The amount will be debited within <strong>24 hours</strong>. You are entitled to a refund from your bank under the terms of your agreement.
-          </span>
-        </div>
-      </div>
-
       <label className="flex items-start gap-2 mb-4 cursor-pointer text-[11px]" style={{ color: subColor }}>
         <input type="checkbox" checked={acceptMandate} onChange={(e) => setAcceptMandate(e.target.checked)} className="mt-[2px] cursor-pointer" />
-        <span>I authorize the SEPA Direct Debit mandate and accept the <a href="/legal/bracelet-cgv" target="_blank" rel="noopener" style={{ color: accentColor }} className="underline">Terms of Sale</a>.</span>
+        <span>I have read and accept the <a href="/legal/bracelet-cgv" target="_blank" rel="noopener" style={{ color: accentColor }} className="underline">Terms of Sale</a>.</span>
       </label>
 
       {error && <p className="text-xs text-red-400 text-center mb-3">{error}</p>}
 
-      <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60" style={{ background: dark ? "linear-gradient(135deg, #6FE0F5, #0BA5C7)" : "linear-gradient(135deg, #1A3FB8, #2451D9)", color: dark ? "#0A1C4A" : "#fff" }}>
-        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-        {loading ? "Creating secure mandate…" : `Authorize SEPA mandate — ${price}€`}
+      <button type="submit" disabled={creatingIntent} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60" style={{ background: dark ? "linear-gradient(135deg, #6FE0F5, #0BA5C7)" : "linear-gradient(135deg, #1A3FB8, #2451D9)", color: dark ? "#0A1C4A" : "#fff" }}>
+        {creatingIntent ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+        Continue to IBAN
       </button>
 
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80" style={{ color: accentColor }}>
         <ArrowLeft className="w-3 h-3" /> Back to options
+      </button>
+    </form>
+  );
+}
+
+function SepaConfirmStep({
+  fullName, email, price, dark, onBack, onSuccess,
+}: { fullName: string; email: string; price: string; dark: boolean; onBack: () => void; onSuccess: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const textColor = dark ? "#fff" : "#0F172A";
+  const subColor = dark ? "rgba(255,255,255,0.6)" : "#64748B";
+  const inputBg = dark ? "rgba(255,255,255,0.08)" : "#F8FAFC";
+  const inputBorder = dark ? "rgba(255,255,255,0.15)" : "#E2E8F0";
+  const accentColor = dark ? "#6FE0F5" : "#1A3FB8";
+  const noticeBg = dark ? "rgba(111,224,245,0.08)" : "rgba(26,63,184,0.06)";
+  const noticeBorder = dark ? "rgba(111,224,245,0.25)" : "rgba(26,63,184,0.2)";
+
+  const handleConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setError("");
+    setSubmitting(true);
+    const iban = elements.getElement(IbanElement);
+    if (!iban) { setError("IBAN field not ready"); setSubmitting(false); return; }
+
+    const { error: confirmErr, paymentIntent } = await stripe.confirmSepaDebitPayment(
+      // @ts-ignore -- client secret comes from Elements provider
+      undefined as any,
+      {
+        payment_method: {
+          sepa_debit: iban,
+          billing_details: { name: fullName, email },
+        },
+      } as any,
+    );
+
+    if (confirmErr) {
+      setError(confirmErr.message || "Mandate could not be authorized");
+      setSubmitting(false);
+      return;
+    }
+    if (paymentIntent && (paymentIntent.status === "processing" || paymentIntent.status === "succeeded")) {
+      onSuccess();
+    } else {
+      setError("Unexpected status: " + (paymentIntent?.status || "unknown"));
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleConfirm} className="py-4">
+      <p className="text-sm font-semibold mb-1 text-center" style={{ color: textColor }}>Enter your IBAN</p>
+      <p className="text-xs mb-4 text-center" style={{ color: subColor }}>
+        Securely processed by Stripe — your IBAN never touches our servers
+      </p>
+
+      <div className="px-4 py-3 rounded-lg mb-4" style={{ background: inputBg, border: `1px solid ${inputBorder}` }}>
+        <IbanElement
+          options={{
+            supportedCountries: ["SEPA"],
+            placeholderCountry: "FR",
+            style: {
+              base: {
+                color: textColor,
+                fontSize: "14px",
+                fontFamily: "inherit",
+                "::placeholder": { color: subColor },
+              },
+              invalid: { color: "#ef4444" },
+            },
+          }}
+        />
+      </div>
+
+      <div className="rounded-lg p-3 mb-4 text-[11px] leading-relaxed" style={{ background: noticeBg, border: `1px solid ${noticeBorder}`, color: subColor }}>
+        <div className="flex items-start gap-2">
+          <ShieldCheck className="w-3.5 h-3.5 mt-[1px] flex-shrink-0" style={{ color: accentColor }} />
+          <span style={{ color: textColor }}>
+            By providing your IBAN and confirming this payment, you authorize <strong>AETHER</strong> and Stripe, our payment service provider, to send instructions to your bank to debit your account of <strong>{price}€</strong>. The amount will be debited within <strong>24 hours</strong>. You are entitled to a refund from your bank under the terms of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.
+          </span>
+        </div>
+      </div>
+
+      {error && <p className="text-xs text-red-400 text-center mb-3">{error}</p>}
+
+      <button type="submit" disabled={!stripe || submitting} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60" style={{ background: dark ? "linear-gradient(135deg, #6FE0F5, #0BA5C7)" : "linear-gradient(135deg, #1A3FB8, #2451D9)", color: dark ? "#0A1C4A" : "#fff" }}>
+        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+        {submitting ? "Authorizing mandate…" : `Confirm SEPA mandate — ${price}€`}
+      </button>
+
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80" style={{ color: accentColor }}>
+        <ArrowLeft className="w-3 h-3" /> Edit details
       </button>
     </form>
   );
