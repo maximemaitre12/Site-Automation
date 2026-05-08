@@ -375,19 +375,6 @@ const LeftCard = ({ plan, onCardPayment, loadingPlan }: {
               <span className="relative z-10">SEPA Direct Debit</span>
             </motion.button>
 
-            <motion.button
-              onClick={() => onCardPayment(plan.key)}
-              disabled={loadingPlan === plan.key}
-              className="w-full flex items-center justify-center gap-2 py-4 text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
-              style={{ background: "#fff", color: "#0A1C4A", border: "1.5px solid #D5DAE5", borderRadius: 12, fontSize: 14 }}
-              initial={{ scaleY: 0, opacity: 0 }}
-              animate={{ scaleY: 1, opacity: 1 }}
-              transition={{ delay: baseDelay + 0.55, duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
-              whileHover={{ borderColor: "#1A3FB8" }}
-            >
-              {loadingPlan === plan.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-              <span>Pay by card</span>
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
