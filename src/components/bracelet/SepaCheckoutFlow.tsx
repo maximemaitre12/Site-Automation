@@ -107,8 +107,9 @@ function SepaForm({ planName, planKey, price, onBack, dark = false }: SepaChecko
 
   if (intent && stripePromise) {
     return (
-      <Elements stripe={stripePromise} options={{ clientSecret: intent.client_secret, locale: "en" }}>
+      <Elements stripe={stripePromise} options={{ locale: "en" }}>
         <SepaConfirmStep
+          clientSecret={intent.client_secret}
           fullName={fullName}
           email={email}
           price={price}
