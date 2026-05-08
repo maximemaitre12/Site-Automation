@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import sepaQrCode from "@/assets/sepa-qrcode.jpg";
 
 interface SepaCheckoutFlowProps {
   planName: string;
@@ -12,13 +11,13 @@ interface SepaCheckoutFlowProps {
 }
 
 export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dark = false }: SepaCheckoutFlowProps) {
-  const [step, setStep] = useState<"form" | "qr">("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("France");
+  const [acceptMandate, setAcceptMandate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -28,75 +27,54 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
   const inputBorder = dark ? "rgba(255,255,255,0.15)" : "#E2E8F0";
   const inputText = dark ? "#fff" : "#0F172A";
   const accentColor = dark ? "#6FE0F5" : "#1A3FB8";
+  const noticeBg = dark ? "rgba(111,224,245,0.08)" : "rgba(26,63,184,0.06)";
+  const noticeBorder = dark ? "rgba(111,224,245,0.25)" : "rgba(26,63,184,0.2)";
+
+  const countryCode = (() => {
+    const c = country.trim().toLowerCase();
+    if (["france", "fr"].includes(c)) return "FR";
+    if (["belgium", "belgique", "be"].includes(c)) return "BE";
+    if (["germany", "deutschland", "allemagne", "de"].includes(c)) return "DE";
+    if (["spain", "espagne", "es"].includes(c)) return "ES";
+    if (["italy", "italie", "it"].includes(c)) return "IT";
+    if (["netherlands", "pays-bas", "nl"].includes(c)) return "NL";
+    if (["luxembourg", "lu"].includes(c)) return "LU";
+    if (["portugal", "pt"].includes(c)) return "PT";
+    return country.trim().slice(0, 2).toUpperCase() || "FR";
+  })();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!fullName.trim() || fullName.trim().length < 2) {
-      setError("Please enter your full name");
-      return;
-    }
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-    if (!address.trim() || address.trim().length < 5) {
-      setError("Please enter your delivery address");
-      return;
-    }
-    if (!city.trim() || city.trim().length < 2) {
-      setError("Please enter your city");
-      return;
-    }
-    if (!postalCode.trim() || postalCode.trim().length < 3) {
-      setError("Please enter your postal code");
-      return;
-    }
+    if (!fullName.trim() || fullName.trim().length < 2) return setError("Please enter your full name");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Please enter a valid email address");
+    if (!address.trim() || address.trim().length < 5) return setError("Please enter your delivery address");
+    if (!city.trim()) return setError("Please enter your city");
+    if (!postalCode.trim()) return setError("Please enter your postal code");
+    if (!acceptMandate) return setError("You must authorize the SEPA direct debit mandate to proceed");
 
     setLoading(true);
     try {
-      const { error: insertError } = await supabase.from("bracelet_orders").insert({
-        full_name: fullName.trim(),
-        email: email.trim().toLowerCase(),
-        plan: planKey,
-        amount: parseFloat(price.replace(",", ".")),
-        payment_method: "sepa",
-        status: "pending",
-        metadata: { plan_name: planName, shipping_address: address.trim(), shipping_city: city.trim(), shipping_postal_code: postalCode.trim(), shipping_country: country.trim() },
+      const { data, error: fnError } = await supabase.functions.invoke("bracelet-sepa-checkout", {
+        body: {
+          plan: planKey,
+          email: email.trim().toLowerCase(),
+          full_name: fullName.trim(),
+          address: address.trim(),
+          city: city.trim(),
+          postal_code: postalCode.trim(),
+          country: countryCode,
+        },
       });
-
-      if (insertError) throw insertError;
-      setStep("qr");
+      if (fnError) throw fnError;
+      if (!data?.url) throw new Error("No checkout URL returned");
+      window.location.href = data.url;
     } catch (err: any) {
-      setError(err.message || "An error occurred");
-    } finally {
+      setError(err.message || "An error occurred while creating your SEPA mandate");
       setLoading(false);
     }
   };
-
-  if (step === "qr") {
-    return (
-      <div className="text-center py-4">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: dark ? "rgba(255,180,50,0.15)" : "rgba(234,179,8,0.1)" }}>
-          <span className="text-lg">⚠</span>
-        </div>
-        <p className="text-sm font-semibold mb-2" style={{ color: textColor }}>
-          Temporarily Unavailable
-        </p>
-        <p className="text-xs leading-relaxed max-w-[260px] mx-auto mb-4" style={{ color: subColor }}>
-          Unfortunately, this service is momentarily unavailable. We are actively working to resolve this. Please try again later.
-        </p>
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1.5 mx-auto mt-2 text-xs font-medium transition-colors hover:opacity-80"
-          style={{ color: accentColor }}
-        >
-          <ArrowLeft className="w-3 h-3" /> Back to options
-        </button>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="py-4">
@@ -104,115 +82,42 @@ export default function SepaCheckoutFlow({ planName, planKey, price, onBack, dar
         SEPA Direct Debit — {planName}
       </p>
       <p className="text-xs mb-4 text-center" style={{ color: subColor }}>
-        Enter your details to confirm your {price}€ order
+        Authorize a secure SEPA mandate of {price}€ — funds debited within 24 hours
       </p>
 
       <div className="space-y-3 mb-4">
-        <input
-          type="text"
-          placeholder="Full name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
-          style={{
-            background: inputBg,
-            border: `1px solid ${inputBorder}`,
-            color: inputText,
-          }}
-          autoComplete="name"
-        />
-        <input
-          type="email"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
-          style={{
-            background: inputBg,
-            border: `1px solid ${inputBorder}`,
-            color: inputText,
-          }}
-          autoComplete="email"
-        />
-        <input
-          type="text"
-          placeholder="Delivery address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
-          style={{
-            background: inputBg,
-            border: `1px solid ${inputBorder}`,
-            color: inputText,
-          }}
-          autoComplete="street-address"
-        />
+        <input type="text" placeholder="Full name (account holder)" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="name" />
+        <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="email" />
+        <input type="text" placeholder="Delivery address" value={address} onChange={(e) => setAddress(e.target.value)} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="street-address" />
         <div className="flex gap-3">
-          <input
-            type="text"
-            placeholder="City"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
-            style={{
-              background: inputBg,
-              border: `1px solid ${inputBorder}`,
-              color: inputText,
-            }}
-            autoComplete="address-level2"
-          />
-          <input
-            type="text"
-            placeholder="Postal code"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            className="w-[120px] px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
-            style={{
-              background: inputBg,
-              border: `1px solid ${inputBorder}`,
-              color: inputText,
-            }}
-            autoComplete="postal-code"
-          />
+          <input type="text" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} className="flex-1 px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="address-level2" />
+          <input type="text" placeholder="Postal code" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="w-[120px] px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="postal-code" />
         </div>
-        <input
-          type="text"
-          placeholder="Country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all focus:ring-2"
-          style={{
-            background: inputBg,
-            border: `1px solid ${inputBorder}`,
-            color: inputText,
-          }}
-          autoComplete="country-name"
-        />
+        <input type="text" placeholder="Country" value={country} onChange={(e) => setCountry(e.target.value)} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ background: inputBg, border: `1px solid ${inputBorder}`, color: inputText }} autoComplete="country-name" />
       </div>
 
-      {error && (
-        <p className="text-xs text-red-400 text-center mb-3">{error}</p>
-      )}
+      <div className="rounded-lg p-3 mb-3 text-[11px] leading-relaxed" style={{ background: noticeBg, border: `1px solid ${noticeBorder}`, color: subColor }}>
+        <div className="flex items-start gap-2">
+          <ShieldCheck className="w-3.5 h-3.5 mt-[1px] flex-shrink-0" style={{ color: accentColor }} />
+          <span style={{ color: textColor }}>
+            By confirming, you authorize <strong>AETHER</strong> and Stripe, our payment service provider, to send instructions to your bank to debit your account of <strong>{price}€</strong> for your Oreon bracelet order. The amount will be debited within <strong>24 hours</strong>. You are entitled to a refund from your bank under the terms of your agreement.
+          </span>
+        </div>
+      </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60"
-        style={{
-          background: dark ? "linear-gradient(135deg, #6FE0F5, #0BA5C7)" : "linear-gradient(135deg, #1A3FB8, #2451D9)",
-          color: dark ? "#0A1C4A" : "#fff",
-        }}
-      >
+      <label className="flex items-start gap-2 mb-4 cursor-pointer text-[11px]" style={{ color: subColor }}>
+        <input type="checkbox" checked={acceptMandate} onChange={(e) => setAcceptMandate(e.target.checked)} className="mt-[2px] cursor-pointer" />
+        <span>I authorize the SEPA Direct Debit mandate and accept the <a href="/legal/bracelet-cgv" target="_blank" rel="noopener" style={{ color: accentColor }} className="underline">Terms of Sale</a>.</span>
+      </label>
+
+      {error && <p className="text-xs text-red-400 text-center mb-3">{error}</p>}
+
+      <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-sm font-semibold tracking-wide uppercase transition-all disabled:opacity-60" style={{ background: dark ? "linear-gradient(135deg, #6FE0F5, #0BA5C7)" : "linear-gradient(135deg, #1A3FB8, #2451D9)", color: dark ? "#0A1C4A" : "#fff" }}>
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-        Confirm and show QR code
+        {loading ? "Creating secure mandate…" : `Authorize SEPA mandate — ${price}€`}
       </button>
 
-      <button
-        type="button"
-        onClick={onBack}
-        className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80"
-        style={{ color: accentColor }}
-      >
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 mx-auto mt-4 text-xs font-medium transition-colors hover:opacity-80" style={{ color: accentColor }}>
         <ArrowLeft className="w-3 h-3" /> Back to options
       </button>
     </form>
