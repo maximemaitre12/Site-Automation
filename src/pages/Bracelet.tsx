@@ -92,8 +92,8 @@ const faqs = [
     a: "The bracelet payment is one-time. You pay once by credit card or SEPA, receive your Oreon bracelet, then subscribe to AETHER separately when the platform opens on June 1st, 2026.",
   },
   {
-    q: "Can I pay by credit card?",
-    a: "Yes, you can choose credit card payment by clicking the corresponding button in the pricing section.",
+    q: "How is payment collected?",
+    a: "Payment is collected exclusively via SEPA Direct Debit. You sign the mandate directly on the site, and the amount is debited from your bank account within 24 hours.",
   },
   {
     q: "Is there a subscription or recurring fees?",
