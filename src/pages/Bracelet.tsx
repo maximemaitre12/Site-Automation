@@ -69,15 +69,11 @@ const steps = [
 const faqs = [
   {
     q: "How much does the bracelet cost?",
-    a: "The Oreon bracelet is sold as a one-time payment: 3,99 € for pre-order or 4,99 € for express delivery. The AETHER platform subscription opens separately on June 1st, 2026.",
-  },
-  {
-    q: "What is the difference between the two plans?",
-    a: "The Pre-order plan at 3.99€ lets you reserve your bracelet at a reduced price, delivered when available. The Express delivery plan at 4.99€ includes shipping within 48h and advanced features.",
+    a: "The Oreon bracelet is sold as a one-time payment of 3,99 € (pre-order). The AETHER platform subscription opens separately on June 1st, 2026.",
   },
   {
     q: "How does the payment work?",
-    a: "The bracelet payment is one-time. You pay once by credit card or SEPA, receive your Oreon bracelet, then subscribe to AETHER separately when the platform opens on June 1st, 2026.",
+    a: "The bracelet payment is one-time. You pay 3,99 € via SEPA Direct Debit, receive your Oreon bracelet, then subscribe to AETHER separately when the platform opens on June 1st, 2026.",
   },
   {
     q: "How is payment collected?",
