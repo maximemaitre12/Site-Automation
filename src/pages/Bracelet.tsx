@@ -58,18 +58,6 @@ const plans = [
       "Delivered around June 1st",
     ],
   },
-  {
-    name: "Express delivery",
-    key: "livraison",
-    price: "4,99",
-    popular: true,
-    features: [
-      "Oreon physical bracelet",
-      "Shipping included",
-      "Delivery within 48h",
-      "Priority support",
-    ],
-  },
 ];
 
 const steps = [
