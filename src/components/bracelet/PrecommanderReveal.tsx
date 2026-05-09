@@ -715,9 +715,8 @@ export default function PrecommanderReveal({ plans, onCardPayment, loadingPlan }
                       />
                     </div>
                     
-                    <div className="grid md:grid-cols-2 gap-6 pt-4">
+                    <div className="max-w-[480px] mx-auto pt-4">
                       <LeftCard plan={leftPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
-                      <RightCard plan={rightPlan} onCardPayment={onCardPayment} loadingPlan={loadingPlan} />
                     </div>
                   </div>
                 </motion.div>
