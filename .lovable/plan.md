@@ -1,56 +1,103 @@
+## Objectif
 
-## Bracelet Oreon — New Product Page
+Refondre les trois pages juridiques liées au bracelet Oreon et au site AETHER pour qu'elles soient claires, complètes, rassurantes (politique de remboursement souple) et écrites sans aucun tiret (ni "-", ni "—", ni "–"), afin d'éliminer toute trace stylistique typique d'une rédaction IA.
 
-### Overview
-Create a complete `/bracelet` page for the "Oreon" smart bracelet product. The bracelet is free; the user commits to a monthly SEPA subscription (2.99€ or 3.99€). A QR code triggers the SEPA mandate. The page matches the existing site design (Royal Blue #1E4D8C, Inter/Montserrat fonts, clean editorial style).
+## Pages concernées
 
-### What will be built
+1. **`src/pages/legal/LegalNotice.tsx`** (Mentions légales, route `/legal/mentions`)
+2. **`src/pages/legal/BraceletCGV.tsx`** (CGV bracelet Oreon, route `/legal/bracelet-cgv`)
+3. **Nouvelle page** `src/pages/legal/RefundPolicy.tsx` (Politique de remboursement, route `/legal/remboursement`)
+4. Mise à jour du **footer** (`src/components/landing/LandingFooter.tsx`) pour ajouter le lien "Politique de remboursement" et un lien "CGV bracelet".
+5. Ajout de la route dans **`src/App.tsx`**.
 
-**1. New page: `src/pages/Bracelet.tsx`**
-Full product landing page with the following sections:
-- **Hero** — Dark Royal Blue gradient background (same as PharmaHero), product name "Oreon", tagline about biometric tracking + AI automations, CTA to scroll to pricing
-- **Product Image** — AI-generated image of a sleek smart bracelet (generated via Lovable AI, saved as asset)
-- **Features Grid** — 4-6 feature cards: biometric capture, real-time health tracking, AI automation workflows, app integration, data privacy, battery life
-- **Pricing Section** — Two plan cards (2.99€/month and 3.99€/month), bracelet marked as "Offert" (free), SEPA direct debit mention
-- **QR Code Section** — Placeholder QR code image with instructions: "Scan to activate your SEPA mandate". You'll replace the QR before publishing
-- **How It Works** — 3-step flow: Receive bracelet → Scan QR code → Start tracking
-- **FAQ** — Common questions about the bracelet, subscription, SEPA, cancellation
+## Règle de style absolue
 
-**2. New legal page: `src/pages/legal/BraceletCGU.tsx`**
-Dedicated Terms & Conditions for the Oreon bracelet subscription covering:
-- Subscription terms (monthly SEPA debit, 2.99€ or 3.99€)
-- Free bracelet conditions (commitment to subscription)
-- SEPA mandate details and cancellation policy
-- Biometric data collection and privacy (GDPR)
-- Return/refund policy
-- Warranty and liability
+Aucun tiret dans le contenu rédigé :
+- Plus de "-" (hyphen)
+- Plus de "—" (em dash)
+- Plus de "–" (en dash)
+- Les listes utilisent des puces "•" déjà en place
+- Les énumérations dans les phrases utilisent des virgules, "et", "ou", deux points, parenthèses
+- Les mots composés sont reformulés (ex. "à vie" au lieu de "garanti à vie", "service après vente" sans tiret accepté en français moderne, "TVA non applicable" plutôt que "TVA non‑applicable")
+- Les dates écrites en toutes lettres ("1er juin 2026") au lieu de "01-06-2026"
+- Les numéros (SIREN, téléphone) gardent leurs espaces, jamais de tiret
 
-**3. Navigation updates**
-- Add "Bracelet" link in `LandingHeader.tsx` nav items
-- Add "Bracelet" link in `LandingFooter.tsx`
-- Add routes in `App.tsx`: `/bracelet` (public, inside PublicLayout) and `/legal/bracelet-cgu`
+Vérification finale : un grep sur les trois fichiers ne doit retourner aucune occurrence de `-`, `—`, `–` dans les chaînes de texte affichées (les imports JS et la syntaxe JSX sont exclus de la règle, évidemment).
 
-**4. AI-generated product image**
-- Generate a premium product photo of a sleek black/dark smart bracelet using Lovable AI image generation
-- Save as `src/assets/oreon-bracelet.png`
-- Used in hero and product sections
+## Contenu des pages
 
-**5. Placeholder QR code**
-- Create or embed a simple placeholder QR code image (pointing to example.com)
-- You replace it before publishing
+### 1. Mentions légales (`LegalNotice.tsx`)
 
-### Design Details
-- Same Royal Blue (#1E4D8C) gradient hero as landing page
-- White sections with subtle borders for features/pricing
-- Cards with slight shadows matching existing component style
-- Typography: Montserrat headings, Inter body
-- Responsive layout matching existing pages
-- All text in French
+Sections claires :
+1. Éditeur du site (AETHER GROUP, SAS, SIREN 104 445 424, adresse 66 Avenue des Champs Élysées 75008 Paris, capital social, TVA non applicable art. 293 B du CGI)
+2. Directeur de la publication (Youriy Strashnyi)
+3. Hébergement (Lovable Cloud, infrastructure européenne)
+4. Contact (email + téléphone, sans tirets)
+5. Propriété intellectuelle
+6. Données personnelles (renvoi vers Politique de confidentialité)
+7. Cookies
+8. Droit applicable et juridiction compétente
 
-### Files created/modified
-- `src/pages/Bracelet.tsx` (new)
-- `src/pages/legal/BraceletCGU.tsx` (new)
-- `src/components/landing/LandingHeader.tsx` (add nav item)
-- `src/components/landing/LandingFooter.tsx` (add link)
-- `src/App.tsx` (add routes)
-- `src/assets/oreon-bracelet.png` (AI-generated image)
+### 2. CGV Bracelet Oreon (`BraceletCGV.tsx`)
+
+Mise à jour pour refléter la réalité actuelle (option 4,99 € retirée, prix unique 3,99 €, paiement uniquement par prélèvement SEPA signé sur le site) :
+
+1. Objet
+2. Produit (bracelet silicone NFC, non médical)
+3. Prix : 3,99 € TTC, paiement unique, frais de port inclus France métropolitaine
+4. Commande (étapes en ligne)
+5. Paiement : exclusivement prélèvement SEPA, mandat signé électroniquement sur le site, débit sous 24 heures, certifié Stripe PCI DSS niveau 1
+6. Livraison : estimée avant le 1er juin 2026, suivi par email
+7. Droit de rétractation : 14 jours calendaires, procédure simple par email
+8. **Politique de remboursement étendue** (renvoi vers la page dédiée) : remboursement intégral sous 14 jours, sans justification, sur simple demande à `contact@aether-connect.com`. Bracelet à retourner si déjà reçu, frais de retour pris en charge par AETHER pour toute demande de remboursement effectuée dans les 30 premiers jours.
+9. Garanties (légale de conformité, vices cachés, commerciale à vie)
+10. Responsabilité
+11. Données personnelles
+12. Propriété intellectuelle
+13. Droit applicable et litiges (médiateur de la consommation, juridiction Paris)
+14. Contact
+
+Toutes les phrases relues pour supprimer chaque tiret. Les listes restent à puces "•".
+
+### 3. Politique de remboursement (nouvelle page `RefundPolicy.tsx`)
+
+Ton volontairement humain et rassurant. Sections :
+
+1. **Notre engagement** : "Si le bracelet ne vous convient pas, nous vous remboursons. Sans discussion, sans justification, sans frais cachés."
+2. **Délai** : 14 jours calendaires à compter de la réception (droit légal de rétractation), étendu à 30 jours commerciaux par AETHER pour le bracelet Oreon.
+3. **Comment demander un remboursement** : un email à `contact@aether-connect.com` avec votre numéro de commande. Réponse sous 24 heures ouvrées.
+4. **Retour du produit** : étiquette de retour prépayée fournie par AETHER. Aucun frais à votre charge. Le bracelet doit être renvoyé dans son emballage d'origine, en bon état.
+5. **Délai de remboursement** : sous 14 jours après réception du bracelet retourné, par le même moyen de paiement (prélèvement SEPA inversé, virement remboursement).
+6. **Cas particuliers** : bracelet personnalisé non remboursable une fois fabriqué (mais annulation possible avant lancement de la production), produit endommagé par mauvaise utilisation non couvert.
+7. **Garantie à vie séparée** : rappel que la garantie commerciale couvre tout défaut de fabrication sans limite de durée.
+8. **Contact** : email + téléphone.
+
+Encadré visible en haut de page : "Remboursement simple, rapide, sans condition. Vous avez 30 jours pour changer d'avis."
+
+### 4. Footer
+
+Ajouter dans la colonne "Company" ou créer une nouvelle entrée dans la liste des liens légaux en bas :
+- "Politique de remboursement" → `/legal/remboursement`
+- "CGV Bracelet" → `/legal/bracelet-cgv`
+
+Aucun tiret ajouté dans les libellés.
+
+### 5. Routing
+
+Ajouter dans `src/App.tsx` :
+```tsx
+import RefundPolicy from "./pages/legal/RefundPolicy";
+// ...
+<Route path="/legal/remboursement" element={<RefundPolicy />} />
+```
+
+## Détails techniques
+
+- Conserver la structure visuelle existante des pages légales (header sticky padding, max width 800px, tokens couleur `#0F172A`, `#475569`, `#1E4D8C`).
+- Conserver le composant `whitespace-pre-line` pour respecter les retours à la ligne dans les `content`.
+- Aucune modification des composants UI partagés ni de la logique métier.
+- Date "Dernière mise à jour" : Mai 2026 (cohérent avec l'existant).
+
+## Vérification finale
+
+Après implémentation, lancer un grep ciblé sur les trois fichiers pour s'assurer qu'aucun caractère tiret n'apparaît dans les chaînes affichées à l'utilisateur.
