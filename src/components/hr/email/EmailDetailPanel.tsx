@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -154,7 +155,14 @@ export function EmailDetailPanel({
               {email.body_html ? (
                 <div 
                   className="prose prose-sm max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: email.body_html }}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(email.body_html, {
+                      ALLOWED_TAGS: ['p','br','strong','em','u','b','i','a','ul','ol','li','h1','h2','h3','h4','h5','h6','blockquote','code','pre','span','div','hr','table','thead','tbody','tr','td','th'],
+                      ALLOWED_ATTR: ['href','target','rel','class','style'],
+                      ALLOW_DATA_ATTR: false,
+                      ADD_ATTR: ['target'],
+                    }),
+                  }}
                 />
               ) : (
                 <div className="whitespace-pre-wrap text-sm">
