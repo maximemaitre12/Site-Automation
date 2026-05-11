@@ -59,6 +59,8 @@ export function LandingFooter() {
             <Link to="/legal/mentions" className="hover:text-[#1E4D8C] transition-colors">Mentions légales</Link>
             <Link to="/legal/privacy" className="hover:text-[#1E4D8C] transition-colors">Politique de confidentialité</Link>
             <Link to="/legal/terms" className="hover:text-[#1E4D8C] transition-colors">CGU</Link>
+            <Link to="/legal/bracelet-cgv" className="hover:text-[#1E4D8C] transition-colors">CGV Bracelet</Link>
+            <Link to="/legal/remboursement" className="hover:text-[#1E4D8C] transition-colors">Politique de remboursement</Link>
             <span>ISO 27001</span>
             <span>21 CFR Part 11</span>
             <span>GMP</span>
