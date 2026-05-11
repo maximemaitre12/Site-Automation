@@ -913,6 +913,7 @@ export type Database = {
       companies: {
         Row: {
           created_at: string
+          created_by: string | null
           id: string
           logo_url: string | null
           max_storage_mb: number | null
@@ -926,6 +927,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           id?: string
           logo_url?: string | null
           max_storage_mb?: number | null
@@ -939,6 +941,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           id?: string
           logo_url?: string | null
           max_storage_mb?: number | null
