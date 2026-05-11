@@ -1,55 +1,53 @@
 import { Link } from "react-router-dom";
-import { ShieldCheck, Mail, PackageCheck, Wallet, Clock, AlertCircle, Heart } from "lucide-react";
+import { ShieldCheck, Mail, Wallet, Clock, AlertCircle, Heart, Truck } from "lucide-react";
 
 const sections = [
   {
     icon: Heart,
     title: "1. Notre engagement",
-    content: `Si le bracelet ne vous convient pas, nous vous remboursons. Sans discussion, sans justification, sans frais cachés.
+    content: `Tant que votre bracelet Oreon n'est pas expédié, vous pouvez en demander le remboursement intégral à tout moment. Sans frais, sans justification, sans question.
 
-Cet engagement est la traduction concrète de notre conviction : un produit n'a de valeur que si vous en êtes pleinement satisfait. Nous préférons un client serein qu'un client retenu.`,
+C'est notre engagement le plus simple : un précommandeur n'est jamais retenu contre son gré. Le bracelet n'a de valeur que si vous le souhaitez vraiment.`,
   },
   {
     icon: Clock,
-    title: "2. Délai pour demander un remboursement",
-    content: `Vous disposez de 30 jours calendaires à compter de la réception du bracelet pour en demander le remboursement intégral. Ce délai est volontairement plus long que le minimum légal de 14 jours prévu par le Code de la consommation, afin de vous laisser le temps de l'essayer en conditions réelles.
+    title: "2. Une fenêtre confortable",
+    content: `Le bracelet Oreon est vendu en précommande. Entre la signature de votre mandat SEPA et l'expédition effective, plusieurs semaines s'écoulent. Toute cette période vous appartient : vous pouvez annuler votre commande librement.
 
-Aucune justification n'est requise. Aucune question ne vous sera posée.`,
+Concrètement, vous disposez de la totalité du délai de précommande pour changer d'avis. Aucune fenêtre piégeuse, aucun délai caché.`,
   },
   {
     icon: Mail,
-    title: "3. Comment nous le demander",
-    content: `Une seule étape suffit : envoyez un email à contact@aether-connect.com en précisant votre numéro de commande (présent dans l'email de confirmation).
+    title: "3. Comment annuler et être remboursé",
+    content: `Une seule action suffit : envoyez un email à contact@aether-connect.com en précisant votre numéro de commande, présent dans l'email de confirmation.
 
 Notre équipe vous répond sous 24 heures ouvrées avec :
-• La confirmation de la prise en compte de votre demande
-• Une étiquette de retour prépayée à imprimer
-• Les instructions de retour, simples et claires`,
-  },
-  {
-    icon: PackageCheck,
-    title: "4. Retour du bracelet",
-    content: `Glissez le bracelet dans son emballage d'origine, collez l'étiquette prépayée fournie, déposez le colis dans le point relais ou la boîte aux lettres indiqués. Aucun frais n'est à votre charge.
-
-Le bracelet doit être retourné dans un état général satisfaisant. L'usure d'essai est tolérée et n'affecte pas votre droit au remboursement.`,
+• La confirmation immédiate de l'annulation de votre précommande
+• L'arrêt de toute production ou préparation à votre nom
+• Le déclenchement du remboursement intégral`,
   },
   {
     icon: Wallet,
-    title: "5. Délai et modalités de remboursement",
-    content: `Dès réception et vérification du retour, nous procédons au remboursement intégral du montant payé, frais de port inclus, dans un délai maximum de 14 jours calendaires.
+    title: "4. Remboursement intégral et automatique",
+    content: `Le remboursement porte sur la totalité du montant prélevé, sans aucune retenue, sans frais de dossier, sans pénalité.
 
-Le remboursement est effectué automatiquement par virement bancaire sur le compte ayant servi au prélèvement SEPA initial. Aucune action de votre part n'est nécessaire à cette étape.
+Il est effectué automatiquement par virement bancaire sur le compte ayant servi au prélèvement SEPA initial, dans un délai maximum de 14 jours calendaires suivant la confirmation d'annulation. La plupart des remboursements sont émis sous 48 heures ouvrées.
 
-Vous recevrez une confirmation par email dès que le virement est émis.`,
+Vous recevez une confirmation par email dès que le virement est émis.`,
+  },
+  {
+    icon: Truck,
+    title: "5. Et après l'expédition ?",
+    content: `Une fois votre bracelet expédié, votre droit à remboursement reste pleinement protégé par la loi : vous bénéficiez du droit légal de rétractation de 14 jours calendaires à compter de la réception, conformément aux articles L.221.18 et suivants du Code de la consommation.
+
+La procédure reste tout aussi simple : un email à contact@aether-connect.com, une étiquette de retour prépayée fournie par AETHER Group, et un remboursement intégral sous 14 jours après réception du retour.`,
   },
   {
     icon: AlertCircle,
     title: "6. Cas particuliers",
-    content: `Bracelet personnalisé : un bracelet ayant fait l'objet d'une personnalisation gravée ou colorée sur mesure ne peut être remboursé une fois la production lancée. L'annulation reste possible sans frais avant le démarrage effectif de la fabrication.
+    content: `Bracelet personnalisé : si vous avez choisi une gravure ou une personnalisation sur mesure, l'annulation reste totalement gratuite tant que la production n'est pas physiquement lancée. Une fois la fabrication démarrée, le bracelet personnalisé ne peut plus faire l'objet d'un remboursement, mais nous vous prévenons toujours par email avant tout lancement, ce qui vous laisse une dernière fenêtre pour annuler sereinement.
 
-Bracelet endommagé par mauvaise utilisation : les dommages résultant d'une utilisation manifestement non conforme (perforation volontaire, exposition à des produits chimiques agressifs, démontage de la puce NFC) ne sont pas couverts par la politique de remboursement. La garantie commerciale à vie reste en revanche applicable pour tout défaut de fabrication.
-
-Au‑delà de 30 jours : votre droit légal de garantie de conformité (2 ans) et la garantie commerciale à vie restent intégralement applicables. Contactez notre service client pour toute prise en charge.`,
+Mauvaise utilisation après réception : les dommages résultant d'un usage manifestement non conforme (perforation volontaire, exposition à des produits chimiques agressifs, démontage de la puce NFC) ne sont pas couverts. La garantie commerciale à vie reste en revanche pleinement applicable pour tout défaut de fabrication.`,
   },
   {
     icon: ShieldCheck,
@@ -74,10 +72,10 @@ export default function RefundPolicy() {
 
         <div className="p-6 rounded-2xl mb-12" style={{ background: "#F1F5FB", border: "1px solid #DBE6F2" }}>
           <p className="font-heading text-lg font-semibold mb-2" style={{ color: "#1E4D8C" }}>
-            Remboursement simple, rapide, sans condition.
+            Remboursement intégral et gratuit avant la livraison.
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "#475569" }}>
-            Vous avez 30 jours pour changer d'avis. Un email suffit. Étiquette de retour offerte. Remboursement intégral sous 14 jours.
+            Tant que votre bracelet n'est pas expédié, vous pouvez annuler à tout moment. Un email suffit. Aucun frais, aucune justification, remboursement complet sous 14 jours, généralement en 48 heures.
           </p>
         </div>
 
@@ -101,7 +99,7 @@ export default function RefundPolicy() {
 
         <div className="mt-16 pt-8 border-t" style={{ borderColor: "#E2E8F0" }}>
           <p className="text-sm mb-2" style={{ color: "#64748B" }}>
-            Une question avant de commander ou pour un retour en cours ?
+            Une question avant de précommander ou pour annuler une commande en cours ?
           </p>
           <p className="text-sm" style={{ color: "#475569" }}>
             <a href="mailto:contact@aether-connect.com" className="underline hover:no-underline" style={{ color: "#1E4D8C" }}>
