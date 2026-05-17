@@ -79,6 +79,17 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      // Special bypass: RHfarmasoft credentials redirect to external HR portal
+      if (
+        mode === 'login' &&
+        email.trim().toLowerCase() === 'rhfarmasoft' &&
+        password === 'Farmasoft2026!'
+      ) {
+        setLoading(false);
+        window.location.href = 'https://hr.aether-farmasoft.com';
+        return;
+      }
+
       const resolvedEmail = resolveEmail(email);
 
       if (mode === 'login') {
