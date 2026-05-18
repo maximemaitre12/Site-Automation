@@ -87,10 +87,10 @@ export function LandingHeader() {
 
         <div className="hidden md:flex items-center gap-4">
           <Link
-            to="/auth?mode=login&redirect=/farmasoft"
+            to={loginHref}
             className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-600 hover:text-[#1E4D8C]" : "text-white/70 hover:text-white"}`}
           >
-            Log in
+            {loginLabel}
           </Link>
           <Link
             to="/contact"
