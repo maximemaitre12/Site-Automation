@@ -128,11 +128,11 @@ export function LandingHeader() {
               )
             )}
             <Link
-              to="/auth?mode=login&redirect=/farmasoft"
+              to={loginHref}
               onClick={() => setIsMenuOpen(false)}
               className="w-full py-3 px-4 text-sm font-medium text-gray-700 text-center border border-gray-200 mt-2"
             >
-              Log in
+              {loginLabel}
             </Link>
             <Link
               to="/contact"
