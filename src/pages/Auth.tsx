@@ -380,12 +380,6 @@ export default function Auth() {
               )}
             </div>
 
-            <div className="mt-14 pt-6 border-t border-gray-100 flex items-center justify-center gap-2">
-              <Lock className="w-3 h-3 text-gray-400" strokeWidth={2} />
-              <p className="text-[10px] text-gray-400 tracking-[0.15em] uppercase font-medium">
-                Protected by enterprise grade encryption
-              </p>
-            </div>
           </div>
         </div>
       </div>
