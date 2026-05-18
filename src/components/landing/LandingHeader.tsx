@@ -9,14 +9,32 @@ const navItems = [
   { label: "Oreon", href: "/bracelet" },
 ];
 
+function hasValidStoredSession(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem("sb-gydrpmetswrkrjcbkgqd-auth-token");
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    const token = parsed?.access_token ?? parsed?.currentSession?.access_token;
+    const expiresAt = parsed?.expires_at ?? parsed?.currentSession?.expires_at;
+    if (!token) return false;
+    if (expiresAt && Number(expiresAt) * 1000 < Date.now()) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hasStoredSession] = useState<boolean>(() => hasValidStoredSession());
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const loginHref = user ? "/dashboard" : "/auth?mode=login&redirect=/farmasoft";
-  const loginLabel = user ? "Open app" : "Log in";
+  const isAuthenticated = !!user || hasStoredSession;
+  const loginHref = isAuthenticated ? "/dashboard" : "/auth?mode=login&redirect=/farmasoft";
+  const loginLabel = isAuthenticated ? "Open app" : "Log in";
   const isContactPage = location.pathname === "/contact";
   const isLandingPage = location.pathname === "/" || location.pathname === "/index";
   const useDarkMode = scrolled || isContactPage;
