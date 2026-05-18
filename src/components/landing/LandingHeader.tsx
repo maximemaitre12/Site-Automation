@@ -14,6 +14,9 @@ export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const loginHref = user ? "/dashboard" : "/auth?mode=login&redirect=/farmasoft";
+  const loginLabel = user ? "Open app" : "Log in";
   const isContactPage = location.pathname === "/contact";
   const isLandingPage = location.pathname === "/" || location.pathname === "/index";
   const useDarkMode = scrolled || isContactPage;
