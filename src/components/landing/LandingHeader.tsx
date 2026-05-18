@@ -2,6 +2,7 @@ import { Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import aetherLogo from "@/assets/aether-logo-final.png";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { label: "Pharma Solutions", href: "/platform" },
@@ -13,6 +14,9 @@ export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const loginHref = user ? "/dashboard" : "/auth?mode=login&redirect=/farmasoft";
+  const loginLabel = user ? "Open app" : "Log in";
   const isContactPage = location.pathname === "/contact";
   const isLandingPage = location.pathname === "/" || location.pathname === "/index";
   const useDarkMode = scrolled || isContactPage;
@@ -83,10 +87,10 @@ export function LandingHeader() {
 
         <div className="hidden md:flex items-center gap-4">
           <Link
-            to="/auth?mode=login&redirect=/farmasoft"
+            to={loginHref}
             className={`text-sm font-medium transition-colors ${useDarkMode ? "text-gray-600 hover:text-[#1E4D8C]" : "text-white/70 hover:text-white"}`}
           >
-            Log in
+            {loginLabel}
           </Link>
           <Link
             to="/contact"
@@ -124,11 +128,11 @@ export function LandingHeader() {
               )
             )}
             <Link
-              to="/auth?mode=login&redirect=/farmasoft"
+              to={loginHref}
               onClick={() => setIsMenuOpen(false)}
               className="w-full py-3 px-4 text-sm font-medium text-gray-700 text-center border border-gray-200 mt-2"
             >
-              Log in
+              {loginLabel}
             </Link>
             <Link
               to="/contact"
