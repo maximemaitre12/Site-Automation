@@ -2,6 +2,7 @@ import { Menu, X } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import aetherLogo from "@/assets/aether-logo-final.png";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { label: "Pharma Solutions", href: "/platform" },
