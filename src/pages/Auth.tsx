@@ -28,7 +28,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const { signIn, signUp, resetPassword, user } = useAuth();
+  const { signIn, signUp, resetPassword, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [justSignedUp, setJustSignedUp] = useState(false);
@@ -36,11 +36,16 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
-      if (redirectTo) navigate(redirectTo);
-      else if (justSignedUp) navigate('/select-plan');
-      else navigate('/dashboard');
+      if (redirectTo) navigate(redirectTo, { replace: true });
+      else if (justSignedUp) navigate('/select-plan', { replace: true });
+      else navigate('/dashboard', { replace: true });
     }
   }, [user, navigate, justSignedUp, redirectTo]);
+
+  // Don't flash the auth form while we're checking the session or if the user is already signed in
+  if (authLoading || user) {
+    return <div className="min-h-screen bg-white" />;
+  }
 
   const resolveEmail = (identifier: string) => {
     const trimmed = identifier.trim();
