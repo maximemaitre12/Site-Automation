@@ -350,10 +350,10 @@ export default function Auth() {
             <div className="mt-8 text-center text-[13px]">
               {mode === 'login' && (
                 <p className="text-gray-500">
-                  New to Aether Connect?{' '}
-                  <button onClick={() => setMode('signup')} className="font-semibold hover:underline" style={{ color: BRAND }}>
-                    Create an account
-                  </button>
+                  No workspace yet?{' '}
+                  <Link to="/contact" className="font-semibold hover:underline" style={{ color: BRAND }}>
+                    Contact us to request access
+                  </Link>
                 </p>
               )}
               {mode === 'signup' && (
