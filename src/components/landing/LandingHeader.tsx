@@ -124,9 +124,16 @@ export function LandingHeader() {
               )
             )}
             <Link
+              to="/auth?mode=login&redirect=/farmasoft"
+              onClick={() => setIsMenuOpen(false)}
+              className="w-full py-3 px-4 text-sm font-medium text-gray-700 text-center border border-gray-200 mt-2"
+            >
+              Log in
+            </Link>
+            <Link
               to="/contact"
               onClick={() => setIsMenuOpen(false)}
-              className="w-full py-3 px-4 text-sm font-bold text-white text-center mt-2"
+              className="w-full py-3 px-4 text-sm font-bold text-white text-center"
               style={{ background: "#1E4D8C" }}
             >
               Book a Demo
