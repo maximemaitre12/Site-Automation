@@ -349,12 +349,12 @@ serve(async (req) => {
 
   try {
     const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const lastUserMessage = [...messages].reverse().find((m: any) => m.role === 'user')?.content || '';
     console.log(`[RAG] Query: "${lastUserMessage}"`);
-    
+
     const knowledgeContext = await retrieveKnowledge(lastUserMessage);
     console.log(`[RAG] Retrieved ${knowledgeContext.length} chars of context`);
 
@@ -373,49 +373,83 @@ ${knowledgeContext}
 ═══════════════════════════════════════
 FINAL LANGUAGE REMINDER (OVERRIDES EVERYTHING)
 ═══════════════════════════════════════
-Your response language = the user's last message language. 
+Your response language = the user's last message language.
 If user wrote in English → 100% English output. No French words anywhere.
 If user wrote in French → 100% French output.
 This is the HIGHEST PRIORITY rule. Violating it makes your response INVALID.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const anthropicMessages = messages
+      .filter((m: any) => m.role === 'user' || m.role === 'assistant')
+      .map((m: any) => ({ role: m.role, content: String(m.content ?? '') }));
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: fullSystemPrompt },
-          ...messages,
-        ],
+        model: "claude-sonnet-4-5",
+        max_tokens: 4096,
+        system: fullSystemPrompt,
+        messages: anthropicMessages,
         stream: true,
       }),
     });
 
     if (!response.ok) {
+      const t = await response.text();
+      console.error("Anthropic error:", response.status, t);
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited, please try again shortly." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
       return new Response(JSON.stringify({ error: "AI service error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(response.body, {
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const upstream = response.body!.getReader();
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        let buffer = '';
+        try {
+          while (true) {
+            const { done, value } = await upstream.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            let idx: number;
+            while ((idx = buffer.indexOf('\n')) !== -1) {
+              const line = buffer.slice(0, idx).replace(/\r$/, '');
+              buffer = buffer.slice(idx + 1);
+              if (!line.startsWith('data: ')) continue;
+              const payload = line.slice(6).trim();
+              if (!payload) continue;
+              try {
+                const evt = JSON.parse(payload);
+                if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+                  const out = { choices: [{ delta: { content: evt.delta.text } }] };
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify(out)}\n\n`));
+                } else if (evt.type === 'message_stop') {
+                  controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+                }
+              } catch { /* ignore */ }
+            }
+          }
+          controller.close();
+        } catch (err) {
+          console.error('stream relay error:', err);
+          controller.error(err);
+        }
+      },
+    });
+
+    return new Response(stream, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
